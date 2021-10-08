@@ -1,0 +1,20 @@
+.ts-graph {
+    position: relative;
+    width: 100%;
+    background: white repeating-radial-gradient(rgba(0, 0, 0, .2), rgba(0, 0, 0, .2) 1px, transparent 0, transparent 100%);
+    background-size: 30px 30px, 30px 30px;
+}
+
+.ts-remove {
+    transform: translateX(25px) translateY(-10px);
+}
+
+.ts-edge-online {
+    stroke: #28A745;
+    stroke-width: 1;
+}
+
+.ts-edge-offline {
+    stroke: #FFC107;
+    stroke-width: 1;
+}

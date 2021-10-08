@@ -1,0 +1,329 @@
+syntax = "proto3";
+
+message ByeMessage {
+  int32 timestamp = 1;
+  int32 code = 3;
+}
+
+message LinkStatusMessage {
+  int32 timestamp = 1;
+  int32 code = 3;
+  string status = 4;
+}
+
+message GeneralStatusMessage {
+  int32 timestamp = 1;
+  int32 code = 3;
+  int32 dataLength = 4;
+  bytes data = 5;
+}
+
+message EventMessage {
+  int32 timestamp = 1;
+  int32 code = 3;
+  int32 type = 4;
+  int32 severity = 5;
+  int32 dataLength = 6;
+  bytes data = 7;
+  string message = 8;
+}
+
+message DeviceInformationMessage {
+  int32  timestamp = 1;
+  string reqId = 2;
+  int32  code = 3;
+  string information = 4;
+}
+
+message DeviceSettingsMessage {
+  int32 timestamp = 1;
+  string reqId = 2;
+  int32 code = 3;
+  string settings = 4;
+}
+
+message DeviceMultipartSettingsMessage {
+  int32 timestamp = 1;
+  string reqId = 2;
+  int32 code = 3;
+  string settings = 4;
+  int32 numberOfSegments = 5;
+  int32 segmentIndex = 6;
+}
+
+message DeviceSettingsResponseMessage {
+  int32 timestamp = 1;
+  string reqId = 2;
+  int32 code = 3;
+}
+
+message GeneralResponseMessage {
+  int32 timestamp = 1;
+  string reqId = 2;
+  int32 subCommand = 3;
+  int32 code = 4;
+  int32 dataLength = 5;
+  bytes data = 6;
+}
+
+message PullSettingsMessage {
+  int32 timestamp = 1;
+  string reqId = 2;
+}
+
+message PullWsnSettingsMessage {
+  int32 timestamp = 1;
+  string reqId = 2;
+}
+
+message SensorDataMessage {
+  int32 timestamp = 1;
+  string reqId = 2;
+  int32 code = 3;
+  int32 sensorId = 4;
+  int32 usec = 5;
+  int32 length = 6;
+  repeated float values = 7;
+}
+
+message LargeSensorDataMessage {
+  int32 timestamp = 1;
+  string reqId = 2;
+  int32 code = 3;
+  int32 sessionId = 4;
+  int32 seqId = 5;
+  int32 isContinued = 6;
+  int32 metaLength = 7;
+  int32 dataLength = 8;
+  bytes data = 9;
+}
+
+message ContinuousDataMessage {
+  int32 timestamp = 1;
+  string reqId = 2;
+  int32 code = 3;
+  int32 sensorId = 4;
+  int32 usec = 5;
+  int32 dataLength = 6;
+  bytes data = 7;
+}
+
+message CalibrateStatusMessage {
+  int32 timestamp = 1;
+  string reqId = 2;
+  int32 code = 3;
+  int32 step = 4;
+  int32 length = 5;
+  repeated float values = 6;
+}
+
+message FirmwareUpgradeResponseMessage {
+  int32 timestamp = 1;
+  string reqId = 2;
+  int32 code = 3;
+  string taskId = 4;
+}
+
+message FirmwareCancelResponseMessage {
+  int32 timestamp = 1;
+  string reqId = 2;
+  int32 code = 3;
+  string taskId = 4;
+}
+
+message FirmwareLoadStatusMessage {
+  int32 timestamp = 1;
+  string reqId = 2;
+  int32 code = 3;
+  string taskId = 4;
+  int32 seqId = 5;
+  float progress = 6;
+}
+
+message FirmwareUpgradeStatusMessage {
+  int32 timestamp = 1;
+  string reqId = 2;
+  int32 code = 3;
+  string taskId = 4;
+  float progress = 5;
+}
+
+message DeviceStatusMessage {
+  int32 timestamp = 1;
+  string reqId = 2;
+  int32 code = 3;
+  string status = 4;
+}
+
+message TunnelDataMessage {
+  int32 timestamp = 1;
+  int32 code = 3;
+  string message = 4;
+}
+
+message RebootCommand {
+  int32 timestamp = 1;
+  string reqId = 2;
+  int32 subCommand = 3;
+}
+
+message ResetCommand {
+  int32 timestamp = 1;
+  string reqId = 2;
+  int32 subCommand = 3;
+}
+
+message GetDeviceInformationCommand {
+  int32 timestamp = 1;
+  string reqId = 2;
+  int32 subCommand = 3;
+}
+
+message GetDeviceSettingsCommand {
+  int32 timestamp = 1;
+  string reqId = 2;
+  int32 subCommand = 3;
+}
+
+message UpdateDeviceSettingsCommand {
+  int32 timestamp = 1;
+  string reqId = 2;
+  int32 subCommand = 3;
+  string settings = 4;
+  int32 lastUpdateTime = 5;
+}
+
+message UpdateWsnSettingsCommand {
+  int32 timestamp = 1;
+  string reqId = 2;
+  int32 subCommand = 3;
+  int32 routingTableLength = 4;
+  bytes routingTable = 5;
+  string wsnSettings = 6;
+  int32 lastUpdateTime = 7;
+}
+
+message DeviceListItem {
+  bytes mac = 1;
+  bytes name = 2;
+  int32 type = 3;
+  string model = 4;
+  int32 modbusId = 5;
+}
+
+message UpdateDeviceListCommand {
+  int32 timestamp = 1;
+  string reqId = 2;
+  int32 subCommand = 3;
+  repeated DeviceListItem items = 10;
+}
+
+message AddDeviceCommand {
+  int32 timestamp = 1;
+  string reqId = 2;
+  int32 subCommand = 3;
+  bytes mac = 4;
+  bytes parentMac = 5;
+  bytes name = 6;
+  int32 type = 7;
+  string model = 8;
+  int32 modbusId = 9;
+}
+
+message DeleteDeviceCommand {
+  int32 timestamp = 1;
+  string reqId = 2;
+  int32 subCommand = 3;
+  bytes mac = 4;
+}
+
+message SetTimeCommand {
+  int32 timestamp = 1;
+  string reqId = 2;
+  int32 subCommand = 3;
+}
+
+message MaintainCommand {
+  int32 timestamp = 1;
+  string reqId = 2;
+  int32 subCommand = 3;
+}
+
+message ProvisionCommand {
+  int32 timestamp = 1;
+  string reqId = 2;
+  int32 subCommand = 3;
+}
+
+message CalibrateCommand {
+  int32 timestamp = 1;
+  string reqId = 2;
+  int32 subCommand = 3;
+  int32 type = 4;
+  float param1 = 5;
+  float param2 = 6;
+}
+
+message ResetDataCommand {
+  int32 timestamp = 1;
+  string reqId = 2;
+  int32 subCommand = 3;
+  int32 type = 4;
+}
+
+message InspectCommand {
+  int32 timestamp = 1;
+  string reqId = 2;
+  int32 subCommand = 3;
+}
+
+message UpgradeFirmwareCommand {
+  int32 timestamp = 1;
+  string reqId = 2;
+  int32 subCommand = 3;
+  string taskId = 4;
+  string model = 5;
+  string crc = 6;
+  int32 major = 7;
+  int32 minor = 8;
+  int32 version = 9;
+  int32 size = 10;
+}
+
+message CancelFirmwareCommand {
+  int32 timestamp = 1;
+  string reqId = 2;
+  int32 subCommand = 3;
+  string taskId = 4;
+}
+
+message LoadFirmwareCommand {
+  int32 timestamp = 1;
+  string reqId = 2;
+  int32 subCommand = 3;
+  string taskId = 4;
+  int32 size = 5;
+  int32 seqId = 6;
+  int32 dataLength = 7;
+  bytes data = 8;
+}
+
+message GetSensorDataCommand {
+  int32 timestamp = 1;
+  string reqId = 2;
+  int32 subCommand = 3;
+}
+
+message AcquireSensorDataCommand {
+  int32 timestamp = 1;
+  string reqId = 2;
+  int32 subCommand = 3;
+}
+
+message TunnelCommand {
+  int32 timestamp = 1;
+  string reqId = 2;
+  int32 subCommand = 3;
+  int32 duration = 4;
+  string message = 5;
+}

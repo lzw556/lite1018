@@ -1,0 +1,36 @@
+#login-page {
+    background-image: url("../../assets/images/login-bg-dark.jpg");
+    background-size: cover;
+    position: fixed;
+    height: 100%;
+    width: 100%;
+    overflow-y: scroll;
+}
+
+#login-page .logo {
+    padding-top: 8%
+}
+
+#login-page .title {
+    font-size: 48pt;
+    color: white;
+    letter-spacing: 10pt;
+}
+
+#login-page .ad {
+    background-image: url("../../assets/images/login-ad-dark.png");
+}
+
+#login-page .split-line {
+    height: 1px;
+    background: linear-gradient(244deg, #2f3243, #c30d23 50%, #2f3243);
+}
+
+#login-page Form {
+    padding-top: 164px;
+}
+
+#login-page Form Button {
+    width: 100%;
+    font-weight: bold;
+}

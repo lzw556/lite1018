@@ -40,6 +40,7 @@ Temporary Items
 ### Node template
 # Logs
 logs
+resources
 *.log
 npm-debug.log*
 yarn-debug.log*
@@ -79,6 +80,7 @@ build/Release
 
 # Dependency directories
 web/node_modules/
+web/build
 jspm_packages/
 
 # Snowpack dependency directory (https://snowpack.dev/)
@@ -169,7 +171,7 @@ web/dist
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
 
-server/adapter/api/dist
+server/adapter/api/static
 
 # Dependency directories (remove the comment below to include it)
 # vendor/
@@ -246,4 +248,15 @@ fabric.properties
 
 # Android studio 3.1+ serialized cache file
 .idea/caches/build_file_checksums.ser
+
+### VisualStudioCode template
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+
+# Local History for Visual Studio Code
+.history/
 
