@@ -14,6 +14,7 @@ type UserRepository interface {
 	Create(ctx context.Context, e *po.User) error
 
 	Save(ctx context.Context, e *po.User) error
+	Updates(ctx context.Context, e *po.User, updates map[string]interface{}) error
 
 	Delete(ctx context.Context, id uint) error
 }

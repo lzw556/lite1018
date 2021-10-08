@@ -172,6 +172,7 @@ web/dist
 *.out
 
 server/adapter/api/static
+data/
 
 # Dependency directories (remove the comment below to include it)
 # vendor/

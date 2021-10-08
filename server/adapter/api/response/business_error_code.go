@@ -14,6 +14,7 @@ const UnknownBusinessError BusinessErrorCode = 10000
 const (
 	UserNotFoundError BusinessErrorCode = iota + 10001
 	InvalidUsernameOrPasswordError
+	InvalidOldPasswordError
 	UserExistsError
 	InvalidTokenError
 )
@@ -46,6 +47,7 @@ var businessErrorMap = map[BusinessErrorCode]string{
 	UnknownBusinessError:           "未知错误",
 	UserNotFoundError:              "用户不存在",
 	InvalidUsernameOrPasswordError: "用户名或密码错误",
+	InvalidOldPasswordError:        "原密码错误",
 	UserExistsError:                "用户已存在",
 	InvalidTokenError:              "无效的登录凭证",
 	AssetNotFoundError:             "资产不存在",

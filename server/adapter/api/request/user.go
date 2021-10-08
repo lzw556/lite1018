@@ -11,3 +11,10 @@ type User struct {
 	Email    string `json:"email"`
 	Phone    string `json:"phone"`
 }
+
+type Profile map[string]string
+
+type UserPass struct {
+	Old string `json:"old"`
+	New string `json:"new"`
+}

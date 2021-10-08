@@ -25,7 +25,7 @@ func (db Database) DNS() string {
 	case "mysql":
 		return fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local", db.Username, db.Password, db.Host, db.Port, db.Name)
 	case "sqlite":
-		return fmt.Sprintf("%s.db", db.Name)
+		return fmt.Sprintf("./data/%s.db", db.Name)
 	default:
 		panic(fmt.Errorf("unknown database driver %s", db.Driver))
 	}

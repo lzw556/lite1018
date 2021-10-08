@@ -100,3 +100,37 @@ func (s User) RemoveUser(userID uint) error {
 	}
 	return s.repository.Delete(ctx, e.ID)
 }
+
+func (s User) UpdateProfile(userID uint, req request.Profile) (*vo.User, error) {
+	ctx := context.TODO()
+	e, err := s.repository.Get(ctx, userID)
+	if err != nil {
+		return nil, response.BusinessErr(response.UserNotFoundError, "")
+	}
+	updates := map[string]interface{}{}
+	for k, v := range req {
+		updates[k] = v
+	}
+	if err := s.repository.Updates(ctx, &e, updates); err != nil {
+		return nil, err
+	}
+	result := vo.NewUser(e)
+	return &result, nil
+}
+
+func (s User) UpdatePass(userID uint, req request.UserPass) error {
+	ctx := context.TODO()
+	e, err := s.repository.Get(ctx, userID)
+	if err != nil {
+		return response.BusinessErr(response.UserNotFoundError, "")
+	}
+	if err := bcrypt.CompareHashAndPassword([]byte(e.Password), []byte(req.Old)); err != nil {
+		return response.BusinessErr(response.InvalidOldPasswordError, "")
+	}
+	newPwd, err := bcrypt.GenerateFromPassword([]byte(req.New), 0)
+	if err != nil {
+		return err
+	}
+	e.Password = string(newPwd)
+	return s.repository.Save(ctx, &e)
+}

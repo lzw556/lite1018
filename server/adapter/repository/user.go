@@ -46,6 +46,10 @@ func (repo User) Save(ctx context.Context, e *po.User) error {
 	return repo.DB(ctx).Save(e).Error
 }
 
+func (repo User) Updates(ctx context.Context, e *po.User, updates map[string]interface{}) error {
+	return repo.DB(ctx).Model(e).Updates(updates).Error
+}
+
 func (repo User) Delete(ctx context.Context, id uint) error {
 	return repo.DB(ctx).Delete(&po.User{}, id).Error
 }

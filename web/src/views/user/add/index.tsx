@@ -1,6 +1,6 @@
 import {Form, Input, message, Modal} from "antd";
-import "../../App.css"
-import {AddUserRequest} from "../../apis/user";
+import "../../../App.css"
+import {AddUserRequest} from "../../../apis/user";
 import {useState} from "react";
 import {KeyOutlined, LockOutlined, MailOutlined, MobileOutlined, UserOutlined} from "@ant-design/icons";
 
@@ -10,7 +10,7 @@ export interface AddUserProps {
     onSuccess: () => void
 }
 
-const AddModal = (props: AddUserProps) => {
+const AddUserModal = (props: AddUserProps) => {
 
     const {visible, onCancel, onSuccess} = props
     const [isLoading, setIsLoading] = useState<boolean>(false)
@@ -69,4 +69,4 @@ const AddModal = (props: AddUserProps) => {
     </Modal>
 }
 
-export default AddModal
+export default AddUserModal

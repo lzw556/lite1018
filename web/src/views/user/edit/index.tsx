@@ -1,7 +1,7 @@
 import {Form, Input, message, Modal} from "antd";
 import {useState} from "react";
-import {UpdateUserRequest} from "../../apis/user";
-import {User} from "../../types/user";
+import {UpdateUserRequest} from "../../../apis/user";
+import {User} from "../../../types/user";
 import {MailOutlined, MobileOutlined} from "@ant-design/icons";
 
 export interface EditUserProps {
@@ -11,7 +11,7 @@ export interface EditUserProps {
     user: User
 }
 
-const EditModal = (props: EditUserProps) => {
+const EditUserModal = (props: EditUserProps) => {
     const {visible, onCancel, onSuccess, user} = props
     const [isLoading, setIsLoading] = useState<boolean>(false)
     const [form] = Form.useForm()
@@ -53,4 +53,4 @@ const EditModal = (props: EditUserProps) => {
     </Modal>
 }
 
-export default EditModal
+export default EditUserModal

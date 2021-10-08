@@ -24,9 +24,14 @@ func (r *userRouter) initRoutes() {
 		// GET
 		router.NewGetRoute("users", r.paging),
 		router.NewGetRoute("users/:id", r.getByID),
+		router.NewGetRoute("me/profile", r.profile),
 
 		// PUT
 		router.NewPutRoute("users/:id", r.updateByID),
+
+		// PATCH
+		router.NewPatchRoute("me/profile", r.updateProfile),
+		router.NewPatchRoute("me/pass", r.updatePass),
 
 		// DELETE
 		router.NewDeleteRoute("users/:id", r.removeByID),

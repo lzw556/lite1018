@@ -19,9 +19,10 @@ import (
 var dist embed.FS
 
 type Adapter struct {
-	server  *http.Server
-	engine  *gin.Engine
-	routers []router.Router
+	server      *http.Server
+	engine      *gin.Engine
+	routers     []router.Router
+	middlewares []middleware.Middleware
 
 	port int
 }
@@ -40,20 +41,19 @@ func (a *Adapter) RegisterRouters(routers ...router.Router) {
 }
 
 func (a *Adapter) UseMiddleware(middlewares ...middleware.Middleware) {
-	for _, m := range middlewares {
-		a.engine.Group("api").Use(m.WrapHandler())
-	}
+	a.middlewares = append(a.middlewares, middlewares...)
 }
 
 func (a *Adapter) Run() error {
 	xlog.Infof("api server started on port: %d", a.port)
 	a.engine.Use(static.Serve("/", middleware.EmbedFileSystem(dist, "static")))
+	group := a.engine.Group("api")
+	for _, m := range a.middlewares {
+		group.Use(m.WrapHandler())
+	}
 	for _, r := range a.routers {
 		for _, route := range r.Routes() {
-			group := a.engine.Group("api")
-			{
-				group.Handle(route.Method(), route.Path(), a.errorWrapper(route.Handler()))
-			}
+			group.Handle(route.Method(), route.Path(), a.errorWrapper(route.Handler()))
 		}
 	}
 	a.server = &http.Server{

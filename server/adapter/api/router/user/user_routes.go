@@ -51,3 +51,26 @@ func (r userRouter) removeByID(ctx *gin.Context) (interface{}, error) {
 	id := cast.ToUint(ctx.Param("id"))
 	return nil, r.service.RemoveUser(id)
 }
+
+func (r userRouter) profile(ctx *gin.Context) (interface{}, error) {
+	id := cast.ToUint(ctx.MustGet("user_id"))
+	return r.service.GetUser(id)
+}
+
+func (r userRouter) updateProfile(ctx *gin.Context) (interface{}, error) {
+	id := cast.ToUint(ctx.MustGet("user_id"))
+	var req request.Profile
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		return nil, response.InvalidParameterError(err.Error())
+	}
+	return r.service.UpdateProfile(id, req)
+}
+
+func (r userRouter) updatePass(ctx *gin.Context) (interface{}, error) {
+	id := cast.ToUint(ctx.MustGet("user_id"))
+	var req request.UserPass
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		return nil, response.InvalidParameterError(err.Error())
+	}
+	return nil, r.service.UpdatePass(id, req)
+}

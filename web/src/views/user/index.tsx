@@ -1,12 +1,12 @@
 import {Button, Card, Col, message, Popconfirm, Row, Space} from "antd";
 import {useCallback, useState} from "react";
 import {Content} from "antd/lib/layout/layout";
-import AddModal from "./addModal";
 import {RemoveUserRequest, GetUserRequest, PagingUsersRequest} from "../../apis/user";
-import EditModal from "./editModal";
 import TableLayout, {TableProps} from "../layout/TableLayout";
 import {InitializeUserState} from "../../types/user";
 import {DeleteOutlined, EditOutlined, UserAddOutlined} from "@ant-design/icons";
+import AddUserModal from "./add";
+import EditUserModal from "./edit";
 
 const UserPage = () => {
     const [addUserVisible, setAddUserVisible] = useState<boolean>(false)
@@ -126,9 +126,9 @@ const UserPage = () => {
                 </Content>
             </Col>
         </Row>
-        <AddModal visible={addUserVisible} onCancel={() => setAddUserVisible(false)} onSuccess={onAddUserSuccess}/>
-        <EditModal user={user} visible={editUserVisible} onCancel={() => setEditUserVisible(false)}
-                   onSuccess={onEditUserSuccess}/>
+        <AddUserModal visible={addUserVisible} onCancel={() => setAddUserVisible(false)} onSuccess={onAddUserSuccess}/>
+        <EditUserModal user={user} visible={editUserVisible} onCancel={() => setEditUserVisible(false)}
+               onSuccess={onEditUserSuccess}/>
     </div>
 }
 
