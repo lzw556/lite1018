@@ -24,12 +24,10 @@ import Label from "../../components/label";
 import ReplaceMacModal from "./replace/replaceMacModal";
 import EditWsnSettingModal from "./edit/editWsnSettingModal";
 import useSocket from "../../socket";
-import {ResponseResult} from "../../types/response";
 import * as _ from "lodash";
 
 const {Search} = Input
 const {Option} = Select
-const io = require("socket.io-client")
 
 const DevicePage = () => {
     const [table, setTable] = useState<TableProps>({data: {}, isLoading: false, pagination: true, refreshKey: 0})
@@ -231,7 +229,7 @@ const DevicePage = () => {
                     <Dropdown overlay={renderCommandMenus(record)}>
                         <Button type="text" icon={<CodeOutlined/>}/>
                     </Dropdown>
-                    <Popconfirm placement="left" title="确认要删除该用户吗?" onConfirm={() => onDelete(record.id)}
+                    <Popconfirm placement="left" title="确认要删除该设备吗?" onConfirm={() => onDelete(record.id)}
                                 okText="删除" cancelText="取消">
                         <Button type="text" size="small" icon={<DeleteOutlined/>} danger/>
                     </Popconfirm>

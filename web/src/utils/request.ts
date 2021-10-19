@@ -3,7 +3,7 @@ import {ResponseResult} from "../types/response";
 import {getToken, isLogin} from "./session";
 
 axios.defaults.timeout = 10000
-axios.defaults.baseURL = "http://localhost:8080/api"
+axios.defaults.baseURL = "/api"
 
 axios.interceptors.request.use((config:AxiosRequestConfig) => {
     if (isLogin()) {

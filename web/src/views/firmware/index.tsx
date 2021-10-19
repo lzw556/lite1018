@@ -1,5 +1,5 @@
 import {Button, Card, Col, Empty, message, Popconfirm, Row, Space, Upload} from "antd";
-import {DeleteOutlined, EditOutlined, UploadOutlined} from "@ant-design/icons";
+import {DeleteOutlined, UploadOutlined} from "@ant-design/icons";
 import {Content} from "antd/lib/layout/layout";
 import {useCallback, useState} from "react";
 import TableLayout, {DEFAULT_TABLE_PROPS, TableProps} from "../layout/TableLayout";

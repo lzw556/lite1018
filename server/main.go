@@ -5,14 +5,17 @@ import (
 	"fmt"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/middleware"
+	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/alarm"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/asset"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/device"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/firmware"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/network"
+	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/property"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/user"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/iot"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/iot/dispatcher"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/mqtt"
+	"github.com/thetasensors/theta-cloud-lite/server/adapter/ruleengine"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/socket"
 	"github.com/thetasensors/theta-cloud-lite/server/config"
 	"github.com/thetasensors/theta-cloud-lite/server/core"
@@ -96,6 +99,7 @@ func init() {
 	xlog.Init("release")
 	cache.Init("debug")
 	task.Init()
+	ruleengine.Init()
 }
 
 func initMQTTServer() *mqtt.Adapter {
@@ -125,6 +129,7 @@ func initIoTServer() *iot.Adapter {
 		dispatcher.NewRebootResponse(),
 		dispatcher.NewUpdateDeviceSettingsResponse(),
 		dispatcher.NewUpdateWsnSettingsResponse(),
+		dispatcher.NewUpdateDeviceListResponse(),
 		dispatcher.NewRestartStatus(),
 	)
 	return &iotServer
@@ -141,8 +146,10 @@ func initApiServer() (*api.Adapter, string) {
 		user.NewRouter(service.NewUser()),
 		asset.NewRouter(service.NewAsset()),
 		device.NewRouter(service.NewDevice()),
+		property.NewRouter(service.NewProperty()),
 		firmware.NewRouter(service.NewFirmware()),
 		network.NewRouter(service.NewNetwork()),
+		alarm.NewRouter(service.NewAlarm()),
 	)
 	if conf.Mode == "release" {
 		return apiServer, fmt.Sprintf("%s:%d/#/", readLocalIPAddress(), conf.Port)

@@ -4,7 +4,7 @@ import {FC} from "react";
 import {Device} from "../../../types/device";
 import {DeviceType} from "../../../types/device_type";
 
-interface Node {
+interface INode {
     id: string
     text: string
     data: {
@@ -12,14 +12,14 @@ interface Node {
     }
 }
 
-interface Edge {
+interface IEdge {
     id: string
     from: string
     to: string
 }
 
 export interface GraphProps {
-    data: { nodes: Node[], edges: Edge[] }
+    data: { nodes: INode[], edges: IEdge[] }
     height: number
     selections: string[]
     onClick?: (device: Device) => void

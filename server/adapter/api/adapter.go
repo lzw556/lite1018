@@ -4,6 +4,7 @@ import (
 	"context"
 	"embed"
 	"fmt"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/middleware"
@@ -29,7 +30,7 @@ type Adapter struct {
 
 func NewAdapter(conf config.API) *Adapter {
 	a := Adapter{
-		engine: gin.Default(),
+		engine: gin.New(),
 		port:   conf.Port,
 	}
 	gin.SetMode(conf.Mode)
@@ -44,8 +45,16 @@ func (a *Adapter) UseMiddleware(middlewares ...middleware.Middleware) {
 	a.middlewares = append(a.middlewares, middlewares...)
 }
 
+func (a *Adapter) enableCors() {
+
+}
+
 func (a *Adapter) Run() error {
 	xlog.Infof("api server started on port: %d", a.port)
+	a.engine.Use(gin.Recovery())
+	a.engine.Use(cors.New(cors.Config{
+		AllowAllOrigins: true,
+	}))
 	a.engine.Use(static.Serve("/", middleware.EmbedFileSystem(dist, "static")))
 	group := a.engine.Group("api")
 	for _, m := range a.middlewares {

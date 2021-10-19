@@ -46,3 +46,7 @@ export function ReplaceDeviceMacRequest(id:number, mac: string) {
 export function SendDeviceCommandRequest(id:number, cmd:any) {
     return request.post(`/devices/${id}/commands/${cmd}`, {}).then(res => res.data)
 }
+
+export function GetDeviceGroupByAsset(deviceType: number) {
+    return request.get(`/devices/groupBy/asset`, {device_type: deviceType}).then(res => res.data)
+}

@@ -10,6 +10,9 @@ func (DeviceTypeSpec) IsSpecifiedBy(v interface{}) bool {
 
 func (s DeviceTypeSpec) Scope() func(db *gorm.DB) *gorm.DB {
 	return func(db *gorm.DB) *gorm.DB {
-		return db.Where("type_id = ?", s)
+		if uint(s) == 0 {
+			return db
+		}
+		return db.Where("device_type_id = ?", s)
 	}
 }

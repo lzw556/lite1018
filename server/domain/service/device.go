@@ -68,6 +68,14 @@ func (s Device) FindDevicesByPaginate(assetID, page, size int, req request.Devic
 	return result, total, nil
 }
 
+func (s Device) FindDevicesGroupByAsset(deviceType uint) ([]vo.Group, error) {
+	query, err := s.factory.NewDeviceGroupByQuery(deviceType)
+	if err != nil {
+		return nil, err
+	}
+	return query.GroupBy("asset")
+}
+
 func (s Device) UpdateDeviceSetting(deviceID uint, req request.DeviceSetting) error {
 	cmd, err := s.factory.NewDeviceUpdateCmd(deviceID)
 	if err != nil {

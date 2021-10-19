@@ -12,6 +12,7 @@ type Service interface {
 
 	GetDevice(deviceID uint) (*vo.Device, error)
 	FindDevicesByPaginate(assetID, page, size int, req request.DeviceSearch) ([]vo.Device, int64, error)
+	FindDevicesGroupByAsset(deviceType uint) ([]vo.Group, error)
 	CheckDeviceMacAddress(mac string) error
 	ReplaceDevice(deviceID uint, mac string) error
 

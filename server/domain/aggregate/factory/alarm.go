@@ -1,0 +1,138 @@
+package factory
+
+import (
+	"context"
+	"fmt"
+	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/request"
+	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
+	"github.com/thetasensors/theta-cloud-lite/server/domain/aggregate/command"
+	"github.com/thetasensors/theta-cloud-lite/server/domain/aggregate/query"
+	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
+	"github.com/thetasensors/theta-cloud-lite/server/domain/po"
+	spec "github.com/thetasensors/theta-cloud-lite/server/domain/specification"
+)
+
+type Alarm struct {
+	assetRepo             dependency.AssetRepository
+	deviceRepo            dependency.DeviceRepository
+	alarmRuleRepo         dependency.AlarmRuleRepository
+	alarmRuleTemplateRepo dependency.AlarmRuleTemplateRepository
+}
+
+func NewAlarm() Alarm {
+	return Alarm{
+		assetRepo:             repository.Asset{},
+		deviceRepo:            repository.Device{},
+		alarmRuleRepo:         repository.AlarmRule{},
+		alarmRuleTemplateRepo: repository.AlarmRuleTemplate{},
+	}
+}
+
+func (factory Alarm) NewAlarmRuleTemplateQuery(id uint) (*query.AlarmRuleTemplateQuery, error) {
+	e, err := factory.alarmRuleTemplateRepo.Get(context.TODO(), id)
+	if err != nil {
+		return nil, err
+	}
+	q := query.NewAlarmRuleTemplateQuery()
+	q.AlarmRuleTemplate = e
+	return &q, nil
+}
+
+func (factory Alarm) NewAlarmRuleCreateCmd(req request.AlarmRule) (*command.AlarmRuleCreateCmd, error) {
+	cmd := command.NewAlarmRuleCreateCmd()
+	switch req.CreateType {
+	case 0:
+		cmd.AlarmRules = factory.buildAlarmRulesByCustom(req)
+	case 1:
+		rules, err := factory.buildAlarmRulesFormTemplates(req)
+		if err != nil {
+			return nil, err
+		}
+		cmd.AlarmRules = rules
+	}
+	return &cmd, nil
+}
+
+func (factory Alarm) buildAlarmRulesByCustom(req request.AlarmRule) po.AlarmRules {
+	rules := make(po.AlarmRules, len(req.DeviceIDs))
+	for i, id := range req.DeviceIDs {
+		rules[i] = po.AlarmRule{
+			Name:        fmt.Sprintf("%s%d", req.Name, i),
+			Description: req.Description,
+			DeviceID:    id,
+			PropertyID:  req.PropertyID,
+			Rule: po.AlarmRuleContent{
+				Field:     req.Rule.Field,
+				Method:    req.Rule.Method,
+				Operation: req.Rule.Operation,
+				Threshold: req.Rule.Threshold,
+			},
+			Enabled: true,
+		}
+	}
+	return rules
+}
+
+func (factory Alarm) buildAlarmRulesFormTemplates(req request.AlarmRule) (po.AlarmRules, error) {
+	ctx := context.TODO()
+	templates := make([]po.AlarmRuleTemplate, len(req.TemplateIDs))
+	for i, id := range req.TemplateIDs {
+		template, err := factory.alarmRuleTemplateRepo.Get(ctx, id)
+		if err != nil {
+			return nil, err
+		}
+		templates[i] = template
+	}
+	rules := make(po.AlarmRules, 0)
+	for _, id := range req.DeviceIDs {
+		for _, template := range templates {
+			rules = append(rules, po.AlarmRule{
+				Name:        fmt.Sprintf("%s%d", req.Name, len(rules)),
+				Description: req.Description,
+				DeviceID:    id,
+				PropertyID:  template.PropertyID,
+				Rule:        template.Rule,
+				Enabled:     true,
+			})
+		}
+	}
+	return rules, nil
+}
+
+func (factory Alarm) NewAlarmRulePagingQuery(assetID, deviceID uint, page, size int) (*query.AlarmRulePagingQuery, error) {
+	ctx := context.TODO()
+	specs := make([]spec.Specification, 0)
+	if deviceID != 0 {
+		specs = append(specs, spec.DevicesSpec{deviceID})
+	} else {
+		if assetID != 0 {
+			devices, err := factory.deviceRepo.FindBySpecs(ctx, spec.AssetSpec(assetID))
+			if err != nil {
+				return nil, err
+			}
+			deviceIDs := make([]uint, len(devices))
+			for i, device := range devices {
+				deviceIDs[i] = device.ID
+			}
+			specs = append(specs, spec.DevicesSpec(deviceIDs))
+		}
+	}
+	es, total, err := factory.alarmRuleRepo.PagingBySpecs(ctx, page, size, specs...)
+	if err != nil {
+		return nil, err
+	}
+	q := query.NewAlarmRulePagingQuery(total)
+	q.AlarmRules = es
+	return &q, nil
+}
+
+func (factory Alarm) NewAlarmRuleQuery(id uint) (*query.AlarmRuleQuery, error) {
+	ctx := context.TODO()
+	e, err := factory.alarmRuleRepo.Get(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	q := query.NewAlarmRuleQuery()
+	q.AlarmRule = e
+	return &q, nil
+}

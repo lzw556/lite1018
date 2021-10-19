@@ -43,6 +43,11 @@ const (
 	NetworkNotFoundError BusinessErrorCode = iota + 14001
 )
 
+const (
+	AlarmRuleNameExists BusinessErrorCode = iota + 15001
+	AlarmRuleNotFoundError
+)
+
 var businessErrorMap = map[BusinessErrorCode]string{
 	UnknownBusinessError:           "未知错误",
 	UserNotFoundError:              "用户不存在",
@@ -62,6 +67,8 @@ var businessErrorMap = map[BusinessErrorCode]string{
 	FirmwareNotFoundError:          "固件不存在",
 	FirmwareFormatError:            "固件格式错误",
 	FirmwareExistsError:            "固件已存在",
+	AlarmRuleNameExists:            "规则名称已经存在",
+	AlarmRuleNotFoundError:         "报警规则不存在",
 }
 
 func getErrMessage(code BusinessErrorCode) string {

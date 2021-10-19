@@ -42,7 +42,7 @@ func (factory Network) NewNetworkQuery(networkID uint) (*query.NetworkQuery, err
 
 func (factory Network) NewNetworksQuery(assetID uint) (*query.NetworksQuery, error) {
 	ctx := context.TODO()
-	es, err := factory.deviceRepo.FindBySpecs(ctx, spec.AssetSpec(assetID), spec.DeviceTypeSpec(devicetype.GatewayType))
+	es, err := factory.deviceRepo.FindBySpecs(ctx, spec.AssetSpec(assetID), spec.TypeSpec(devicetype.GatewayType))
 	if err != nil {
 		return nil, err
 	}

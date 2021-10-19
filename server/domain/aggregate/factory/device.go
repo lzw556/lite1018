@@ -123,6 +123,17 @@ func (factory Device) NewDeviceQuery(id uint) (*query.DeviceQuery, error) {
 	return &q, nil
 }
 
+func (factory Device) NewDeviceGroupByQuery(deviceType uint) (*query.DeviceGroupByQuery, error) {
+	ctx := context.TODO()
+	es, err := factory.deviceRepo.FindBySpecs(ctx, spec.TypeSpec(deviceType))
+	if err != nil {
+		return nil, err
+	}
+	q := query.NewDeviceGroupByQuery()
+	q.Devices = es
+	return &q, nil
+}
+
 func (factory Device) NewDevicePagingQuery(assetID, page, size int, req request.DeviceSearch) (*query.DevicePagingQuery, error) {
 	ctx := context.TODO()
 	specs := []spec.Specification{

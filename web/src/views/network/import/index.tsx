@@ -87,8 +87,7 @@ const ImportNetworkPage = () => {
                         name: n.data.name,
                         mac_address: n.data.address,
                         type_id: n.data.type,
-                        ...
-                            JSON.parse(n.data.settings)
+                        ...JSON.parse(n.data.settings)
                     }
                 })
             }
@@ -139,7 +138,7 @@ const ImportNetworkPage = () => {
                 mac_address: nodes[current].data.address
             })
         }
-    }, [nodes[current]])
+    }, [current])
 
     return <div>
         <Row justify="center">

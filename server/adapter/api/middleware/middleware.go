@@ -14,7 +14,7 @@ func pathMatch(path string, exclusion string) bool {
 		return true
 	}
 	// remove request path prefix "api/"
-	path = strings.TrimPrefix(path, "api/")
+	path = strings.TrimPrefix(path, "/api")
 	i := strings.Index(exclusion, "*")
 	if i <= 0 {
 		return path == exclusion

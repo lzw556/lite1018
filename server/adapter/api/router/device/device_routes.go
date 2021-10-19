@@ -107,3 +107,8 @@ func (r deviceRouter) removeDataByID(ctx *gin.Context) (interface{}, error) {
 	to := cast.ToInt64(ctx.Query("to"))
 	return nil, r.service.RemoveDataByID(id, from, to)
 }
+
+func (r deviceRouter) findGroupByAsset(ctx *gin.Context) (interface{}, error) {
+	deviceType := cast.ToUint(ctx.Query("device_type"))
+	return r.service.FindDevicesGroupByAsset(deviceType)
+}

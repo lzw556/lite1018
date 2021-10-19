@@ -23,7 +23,7 @@ const MePage = () => {
 
     const renderPhone = () => {
         if (isPhoneEdit) {
-            return <Form.Item name={"phone"} initialValue={user?.phone} rules={[{type: "number"}]}>
+            return <Form.Item name={"phone"} initialValue={user?.phone} >
                 <Input size="small"/>
             </Form.Item>
         } else {
@@ -139,7 +139,7 @@ const MePage = () => {
                                 密码
                             </Col>
                             <Col span={5}>
-                                ********
+                                ****************
                             </Col>
                             <Col span={2} offset={1}>
                                 <a onClick={() => setIsPassEdit(true)}>修改</a>

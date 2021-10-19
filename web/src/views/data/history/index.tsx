@@ -59,7 +59,7 @@ const HistoryDataPage = () => {
     const [endDate, setEndDate] = useState<moment.Moment>(moment().endOf('day'))
     const [option, setOption] = useState<any>(defaultHistoryDataOption)
     const [downloadVisible, setDownloadVisible] = useState<boolean>(false)
-    const [height, setHeight] = useState<number>(window.innerHeight - 230)
+    const [height] = useState<number>(window.innerHeight - 230)
 
     const onAssetChange = (value: number) => {
         setAssetId(value)

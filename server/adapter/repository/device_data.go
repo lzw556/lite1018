@@ -50,3 +50,19 @@ func (repo DeviceData) Find(deviceID uint, from, to time.Time) ([]po.DeviceData,
 	})
 	return es, err
 }
+
+func (repo DeviceData) Last(deviceID uint) (po.DeviceData, error) {
+	var e po.DeviceData
+	err := repo.BoltDB().View(func(tx *bbolt.Tx) error {
+		bucket := tx.Bucket([]byte(e.BucketName()))
+		if bucket != nil {
+			c := bucket.Bucket(itob(deviceID)).Cursor()
+			_, v := c.Last()
+			if err := json.Unmarshal(v, &e); err != nil {
+				return err
+			}
+		}
+		return nil
+	})
+	return e, err
+}

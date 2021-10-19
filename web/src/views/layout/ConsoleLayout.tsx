@@ -4,6 +4,8 @@ import "./layout.css"
 import {NavLink} from "react-router-dom";
 import RouterGuard from "../../routers/routerGuard";
 import {HeaderLayout} from "./index";
+import {GetParamValue} from "../../utils/path";
+import AlertNotification from "../../components/alertNotification";
 
 const {SubMenu} = Menu
 const {Sider} = Layout
@@ -14,17 +16,18 @@ const ConsoleLayout = (props: any) => {
 
     const renderMenuItem = (children: []) => {
         return children.map((item: any) => {
-            if (item.children && item.children.length) {
-                return <SubMenu key={item.path} title={item.title}>
-                    {renderMenuItem(item.children)}
-                </SubMenu>
+            if (!item.hidden) {
+                if (item.children && item.children.length) {
+                    return <SubMenu key={item.path} title={item.title}>
+                        {renderMenuItem(item.children)}
+                    </SubMenu>
+                }
+                return <Menu.Item key={item.path}>
+                    <NavLink to={item.path}>{item.title}</NavLink>
+                </Menu.Item>
             }
-            return <Menu.Item key={item.path}>
-                <NavLink to={item.path}>{item.title}</NavLink>
-            </Menu.Item>
         })
     }
-
 
     const travel = (routes: [], callback: any) => {
         routes.forEach((item: any) => {
@@ -42,6 +45,19 @@ const ConsoleLayout = (props: any) => {
         breadcrumbItem[item.name] = item
     })
 
+    const renderBreadcrumbItems = () => {
+        const items = pathname.split("/").map((path: string) => {
+            return breadcrumbItem[path]
+        })
+        const locale = GetParamValue(location.search, "locale")
+        if (locale) {
+            items.push(breadcrumbItem[locale])
+        }
+        return items.filter((item: any) => !!item).map((item: any) => {
+            return <Breadcrumb.Item key={item.name}>{item.title}</Breadcrumb.Item>
+        })
+    }
+
     return <Layout className="ts-console">
         <HeaderLayout hideConsole={true}/>
         <Layout>
@@ -51,31 +67,31 @@ const ConsoleLayout = (props: any) => {
                       defaultOpenKeys={['/device-management']}>
                     {
                         menus.map((item: any) => {
-                            if (item.children && item.children.length) {
-                                return <SubMenu key={item.path} title={item.title}
-                                                icon={<item.icon />}>
-                                    {renderMenuItem(item.children)}
-                                </SubMenu>
+                            if (!item.hidden) {
+                                if (item.children && item.children.length) {
+                                    return <SubMenu key={item.path} title={item.title}
+                                                    icon={<item.icon/>}>
+                                        {renderMenuItem(item.children)}
+                                    </SubMenu>
+                                }
+                                return <Menu.Item key={item.path} icon={<item.icon/>}>
+                                    <NavLink to={item.path}>{item.title}</NavLink>
+                                </Menu.Item>
                             }
-                            return <Menu.Item key={item.path} icon={<item.icon />}>
-                                <NavLink to={item.path}>{item.title}</NavLink>
-                            </Menu.Item>
                         })
                     }
                 </Menu>
             </Sider>
             <Layout style={{padding: "15px", background: "#eef0f5"}}>
-                <Breadcrumb className="ts-breadcrumb" style={{position:"absolute"}}>
+                <Breadcrumb className="ts-breadcrumb" style={{position: "absolute"}}>
                     {
-                        pathname.split("/").map((path: string) => {
-                            const item = breadcrumbItem[path]
-                            return item ? <Breadcrumb.Item key={item.name}>{item.title}</Breadcrumb.Item> : null
-                        })
+                        renderBreadcrumbItems()
                     }
                 </Breadcrumb>
                 <RouterGuard {...props} routes={routes}/>
             </Layout>
         </Layout>
+        <AlertNotification />
     </Layout>
 }
 

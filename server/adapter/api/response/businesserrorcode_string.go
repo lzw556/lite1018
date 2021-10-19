@@ -26,6 +26,8 @@ func _() {
 	_ = x[FirmwareFormatError-13002]
 	_ = x[FirmwareExistsError-13003]
 	_ = x[NetworkNotFoundError-14001]
+	_ = x[AlarmRuleNameExists-15001]
+	_ = x[AlarmRuleNotFoundError-15002]
 }
 
 const (
@@ -34,12 +36,14 @@ const (
 	_BusinessErrorCode_name_2 = "DeviceNotFoundErrorDeviceMacExistsErrorUnknownDeviceTypeErrorDeviceCommandSendFailedErrorDeviceCommandSendTimeoutErrorDeviceCommandExecFailedErrorUnknownDeviceCommandTypeError"
 	_BusinessErrorCode_name_3 = "FirmwareNotFoundErrorFirmwareFormatErrorFirmwareExistsError"
 	_BusinessErrorCode_name_4 = "NetworkNotFoundError"
+	_BusinessErrorCode_name_5 = "AlarmRuleNameExistsAlarmRuleNotFoundError"
 )
 
 var (
 	_BusinessErrorCode_index_0 = [...]uint8{0, 20, 37, 67, 90, 105, 122}
 	_BusinessErrorCode_index_2 = [...]uint8{0, 19, 39, 61, 89, 118, 146, 175}
 	_BusinessErrorCode_index_3 = [...]uint8{0, 21, 40, 59}
+	_BusinessErrorCode_index_5 = [...]uint8{0, 19, 41}
 )
 
 func (i BusinessErrorCode) String() string {
@@ -57,6 +61,9 @@ func (i BusinessErrorCode) String() string {
 		return _BusinessErrorCode_name_3[_BusinessErrorCode_index_3[i]:_BusinessErrorCode_index_3[i+1]]
 	case i == 14001:
 		return _BusinessErrorCode_name_4
+	case 15001 <= i && i <= 15002:
+		i -= 15001
+		return _BusinessErrorCode_name_5[_BusinessErrorCode_index_5[i]:_BusinessErrorCode_index_5[i+1]]
 	default:
 		return "BusinessErrorCode(" + strconv.FormatInt(int64(i), 10) + ")"
 	}

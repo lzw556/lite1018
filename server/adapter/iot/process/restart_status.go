@@ -44,7 +44,7 @@ func (p RestartStatus) Process(ctx *iot.Context, msg iot.Message) error {
 				return fmt.Errorf("find device list failed: %v", err)
 			}
 			if iot.SyncWsnSettings(network, gateway, false, 3*time.Second) {
-				iot.SyncDeviceList(gateway, devices, 3*time.Second)
+				iot.SyncDeviceList(gateway, devices, 5*time.Second)
 			}
 		}
 	}

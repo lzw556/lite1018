@@ -22,6 +22,7 @@ func (r *deviceRouter) initRoutes() {
 		router.NewPostRoute("devices/:id/commands/:cmd", r.executeCommand),
 
 		// GET
+		router.NewGetRoute("devices/groupBy/asset", r.findGroupByAsset),
 		router.NewGetRoute("devices", r.paging),
 		router.NewGetRoute("devices/:id", r.getByID),
 		router.NewGetRoute("devices/:id/setting", r.getSettingByID),
