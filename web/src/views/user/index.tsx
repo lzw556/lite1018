@@ -7,6 +7,7 @@ import {InitializeUserState} from "../../types/user";
 import {DeleteOutlined, EditOutlined, UserAddOutlined} from "@ant-design/icons";
 import AddUserModal from "./add";
 import EditUserModal from "./edit";
+import ShadowCard from "../../components/shadowCard";
 
 const UserPage = () => {
     const [addUserVisible, setAddUserVisible] = useState<boolean>(false)
@@ -113,7 +114,7 @@ const UserPage = () => {
         <Row justify="center">
             <Col span={24}>
                 <Content style={{paddingTop: "15px"}}>
-                    <Card>
+                    <ShadowCard>
                         <TableLayout
                             columns={columns}
                             data={table.data}
@@ -122,7 +123,7 @@ const UserPage = () => {
                             pagination={true}
                             onChange={onChange}
                         />
-                    </Card>
+                    </ShadowCard>
                 </Content>
             </Col>
         </Row>

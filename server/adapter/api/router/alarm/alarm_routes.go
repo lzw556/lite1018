@@ -5,6 +5,7 @@ import (
 	"github.com/spf13/cast"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/request"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/response"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/json"
 )
 
 func (r alarmRouter) createAlarmRuleTemplate(ctx *gin.Context) (interface{}, error) {
@@ -87,4 +88,30 @@ func (r alarmRouter) updateAlarmRule(ctx *gin.Context) (interface{}, error) {
 func (r alarmRouter) removeAlarmRule(ctx *gin.Context) (interface{}, error) {
 	id := cast.ToUint(ctx.Param("id"))
 	return nil, r.service.RemoveAlarmRule(id)
+}
+
+func (r alarmRouter) pagingAlarmRecords(ctx *gin.Context) (interface{}, error) {
+	page := cast.ToInt(ctx.Query("page"))
+	size := cast.ToInt(ctx.Query("size"))
+	from := cast.ToInt64(ctx.Query("from"))
+	to := cast.ToInt64(ctx.Query("to"))
+	var req request.AlarmFilter
+	if err := json.Unmarshal([]byte(ctx.Query("filter")), &req); err != nil {
+		return nil, response.InvalidParameterError(err.Error())
+	}
+	result, total, err := r.service.FindAlarmRecordsByPaginate(from, to, page, size, req)
+	if err != nil {
+		return nil, err
+	}
+	return response.NewPageResult(page, size, total, result), nil
+}
+
+func (r alarmRouter) alarmStatistics(ctx *gin.Context) (interface{}, error) {
+	from := cast.ToInt64(ctx.Query("from"))
+	to := cast.ToInt64(ctx.Query("to"))
+	var req request.AlarmFilter
+	if err := json.Unmarshal([]byte(ctx.Query("filter")), &req); err != nil {
+		return nil, response.InvalidParameterError(err.Error())
+	}
+	return r.service.GetAlarmStatistics(from, to, req)
 }

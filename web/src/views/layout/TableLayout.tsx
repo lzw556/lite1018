@@ -40,7 +40,7 @@ const TableLayout = (props: TableProps) => {
     return <ConfigProvider renderEmpty={emptyLayout}>
         <Row justify="center">
             <Col span={24}>
-                <Table columns={columns} dataSource={data.result} pagination={false}
+                <Table rowKey={(record: any) => record.id} size={"small"} columns={columns} dataSource={data.result} pagination={false}
                        loading={isLoading}/>
             </Col>
         </Row>

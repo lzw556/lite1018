@@ -35,15 +35,17 @@ func (repo DeviceData) Find(deviceID uint, from, to time.Time) ([]po.DeviceData,
 	err := repo.BoltDB().View(func(tx *bbolt.Tx) error {
 		bucket := tx.Bucket([]byte(po.DeviceData{}.BucketName()))
 		if bucket != nil {
-			c := bucket.Bucket(itob(deviceID)).Cursor()
-			min := []byte(from.Format("2006-01-02T15:04:05Z"))
-			max := []byte(to.Format("2006-01-02T15:04:05Z"))
-			for k, v := c.Seek(min); k != nil && bytes.Compare(k, max) <= 0; k, v = c.Next() {
-				var e po.DeviceData
-				if err := json.Unmarshal(v, &e); err != nil {
-					return err
+			if dataBucket := bucket.Bucket(itob(deviceID)); dataBucket != nil {
+				c := dataBucket.Cursor()
+				min := []byte(from.Format("2006-01-02T15:04:05Z"))
+				max := []byte(to.Format("2006-01-02T15:04:05Z"))
+				for k, v := c.Seek(min); k != nil && bytes.Compare(k, max) <= 0; k, v = c.Next() {
+					var e po.DeviceData
+					if err := json.Unmarshal(v, &e); err != nil {
+						return err
+					}
+					es = append(es, e)
 				}
-				es = append(es, e)
 			}
 		}
 		return nil

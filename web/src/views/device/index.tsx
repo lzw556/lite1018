@@ -25,6 +25,7 @@ import ReplaceMacModal from "./replace/replaceMacModal";
 import EditWsnSettingModal from "./edit/editWsnSettingModal";
 import useSocket from "../../socket";
 import * as _ from "lodash";
+import ShadowCard from "../../components/shadowCard";
 
 const {Search} = Input
 const {Option} = Select
@@ -122,8 +123,8 @@ const DevicePage = () => {
             onCommand(record, e.key)
         }}>
             <Menu.Item key={DeviceCommand.Reboot} disabled={!disabled}>重启</Menu.Item>
-            <Menu.Item key={DeviceCommand.Reset} disabled={!disabled}>重置</Menu.Item>
             <Menu.Item key={DeviceCommand.Upgrade} disabled={!disabled}>固件升级</Menu.Item>
+            <Menu.Item key={DeviceCommand.Reset} disabled={!disabled}>恢复出厂设置</Menu.Item>
         </Menu>
     }
 
@@ -171,7 +172,7 @@ const DevicePage = () => {
                 return <Space>
                     <Spin indicator={<LoadingOutlined/>}
                           spinning={executeDevice ? executeDevice.id === record.id : false}/>
-                    <a>{text}</a>
+                    <a href={`#/device-management/devices?locale=deviceDetail&id=${record.id}`}>{text}</a>
                 </Space>
             }
         },
@@ -203,7 +204,7 @@ const DevicePage = () => {
             }
         },
         {
-            title: '电量(mV)',
+            title: '电池电压(mV)',
             dataIndex: 'status',
             key: 'batteryVoltage',
             render: (status: any) => {
@@ -253,7 +254,7 @@ const DevicePage = () => {
         <Row justify="center">
             <Col span={24}>
                 <Content style={{paddingTop: "15px"}}>
-                    <Card>
+                    <ShadowCard>
                         <Row justify="center">
                             <Col span={24}>
                                 <Space>
@@ -293,7 +294,7 @@ const DevicePage = () => {
                                 />
                             </Col>
                         </Row>
-                    </Card>
+                    </ShadowCard>
                 </Content>
             </Col>
         </Row>

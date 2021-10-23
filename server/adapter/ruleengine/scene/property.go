@@ -11,6 +11,7 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/domain/vo"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/xlog"
 	"strconv"
+	"time"
 )
 
 type Property struct {
@@ -49,35 +50,38 @@ func (s Property) CURRENT(deviceID uint, field string) *float32 {
 }
 
 func (s Property) Alert(alarmID uint, value float32, level uint) {
-	ctx := context.TODO()
-	rule, err := s.alarmRuleRepo.Get(ctx, alarmID)
-	if err != nil {
-		return
-	}
-	e := po.AlarmRecord{
-		AlarmID:    alarmID,
-		DeviceID:   rule.DeviceID,
-		PropertyID: s.Property.ID,
-		Rule:       rule.Rule,
-		Value:      value,
-		Level:      level,
-	}
-	if err := s.alarmRecordRepo.Create(ctx, &e); err != nil {
-		xlog.Error("create alarm record failed", err)
-		return
-	}
-	s.Device.UpdateAlarmState(alarmID, level)
+	if s.Device.GetAlarmState(alarmID) != level {
+		ctx := context.TODO()
+		rule, err := s.alarmRuleRepo.Get(ctx, alarmID)
+		if err != nil {
+			return
+		}
+		e := po.AlarmRecord{
+			AlarmID:    alarmID,
+			DeviceID:   rule.DeviceID,
+			PropertyID: s.Property.ID,
+			Rule:       rule.Rule,
+			Value:      value,
+			Level:      level,
+		}
+		e.CreatedAt = time.Now().UTC()
+		if err := s.alarmRecordRepo.Create(ctx, &e); err != nil {
+			xlog.Error("create alarm record failed", err)
+			return
+		}
+		s.Device.UpdateAlarmState(alarmID, level)
 
-	alert := vo.NewAlert()
-	alert.Title = fmt.Sprintf("%s报警", rule.Name)
-	threshold := strconv.FormatFloat(float64(rule.Rule.Threshold), 'f', s.Property.Precision, 64)
-	alert.Content = fmt.Sprintf("设备【%s】的【%s】值%s设定阈值: %s%s", s.Device.Name, rule.Rule.Field, operation(rule.Rule.Operation), threshold, s.Property.Unit)
-	alert.Level = level
-	alert.Data["device"] = map[string]interface{}{
-		"id":   s.Device.ID,
-		"name": s.Device.Name,
+		alert := vo.NewAlert()
+		alert.Title = fmt.Sprintf("%s报警", rule.Name)
+		threshold := strconv.FormatFloat(float64(rule.Rule.Threshold), 'f', s.Property.Precision, 64)
+		alert.Content = fmt.Sprintf("设备【%s】的【%s】值%s设定阈值: %s%s", s.Device.Name, rule.Rule.Field, operation(rule.Rule.Operation), threshold, s.Property.Unit)
+		alert.Level = level
+		alert.Data["device"] = map[string]interface{}{
+			"id":   s.Device.ID,
+			"name": s.Device.Name,
+		}
+		socket.Emit("socket::alert", alert)
 	}
-	socket.Emit("socket::alert", alert)
 }
 
 func (s Property) Recovery(alarmID uint) {

@@ -127,10 +127,13 @@ func initIoTServer() *iot.Adapter {
 		dispatcher.NewSensorData(),
 		dispatcher.NewLinkStatus(),
 		dispatcher.NewRebootResponse(),
+		dispatcher.NewResetResponse(),
 		dispatcher.NewUpdateDeviceSettingsResponse(),
 		dispatcher.NewUpdateWsnSettingsResponse(),
 		dispatcher.NewUpdateDeviceListResponse(),
 		dispatcher.NewRestartStatus(),
+		dispatcher.NewDeviceInformation(),
+		dispatcher.NewEvent(),
 	)
 	return &iotServer
 }

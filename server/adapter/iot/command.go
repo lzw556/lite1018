@@ -94,6 +94,8 @@ func ExecuteCommand(gateway string, device entity.Device, t CommandType, timeout
 	switch t {
 	case RebootCmdType:
 		cmd = command.NewRebootCmd()
+	case ResetCmdType:
+		cmd = command.NewResetCmd()
 	default:
 		return UnknownCommandTypeError
 	}

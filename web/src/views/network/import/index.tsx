@@ -9,6 +9,7 @@ import {DeviceType} from "../../../types/device_type";
 import {ImportNetworkRequest} from "../../../apis/network";
 import AssetSelect from "../../asset/select/assetSelect";
 import * as _ from 'lodash'
+import ShadowCard from "../../../components/shadowCard";
 
 const {Dragger} = Upload
 const {Option} = Select
@@ -151,7 +152,7 @@ const ImportNetworkPage = () => {
             </Col>
         </Row>
         <Content style={{paddingTop: "15px"}}>
-            <Card>
+            <ShadowCard>
                 <Form form={form} labelCol={{span: 6}}>
                 {
                     !success ?
@@ -267,7 +268,7 @@ const ImportNetworkPage = () => {
                         />
                 }
                 </Form>
-            </Card>
+            </ShadowCard>
         </Content>
     </div>
 }

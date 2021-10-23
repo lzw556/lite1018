@@ -9,6 +9,7 @@ import Graph from "./graph/graph";
 import {CaretDownOutlined, ClusterOutlined, ExclamationCircleOutlined} from "@ant-design/icons";
 import AccessDeviceModal from "./modal/accessDevice";
 import Label from "../../components/label";
+import ShadowCard from "../../components/shadowCard";
 
 interface NetworkTreeNode extends TreeDataNode {
     network: Network
@@ -145,7 +146,7 @@ const NetworkPage = () => {
         <Row justify="center">
             <Col span={24}>
                 <Content style={{paddingTop: "35px"}}>
-                    <Card>
+                    <ShadowCard>
                         <Row justify="center">
                             <Col span={24}>
                                 <Space>
@@ -186,7 +187,7 @@ const NetworkPage = () => {
                                 </Card>
                             </Col>
                         </Row>
-                    </Card>
+                    </ShadowCard>
                 </Content>
             </Col>
         </Row>

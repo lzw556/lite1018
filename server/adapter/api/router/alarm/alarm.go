@@ -26,8 +26,9 @@ func (r *alarmRouter) initRoutes() {
 		router.NewGetRoute("alarmRuleTemplates/:id", r.getAlarmRuleTemplate),
 		router.NewGetRoute("alarmRules", r.pagingAlarmRules),
 		router.NewGetRoute("alarmRules/:id", r.getAlarmRules),
-
+		router.NewGetRoute("alarmRecords", r.pagingAlarmRecords),
 		router.NewGetRoute("alarmRules/check/:name", r.checkAlarmRule),
+		router.NewGetRoute("alarmStatistics", r.alarmStatistics),
 
 		// PUT
 		router.NewPutRoute("alarmRuleTemplates/:id", r.updateAlarmRuleTemplate),

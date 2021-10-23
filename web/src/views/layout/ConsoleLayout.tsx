@@ -17,7 +17,7 @@ const ConsoleLayout = (props: any) => {
     const renderMenuItem = (children: []) => {
         return children.map((item: any) => {
             if (!item.hidden) {
-                if (item.children && item.children.length) {
+                if (item.children && item.children.filter((item:any) => !item.hidden).length) {
                     return <SubMenu key={item.path} title={item.title}>
                         {renderMenuItem(item.children)}
                     </SubMenu>
@@ -61,14 +61,14 @@ const ConsoleLayout = (props: any) => {
     return <Layout className="ts-console">
         <HeaderLayout hideConsole={true}/>
         <Layout>
-            <Sider width={200} style={{background: "white", height: "100%"}}>
+            <Sider width={200} style={{background: "white", height: "100%", overflowY: "scroll", boxShadow: "0 2px 10px 0 rgba(0,0,0, 0.08)"}}>
                 <Menu mode="inline" className="ts-menu" defaultSelectedKeys={["devices"]}
                       selectedKeys={[pathname]}
                       defaultOpenKeys={['/device-management']}>
                     {
                         menus.map((item: any) => {
                             if (!item.hidden) {
-                                if (item.children && item.children.length) {
+                                if (item.children && item.children.filter((item:any) => !item.hidden).length) {
                                     return <SubMenu key={item.path} title={item.title}
                                                     icon={<item.icon/>}>
                                         {renderMenuItem(item.children)}
@@ -82,7 +82,7 @@ const ConsoleLayout = (props: any) => {
                     }
                 </Menu>
             </Sider>
-            <Layout style={{padding: "15px", background: "#eef0f5"}}>
+            <Layout style={{padding: "15px", background: "#eef0f5", overflowY: "scroll"}}>
                 <Breadcrumb className="ts-breadcrumb" style={{position: "absolute"}}>
                     {
                         renderBreadcrumbItems()

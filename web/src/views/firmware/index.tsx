@@ -5,6 +5,7 @@ import {useCallback, useState} from "react";
 import TableLayout, {DEFAULT_TABLE_PROPS, TableProps} from "../layout/TableLayout";
 import {PagingFirmwaresRequest, RemoveFirmwareRequest} from "../../apis/firmware";
 import moment from "moment";
+import ShadowCard from "../../components/shadowCard";
 
 
 const FirmwarePage = () => {
@@ -126,7 +127,7 @@ const FirmwarePage = () => {
         <Row justify="center">
             <Col span={24}>
                 <Content style={{paddingTop: "15px"}}>
-                    <Card>
+                    <ShadowCard>
                         <TableLayout
                             emptyLayout={firmwareEmptyLayout}
                             columns={columns}
@@ -135,7 +136,7 @@ const FirmwarePage = () => {
                             onChange={onChange}
                             pagination={true}
                             data={table.data}/>
-                    </Card>
+                    </ShadowCard>
                 </Content>
             </Col>
         </Row>

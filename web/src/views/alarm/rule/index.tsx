@@ -1,10 +1,11 @@
-import {Button, Card, Col, Row, Space} from "antd";
+import {Button, Col, Row, Space} from "antd";
 import {PlusOutlined} from "@ant-design/icons";
 import {Content} from "antd/lib/layout/layout";
 import {useState} from "react";
 import {useLocation} from "react-router-dom";
 import RulesPage from "./list";
 import RuleTemplatesPage from "./template";
+import ShadowCard from "../../../components/shadowCard";
 
 
 const tabList = [
@@ -52,11 +53,11 @@ const AlarmRulePage = () => {
         <Row justify="center">
             <Col span={24}>
                 <Content style={{paddingTop: "15px"}}>
-                    <Card tabList={tabList} activeTabKey={currentKey} size={"small"} onTabChange={key => {
+                    <ShadowCard tabList={tabList} activeTabKey={currentKey} size={"small"} onTabChange={key => {
                         setCurrentKey(key)
                     }}>
                         {contents.get(currentKey)}
-                    </Card>
+                    </ShadowCard>
                 </Content>
             </Col>
         </Row>

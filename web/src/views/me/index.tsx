@@ -5,6 +5,7 @@ import EditPassModal from "./edit/editPassModal";
 import "./index.css";
 import {GetMyProfile, UpdateMyProfile} from "../../apis/profile";
 import {User} from "../../types/user";
+import ShadowCard from "../../components/shadowCard";
 
 const MePage = () => {
     const [isPhoneEdit, setIsPhoneEdit] = useState<boolean>(false)
@@ -77,7 +78,7 @@ const MePage = () => {
         <Row justify="center">
             <Col span={24}>
                 <Content style={{paddingTop: "35px"}}>
-                    <Card title="基本信息" bordered={false}>
+                    <ShadowCard title="基本信息" bordered={false}>
                         <Form form={form}>
                             <p>
                                 <Row justify={"start"}>
@@ -131,9 +132,9 @@ const MePage = () => {
                                 </Row>
                             </p>
                         </Form>
-                    </Card>
+                    </ShadowCard>
                     <br/>
-                    <Card title="账号安全" bordered={false}>
+                    <ShadowCard title="账号安全" bordered={false}>
                         <Row justify={"start"}>
                             <Col span={2} className="ts-label">
                                 密码
@@ -145,7 +146,7 @@ const MePage = () => {
                                 <a onClick={() => setIsPassEdit(true)}>修改</a>
                             </Col>
                         </Row>
-                    </Card>
+                    </ShadowCard>
                 </Content>
             </Col>
         </Row>

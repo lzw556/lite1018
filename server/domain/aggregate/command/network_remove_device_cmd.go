@@ -2,12 +2,14 @@ package command
 
 import (
 	"context"
+	"github.com/thetasensors/theta-cloud-lite/server/adapter/iot"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	spec "github.com/thetasensors/theta-cloud-lite/server/domain/specification"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/vo"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/transaction"
+	"time"
 )
 
 type NetworkRemoveDeviceCmd struct {
@@ -39,15 +41,23 @@ func (cmd NetworkRemoveDeviceCmd) Run() (*vo.Network, error) {
 		return nil, err
 	}
 	result := vo.NewNetwork(cmd.Network)
-	if gateway, err := cmd.deviceRepo.Get(ctx, cmd.Network.GatewayID); err == nil {
-		result.AddGateway(gateway)
+
+	gateway, err := cmd.deviceRepo.Get(ctx, cmd.Network.GatewayID)
+	if err != nil {
+		return nil, err
 	}
-	if devices, err := cmd.deviceRepo.FindBySpecs(ctx, spec.NetworkSpec(cmd.Network.ID)); err == nil {
-		nodes := make([]vo.Device, len(devices))
-		for i, device := range devices {
-			nodes[i] = vo.NewDevice(device)
-		}
-		result.SetNodes(nodes)
+	result.AddGateway(gateway)
+	devices, err := cmd.deviceRepo.FindBySpecs(ctx, spec.NetworkSpec(cmd.Network.ID))
+	if err != nil {
+		return nil, err
+	}
+	nodes := make([]vo.Device, len(devices))
+	for i, device := range devices {
+		nodes[i] = vo.NewDevice(device)
+	}
+	result.SetNodes(nodes)
+	if iot.SyncWsnSettings(cmd.Network, gateway, false, 3*time.Second) {
+		iot.SyncDeviceList(gateway, devices, 3*time.Second)
 	}
 	return &result, nil
 }

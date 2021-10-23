@@ -1,15 +1,16 @@
 import TableLayout, {TableProps} from "../../../layout/TableLayout";
-import {useCallback, useEffect, useState} from "react";
+import {useCallback, useState} from "react";
 import {GetAlarmRuleRequest, PagingAlarmRulesRequest, RemoveAlarmRuleRequest} from "../../../../apis/alarm";
 import {Device} from "../../../../types/device";
 import {DeviceTypeString} from "../../../../types/device_type";
-import {Button, Col, Divider, message, Popconfirm, Row, Select, Space} from "antd";
+import {Button, Card, Col, Divider, message, Popconfirm, Row, Select, Space} from "antd";
 import Label from "../../../../components/label";
 import AssetSelect from "../../../asset/select/assetSelect";
-import {CaretDownOutlined, DeleteOutlined} from "@ant-design/icons";
-import {PagingDevicesRequest} from "../../../../apis/device";
+import {CaretDownOutlined} from "@ant-design/icons";
 import EditModal from "../modal/editModal";
 import {AlarmRule} from "../../../../types/alarm_rule";
+import SensorSelect from "../../../../components/sensorSelect";
+import ShadowCard from "../../../../components/shadowCard";
 
 
 const {Option} = Select
@@ -22,48 +23,38 @@ const RulesPage = () => {
     const [editVisible, setEditVisible] = useState<boolean>(false)
     const [devices, setDevices] = useState<Device[]>()
 
-    const onAssetChanged = (value:any) => {
+    const onAssetChanged = (value: any) => {
         setAssetId(value)
     }
 
-    const onDeviceChanged = (value:any) => {
+    const onDeviceChanged = (value: any) => {
         setDeviceId(value)
-    }
-
-    const onLoadDevices = (open:any) => {
-        if (open) {
-            PagingDevicesRequest(assetId, 1, 100, {}).then(res => {
-                if (res.code === 200) {
-                    setDevices(res.data.result.filter(item => item.category === 3))
-                }
-            })
-        }
     }
 
     const onRefresh = () => {
         setTable(Object.assign({}, table, {refreshKey: table.refreshKey + 1}))
     }
 
-    const onEdit = (id:number) => {
+    const onEdit = (id: number) => {
         GetAlarmRuleRequest(id).then(res => {
             if (res.code === 200) {
                 setRule(res.data)
                 setEditVisible(true)
-            }else {
+            } else {
                 message.error(res.msg).then()
             }
         })
     }
 
-    const onDelete = (id:number) => {
-      RemoveAlarmRuleRequest(id).then(res => {
-          if (res.code === 200) {
-              message.success("删除成功").then()
-              onRefresh()
-          }else {
-              message.error("删除失败").then()
-          }
-      })
+    const onDelete = (id: number) => {
+        RemoveAlarmRuleRequest(id).then(res => {
+            if (res.code === 200) {
+                message.success("删除成功").then()
+                onRefresh()
+            } else {
+                message.error("删除失败").then()
+            }
+        })
     }
 
     const columns = [
@@ -139,15 +130,11 @@ const RulesPage = () => {
                         <AssetSelect bordered={false} style={{width: "150px"}} defaultValue={assetId}
                                      defaultActiveFirstOption={true}
                                      defaultOption={{value: 0, text: "所有资产"}} placeholder={"请选择资产"}
-                                     onChange={onAssetChanged} suffixIcon={<CaretDownOutlined />}/>
+                                     onChange={onAssetChanged} suffixIcon={<CaretDownOutlined/>}/>
                     </Label>
                     <Label name={"设备"}>
-                        <Select bordered={false} style={{width: "150px"}} defaultValue={deviceId} placeholder={"请选择设备"} suffixIcon={<CaretDownOutlined />} onDropdownVisibleChange={onLoadDevices} onChange={onDeviceChanged}>
-                            <Option value={0} key={0}>所有设备</Option>
-                            {
-                                devices?.map(item => (<Option key={item.id} value={item.id}>{item.name}</Option>))
-                            }
-                        </Select>
+                        <SensorSelect bordered={false} style={{width: "128px"}} value={deviceId} assetId={assetId}
+                                      placeholder={"请选择设备"} onChange={onDeviceChanged}/>
                     </Label>
                 </Space>
             </Col>

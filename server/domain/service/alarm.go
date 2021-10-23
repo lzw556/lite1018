@@ -162,3 +162,20 @@ func (s Alarm) RemoveAlarmRule(id uint) error {
 		return ruleengine.RemoveRules(e.Name)
 	})
 }
+
+func (s Alarm) FindAlarmRecordsByPaginate(from, to int64, page, size int, req request.AlarmFilter) ([]vo.AlarmRecord, int64, error) {
+	query, err := s.factory.NewAlarmRecordPagingQuery(from, to, page, size, req)
+	if err != nil {
+		return nil, 0, err
+	}
+	result, total := query.Paging()
+	return result, total, nil
+}
+
+func (s Alarm) GetAlarmStatistics(from, to int64, req request.AlarmFilter) (vo.AlarmStatistics, error) {
+	query, err := s.factory.NewAlarmStatisticsQuery(from, to, req)
+	if err != nil {
+		return vo.AlarmStatistics{}, err
+	}
+	return query.Query(), nil
+}

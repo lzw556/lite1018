@@ -12,6 +12,7 @@ import {SpeedObjectSettings} from "../form/item/speedObjectFormItem";
 import {AddDeviceRequest} from "../../../apis/device";
 import {IPNSettingKeys} from "../form/item/ipnFormItem";
 import {WSNSettingKeys} from "../form/item/wsnFormItem";
+import ShadowCard from "../../../components/shadowCard";
 
 
 
@@ -112,7 +113,7 @@ const AddDevicePage = () => {
     }
 
     return <Content style={{paddingTop: "35px"}}>
-        <Card>
+        <ShadowCard>
             {
                 success && (<Result
                     status="success"
@@ -167,7 +168,7 @@ const AddDevicePage = () => {
                     </Row>
                 </Col>
             </Row>
-        </Card>
+        </ShadowCard>
     </Content>
 }
 

@@ -3,22 +3,26 @@ package vo
 import "github.com/thetasensors/theta-cloud-lite/server/domain/po"
 
 type Property struct {
-	ID     uint    `json:"id"`
-	Name   string  `json:"name"`
-	Unit   string  `json:"unit"`
-	Fields []Field `json:"fields"`
+	ID        uint   `json:"id"`
+	Name      string `json:"name"`
+	Unit      string `json:"unit"`
+	Precision int    `json:"precision"`
+	Fields    Fields `json:"fields"`
 }
 
 func NewProperty(e po.Property) Property {
 	m := Property{
-		ID:   e.ID,
-		Name: e.Name,
-		Unit: e.Unit,
+		ID:        e.ID,
+		Name:      e.Name,
+		Precision: e.Precision,
+		Unit:      e.Unit,
 	}
 	m.Fields = make([]Field, 0)
-	for k := range e.Fields {
+	for k, idx := range e.Fields {
 		m.Fields = append(m.Fields, Field{
-			Name: k,
+			Index: idx,
+			Name:  k,
+			Unit:  e.Unit,
 		})
 	}
 	return m

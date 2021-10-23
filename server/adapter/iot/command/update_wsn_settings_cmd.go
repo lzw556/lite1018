@@ -1,6 +1,8 @@
 package command
 
 import (
+	"bytes"
+	"encoding/hex"
 	"fmt"
 	"github.com/gogo/protobuf/proto"
 	pd "github.com/thetasensors/theta-cloud-lite/server/adapter/iot/proto"
@@ -65,18 +67,22 @@ func (cmd UpdateWsnSettingsCmd) Payload() []byte {
 		m.SubCommand = 1
 	} else {
 		m.SubCommand = 0
-		b, err := json.Marshal(cmd.routingTable)
-		if err != nil {
-			return nil
+		for _, table := range cmd.routingTable {
+			child, _ := hex.DecodeString(table[0])
+			parent, _ := hex.DecodeString(table[1])
+			m.RoutingTable = combineBytes(m.RoutingTable, child, parent)
 		}
-		m.RoutingTableLength = int32(len(b))
-		m.RoutingTable = b
+		m.RoutingTableLength = int32(len(m.RoutingTable))
 	}
-	bytes, err := proto.Marshal(&m)
+	payload, err := proto.Marshal(&m)
 	if err != nil {
 		return nil
 	}
-	return bytes
+	return payload
+}
+
+func combineBytes(bs ...[]byte) []byte {
+	return bytes.Join(bs, []byte(""))
 }
 
 func (cmd UpdateWsnSettingsCmd) Response() chan pd.GeneralResponseMessage {

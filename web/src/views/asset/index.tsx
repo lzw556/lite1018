@@ -8,6 +8,7 @@ import {EmptyLayout} from "../layout";
 import {InitializeAssetState} from "../../types/asset";
 import EditModal from "./editModal";
 import {DeleteOutlined, EditOutlined, FolderAddOutlined} from "@ant-design/icons";
+import ShadowCard from "../../components/shadowCard";
 
 
 const AssetPage: FC = () => {
@@ -110,7 +111,7 @@ const AssetPage: FC = () => {
         <Row justify="center">
             <Col span={24}>
                 <Content style={{paddingTop: "15px"}}>
-                    <Card>
+                    <ShadowCard>
                         <TableLayout
                             emptyLayout={AssetEmptyLayout}
                             columns={columns}
@@ -119,7 +120,7 @@ const AssetPage: FC = () => {
                             onChange={onChange}
                             pagination={true}
                             data={table.data}/>
-                    </Card>
+                    </ShadowCard>
                 </Content>
             </Col>
         </Row>

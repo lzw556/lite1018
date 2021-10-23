@@ -108,12 +108,20 @@ func (s Device) ReplaceDevice(deviceID uint, mac string) error {
 	return cmd.Replace(mac)
 }
 
-func (s Device) FindDataByID(deviceID uint, pID uint, from, to int64) (vo.PropertyData, error) {
+func (s Device) GetPropertyDataByID(deviceID uint, pID uint, from, to int64) (vo.PropertyData, error) {
 	query, err := s.factory.NewDeviceQuery(deviceID)
 	if err != nil {
 		return vo.PropertyData{}, err
 	}
-	return query.DataByRange(pID, time.Unix(from, 0), time.Unix(to, 0))
+	return query.PropertyDataByRange(pID, time.Unix(from, 0), time.Unix(to, 0))
+}
+
+func (s Device) FindDeviceDataByID(deviceID uint, from, to int64) ([]vo.PropertyData, error) {
+	query, err := s.factory.NewDeviceQuery(deviceID)
+	if err != nil {
+		return nil, err
+	}
+	return query.DataByRange(time.Unix(from, 0), time.Unix(to, 0))
 }
 
 func (Device) RemoveDataByID(deviceID int, from, to int64) error {
@@ -126,4 +134,12 @@ func (s Device) ExecuteCommand(deviceID uint, cmdType uint) error {
 		return err
 	}
 	return cmd.Run(cmdType)
+}
+
+func (s Device) GetChildren(deviceID uint) ([]vo.Device, error) {
+	query, err := s.factory.NewDeviceChildrenQuery(deviceID)
+	if err != nil {
+		return nil, err
+	}
+	return query.Query()
 }

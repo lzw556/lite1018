@@ -1,8 +1,8 @@
 import {
     AddAlarmRule, AddAlarmRuleTemplate,
-    AddDevice, Alarm, AlarmRule,
+    AddDevice, AlarmRecord, AlarmRule,
     Asset,
-    Device, EditAlarmRuleTemplate,
+    Device, DeviceDetail, EditAlarmRuleTemplate,
     Firmware,
     HistoryData,
     ImportNetwork,
@@ -84,6 +84,16 @@ const ConsoleRoutes = [
                 component: Device,
                 hidden: false,
                 auth: false,
+                children: [
+                    {
+                        name: "deviceDetail",
+                        path: "/device-management/devices",
+                        title: "设备详情",
+                        component: DeviceDetail,
+                        hidden: true,
+                        auth: false,
+                    }
+                ]
             },
             {
                 name: "add",
@@ -152,10 +162,10 @@ const ConsoleRoutes = [
         hidden: false,
         children: [
             {
-                name: "alarms",
-                path: "/alarm-management/alarms",
+                name: "alarmRecords",
+                path: "/alarm-management/alarmRecords",
                 title: "报警列表",
-                component: Alarm,
+                component: AlarmRecord,
                 hidden: false,
                 auth: false
             },
@@ -166,31 +176,33 @@ const ConsoleRoutes = [
                 component: AlarmRule,
                 hidden: false,
                 auth: false,
+                children: [
+                    {
+                        name: "addRule",
+                        path: "/alarm-management/alarmRules",
+                        title: "添加规则",
+                        component: AddAlarmRule,
+                        hidden: true,
+                        auth: false,
+                    },
+                    {
+                        name: "addRuleTemplate",
+                        path: "/alarm-management/alarmRules",
+                        title: "创建规则模板",
+                        component: AddAlarmRuleTemplate,
+                        hidden: true,
+                        auth: false,
+                    },
+                    {
+                        name: "editRuleTemplate",
+                        path: "/alarm-management/alarmRules",
+                        title: "编辑规则模板",
+                        component: EditAlarmRuleTemplate,
+                        hidden: true,
+                        auth: false,
+                    }
+                ]
             },
-            {
-                name: "addRule",
-                path: "/alarm-management/alarmRules",
-                title: "添加规则",
-                component: AddAlarmRule,
-                hidden: true,
-                auth: false,
-            },
-            {
-                name: "addRuleTemplate",
-                path: "/alarm-management/alarmRules",
-                title: "创建规则模板",
-                component: AddAlarmRuleTemplate,
-                hidden: true,
-                auth: false,
-            },
-            {
-                name: "editRuleTemplate",
-                path: "/alarm-management/alarmRules",
-                title: "编辑规则模板",
-                component: EditAlarmRuleTemplate,
-                hidden: true,
-                auth: false,
-            }
         ]
     },
     {

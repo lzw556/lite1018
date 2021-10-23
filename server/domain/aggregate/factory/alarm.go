@@ -10,11 +10,13 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/po"
 	spec "github.com/thetasensors/theta-cloud-lite/server/domain/specification"
+	"time"
 )
 
 type Alarm struct {
 	assetRepo             dependency.AssetRepository
 	deviceRepo            dependency.DeviceRepository
+	alarmRecordRepo       dependency.AlarmRecordRepository
 	alarmRuleRepo         dependency.AlarmRuleRepository
 	alarmRuleTemplateRepo dependency.AlarmRuleTemplateRepository
 }
@@ -23,6 +25,7 @@ func NewAlarm() Alarm {
 	return Alarm{
 		assetRepo:             repository.Asset{},
 		deviceRepo:            repository.Device{},
+		alarmRecordRepo:       repository.AlarmRecord{},
 		alarmRuleRepo:         repository.AlarmRule{},
 		alarmRuleTemplateRepo: repository.AlarmRuleTemplate{},
 	}
@@ -67,6 +70,7 @@ func (factory Alarm) buildAlarmRulesByCustom(req request.AlarmRule) po.AlarmRule
 				Operation: req.Rule.Operation,
 				Threshold: req.Rule.Threshold,
 			},
+			Level:   req.Level,
 			Enabled: true,
 		}
 	}
@@ -101,21 +105,9 @@ func (factory Alarm) buildAlarmRulesFormTemplates(req request.AlarmRule) (po.Ala
 
 func (factory Alarm) NewAlarmRulePagingQuery(assetID, deviceID uint, page, size int) (*query.AlarmRulePagingQuery, error) {
 	ctx := context.TODO()
-	specs := make([]spec.Specification, 0)
-	if deviceID != 0 {
-		specs = append(specs, spec.DevicesSpec{deviceID})
-	} else {
-		if assetID != 0 {
-			devices, err := factory.deviceRepo.FindBySpecs(ctx, spec.AssetSpec(assetID))
-			if err != nil {
-				return nil, err
-			}
-			deviceIDs := make([]uint, len(devices))
-			for i, device := range devices {
-				deviceIDs[i] = device.ID
-			}
-			specs = append(specs, spec.DevicesSpec(deviceIDs))
-		}
+	specs, err := factory.buildFilterSpecs(request.AlarmFilter{DeviceID: deviceID, AssetID: assetID})
+	if err != nil {
+		return nil, err
 	}
 	es, total, err := factory.alarmRuleRepo.PagingBySpecs(ctx, page, size, specs...)
 	if err != nil {
@@ -135,4 +127,60 @@ func (factory Alarm) NewAlarmRuleQuery(id uint) (*query.AlarmRuleQuery, error) {
 	q := query.NewAlarmRuleQuery()
 	q.AlarmRule = e
 	return &q, nil
+}
+
+func (factory Alarm) NewAlarmRecordPagingQuery(from, to int64, page, size int, req request.AlarmFilter) (*query.AlarmRecordPagingQuery, error) {
+	ctx := context.TODO()
+	specs, err := factory.buildFilterSpecs(req)
+	if err != nil {
+		return nil, err
+	}
+	specs = append(specs, spec.LevelsSpec(req.AlarmLevels))
+	specs = append(specs, spec.CreatedAtRangeSpec{time.Unix(from, 0), time.Unix(to, 0)})
+
+	es, total, err := factory.alarmRecordRepo.PagingBySpecs(ctx, page, size, specs...)
+	if err != nil {
+		return nil, err
+	}
+	q := query.NewAlarmRecordPagingQuery(total)
+	q.AlarmRecords = es
+	return &q, nil
+}
+
+func (factory Alarm) NewAlarmStatisticsQuery(from, to int64, req request.AlarmFilter) (*query.AlarmStatisticsQuery, error) {
+	ctx := context.TODO()
+	specs, err := factory.buildFilterSpecs(req)
+	if err != nil {
+		return nil, err
+	}
+	specs = append(specs, spec.LevelsSpec(req.AlarmLevels))
+	specs = append(specs, spec.CreatedAtRangeSpec{time.Unix(from, 0), time.Unix(to, 0)})
+	es, err := factory.alarmRecordRepo.FindBySpecs(ctx, specs...)
+	if err != nil {
+		return nil, err
+	}
+	q := query.NewAlarmStatisticsQuery()
+	q.AlarmRecords = es
+	return &q, nil
+}
+
+func (factory Alarm) buildFilterSpecs(filter request.AlarmFilter) ([]spec.Specification, error) {
+	ctx := context.TODO()
+	specs := make([]spec.Specification, 0)
+	if filter.DeviceID != 0 {
+		specs = append(specs, spec.DevicesSpec{filter.DeviceID})
+	} else {
+		if filter.AssetID != 0 {
+			devices, err := factory.deviceRepo.FindBySpecs(ctx, spec.AssetSpec(filter.AssetID))
+			if err != nil {
+				return nil, err
+			}
+			deviceIDs := make([]uint, len(devices))
+			for i, device := range devices {
+				deviceIDs[i] = device.ID
+			}
+			specs = append(specs, spec.DevicesSpec(deviceIDs))
+		}
+	}
+	return specs, nil
 }

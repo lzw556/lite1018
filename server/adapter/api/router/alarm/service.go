@@ -18,4 +18,8 @@ type Service interface {
 	GetAlarmRule(id uint) (*vo.AlarmRule, error)
 	UpdateAlarmRule(id uint, req request.UpdateAlarmRule) error
 	RemoveAlarmRule(id uint) error
+
+	FindAlarmRecordsByPaginate(from, to int64, page, size int, req request.AlarmFilter) ([]vo.AlarmRecord, int64, error)
+
+	GetAlarmStatistics(from, to int64, req request.AlarmFilter) (vo.AlarmStatistics, error)
 }

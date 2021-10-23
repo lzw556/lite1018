@@ -10,6 +10,7 @@ func InitBuckets(db *bbolt.DB) {
 	buckets := []core.Bucket{
 		po.DeviceStatus{},
 		po.DeviceData{},
+		po.DeviceInformation{},
 	}
 	_ = db.Update(func(tx *bbolt.Tx) error {
 		for _, bucket := range buckets {

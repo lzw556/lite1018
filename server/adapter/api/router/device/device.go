@@ -25,8 +25,10 @@ func (r *deviceRouter) initRoutes() {
 		router.NewGetRoute("devices/groupBy/asset", r.findGroupByAsset),
 		router.NewGetRoute("devices", r.paging),
 		router.NewGetRoute("devices/:id", r.getByID),
+		router.NewGetRoute("devices/:id/children", r.getChildren),
 		router.NewGetRoute("devices/:id/setting", r.getSettingByID),
 		router.NewGetRoute("devices/checkMacAddress/:mac", r.checkMacAddress),
+		router.NewGetRoute("devices/:id/property/:pid/data", r.findPropertyDataByID),
 		router.NewGetRoute("devices/:id/data", r.findDataByID),
 		router.NewGetRoute("devices/:id/download/data", r.downloadDataByID),
 

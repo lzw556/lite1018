@@ -81,12 +81,19 @@ func (r deviceRouter) removeByID(ctx *gin.Context) (interface{}, error) {
 	return nil, r.service.RemoveDevice(id)
 }
 
-func (r deviceRouter) findDataByID(ctx *gin.Context) (interface{}, error) {
+func (r deviceRouter) findPropertyDataByID(ctx *gin.Context) (interface{}, error) {
 	id := cast.ToUint(ctx.Param("id"))
-	propertyID := cast.ToUint(ctx.Query("pid"))
+	propertyID := cast.ToUint(ctx.Param("pid"))
 	from := cast.ToInt64(ctx.Query("from"))
 	to := cast.ToInt64(ctx.Query("to"))
-	return r.service.FindDataByID(id, propertyID, from, to)
+	return r.service.GetPropertyDataByID(id, propertyID, from, to)
+}
+
+func (r deviceRouter) findDataByID(ctx *gin.Context) (interface{}, error) {
+	id := cast.ToUint(ctx.Param("id"))
+	from := cast.ToInt64(ctx.Query("from"))
+	to := cast.ToInt64(ctx.Query("to"))
+	return r.service.FindDeviceDataByID(id, from, to)
 }
 
 func (r deviceRouter) downloadDataByID(ctx *gin.Context) (interface{}, error) {
@@ -94,7 +101,7 @@ func (r deviceRouter) downloadDataByID(ctx *gin.Context) (interface{}, error) {
 	propertyID := cast.ToUint(ctx.Query("pid"))
 	from := cast.ToInt64(ctx.Query("from"))
 	to := cast.ToInt64(ctx.Query("to"))
-	result, err := r.service.FindDataByID(id, propertyID, from, to)
+	result, err := r.service.GetPropertyDataByID(id, propertyID, from, to)
 	if err != nil {
 		return nil, err
 	}
@@ -111,4 +118,9 @@ func (r deviceRouter) removeDataByID(ctx *gin.Context) (interface{}, error) {
 func (r deviceRouter) findGroupByAsset(ctx *gin.Context) (interface{}, error) {
 	deviceType := cast.ToUint(ctx.Query("device_type"))
 	return r.service.FindDevicesGroupByAsset(deviceType)
+}
+
+func (r deviceRouter) getChildren(ctx *gin.Context) (interface{}, error) {
+	id := cast.ToUint(ctx.Param("id"))
+	return r.service.GetChildren(id)
 }

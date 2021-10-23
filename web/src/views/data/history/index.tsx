@@ -1,5 +1,5 @@
 import {useEffect, useState} from "react";
-import {GetDeviceDataRequest, PagingDevicesRequest} from "../../../apis/device";
+import {GetPropertyDataRequest, PagingDevicesRequest} from "../../../apis/device";
 import {Button, Card, Col, DatePicker, Row, Select, Space} from "antd";
 import {CaretDownOutlined, DownloadOutlined} from "@ant-design/icons";
 import {Content} from "antd/lib/layout/layout";
@@ -10,45 +10,13 @@ import moment from "moment";
 import LabelSelect from "../../../components/labelSelect";
 import Label from "../../../components/label";
 import DownloadDataModal from "../download";
+import ShadowCard from "../../../components/shadowCard";
+import { DefaultHistoryDataOption } from "../../../constants/chart";
 
 const {Option} = Select
 const {RangePicker} = DatePicker
 
-const defaultHistoryDataOption = {
-    title: {
-        text: ''
-    },
-    tooltip: {
-        trigger: 'axis'
-    },
-    legend: {
-        data: []
-    },
-    toolbox: {
-        feature: {
-            saveAsImage: {}
-        }
-    },
-    grid: {
-        left: '3%',
-        right: '4%',
-        bottom: '3%',
-        containLabel: true
-    },
-    xAxis: [
-        {
-            type: 'category',
-            boundaryGap: false,
-            data: []
-        }
-    ],
-    yAxis: [
-        {
-            type: 'value'
-        }
-    ],
-    series: []
-}
+
 
 const HistoryDataPage = () => {
     const [devices, setDevices] = useState<Device[]>([])
@@ -57,7 +25,7 @@ const HistoryDataPage = () => {
     const [property, setProperty] = useState<any>()
     const [startDate, setStartDate] = useState<moment.Moment>(moment().startOf('day').subtract(7, 'd'))
     const [endDate, setEndDate] = useState<moment.Moment>(moment().endOf('day'))
-    const [option, setOption] = useState<any>(defaultHistoryDataOption)
+    const [option, setOption] = useState<any>(DefaultHistoryDataOption)
     const [downloadVisible, setDownloadVisible] = useState<boolean>(false)
     const [height] = useState<number>(window.innerHeight - 230)
 
@@ -103,7 +71,7 @@ const HistoryDataPage = () => {
 
     useEffect(() => {
         if (device && property && startDate && endDate) {
-            GetDeviceDataRequest(device.id, property.id, startDate.utc().unix(), endDate.utc().unix()).then(res => {
+            GetPropertyDataRequest(device.id, property.id, startDate.utc().unix(), endDate.utc().unix()).then(res => {
                 if (res.code === 200) {
                     const series = Object.keys(res.data.fields).map(key => {
                         return {name: key, type: 'line', areaStyle: {normal: {}}, data: res.data.fields[key]}
@@ -137,7 +105,7 @@ const HistoryDataPage = () => {
         <Row justify="center">
             <Col span={24}>
                 <Content style={{paddingTop: "15px"}}>
-                    <Card>
+                    <ShadowCard>
                         <Row justify="center">
                             <Col span={24}>
                                 <Space>
@@ -186,7 +154,7 @@ const HistoryDataPage = () => {
                                 </Card>
                             </Col>
                         </Row>
-                    </Card>
+                    </ShadowCard>
                 </Content>
             </Col>
         </Row>

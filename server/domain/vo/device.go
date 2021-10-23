@@ -17,8 +17,9 @@ type Device struct {
 	WSN        map[string]interface{} `json:"wsn,omitempty"`
 	Category   uint                   `json:"category"`
 
-	Properties []Property   `json:"properties"`
-	Status     DeviceStatus `json:"status"`
+	Properties  []Property        `json:"properties"`
+	Status      DeviceStatus      `json:"status"`
+	Information DeviceInformation `json:"information"`
 }
 
 func NewDevice(e entity.Device) Device {

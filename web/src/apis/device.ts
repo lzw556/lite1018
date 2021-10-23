@@ -31,8 +31,12 @@ export function DeleteDeviceRequest(id:number) {
     return request.delete(`/devices/${id}`).then(res => res.data)
 }
 
-export function GetDeviceDataRequest(id:number, pid:number, from:number, to:number) {
-    return request.get<PropertyData>(`/devices/${id}/data`, {pid, from, to}).then(res => res.data)
+export function GetPropertyDataRequest(id:number, pid:number, from:number, to:number) {
+    return request.get<PropertyData>(`/devices/${id}/property/${pid}/data`, {from, to}).then(res => res.data)
+}
+
+export function GetDeviceDataRequest(id:number, from:number, to:number) {
+    return request.get<PropertyData[]>(`/devices/${id}/data`, {from, to}).then(res => res.data)
 }
 
 export function DownloadDeviceDataRequest(id:number, pid:number, from:number, to:number) {
@@ -49,4 +53,8 @@ export function SendDeviceCommandRequest(id:number, cmd:any) {
 
 export function GetDeviceGroupByAsset(deviceType: number) {
     return request.get(`/devices/groupBy/asset`, {device_type: deviceType}).then(res => res.data)
+}
+
+export function GetChildrenRequest(id:number) {
+    return request.get<Device[]>(`/devices/${id}/children`).then(res => res.data)
 }

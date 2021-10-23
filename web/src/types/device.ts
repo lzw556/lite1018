@@ -12,6 +12,7 @@ export type Device = {
     sensors: Map<string, any>
     wsn?: WsnSetting
     status?: any
+    information?:any
     category: number
     properties: { id: number, name: string }[]
 }

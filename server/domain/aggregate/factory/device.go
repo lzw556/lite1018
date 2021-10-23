@@ -3,6 +3,7 @@ package factory
 import (
 	"context"
 	"errors"
+	"fmt"
 	"github.com/spf13/cast"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/request"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/response"
@@ -180,4 +181,27 @@ func (factory Device) NewDeviceExecuteCommandCmd(deviceID uint) (*command.Device
 	}
 	cmd.Gateway = gateway
 	return &cmd, nil
+}
+
+func (factory Device) NewDeviceChildrenQuery(id uint) (*query.DeviceChildrenQuery, error) {
+	ctx := context.TODO()
+	e, err := factory.deviceRepo.Get(ctx, id)
+	if err != nil {
+		return nil, response.BusinessErr(response.DeviceNotFoundError, "")
+	}
+	network, err := factory.networkRepo.Get(ctx, e.NetworkID)
+	if err != nil {
+		return nil, response.BusinessErr(response.NetworkNotFoundError, "")
+	}
+	macs := network.GetChildren(e.MacAddress)
+	if len(macs) > 0 {
+		children, err := factory.deviceRepo.FindBySpecs(ctx, spec.DeviceMacsSpec(macs))
+		if err != nil {
+			return nil, err
+		}
+		q := query.NewDeviceChildrenQuery()
+		q.Devices = children
+		return &q, nil
+	}
+	return nil, fmt.Errorf("has no children")
 }

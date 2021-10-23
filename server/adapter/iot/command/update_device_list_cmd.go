@@ -1,6 +1,7 @@
 package command
 
 import (
+	"encoding/hex"
 	"github.com/gogo/protobuf/proto"
 	pd "github.com/thetasensors/theta-cloud-lite/server/adapter/iot/proto"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
@@ -40,25 +41,26 @@ func (cmd UpdateDeviceListCmd) Payload() []byte {
 		ReqId:     cmd.reqID,
 		Items:     make([]*pd.DeviceListItem, 0),
 	}
-	m.Items = append(m.Items, &pd.DeviceListItem{
-		Mac:  []byte(cmd.gateway.MacAddress),
-		Name: []byte(cmd.gateway.Name),
-		Type: int32(cmd.gateway.TypeID),
-	})
+	m.Items = append(m.Items, toDeviceListItem(cmd.gateway))
 	for _, child := range cmd.children {
 		if cmd.gateway.MacAddress != child.MacAddress {
-			m.Items = append(m.Items, &pd.DeviceListItem{
-				Mac:  []byte(child.MacAddress),
-				Name: []byte(child.Name),
-				Type: int32(child.TypeID),
-			})
+			m.Items = append(m.Items, toDeviceListItem(child))
 		}
 	}
-	bytes, err := proto.Marshal(&m)
+	payload, err := proto.Marshal(&m)
 	if err != nil {
 		return nil
 	}
-	return bytes
+	return payload
+}
+
+func toDeviceListItem(e entity.Device) *pd.DeviceListItem {
+	item := &pd.DeviceListItem{
+		Type: int32(e.TypeID),
+	}
+	item.Mac, _ = hex.DecodeString(e.MacAddress)
+	item.Name, _ = hex.DecodeString(e.Name)
+	return item
 }
 
 func (cmd UpdateDeviceListCmd) Response() chan pd.GeneralResponseMessage {

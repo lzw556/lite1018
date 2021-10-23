@@ -48,4 +48,14 @@ func (n *Network) ReplaceDevice(e Device, newMac string) {
 	}
 }
 
+func (n Network) GetChildren(mac string) []string {
+	macs := make([]string, 0)
+	for _, table := range n.RoutingTables {
+		if table[1] == mac {
+			macs = append(macs, table[0])
+		}
+	}
+	return macs
+}
+
 type Networks []Network

@@ -12,6 +12,7 @@ type PropertyData struct {
 	Unit   string               `json:"unit"`
 	Fields map[string][]float32 `json:"fields"`
 	Time   []int64              `json:"time"`
+	Alarms []AlarmRule          `json:"alarms,omitempty"`
 }
 
 func NewPropertyData(e po.Property) PropertyData {
@@ -19,6 +20,13 @@ func NewPropertyData(e po.Property) PropertyData {
 		Name:   e.Name,
 		Unit:   e.Unit,
 		Fields: map[string][]float32{},
+		Alarms: make([]AlarmRule, 0),
+	}
+}
+
+func (d *PropertyData) AddAlarms(es ...po.AlarmRule) {
+	for _, e := range es {
+		d.Alarms = append(d.Alarms, NewAlarmRule(e))
 	}
 }
 

@@ -7,17 +7,18 @@ import (
 	pd "github.com/thetasensors/theta-cloud-lite/server/adapter/iot/proto"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
+	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/po"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/json"
 )
 
 type DeviceStatus struct {
-	deviceStatusRepo dependency.DeviceStatusRepository
+	repository dependency.DeviceStatusRepository
 }
 
 func NewDeviceStatus() Processor {
 	return newRoot(DeviceStatus{
-		deviceStatusRepo: repository.DeviceStatus{},
+		repository: repository.DeviceStatus{},
 	})
 }
 
@@ -31,7 +32,7 @@ func (DeviceStatus) Next() Processor {
 
 func (p DeviceStatus) Process(ctx *iot.Context, msg iot.Message) error {
 	if value, ok := ctx.Get(msg.Body.Device); ok {
-		if device, ok := value.(po.Device); ok {
+		if device, ok := value.(entity.Device); ok {
 			m := pd.DeviceStatusMessage{}
 			if err := proto.Unmarshal(msg.Body.Payload, &m); err != nil {
 				return fmt.Errorf("unmarshal [DeviceStatus] message failed： %v", err)
@@ -40,7 +41,7 @@ func (p DeviceStatus) Process(ctx *iot.Context, msg iot.Message) error {
 			if err := json.Unmarshal([]byte(m.Status), &e); err != nil {
 				return fmt.Errorf("unmarshal device %s status %s failed: %v", device.MacAddress, m.Status, err)
 			}
-			if err := p.deviceStatusRepo.Create(device.ID, e); err != nil {
+			if err := p.repository.Create(device.ID, e); err != nil {
 				return fmt.Errorf("save device status failed: %v", err)
 			}
 		}

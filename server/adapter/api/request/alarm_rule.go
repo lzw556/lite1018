@@ -25,6 +25,7 @@ type AlarmRule struct {
 	DeviceType  uint             `json:"device_type"`
 	Rule        AlarmRuleContent `json:"rule"`
 	TemplateIDs []uint           `json:"template_ids"`
+	Level       uint             `json:"level"`
 }
 
 type UpdateAlarmRule struct {
