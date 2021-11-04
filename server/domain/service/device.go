@@ -11,6 +11,7 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
 	spec "github.com/thetasensors/theta-cloud-lite/server/domain/specification"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/vo"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/errcode"
 	"gorm.io/gorm"
 	"time"
 )
@@ -97,7 +98,7 @@ func (s Device) CheckDeviceMacAddress(mac string) error {
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil
 	}
-	return response.BusinessErr(response.DeviceMacExistsError, mac)
+	return response.BusinessErr(errcode.DeviceMacExistsError, mac)
 }
 
 func (s Device) ReplaceDevice(deviceID uint, mac string) error {
@@ -134,6 +135,22 @@ func (s Device) ExecuteCommand(deviceID uint, cmdType uint) error {
 		return err
 	}
 	return cmd.Run(cmdType)
+}
+
+func (s Device) ExecuteDeviceUpgrade(deviceID uint, req request.DeviceUpgrade) error {
+	cmd, err := s.factory.NewDeviceUpgradeCmd(deviceID)
+	if err != nil {
+		return err
+	}
+	return cmd.Upgrade(req)
+}
+
+func (s Device) ExecuteDeviceCancelUpgrade(deviceID uint) error {
+	cmd, err := s.factory.NewDeviceUpgradeCmd(deviceID)
+	if err != nil {
+		return err
+	}
+	return cmd.CancelUpgrade()
 }
 
 func (s Device) GetChildren(deviceID uint) ([]vo.Device, error) {

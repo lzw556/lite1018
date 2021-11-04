@@ -9,6 +9,7 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/po"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/vo"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/errcode"
 )
 
 type Asset struct {
@@ -32,7 +33,7 @@ func (s Asset) UpdateAsset(assetID uint, req request.Asset) (*vo.Asset, error) {
 	ctx := context.TODO()
 	e, err := s.repository.Get(ctx, assetID)
 	if err != nil {
-		return nil, response.BusinessErr(response.AssetNotFoundError, "")
+		return nil, response.BusinessErr(errcode.AssetNotFoundError, "")
 	}
 	e.Name = req.Name
 	if err := s.repository.Save(ctx, &e); err != nil {
@@ -61,7 +62,7 @@ func (s Asset) FindAssetsByPaginate(page, size int) ([]vo.Asset, int64, error) {
 func (s Asset) GetAsset(assetID uint) (*vo.Asset, error) {
 	e, err := s.repository.Get(context.TODO(), assetID)
 	if err != nil {
-		return nil, response.BusinessErr(response.AssetNotFoundError, "")
+		return nil, response.BusinessErr(errcode.AssetNotFoundError, "")
 	}
 	result := vo.NewAsset(e)
 	return &result, nil

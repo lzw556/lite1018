@@ -13,6 +13,8 @@ type Network struct {
 	RoutingTables           po.RoutingTables `json:"routingTables"`
 	CommunicationPeriod     uint             `json:"communicationPeriod"`
 	CommunicationTimeOffset uint             `json:"communicationTimeOffset"`
+	GroupSize               uint             `json:"groupSize"`
+	GroupInterval           uint             `json:"groupInterval"`
 }
 
 func NewNetwork(e entity.Network) Network {
@@ -21,6 +23,8 @@ func NewNetwork(e entity.Network) Network {
 		Name:                    e.Name,
 		CommunicationPeriod:     e.CommunicationPeriod,
 		CommunicationTimeOffset: e.CommunicationTimeOffset,
+		GroupSize:               e.GroupSize,
+		GroupInterval:           e.GroupInterval,
 		RoutingTables:           e.RoutingTables,
 	}
 }

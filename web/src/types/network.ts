@@ -6,4 +6,9 @@ export type Network = {
     gateway: Device
     routingTables: []
     nodes: Device[]
+    communicationPeriod: number
+    communicationTimeOffset: number
+    groupSize: number
+    groupInterval: number
+
 }

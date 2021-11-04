@@ -9,6 +9,7 @@ type Service interface {
 	CreateFirmware(req request.Firmware) error
 
 	FindFirmwaresByPaginate(page, size int) (vo.Firmwares, int64, error)
+	FindFirmwaresByDeviceID(deviceID uint) (vo.Firmwares, error)
 
 	RemoveFirmware(firmwareID uint) error
 }

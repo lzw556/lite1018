@@ -1,19 +1,31 @@
-import {Button, Card, Col, message, Modal, Row, Space, Tree, TreeDataNode} from "antd";
+import {Button, Card, Col, Dropdown, Form, Input, Menu, message, Row, Select, Space, Tooltip} from "antd";
 import {Content} from "antd/lib/layout/layout";
-import AssetSelect from "../asset/select/assetSelect";
-import {useCallback, useEffect, useState} from "react";
-import {ExportNetworkRequest, GetNetworkRequest, GetNetworksRequest, RemoveDeviceRequest} from "../../apis/network";
+import {useEffect, useState} from "react";
+import {
+    ExportNetworkRequest,
+    GetNetworkRequest,
+    RemoveDevicesRequest,
+    SyncNetworkRequest,
+    UpdateNetworkRequest
+} from "../../apis/network";
 import {Network} from "../../types/network";
 import {Device} from "../../types/device";
 import Graph from "./graph/graph";
-import {CaretDownOutlined, ClusterOutlined, ExclamationCircleOutlined} from "@ant-design/icons";
+import {QuestionCircleOutlined, UnorderedListOutlined} from "@ant-design/icons";
 import AccessDeviceModal from "./modal/accessDevice";
 import Label from "../../components/label";
 import ShadowCard from "../../components/shadowCard";
-
-interface NetworkTreeNode extends TreeDataNode {
-    network: Network
-}
+import "./index.css"
+import {COMMUNICATION_PERIOD, COMMUNICATION_TIME_OFFSET, GROUP_INTERVAL} from "../../constants";
+import CommunicationPeriodSelect from "../../components/communicationPeriodSelect";
+import CommunicationTimeOffsetSelect from "../../components/communicationTimeOffsetSelect";
+import GroupSizeSelect from "../../components/groupSizeSelect";
+import GroupIntervalSelect from "../../components/groupIntervalSelect";
+import AssetSelect from "../../components/assetSelect";
+import NetworkSelect from "../../components/networkSelect";
+import {SendDeviceCommandRequest} from "../../apis/device";
+import {DeviceCommand} from "../../types/device_command";
+import {EmptyLayout} from "../layout";
 
 export interface DevicePopover {
     device: Device
@@ -22,29 +34,26 @@ export interface DevicePopover {
     visible: boolean
 }
 
+const {Option} = Select
+
 const NetworkPage = () => {
     const [assetId, setAssetId] = useState<number>(0)
-    const [networks, setNetworks] = useState<NetworkTreeNode[]>([])
     const [network, setNetwork] = useState<Network>()
-    const [height, setHeight] = useState<number>(window.innerHeight - 220)
-    const [device, setDevice] = useState<Device>()
+    const [height] = useState<number>(window.innerHeight - 220)
+    const [device] = useState<Device>()
     const [accessVisible, setAccessVisible] = useState<boolean>(false)
-    const [modal, contextHolder] = Modal.useModal()
-
-    const loadNetworks = useCallback(() => {
-        GetNetworksRequest(assetId).then(res => {
-            if (res.code === 200) {
-                setNetworks(res.data.map(item => {
-                    return {key: item.id, title: item.name, icon: <ClusterOutlined/>, network: item}
-                }))
-            }
-        })
-    }, [assetId])
+    const [isEdit, setIsEdit] = useState<boolean>(false)
+    const [isNetworkEdit, setIsNetworkEdit] = useState<boolean>(false)
+    const [removeNode, setRemoveNode] = useState<number[]>([])
+    const [routingTables, setRoutingTables] = useState<any>()
+    const [form] = Form.useForm()
 
     const fetchNetwork = (id: number) => {
         GetNetworkRequest(id).then(res => {
             if (res.code === 200) {
                 setNetwork(res.data)
+                setIsNetworkEdit(false)
+                setIsEdit(false)
             }
         })
     }
@@ -53,92 +62,232 @@ const NetworkPage = () => {
         setAssetId(value)
     }
 
-    const onClickNode = (device: Device) => {
-        setDevice(device)
-    }
-
-    const onHoverNode = (x: number, y: number, device: Device) => {
-    }
-
-    const onLeaveNode = () => {
-    }
-
-    const onRemoveNode = (device: Device) => {
-        modal.confirm({
-            title: "请注意",
-            icon: <ExclamationCircleOutlined/>,
-            content: <p>此操作并不会删除设备，只是将设备从该网络中移除</p>,
-            okText: "确定",
-            onOk() {
-                if (network) {
-                    RemoveDeviceRequest(network.id, device.id).then(res => {
-                        if (res.code === 200) {
-                            message.success("移除成功").then()
-                            setNetwork(res.data)
-                        } else {
-                            message.error(`移除失败,${res.msg}`).then()
-                        }
-                    })
-                }
-            },
-            cancelText: "取消",
-            onCancel() {
-
-            }
-        })
-    }
-
     const onAccessDeviceSuccess = (id: number) => {
         fetchNetwork(id)
         setAccessVisible(false)
     }
 
+    const onMenuClick = (n: Network, key: any) => {
+        switch (key) {
+            case "1":
+                setAccessVisible(true)
+                break
+            case "2":
+                ExportNetworkRequest(n.id).then(res => {
+                    const url = window.URL.createObjectURL(new Blob([res.data]))
+                    const link = document.createElement('a')
+                    link.href = url
+                    link.setAttribute('download', `${n.name}.json`)
+                    document.body.appendChild(link)
+                    link.click()
+                })
+                break
+            case "3":
+                SendDeviceCommandRequest(n.gateway.id, DeviceCommand.Provision).then(res => {
+                    if (res.code === 200) {
+                        message.success("命令发送成功").then()
+                    } else {
+                        message.error("命令发送失败").then()
+                    }
+                })
+                break
+            case "4":
+                SyncNetworkRequest(n.id).then(res => {
+                    if (res.code === 200) {
+                        message.success("网络同步成功").then()
+                    } else {
+                        message.error("网络同步失败").then()
+                    }
+                })
+        }
+    }
+
+    const onSaveNetwork = () => {
+        if (network && removeNode && removeNode.length) {
+            RemoveDevicesRequest(network.id, {device_ids: removeNode, routing_tables: routingTables}).then(res => {
+                if (res.code === 200) {
+                    fetchNetwork(network.id)
+                    message.success("保存成功").then()
+                } else {
+                    message.error("保存失败").then()
+                }
+            })
+        } else {
+            setIsNetworkEdit(!isNetworkEdit)
+        }
+    }
+
+    const renderMoreAction = () => {
+        if (network) {
+            const isOnline = network.gateway.status?.isOnline
+            return <Menu onClick={(e) => {
+                onMenuClick(network, e.key)
+            }}>
+                <Menu.Item key={1}>
+                    接入设备
+                </Menu.Item>
+                <Menu.Item key={2}>
+                    导出网络
+                </Menu.Item>
+                <Menu.Item key={3} disabled={!isOnline}>
+                    继续组网
+                </Menu.Item>
+                <Menu.Item key={4} disabled={!isOnline}>
+                    同步网络
+                </Menu.Item>
+            </Menu>
+        }
+        return <div/>
+    }
+
     const renderActionButton = () => {
         if (network) {
             return <Space>
-                <Button type="link" size="small" onClick={() => setAccessVisible(true)}>
-                    接入设备
-                </Button>
-                <Button type="link" size="small" onClick={() => {
-                    ExportNetworkRequest(network.id).then(res => {
-                        const url = window.URL.createObjectURL(new Blob([res.data]))
-                        const link = document.createElement('a')
-                        link.href = url
-                        link.setAttribute('download', `${network.name}.json`)
-                        document.body.appendChild(link)
-                        link.click()
-                    })
-                }}>
-                    导出网络
-                </Button>
+                <Button size={"small"} type={"link"} hidden={isNetworkEdit}
+                        onClick={() => setIsNetworkEdit(!isNetworkEdit)}>编辑</Button>
+                <Button size={"small"} type={"link"} hidden={!isNetworkEdit} onClick={onSaveNetwork}>保存</Button>
+                <Button size={"small"} type={"link"} hidden={!isNetworkEdit}
+                        onClick={() => setIsNetworkEdit(!isNetworkEdit)}>取消</Button>
+                <Dropdown overlay={renderMoreAction}>
+                    <Button size={"small"} type={"text"} icon={<UnorderedListOutlined/>}/>
+                </Dropdown>
             </Space>
         }
     }
 
-    const loadGraphData = () => {
+    const onSave = () => {
+        form.validateFields().then(values => {
+            if (network) {
+                UpdateNetworkRequest(network.id, values).then(res => {
+                    if (res.code === 200) {
+                        message.success("保存成功").then()
+                        setNetwork(Object.assign({}, network, {
+                            name: res.data.name,
+                            communicationPeriod: res.data.communicationPeriod,
+                            communicationTimeOffset: res.data.communicationTimeOffset,
+                            groupSize: res.data.groupSize,
+                            groupInterval: res.data.groupInterval,
+                        }))
+                        setIsEdit(!isEdit)
+                    } else {
+                        message.error("保存失败").then()
+                    }
+                })
+            }
+        })
+    }
+
+    const renderEditButton = () => {
         if (network) {
-            const nodes = network.nodes.map(item => {
-                return {id: item.macAddress, text: item.name, data: {device: item}}
-            })
-            const edges = network.routingTables.map(item => {
-                return {from: item[1], to: item[0], id: ""}
-            })
-            return {nodes: nodes, edges: edges}
+            return <Space>
+                <Button size={"small"} type={"link"} hidden={!isEdit} onClick={onSave}>保存</Button>
+                <Button size={"small"} type={"link"} hidden={!isEdit} onClick={() => setIsEdit(!isEdit)}>取消</Button>
+                <Button size={"small"} type={"link"} hidden={isEdit} onClick={() => setIsEdit(!isEdit)}>编辑</Button>
+            </Space>
         }
-        return {nodes: [], edges: []}
     }
 
-    const resizeListener = (e: any) => {
-        setHeight(e.target.innerHeight - 220)
+    const renderBasicInfo = () => {
+        if (network) {
+            const period = COMMUNICATION_PERIOD.find(item => item.value === network.communicationPeriod)
+            const offset = COMMUNICATION_TIME_OFFSET.find(item => item.value === network.communicationTimeOffset)
+            const interval = GROUP_INTERVAL.find(item => item.value === network.groupInterval)
+            return <Form form={form}>
+                <Row justify={"start"}>
+                    <Col span={8} className={"ts-detail-label"}>
+                        网络名称
+                    </Col>
+                    <Col span={10} offset={2}>
+                        <Form.Item name={"name"} initialValue={network.name} noStyle>
+                            {
+                                isEdit ? <Input style={{width: "128px"}} size={"small"}/> : network.name
+                            }
+                        </Form.Item>
+                    </Col>
+                </Row>
+                <br/>
+                <Row justify={"start"}>
+                    <Col span={8} className={"ts-detail-label"}>
+                        <Space>
+                            通讯周期
+                            <Tooltip placement="top" title={"指网关与服务器的通讯周期"}>
+                                <QuestionCircleOutlined/>
+                            </Tooltip>
+                        </Space>
+                    </Col>
+                    <Col span={10} offset={2}>
+                        <Form.Item name={"communication_period"} initialValue={network.communicationPeriod} noStyle>
+                            {
+                                isEdit ?
+                                    <CommunicationPeriodSelect style={{width: "128px"}} size={"small"}
+                                                               placeholder={"请选择网络通讯周期"}/> :
+                                    period ? period.text : `${network.communicationPeriod / 1000}秒`
+                            }
+                        </Form.Item>
+                    </Col>
+                </Row>
+                <br/>
+                <Row justify={"start"}>
+                    <Col span={8} className={"ts-detail-label"}>
+                        通讯延时
+                    </Col>
+                    <Col span={10} offset={2}>
+                        <Form.Item name={"communication_time_offset"} initialValue={network.communicationTimeOffset}
+                                   noStyle>
+                            {
+                                isEdit ? <CommunicationTimeOffsetSelect style={{width: "128px"}} size={"small"}
+                                                                        placeholder={"请选择网络通讯延时"}/> :
+                                    offset ? offset.text : `${network.communicationTimeOffset / 1000}秒`
+                            }
+                        </Form.Item>
+                    </Col>
+                </Row>
+                <br/>
+                <Row justify={"start"}>
+                    <Col span={8} className={"ts-detail-label"}>
+                        每组设备数
+                    </Col>
+                    <Col span={10} offset={2}>
+                        <Form.Item name={"group_size"} initialValue={network.groupSize} noStyle>
+                            {
+                                isEdit ? <GroupSizeSelect style={{width: "128px"}} size={"small"}
+                                                          placeholder={"请选择网络每组设备数"}/> : network.groupSize
+                            }
+                        </Form.Item>
+                    </Col>
+                </Row>
+                <br/>
+                <Row justify={"start"}>
+                    <Col span={8} className={"ts-detail-label"}>
+                        每组通信间隔
+                    </Col>
+                    <Col span={10} offset={2}>
+                        <Form.Item name={"group_interval"} initialValue={network.groupInterval} noStyle>
+                            {
+                                isEdit ? <GroupIntervalSelect style={{width: "128px"}} size={"small"}
+                                                              placeholder={"请选择网络每组通信间隔"}/> : interval ? interval.text : `${network.groupInterval / 1000}秒`
+                            }
+                        </Form.Item>
+                    </Col>
+                </Row>
+            </Form>
+        }
     }
 
-    useEffect(() => {
-        loadNetworks()
-        window.addEventListener("resize", resizeListener)
-        return window.removeEventListener("resize", resizeListener)
-    }, [loadNetworks])
+    const renderNetworkGraph = () => {
+        if (network) {
+            return <Graph height={height}
+                          isEdit={isNetworkEdit}
+                          network={network}
+                          onNodeRemove={(value, tables) => {
+                              setRemoveNode([...removeNode, value])
+                              setRoutingTables(tables)
+                          }}/>
+        }
+        return <EmptyLayout description={"暂无网络"}/>
+    }
 
-    return <div>
+    return <>
         <Row justify="center">
             <Col span={24} style={{textAlign: "right"}}>
             </Col>
@@ -153,37 +302,39 @@ const NetworkPage = () => {
                                     <Label name={"资产"}>
                                         <AssetSelect bordered={false} style={{width: "150px"}} defaultValue={assetId}
                                                      defaultActiveFirstOption={true}
-                                                     defaultOption={{value: 0, text: "所有资产"}} placeholder={"请选择资产"}
-                                                     onChange={onAssetChange} suffixIcon={<CaretDownOutlined />}/>
+                                                     placeholder={"请选择资产"}
+                                                     onChange={onAssetChange}>
+                                            <Option key={0} value={0}>所有资产</Option>
+                                        </AssetSelect>
+                                    </Label>
+                                    <Label name={"网络"}>
+                                        <NetworkSelect value={network?.id} bordered={false}
+                                                       defaultActiveFirstOption={true} style={{width: "150px"}}
+                                                       placeholder={"暂无网络"} asset={assetId} onChange={value => {
+                                            value ? fetchNetwork(value) : setNetwork(undefined)
+                                        }} onDefaultSelect={value => {
+                                            value ? fetchNetwork(value) : setNetwork(undefined)
+                                        }}/>
                                     </Label>
                                 </Space>
                             </Col>
                         </Row>
                         <br/>
                         <Row justify="space-between" style={{height: `${height}px`}}>
-                            <Col span={4} style={{height: "100%"}}>
-                                <Card type={"inner"} title={"网络列表"} size={"small"}
-                                      style={{height: "100%", backgroundColor: "#f4f5f6"}}>
-                                    <Tree treeData={networks}
-                                          showIcon={true}
-                                          style={{height: "100%", backgroundColor: "#f4f5f6"}}
-                                          onSelect={(selectedKeys) => {
-                                              if (selectedKeys && selectedKeys.length) {
-                                                  fetchNetwork(Number(selectedKeys[0]))
-                                              }
-                                          }}/>
-                                </Card>
-                            </Col>
-                            <Col span={20} style={{paddingLeft: "4px", height: "100%"}}>
+                            <Col span={17} style={{paddingRight: "4px", height: "100%"}}>
                                 <Card type="inner" size={"small"} title={"拓扑图"} style={{height: "100%"}}
                                       extra={renderActionButton()}>
-                                    <Graph selections={device ? [device.macAddress] : []} height={height}
-                                           data={loadGraphData()}
-                                           onClick={onClickNode}
-                                           onRemove={onRemoveNode}
-                                           onHover={onHoverNode}
-                                           onLeave={onLeaveNode}
-                                    />
+                                    {
+                                        renderNetworkGraph()
+                                    }
+                                </Card>
+                            </Col>
+                            <Col span={7} style={{height: "100%"}}>
+                                <Card type={"inner"} title={"基本信息"} size={"small"}
+                                      style={{height: "100%"}} extra={renderEditButton()}>
+                                    {
+                                        renderBasicInfo()
+                                    }
                                 </Card>
                             </Col>
                         </Row>
@@ -191,7 +342,6 @@ const NetworkPage = () => {
                 </Content>
             </Col>
         </Row>
-        {contextHolder}
         <AccessDeviceModal parent={device}
                            assetId={assetId}
                            networkId={network ? network.id : 0}
@@ -199,7 +349,7 @@ const NetworkPage = () => {
                            onCancel={() => {
                                setAccessVisible(false)
                            }} onSuccess={onAccessDeviceSuccess}/>
-    </div>
+    </>
 }
 
 export default NetworkPage

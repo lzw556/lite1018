@@ -10,10 +10,12 @@ type Service interface {
 	FindNetworks(assetID uint) ([]vo.Network, error)
 	CreateNetwork(req request.ImportNetwork) error
 
+	UpdateNetwork(networkID uint, req request.Network) (*vo.Network, error)
 	UpdateSetting(gatewayID uint, req request.WSN) error
 
 	ExportNetwork(networkID uint) (*vo.NetworkExportFile, error)
+	SyncNetwork(networkID uint) error
 
 	AccessDevices(networkID uint, req request.AccessDevices) error
-	RemoveDevice(networkID, deviceID uint) (*vo.Network, error)
+	RemoveDevices(networkID uint, req request.RemoveDevices) error
 }

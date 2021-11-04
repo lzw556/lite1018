@@ -1,34 +1,35 @@
 package command
 
 import (
+	"context"
 	"github.com/gogo/protobuf/proto"
 	pd "github.com/thetasensors/theta-cloud-lite/server/adapter/iot/proto"
 	"time"
 )
 
-type ResetCmd struct {
-	command
+type resetCmd struct {
+	request
 }
 
-func NewResetCmd() ResetCmd {
-	cmd := ResetCmd{}
-	cmd.command = newCommand()
+func newResetCmd() resetCmd {
+	cmd := resetCmd{}
+	cmd.request = newRequest()
 	return cmd
 }
 
-func (cmd ResetCmd) ID() string {
-	return cmd.reqID
-}
-
-func (cmd ResetCmd) Name() string {
+func (cmd resetCmd) Name() string {
 	return "resetDeviceSettings"
 }
 
-func (cmd ResetCmd) Qos() byte {
+func (cmd resetCmd) Response() string {
+	return "resetDeviceSettingsResponse"
+}
+
+func (cmd resetCmd) Qos() byte {
 	return 1
 }
 
-func (cmd ResetCmd) Payload() []byte {
+func (cmd resetCmd) Payload() []byte {
 	c := pd.ResetCommand{
 		ReqId:     cmd.reqID,
 		Timestamp: int32(time.Now().UTC().Unix()),
@@ -40,6 +41,6 @@ func (cmd ResetCmd) Payload() []byte {
 	return bytes
 }
 
-func (cmd ResetCmd) Response() chan pd.GeneralResponseMessage {
-	return cmd.response
+func (cmd resetCmd) Execute(ctx context.Context, gateway string, target string, timeout time.Duration) ([]byte, error) {
+	return cmd.request.do(ctx, gateway, target, cmd, timeout)
 }

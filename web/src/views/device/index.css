@@ -1,0 +1,13 @@
+[data-theme='compact'] .site-navigation-steps,
+.site-navigation-steps {
+    margin-bottom: 60px;
+    box-shadow: 0 -1px 0 0 #e8e8e8 inset;
+}
+
+.ts-detail-label {
+    color: #8a8e99;
+}
+
+.ts-setting-grid {
+    width: 50%;
+}

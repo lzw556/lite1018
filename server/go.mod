@@ -26,7 +26,8 @@ require (
 	github.com/xuri/excelize/v2 v2.4.1
 	go.etcd.io/bbolt v1.3.6
 	go.uber.org/zap v1.19.0
-	golang.org/x/crypto v0.0.0-20210711020723-a769d52b0f97
+	golang.org/x/crypto v0.0.0-20210921155107-089bfa567519
+	golang.org/x/sys v0.0.0-20211025201205-69cdffdb9359 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0
 	gorm.io/driver/mysql v1.1.2
 	gorm.io/driver/postgres v1.1.0

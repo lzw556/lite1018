@@ -1,6 +1,6 @@
 import {Form, Input} from "antd"
 import {CheckMacAddressRequest} from "../../../apis/device";
-import AssetSelect from "../../asset/select/assetSelect";
+import AssetSelect from "../../../components/assetSelect";
 
 
 const BaseInfoForm = (props: any) => {

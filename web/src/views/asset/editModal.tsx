@@ -1,13 +1,14 @@
 import {Asset} from "../../types/asset";
-import {Form, Input, message, Modal} from "antd";
-import {useState} from "react";
+import {Form, message} from "antd";
+import {useEffect, useState} from "react";
 import {UpdateAssetRequest} from "../../apis/asset";
+import AssetModal from "./assetModal";
 
 export interface EditAssetProps {
     visible: boolean
     asset: Asset
-    onCancel?:() => void
-    onSuccess:() => void
+    onCancel?: () => void
+    onSuccess: () => void
 }
 
 const EditModal = (props: EditAssetProps) => {
@@ -15,9 +16,17 @@ const EditModal = (props: EditAssetProps) => {
     const [form] = Form.useForm()
     const [isLoading, setIsLoading] = useState<boolean>(false)
 
+    useEffect(() => {
+        if (visible) {
+            form.setFieldsValue({
+                name: asset.name
+            })
+        }
+    }, [visible])
+
     const onSave = () => {
         setIsLoading(true)
-        form.validateFields().then(values=> {
+        form.validateFields().then(values => {
             UpdateAssetRequest(asset.id, values.name).then(res => {
                 setIsLoading(false)
                 if (res.code === 200) {
@@ -25,27 +34,16 @@ const EditModal = (props: EditAssetProps) => {
                     message.success("保存成功").then()
                 }
             })
-        }).catch(e =>
+        }).catch(_ =>
             setIsLoading(false)
         )
     }
 
-    return <Modal
-        width={320}
-        title="编辑资产"
-        visible={visible}
-        cancelText="取消"
-        onCancel={onCancel}
-        okText="保存"
-        onOk={onSave}
-        confirmLoading={isLoading}>
-
-        <Form form={form}>
-            <Form.Item name="name" initialValue={asset.name} rules={[{required: true, message: "请输入资产名称"}]}>
-                <Input placeholder="资产名称"/>
-            </Form.Item>
-        </Form>
-    </Modal>
+    return <AssetModal form={form} width={320} title={"资产编辑"} okText={"保存"} cancelText={"取消"}
+                       visible={visible}
+                       onCancel={onCancel}
+                       onOk={onSave}
+                       confirmLoading={isLoading}/>
 }
 
 export default EditModal

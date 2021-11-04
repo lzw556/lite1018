@@ -1,26 +1,21 @@
-import {Button, Empty} from "antd"
+import {Empty, EmptyProps} from "antd"
 import "../../App.css";
 
-export interface EmptyLayoutProps {
+export interface EmptyLayoutProps extends EmptyProps{
     description: string
-    buttonText: string
-    onClick?:() => void
 }
 
 const EmptyLayout = (props: EmptyLayoutProps) => {
-    const {description, buttonText, onClick} = props
+    const {description, children} = props
     return <Empty
-        image="https://gw.alipayobjects.com/zos/antfincdn/ZHrcdLPrvN/empty.svg"
-        imageStyle={{
-            height: 60,
-        }}
+        image={Empty.PRESENTED_IMAGE_SIMPLE}
         description={
             <p>
                 {description}
             </p>
         }
     >
-        <Button type="primary" onClick={onClick}>{buttonText}</Button>
+        {children}
     </Empty>
 }
 

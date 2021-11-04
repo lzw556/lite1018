@@ -1,4 +1,4 @@
-import {Col, ConfigProvider, Pagination, Row, Table} from "antd";
+import {Col, ConfigProvider, Empty, Pagination, Row, Table} from "antd";
 import {useEffect, useState} from "react";
 
 export interface TableProps {
@@ -7,7 +7,7 @@ export interface TableProps {
     pagination: boolean
     refreshKey: number
     data: any
-    emptyLayout?: any
+    emptyText?: string
     onChange?: (current: number, size: number) => void
 }
 
@@ -19,7 +19,7 @@ export const DEFAULT_TABLE_PROPS: TableProps = {
 }
 
 const TableLayout = (props: TableProps) => {
-    const {columns, data, isLoading, onChange, pagination, refreshKey, emptyLayout} = props
+    const {columns, data, isLoading, onChange, pagination, refreshKey, emptyText} = props
     const [current, setCurrent] = useState<number>(1)
     const [size, setSize] = useState<number>(10)
 
@@ -37,7 +37,11 @@ const TableLayout = (props: TableProps) => {
         }
     }, [onChange, current, size, refreshKey])
 
-    return <ConfigProvider renderEmpty={emptyLayout}>
+    const renderEmpty = () => {
+        return <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={emptyText}/>
+    }
+
+    return <ConfigProvider renderEmpty={renderEmpty}>
         <Row justify="center">
             <Col span={24}>
                 <Table rowKey={(record: any) => record.id} size={"small"} columns={columns} dataSource={data.result} pagination={false}

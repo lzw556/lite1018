@@ -2,16 +2,17 @@ package service
 
 import (
 	"context"
+	"github.com/thetasensors/theta-cloud-lite/server/adapter"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/request"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/response"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/alarm"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
-	"github.com/thetasensors/theta-cloud-lite/server/adapter/ruleengine"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/aggregate/factory"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/po"
 	spec "github.com/thetasensors/theta-cloud-lite/server/domain/specification"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/vo"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/errcode"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/transaction"
 )
 
@@ -103,7 +104,7 @@ func (s Alarm) CheckAlarmRule(name string) error {
 		return err
 	}
 	if len(es) > 0 {
-		return response.BusinessErr(response.AlarmRuleNameExists, "")
+		return response.BusinessErr(errcode.AlarmRuleNameExists, "")
 	}
 	return nil
 }
@@ -137,7 +138,7 @@ func (s Alarm) UpdateAlarmRule(id uint, req request.UpdateAlarmRule) error {
 	ctx := context.TODO()
 	e, err := s.repository.Get(ctx, id)
 	if err != nil {
-		return response.BusinessErr(response.AlarmRuleNotFoundError, "")
+		return response.BusinessErr(errcode.AlarmRuleNotFoundError, "")
 	}
 	e.Level = req.Level
 	e.Rule.Threshold = req.Rule.Threshold
@@ -146,20 +147,20 @@ func (s Alarm) UpdateAlarmRule(id uint, req request.UpdateAlarmRule) error {
 		if err := s.repository.Save(txCtx, &e); err != nil {
 			return err
 		}
-		return ruleengine.UpdateRules(e)
+		return adapter.RuleEngine.UpdateRules(e)
 	})
 }
 
 func (s Alarm) RemoveAlarmRule(id uint) error {
 	e, err := s.repository.Get(context.TODO(), id)
 	if err != nil {
-		return response.BusinessErr(response.AlarmRuleNotFoundError, "")
+		return response.BusinessErr(errcode.AlarmRuleNotFoundError, "")
 	}
 	return transaction.Execute(context.TODO(), func(txCtx context.Context) error {
 		if err := s.repository.Delete(context.TODO(), e.ID); err != nil {
 			return err
 		}
-		return ruleengine.RemoveRules(e.Name)
+		return adapter.RuleEngine.RemoveRules(e.Name)
 	})
 }
 

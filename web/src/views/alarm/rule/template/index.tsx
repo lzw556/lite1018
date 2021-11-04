@@ -90,6 +90,7 @@ const RuleTemplatesPage = () => {
         <Row justify={"space-between"}>
             <Col span={24}>
                 <TableLayout isLoading={table.isLoading}
+                             emptyText={"报警规则模板列表为空"}
                              pagination={table.pagination}
                              refreshKey={table.refreshKey}
                              columns={columns}

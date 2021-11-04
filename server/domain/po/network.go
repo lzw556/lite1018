@@ -12,8 +12,10 @@ type Network struct {
 	gorm.Model
 	Name                    string `gorm:"type:varchar(64)"`
 	GatewayID               uint
-	CommunicationPeriod     uint          `gorm:"default:0;not null;"`
-	CommunicationTimeOffset uint          `gorm:"default:0;not null;"`
+	CommunicationPeriod     uint `gorm:"default:0;not null;"`
+	CommunicationTimeOffset uint `gorm:"default:0;not null;"`
+	GroupSize               uint `gorm:"default:4;not null;"`
+	GroupInterval           uint
 	RoutingTables           RoutingTables `gorm:"type:json"`
 }
 

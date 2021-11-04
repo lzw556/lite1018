@@ -17,6 +17,8 @@ type Service interface {
 	ReplaceDevice(deviceID uint, mac string) error
 
 	ExecuteCommand(deviceID uint, cmdType uint) error
+	ExecuteDeviceUpgrade(deviceID uint, req request.DeviceUpgrade) error
+	ExecuteDeviceCancelUpgrade(deviceID uint) error
 
 	GetDeviceSetting(deviceID uint) (*vo.DeviceSetting, error)
 	UpdateDeviceSetting(deviceID uint, req request.DeviceSetting) error

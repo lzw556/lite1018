@@ -1,41 +1,44 @@
 package command
 
 import (
-	"encoding/hex"
+	"context"
+	"encoding/binary"
+	"fmt"
 	"github.com/gogo/protobuf/proto"
 	pd "github.com/thetasensors/theta-cloud-lite/server/adapter/iot/proto"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/units"
 	"time"
 )
 
-type UpdateDeviceListCmd struct {
-	command
+type updateDeviceListCmd struct {
+	request
 	gateway  entity.Device
 	children []entity.Device
 }
 
-func NewUpdateDeviceListCmd(gateway entity.Device, children []entity.Device) UpdateDeviceListCmd {
-	cmd := UpdateDeviceListCmd{
+func newUpdateDeviceListCmd(gateway entity.Device, children []entity.Device) updateDeviceListCmd {
+	cmd := updateDeviceListCmd{
 		gateway:  gateway,
 		children: children,
 	}
-	cmd.command = newCommand()
+	cmd.request = newRequest()
 	return cmd
 }
 
-func (cmd UpdateDeviceListCmd) ID() string {
-	return cmd.reqID
-}
-
-func (UpdateDeviceListCmd) Name() string {
+func (updateDeviceListCmd) Name() string {
 	return "updateDeviceList"
 }
 
-func (UpdateDeviceListCmd) Qos() byte {
+func (cmd updateDeviceListCmd) Response() string {
+	return "updateDeviceListResponse"
+}
+
+func (updateDeviceListCmd) Qos() byte {
 	return 1
 }
 
-func (cmd UpdateDeviceListCmd) Payload() []byte {
+func (cmd updateDeviceListCmd) Payload() []byte {
 	m := pd.UpdateDeviceListCommand{
 		Timestamp: int32(time.Now().Unix()),
 		ReqId:     cmd.reqID,
@@ -57,12 +60,12 @@ func (cmd UpdateDeviceListCmd) Payload() []byte {
 func toDeviceListItem(e entity.Device) *pd.DeviceListItem {
 	item := &pd.DeviceListItem{
 		Type: int32(e.TypeID),
+		Mac:  units.StringToBytes(binary.LittleEndian, e.MacAddress),
+		Name: units.StringToBytes(binary.BigEndian, fmt.Sprintf("%x", e.Name)),
 	}
-	item.Mac, _ = hex.DecodeString(e.MacAddress)
-	item.Name, _ = hex.DecodeString(e.Name)
 	return item
 }
 
-func (cmd UpdateDeviceListCmd) Response() chan pd.GeneralResponseMessage {
-	return cmd.response
+func (cmd updateDeviceListCmd) Execute(ctx context.Context, gateway string, target string, timeout time.Duration) ([]byte, error) {
+	return cmd.request.do(ctx, gateway, target, cmd, timeout)
 }

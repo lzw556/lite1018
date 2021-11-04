@@ -1,13 +1,20 @@
 package dispatcher
 
 import (
-	"github.com/gogo/protobuf/proto"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/iot"
-	pd "github.com/thetasensors/theta-cloud-lite/server/adapter/iot/proto"
-	"github.com/thetasensors/theta-cloud-lite/server/pkg/xlog"
+	"github.com/thetasensors/theta-cloud-lite/server/adapter/iot/process"
 )
 
 type Bye struct {
+	context   *iot.Context
+	processor process.Processor
+}
+
+func NewBye() iot.Dispatcher {
+	return &Bye{
+		context:   iot.NewContext(),
+		processor: process.NewBye(),
+	}
 }
 
 func (Bye) Name() string {
@@ -15,9 +22,5 @@ func (Bye) Name() string {
 }
 
 func (d Bye) Dispatch(msg iot.Message) {
-	m := pd.ByeMessage{}
-	if err := proto.Unmarshal(msg.Body.Payload, &m); err != nil {
-		xlog.Error("unmarshal [Bye] message failed", err)
-		return
-	}
+	process.Do(d.context, d.processor, msg)
 }

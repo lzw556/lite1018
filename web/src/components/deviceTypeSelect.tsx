@@ -1,6 +1,7 @@
 import {DeviceType, DeviceTypeString} from "../types/device_type";
 import {Select, SelectProps} from "antd";
 import {FC} from "react";
+import {CaretDownOutlined} from "@ant-design/icons";
 
 const {Option, OptGroup} = Select
 
@@ -13,7 +14,7 @@ const DeviceTypeSelect: FC<DeviceTypeSelectProps> = (props) => {
 
     const render = () => {
         if (sensor) {
-            return <Select {...props}>
+            return <Select {...props} suffixIcon={<CaretDownOutlined />}>
                 {children}
                 <Option key={DeviceType.BoltLoosening}
                         value={DeviceType.BoltLoosening}>{DeviceTypeString(DeviceType.BoltLoosening)}</Option>

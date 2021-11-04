@@ -16,9 +16,6 @@ import (
 	"net/http"
 )
 
-//go:embed static
-var dist embed.FS
-
 type Adapter struct {
 	server      *http.Server
 	engine      *gin.Engine
@@ -41,6 +38,10 @@ func (a *Adapter) RegisterRouters(routers ...router.Router) {
 	a.routers = append(a.routers, routers...)
 }
 
+func (a *Adapter) StaticFS(dist embed.FS) {
+	a.engine.Use(static.Serve("/", middleware.EmbedFileSystem(dist, "static")))
+}
+
 func (a *Adapter) UseMiddleware(middlewares ...middleware.Middleware) {
 	a.middlewares = append(a.middlewares, middlewares...)
 }
@@ -55,7 +56,6 @@ func (a *Adapter) Run() error {
 	a.engine.Use(cors.New(cors.Config{
 		AllowAllOrigins: true,
 	}))
-	a.engine.Use(static.Serve("/", middleware.EmbedFileSystem(dist, "static")))
 	group := a.engine.Group("api")
 	for _, m := range a.middlewares {
 		group.Use(m.WrapHandler())

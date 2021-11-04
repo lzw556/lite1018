@@ -1,6 +1,21 @@
-import {Button, Card, Cascader, Col, Form, Input, message, Radio, Row, Select, Space, Table, Tree} from "antd";
+import {
+    Button,
+    Card,
+    Cascader,
+    Col,
+    ConfigProvider,
+    Form,
+    Input,
+    message,
+    Radio,
+    Row,
+    Select,
+    Space,
+    Table,
+    Tree
+} from "antd";
 import {Content} from "antd/lib/layout/layout";
-import {FC, useEffect, useState} from "react";
+import {useEffect, useState} from "react";
 import DeviceTypeSelect from "../../../components/deviceTypeSelect";
 import {GetDeviceGroupByAsset} from "../../../apis/device";
 import {Property} from "../../../types/property";
@@ -9,6 +24,7 @@ import {Footer} from "antd/es/layout/layout";
 import {useHistory} from "react-router-dom";
 import {AddAlarmRuleRequest, CheckRuleNameRequest, PagingRuleTemplateRequest} from "../../../apis/alarm";
 import {defaultValidateMessages} from "../../../constants/validateMessage";
+import {EmptyLayout} from "../../layout";
 
 const {Option} = Select
 
@@ -104,7 +120,7 @@ const AddRulePage = () => {
             } else {
                 message.info("请先选择设备").then()
             }
-        }).catch(e => {
+        }).catch(_ => {
 
         })
     }
@@ -184,8 +200,12 @@ const AddRulePage = () => {
 
     const renderFormItem = () => {
         if (createType) {
-            return <Table rowKey={(record: any) => record.id} rowSelection={rowSelection} columns={columns}
-                          dataSource={templates} pagination={false} size={"small"}/>
+            return <ConfigProvider renderEmpty={() => {
+                return <EmptyLayout description={"模板列表为空"}/>
+            }}>
+                <Table rowKey={(record: any) => record.id} rowSelection={rowSelection} columns={columns}
+                       dataSource={templates} pagination={false} size={"small"}/>
+            </ConfigProvider>
         } else {
             return <Card type={"inner"} size={"small"} title={"自定义规则"} bordered={false}>
                 <Row justify={"start"}>

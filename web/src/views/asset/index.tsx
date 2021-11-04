@@ -1,10 +1,9 @@
 import {FC, useCallback, useState} from "react";
-import {Button, Card, Col, message, Popconfirm, Row, Space} from "antd";
+import {Button, Col, message, Popconfirm, Row, Space} from "antd";
 import {Content} from "antd/lib/layout/layout";
 import TableLayout, {TableProps} from "../layout/TableLayout";
 import {GetAssetRequest, PagingAssetsRequest, RemoveAssetRequest} from "../../apis/asset";
 import AddModal from "./addModal";
-import {EmptyLayout} from "../layout";
 import {InitializeAssetState} from "../../types/asset";
 import EditModal from "./editModal";
 import {DeleteOutlined, EditOutlined, FolderAddOutlined} from "@ant-design/icons";
@@ -92,12 +91,6 @@ const AssetPage: FC = () => {
         }
     ]
 
-    const AssetEmptyLayout = () => {
-        return <EmptyLayout description="资产列表为空" buttonText="快速创建资产" onClick={() => {
-            setAddAssetVisible(true)
-        }}/>
-    }
-
     return <div>
         <Row justify="center">
             <Col span={24} style={{textAlign: "right"}}>
@@ -113,7 +106,7 @@ const AssetPage: FC = () => {
                 <Content style={{paddingTop: "15px"}}>
                     <ShadowCard>
                         <TableLayout
-                            emptyLayout={AssetEmptyLayout}
+                            emptyText={"资产列表为空"}
                             columns={columns}
                             isLoading={table.isLoading}
                             refreshKey={table.refreshKey}

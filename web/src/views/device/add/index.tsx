@@ -1,9 +1,9 @@
-import {Button, Card, Col, Form, message, Result, Row, Space, Steps} from "antd";
+import {Button, Col, Form, message, Result, Row, Space, Steps} from "antd";
 import {Content} from "antd/es/layout/layout";
 import {useState} from "react";
 import BaseInfoForm from "../form/baseInfoForm";
 import DeviceTypeForm from "../form/deviceTypeForm";
-import "../device.css"
+import "../index.css"
 import {DeviceType} from "../../../types/device_type";
 import {SensorSettingKeys} from "../form/item/sensorFormItem";
 import {PretighteningSettings} from "../form/item/pretighteningFormItem";
@@ -64,7 +64,7 @@ const AddDevicePage = () => {
         form.validateFields().then(values => {
             setRequestForm(Object.assign({}, requestForm, {name: values.name, mac_address: values.mac, asset_id: values.asset}))
             setCurrent(current + 1)
-        }).catch(e => {
+        }).catch(_ => {
 
         })
     }
@@ -128,6 +128,7 @@ const AddDevicePage = () => {
                         <Button key="add" onClick={() => {
                             form.resetFields()
                             setCurrent(0)
+                            setDeviceType(undefined)
                             setSuccess(false)
                         }}>继续创建设备</Button>,
                     ]}

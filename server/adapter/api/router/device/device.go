@@ -20,6 +20,7 @@ func (r *deviceRouter) initRoutes() {
 		// POST
 		router.NewPostRoute("devices", r.create),
 		router.NewPostRoute("devices/:id/commands/:cmd", r.executeCommand),
+		router.NewPostRoute("devices/:id/upgrade", r.upgrade),
 
 		// GET
 		router.NewGetRoute("devices/groupBy/asset", r.findGroupByAsset),
@@ -42,6 +43,7 @@ func (r *deviceRouter) initRoutes() {
 		// DELETE
 		router.NewDeleteRoute("devices/:id", r.removeByID),
 		router.NewDeleteRoute("devices/:id/data", r.removeDataByID),
+		router.NewDeleteRoute("devices/:id/upgrade", r.cancelUpgrade),
 	}
 }
 

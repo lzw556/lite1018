@@ -9,12 +9,6 @@
     transform: translateX(25px) translateY(-10px);
 }
 
-.ts-edge-online {
-    stroke: #28A745;
-    stroke-width: 1;
-}
-
-.ts-edge-offline {
-    stroke: #FFC107;
-    stroke-width: 1;
+.ts-form-item {
+    margin-bottom: 4px;
 }

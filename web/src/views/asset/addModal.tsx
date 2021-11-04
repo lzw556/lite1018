@@ -1,7 +1,8 @@
-import {Form, Input, message, Modal} from "antd";
-import {useState} from "react";
+import {message} from "antd";
+import {useEffect, useState} from "react";
 import {useForm} from "antd/es/form/Form";
 import {AddAssetRequest} from "../../apis/asset";
+import AssetModal from "./assetModal";
 
 export interface AddAssetProps {
     visible: boolean
@@ -14,7 +15,13 @@ const AddModal = (props: AddAssetProps) => {
     const [isLoading, setIsLoading] = useState<boolean>(false)
     const [form] = useForm()
 
-    const onAdd = async () => {
+    useEffect(() => {
+        if (visible) {
+            form.resetFields()
+        }
+    }, [visible])
+
+    const onAdd = () => {
         setIsLoading(true)
         form.validateFields(["name"]).then(values => {
             AddAssetRequest(values.name).then(res => {
@@ -24,27 +31,18 @@ const AddModal = (props: AddAssetProps) => {
                     onSuccess()
                 }
             })
-        }).catch(e => {
+        }).catch(_ => {
             setIsLoading(false)
         })
     }
 
-    return <Modal
-        width={320}
-        title="添加资产"
-        visible={visible}
-        cancelText="取消"
-        onCancel={onCancel}
-        okText="确认"
-        onOk={onAdd}
-        confirmLoading={isLoading}>
-
-        <Form form={form}>
-            <Form.Item name="name" rules={[{required: true, message: "请输入资产名称"}]}>
-                <Input placeholder="资产名称"/>
-            </Form.Item>
-        </Form>
-    </Modal>
+    return <AssetModal form={form} width={320} title={"资产添加"}
+                       visible={visible}
+                       okText={"确定"}
+                       cancelText={"取消"}
+                       onOk={onAdd}
+                       onCancel={onCancel}
+                       confirmLoading={isLoading}/>
 }
 
 export default AddModal

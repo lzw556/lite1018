@@ -1,4 +1,4 @@
-import {Button, Card, Col, Dropdown, Input, Menu, message, Popconfirm, Row, Select, Space, Spin, Tag} from "antd";
+import {Button, Col, Dropdown, Input, Menu, message, Popconfirm, Row, Select, Space, Spin, Tag} from "antd";
 import {
     AppstoreAddOutlined,
     CaretDownOutlined,
@@ -9,13 +9,17 @@ import {
 } from "@ant-design/icons";
 import {Content} from "antd/lib/layout/layout";
 import {useHistory} from "react-router-dom";
-import AssetSelect from "../asset/select/assetSelect";
 import TableLayout, {TableProps} from "../layout/TableLayout";
-import {useCallback, useEffect, useState} from "react";
-import {EmptyLayout} from "../layout";
+import {useCallback, useState} from "react";
 import {DeviceCommand} from "../../types/device_command";
-import {DeleteDeviceRequest, GetDeviceRequest, PagingDevicesRequest, SendDeviceCommandRequest} from "../../apis/device";
-import {DeviceType} from "../../types/device_type";
+import {
+    DeleteDeviceRequest,
+    DeviceCancelUpgradeRequest,
+    GetDeviceRequest,
+    PagingDevicesRequest,
+    SendDeviceCommandRequest
+} from "../../apis/device";
+import {DeviceType, DeviceTypeString} from "../../types/device_type";
 import EditSettingModal from "./edit/editSettingModal";
 import {Device} from "../../types/device";
 import EditBaseInfoModel from "./edit/editBaseInfoModel";
@@ -24,8 +28,12 @@ import Label from "../../components/label";
 import ReplaceMacModal from "./replace/replaceMacModal";
 import EditWsnSettingModal from "./edit/editWsnSettingModal";
 import useSocket from "../../socket";
-import * as _ from "lodash";
 import ShadowCard from "../../components/shadowCard";
+import UpgradeModal from "./upgrade";
+import "../../string-extension";
+import DeviceUpgradeState from "./state/upgradeState";
+import {IsUpgrading} from "../../types/device_upgrade_status";
+import AssetSelect from "../../components/assetSelect";
 
 const {Search} = Input
 const {Option} = Select
@@ -40,21 +48,10 @@ const DevicePage = () => {
     const [editWsnSettingVisible, setEditWsnSettingVisible] = useState<boolean>(false)
     const [editSettingVisible, setEditSettingVisible] = useState<boolean>(false)
     const [editBaseInfoVisible, setEditBaseInfoVisible] = useState<boolean>(false)
+    const [upgradeVisible, setUpgradeVisible] = useState<boolean>(false)
     const [replaceVisible, setReplaceVisible] = useState<boolean>(false)
     const [executeDevice, setExecuteDevice] = useState<Device>()
-    const {connectionState} = useSocket()
-
-    useEffect(() => {
-        if (connectionState) {
-            const data = _.cloneDeep(table.data)
-            data.result.forEach((item:Device) => {
-                if (item.id === connectionState.id) {
-                    item.status = Object.assign({}, item.status, {isOnline: connectionState.isOnline, connectAt: connectionState.connectAt})
-                }
-            })
-            setTable(Object.assign({}, table, {data: data}))
-        }
-    }, [connectionState])
+    const {connectionState, upgradeState} = useSocket()
 
     const onAssetChange = (value: number) => {
         setAssetId(value)
@@ -106,25 +103,40 @@ const DevicePage = () => {
     }
 
     const onCommand = (device: Device, key: any) => {
-        setExecuteDevice(device)
-        SendDeviceCommandRequest(device.id, key).then(res => {
-            setExecuteDevice(undefined)
-            if (res.code === 200) {
-                message.success("命令发送成功").then()
-            } else {
-                message.error(res.msg).then()
-            }
-        })
+        switch (Number(key)) {
+            case DeviceCommand.Upgrade:
+                setDevice(device)
+                setUpgradeVisible(true)
+                break
+            case DeviceCommand.CancelUpgrade:
+                DeviceCancelUpgradeRequest(device.id).then(res => {
+                    console.log(res)
+                })
+                break
+            default:
+                setExecuteDevice(device)
+                SendDeviceCommandRequest(device.id, key).then(res => {
+                    setExecuteDevice(undefined)
+                    if (res.code === 200) {
+                        message.success("命令发送成功").then()
+                    } else {
+                        message.error(res.msg).then()
+                    }
+                })
+                break
+        }
     }
 
     const renderCommandMenus = (record: Device) => {
         const disabled = record.status && record.status.isOnline
+        const isUpgrading = record.upgradeState && IsUpgrading(record.upgradeState.status)
         return <Menu onClick={(e) => {
             onCommand(record, e.key)
         }}>
-            <Menu.Item key={DeviceCommand.Reboot} disabled={!disabled}>重启</Menu.Item>
-            <Menu.Item key={DeviceCommand.Upgrade} disabled={!disabled}>固件升级</Menu.Item>
-            <Menu.Item key={DeviceCommand.Reset} disabled={!disabled}>恢复出厂设置</Menu.Item>
+            <Menu.Item key={DeviceCommand.Reboot} disabled={!disabled} hidden={isUpgrading}>重启</Menu.Item>
+            <Menu.Item key={DeviceCommand.Upgrade} disabled={!disabled} hidden={isUpgrading}>固件升级</Menu.Item>
+            <Menu.Item key={DeviceCommand.CancelUpgrade} hidden={!isUpgrading}>取消升级</Menu.Item>
+            <Menu.Item key={DeviceCommand.Reset} disabled={!disabled} hidden={isUpgrading}>恢复出厂设置</Menu.Item>
         </Menu>
     }
 
@@ -143,9 +155,10 @@ const DevicePage = () => {
     }
 
     const renderEditMenus = (record: Device) => {
+        const isUpgrading = record.upgradeState && IsUpgrading(record.upgradeState.status)
         return <Menu onClick={(e) => {
             onEdit(record.id, e.key)
-        }}>
+        }} disabled={isUpgrading}>
             <Menu.Item key={0}>替换设备</Menu.Item>
             <Menu.Item key={1}>编辑设备信息</Menu.Item>
             {record.typeId !== DeviceType.Router && <Menu.Item key={2}>更新设备配置</Menu.Item>}
@@ -158,7 +171,12 @@ const DevicePage = () => {
             title: '状态',
             dataIndex: 'status',
             key: 'status',
-            render: (status: any) => {
+            render: (status: any, record:any) => {
+                if (connectionState && connectionState.id === record.id) {
+                    return <Tag color={connectionState.isOnline ? ColorHealth : ColorWarn}>
+                        {connectionState.isOnline ? "在线" : "离线"}
+                    </Tag>
+                }
                 return <Tag color={status && status.isOnline ? ColorHealth : ColorWarn}>
                     {status && status.isOnline ? "在线" : "离线"}
                 </Tag>
@@ -171,36 +189,29 @@ const DevicePage = () => {
             render: (text: string, record: Device) => {
                 return <Space>
                     <Spin indicator={<LoadingOutlined/>}
+                          size={"small"}
                           spinning={executeDevice ? executeDevice.id === record.id : false}/>
                     <a href={`#/device-management/devices?locale=deviceDetail&id=${record.id}`}>{text}</a>
+                    {
+                        upgradeState && upgradeState.id == record.id && (<DeviceUpgradeState status={upgradeState.status} progress={upgradeState.progress}/>)
+                    }
                 </Space>
             }
         },
         {
             title: 'MAC地址',
             dataIndex: 'macAddress',
-            key: 'macAddress'
+            key: 'macAddress',
+            render: (text:string) => {
+                return text.toUpperCase().macSeparator()
+            }
         },
         {
             title: '设备类型',
             dataIndex: 'typeId',
             key: 'typeId',
             render: (text: DeviceType) => {
-                switch (text) {
-                    case DeviceType.Gateway:
-                        return "网关"
-                    case DeviceType.Router:
-                        return "路由器"
-                    case DeviceType.BoltElongation:
-                        return "螺栓伸长量传感器"
-                    case DeviceType.BoltLoosening:
-                        return "螺栓松动传感器"
-                    case DeviceType.NormalTemperatureCorrosion:
-                        return "常温腐蚀传感器"
-                    case DeviceType.HighTemperatureCorrosion:
-                        return "高温腐蚀传感器"
-                }
-                return "未知类型"
+                return DeviceTypeString(text)
             }
         },
         {
@@ -222,8 +233,9 @@ const DevicePage = () => {
         {
             title: '操作',
             key: 'action',
-            render: (text: any, record: any) => (
-                <Space>
+            render: (text: any, record: any) => {
+                const isUpgrading = record.upgradeState && record.upgradeState.status >= 1 && record.upgradeState.status <= 3
+                return <Space>
                     <Dropdown overlay={renderEditMenus(record)}>
                         <Button type="text" size="small" icon={<EditOutlined/>}/>
                     </Dropdown>
@@ -232,16 +244,12 @@ const DevicePage = () => {
                     </Dropdown>
                     <Popconfirm placement="left" title="确认要删除该设备吗?" onConfirm={() => onDelete(record.id)}
                                 okText="删除" cancelText="取消">
-                        <Button type="text" size="small" icon={<DeleteOutlined/>} danger/>
+                        <Button type="text" size="small" icon={<DeleteOutlined/>} danger disabled={isUpgrading}/>
                     </Popconfirm>
                 </Space>
-            ),
+            },
         },
     ]
-
-    const DeviceEmptyLayout = () => {
-        return <EmptyLayout description={"设备列表为空"} buttonText={"快速创建"} onClick={onAddDevice}/>
-    }
 
     return <div>
         <Row justify="center">
@@ -261,8 +269,10 @@ const DevicePage = () => {
                                     <Label name={"资产"}>
                                         <AssetSelect bordered={false} style={{width: "120px"}} defaultValue={assetId}
                                                      defaultActiveFirstOption={true}
-                                                     defaultOption={{value: 0, text: "所有资产"}} placeholder={"请选择资产"}
-                                                     onChange={onAssetChange} suffixIcon={<CaretDownOutlined/>}/>
+                                                     placeholder={"请选择资产"}
+                                                     onChange={onAssetChange} suffixIcon={<CaretDownOutlined/>}>
+                                            <Option key={0} value={0}>所有资产</Option>
+                                        </AssetSelect>
                                     </Label>
                                     <Input.Group compact>
                                         <Select defaultValue={searchTarget} style={{width: "80px"}}
@@ -284,7 +294,7 @@ const DevicePage = () => {
                         <Row justify="center">
                             <Col span={24}>
                                 <TableLayout
-                                    emptyLayout={DeviceEmptyLayout}
+                                    emptyText={"设备列表为空"}
                                     columns={columns}
                                     isLoading={table.isLoading}
                                     pagination={table.pagination}
@@ -327,6 +337,13 @@ const DevicePage = () => {
         }} onCancel={() => {
             setDevice(undefined)
             setEditWsnSettingVisible(false)
+        }}/>
+        <UpgradeModal visible={upgradeVisible} device={device} onSuccess={() => {
+            setDevice(undefined)
+            setUpgradeVisible(false)
+        }} onCancel={() => {
+            setDevice(undefined)
+            setUpgradeVisible(false)
         }}/>
     </div>
 }

@@ -22,6 +22,7 @@ func (r *firmwareRouter) initRoutes() {
 
 		// GET
 		router.NewGetRoute("firmwares", r.paging),
+		router.NewGetRoute("devices/:id/firmwares", r.findFirmwares),
 
 		// DELETE
 		router.NewDeleteRoute("firmwares/:id", r.removeByID),

@@ -6,11 +6,11 @@ import {HeaderLayout} from "./index";
 
 const {Content} = Layout
 
-const DashboardLayout = (props: any) => {
+const DashboardLayout = () => {
 
     useEffect(() => {
         console.log(store.getState().auth.data)
-    })
+    }, [])
 
     return <Layout>
         <HeaderLayout hideConsole={false}/>

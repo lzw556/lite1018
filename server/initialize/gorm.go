@@ -7,7 +7,7 @@ import (
 	"reflect"
 )
 
-func InitTables(db *gorm.DB) {
+func InitTables(db *gorm.DB) error {
 	tables := []interface{}{
 		&po.User{},
 		&po.Role{},
@@ -23,7 +23,7 @@ func InitTables(db *gorm.DB) {
 	for _, table := range tables {
 		if !db.Migrator().HasTable(table) {
 			if err := db.Migrator().CreateTable(table); err != nil {
-				panic(err)
+				return err
 			}
 		} else {
 			t := reflect.TypeOf(table)
@@ -35,29 +35,35 @@ func InitTables(db *gorm.DB) {
 					name := t.Field(i).Name
 					if !db.Migrator().HasColumn(table, name) && name != "Model" && t.Field(i).Tag.Get("gorm") != "-" {
 						if err := db.Migrator().AddColumn(table, name); err != nil {
-							panic(err)
+							return err
 						}
 					}
 				}
 			}
 		}
 	}
-	initUser(db)
-	initProperties(db)
+	if err := initUser(db); err != nil {
+		return err
+	}
+	if err := initProperties(db); err != nil {
+		return err
+	}
+	return nil
 }
 
-func initUser(db *gorm.DB) {
+func initUser(db *gorm.DB) error {
 	user := po.User{
 		Username: "admin",
 		Password: "123456",
 	}
 	err := db.FirstOrCreate(&user, map[string]interface{}{"id": 1, "username": user.Username}).Error
 	if err != nil {
-		panic(err)
+		return err
 	}
+	return err
 }
 
-func initProperties(db *gorm.DB) {
+func initProperties(db *gorm.DB) error {
 	properties := []po.Property{
 		{
 			Name:         "松动角度",
@@ -93,7 +99,8 @@ func initProperties(db *gorm.DB) {
 	for _, property := range properties {
 		err := db.FirstOrCreate(&property, map[string]interface{}{"name": property.Name, "device_type_id": property.DeviceTypeID, "sensor_type": property.SensorType}).Error
 		if err != nil {
-			panic(err)
+			return err
 		}
 	}
+	return nil
 }

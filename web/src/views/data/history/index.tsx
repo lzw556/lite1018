@@ -3,7 +3,6 @@ import {GetPropertyDataRequest, PagingDevicesRequest} from "../../../apis/device
 import {Button, Card, Col, DatePicker, Row, Select, Space} from "antd";
 import {CaretDownOutlined, DownloadOutlined} from "@ant-design/icons";
 import {Content} from "antd/lib/layout/layout";
-import AssetSelect from "../../asset/select/assetSelect";
 import {Device} from "../../../types/device";
 import ReactECharts from "echarts-for-react";
 import moment from "moment";
@@ -12,6 +11,7 @@ import Label from "../../../components/label";
 import DownloadDataModal from "../download";
 import ShadowCard from "../../../components/shadowCard";
 import { DefaultHistoryDataOption } from "../../../constants/chart";
+import AssetSelect from "../../../components/assetSelect";
 
 const {Option} = Select
 const {RangePicker} = DatePicker
@@ -114,8 +114,10 @@ const HistoryDataPage = () => {
                                                      bordered={false}
                                                      defaultValue={assetId}
                                                      defaultActiveFirstOption={true}
-                                                     defaultOption={{value: 0, text: "所有资产"}} placeholder={"请选择资产"}
-                                                     onChange={onAssetChange} suffixIcon={<CaretDownOutlined/>}/>
+                                                     placeholder={"请选择资产"}
+                                                     onChange={onAssetChange}>
+                                            <Option key={0} value={0}>所有资产</Option>
+                                        </AssetSelect>
                                     </Label>
                                     <LabelSelect label={"设备"} placeholder={"请选择设备"} style={{width: "120px"}}
                                                  onDropdownVisibleChange={onLoadDevices}

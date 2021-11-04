@@ -1,8 +1,7 @@
 import {Button, Card, Col, DatePicker, Popconfirm, Row, Select, Space, Tag} from "antd";
 import {Content} from "antd/lib/layout/layout";
-import AssetSelect from "../../asset/select/assetSelect";
 import Label from "../../../components/label";
-import {CaretDownOutlined, DeleteOutlined} from "@ant-design/icons";
+import {DeleteOutlined} from "@ant-design/icons";
 import {useCallback, useState} from "react";
 import {Device} from "../../../types/device";
 import moment from "moment";
@@ -12,6 +11,7 @@ import SensorSelect from "../../../components/sensorSelect";
 import {ColorDanger, ColorInfo, ColorWarn} from "../../../constants/color";
 import {DeviceTypeString} from "../../../types/device_type";
 import {OperationTranslate} from "../../../constants/rule";
+import AssetSelect from "../../../components/assetSelect";
 
 const {Option} = Select
 const {RangePicker} = DatePicker
@@ -19,7 +19,6 @@ const {RangePicker} = DatePicker
 const AlarmRecordPage = () => {
     const [table, setTable] = useState<TableProps>({data: {}, isLoading: false, pagination: true, refreshKey: 0})
     const [assetId, setAssetId] = useState<number>(0)
-    const [devices, setDevices] = useState<Device[]>()
     const [deviceId, setDeviceId] = useState<number>(0)
     const [startDate, setStartDate] = useState<moment.Moment>(moment().startOf("day").subtract(1, "day"))
     const [endDate, setEndDate] = useState<moment.Moment>(moment().endOf("day"))
@@ -147,8 +146,10 @@ const AlarmRecordPage = () => {
                                     <Label name={"资产"}>
                                         <AssetSelect bordered={false} style={{width: "128px"}} defaultValue={assetId}
                                                      defaultActiveFirstOption={true}
-                                                     defaultOption={{value: 0, text: "所有资产"}} placeholder={"请选择资产"}
-                                                     onChange={onAssetChanged} suffixIcon={<CaretDownOutlined/>}/>
+                                                     placeholder={"请选择资产"}
+                                                     onChange={onAssetChanged}>
+                                            <Option key={0} value={0}>所有资产</Option>
+                                        </AssetSelect>
                                     </Label>
                                     <Label name={"设备"}>
                                         <SensorSelect bordered={false} style={{width: "128px"}} value={deviceId}

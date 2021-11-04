@@ -1,6 +1,7 @@
 package command
 
 import (
+	"context"
 	"github.com/gogo/protobuf/proto"
 	pd "github.com/thetasensors/theta-cloud-lite/server/adapter/iot/proto"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/po"
@@ -14,39 +15,39 @@ type deviceSettings struct {
 	Sensors po.SensorSetting `json:"sensors,omitempty"`
 }
 
-type UpdateDeviceSettingsCmd struct {
-	command
+type updateDeviceSettingsCmd struct {
+	request
 	settings deviceSettings
 }
 
-func NewUpdateDeviceSettingsCmd(ipn po.IPNSetting, system po.SystemSetting, sensors po.SensorSetting) UpdateDeviceSettingsCmd {
-	cmd := UpdateDeviceSettingsCmd{
+func newUpdateDeviceSettingsCmd(ipn po.IPNSetting, system po.SystemSetting, sensors po.SensorSetting) updateDeviceSettingsCmd {
+	cmd := updateDeviceSettingsCmd{
 		settings: deviceSettings{
 			IPN:     ipn,
 			System:  system,
 			Sensors: sensors,
 		},
 	}
-	cmd.command = newCommand()
+	cmd.request = newRequest()
 	return cmd
 }
 
-func (cmd UpdateDeviceSettingsCmd) ID() string {
-	return cmd.reqID
-}
-
-func (cmd UpdateDeviceSettingsCmd) Name() string {
+func (cmd updateDeviceSettingsCmd) Name() string {
 	return "updateDeviceSettings"
 }
 
-func (cmd UpdateDeviceSettingsCmd) Qos() byte {
+func (cmd updateDeviceSettingsCmd) Response() string {
+	return "updateDeviceSettingsResponse"
+}
+
+func (cmd updateDeviceSettingsCmd) Qos() byte {
 	return 1
 }
 
-func (cmd UpdateDeviceSettingsCmd) Payload() []byte {
+func (cmd updateDeviceSettingsCmd) Payload() []byte {
 	timestamp := time.Now().UTC().Unix()
 	m := pd.UpdateDeviceSettingsCommand{
-		ReqId:          cmd.ID(),
+		ReqId:          cmd.reqID,
 		Timestamp:      int32(timestamp),
 		LastUpdateTime: int32(timestamp),
 	}
@@ -62,6 +63,6 @@ func (cmd UpdateDeviceSettingsCmd) Payload() []byte {
 	return payload
 }
 
-func (cmd UpdateDeviceSettingsCmd) Response() chan pd.GeneralResponseMessage {
-	return cmd.response
+func (cmd updateDeviceSettingsCmd) Execute(ctx context.Context, gateway string, target string, timeout time.Duration) ([]byte, error) {
+	return cmd.request.do(ctx, gateway, target, cmd, timeout)
 }

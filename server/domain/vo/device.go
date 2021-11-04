@@ -17,9 +17,10 @@ type Device struct {
 	WSN        map[string]interface{} `json:"wsn,omitempty"`
 	Category   uint                   `json:"category"`
 
-	Properties  []Property        `json:"properties"`
-	Status      DeviceStatus      `json:"status"`
-	Information DeviceInformation `json:"information"`
+	Properties   []Property                 `json:"properties"`
+	Status       DeviceStatus               `json:"status"`
+	Information  DeviceInformation          `json:"information"`
+	UpgradeState *entity.DeviceUpgradeState `json:"upgradeState,omitempty"`
 }
 
 func NewDevice(e entity.Device) Device {
@@ -49,6 +50,8 @@ func (d *Device) SetWSN(e entity.Network) {
 	d.WSN = map[string]interface{}{
 		"communication_period":      e.CommunicationPeriod,
 		"communication_time_offset": e.CommunicationTimeOffset,
+		"group_size":                e.GroupSize,
+		"group_interval":            e.GroupInterval,
 	}
 }
 
@@ -56,5 +59,13 @@ func (d *Device) SetProperties(es []po.Property) {
 	d.Properties = make([]Property, len(es))
 	for i, e := range es {
 		d.Properties[i] = NewProperty(e)
+	}
+}
+
+func (d *Device) SetUpgradeState(e entity.Device) {
+	upgradeState := e.GetUpgradeState()
+	switch upgradeState.Status {
+	case entity.DeviceUpgradeStatusError, entity.DeviceUpgradeStatusPending:
+		d.UpgradeState = &upgradeState
 	}
 }

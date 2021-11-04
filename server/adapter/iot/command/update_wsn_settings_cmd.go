@@ -2,6 +2,7 @@ package command
 
 import (
 	"bytes"
+	"context"
 	"encoding/hex"
 	"fmt"
 	"github.com/gogo/protobuf/proto"
@@ -18,15 +19,15 @@ type wsnSettings struct {
 	CommunicationTimeOffset uint `json:"communication_time_offset"`
 }
 
-type UpdateWsnSettingsCmd struct {
-	command
+type updateWsnSettingsCmd struct {
+	request
 	settings        wsnSettings
 	routingTable    po.RoutingTables
 	isUpdateWsnOnly bool
 }
 
-func NewUpdateWsnSettingsCmd(network entity.Network, isUpdateWsnOnly bool) UpdateWsnSettingsCmd {
-	cmd := UpdateWsnSettingsCmd{
+func newUpdateWsnSettingsCmd(network entity.Network, isUpdateWsnOnly bool) updateWsnSettingsCmd {
+	cmd := updateWsnSettingsCmd{
 		isUpdateWsnOnly: isUpdateWsnOnly,
 		settings: wsnSettings{
 			CommunicationTimeOffset: network.CommunicationTimeOffset,
@@ -35,23 +36,27 @@ func NewUpdateWsnSettingsCmd(network entity.Network, isUpdateWsnOnly bool) Updat
 		},
 		routingTable: network.RoutingTables,
 	}
-	cmd.command = newCommand()
+	cmd.request = newRequest()
 	return cmd
 }
 
-func (cmd UpdateWsnSettingsCmd) ID() string {
+func (cmd updateWsnSettingsCmd) ID() string {
 	return cmd.reqID
 }
 
-func (cmd UpdateWsnSettingsCmd) Name() string {
+func (cmd updateWsnSettingsCmd) Name() string {
 	return "updateWsnSettings"
 }
 
-func (cmd UpdateWsnSettingsCmd) Qos() byte {
+func (cmd updateWsnSettingsCmd) Response() string {
+	return "updateWsnSettingsResponse"
+}
+
+func (cmd updateWsnSettingsCmd) Qos() byte {
 	return 1
 }
 
-func (cmd UpdateWsnSettingsCmd) Payload() []byte {
+func (cmd updateWsnSettingsCmd) Payload() []byte {
 	timestamp := time.Now().Unix()
 	settings, err := json.Marshal(cmd.settings)
 	if err != nil {
@@ -85,6 +90,6 @@ func combineBytes(bs ...[]byte) []byte {
 	return bytes.Join(bs, []byte(""))
 }
 
-func (cmd UpdateWsnSettingsCmd) Response() chan pd.GeneralResponseMessage {
-	return cmd.response
+func (cmd updateWsnSettingsCmd) Execute(ctx context.Context, gateway string, target string, timeout time.Duration) ([]byte, error) {
+	return cmd.request.do(ctx, gateway, target, cmd, timeout)
 }

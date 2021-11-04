@@ -3,4 +3,5 @@ export enum DeviceCommand {
     CancelUpgrade,
     Reset,
     Reboot,
+    Provision
 }

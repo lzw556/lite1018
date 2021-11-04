@@ -4,10 +4,10 @@ import (
 	"context"
 	"fmt"
 	"github.com/gogo/protobuf/proto"
+	"github.com/thetasensors/theta-cloud-lite/server/adapter"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/iot"
 	pd "github.com/thetasensors/theta-cloud-lite/server/adapter/iot/proto"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
-	"github.com/thetasensors/theta-cloud-lite/server/adapter/ruleengine"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/po"
@@ -64,7 +64,7 @@ func (p SensorData) Process(ctx *iot.Context, msg iot.Message) error {
 			if err != nil {
 				return fmt.Errorf("find device %s alarm rules faield: %v", device.MacAddress, err)
 			}
-			ruleengine.ExecuteSelectedRules(device, rules)
+			adapter.RuleEngine.ExecuteSelectedRules(device, rules)
 		}
 	}
 	return nil

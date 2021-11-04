@@ -1,13 +1,22 @@
 import {Form, Input, message, Modal} from "antd";
-import AssetSelect from "../../asset/select/assetSelect";
 import {useEffect, useState} from "react";
 import {DeviceType} from "../../../types/device_type";
 import {UpdateDeviceRequest} from "../../../apis/device";
+import AssetSelect from "../../../components/assetSelect";
 
 const EditBaseInfoModel = (props: any) => {
     const {visible, device, onCancel, onSuccess} = props
     const [form] = Form.useForm()
     const [isLoading, setIsLoading] = useState<boolean>(false)
+
+    useEffect(() => {
+        if (visible) {
+            form.setFieldsValue({
+                asset: device.asset.id,
+                name: device.name
+            })
+        }
+    }, [visible])
 
     const onSave = () => {
         form.validateFields().then(values => {
@@ -25,11 +34,11 @@ const EditBaseInfoModel = (props: any) => {
     }
 
     const renderFormItem = () => {
-        if (device) {
+        if (device && visible) {
             switch (device.typeId) {
                 case DeviceType.Gateway:
                     return <Form.Item label={"所属资产"} name={"asset"}>
-                        <AssetSelect value={device.asset.name}/>
+                        <AssetSelect />
                     </Form.Item>
                 case DeviceType.NormalTemperatureCorrosion:
                 case DeviceType.HighTemperatureCorrosion:
@@ -41,7 +50,7 @@ const EditBaseInfoModel = (props: any) => {
     }
 
     useEffect(() => {
-        if (device) {
+        if (device && visible) {
             form.setFieldsValue({name: device.name, asset: device.asset.name})
         }
     }, [device])

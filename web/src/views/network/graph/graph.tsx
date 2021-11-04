@@ -1,8 +1,14 @@
-import {Canvas, Edge, Node, NodeProps, Remove} from "reaflow";
+import {Canvas, Edge, EdgeProps, Label, MarkerArrow, Node, NodeProps, Remove} from "reaflow";
 import "./graph.css"
-import {FC} from "react";
+import {FC, useEffect, useState} from "react";
 import {Device} from "../../../types/device";
 import {DeviceType} from "../../../types/device_type";
+import {Network} from "../../../types/network";
+import {ColorHealth, ColorWarn} from "../../../constants/color";
+import {Popover} from "antd";
+import "../../../string-extension"
+import DeviceInfoPopover from "./deviceInfoPopover";
+import useSocket from "../../../socket";
 
 interface INode {
     id: string
@@ -19,57 +25,93 @@ interface IEdge {
 }
 
 export interface GraphProps {
-    data: { nodes: INode[], edges: IEdge[] }
+    network: Network
+    onNodeRemove?: (id: number, routingTables:any) => void
+    isEdit: boolean
     height: number
-    selections: string[]
-    onClick?: (device: Device) => void
-    onHover?: (x: number, y: number, device: Device) => void
-    onLeave?: () => void
-    onRemove?: (device: Device) => void
 }
 
-const Graph: FC<GraphProps> = ({data, selections, height, onClick, onHover, onLeave, onRemove}) => {
+const Graph: FC<GraphProps> = ({network, onNodeRemove, isEdit, height}) => {
+    const [data, setData] = useState<{ nodes: INode[], edges: IEdge[] }>()
+    const [selections, setSelections] = useState<string[]>([])
+    const {connectionState} = useSocket()
 
-    const renderEdge = (props: any) => {
-        const node = data.nodes.find(n => n.data.device.macAddress === props.target)
-        if (node && node.data.device.status && node.data.device.status.isOnline) {
-            return <Edge style={{stroke: "#28A745", fill: "#28A745"}}/>
+    useEffect(() => {
+        const nodes = network.nodes.map(item => {
+            if (connectionState && connectionState.id === item.id) {
+                item.status.isOnline = connectionState.isOnline
+            }
+            return {id: item.macAddress, text: item.name, data: {device: item}}
+        })
+        const edges = network.routingTables.map(item => {
+            return {from: item[1], to: item[0], id: item[0]}
+        })
+        setSelections(isEdit ? nodes.filter(item => item.data.device.typeId !== DeviceType.Gateway).map(item => item.id) : [])
+        setData({nodes: nodes, edges: edges})
+    }, [network, connectionState, isEdit])
+
+    const onRemove = (node: any) => {
+        if (data) {
+            const newNodes = data.nodes.filter((n: any) => n.id !== node.id)
+            const newEdges = data.edges.filter((e: any) => e.from !== node.id && e.to !== node.id)
+            const parents = data.edges.filter((e: any) => e.to === node.id)
+            const children = data.edges.filter((e: any) => e.from === node.id)
+            parents.forEach((parent: any) => {
+                children.forEach((child: any) => {
+                    const parentNode = data.nodes.find((n: any) => n.id === parent.from)
+                    const childNode = data.nodes.find((n: any) => n.id === child.to)
+                    if (parentNode && childNode) {
+                        newEdges.push({id: childNode.id, from: parentNode.id, to: childNode.id})
+                    }
+                })
+            })
+            if (onNodeRemove) {
+                onNodeRemove(node.data.device.id, newEdges.map(item => [item.to, item.from]))
+            }
+            setData({nodes: newNodes, edges: newEdges})
         }
-        return <Edge style={{stroke: "#FFC107", fill: "#FFC107"}}/>
+    }
+
+    const renderNode = (props: NodeProps) => {
+        const isOnline = props.properties.data.device.status.isOnline
+        let color = ColorWarn
+        if (isOnline) {
+            color = ColorHealth
+        }
+        return <Node
+            style={{fill: "rgba(255, 255, 255, 0)", strokeWidth: 1, stroke: color}}
+            label={<Label style={{fill: "rgba(255, 255, 255, 0)"}} text={""} width={0} height={0}/>}
+            onRemove={(event, node) => {
+                onRemove(node)
+            }}
+        >
+            {
+                event => (
+                    <foreignObject height={event.height} width={event.width} x={0} y={0}>
+                        <Popover placement={"bottom"} content={<DeviceInfoPopover device={event.node.data.device}/>}
+                                 title={event.node.text}>
+                            <div style={{textAlign: "center", position: "fixed", bottom: 0, top: 0, left: 0, right: 0}}>
+                                <a href={`#/device-management/devices?locale=deviceDetail&id=${event.node.data.device.id}`}
+                                   style={{color: color}}>{event.node.text}</a>
+                            </div>
+                        </Popover>
+                    </foreignObject>
+                )
+            }
+        </Node>
+    }
+
+    const renderEdge = (edge: EdgeProps) => {
+        return <Edge remove={<Remove hidden={true}/>}/>
     }
 
     return <div className="ts-graph" style={{height: `${height - 56}px`}}>
-        <Canvas fit={true} selections={selections} nodes={data.nodes} edges={data.edges}
-                direction="RIGHT"
-                node={(props: NodeProps) => (
-                    <Node
-                        onClick={(event, node) => {
-                            if (onClick) {
-                                onClick(node.data.device)
-                            }
-                        }}
-                        onEnter={(event, node) => {
-                            if (onHover) {
-                                onHover(event.clientX, event.clientY + props.height, node.data.device)
-                            }
-                        }}
-                        onLeave={(event, node) => {
-                            if (onLeave) {
-                                onLeave()
-                            }
-                        }}
-                        remove={<Remove x={props.width / 2} y={props.height}
-                                        hidden={props.properties.data.device.typeId === DeviceType.Gateway}/>}
-                        onRemove={(event, node) => {
-                            if (onRemove) {
-                                onRemove(node.data.device)
-                            }
-                        }}
-                    />
-                )}
-                edge={(props) => (
-                    renderEdge(props)
-                )}
+        <Canvas pannable={true}
+                arrow={<MarkerArrow style={{fill: "#8a8e99"}}/>}
+                fit={true}
+                selections={selections} nodes={data?.nodes} edges={data?.edges}
+                edge={renderEdge}
+                node={renderNode}
         />
     </div>
 }

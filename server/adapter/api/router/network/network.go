@@ -27,12 +27,14 @@ func (r *networkRouter) initRoutes() {
 
 		// PUT
 		router.NewPutRoute("networks/setting", r.updateSettingByGatewayID),
+		router.NewPutRoute("networks/:id", r.updateByID),
+		router.NewPutRoute("networks/:id/sync", r.sync),
 
 		// PATCH
 		router.NewPatchRoute("networks/:id/devices", r.accessDevices),
 
 		// DELETE
-		router.NewDeleteRoute("networks/:id/devices/:deviceId", r.removeDeviceByID),
+		router.NewDeleteRoute("networks/:id/devices", r.removeDevices),
 	}
 }
 

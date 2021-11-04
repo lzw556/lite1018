@@ -18,3 +18,5 @@ type Firmware struct {
 func (Firmware) TableName() string {
 	return "ts_firmware"
 }
+
+type Firmwares []Firmware

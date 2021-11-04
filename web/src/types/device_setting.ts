@@ -13,5 +13,7 @@ export const DEFAULT_DEVICE_SETTING_IPN: IpnSetting = {
 
 export const DEFAULT_WSN_SETTING: WsnSetting = {
     communication_period: COMMUNICATION_PERIOD[0].value,
-    communication_time_offset: COMMUNICATION_TIME_OFFSET[0].value
+    communication_time_offset: COMMUNICATION_TIME_OFFSET[0].value,
+    group_size: 4,
+    group_interval: 2 * 60 * 1000
 }

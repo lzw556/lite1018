@@ -2,7 +2,6 @@ package config
 
 import (
 	"fmt"
-	"time"
 )
 
 type Database struct {
@@ -13,9 +12,9 @@ type Database struct {
 	Password    string
 	Name        string
 	MaxIdle     int
-	MaxIdleTime time.Duration
+	MaxIdleTime int
 	MaxActive   int
-	MaxLifetime time.Duration
+	MaxLifetime int
 }
 
 func (db Database) DNS() string {

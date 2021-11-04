@@ -86,9 +86,9 @@ func (a *Adapter) Run() error {
 	return http.ListenAndServe(fmt.Sprintf(":%d", a.port), nil)
 }
 
-func (a *Adapter) emit(msg Message) {
-	fmt.Println(msg)
-	a.socket.BroadcastToNamespace(msg.Namespace, msg.Event, response.SuccessResponse(msg.Data))
+func (a *Adapter) emit(event string, data interface{}) {
+	fmt.Println(data)
+	a.socket.BroadcastToNamespace("/", event, response.SuccessResponse(data))
 }
 
 func (a *Adapter) Close() {

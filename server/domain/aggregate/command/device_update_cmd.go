@@ -5,12 +5,14 @@ import (
 	"errors"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/request"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/response"
-	"github.com/thetasensors/theta-cloud-lite/server/adapter/iot"
+	"github.com/thetasensors/theta-cloud-lite/server/adapter/iot/command"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
+	"github.com/thetasensors/theta-cloud-lite/server/domain/po"
 	spec "github.com/thetasensors/theta-cloud-lite/server/domain/specification"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/devicetype"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/errcode"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/transaction"
 	"gorm.io/gorm"
 	"time"
@@ -31,30 +33,60 @@ func NewDeviceUpdateCmd() DeviceUpdateCmd {
 }
 
 func (cmd DeviceUpdateCmd) UpdateBaseInfo(req request.Device) error {
-	cmd.Device.Name = req.Name
-	return cmd.deviceRepo.Save(context.TODO(), &cmd.Device.Device)
+	if cmd.Device.Name != req.Name {
+		ctx := context.TODO()
+		cmd.Device.Name = req.Name
+		err := cmd.deviceRepo.Save(ctx, &cmd.Device.Device)
+		if err != nil {
+			return err
+		}
+		devices, err := cmd.deviceRepo.FindBySpecs(ctx, spec.NetworkSpec(cmd.Device.NetworkID))
+		if err != nil {
+			return err
+		}
+		network, err := cmd.networkRepo.Get(ctx, cmd.Device.NetworkID)
+		if err != nil {
+			return err
+		}
+		if cmd.Device.GetConnectionState().IsOnline {
+			command.SyncNetwork(network, devices, 3*time.Second)
+		}
+	}
+	return nil
 }
 
 func (cmd DeviceUpdateCmd) UpdateSetting(req request.DeviceSetting) error {
 	switch cmd.Device.TypeID {
 	case devicetype.GatewayType:
-		for k := range cmd.Device.IPN {
-			if value, ok := req[k]; ok {
-				cmd.Device.IPN[k] = value
+		for _, key := range po.IPNSettingKeys {
+			if value, ok := req[key]; ok {
+				cmd.Device.IPN[key] = value
 			}
 		}
+	case devicetype.RouterType:
 	default:
-		for k := range cmd.Device.Sensors {
-			if value, ok := req[k]; ok {
-				cmd.Device.Sensors[k] = value
+		for _, key := range po.SensorSettingKeys[cmd.Device.TypeID] {
+			if value, ok := req[key]; ok {
+				cmd.Device.Sensors[key] = value
 			}
 		}
 	}
-	err := cmd.deviceRepo.Save(context.TODO(), &cmd.Device.Device)
+	ctx := context.TODO()
+	err := cmd.deviceRepo.Save(ctx, &cmd.Device.Device)
 	if err != nil {
 		return err
 	}
-	iot.SyncDeviceSettings(cmd.Device.MacAddress, 3*time.Second)
+	network, err := cmd.networkRepo.Get(ctx, cmd.Device.NetworkID)
+	if err != nil {
+		return err
+	}
+	gateway, err := cmd.deviceRepo.Get(ctx, network.GatewayID)
+	if err != nil {
+		return err
+	}
+	if cmd.Device.GetConnectionState().IsOnline {
+		command.SyncDeviceSettings(gateway, cmd.Device)
+	}
 	return nil
 }
 
@@ -85,7 +117,7 @@ func (cmd DeviceUpdateCmd) Replace(mac string) error {
 	ctx := context.TODO()
 	_, err := cmd.deviceRepo.GetBySpecs(ctx, spec.DeviceMacSpec(mac))
 	if !errors.Is(err, gorm.ErrRecordNotFound) {
-		return response.BusinessErr(response.DeviceMacExistsError, "")
+		return response.BusinessErr(errcode.DeviceMacExistsError, "")
 	}
 	network, err := cmd.networkRepo.Get(ctx, cmd.Device.NetworkID)
 	err = transaction.Execute(ctx, func(txCtx context.Context) error {

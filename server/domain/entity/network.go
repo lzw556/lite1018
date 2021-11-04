@@ -6,6 +6,13 @@ type Network struct {
 	po.Network
 }
 
+func (n *Network) UpdateRoutingTables(tables [][2]string) {
+	n.RoutingTables = make(po.RoutingTables, len(tables))
+	for i, table := range tables {
+		n.RoutingTables[i] = po.RoutingTable{table[0], table[1]}
+	}
+}
+
 func (n *Network) RemoveDevice(e Device) {
 	if len(n.RoutingTables) == 0 {
 		return
@@ -46,6 +53,15 @@ func (n *Network) ReplaceDevice(e Device, newMac string) {
 			n.RoutingTables[i][1] = newMac
 		}
 	}
+}
+
+func (n Network) GetParent(mac string) string {
+	for _, table := range n.RoutingTables {
+		if table[0] == mac {
+			return table[1]
+		}
+	}
+	return ""
 }
 
 func (n Network) GetChildren(mac string) []string {

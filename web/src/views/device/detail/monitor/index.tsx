@@ -101,8 +101,8 @@ const MonitorPage: FC<MonitorPageProps> = ({device}) => {
         if (device){
             if (device.typeId === DeviceType.Gateway || device.typeId === DeviceType.Router) {
                 return <Label name={"设备"}>
-                    <Select bordered={false} defaultActiveFirstOption={true}
-                            value={devices?.length ? devices[0].id : undefined} onChange={onDeviceChanged}>
+                    <Select style={{width:"128px"}} bordered={false} defaultActiveFirstOption={true}
+                            defaultValue={devices?.length ? devices[0].id : undefined} onChange={onDeviceChanged}>
                         {
                             devices?.map(item => (<Option key={item.id} value={item.id}>{item.name}</Option>))
                         }

@@ -13,8 +13,8 @@ export function AccessDevicesRequest(networkId:number, parent:number, children:[
     return request.patch(`/networks/${networkId}/devices`, {parent, children}).then(res => res.data)
 }
 
-export function RemoveDeviceRequest(networkId:number, deviceId:number) {
-    return request.delete<Network>(`/networks/${networkId}/devices/${deviceId}`).then(res => res.data)
+export function RemoveDevicesRequest(networkId:number, params:any) {
+    return request.delete(`/networks/${networkId}/devices`, params).then(res => res.data)
 }
 
 export function ImportNetworkRequest(params:any) {
@@ -27,4 +27,12 @@ export function ExportNetworkRequest(id:number) {
 
 export function UpdateNetworkSettingRequest(gatewayId:number, wsn:any) {
     return request.put(`/networks/setting?gatewayId=${gatewayId}`, wsn).then(res => res.data)
+}
+
+export function UpdateNetworkRequest(id:number, params:any) {
+    return request.put<Network>(`/networks/${id}`, params).then(res => res.data)
+}
+
+export function SyncNetworkRequest(id:number) {
+    return request.put(`/networks/${id}/sync`, null).then(res => res.data)
 }

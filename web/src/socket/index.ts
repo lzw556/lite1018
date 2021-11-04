@@ -10,16 +10,28 @@ const socket = io.connect("localhost:8081/", {
 const useSocket = () => {
     const [connectionState, setConnectionState] = useState<any>()
     const [alertState, setAlertState] = useState<any>()
+    const [upgradeState, setUpgradeState] = useState<any>()
+
     useEffect(() => {
         socket.on("ready", (data: any) => {
             console.log(data)
         })
         socket.on('socket::deviceConnectionStateChanged', (res: ResponseResult<any>) => {
+            console.log(res)
             if (res.code === 200) {
                 setConnectionState({
                     id: res.data.id,
                     isOnline: res.data.connectionState.isOnline,
                     connectAt: res.data.connectionState.connectAt
+                })
+            }
+        })
+        socket.on('socket::deviceUpgradeStateChanged', (res: ResponseResult<any>) => {
+            if (res.code == 200) {
+                setUpgradeState({
+                    id: res.data.id,
+                    status: res.data.upgradeState.status,
+                    progress: res.data.upgradeState.progress,
                 })
             }
         })
@@ -34,14 +46,10 @@ const useSocket = () => {
                 })
             }
         })
-        // return () => {
-        //     if (socket) {
-        //         socket.disconnect()
-        //     }
-        // }
     }, [])
     return {
         connectionState,
+        upgradeState,
         alertState
     }
 }

@@ -31,9 +31,15 @@ func (repo Network) GetBySpecs(ctx context.Context, specs ...spec.Specification)
 	return e, err
 }
 
-func (repo Network) Find(ctx context.Context, ids ...uint) ([]entity.Network, error) {
+func (repo Network) Find(ctx context.Context) ([]entity.Network, error) {
 	var es []entity.Network
-	err := repo.DB(ctx).Find(&es, ids).Error
+	err := repo.DB(ctx).Find(&es).Error
+	return es, err
+}
+
+func (repo Network) FindBySpecs(ctx context.Context, specs ...spec.Specification) ([]entity.Network, error) {
+	var es []entity.Network
+	err := repo.DB(ctx).Scopes(spec.Scopes(specs)...).Find(&es).Error
 	return es, err
 }
 

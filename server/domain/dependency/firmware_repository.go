@@ -12,6 +12,7 @@ type FirmwareRepository interface {
 	Get(ctx context.Context, id uint) (po.Firmware, error)
 	FindByPaginate(ctx context.Context, page, size int) ([]po.Firmware, int64, error)
 	GetBySpecs(ctx context.Context, specs ...specification.Specification) (po.Firmware, error)
+	FindBySpecs(ctx context.Context, specs ...specification.Specification) ([]po.Firmware, error)
 
 	Delete(ctx context.Context, id uint) error
 }

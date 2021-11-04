@@ -31,6 +31,12 @@ func (repo Firmware) FindByPaginate(ctx context.Context, page, size int) ([]po.F
 	return es, total, err
 }
 
+func (repo Firmware) FindBySpecs(ctx context.Context, specs ...spec.Specification) ([]po.Firmware, error) {
+	var es []po.Firmware
+	err := repo.DB(ctx).Scopes(spec.Scopes(specs)...).Find(&es).Error
+	return es, err
+}
+
 func (repo Firmware) Get(ctx context.Context, id uint) (po.Firmware, error) {
 	var e po.Firmware
 	err := repo.DB(ctx).First(&e, id).Error

@@ -82,6 +82,14 @@ export const COMMUNICATION_TIME_OFFSET = [
     }
 ]
 
+
+export const GROUP_INTERVAL = [
+    {
+        value: 2 * 60 * millisecond,
+        text: "2分钟"
+    }
+]
+
 export const SAMPLE_PERIOD_1 = [
     {
         value: 60 * millisecond,

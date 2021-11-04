@@ -27,11 +27,18 @@ func Init() {
 }
 
 func AddJob(job Job) {
-	entityID, err := task.cron.AddJob(job.Spec(), job)
-	if err != nil {
-		return
+	if _, ok := getEntity(job.ID()); !ok {
+		entityID, err := task.cron.AddJob(job.Spec(), job)
+		if err != nil {
+			return
+		}
+		setEntity(job, entityID)
 	}
-	setEntity(job, entityID)
+}
+
+func getEntity(id string) (cron.EntryID, bool) {
+	value, ok := task.entityIDs[id]
+	return value, ok
 }
 
 func Run() {

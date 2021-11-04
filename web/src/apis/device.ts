@@ -51,10 +51,22 @@ export function SendDeviceCommandRequest(id:number, cmd:any) {
     return request.post(`/devices/${id}/commands/${cmd}`, {}).then(res => res.data)
 }
 
+export function DeviceUpgradeRequest(id:number, params:any) {
+    return request.post(`/devices/${id}/upgrade`, params).then(res => res.data)
+}
+
+export function DeviceCancelUpgradeRequest(id:number) {
+    return request.delete(`/devices/${id}/upgrade`).then(res => res.data)
+}
+
 export function GetDeviceGroupByAsset(deviceType: number) {
     return request.get(`/devices/groupBy/asset`, {device_type: deviceType}).then(res => res.data)
 }
 
 export function GetChildrenRequest(id:number) {
     return request.get<Device[]>(`/devices/${id}/children`).then(res => res.data)
+}
+
+export function GetDeviceSettingRequest(id:number) {
+    return request.get(`/devices/${id}/setting`).then(res => res.data)
 }

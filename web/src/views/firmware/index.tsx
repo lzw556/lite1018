@@ -1,9 +1,9 @@
-import {Button, Card, Col, Empty, message, Popconfirm, Row, Space, Upload} from "antd";
+import {Button, Col, message, Popconfirm, Row, Space, Upload} from "antd";
 import {DeleteOutlined, UploadOutlined} from "@ant-design/icons";
 import {Content} from "antd/lib/layout/layout";
 import {useCallback, useState} from "react";
 import TableLayout, {DEFAULT_TABLE_PROPS, TableProps} from "../layout/TableLayout";
-import {PagingFirmwaresRequest, RemoveFirmwareRequest} from "../../apis/firmware";
+import {PagingFirmwaresRequest, RemoveFirmwareRequest, UploadFirmwareRequest} from "../../apis/firmware";
 import moment from "moment";
 import ShadowCard from "../../components/shadowCard";
 
@@ -16,19 +16,20 @@ const FirmwarePage = () => {
         if (info.file.status === 'uploading') {
             setIsUploading(true)
         }
-        if (info.file.status === 'done') {
-            const {response} = info.file
+    }
+
+    const onUpload = (options:any) => {
+        const formData = new FormData()
+        formData.append("file", options.file)
+        UploadFirmwareRequest(formData).then(res => {
             setIsUploading(false)
-            if (response.code === 200) {
+            if (res.code === 200) {
                 onRefresh()
                 message.success("固件上传成功").then()
             }else {
-                message.error(`上传失败,${response.msg}`).then()
+                message.error(`上传失败,${res.msg}`).then()
             }
-        }else if (info.file.status === 'error') {
-            setIsUploading(false)
-            message.error("固件上传失败").then()
-        }
+        })
     }
 
     const onLoading = (isLoading: boolean) => {
@@ -57,10 +58,6 @@ const FirmwarePage = () => {
         }else {
             message.error("删除失败").then()
         }
-    }
-
-    const firmwareEmptyLayout = () => {
-        return <Empty description={"固件列表为空"} image={Empty.PRESENTED_IMAGE_SIMPLE} />
     }
 
     const columns = [
@@ -110,7 +107,7 @@ const FirmwarePage = () => {
                 <Upload
                     accept={".bin"}
                     name="file"
-                    action={"http://localhost:8080/api/firmwares"}
+                    customRequest={onUpload}
                     showUploadList={false}
                     onChange={onFileChange}>
                     <Button type="primary" loading={isUploading}>
@@ -129,7 +126,7 @@ const FirmwarePage = () => {
                 <Content style={{paddingTop: "15px"}}>
                     <ShadowCard>
                         <TableLayout
-                            emptyLayout={firmwareEmptyLayout}
+                            emptyText={"固件列表为空"}
                             columns={columns}
                             isLoading={table.isLoading}
                             refreshKey={table.refreshKey}

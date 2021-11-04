@@ -4,13 +4,21 @@ import SensorFormItem from "./item/sensorFormItem";
 import {DEFAULT_DEVICE_SETTING_IPN, DEFAULT_WSN_SETTING} from "../../../types/device_setting";
 import IpnFormItem from "./item/ipnFormItem";
 import WsnFormItem from "./item/wsnFormItem";
+import {useEffect} from "react";
 
 const {Option, OptGroup} = Select
 
 const DeviceTypeForm = (props: any) => {
     const {form, type, onChange} = props
 
+    useEffect(() => {
+        form.setFieldsValue({
+            typeId: type
+        })
+    }, [type])
+
     const renderFormItem = () => {
+
         switch (type) {
             case DeviceType.Gateway:
                 return <div>
@@ -31,7 +39,7 @@ const DeviceTypeForm = (props: any) => {
     }
 
     return <Form form={form} labelCol={{span: 8}}>
-        <Form.Item label={"设备类型"} name="typeId" initialValue={type} rules={[{required: true, message: "请选择设备类型"}]}>
+        <Form.Item label={"设备类型"} name="typeId" rules={[{required: true, message: "请选择设备类型"}]}>
             <Select placeholder={"请选择设备类型"} onChange={(value: DeviceType) => {
                 onChange(value)
             }}>

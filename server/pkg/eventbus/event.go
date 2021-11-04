@@ -1,7 +1,8 @@
 package eventbus
 
 const (
-	DeviceCommandRequest  = "iot::deviceCommandRequest"
 	DeviceCommandResponse = "iot::deviceCommandResponse"
+	DeviceUpgradeResponse = "iot::deviceUpgradeResponse"
+	DeviceUpgradeStatus   = "iot::deviceUpgradeStatus"
 	SocketEmit            = "socket::emit"
 )

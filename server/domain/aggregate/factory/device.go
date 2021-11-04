@@ -14,6 +14,7 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/domain/po"
 	spec "github.com/thetasensors/theta-cloud-lite/server/domain/specification"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/devicetype"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/errcode"
 	"gorm.io/gorm"
 )
 
@@ -35,7 +36,7 @@ func (factory Device) NewDeviceCreateCmd(req request.Device) (command.DeviceCrea
 	ctx := context.TODO()
 	e, err := factory.deviceRepo.GetBySpecs(ctx, spec.DeviceMacSpec(req.MacAddress))
 	if !errors.Is(err, gorm.ErrRecordNotFound) {
-		return nil, response.BusinessErr(response.DeviceMacExistsError, req.MacAddress)
+		return nil, response.BusinessErr(errcode.DeviceMacExistsError, req.MacAddress)
 	}
 	e.Name = req.Name
 	e.MacAddress = req.MacAddress
@@ -51,7 +52,7 @@ func (factory Device) NewDeviceCreateCmd(req request.Device) (command.DeviceCrea
 		devicetype.HighTemperatureCorrosionType:
 		return factory.newSensorCreateCmd(e.Device, req)
 	}
-	return nil, response.BusinessErr(response.UnknownDeviceTypeError, "")
+	return nil, response.BusinessErr(errcode.UnknownDeviceTypeError, "")
 }
 
 func (factory Device) newGatewayCreateCmd(e po.Device, req request.Device) (*command.GatewayCreateCmd, error) {
@@ -64,6 +65,8 @@ func (factory Device) newGatewayCreateCmd(e po.Device, req request.Device) (*com
 		Name:                    req.Name,
 		CommunicationPeriod:     req.WSN.CommunicationPeriod,
 		CommunicationTimeOffset: req.WSN.CommunicationTimeOffset,
+		GroupSize:               req.WSN.GroupSize,
+		GroupInterval:           req.WSN.GroupInterval,
 		RoutingTables:           make(po.RoutingTables, 0),
 	}
 	return &cmd, nil
@@ -90,7 +93,7 @@ func (factory Device) NewDeviceRemoveCmd(deviceID uint) (*command.DeviceRemoveCm
 	ctx := context.TODO()
 	e, err := factory.deviceRepo.Get(ctx, deviceID)
 	if err != nil {
-		return nil, response.BusinessErr(response.DeviceNotFoundError, "")
+		return nil, response.BusinessErr(errcode.DeviceNotFoundError, "")
 	}
 	cmd := command.NewDeviceRemoveCmd()
 	cmd.Device = e
@@ -103,7 +106,7 @@ func (factory Device) NewDeviceRemoveCmd(deviceID uint) (*command.DeviceRemoveCm
 func (factory Device) NewDeviceUpdateCmd(deviceID uint) (*command.DeviceUpdateCmd, error) {
 	e, err := factory.deviceRepo.Get(context.TODO(), deviceID)
 	if err != nil {
-		return nil, response.BusinessErr(response.DeviceNotFoundError, "")
+		return nil, response.BusinessErr(errcode.DeviceNotFoundError, "")
 	}
 	cmd := command.NewDeviceUpdateCmd()
 	cmd.Device = e
@@ -114,7 +117,7 @@ func (factory Device) NewDeviceQuery(id uint) (*query.DeviceQuery, error) {
 	ctx := context.TODO()
 	e, err := factory.deviceRepo.Get(ctx, id)
 	if err != nil {
-		return nil, response.BusinessErr(response.DeviceNotFoundError, "")
+		return nil, response.BusinessErr(errcode.DeviceNotFoundError, "")
 	}
 	q := query.NewDeviceQuery()
 	q.Device = e
@@ -167,17 +170,17 @@ func (factory Device) NewDeviceExecuteCommandCmd(deviceID uint) (*command.Device
 	ctx := context.TODO()
 	device, err := factory.deviceRepo.Get(ctx, deviceID)
 	if err != nil {
-		return nil, response.BusinessErr(response.DeviceNotFoundError, "")
+		return nil, response.BusinessErr(errcode.DeviceNotFoundError, "")
 	}
 	cmd := command.NewDeviceExecuteCommandCmd()
 	cmd.Device = device
 	network, err := factory.networkRepo.Get(ctx, device.NetworkID)
 	if err != nil {
-		return nil, response.BusinessErr(response.NetworkNotFoundError, "")
+		return nil, response.BusinessErr(errcode.NetworkNotFoundError, "")
 	}
 	gateway, err := factory.deviceRepo.Get(ctx, network.GatewayID)
 	if err != nil {
-		return nil, response.BusinessErr(response.DeviceNotFoundError, "")
+		return nil, response.BusinessErr(errcode.DeviceNotFoundError, "")
 	}
 	cmd.Gateway = gateway
 	return &cmd, nil
@@ -187,11 +190,11 @@ func (factory Device) NewDeviceChildrenQuery(id uint) (*query.DeviceChildrenQuer
 	ctx := context.TODO()
 	e, err := factory.deviceRepo.Get(ctx, id)
 	if err != nil {
-		return nil, response.BusinessErr(response.DeviceNotFoundError, "")
+		return nil, response.BusinessErr(errcode.DeviceNotFoundError, "")
 	}
 	network, err := factory.networkRepo.Get(ctx, e.NetworkID)
 	if err != nil {
-		return nil, response.BusinessErr(response.NetworkNotFoundError, "")
+		return nil, response.BusinessErr(errcode.NetworkNotFoundError, "")
 	}
 	macs := network.GetChildren(e.MacAddress)
 	if len(macs) > 0 {
@@ -204,4 +207,24 @@ func (factory Device) NewDeviceChildrenQuery(id uint) (*query.DeviceChildrenQuer
 		return &q, nil
 	}
 	return nil, fmt.Errorf("has no children")
+}
+
+func (factory Device) NewDeviceUpgradeCmd(deviceID uint) (*command.DeviceUpgradeCmd, error) {
+	ctx := context.TODO()
+	e, err := factory.deviceRepo.Get(ctx, deviceID)
+	if err != nil {
+		return nil, response.BusinessErr(errcode.DeviceNotFoundError, "")
+	}
+	network, err := factory.networkRepo.Get(ctx, e.NetworkID)
+	if err != nil {
+		return nil, err
+	}
+	gateway, err := factory.deviceRepo.Get(ctx, network.GatewayID)
+	if err != nil {
+		return nil, err
+	}
+	cmd := command.NewDeviceUpgradeCmd()
+	cmd.Device = e
+	cmd.Gateway = gateway
+	return &cmd, nil
 }

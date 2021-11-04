@@ -13,6 +13,6 @@ func (s PrimaryKeysSpec) Scope() func(db *gorm.DB) *gorm.DB {
 		if len(s) > 0 {
 			return db.Where("id IN ?", s)
 		}
-		return db
+		return db.Where("id IN ?", []uint{0})
 	}
 }

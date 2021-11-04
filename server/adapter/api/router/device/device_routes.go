@@ -124,3 +124,17 @@ func (r deviceRouter) getChildren(ctx *gin.Context) (interface{}, error) {
 	id := cast.ToUint(ctx.Param("id"))
 	return r.service.GetChildren(id)
 }
+
+func (r deviceRouter) upgrade(ctx *gin.Context) (interface{}, error) {
+	id := cast.ToUint(ctx.Param("id"))
+	var req request.DeviceUpgrade
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		return nil, response.InvalidParameterError(err.Error())
+	}
+	return nil, r.service.ExecuteDeviceUpgrade(id, req)
+}
+
+func (r deviceRouter) cancelUpgrade(ctx *gin.Context) (interface{}, error) {
+	id := cast.ToUint(ctx.Param("id"))
+	return nil, r.service.ExecuteDeviceCancelUpgrade(id)
+}

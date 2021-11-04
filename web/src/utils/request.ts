@@ -18,6 +18,7 @@ axios.interceptors.response.use(<T>(response:AxiosResponse<T>) => {
     }
     return response
 }, error => {
+    console.log(error)
     window.location.hash = '/500'
 })
 
@@ -29,7 +30,7 @@ function request<T>(method: Method, url: string, params: any) {
     return new Promise<AxiosResponse<T>>((resolve, reject) => {
         axios.request({
             url: url,
-            data: method === "POST" || method === "PUT" || method === "PATCH" ? params: null,
+            data: method === "POST" || method === "PUT" || method === "PATCH" || method === "DELETE" ? params: null,
             params: method === "GET" ? params: null,
             method: method,
         }).then(res => resolve(res))
@@ -48,6 +49,21 @@ function download<T>(method: Method, url: string, params: any) {
             params: method === "GET" ? params: null,
             method: method,
             responseType: 'blob'
+        }).then(res => resolve(res))
+            .catch(error => reject(error))
+    })
+}
+
+function upload<T>(url: string, params: any) {
+    if (params) {
+        params = filterNull(params)
+    }
+    return new Promise<AxiosResponse<T>>((resolve, reject) => {
+        axios.request({
+            url: url,
+            data: params,
+            method: "POST",
+            headers: { "Content-Type": "multipart/form-data"}
         }).then(res => resolve(res))
             .catch(error => reject(error))
     })
@@ -80,6 +96,9 @@ function filterNull(params:any) {
 export default {
     download: <T>(url:string, params: any = null) => {
         return download<T>('GET', url, params)
+    },
+    upload: <T>(url:string, params: any) => {
+        return upload<ResponseResult<T>>(url, params)
     },
     get: <T>(url: string, params: any = null) => {
         return request<ResponseResult<T>>('GET', url, params)

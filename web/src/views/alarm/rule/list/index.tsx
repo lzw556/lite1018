@@ -3,14 +3,12 @@ import {useCallback, useState} from "react";
 import {GetAlarmRuleRequest, PagingAlarmRulesRequest, RemoveAlarmRuleRequest} from "../../../../apis/alarm";
 import {Device} from "../../../../types/device";
 import {DeviceTypeString} from "../../../../types/device_type";
-import {Button, Card, Col, Divider, message, Popconfirm, Row, Select, Space} from "antd";
+import {Button, Col, Divider, message, Popconfirm, Row, Select, Space} from "antd";
 import Label from "../../../../components/label";
-import AssetSelect from "../../../asset/select/assetSelect";
-import {CaretDownOutlined} from "@ant-design/icons";
 import EditModal from "../modal/editModal";
 import {AlarmRule} from "../../../../types/alarm_rule";
 import SensorSelect from "../../../../components/sensorSelect";
-import ShadowCard from "../../../../components/shadowCard";
+import AssetSelect from "../../../../components/assetSelect";
 
 
 const {Option} = Select
@@ -21,7 +19,6 @@ const RulesPage = () => {
     const [deviceId, setDeviceId] = useState<number>(0)
     const [rule, setRule] = useState<AlarmRule>()
     const [editVisible, setEditVisible] = useState<boolean>(false)
-    const [devices, setDevices] = useState<Device[]>()
 
     const onAssetChanged = (value: any) => {
         setAssetId(value)
@@ -129,8 +126,10 @@ const RulesPage = () => {
                     <Label name={"资产"}>
                         <AssetSelect bordered={false} style={{width: "150px"}} defaultValue={assetId}
                                      defaultActiveFirstOption={true}
-                                     defaultOption={{value: 0, text: "所有资产"}} placeholder={"请选择资产"}
-                                     onChange={onAssetChanged} suffixIcon={<CaretDownOutlined/>}/>
+                                     placeholder={"请选择资产"}
+                                     onChange={onAssetChanged}>
+                            <Option key={0} value={0}>所有资产</Option>
+                        </AssetSelect>
                     </Label>
                     <Label name={"设备"}>
                         <SensorSelect bordered={false} style={{width: "128px"}} value={deviceId} assetId={assetId}
@@ -142,7 +141,7 @@ const RulesPage = () => {
         <br/>
         <Row justify={"start"}>
             <Col span={24}>
-                <TableLayout columns={columns} isLoading={table.isLoading} pagination={table.pagination}
+                <TableLayout emptyText={"报警规则列表为空"} columns={columns} isLoading={table.isLoading} pagination={table.pagination}
                              refreshKey={table.refreshKey} data={table.data} onChange={onChange}/>
             </Col>
         </Row>

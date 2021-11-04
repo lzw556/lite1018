@@ -1,6 +1,7 @@
 package response
 
 import (
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/errcode"
 	"net/http"
 	"net/url"
 
@@ -30,7 +31,15 @@ func Success(ctx *gin.Context, data interface{}) {
 func SuccessWithBusinessError(ctx *gin.Context, err BusinessError) {
 	ctx.JSON(http.StatusOK, Result{
 		Code: int(err.Code),
-		Msg:  getErrMessage(err.Code),
+		Msg:  errcode.GetErrMessage(err.Code),
+		Data: err.Reason,
+	})
+}
+
+func Redirect(ctx *gin.Context, err BusinessError) {
+	ctx.JSON(http.StatusTemporaryRedirect, Result{
+		Code: int(err.Code),
+		Msg:  errcode.GetErrMessage(err.Code),
 		Data: err.Reason,
 	})
 }

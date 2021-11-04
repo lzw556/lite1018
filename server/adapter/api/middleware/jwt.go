@@ -5,6 +5,7 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/response"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/errcode"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/jwt"
 	"strings"
 )
@@ -32,14 +33,14 @@ func (m JWT) WrapHandler() gin.HandlerFunc {
 
 		authorization := ctx.GetHeader("Authorization")
 		if authorization == "" {
-			response.UnauthorizedWithError(ctx, response.BusinessErr(response.InvalidTokenError, ""))
+			response.UnauthorizedWithError(ctx, response.BusinessErr(errcode.InvalidTokenError, ""))
 			ctx.Abort()
 			return
 		}
 
 		parts := strings.SplitN(authorization, " ", 2)
 		if len(parts) != 2 {
-			response.UnauthorizedWithError(ctx, response.BusinessErr(response.InvalidTokenError, ""))
+			response.UnauthorizedWithError(ctx, response.BusinessErr(errcode.InvalidTokenError, ""))
 			ctx.Abort()
 			return
 		}
@@ -48,13 +49,13 @@ func (m JWT) WrapHandler() gin.HandlerFunc {
 		case "Bearer":
 			tokenClaims, err := jwt.ParseToken(parts[1])
 			if err != nil {
-				response.UnauthorizedWithError(ctx, response.BusinessErr(response.InvalidTokenError, err.Error()))
+				response.UnauthorizedWithError(ctx, response.BusinessErr(errcode.InvalidTokenError, err.Error()))
 			}
 			ctx.Set("user_id", tokenClaims.UserID)
 			ctx.Next()
 			return
 		default:
-			response.UnauthorizedWithError(ctx, response.BusinessErr(response.InvalidTokenError, ""))
+			response.UnauthorizedWithError(ctx, response.BusinessErr(errcode.InvalidTokenError, ""))
 			ctx.Abort()
 			return
 		}

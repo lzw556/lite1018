@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/iot"
+	"github.com/thetasensors/theta-cloud-lite/server/adapter/iot/background"
+	"github.com/thetasensors/theta-cloud-lite/server/adapter/iot/command"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
@@ -43,8 +45,12 @@ func (p RestartStatus) Process(ctx *iot.Context, msg iot.Message) error {
 			if err != nil {
 				return fmt.Errorf("find device list failed: %v", err)
 			}
-			if iot.SyncWsnSettings(network, gateway, false, 3*time.Second) {
-				iot.SyncDeviceList(gateway, devices, 5*time.Second)
+			err = command.SyncNetwork(network, devices, 3*time.Second)
+			if err != nil {
+				return fmt.Errorf("syncing network failed: %v", err)
+			}
+			if queue := background.GetTaskQueue(gateway.MacAddress); queue != nil && !queue.IsRunning() {
+				queue.Run()
 			}
 		}
 	}

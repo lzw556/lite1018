@@ -12,8 +12,9 @@ type NetworkRepository interface {
 	Delete(ctx context.Context, id uint) error
 
 	Get(ctx context.Context, id uint) (entity.Network, error)
+	Find(ctx context.Context) ([]entity.Network, error)
 	GetBySpecs(ctx context.Context, specs ...specification.Specification) (entity.Network, error)
-	Find(ctx context.Context, ids ...uint) ([]entity.Network, error)
+	FindBySpecs(ctx context.Context, specs ...specification.Specification) ([]entity.Network, error)
 
 	UpdateByGatewayID(ctx context.Context, gatewayID, period, timeOffset uint) error
 	Save(ctx context.Context, e *po.Network) error

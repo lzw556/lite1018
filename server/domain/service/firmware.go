@@ -8,10 +8,12 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/response"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/firmware"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
+	"github.com/thetasensors/theta-cloud-lite/server/domain/aggregate/factory"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/po"
 	spec "github.com/thetasensors/theta-cloud-lite/server/domain/specification"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/vo"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/errcode"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/global"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/transaction"
 	"gorm.io/gorm"
@@ -19,11 +21,13 @@ import (
 
 type Firmware struct {
 	repository dependency.FirmwareRepository
+	factory    factory.Firmware
 }
 
 func NewFirmware() firmware.Service {
 	return Firmware{
 		repository: repository.Firmware{},
+		factory:    factory.NewFirmware(),
 	}
 }
 
@@ -31,7 +35,7 @@ func (s Firmware) CreateFirmware(req request.Firmware) error {
 	ctx := context.TODO()
 	e, err := s.repository.GetBySpecs(ctx, spec.FirmwareCrc(req.Crc))
 	if !errors.Is(err, gorm.ErrRecordNotFound) {
-		return response.BusinessErr(response.FirmwareExistsError, req.Crc)
+		return response.BusinessErr(errcode.FirmwareExistsError, req.Crc)
 	}
 	e = po.Firmware{
 		Name:      req.Name,
@@ -68,7 +72,7 @@ func (s Firmware) RemoveFirmware(firmwareID uint) error {
 	ctx := context.TODO()
 	e, err := s.repository.Get(ctx, firmwareID)
 	if err != nil {
-		return response.BusinessErr(response.FirmwareNotFoundError, "")
+		return response.BusinessErr(errcode.FirmwareNotFoundError, "")
 	}
 	return transaction.Execute(ctx, func(txCtx context.Context) error {
 		if err := s.repository.Delete(txCtx, e.ID); err != nil {
@@ -76,4 +80,12 @@ func (s Firmware) RemoveFirmware(firmwareID uint) error {
 		}
 		return global.DeleteFile("./resources/firmwares", e.Filename)
 	})
+}
+
+func (s Firmware) FindFirmwaresByDeviceID(deviceID uint) (vo.Firmwares, error) {
+	query, err := s.factory.NewFirmwaresQuery(deviceID)
+	if err != nil {
+		return nil, err
+	}
+	return query.Query(), nil
 }

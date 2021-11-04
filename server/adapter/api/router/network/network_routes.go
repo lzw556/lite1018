@@ -25,6 +25,11 @@ func (r networkRouter) getByID(ctx *gin.Context) (interface{}, error) {
 	return r.service.GetNetwork(id)
 }
 
+func (r networkRouter) sync(ctx *gin.Context) (interface{}, error) {
+	id := cast.ToUint(ctx.Param("id"))
+	return nil, r.service.SyncNetwork(id)
+}
+
 func (r networkRouter) find(ctx *gin.Context) (interface{}, error) {
 	assetID := cast.ToUint(ctx.Query("assetId"))
 	return r.service.FindNetworks(assetID)
@@ -39,10 +44,13 @@ func (r networkRouter) accessDevices(ctx *gin.Context) (interface{}, error) {
 	return nil, r.service.AccessDevices(id, req)
 }
 
-func (r networkRouter) removeDeviceByID(ctx *gin.Context) (interface{}, error) {
-	networkID := cast.ToUint(ctx.Param("id"))
-	deviceID := cast.ToUint(ctx.Param("deviceId"))
-	return r.service.RemoveDevice(networkID, deviceID)
+func (r networkRouter) removeDevices(ctx *gin.Context) (interface{}, error) {
+	id := cast.ToUint(ctx.Param("id"))
+	var req request.RemoveDevices
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		return nil, response.InvalidParameterError(err.Error())
+	}
+	return nil, r.service.RemoveDevices(id, req)
 }
 
 func (r networkRouter) updateSettingByGatewayID(ctx *gin.Context) (interface{}, error) {
@@ -52,4 +60,13 @@ func (r networkRouter) updateSettingByGatewayID(ctx *gin.Context) (interface{}, 
 		return nil, response.InvalidParameterError(err.Error())
 	}
 	return nil, r.service.UpdateSetting(gatewayID, req)
+}
+
+func (r networkRouter) updateByID(ctx *gin.Context) (interface{}, error) {
+	id := cast.ToUint(ctx.Param("id"))
+	var req request.Network
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		return nil, response.InvalidParameterError(err.Error())
+	}
+	return r.service.UpdateNetwork(id, req)
 }

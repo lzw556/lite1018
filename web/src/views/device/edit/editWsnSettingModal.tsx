@@ -39,7 +39,9 @@ const EditWsnSettingModal: FC<EditWsnSettingProps> = ({visible, device, onCancel
             const wsn = Object.assign({}, DEFAULT_WSN_SETTING, device.wsn)
             form.setFieldsValue({
                 communication_period: wsn.communication_period,
-                communication_time_offset: wsn.communication_time_offset
+                communication_time_offset: wsn.communication_time_offset,
+                group_size: wsn.group_size,
+                group_interval: wsn.group_interval,
             })
             return <WsnFormItem wsn={wsn}/>
         }

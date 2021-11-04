@@ -33,3 +33,8 @@ func (r firmwareRouter) removeByID(ctx *gin.Context) (interface{}, error) {
 	id := cast.ToUint(ctx.Param("id"))
 	return nil, r.service.RemoveFirmware(id)
 }
+
+func (r firmwareRouter) findFirmwares(ctx *gin.Context) (interface{}, error) {
+	id := cast.ToUint(ctx.Param("id"))
+	return r.service.FindFirmwaresByDeviceID(id)
+}

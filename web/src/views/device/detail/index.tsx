@@ -1,7 +1,7 @@
 import {useCallback, useEffect, useState} from "react";
 import {useHistory, useLocation} from "react-router-dom";
 import {GetParamValue} from "../../../utils/path";
-import {Button, Card, Col, Dropdown, Menu, message, Row, Space} from "antd";
+import {Button, Col, Dropdown, Menu, message, Row, Space} from "antd";
 import {Device} from "../../../types/device";
 import {GetDeviceRequest} from "../../../apis/device";
 import {Content} from "antd/lib/layout/layout";
@@ -11,6 +11,8 @@ import MonitorPage from "./monitor";
 import AlertPage from "./alert";
 import {DownOutlined} from "@ant-design/icons";
 import {DeviceCommand} from "../../../types/device_command";
+import SettingPage from "./setting";
+import {DeviceType} from "../../../types/device_type";
 
 const tabList = [
     {
@@ -31,27 +33,30 @@ const DeviceDetailPage = () => {
     const location = useLocation<any>()
     const history = useHistory()
     const [device, setDevice] = useState<Device>()
+    const [isLoading, setIsLoading] = useState<boolean>(false)
     const [currentKey, setCurrentKey] = useState<string>("monitor")
 
     const contents = new Map<string, any>([
-        ["monitor", <MonitorPage device={device} />],
+        ["monitor", <MonitorPage device={device}/>],
         ["alert", <AlertPage device={device}/>],
+        ["setting", <SettingPage device={device}/>],
         ["event", <a/>]
     ])
 
     const fetchDevice = useCallback(() => {
         const id = GetParamValue(location.search, "id")
         if (id && !!Number(id)) {
+            setIsLoading(true)
             GetDeviceRequest(Number(id)).then(res => {
-                console.log(res.data)
+                setIsLoading(false)
                 if (res.code === 200) {
                     setDevice(res.data)
-                }else {
+                } else {
                     message.error("设备不存在").then()
                     history.push({pathname: "/device-management/devices"})
                 }
             })
-        }else {
+        } else {
             message.error("设备不存在").then()
             history.push({pathname: "/device-management/devices"})
         }
@@ -60,7 +65,21 @@ const DeviceDetailPage = () => {
     useEffect(() => {
         fetchDevice()
     }, [fetchDevice])
-    
+
+    const renderTabList = () => {
+        if (device && device.typeId !== DeviceType.Router) {
+            return [
+                tabList[0],
+                {
+                    key: "setting",
+                    tab: "配置信息"
+                },
+                ...tabList.slice(1)
+            ]
+        }
+        return tabList
+    }
+
     const renderCommandMenu = () => {
         return <Menu>
             <Menu.Item key={DeviceCommand.Reboot}>重启</Menu.Item>
@@ -82,10 +101,10 @@ const DeviceDetailPage = () => {
             <Col span={24}>
                 <Content style={{paddingTop: "15px"}}>
                     {
-                        device && <InformationCard device={device}/>
+                        device && <InformationCard device={device} isLoading={isLoading}/>
                     }
                     <br/>
-                    <ShadowCard size={"small"} tabList={tabList} onTabChange={key => {
+                    <ShadowCard size={"small"} tabList={renderTabList()} onTabChange={key => {
                         setCurrentKey(key)
                     }}>
                         {contents.get(currentKey)}

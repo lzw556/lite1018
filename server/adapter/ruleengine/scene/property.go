@@ -4,11 +4,11 @@ import (
 	"context"
 	"fmt"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
-	"github.com/thetasensors/theta-cloud-lite/server/adapter/socket"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/po"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/vo"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/eventbus"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/xlog"
 	"strconv"
 	"time"
@@ -80,7 +80,7 @@ func (s Property) Alert(alarmID uint, value float32, level uint) {
 			"id":   s.Device.ID,
 			"name": s.Device.Name,
 		}
-		socket.Emit("socket::alert", alert)
+		eventbus.Publish(eventbus.SocketEmit, "socket:alert", alert)
 	}
 }
 
@@ -100,7 +100,7 @@ func (s Property) Recovery(alarmID uint) {
 			"id":   s.Device.ID,
 			"name": s.Device.Name,
 		}
-		socket.Emit("socket::alert", alert)
+		eventbus.Publish(eventbus.SocketEmit, "socket:alert", alert)
 	}
 }
 
