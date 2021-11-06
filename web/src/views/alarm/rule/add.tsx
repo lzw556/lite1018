@@ -23,8 +23,9 @@ import {GetPropertiesRequest} from "../../../apis/property";
 import {Footer} from "antd/es/layout/layout";
 import {useHistory} from "react-router-dom";
 import {AddAlarmRuleRequest, CheckRuleNameRequest, PagingRuleTemplateRequest} from "../../../apis/alarm";
-import {defaultValidateMessages} from "../../../constants/validateMessage";
+import {defaultValidateMessages, numberRule} from "../../../constants/validateMessage";
 import {EmptyLayout} from "../../layout";
+import {GetFieldName} from "../../../constants/field";
 
 const {Option} = Select
 
@@ -91,7 +92,7 @@ const AddRulePage = () => {
                 children: item.fields.map(item => {
                     return {
                         value: item.name,
-                        label: item.name,
+                        label: GetFieldName(item.name),
                     }
                 })
             }
@@ -237,13 +238,7 @@ const AddRulePage = () => {
                         </Form.Item>
                     </Col>
                     <Col span={5}>
-                        <Form.Item name={"threshold"} rules={[{
-                            required: true, type: "number", transform(value: any) {
-                                if (value) {
-                                    return Number(value)
-                                }
-                            }
-                        }]}>
+                        <Form.Item name={"threshold"} rules={[numberRule]}>
                             <Input placeholder={"报警阈值"} size={"middle"}
                                    suffix={property?.unit}/>
                         </Form.Item>

@@ -10,6 +10,7 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	spec "github.com/thetasensors/theta-cloud-lite/server/domain/specification"
+	"golang.org/x/sync/errgroup"
 	"time"
 )
 
@@ -45,8 +46,15 @@ func (p RestartStatus) Process(ctx *iot.Context, msg iot.Message) error {
 			if err != nil {
 				return fmt.Errorf("find device list failed: %v", err)
 			}
-			err = command.SyncNetwork(network, devices, 3*time.Second)
-			if err != nil {
+			var eg errgroup.Group
+			eg.Go(func() error {
+				command.SyncNetworkLinkStatus(network, devices, 3*time.Second)
+				return nil
+			})
+			eg.Go(func() error {
+				return command.SyncNetwork(network, devices, 3*time.Second)
+			})
+			if err := eg.Wait(); err != nil {
 				return fmt.Errorf("syncing network failed: %v", err)
 			}
 			if queue := background.GetTaskQueue(gateway.MacAddress); queue != nil && !queue.IsRunning() {

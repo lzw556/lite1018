@@ -4,11 +4,10 @@ import {FC, useEffect, useState} from "react";
 import {Device} from "../../../types/device";
 import {DeviceType} from "../../../types/device_type";
 import {Network} from "../../../types/network";
-import {ColorHealth, ColorWarn} from "../../../constants/color";
 import {Popover} from "antd";
 import "../../../string-extension"
 import DeviceInfoPopover from "./deviceInfoPopover";
-import useSocket from "../../../socket";
+import "./graph.css"
 
 interface INode {
     id: string
@@ -34,13 +33,9 @@ export interface GraphProps {
 const Graph: FC<GraphProps> = ({network, onNodeRemove, isEdit, height}) => {
     const [data, setData] = useState<{ nodes: INode[], edges: IEdge[] }>()
     const [selections, setSelections] = useState<string[]>([])
-    const {connectionState} = useSocket()
 
     useEffect(() => {
         const nodes = network.nodes.map(item => {
-            if (connectionState && connectionState.id === item.id) {
-                item.status.isOnline = connectionState.isOnline
-            }
             return {id: item.macAddress, text: item.name, data: {device: item}}
         })
         const edges = network.routingTables.map(item => {
@@ -48,7 +43,7 @@ const Graph: FC<GraphProps> = ({network, onNodeRemove, isEdit, height}) => {
         })
         setSelections(isEdit ? nodes.filter(item => item.data.device.typeId !== DeviceType.Gateway).map(item => item.id) : [])
         setData({nodes: nodes, edges: edges})
-    }, [network, connectionState, isEdit])
+    }, [network, isEdit])
 
     const onRemove = (node: any) => {
         if (data) {
@@ -73,13 +68,9 @@ const Graph: FC<GraphProps> = ({network, onNodeRemove, isEdit, height}) => {
     }
 
     const renderNode = (props: NodeProps) => {
-        const isOnline = props.properties.data.device.status.isOnline
-        let color = ColorWarn
-        if (isOnline) {
-            color = ColorHealth
-        }
+        const clazz = props.properties.data.device.status.isOnline ? "ts-online" : "ts-offline"
         return <Node
-            style={{fill: "rgba(255, 255, 255, 0)", strokeWidth: 1, stroke: color}}
+            style={{fill: "rgba(255, 255, 255, 0)", strokeWidth: 0}}
             label={<Label style={{fill: "rgba(255, 255, 255, 0)"}} text={""} width={0} height={0}/>}
             onRemove={(event, node) => {
                 onRemove(node)
@@ -90,9 +81,8 @@ const Graph: FC<GraphProps> = ({network, onNodeRemove, isEdit, height}) => {
                     <foreignObject height={event.height} width={event.width} x={0} y={0}>
                         <Popover placement={"bottom"} content={<DeviceInfoPopover device={event.node.data.device}/>}
                                  title={event.node.text}>
-                            <div style={{textAlign: "center", position: "fixed", bottom: 0, top: 0, left: 0, right: 0}}>
-                                <a href={`#/device-management/devices?locale=deviceDetail&id=${event.node.data.device.id}`}
-                                   style={{color: color}}>{event.node.text}</a>
+                            <div className={clazz} style={{textAlign: "center", position: "fixed", bottom: 0, top: 0, left: 0, right: 0}}>
+                                <a href={`#/device-management/devices?locale=deviceDetail&id=${event.node.data.device.id}`}>{event.node.text}</a>
                             </div>
                         </Popover>
                     </foreignObject>

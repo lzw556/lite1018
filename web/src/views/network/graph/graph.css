@@ -12,3 +12,21 @@
 .ts-form-item {
     margin-bottom: 4px;
 }
+
+.ts-online {
+    border: 1px solid #28A745;
+    border-radius: 2px;
+}
+
+.ts-online a {
+    color: #28A745;
+}
+
+.ts-offline {
+    border: 1px solid #FFC107;
+    border-radius: 2px;
+}
+
+.ts-offline a {
+    color: #FFC107;
+}

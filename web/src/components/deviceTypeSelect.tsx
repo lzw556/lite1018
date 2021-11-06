@@ -1,4 +1,4 @@
-import {DeviceType, DeviceTypeString} from "../types/device_type";
+import {DeviceType, DeviceTypeString, GetSensors} from "../types/device_type";
 import {Select, SelectProps} from "antd";
 import {FC} from "react";
 import {CaretDownOutlined} from "@ant-design/icons";
@@ -12,18 +12,17 @@ export interface DeviceTypeSelectProps extends SelectProps<any> {
 const DeviceTypeSelect: FC<DeviceTypeSelectProps> = (props) => {
     const {sensor, children} = props
 
+    const renderSensors = () => {
+        return GetSensors().map(item => (<Option key={item} value={item}>{DeviceTypeString(item)}</Option>))
+    }
+
     const render = () => {
         if (sensor) {
             return <Select {...props} suffixIcon={<CaretDownOutlined />}>
                 {children}
-                <Option key={DeviceType.BoltLoosening}
-                        value={DeviceType.BoltLoosening}>{DeviceTypeString(DeviceType.BoltLoosening)}</Option>
-                <Option key={DeviceType.BoltElongation}
-                        value={DeviceType.BoltElongation}>{DeviceTypeString(DeviceType.BoltElongation)}</Option>
-                <Option key={DeviceType.NormalTemperatureCorrosion}
-                        value={DeviceType.NormalTemperatureCorrosion}>{DeviceTypeString(DeviceType.NormalTemperatureCorrosion)}</Option>
-                <Option key={DeviceType.HighTemperatureCorrosion}
-                        value={DeviceType.HighTemperatureCorrosion}>{DeviceTypeString(DeviceType.HighTemperatureCorrosion)}</Option>
+                {
+                    renderSensors()
+                }
             </Select>
         } else {
             return <Select {...props}>
@@ -34,14 +33,9 @@ const DeviceTypeSelect: FC<DeviceTypeSelectProps> = (props) => {
                     <Option key={257} value={257}>{DeviceTypeString(DeviceType.Router)}</Option>
                 </OptGroup>
                 <OptGroup label={"传感器"} key={"sensor"}>
-                    <Option key={DeviceType.BoltLoosening}
-                            value={DeviceType.BoltLoosening}>{DeviceTypeString(DeviceType.BoltLoosening)}</Option>
-                    <Option key={DeviceType.BoltElongation}
-                            value={DeviceType.BoltElongation}>{DeviceTypeString(DeviceType.BoltElongation)}</Option>
-                    <Option key={DeviceType.NormalTemperatureCorrosion}
-                            value={DeviceType.NormalTemperatureCorrosion}>{DeviceTypeString(DeviceType.NormalTemperatureCorrosion)}</Option>
-                    <Option key={DeviceType.HighTemperatureCorrosion}
-                            value={DeviceType.HighTemperatureCorrosion}>{DeviceTypeString(DeviceType.HighTemperatureCorrosion)}</Option>
+                    {
+                        renderSensors()
+                    }
                 </OptGroup>
             </Select>
         }

@@ -75,12 +75,13 @@ func (s Property) Alert(alarmID uint, value float32, level uint) {
 		alert.Title = fmt.Sprintf("%s报警", rule.Name)
 		threshold := strconv.FormatFloat(float64(rule.Rule.Threshold), 'f', s.Property.Precision, 64)
 		alert.Content = fmt.Sprintf("设备【%s】的【%s】值%s设定阈值: %s%s", s.Device.Name, rule.Rule.Field, operation(rule.Rule.Operation), threshold, s.Property.Unit)
+		alert.Field = rule.Rule.Field
 		alert.Level = level
 		alert.Data["device"] = map[string]interface{}{
 			"id":   s.Device.ID,
 			"name": s.Device.Name,
 		}
-		eventbus.Publish(eventbus.SocketEmit, "socket:alert", alert)
+		eventbus.Publish(eventbus.SocketEmit, "socket::alert", alert)
 	}
 }
 
@@ -95,6 +96,7 @@ func (s Property) Recovery(alarmID uint) {
 		alert := vo.NewAlert()
 		alert.Title = fmt.Sprintf("%s报警", rule.Name)
 		alert.Content = fmt.Sprintf("设备【%s】的【%s】值已恢复正常", s.Device.Name, rule.Rule.Field)
+		alert.Field = rule.Rule.Field
 		alert.Level = 0
 		alert.Data["device"] = map[string]interface{}{
 			"id":   s.Device.ID,

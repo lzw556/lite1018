@@ -8,6 +8,7 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/domain/po"
 	spec "github.com/thetasensors/theta-cloud-lite/server/domain/specification"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/vo"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/xlog"
 	"time"
 )
 
@@ -44,8 +45,14 @@ func (query DeviceQuery) Detail() (*vo.Device, error) {
 	}
 	result := vo.NewDevice(query.Device)
 	result.SetAsset(asset)
-	result.Status.DeviceStatus, _ = query.deviceStatusRepo.Get(query.Device.ID)
-	result.Information.DeviceInformation, _ = query.deviceInformationRepo.Get(query.Device.ID)
+	result.Status.DeviceStatus, err = query.deviceStatusRepo.Get(query.Device.ID)
+	if err != nil {
+		xlog.Errorf("get device [%s] status failed:%v", query.Device.MacAddress, err)
+	}
+	result.Information.DeviceInformation, err = query.deviceInformationRepo.Get(query.Device.ID)
+	if err != nil {
+		xlog.Errorf("get device information failed:%v", query.Device.MacAddress, err)
+	}
 	if query.Network.ID != 0 {
 		result.SetWSN(query.Network)
 	}

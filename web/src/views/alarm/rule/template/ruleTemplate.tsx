@@ -6,6 +6,7 @@ import {Content} from "antd/lib/layout/layout";
 import DeviceTypeSelect from "../../../../components/deviceTypeSelect";
 import {AlarmRuleTemplate} from "../../../../types/alarm_rule_template";
 import {useHistory} from "react-router-dom";
+import {GetFieldName} from "../../../../constants/field";
 
 const {Option} = Select
 
@@ -35,6 +36,10 @@ const RuleTemplate: FC<RuleTemplateProps> = ({defaultValue, onOk, okText}) => {
 
     const onDeviceTypeChanged = (value: any) => {
         setDeviceType(value)
+        setProperties([])
+        setProperty(undefined)
+        setRule(undefined)
+        form.resetFields(["property", "threshold"])
     }
 
     const onPropertyChanged = (values: any) => {
@@ -49,7 +54,7 @@ const RuleTemplate: FC<RuleTemplateProps> = ({defaultValue, onOk, okText}) => {
                 children: item.fields.map(item => {
                     return {
                         value: item.name,
-                        label: item.name,
+                        label: GetFieldName(item.name),
                     }
                 })
             }

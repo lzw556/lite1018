@@ -18,6 +18,7 @@ import {
 } from "../../../../constants/rule";
 import ReactECharts from "echarts-for-react";
 import {DefaultMultiBarOption} from "../../../../constants/chart";
+import {GetFieldName} from "../../../../constants/field";
 
 export interface AlertPageProps {
     device?: Device
@@ -98,10 +99,10 @@ const AlertPage: FC<AlertPageProps> = ({device}) => {
         if (device) {
             if (device.typeId === DeviceType.Gateway || device.typeId === DeviceType.Router) {
                 return <Label name={"设备"}>
-                    <Select bordered={false} defaultActiveFirstOption={true}
-                            value={devices?.length ? devices[0].id : undefined}>
+                    <Select style={{width:"128px"}} bordered={false} defaultActiveFirstOption={true}
+                            defaultValue={devices?.length ? devices[0].id : undefined} onChange={value => setSelectedDevice(value)}>
                         {
-                            devices?.map(item => (<Option key={item.id} value={item.id}>{item.name}</Option>))
+                            devices?.filter(item => item.category === 3).map(item => (<Option key={item.id} value={item.id}>{item.name}</Option>))
                         }
                     </Select>
                 </Label>
@@ -135,7 +136,7 @@ const AlertPage: FC<AlertPageProps> = ({device}) => {
             dataIndex: 'rule',
             key: 'rule',
             render: (_: any, record: any) => {
-                return `当前${record.rule.field}值为: 
+                return `当前【${GetFieldName(record.rule.field)}】值为: 
                 ${record.value.toFixed(record.property.precision)}${record.property.unit}\n
                 ${OperationTranslate(record.rule.operation)}设定的阈值:${record.rule.threshold.toFixed(record.property.precision)}${record.property.unit}`
             }
@@ -198,7 +199,7 @@ const AlertPage: FC<AlertPageProps> = ({device}) => {
                         </Space>
                     </Col>
                 </Row>
-                <Row justify={"start"} hidden={!chartVisible}>
+                <Row justify={"start"} style={{paddingTop: "8px"}} hidden={!chartVisible}>
                     <Col span={24}>
                         <ReactECharts option={option}
                                       style={{height: "200px", width: "100%"}}/>

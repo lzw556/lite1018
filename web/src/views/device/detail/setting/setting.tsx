@@ -1,15 +1,13 @@
 import {FC, useState} from "react";
-import {Button, Form, message, Space} from "antd";
+import {Button, Form, FormItemProps, message, Space} from "antd";
 import {CheckOutlined, CloseOutlined, EditOutlined} from "@ant-design/icons";
 import {UpdateDeviceSettingRequest} from "../../../../apis/device";
 import {Device} from "../../../../types/device";
 import {ColorHealth} from "../../../../constants/color";
 
-export interface SettingProps {
+export interface SettingProps extends FormItemProps{
     device: Device
     name: string
-    title: string
-    description?: string
     value?: any
     editable: boolean
     renderEdit: (value: any) => any
@@ -17,7 +15,16 @@ export interface SettingProps {
     onSuccess: (setting: any) => void
 }
 
-const Setting: FC<SettingProps> = ({device, name, description, value, title, renderValue, editable, renderEdit, onSuccess}) => {
+const Setting: FC<SettingProps> = (props) => {
+    const {
+        device,
+        name,
+        value,
+        renderValue,
+        editable,
+        renderEdit,
+        onSuccess
+    } = props
     const [editSetting, setEditSetting] = useState<boolean>(false)
     const [setting] = useState<any>({[name]: value})
 
@@ -50,7 +57,7 @@ const Setting: FC<SettingProps> = ({device, name, description, value, title, ren
             } else {
                 return <Space>
                     {
-                        renderValue? renderValue(setting[name]) : setting[name]
+                        renderValue ? renderValue(setting[name]) : setting[name]
                     }
                     <a onClick={() => setEditSetting(true)}><EditOutlined/></a>
                 </Space>
@@ -63,7 +70,7 @@ const Setting: FC<SettingProps> = ({device, name, description, value, title, ren
     }
 
     return <>
-        <Form.Item labelAlign={"left"}  colon={false} labelCol={{span: 8}} tooltip={description} label={title}>
+        <Form.Item labelAlign={"left"} colon={false} labelCol={{span: 8}} {...props}>
             {
                 renderSetting()
             }

@@ -1,13 +1,15 @@
 import useSocket from "../socket";
-import {Alert, Space} from "antd";
-import {useCallback, useEffect, useState} from "react";
+import {Alert, notification, Space} from "antd";
+import {useEffect, useState} from "react";
 import _ from "lodash";
+import {GetFieldName} from "../constants/field";
 
 const AlertNotification = () => {
     const {alertState} = useSocket()
     const [alerts, setAlerts] = useState<any>([])
 
-    const fetchAlerts = useCallback(() => {
+    useEffect(() => {
+        console.log(alertState)
         if (alertState) {
             const newAlerts = _.cloneDeep(alerts)
             newAlerts.push(alertState)
@@ -15,31 +17,40 @@ const AlertNotification = () => {
         }
     }, [alertState])
 
-    useEffect(() => {
-        fetchAlerts()
-    }, [fetchAlerts])
-
     const renderAlertItems = () => {
         return alerts.map((item: any) => renderAlert(item))
     }
 
     const renderAlert = (alert: any) => {
         if (alert) {
-            let type: any = "success"
+            const content = alert.content.replace(alert.field, GetFieldName(alert.field))
             switch (alert.level) {
                 case 1:
-                    type = "info"
+                    notification.info({
+                        message: alert.title,
+                        description: content
+                    })
                     break
                 case 2:
-                    type = "warning"
+                    notification.warning({
+                        message: alert.title,
+                        description: content
+                    })
                     break
                 case 3:
-                    type = "error"
+                    notification.error({
+                        message:alert.title,
+                        description: content,
+                        duration: null
+                    })
                     break
                 default:
-                    return <Alert type={"success"} message={alert.title} description={alert.content} showIcon closable={true}/>
+                    notification.success({
+                        message: alert.title,
+                        description: content,
+                    })
+                    break
             }
-            return <Alert type={type} message={alert.title} description={alert.content} showIcon closable={true}/>
         }
     }
 

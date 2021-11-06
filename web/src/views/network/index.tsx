@@ -26,6 +26,8 @@ import NetworkSelect from "../../components/networkSelect";
 import {SendDeviceCommandRequest} from "../../apis/device";
 import {DeviceCommand} from "../../types/device_command";
 import {EmptyLayout} from "../layout";
+import useSocket from "../../socket";
+import _ from "lodash";
 
 export interface DevicePopover {
     device: Device
@@ -47,6 +49,23 @@ const NetworkPage = () => {
     const [removeNode, setRemoveNode] = useState<number[]>([])
     const [routingTables, setRoutingTables] = useState<any>()
     const [form] = Form.useForm()
+    const {connectionState} = useSocket()
+
+    useEffect(() => {
+        console.log(connectionState)
+        if (connectionState && network) {
+            const newNetwork = _.cloneDeep(network)
+            newNetwork.nodes = newNetwork.nodes.map(item => {
+                if (item.id === connectionState.id) {
+                    item.status.isOnline = connectionState.isOnline
+                    item.status.connectAt = connectionState.connectAt
+                }
+                return item
+            })
+            console.log(newNetwork)
+            setNetwork(newNetwork)
+        }
+    }, [connectionState])
 
     const fetchNetwork = (id: number) => {
         GetNetworkRequest(id).then(res => {

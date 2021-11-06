@@ -10,6 +10,7 @@ import {ColorDanger} from "../../../../constants/color";
 import {AlarmRule} from "../../../../types/alarm_rule";
 import Label from "../../../../components/label";
 import {ReloadOutlined} from "@ant-design/icons";
+import {GetFieldName} from "../../../../constants/field";
 
 export interface MonitorPageProps {
     device?: Device
@@ -48,7 +49,7 @@ const MonitorPage: FC<MonitorPageProps> = ({device}) => {
         if (alarms) {
             const data = alarms.filter(item => item.level === 3).map(item => {
                 return {
-                    name: item.rule.field,
+                    name: GetFieldName(item.rule.field),
                     yAxis: item.rule.threshold,
                     lineStyle: {color: ColorDanger},
                     tooltip: {formatter: `紧急<br/>{b} ${item.rule.operation} {c} ${unit}`},
@@ -70,11 +71,12 @@ const MonitorPage: FC<MonitorPageProps> = ({device}) => {
 
     const fetchDeviceData = (id: number) => {
         GetDeviceDataRequest(id, startDate.utc().unix(), endDate.utc().unix()).then(res => {
+            setOptions([])
             if (res.code === 200) {
                 setOptions(res.data.map(item => {
                     const series = Object.keys(item.fields).map(key => {
                         return {
-                            name: key,
+                            name: GetFieldName(key),
                             type: 'line',
                             areaStyle: {normal: {}},
                             data: item.fields[key],
@@ -104,7 +106,7 @@ const MonitorPage: FC<MonitorPageProps> = ({device}) => {
                     <Select style={{width:"128px"}} bordered={false} defaultActiveFirstOption={true}
                             defaultValue={devices?.length ? devices[0].id : undefined} onChange={onDeviceChanged}>
                         {
-                            devices?.map(item => (<Option key={item.id} value={item.id}>{item.name}</Option>))
+                            devices?.filter(item => item.category === 3).map(item => (<Option key={item.id} value={item.id}>{item.name}</Option>))
                         }
                     </Select>
                 </Label>

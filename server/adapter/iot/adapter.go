@@ -6,7 +6,6 @@ import (
 	"github.com/mochi-co/mqtt/server"
 	"github.com/mochi-co/mqtt/server/listeners"
 	uuid "github.com/satori/go.uuid"
-	"github.com/thetasensors/theta-cloud-lite/server/adapter/iot/cron"
 	"github.com/thetasensors/theta-cloud-lite/server/config"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/xlog"
 )
@@ -84,7 +83,6 @@ func (a *Adapter) Publish(topic string, qos byte, payload []byte) error {
 }
 
 func (a *Adapter) Run() error {
-	cron.Start()
 	if a.serverEnabled {
 		if err := a.startMQTTServer(); err != nil {
 			return err

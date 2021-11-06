@@ -47,3 +47,12 @@ export const defaultValidateMessages = {
         mismatch: "'${name}' does not match pattern ${pattern}",
     },
 };
+
+export const numberRule: any = {
+    required: true, type: "number", transform(value: any) {
+        if (value) {
+            return Number(value)
+        }
+        return value
+    }
+}

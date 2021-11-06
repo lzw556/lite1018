@@ -129,7 +129,7 @@ const DevicePage = () => {
 
     const renderCommandMenus = (record: Device) => {
         const disabled = record.status && record.status.isOnline
-        const isUpgrading = record.upgradeState && IsUpgrading(record.upgradeState.status)
+        const isUpgrading = upgradeState && IsUpgrading(upgradeState.status)
         return <Menu onClick={(e) => {
             onCommand(record, e.key)
         }}>

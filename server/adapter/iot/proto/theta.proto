@@ -11,6 +11,13 @@ message LinkStatusMessage {
   string status = 4;
 }
 
+message AllLinkStatusMessage {
+  int32 timestamp = 1;
+  string reqId = 2;
+  int32 code = 3;
+  string allStatus = 4;
+}
+
 message GeneralStatusMessage {
   int32 timestamp = 1;
   int32 code = 3;
@@ -179,7 +186,19 @@ message GetDeviceInformationCommand {
   int32 subCommand = 3;
 }
 
+message GetDeviceStatusCommand {
+  int32 timestamp = 1;
+  string reqId = 2;
+  int32 subCommand = 3;
+}
+
 message GetDeviceSettingsCommand {
+  int32 timestamp = 1;
+  string reqId = 2;
+  int32 subCommand = 3;
+}
+
+message GetAllLinkStatusCommand {
   int32 timestamp = 1;
   string reqId = 2;
   int32 subCommand = 3;

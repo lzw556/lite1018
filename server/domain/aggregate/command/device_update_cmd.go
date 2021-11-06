@@ -128,7 +128,7 @@ func (cmd DeviceUpdateCmd) Replace(mac string) error {
 			}
 		}
 		cmd.Device.MacAddress = mac
-		return cmd.deviceRepo.Save(ctx, &cmd.Device.Device)
+		return cmd.deviceRepo.Save(txCtx, &cmd.Device.Device)
 	})
 	if err != nil {
 		return err

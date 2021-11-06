@@ -12,6 +12,7 @@ import {ColorDanger, ColorInfo, ColorWarn} from "../../../constants/color";
 import {DeviceTypeString} from "../../../types/device_type";
 import {OperationTranslate} from "../../../constants/rule";
 import AssetSelect from "../../../components/assetSelect";
+import {GetFieldName} from "../../../constants/field";
 
 const {Option} = Select
 const {RangePicker} = DatePicker
@@ -77,7 +78,6 @@ const AlarmRecordPage = () => {
             dataIndex: 'device',
             key: 'device',
             render: (device: any) => {
-                console.log(device)
                 return device.name
             }
         },
@@ -95,7 +95,7 @@ const AlarmRecordPage = () => {
             key: 'rule',
             render: (_: any, record: any) => {
                 console.log(record)
-                return `当前${record.rule.field}值为: 
+                return `当前【${GetFieldName(record.rule.field)}】值为: 
                 ${record.value.toFixed(record.property.precision)}${record.property.unit}\n
                 ${OperationTranslate(record.rule.operation)}设定的阈值:${record.rule.threshold.toFixed(record.property.precision)}${record.property.unit}`
             }

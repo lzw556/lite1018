@@ -5,6 +5,7 @@ import {DEFAULT_DEVICE_SETTING_IPN, DEFAULT_WSN_SETTING} from "../../../types/de
 import IpnFormItem from "./item/ipnFormItem";
 import WsnFormItem from "./item/wsnFormItem";
 import {useEffect} from "react";
+import DeviceTypeSelect from "../../../components/deviceTypeSelect";
 
 const {Option, OptGroup} = Select
 
@@ -32,6 +33,9 @@ const DeviceTypeForm = (props: any) => {
             case DeviceType.BoltElongation:
             case DeviceType.NormalTemperatureCorrosion:
             case DeviceType.HighTemperatureCorrosion:
+            case DeviceType.VibrationTemperature3Axis:
+            case DeviceType.AngleDip:
+            case DeviceType.PressureTemperature:
                 return <SensorFormItem deviceType={type}/>
             default:
                 return null
@@ -40,24 +44,9 @@ const DeviceTypeForm = (props: any) => {
 
     return <Form form={form} labelCol={{span: 8}}>
         <Form.Item label={"设备类型"} name="typeId" rules={[{required: true, message: "请选择设备类型"}]}>
-            <Select placeholder={"请选择设备类型"} onChange={(value: DeviceType) => {
+            <DeviceTypeSelect sensor={false} placeholder={"请选择设备类型"} onChange={(value:DeviceType) => {
                 onChange(value)
-            }}>
-                <OptGroup label={"网关"} key={"gateway"}>
-                    <Option key={1} value={1}>网关</Option>
-                </OptGroup>
-                <OptGroup label={"路由器"} key={"router"}>
-                    <Option key={257} value={257}>路由器</Option>
-                </OptGroup>
-                <OptGroup label={"传感器"} key={"sensor"}>
-                    <Option key={DeviceType.BoltLoosening} value={DeviceType.BoltLoosening}>螺栓松动</Option>
-                    <Option key={DeviceType.BoltElongation} value={DeviceType.BoltElongation}>螺栓伸长量</Option>
-                    <Option key={DeviceType.NormalTemperatureCorrosion}
-                            value={DeviceType.NormalTemperatureCorrosion}>常温腐蚀</Option>
-                    <Option key={DeviceType.HighTemperatureCorrosion}
-                            value={DeviceType.HighTemperatureCorrosion}>高温腐蚀</Option>
-                </OptGroup>
-            </Select>
+            }}/>
         </Form.Item>
         {
             renderFormItem()

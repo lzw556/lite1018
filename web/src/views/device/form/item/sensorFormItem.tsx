@@ -22,7 +22,7 @@ const SensorFormItem = (props: any) => {
     }
 
     const getDefaultSpeedObject = () => {
-        return device ? device.sensors.speed_object : 6000
+        return device ? Number(device.sensors.speed_object) : 6000
     }
 
     const getDefaultSamplePeriod = () => {

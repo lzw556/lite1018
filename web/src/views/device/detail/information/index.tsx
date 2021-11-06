@@ -1,14 +1,14 @@
 import {Col, Row, Skeleton, Space, Tag} from "antd";
 import {FC} from "react";
-import {Device} from "../../../types/device";
-import {DeviceType, DeviceTypeString} from "../../../types/device_type";
-import "../index.css"
+import {Device} from "../../../../types/device";
+import {DeviceType, DeviceTypeString} from "../../../../types/device_type";
+import "../../index.css"
 import moment from "moment";
-import ShadowCard from "../../../components/shadowCard";
-import {ColorHealth, ColorWarn} from "../../../constants/color";
-import "../../../string-extension";
-import useSocket from "../../../socket";
-import DeviceUpgradeState from "../state/upgradeState";
+import ShadowCard from "../../../../components/shadowCard";
+import {ColorHealth, ColorWarn} from "../../../../constants/color";
+import "../../../../string-extension";
+import useSocket from "../../../../socket";
+import DeviceUpgradeState from "../../state/upgradeState";
 
 export interface GatewayInformationProps {
     device: Device

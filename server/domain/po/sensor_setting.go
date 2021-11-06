@@ -32,6 +32,15 @@ var SensorSettingKeys = map[uint][]string{
 		"speed_object",
 		"length_rod",
 	},
+	devicetype.VibrationTemperature3AxisType: {
+		"schedule0_sample_period",
+	},
+	devicetype.AngleDipType: {
+		"schedule0_sample_period",
+	},
+	devicetype.PressureTemperatureType: {
+		"schedule0_sample_period",
+	},
 }
 
 type SensorSetting map[string]interface{}

@@ -25,17 +25,19 @@ const EditSettingModal = (props:EditSettingProps) => {
                     const ipn = Object.assign({}, DEFAULT_DEVICE_SETTING_IPN, device.ipn)
                     form.setFieldsValue({ip_mode: ipn.ip_mode, ntp_is_enabled: ipn.ntp_is_enabled})
                     return <IpnFormItem ipn={ipn}/>
+                case DeviceType.Router:
+                    break
                 default:
+                    form.setFieldsValue(device.sensors)
                     return <SensorFormItem deviceType={device.typeId} device={device}/>
             }
         }
-        return <div>
-
-        </div>
+        return <div/>
     }
 
     const onSave = () => {
         form.validateFields().then(values => {
+            console.log(values)
             if (device) {
                 setIsLoading(true)
                 UpdateDeviceSettingRequest(device.id, values).then(res => {

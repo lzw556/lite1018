@@ -3,7 +3,7 @@ import {ResponseResult} from "../types/response";
 
 const io = require('socket.io-client')
 
-const socket = io.connect("localhost:8081/", {
+const socket = io.connect(":8081/", {
     transports: ["websocket"]
 })
 
@@ -17,7 +17,6 @@ const useSocket = () => {
             console.log(data)
         })
         socket.on('socket::deviceConnectionStateChanged', (res: ResponseResult<any>) => {
-            console.log(res)
             if (res.code === 200) {
                 setConnectionState({
                     id: res.data.id,
@@ -37,10 +36,10 @@ const useSocket = () => {
         })
         socket.on("socket::alert", (res: ResponseResult<any>) => {
             if (res.code === 200) {
-                console.log(res.data)
                 setAlertState({
                     title: res.data.title,
                     content: res.data.content,
+                    field: res.data.field,
                     level: res.data.level,
                     data: res.data.data,
                 })

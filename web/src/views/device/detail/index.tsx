@@ -23,10 +23,10 @@ const tabList = [
         key: "alert",
         tab: "报警记录"
     },
-    {
-        key: "event",
-        tab: "事件",
-    }
+    // {
+    //     key: "event",
+    //     tab: "事件",
+    // }
 ]
 
 const DeviceDetailPage = () => {
@@ -40,7 +40,7 @@ const DeviceDetailPage = () => {
         ["monitor", <MonitorPage device={device}/>],
         ["alert", <AlertPage device={device}/>],
         ["setting", <SettingPage device={device}/>],
-        ["event", <a/>]
+        // ["event", <a/>]
     ])
 
     const fetchDevice = useCallback(() => {

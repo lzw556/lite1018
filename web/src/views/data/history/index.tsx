@@ -12,6 +12,7 @@ import DownloadDataModal from "../download";
 import ShadowCard from "../../../components/shadowCard";
 import { DefaultHistoryDataOption } from "../../../constants/chart";
 import AssetSelect from "../../../components/assetSelect";
+import {GetFieldName} from "../../../constants/field";
 
 const {Option} = Select
 const {RangePicker} = DatePicker
@@ -74,7 +75,7 @@ const HistoryDataPage = () => {
             GetPropertyDataRequest(device.id, property.id, startDate.utc().unix(), endDate.utc().unix()).then(res => {
                 if (res.code === 200) {
                     const series = Object.keys(res.data.fields).map(key => {
-                        return {name: key, type: 'line', areaStyle: {normal: {}}, data: res.data.fields[key]}
+                        return {name: GetFieldName(key), type: 'line', areaStyle: {normal: {}}, data: res.data.fields[key]}
                     })
                     const xAxis = [{
                         type: 'category',

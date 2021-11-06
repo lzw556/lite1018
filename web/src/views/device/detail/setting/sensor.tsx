@@ -4,6 +4,7 @@ import {Card, Col, Input, Row, Select} from "antd";
 import Setting from "./setting";
 import {SAMPLE_PERIOD_1} from "../../../../constants";
 import {DeviceType} from "../../../../types/device_type";
+import {numberRule} from "../../../../constants/validateMessage";
 
 export interface SensorSettingProps {
     device: Device
@@ -34,7 +35,7 @@ const SensorSetting: FC<SensorSettingProps> = ({device, values}) => {
                             <Setting device={device} renderValue={item => {
                                 return item ? `${item}kN` : "-"
                             }} value={sensors.initial_pretightening_force}
-                                     name={"initial_pretightening_force"} title={"初始预紧力"} editable={true}
+                                     name={"initial_pretightening_force"} label={"初始预紧力"} editable={true}
                                      renderEdit={item => {
                                          return <Input style={{width: "128px"}} size={"small"} type={"number"}
                                                        defaultValue={item.initial_pretightening_force} suffix={"kN"}/>
@@ -45,9 +46,10 @@ const SensorSetting: FC<SensorSettingProps> = ({device, values}) => {
                                 return item ? `${item}mm` : "-"
                             }}
                                      value={sensors.initial_pretightening_length}
-                                     name={"initial_pretightening_length"} title={"初始预紧长度"} editable={true}
+                                     name={"initial_pretightening_length"} label={"初始预紧长度"} editable={true}
                                      renderEdit={item => {
-                                         return <Input style={{width: "128px"}} size={"small"} defaultValue={item.initial_pretightening_length}
+                                         return <Input style={{width: "128px"}} size={"small"}
+                                                       defaultValue={item.initial_pretightening_length}
                                                        type={"number"} suffix={"mm"}/>
                                      }} onSuccess={onRefreshSetting}/>
                         </Col>
@@ -56,15 +58,17 @@ const SensorSetting: FC<SensorSettingProps> = ({device, values}) => {
                         <Col span={9}>
                             <Setting device={device} name={"pretightening_k"} renderValue={item => {
                                 return item ? `${item}` : "-"
-                            }} value={sensors.pretightening_k} title={"预紧力系数"} editable={true} renderEdit={item => {
-                                return <Input style={{width: "128px"}} type={"number"} size={"small"} defaultValue={item.pretightening_k}/>
+                            }} value={sensors.pretightening_k} label={"预紧力系数"} editable={true} renderEdit={item => {
+                                return <Input style={{width: "128px"}} type={"number"} size={"small"}
+                                              defaultValue={item.pretightening_k}/>
                             }} onSuccess={onRefreshSetting}/>
                         </Col>
                         <Col span={9}>
                             <Setting device={device} name={"elastic_modulus"} renderValue={item => {
                                 return item ? `${item}Gpa` : "-"
-                            }} value={sensors.elastic_modulus} title={"弹性模量"} editable={true} renderEdit={item => {
-                                return <Input style={{width: "128px"}} size={"small"} type={"number"} defaultValue={item.elastic_modulus}
+                            }} value={sensors.elastic_modulus} label={"弹性模量"} editable={true} renderEdit={item => {
+                                return <Input style={{width: "128px"}} size={"small"} type={"number"}
+                                              defaultValue={item.elastic_modulus}
                                               suffix={"Gpa"}/>
                             }} onSuccess={onRefreshSetting}/>
                         </Col>
@@ -73,16 +77,18 @@ const SensorSetting: FC<SensorSettingProps> = ({device, values}) => {
                         <Col span={9}>
                             <Setting device={device} name={"sectional_area"} renderValue={item => {
                                 return item ? `${item}mm²` : "-"
-                            }} value={sensors.sectional_area} title={"截面积"} editable={true} renderEdit={item => {
-                                return <Input style={{width: "128px"}} type={"number"} size={"small"} defaultValue={item.sectional_area}
+                            }} value={sensors.sectional_area} label={"截面积"} editable={true} renderEdit={item => {
+                                return <Input style={{width: "128px"}} type={"number"} size={"small"}
+                                              defaultValue={item.sectional_area}
                                               suffix={"mm²"}/>
                             }} onSuccess={onRefreshSetting}/>
                         </Col>
                         <Col span={9}>
                             <Setting device={device} name={"clamped_length"} renderValue={item => {
                                 return item ? `${item}mm` : "-"
-                            }} value={sensors.clamped_length} title={"有效受力长度"} editable={true} renderEdit={item => {
-                                return <Input style={{width: "128px"}} size={"small"} type={"number"} defaultValue={item.clamped_length}
+                            }} value={sensors.clamped_length} label={"有效受力长度"} editable={true} renderEdit={item => {
+                                return <Input style={{width: "128px"}} size={"small"} type={"number"}
+                                              defaultValue={item.clamped_length}
                                               suffix={"mm"}/>
                             }} onSuccess={onRefreshSetting}/>
                         </Col>
@@ -95,7 +101,7 @@ const SensorSetting: FC<SensorSettingProps> = ({device, values}) => {
     return <Card bordered={false} size={"small"}>
         <Row justify={"start"}>
             <Col span={9}>
-                <Setting device={device} name={"schedule0_sample_period"} title={"采集周期"}
+                <Setting device={device} name={"schedule0_sample_period"} label={"采集周期"}
                          value={sensors.schedule0_sample_period}
                          renderValue={item => {
                              const period = SAMPLE_PERIOD_1.find(p => p.value === item)
@@ -115,10 +121,10 @@ const SensorSetting: FC<SensorSettingProps> = ({device, values}) => {
                 }} onSuccess={onRefreshSetting}/>
             </Col>
             <Col span={9} hidden={isHideSpeedObject()}>
-                <Setting device={device} name={"speed_object"} value={sensors.speed_object} title={"波速"} editable={true}
+                <Setting device={device} name={"speed_object"} value={sensors.speed_object} label={"波速"} editable={true}
                          renderEdit={item => {
                              return <Input size={"small"} type={"number"} value={item.speed_object}/>
-                         }} onSuccess={onRefreshSetting}/>
+                         }} onSuccess={onRefreshSetting} rules={[numberRule]}/>
             </Col>
         </Row>
         {
