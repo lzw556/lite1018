@@ -3,17 +3,16 @@ package api
 import (
 	"context"
 	"embed"
-	"fmt"
+	"net/http"
+
 	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/middleware"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/response"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router"
-	"github.com/thetasensors/theta-cloud-lite/server/config"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/vo"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/xlog"
-	"net/http"
 )
 
 type Adapter struct {
@@ -21,16 +20,12 @@ type Adapter struct {
 	engine      *gin.Engine
 	routers     []router.Router
 	middlewares []middleware.Middleware
-
-	port int
 }
 
-func NewAdapter(conf config.API) *Adapter {
+func NewAdapter() *Adapter {
 	a := Adapter{
 		engine: gin.New(),
-		port:   conf.Port,
 	}
-	gin.SetMode(conf.Mode)
 	return &a
 }
 
@@ -46,12 +41,8 @@ func (a *Adapter) UseMiddleware(middlewares ...middleware.Middleware) {
 	a.middlewares = append(a.middlewares, middlewares...)
 }
 
-func (a *Adapter) enableCors() {
-
-}
-
 func (a *Adapter) Run() error {
-	xlog.Infof("api server started on port: %d", a.port)
+	xlog.Info("api server started on port 8290")
 	a.engine.Use(gin.Recovery())
 	a.engine.Use(cors.New(cors.Config{
 		AllowAllOrigins: true,
@@ -66,7 +57,7 @@ func (a *Adapter) Run() error {
 		}
 	}
 	a.server = &http.Server{
-		Addr:    fmt.Sprintf(":%d", a.port),
+		Addr:    ":8290",
 		Handler: a.engine,
 	}
 	return a.server.ListenAndServe()

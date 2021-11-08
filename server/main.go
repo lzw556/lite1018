@@ -2,6 +2,7 @@ package main
 
 import (
 	"embed"
+
 	"github.com/thetasensors/theta-cloud-lite/server/app"
 	"github.com/thetasensors/theta-cloud-lite/server/config"
 	"github.com/thetasensors/theta-cloud-lite/server/core"
@@ -18,13 +19,11 @@ func main() {
 	dbConf := config.Database{}
 	if err := config.Scan("database", &dbConf); err != nil {
 		panic(err)
-		return
 	}
 	core.InitGorm(dbConf)
 	if global.DB != nil {
 		if err := initialize.InitTables(global.DB); err != nil {
 			panic(err)
-			return
 		}
 	}
 	global.BoltDB = core.BoltDB()

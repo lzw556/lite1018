@@ -4,6 +4,13 @@ import (
 	"context"
 	"embed"
 	"fmt"
+	"net"
+	"os"
+	"os/exec"
+	"os/signal"
+	"runtime"
+	"syscall"
+
 	"github.com/thetasensors/theta-cloud-lite/server/adapter"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/middleware"
@@ -23,12 +30,6 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/cache"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/task"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/xlog"
-	"net"
-	"os"
-	"os/exec"
-	"os/signal"
-	"runtime"
-	"syscall"
 )
 
 func Start(mode string, dist embed.FS) {
@@ -47,18 +48,16 @@ func Start(mode string, dist embed.FS) {
 
 	runApiServer(dist)
 
-	select {
-	case <-ctx.Done():
-		if adapter.IoT != nil {
-			adapter.IoT.Close()
-		}
-		if adapter.Api != nil {
-			adapter.Api.Close()
-		}
-		if adapter.Socket != nil {
-			adapter.Socket.Close()
-		}
-		return
+	<-ctx.Done()
+
+	if adapter.IoT != nil {
+		adapter.IoT.Close()
+	}
+	if adapter.Api != nil {
+		adapter.Api.Close()
+	}
+	if adapter.Socket != nil {
+		adapter.Socket.Close()
 	}
 }
 
@@ -73,7 +72,6 @@ func runIoTServer() {
 	conf := config.IoT{}
 	if err := config.Scan("iot", &conf); err != nil {
 		panic(err)
-		return
 	}
 	adapter.IoT = iot.NewAdapter(conf)
 	adapter.IoT.RegisterDispatchers(
@@ -91,11 +89,7 @@ func runIoTServer() {
 }
 
 func runApiServer(dist embed.FS) {
-	var conf config.API
-	if err := config.Scan("api", &conf); err != nil {
-		panic(err)
-	}
-	adapter.Api = api.NewAdapter(conf)
+	adapter.Api = api.NewAdapter()
 	adapter.Api.StaticFS(dist)
 	adapter.Api.UseMiddleware(middleware.NewJWT("/login"))
 	adapter.Api.RegisterRouters(
@@ -113,15 +107,11 @@ func runApiServer(dist embed.FS) {
 			os.Exit(-1)
 		}
 	}()
-	openBrowser(fmt.Sprintf("%s:%d", readLocalIPAddress(), conf.Port))
+	openBrowser(fmt.Sprintf("%s:8290", readLocalIPAddress()))
 }
 
 func runSocketServer() {
-	var conf config.Socket
-	if err := config.Scan("socket", &conf); err != nil {
-		panic(err)
-	}
-	adapter.Socket = socket.NewAdapter(conf)
+	adapter.Socket = socket.NewAdapter()
 	go func() {
 		if err := adapter.Socket.Run(); err != nil {
 			xlog.Error("socket server start failed", err)

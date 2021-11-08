@@ -2,15 +2,15 @@ package socket
 
 import (
 	"fmt"
-	uuid "github.com/satori/go.uuid"
-	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/response"
-	"github.com/thetasensors/theta-cloud-lite/server/adapter/socket/event"
-	"github.com/thetasensors/theta-cloud-lite/server/config"
-	"github.com/thetasensors/theta-cloud-lite/server/pkg/eventbus"
-	"github.com/thetasensors/theta-cloud-lite/server/pkg/xlog"
 	"io"
 	"log"
 	"net/http"
+
+	uuid "github.com/satori/go.uuid"
+	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/response"
+	"github.com/thetasensors/theta-cloud-lite/server/adapter/socket/event"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/eventbus"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/xlog"
 
 	socketio "github.com/googollee/go-socket.io"
 	"github.com/googollee/go-socket.io/engineio"
@@ -22,13 +22,10 @@ type Adapter struct {
 	socket *socketio.Server
 
 	events []event.Event
-	port   int
 }
 
-func NewAdapter(conf config.Socket) *Adapter {
-	a := &Adapter{
-		port: conf.Port,
-	}
+func NewAdapter() *Adapter {
+	a := &Adapter{}
 	a.socket = socketio.NewServer(&engineio.Options{
 		Transports: []transport.Transport{
 			&websocket.Transport{
@@ -83,7 +80,7 @@ func (a *Adapter) Run() error {
 		}
 	}()
 	http.Handle("/socket.io/", a.socket)
-	return http.ListenAndServe(fmt.Sprintf(":%d", a.port), nil)
+	return http.ListenAndServe(":8291", nil)
 }
 
 func (a *Adapter) emit(event string, data interface{}) {
