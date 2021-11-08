@@ -1,9 +1,9 @@
-import {useEffect, useState} from "react";
-import {GetPropertyDataRequest, PagingDevicesRequest} from "../../../apis/device";
-import {Button, Card, Col, DatePicker, Row, Select, Space} from "antd";
-import {CaretDownOutlined, DownloadOutlined} from "@ant-design/icons";
-import {Content} from "antd/lib/layout/layout";
-import {Device} from "../../../types/device";
+import { useEffect, useState } from "react";
+import { GetPropertyDataRequest, PagingDevicesRequest } from "../../../apis/device";
+import { Button, Card, Col, DatePicker, Row, Select, Space } from "antd";
+import { CaretDownOutlined, DownloadOutlined } from "@ant-design/icons";
+import { Content } from "antd/lib/layout/layout";
+import { Device } from "../../../types/device";
 import ReactECharts from "echarts-for-react";
 import moment from "moment";
 import LabelSelect from "../../../components/labelSelect";
@@ -12,12 +12,11 @@ import DownloadDataModal from "../download";
 import ShadowCard from "../../../components/shadowCard";
 import { DefaultHistoryDataOption } from "../../../constants/chart";
 import AssetSelect from "../../../components/assetSelect";
-import {GetFieldName} from "../../../constants/field";
+import { GetFieldName } from "../../../constants/field";
+import { GetSensors } from "../../../types/device_type";
 
-const {Option} = Select
-const {RangePicker} = DatePicker
-
-
+const { Option } = Select
+const { RangePicker } = DatePicker
 
 const HistoryDataPage = () => {
     const [devices, setDevices] = useState<Device[]>([])
@@ -47,7 +46,9 @@ const HistoryDataPage = () => {
     }
 
     const onDeviceChange = (value: number) => {
-        setDevice(devices.find(item => item.id === value))
+        const d = devices.find(d => d.id === value)
+        setDevice(d)
+        setProperty(d?.properties[0])
     }
 
     const onPropertyChange = (value: number) => {
@@ -75,7 +76,7 @@ const HistoryDataPage = () => {
             GetPropertyDataRequest(device.id, property.id, startDate.utc().unix(), endDate.utc().unix()).then(res => {
                 if (res.code === 200) {
                     const series = Object.keys(res.data.fields).map(key => {
-                        return {name: GetFieldName(key), type: 'line', areaStyle: {normal: {}}, data: res.data.fields[key]}
+                        return { name: GetFieldName(key), type: 'line', areaStyle: { normal: {} }, data: res.data.fields[key] }
                     })
                     const xAxis = [{
                         type: 'category',
@@ -83,54 +84,54 @@ const HistoryDataPage = () => {
                         data: res.data.time.map(item => moment.unix(item).local().format("YYYY-MM-DD HH:mm:ss"))
                     }]
                     setOption(Object.assign({}, option, {
-                        title: {text: res.data.name},
-                        tooltip: {formatter: `{b}<br/>{a}: {c}${res.data.unit}`},
+                        title: { text: res.data.name },
+                        tooltip: { formatter: `{b}<br/>{a}: {c}${res.data.unit}` },
                         xAxis: xAxis,
                         series: series
                     }))
                 }
             })
         }
-    }, [device, property, startDate, endDate])
+    }, [property, startDate, endDate])
 
     return <div>
         <Row justify="center">
-            <Col span={24} style={{textAlign: "right"}}>
+            <Col span={24} style={{ textAlign: "right" }}>
                 <Space>
                     <Button type="primary" onClick={() => {
                         setDownloadVisible(true)
-                    }}>下载数据<DownloadOutlined/></Button>
+                    }}>下载数据<DownloadOutlined /></Button>
                 </Space>
             </Col>
         </Row>
         <Row justify="center">
             <Col span={24}>
-                <Content style={{paddingTop: "15px"}}>
+                <Content style={{ paddingTop: "15px" }}>
                     <ShadowCard>
                         <Row justify="center">
                             <Col span={24}>
                                 <Space>
                                     <Label name={"资产"}>
-                                        <AssetSelect style={{width: "120px"}}
-                                                     bordered={false}
-                                                     defaultValue={assetId}
-                                                     defaultActiveFirstOption={true}
-                                                     placeholder={"请选择资产"}
-                                                     onChange={onAssetChange}>
+                                        <AssetSelect style={{ width: "120px" }}
+                                            bordered={false}
+                                            defaultValue={assetId}
+                                            defaultActiveFirstOption={true}
+                                            placeholder={"请选择资产"}
+                                            onChange={onAssetChange}>
                                             <Option key={0} value={0}>所有资产</Option>
                                         </AssetSelect>
                                     </Label>
-                                    <LabelSelect label={"设备"} placeholder={"请选择设备"} style={{width: "120px"}}
-                                                 onDropdownVisibleChange={onLoadDevices}
-                                                 onChange={onDeviceChange} suffixIcon={<CaretDownOutlined/>}>
+                                    <LabelSelect label={"设备"} placeholder={"请选择设备"} style={{ width: "120px" }}
+                                        onDropdownVisibleChange={onLoadDevices}
+                                        onChange={onDeviceChange} suffixIcon={<CaretDownOutlined />}>
                                         {
-                                            devices.filter(item => item.category === 3).map(item =>
+                                            devices.filter(item => GetSensors().includes(item.typeId)).map(item =>
                                                 <Option key={item.id} value={item.id}>{item.name}</Option>
                                             )
                                         }
                                     </LabelSelect>
-                                    <LabelSelect label={"属性"} placeholder={"请选择属性"} style={{width: "120px"}}
-                                                 onChange={onPropertyChange} suffixIcon={<CaretDownOutlined/>}>
+                                    <LabelSelect label={"属性"} value={property?.id} placeholder={"请选择属性"} style={{ width: "120px" }}
+                                        onChange={onPropertyChange} suffixIcon={<CaretDownOutlined />}>
                                         {
                                             device ? device.properties.map(item =>
                                                 <Option key={item.id} value={item.id}>{item.name}</Option>
@@ -145,15 +146,15 @@ const HistoryDataPage = () => {
                                                 setStartDate(moment(dateString[0]).startOf('day'))
                                                 setEndDate(moment(dateString[1]).endOf('day'))
                                             }
-                                        }}/>
+                                        }} />
                                 </Space>
                             </Col>
                         </Row>
-                        <br/>
+                        <br />
                         <Row justify="center">
                             <Col span={24}>
-                                <Card style={{height: `${height}px`}}>
-                                    <ReactECharts option={option} style={{height: `${height - 20}px`}}/>
+                                <Card style={{ height: `${height}px` }}>
+                                    <ReactECharts option={option} style={{ height: `${height - 20}px` }} />
                                 </Card>
                             </Col>
                         </Row>
@@ -165,7 +166,7 @@ const HistoryDataPage = () => {
             setDownloadVisible(false)
         }} onSuccess={() => {
             setDownloadVisible(false)
-        }}/>
+        }} />
     </div>
 }
 

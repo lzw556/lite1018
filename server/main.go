@@ -20,7 +20,7 @@ func main() {
 	if err := config.Scan("database", &dbConf); err != nil {
 		panic(err)
 	}
-	core.InitGorm(dbConf)
+	global.DB = core.InitGorm(dbConf)
 	if global.DB != nil {
 		if err := initialize.InitTables(global.DB); err != nil {
 			panic(err)

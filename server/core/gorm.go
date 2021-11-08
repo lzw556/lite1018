@@ -5,14 +5,13 @@ import (
 	"time"
 
 	"github.com/thetasensors/theta-cloud-lite/server/config"
-	"github.com/thetasensors/theta-cloud-lite/server/pkg/global"
 	"gorm.io/driver/mysql"
 	"gorm.io/driver/postgres"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
 
-func InitGorm(conf config.Database) {
+func InitGorm(conf config.Database) *gorm.DB {
 	var db *gorm.DB
 	switch conf.Driver {
 	case "postgres":
@@ -35,7 +34,7 @@ func InitGorm(conf config.Database) {
 	sqlDB.SetConnMaxIdleTime(time.Duration(conf.MaxIdleTime) * time.Second)
 	sqlDB.SetMaxOpenConns(conf.MaxActive)
 	sqlDB.SetMaxIdleConns(conf.MaxIdle)
-	global.DB = db
+	return db
 }
 
 func initPostgresSQL(conf config.Database) *gorm.DB {

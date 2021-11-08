@@ -3,7 +3,6 @@ import {Content} from "antd/lib/layout/layout";
 import Label from "../../../components/label";
 import {DeleteOutlined} from "@ant-design/icons";
 import {useCallback, useState} from "react";
-import {Device} from "../../../types/device";
 import moment from "moment";
 import TableLayout, {TableProps} from "../../layout/TableLayout";
 import {PagingAlarmRecordsRequest} from "../../../apis/alarm";

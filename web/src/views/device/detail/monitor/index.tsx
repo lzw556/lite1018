@@ -1,7 +1,7 @@
 import {Device} from "../../../../types/device";
 import {FC, useEffect, useState} from "react";
 import {Button, Card, Col, DatePicker, Empty, Row, Select, Space} from "antd";
-import {DeviceType} from "../../../../types/device_type";
+import {DeviceType, GetSensors} from "../../../../types/device_type";
 import {GetChildrenRequest, GetDeviceDataRequest} from "../../../../apis/device";
 import moment from "moment";
 import {DefaultMonitorDataOption} from "../../../../constants/chart";
@@ -102,11 +102,12 @@ const MonitorPage: FC<MonitorPageProps> = ({device}) => {
     const renderDeviceSelect = () => {
         if (device){
             if (device.typeId === DeviceType.Gateway || device.typeId === DeviceType.Router) {
+                const options = devices?.filter(item => GetSensors().includes(item.typeId))
                 return <Label name={"设备"}>
                     <Select style={{width:"128px"}} bordered={false} defaultActiveFirstOption={true}
-                            defaultValue={devices?.length ? devices[0].id : undefined} onChange={onDeviceChanged}>
+                            defaultValue={options?.length ? options[0].id : undefined} onChange={onDeviceChanged}>
                         {
-                            devices?.filter(item => item.category === 3).map(item => (<Option key={item.id} value={item.id}>{item.name}</Option>))
+                            options?.map(item => (<Option key={item.id} value={item.id}>{item.name}</Option>))
                         }
                     </Select>
                 </Label>

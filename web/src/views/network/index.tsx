@@ -52,7 +52,6 @@ const NetworkPage = () => {
     const {connectionState} = useSocket()
 
     useEffect(() => {
-        console.log(connectionState)
         if (connectionState && network) {
             const newNetwork = _.cloneDeep(network)
             newNetwork.nodes = newNetwork.nodes.map(item => {
@@ -62,7 +61,6 @@ const NetworkPage = () => {
                 }
                 return item
             })
-            console.log(newNetwork)
             setNetwork(newNetwork)
         }
     }, [connectionState])
