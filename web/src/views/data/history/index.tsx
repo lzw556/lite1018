@@ -139,6 +139,7 @@ const HistoryDataPage = () => {
                                         }
                                     </LabelSelect>
                                     <RangePicker
+                                        allowClear={false}
                                         value={[startDate, endDate]}
                                         renderExtraFooter={renderExtraFooter}
                                         onChange={(date, dateString) => {

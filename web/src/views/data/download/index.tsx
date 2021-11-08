@@ -1,19 +1,19 @@
-import {Cascader, Form, Modal, DatePicker} from "antd";
-import {FC, useState} from "react";
-import {PagingAssetsRequest} from "../../../apis/asset";
-import {DownloadDeviceDataRequest, PagingDevicesRequest} from "../../../apis/device";
+import { Cascader, Form, Modal, DatePicker } from "antd";
+import { FC, useState } from "react";
+import { PagingAssetsRequest } from "../../../apis/asset";
+import { DownloadDeviceDataRequest, PagingDevicesRequest } from "../../../apis/device";
 import moment from "moment";
-import {Device} from "../../../types/device";
+import { Device } from "../../../types/device";
 
-const {RangePicker} = DatePicker
+const { RangePicker } = DatePicker
 
 export interface DownloadDataProps {
     visible: boolean
     onCancel?: () => void
-    onSuccess:() => void
+    onSuccess: () => void
 }
 
-const DownloadDataModal: FC<DownloadDataProps> = ({visible, onCancel, onSuccess}) => {
+const DownloadDataModal: FC<DownloadDataProps> = ({ visible, onCancel, onSuccess }) => {
     const [options, setOptions] = useState<any>()
     const [startDate, setStartDate] = useState<moment.Moment>(moment().startOf('day').subtract(7, 'd'))
     const [endDate, setEndDate] = useState<moment.Moment>(moment().endOf('day'))
@@ -25,7 +25,7 @@ const DownloadDataModal: FC<DownloadDataProps> = ({visible, onCancel, onSuccess}
             PagingAssetsRequest(1, 100).then(res => {
                 if (res.code === 200) {
                     setOptions(res.data.result.map(item => {
-                        return {value: item.id, label: item.name, isLeaf: false}
+                        return { value: item.id, label: item.name, isLeaf: false }
                     }))
                 }
             })
@@ -40,7 +40,7 @@ const DownloadDataModal: FC<DownloadDataProps> = ({visible, onCancel, onSuccess}
                     return {
                         value: item.id, label: item.name, isLeaf: false, data: item,
                         children: item.properties.map(property => {
-                            return {value: property.id, label: property.name, data: property}
+                            return { value: property.id, label: property.name, data: property }
                         })
                     }
                 })
@@ -49,7 +49,7 @@ const DownloadDataModal: FC<DownloadDataProps> = ({visible, onCancel, onSuccess}
         })
     }
 
-    const onChange = (values:any, selectedOptions:any) => {
+    const onChange = (values: any, selectedOptions: any) => {
         setSelectedDevice(selectedOptions[1].data)
         setSelectedProperty(selectedOptions[2].data)
     }
@@ -71,21 +71,22 @@ const DownloadDataModal: FC<DownloadDataProps> = ({visible, onCancel, onSuccess}
     }
 
     return <Modal width={390} visible={visible} title={"数据下载"} okText={"下载"} onOk={onDownload} cancelText={"取消"}
-                  onCancel={onCancel}>
-            <Form.Item label={"设备属性"} required>
-                <Cascader style={{width: "252px"}} placeholder={"请选择设备属性"} options={options} onPopupVisibleChange={onLoadAsset} loadData={onLoadData} onChange={onChange}/>
-            </Form.Item>
-            <Form.Item label={"时间范围"} required>
-                <RangePicker
-                    style={{width:"252px"}}
-                    value={[startDate, endDate]}
-                    onChange={(date, dateString) => {
-                        if (dateString) {
-                            setStartDate(moment(dateString[0]).startOf('day'))
-                            setEndDate(moment(dateString[1]).endOf('day'))
-                        }
-                    }}/>
-            </Form.Item>
+        onCancel={onCancel}>
+        <Form.Item label={"设备属性"} required>
+            <Cascader style={{ width: "252px" }} placeholder={"请选择设备属性"} options={options} onPopupVisibleChange={onLoadAsset} loadData={onLoadData} onChange={onChange} />
+        </Form.Item>
+        <Form.Item label={"时间范围"} required>
+            <RangePicker
+                allowClear={false}
+                style={{ width: "252px" }}
+                value={[startDate, endDate]}
+                onChange={(_, dateString) => {
+                    if (dateString) {
+                        setStartDate(moment(dateString[0]).startOf('day'))
+                        setEndDate(moment(dateString[1]).endOf('day'))
+                    }
+                }} />
+        </Form.Item>
     </Modal>
 }
 

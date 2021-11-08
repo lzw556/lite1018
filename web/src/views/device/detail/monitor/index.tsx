@@ -31,16 +31,15 @@ const MonitorPage: FC<MonitorPageProps> = ({device}) => {
             if (device.typeId === DeviceType.Gateway || device.typeId === DeviceType.Router) {
                 GetChildrenRequest(device.id).then(res => {
                     if (res.code === 200) {
-                        setDevices(res.data)
-                        if (res.data.length) {
-                            fetchDeviceData(res.data[0].id)
-                            setSelectedDevice(res.data[0].id)
+                        const result = res.data.filter(item => GetSensors().includes(item.typeId))
+                        setDevices(result)
+                        if (result.length > 0) {
+                            fetchDeviceData(result[0].id)
                         }
                     }
                 })
             } else {
                 fetchDeviceData(device.id)
-                setSelectedDevice(device.id)
             }
         }
     }, [device])
@@ -66,10 +65,10 @@ const MonitorPage: FC<MonitorPageProps> = ({device}) => {
 
     const onDeviceChanged = (id: number) => {
         fetchDeviceData(id)
-        setSelectedDevice(id)
     }
 
     const fetchDeviceData = (id: number) => {
+        setSelectedDevice(id)
         GetDeviceDataRequest(id, startDate.utc().unix(), endDate.utc().unix()).then(res => {
             setOptions([])
             if (res.code === 200) {
@@ -102,12 +101,11 @@ const MonitorPage: FC<MonitorPageProps> = ({device}) => {
     const renderDeviceSelect = () => {
         if (device){
             if (device.typeId === DeviceType.Gateway || device.typeId === DeviceType.Router) {
-                const options = devices?.filter(item => GetSensors().includes(item.typeId))
                 return <Label name={"设备"}>
                     <Select style={{width:"128px"}} bordered={false} defaultActiveFirstOption={true}
-                            defaultValue={options?.length ? options[0].id : undefined} onChange={onDeviceChanged}>
+                            defaultValue={devices?.length ? devices[0].id : undefined} onChange={onDeviceChanged}>
                         {
-                            options?.map(item => (<Option key={item.id} value={item.id}>{item.name}</Option>))
+                            devices?.map(item => (<Option key={item.id} value={item.id}>{item.name}</Option>))
                         }
                     </Select>
                 </Label>
