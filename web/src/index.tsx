@@ -1,4 +1,3 @@
-import React from 'react';
 import ReactDOM from 'react-dom';
 import {persistor, store} from './store'
 import {PersistGate} from "redux-persist/integration/react";

@@ -2,25 +2,25 @@ package core
 
 import (
 	"fmt"
+	"time"
+
 	"github.com/thetasensors/theta-cloud-lite/server/config"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/global"
 	"gorm.io/driver/mysql"
 	"gorm.io/driver/postgres"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
-	"time"
 )
 
 func InitGorm(conf config.Database) {
 	var db *gorm.DB
-	var err error
 	switch conf.Driver {
 	case "postgres":
-		db, err = initPostgresSQL(conf)
+		db = initPostgresSQL(conf)
 	case "mysql":
-		db, err = initMySQL(conf)
+		db = initMySQL(conf)
 	case "sqlite":
-		db, err = initSQLite(conf)
+		db = initSQLite(conf)
 	default:
 		panic(fmt.Errorf("unknown database driver %s", conf.Driver))
 	}
@@ -38,26 +38,26 @@ func InitGorm(conf config.Database) {
 	global.DB = db
 }
 
-func initPostgresSQL(conf config.Database) (*gorm.DB, error) {
+func initPostgresSQL(conf config.Database) *gorm.DB {
 	db, err := gorm.Open(postgres.Open(conf.DNS()), &gorm.Config{})
 	if err != nil {
-		return nil, err
+		panic(err)
 	}
-	return db, nil
+	return db
 }
 
-func initMySQL(conf config.Database) (*gorm.DB, error) {
+func initMySQL(conf config.Database) *gorm.DB {
 	db, err := gorm.Open(mysql.Open(conf.DNS()), &gorm.Config{})
 	if err != nil {
-		return nil, err
+		panic(err)
 	}
-	return db, nil
+	return db
 }
 
-func initSQLite(conf config.Database) (*gorm.DB, error) {
+func initSQLite(conf config.Database) *gorm.DB {
 	db, err := gorm.Open(sqlite.Open(conf.DNS()), &gorm.Config{})
 	if err != nil {
-		return nil, err
+		panic(err)
 	}
-	return db, nil
+	return db
 }
