@@ -128,7 +128,7 @@ const DevicePage = () => {
     }
 
     const renderCommandMenus = (record: Device) => {
-        const disabled = record.status && record.status.isOnline
+        const disabled = record.state && record.state.isOnline
         const isUpgrading = upgradeState && IsUpgrading(upgradeState.status)
         return <Menu onClick={(e) => {
             onCommand(record, e.key)
@@ -169,16 +169,16 @@ const DevicePage = () => {
     const columns = [
         {
             title: '状态',
-            dataIndex: 'status',
-            key: 'status',
-            render: (status: any, record:any) => {
+            dataIndex: 'state',
+            key: 'state',
+            render: (state: any, record:any) => {
                 if (connectionState && connectionState.id === record.id) {
                     return <Tag color={connectionState.isOnline ? ColorHealth : ColorWarn}>
                         {connectionState.isOnline ? "在线" : "离线"}
                     </Tag>
                 }
-                return <Tag color={status && status.isOnline ? ColorHealth : ColorWarn}>
-                    {status && status.isOnline ? "在线" : "离线"}
+                return <Tag color={state && state.isOnline ? ColorHealth : ColorWarn}>
+                    {state && state.isOnline ? "在线" : "离线"}
                 </Tag>
             }
         },
@@ -216,18 +216,18 @@ const DevicePage = () => {
         },
         {
             title: '电池电压(mV)',
-            dataIndex: 'status',
+            dataIndex: 'state',
             key: 'batteryVoltage',
-            render: (status: any) => {
-                return status ? status.batteryVoltage : 0
+            render: (state: any) => {
+                return state ? state.batteryVoltage : 0
             }
         },
         {
             title: '信号强度(dB)',
-            dataIndex: 'status',
+            dataIndex: 'state',
             key: 'signalLevel',
-            render: (status: any) => {
-                return <div>{status ? status.signalLevel : 0}</div>
+            render: (state: any) => {
+                return <div>{state ? state.signalLevel : 0}</div>
             }
         },
         {

@@ -2,6 +2,7 @@ import request from "../utils/request";
 import {PageResult} from "../types/page";
 import {Device} from "../types/device";
 import {PropertyData} from "../types/property_data";
+import {DeviceStatistic} from "../types/device_statistic";
 
 export function CheckMacAddressRequest(mac: string) {
     return request.get(`/devices/checkMacAddress/${mac}`).then(res => res.data)
@@ -69,4 +70,8 @@ export function GetChildrenRequest(id:number) {
 
 export function GetDeviceSettingRequest(id:number) {
     return request.get(`/devices/${id}/setting`).then(res => res.data)
+}
+
+export function GetDevicesStatisticsRequest() {
+    return request.get<DeviceStatistic[]>(`/devices/statistics`).then(res => res.data)
 }

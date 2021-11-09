@@ -7,6 +7,7 @@ import (
 
 type AssetRepository interface {
 	Get(ctx context.Context, id uint) (po.Asset, error)
+	Find(ctx context.Context) ([]po.Asset, error)
 	FindByPaginate(ctx context.Context, page int, size int) ([]po.Asset, int64, error)
 
 	Create(ctx context.Context, e *po.Asset) error

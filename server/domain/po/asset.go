@@ -17,3 +17,5 @@ type Asset struct {
 func (Asset) TableName() string {
 	return "ts_asset"
 }
+
+type Assets []Asset

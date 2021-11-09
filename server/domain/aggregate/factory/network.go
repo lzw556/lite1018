@@ -81,7 +81,7 @@ func (factory Network) NewNetworkAccessDevicesCmd(networkID uint, req request.Ac
 	if err != nil {
 		return nil, response.BusinessErr(errcode.DeviceNotFoundError, "")
 	}
-	children, err := factory.deviceRepo.Find(ctx, req.Children)
+	children, err := factory.deviceRepo.Find(ctx, req.Children...)
 	if err != nil {
 		return nil, response.BusinessErr(errcode.DeviceNotFoundError, "")
 	}

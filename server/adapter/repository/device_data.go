@@ -58,10 +58,12 @@ func (repo DeviceData) Last(deviceID uint) (po.DeviceData, error) {
 	err := repo.BoltDB().View(func(tx *bbolt.Tx) error {
 		bucket := tx.Bucket([]byte(e.BucketName()))
 		if bucket != nil {
-			c := bucket.Bucket(itob(deviceID)).Cursor()
-			_, v := c.Last()
-			if err := json.Unmarshal(v, &e); err != nil {
-				return err
+			if dataBucket := bucket.Bucket(itob(deviceID)); dataBucket != nil {
+				c := dataBucket.Cursor()
+				_, v := c.Last()
+				if err := json.Unmarshal(v, &e); err != nil {
+					return err
+				}
 			}
 		}
 		return nil

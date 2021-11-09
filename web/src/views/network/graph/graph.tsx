@@ -7,7 +7,6 @@ import {Network} from "../../../types/network";
 import {Popover} from "antd";
 import "../../../string-extension"
 import DeviceInfoPopover from "./deviceInfoPopover";
-import "./graph.css"
 
 interface INode {
     id: string
@@ -68,7 +67,7 @@ const Graph: FC<GraphProps> = ({network, onNodeRemove, isEdit, height}) => {
     }
 
     const renderNode = (props: NodeProps) => {
-        const clazz = props.properties.data.device.status.isOnline ? "ts-online" : "ts-offline"
+        const clazz = props.properties.data.device.state.isOnline ? "ts-online" : "ts-offline"
         return <Node
             style={{fill: "rgba(255, 255, 255, 0)", strokeWidth: 0}}
             label={<Label style={{fill: "rgba(255, 255, 255, 0)"}} text={""} width={0} height={0}/>}

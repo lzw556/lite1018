@@ -56,8 +56,8 @@ const NetworkPage = () => {
             const newNetwork = _.cloneDeep(network)
             newNetwork.nodes = newNetwork.nodes.map(item => {
                 if (item.id === connectionState.id) {
-                    item.status.isOnline = connectionState.isOnline
-                    item.status.connectAt = connectionState.connectAt
+                    item.state.isOnline = connectionState.isOnline
+                    item.state.connectAt = connectionState.connectAt
                 }
                 return item
             })
@@ -136,7 +136,7 @@ const NetworkPage = () => {
 
     const renderMoreAction = () => {
         if (network) {
-            const isOnline = network.gateway.status?.isOnline
+            const isOnline = network.gateway.state?.isOnline
             return <Menu onClick={(e) => {
                 onMenuClick(network, e.key)
             }}>

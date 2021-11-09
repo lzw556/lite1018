@@ -1,4 +1,3 @@
-
 export const DefaultHistoryDataOption = {
     title: {
         text: ''
@@ -102,4 +101,48 @@ export const DefaultMultiBarOption = {
         }
     ],
     series: []
+}
+
+export const DefaultPieOption = {
+    graphic: {
+        type: "text",
+        left: "center",
+        top: "35%",
+        style: {
+            text: "正常率",
+        }
+    },
+    tooltip: {
+        trigger: 'item',
+        formatter: "{a} <br/>{b}: {c} ({d}%)"
+    },
+    legend: {
+        show: true,
+        bottom: 0,
+        right: 0,
+    },
+    series: [
+        {
+            type: 'pie',
+            radius: ['40%', '70%'],
+            center: ['50%', '40%'],
+            avoidLabelOverlap: false,
+            label: {
+                show: false,
+                position: 'center'
+            },
+            emphasis: {
+                label: {
+                    show: false,
+                    fontSize: '10',
+                    fontWeight: 'bold'
+                }
+            },
+            labelLine: {
+                show: false
+            },
+            data: [
+            ]
+        }
+    ]
 }

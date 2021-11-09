@@ -17,25 +17,29 @@ type Device struct {
 	WSN        map[string]interface{} `json:"wsn,omitempty"`
 	Category   uint                   `json:"category"`
 
-	Properties   []Property                 `json:"properties"`
-	Status       DeviceStatus               `json:"status"`
 	Information  DeviceInformation          `json:"information"`
+	Properties   []Property                 `json:"properties"`
+	State        DeviceState                `json:"state"`
+	AccessState  uint                       `json:"accessState"`
 	UpgradeState *entity.DeviceUpgradeState `json:"upgradeState,omitempty"`
+	AlertState   uint                       `json:"alertState"`
 }
 
 func NewDevice(e entity.Device) Device {
 	d := Device{
-		ID:         e.ID,
-		Name:       e.Name,
-		MacAddress: e.MacAddress,
-		TypeID:     e.TypeID,
-		Category:   uint(e.Category),
-		IPN:        e.IPN,
-		System:     e.System,
-		Sensors:    e.Sensors,
-		Status:     DeviceStatus{},
+		ID:          e.ID,
+		Name:        e.Name,
+		MacAddress:  e.MacAddress,
+		TypeID:      e.TypeID,
+		Category:    uint(e.Category),
+		IPN:         e.IPN,
+		System:      e.System,
+		Sensors:     e.Sensors,
+		State:       DeviceState{},
+		AccessState: e.NetworkID,
 	}
-	d.Status.DeviceConnectionState = e.GetConnectionState()
+	d.State.DeviceConnectionState = e.GetConnectionState()
+	d.AlertState = e.GetAlertLevel()
 	return d
 }
 

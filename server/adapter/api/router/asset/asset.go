@@ -22,6 +22,7 @@ func (r *assetRouter) initRoutes() {
 
 		// GET
 		router.NewGetRoute("assets", r.paging),
+		router.NewGetRoute("assets/statistics", r.statistic),
 		router.NewGetRoute("assets/:id", r.getByID),
 
 		// PUT

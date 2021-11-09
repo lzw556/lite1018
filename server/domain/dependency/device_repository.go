@@ -17,7 +17,7 @@ type DeviceRepository interface {
 	UpdatesBySpecs(ctx context.Context, updates map[string]interface{}, specs ...specification.Specification) error
 
 	Get(ctx context.Context, id uint) (entity.Device, error)
-	Find(ctx context.Context, ids []uint) ([]entity.Device, error)
+	Find(ctx context.Context, ids ...uint) ([]entity.Device, error)
 	GetBySpecs(ctx context.Context, specs ...specification.Specification) (entity.Device, error)
 	FindBySpecs(ctx context.Context, specs ...specification.Specification) ([]entity.Device, error)
 	PagingBySpecs(ctx context.Context, page, size int, specs ...specification.Specification) ([]entity.Device, int64, error)

@@ -15,6 +15,12 @@ func (repo Asset) Get(ctx context.Context, id uint) (po.Asset, error) {
 	return e, err
 }
 
+func (repo Asset) Find(ctx context.Context) ([]po.Asset, error) {
+	var es []po.Asset
+	err := repo.DB(ctx).Find(&es).Error
+	return es, err
+}
+
 func (repo Asset) FindByPaginate(ctx context.Context, page int, size int) ([]po.Asset, int64, error) {
 	db := repo.DB(ctx).Model(&po.Asset{})
 	var total int64

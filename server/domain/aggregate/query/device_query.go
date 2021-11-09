@@ -45,7 +45,7 @@ func (query DeviceQuery) Detail() (*vo.Device, error) {
 	}
 	result := vo.NewDevice(query.Device)
 	result.SetAsset(asset)
-	result.Status.DeviceStatus, err = query.deviceStatusRepo.Get(query.Device.ID)
+	result.State.DeviceStatus, err = query.deviceStatusRepo.Get(query.Device.ID)
 	if err != nil {
 		xlog.Errorf("get device [%s] status failed:%v", query.Device.MacAddress, err)
 	}

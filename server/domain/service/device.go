@@ -160,3 +160,11 @@ func (s Device) GetChildren(deviceID uint) ([]vo.Device, error) {
 	}
 	return query.Query()
 }
+
+func (s Device) Statistic() ([]vo.DeviceStatistic, error) {
+	query, err := s.factory.NewDeviceStatisticQuery()
+	if err != nil {
+		return nil, err
+	}
+	return query.Statistic()
+}

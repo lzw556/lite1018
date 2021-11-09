@@ -71,7 +71,7 @@ const InformationCard: FC<GatewayInformationProps> = ({device, isLoading}) => {
                 </Col>
                 <Col span={6}>
                     {
-                        device.status && device.status.isOnline ? (<Tag color={ColorHealth}>在线</Tag>) : (
+                        device.state && device.state.isOnline ? (<Tag color={ColorHealth}>在线</Tag>) : (
                             <Tag color={ColorWarn}>离线</Tag>)
                     }
                 </Col>
@@ -91,7 +91,7 @@ const InformationCard: FC<GatewayInformationProps> = ({device, isLoading}) => {
                 </Col>
                 <Col span={6}>
                     {
-                        device.status ? device.status.batteryVoltage : "-"
+                        device.state ? device.state.batteryVoltage : "-"
                     }
                 </Col>
                 <Col span={3} className="ts-detail-label">
@@ -110,7 +110,7 @@ const InformationCard: FC<GatewayInformationProps> = ({device, isLoading}) => {
                 </Col>
                 <Col span={6}>
                     {
-                        device.status ? device.status.signalLevel : "-"
+                        device.state ? device.state.signalLevel : "-"
                     }
                 </Col>
                 <Col span={3} className="ts-detail-label">
@@ -129,7 +129,7 @@ const InformationCard: FC<GatewayInformationProps> = ({device, isLoading}) => {
                 </Col>
                 <Col span={6}>
                     {
-                        device.status.connectedAt ? moment(device.status.connectedAt * 1000).format("YYYY-MM-DD HH:mm:ss") : "-"
+                        device.state.connectedAt ? moment(device.state.connectedAt * 1000).format("YYYY-MM-DD HH:mm:ss") : "-"
                     }
                 </Col>
                 <Col span={3} className="ts-detail-label">

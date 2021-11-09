@@ -36,6 +36,10 @@ func (r deviceRouter) paging(ctx *gin.Context) (interface{}, error) {
 	return response.NewPageResult(page, size, total, result), nil
 }
 
+func (r deviceRouter) statistic(_ *gin.Context) (interface{}, error) {
+	return r.service.Statistic()
+}
+
 func (r deviceRouter) updateByID(ctx *gin.Context) (interface{}, error) {
 	id := cast.ToUint(ctx.Param("id"))
 	var req request.Device

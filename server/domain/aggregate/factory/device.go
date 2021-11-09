@@ -228,3 +228,13 @@ func (factory Device) NewDeviceUpgradeCmd(deviceID uint) (*command.DeviceUpgrade
 	cmd.Gateway = gateway
 	return &cmd, nil
 }
+
+func (factory Device) NewDeviceStatisticQuery() (*query.DeviceStatisticQuery, error) {
+	es, err := factory.deviceRepo.Find(context.TODO())
+	if err != nil {
+		return nil, err
+	}
+	q := query.NewDeviceStatisticQuery()
+	q.Devices = es
+	return &q, nil
+}

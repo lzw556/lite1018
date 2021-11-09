@@ -29,7 +29,7 @@ func (query DevicePagingQuery) Paging() ([]vo.Device, int64) {
 		result[i] = vo.NewDevice(device)
 		result[i].SetProperties(query.PropertiesMap[device.TypeID])
 		result[i].SetUpgradeState(device)
-		result[i].Status.DeviceStatus, _ = query.deviceStatusRepo.Get(device.ID)
+		result[i].State.DeviceStatus, _ = query.deviceStatusRepo.Get(device.ID)
 	}
 	return result, query.total
 }

@@ -6,6 +6,7 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/response"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/asset"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
+	"github.com/thetasensors/theta-cloud-lite/server/domain/aggregate/factory"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/po"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/vo"
@@ -14,11 +15,13 @@ import (
 
 type Asset struct {
 	repository dependency.AssetRepository
+	factory    factory.Asset
 }
 
 func NewAsset() asset.Service {
 	return Asset{
 		repository: repository.Asset{},
+		factory:    factory.NewAsset(),
 	}
 }
 
@@ -66,4 +69,12 @@ func (s Asset) GetAsset(assetID uint) (*vo.Asset, error) {
 	}
 	result := vo.NewAsset(e)
 	return &result, nil
+}
+
+func (s Asset) Statistic() ([]vo.AssetStatistic, error) {
+	cmd, err := s.factory.NewAssetStatisticQuery()
+	if err != nil {
+		return nil, err
+	}
+	return cmd.Statistic()
 }

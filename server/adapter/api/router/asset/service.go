@@ -11,4 +11,5 @@ type Service interface {
 	RemoveAsset(assetID uint) error
 	FindAssetsByPaginate(page, size int) ([]vo.Asset, int64, error)
 	GetAsset(assetID uint) (*vo.Asset, error)
+	Statistic() ([]vo.AssetStatistic, error)
 }

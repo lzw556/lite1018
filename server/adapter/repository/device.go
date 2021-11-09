@@ -42,7 +42,7 @@ func (repo Device) Get(ctx context.Context, id uint) (entity.Device, error) {
 	return e, nil
 }
 
-func (repo Device) Find(ctx context.Context, ids []uint) ([]entity.Device, error) {
+func (repo Device) Find(ctx context.Context, ids ...uint) ([]entity.Device, error) {
 	var es []entity.Device
 	err := repo.DB(ctx).Find(&es, ids).Error
 	return es, err

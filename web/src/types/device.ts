@@ -1,5 +1,6 @@
 import {DeviceType} from "./device_type";
 import {WsnSetting} from "./wsn_setting";
+import {Property} from "./property";
 
 export type Device = {
     id: number
@@ -11,9 +12,11 @@ export type Device = {
     system: Map<string, any>
     sensors: Map<string, any>
     wsn?: WsnSetting
-    status?: any
+    state?: any
     upgradeState?:any
+    alertState:number
+    accessState: number
     information?:any
     category: number
-    properties: { id: number, name: string }[]
+    properties: Property[]
 }

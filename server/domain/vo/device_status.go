@@ -5,7 +5,7 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/domain/po"
 )
 
-type DeviceStatus struct {
+type DeviceState struct {
 	entity.DeviceConnectionState
 	po.DeviceStatus
 }
