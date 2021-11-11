@@ -17,10 +17,8 @@ func NewRouter(s Service) router.Router {
 
 func (r *systemRouter) initRoutes() {
 	r.routes = []router.Route{
-		// POST
-		router.NewPostRoute("system/init", r.initSystem),
 		// GET
-		router.NewGetRoute("system/checkInit", r.checkInit),
+		router.NewGetRoute("system", r.get),
 	}
 }
 

@@ -1,7 +1,6 @@
 package vo
 
 import (
-	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/po"
 )
 
@@ -17,10 +16,10 @@ func NewAssetStatistic(e po.Asset) AssetStatistic {
 	}
 }
 
-func (s *AssetStatistic) SetStatus(devices []entity.Device) {
-	for _, device := range devices {
-		if device.GetAlertLevel() > s.Status {
-			s.Status = device.GetAlertLevel()
+func (s *AssetStatistic) UpdateStatus() {
+	for _, device := range s.Devices {
+		if uint(device.State.AlertLevel) > s.Status {
+			s.Status = uint(device.State.AlertLevel)
 		}
 		if s.Status >= 3 {
 			break

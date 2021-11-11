@@ -1,3 +1,5 @@
+import {ColorHealth} from "./color";
+
 export const DefaultHistoryDataOption = {
     title: {
         text: ''
@@ -12,7 +14,7 @@ export const DefaultHistoryDataOption = {
     grid: {
         left: '3%',
         right: '4%',
-        bottom: '3%',
+        bottom: '12%',
         containLabel: true,
         borderWidth: '0',
     },
@@ -21,6 +23,17 @@ export const DefaultHistoryDataOption = {
             type: 'category',
             boundaryGap: false,
             data: []
+        }
+    ],
+    dataZoom: [
+        {
+            type: 'inside',
+            start: 80,
+            end: 100
+        },
+        {
+            start: 80,
+            end: 100
         }
     ],
     yAxis: [
@@ -64,7 +77,7 @@ export const DefaultMonitorDataOption = {
         {
             type: 'value',
             axisLine: {
-              show: false
+                show: false
             },
             splitLine: {
                 show: false
@@ -85,19 +98,25 @@ export const DefaultMultiBarOption = {
         data: ["提示", "重要", "紧急"]
     },
     grid: {
-      left: '3%',
-      top: '15%',
-      right: '3%',
-      bottom: '10%',
+        left: '3%',
+        top: '15%',
+        right: '3%',
+        bottom: '10%',
     },
     xAxis: [{
         type: 'category',
-        axisTick: { show: false },
+        axisTick: {show: false},
         data: []
     }],
     yAxis: [
         {
-            type: 'value'
+            type: 'value',
+            axisLine: {
+                show: false
+            },
+            axisTick: {
+                show: false
+            },
         }
     ],
     series: []
@@ -141,7 +160,40 @@ export const DefaultPieOption = {
             labelLine: {
                 show: false
             },
+            data: []
+        }
+    ]
+}
+
+export const DefaultGaugeOption =  {
+    series: [
+        {
+            name: 'Pressure',
+            type: 'gauge',
+            progress: {
+                show: true
+            },
+            pointer:{
+                show:false//是否显示指针
+            },
+            itemStyle: {
+                color: ColorHealth
+            },
+            detail: {
+                fontSize: 28,
+                valueAnimation: true,
+                offsetCenter: [0, 0],
+                formatter: '{value}%'
+            },
+            axisTick:false,
+            axisLabel:false,
+            splitLine: {
+                show: false
+            },
             data: [
+                {
+                    value: 50,
+                }
             ]
         }
     ]

@@ -1,4 +1,4 @@
-import {Button, Col, Dropdown, Input, Menu, message, Popconfirm, Row, Select, Space, Spin, Tag} from "antd";
+import {Button, Col, Dropdown, Input, Menu, message, Popconfirm, Row, Select, Space, Spin, Tag, Typography} from "antd";
 import {
     AppstoreAddOutlined,
     CaretDownOutlined,
@@ -37,6 +37,7 @@ import AssetSelect from "../../components/assetSelect";
 
 const {Search} = Input
 const {Option} = Select
+const {Text} =Typography
 
 const DevicePage = () => {
     const [table, setTable] = useState<TableProps>({data: {}, isLoading: false, pagination: true, refreshKey: 0})
@@ -203,7 +204,11 @@ const DevicePage = () => {
             dataIndex: 'macAddress',
             key: 'macAddress',
             render: (text:string) => {
-                return text.toUpperCase().macSeparator()
+                return <Text>
+                    {
+                        text.toUpperCase().macSeparator()
+                    }
+                </Text>
             }
         },
         {

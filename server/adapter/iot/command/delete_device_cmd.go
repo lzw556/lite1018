@@ -5,7 +5,7 @@ import (
 	"encoding/binary"
 	"github.com/gogo/protobuf/proto"
 	pd "github.com/thetasensors/theta-cloud-lite/server/adapter/iot/proto"
-	"github.com/thetasensors/theta-cloud-lite/server/pkg/units"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/utils"
 	"time"
 )
 
@@ -37,7 +37,7 @@ func (cmd deleteDeviceCmd) Payload() []byte {
 	m := pd.DeleteDeviceCommand{
 		Timestamp: int32(time.Now().Unix()),
 		ReqId:     cmd.reqID,
-		Mac:       units.StringToBytes(binary.BigEndian, cmd.mac),
+		Mac:       utils.StringToBytes(binary.BigEndian, cmd.mac),
 	}
 	payload, err := proto.Marshal(&m)
 	if err != nil {

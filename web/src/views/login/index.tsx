@@ -35,46 +35,47 @@ const LoginPage: FC = () => {
     })
 
     return <div id="login-page">
-        <Row justify="center" align="bottom" className="logo">
-            <Col span={18} offset={4}>
-                <Space size={48}>
-                    <img src={logo} alt="ThetaSensors"/>
-                    <Typography.Text strong className="title">云监控平台</Typography.Text>
-                </Space>
-            </Col>
-        </Row>
-        <br/>
-        <br/>
-        <Row justify="center" align="bottom">
-            <Col span={16} offset={6}>
-                <img src={ad} alt="Theta"/>
-            </Col>
-        </Row>
-        <br/>
-        <Row justify="center" align="bottom">
-            <Col span={18} className="split-line"/>
-        </Row>
-        <Form onFinish={login}>
-            <Row justify="space-between">
-                <Col span={4}/>
-                <Col span={4}>
-                    <Form.Item name="username" rules={[{required: true, message: '请输入用户名'}]}>
-                        <Input prefix={<UserOutlined />} placeholder="用户名"/>
-                    </Form.Item>
+        <div className={"logo"}>
+            <Row justify="center" align="bottom">
+                <Col span={24}>
+                    <Space size={48}>
+                        <img src={logo} alt="ThetaSensors"/>
+                        <Typography.Text strong className="title">云监控平台</Typography.Text>
+                    </Space>
                 </Col>
-                <Col span={4}>
-                    <Form.Item name="password" rules={[{required: true, message: '请输入密码'}]}>
-                        <Input prefix={<KeyOutlined />} placeholder="密码" type="password"/>
-                    </Form.Item>
-                </Col>
-                <Col span={4}>
-                    <Form.Item>
-                        <Button type="primary" htmlType="submit" loading={isLoading}>登 录</Button>
-                    </Form.Item>
-                </Col>
-                <Col span={4}/>
             </Row>
-        </Form>
+            <br/>
+            <Row justify="center" align="bottom">
+                <Col span={24}>
+                    <img src={ad} alt="Theta"/>
+                </Col>
+            </Row>
+            <br/>
+            <Row justify="center" align="bottom">
+                <Col span={24} className="split-line"/>
+            </Row>
+        </div>
+        <div className={"ts-login-form"}>
+            <Form onFinish={login}>
+                <Row justify="center">
+                    <Col offset={1} span={4}>
+                        <Form.Item name="username" rules={[{required: true, message: '请输入用户名'}]}>
+                            <Input prefix={<UserOutlined />} placeholder="用户名"/>
+                        </Form.Item>
+                    </Col>
+                    <Col offset={1} span={4}>
+                        <Form.Item name="password" rules={[{required: true, message: '请输入密码'}]}>
+                            <Input prefix={<KeyOutlined />} placeholder="密码" type="password"/>
+                        </Form.Item>
+                    </Col>
+                    <Col offset={1} span={4}>
+                        <Form.Item>
+                            <Button type="primary" htmlType="submit" loading={isLoading}>登 录</Button>
+                        </Form.Item>
+                    </Col>
+                </Row>
+            </Form>
+        </div>
     </div>
 }
 

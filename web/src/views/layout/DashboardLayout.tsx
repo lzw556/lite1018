@@ -1,7 +1,6 @@
 import {Layout} from "antd";
 import "../../App.css";
 import {FC, useEffect, useState} from "react";
-import {store} from "../../store";
 import {HeaderLayout} from "./index";
 
 const {Content} = Layout
@@ -13,7 +12,7 @@ const DashboardLayout:FC<DashboardLayoutProps> = ({children}) => {
     const [height] = useState<number>(window.innerHeight)
 
     useEffect(() => {
-        console.log(store.getState().auth.data)
+
     }, [])
 
     return <Layout style={{height: `${height}px`}}>

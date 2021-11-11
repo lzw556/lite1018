@@ -18,6 +18,7 @@ export const ImportNetwork = lazy(() => import('./network/import'))
 export const Firmware = lazy(() => import('./firmware'))
 export const User = lazy(() => import('./user'))
 export const Me = lazy(() => import('./me'))
+export const System = lazy(() => import('./system'))
 
 export const NotFound = lazy(() => import('./404'))
 export const ServerError = lazy(() => import('./500'))

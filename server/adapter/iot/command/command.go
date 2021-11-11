@@ -21,6 +21,8 @@ func Execute(gateway, device entity.Device, t Type) error {
 		cmd = newRebootCmd()
 	case ResetCmdType:
 		cmd = newResetCmd()
+	case ResetDataCmdType:
+		cmd = newResetDataCmd()
 	case ProvisionCmdType:
 		cmd = newProvisionCmd()
 	default:

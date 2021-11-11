@@ -22,7 +22,7 @@ func New(mode string) *Logger {
 func NewZapCore(mode string) zapcore.Core {
 	var cores []zapcore.Core
 	hook := lumberjack.Logger{
-		Filename: "logs/iot.log",
+		Filename: "logs/ts.log",
 		MaxSize:  60,
 		Compress: true,
 	}

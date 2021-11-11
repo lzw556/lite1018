@@ -4,13 +4,6 @@ import (
 	"context"
 	"embed"
 	"fmt"
-	"net"
-	"os"
-	"os/exec"
-	"os/signal"
-	"runtime"
-	"syscall"
-
 	"github.com/thetasensors/theta-cloud-lite/server/adapter"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/middleware"
@@ -20,6 +13,7 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/firmware"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/network"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/property"
+	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/system"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/user"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/iot"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/iot/dispatcher"
@@ -29,7 +23,13 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/domain/service"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/cache"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/task"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/utils"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/xlog"
+	"os"
+	"os/exec"
+	"os/signal"
+	"runtime"
+	"syscall"
 )
 
 func Start(mode string, dist embed.FS) {
@@ -100,6 +100,7 @@ func runApiServer(dist embed.FS) {
 		firmware.NewRouter(service.NewFirmware()),
 		network.NewRouter(service.NewNetwork()),
 		alarm.NewRouter(service.NewAlarm()),
+		system.NewRouter(service.NewSystem()),
 	)
 	go func() {
 		if err := adapter.Api.Run(); err != nil {
@@ -107,7 +108,7 @@ func runApiServer(dist embed.FS) {
 			os.Exit(-1)
 		}
 	}()
-	openBrowser(fmt.Sprintf("%s:8290", readLocalIPAddress()))
+	openBrowser(fmt.Sprintf("%s:8290", utils.ReadLocalIPAddress()))
 }
 
 func runSocketServer() {
@@ -119,23 +120,6 @@ func runSocketServer() {
 		}
 	}()
 	xlog.Info("socket server start successful")
-}
-
-func readLocalIPAddress() string {
-	addrs, err := net.InterfaceAddrs()
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
-	for _, address := range addrs {
-		// 检查ip地址判断是否回环地址
-		if ipnet, ok := address.(*net.IPNet); ok && !ipnet.IP.IsLoopback() {
-			if ipnet.IP.To4() != nil {
-				return ipnet.IP.String()
-			}
-		}
-	}
-	return ""
 }
 
 func openBrowser(url string) {

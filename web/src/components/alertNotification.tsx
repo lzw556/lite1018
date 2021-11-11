@@ -1,27 +1,21 @@
 import useSocket from "../socket";
-import {Alert, notification, Space} from "antd";
+import {notification, Space} from "antd";
 import {useEffect, useState} from "react";
-import _ from "lodash";
 import {GetFieldName} from "../constants/field";
 
 const AlertNotification = () => {
     const {alertState} = useSocket()
-    const [alerts, setAlerts] = useState<any>([])
+    const [alert, setAlert] = useState<any>()
 
     useEffect(() => {
         console.log(alertState)
         if (alertState) {
-            const newAlerts = _.cloneDeep(alerts)
-            newAlerts.push(alertState)
-            setAlerts(newAlerts)
+            setAlert(alertState)
         }
     }, [alertState])
 
-    const renderAlertItems = () => {
-        return alerts.map((item: any) => renderAlert(item))
-    }
 
-    const renderAlert = (alert: any) => {
+    const renderAlert = () => {
         if (alert) {
             const content = alert.content.replace(alert.field, GetFieldName(alert.field))
             switch (alert.level) {
@@ -52,12 +46,13 @@ const AlertNotification = () => {
                     break
             }
         }
+        return null
     }
 
     return <div style={{position: "fixed", top: 0, right: 0, padding: "8px"}}>
         <Space direction={"vertical"}>
             {
-                renderAlertItems()
+                renderAlert()
             }
         </Space>
     </div>

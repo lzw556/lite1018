@@ -7,12 +7,10 @@ import {State} from "./index";
 export default function userLogin(state: State<LoginResponse> = {data: {username: ""}}, action: Action<LoginResponse>) {
     switch (action.type) {
         case USER_LOGIN_SUCCESS:
-            const s = {
+            return {
                 ...state,
                 data: action.payload
             }
-            console.log(s)
-            return s
         default:
             return state
     }

@@ -1,9 +1,8 @@
 package api
 
 import (
-	"context"
 	"embed"
-	"net/http"
+	"github.com/fvbock/endless"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/static"
@@ -16,7 +15,6 @@ import (
 )
 
 type Adapter struct {
-	server      *http.Server
 	engine      *gin.Engine
 	routers     []router.Router
 	middlewares []middleware.Middleware
@@ -56,15 +54,11 @@ func (a *Adapter) Run() error {
 			group.Handle(route.Method(), route.Path(), a.errorWrapper(route.Handler()))
 		}
 	}
-	a.server = &http.Server{
-		Addr:    ":8290",
-		Handler: a.engine,
-	}
-	return a.server.ListenAndServe()
+	s := endless.NewServer(":8290", a.engine)
+	return s.ListenAndServe()
 }
 
 func (a *Adapter) Close() {
-	_ = a.server.Shutdown(context.Background())
 	xlog.Info("shutdown api server")
 }
 

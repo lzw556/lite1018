@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"github.com/gogo/protobuf/proto"
 	pd "github.com/thetasensors/theta-cloud-lite/server/adapter/iot/proto"
-	"github.com/thetasensors/theta-cloud-lite/server/pkg/units"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/utils"
 	"time"
 )
 
@@ -46,9 +46,9 @@ func (cmd addDeviceCmd) Payload() []byte {
 		Timestamp: int32(time.Now().Unix()),
 		ReqId:     cmd.reqID,
 		Type:      int32(cmd.typeID),
-		Name:      units.StringToBytes(binary.BigEndian, fmt.Sprintf("%x", cmd.name)),
-		Mac:       units.StringToBytes(binary.BigEndian, cmd.mac),
-		ParentMac: units.StringToBytes(binary.BigEndian, cmd.parent),
+		Name:      utils.StringToBytes(binary.BigEndian, fmt.Sprintf("%x", cmd.name)),
+		Mac:       utils.StringToBytes(binary.BigEndian, cmd.mac),
+		ParentMac: utils.StringToBytes(binary.BigEndian, cmd.parent),
 	}
 	payload, err := proto.Marshal(&m)
 	if err != nil {

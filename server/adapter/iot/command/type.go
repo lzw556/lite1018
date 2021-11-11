@@ -6,6 +6,7 @@ const (
 	UpgradeCmdType Type = iota + 1
 	CancelUpgradeCmdType
 	ResetCmdType
+	ResetDataCmdType
 	RebootCmdType
 	ProvisionCmdType
 )

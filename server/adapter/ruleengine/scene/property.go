@@ -8,7 +8,6 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/po"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/vo"
-	"github.com/thetasensors/theta-cloud-lite/server/pkg/eventbus"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/xlog"
 	"strconv"
 	"time"
@@ -18,18 +17,20 @@ type Property struct {
 	po.Property
 	entity.Device
 
-	deviceDataRepo  dependency.DeviceDataRepository
-	alarmRuleRepo   dependency.AlarmRuleRepository
-	alarmRecordRepo dependency.AlarmRecordRepository
+	deviceStatusRepo dependency.DeviceStatusRepository
+	deviceDataRepo   dependency.DeviceDataRepository
+	alarmRuleRepo    dependency.AlarmRuleRepository
+	alarmRecordRepo  dependency.AlarmRecordRepository
 }
 
 func NewProperty(p po.Property, d entity.Device) Property {
 	return Property{
-		Property:        p,
-		Device:          d,
-		deviceDataRepo:  repository.DeviceData{},
-		alarmRuleRepo:   repository.AlarmRule{},
-		alarmRecordRepo: repository.AlarmRecord{},
+		Property:         p,
+		Device:           d,
+		deviceStatusRepo: repository.DeviceStatus{},
+		deviceDataRepo:   repository.DeviceData{},
+		alarmRuleRepo:    repository.AlarmRule{},
+		alarmRecordRepo:  repository.AlarmRecord{},
 	}
 }
 
@@ -70,18 +71,31 @@ func (s Property) Alert(alarmID uint, value float32, level uint) {
 			return
 		}
 		s.Device.UpdateAlarmState(alarmID, level)
+		s.updateDeviceStatus()
 
-		alert := vo.NewAlert()
+		alert := vo.NewAlert(rule.Rule.Field, level)
 		alert.Title = fmt.Sprintf("%s报警", rule.Name)
 		threshold := strconv.FormatFloat(float64(rule.Rule.Threshold), 'f', s.Property.Precision, 64)
 		alert.Content = fmt.Sprintf("设备【%s】的【%s】值%s设定阈值: %s%s", s.Device.Name, rule.Rule.Field, operation(rule.Rule.Operation), threshold, s.Property.Unit)
-		alert.Field = rule.Rule.Field
-		alert.Level = level
-		alert.Data["device"] = map[string]interface{}{
-			"id":   s.Device.ID,
-			"name": s.Device.Name,
+		alert.SetDevice(s.Device)
+		alert.Notify()
+	}
+}
+
+func (s Property) updateDeviceStatus() {
+	if status, err := s.deviceStatusRepo.Get(s.Device.ID); err == nil {
+		level := status.AlertLevel
+		if s.Device.GetAlertLevel() == 0 {
+			level = 0
+		} else if uint(status.AlertLevel) < s.Device.GetAlertLevel() {
+			level = int(s.GetAlertLevel())
 		}
-		eventbus.Publish(eventbus.SocketEmit, "socket::alert", alert)
+		if level != status.AlertLevel {
+			status.AlertLevel = level
+			if err := s.deviceStatusRepo.Create(s.Device.ID, status); err != nil {
+				xlog.Error("update device status failed", err)
+			}
+		}
 	}
 }
 
@@ -93,16 +107,13 @@ func (s Property) Recovery(alarmID uint) {
 			return
 		}
 		s.Device.UpdateAlarmState(alarmID, 0)
-		alert := vo.NewAlert()
+		s.updateDeviceStatus()
+
+		alert := vo.NewAlert(rule.Rule.Field, 0)
 		alert.Title = fmt.Sprintf("%s报警", rule.Name)
 		alert.Content = fmt.Sprintf("设备【%s】的【%s】值已恢复正常", s.Device.Name, rule.Rule.Field)
-		alert.Field = rule.Rule.Field
-		alert.Level = 0
-		alert.Data["device"] = map[string]interface{}{
-			"id":   s.Device.ID,
-			"name": s.Device.Name,
-		}
-		eventbus.Publish(eventbus.SocketEmit, "socket:alert", alert)
+		alert.SetDevice(s.Device)
+		alert.Notify()
 	}
 }
 

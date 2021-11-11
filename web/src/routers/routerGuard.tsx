@@ -31,10 +31,10 @@ const RouterGuard = (props: any) => {
     }
 
     const target = routes.find((item: any) => match(item, decodeLocation()))
+    console.log(target)
     if (target && !target.auth) {
         return <Route exact path={target.path} key={target.path} component={target.component}/>
     }
-
     if (isLogin()) {
         if (target) {
             return <Route exact path={target.path} key={target.path} component={target.component}/>

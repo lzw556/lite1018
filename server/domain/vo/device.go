@@ -22,7 +22,6 @@ type Device struct {
 	State        DeviceState                `json:"state"`
 	AccessState  uint                       `json:"accessState"`
 	UpgradeState *entity.DeviceUpgradeState `json:"upgradeState,omitempty"`
-	AlertState   uint                       `json:"alertState"`
 }
 
 func NewDevice(e entity.Device) Device {
@@ -39,7 +38,6 @@ func NewDevice(e entity.Device) Device {
 		AccessState: e.NetworkID,
 	}
 	d.State.DeviceConnectionState = e.GetConnectionState()
-	d.AlertState = e.GetAlertLevel()
 	return d
 }
 

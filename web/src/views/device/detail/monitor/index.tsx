@@ -42,7 +42,7 @@ const MonitorPage: FC<MonitorPageProps> = ({device}) => {
                 fetchDeviceData(device.id)
             }
         }
-    }, [device])
+    }, [device, startDate, endDate])
 
     const convertMarkLine = (alarms: AlarmRule[], unit: string) => {
         if (alarms) {
@@ -78,7 +78,7 @@ const MonitorPage: FC<MonitorPageProps> = ({device}) => {
                             name: GetFieldName(key),
                             type: 'line',
                             areaStyle: {normal: {}},
-                            data: item.fields[key],
+                            data: item.fields[key].map((value:any) => Number(value).toFixed(3)),
                             markLine: convertMarkLine(item.alarms, item.unit)
                         }
                     })

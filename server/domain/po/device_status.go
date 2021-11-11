@@ -3,7 +3,7 @@ package po
 type DeviceStatus struct {
 	BatteryLevel         float32 `json:"batteryLevel"`
 	SignalLevel          float32 `json:"signalLevel"`
-	AlarmLevel           int     `json:"alarmLevel"`
+	AlertLevel           int     `json:"alertLevel"`
 	BatteryVoltage       int     `json:"batteryVoltage"`
 	IsAcquisitionEnabled bool    `json:"isAcquisitionEnabled"`
 }

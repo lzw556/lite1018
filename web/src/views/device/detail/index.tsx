@@ -3,7 +3,7 @@ import {useHistory, useLocation} from "react-router-dom";
 import {GetParamValue} from "../../../utils/path";
 import {Button, Col, Dropdown, Menu, message, Row, Space} from "antd";
 import {Device} from "../../../types/device";
-import {GetDeviceRequest} from "../../../apis/device";
+import {GetDeviceRequest, SendDeviceCommandRequest} from "../../../apis/device";
 import {Content} from "antd/lib/layout/layout";
 import InformationCard from "./information";
 import ShadowCard from "../../../components/shadowCard";
@@ -80,10 +80,28 @@ const DeviceDetailPage = () => {
         return tabList
     }
 
+    const onCommand = ({key}:any) => {
+        if (device) {
+            SendDeviceCommandRequest(device.id, key).then(res => {
+                if (res.code === 200) {
+                    message.success("发送成功").then()
+                }else {
+                    message.error("发送失败").then()
+                }
+            })
+        }
+    }
+
     const renderCommandMenu = () => {
-        return <Menu>
-            <Menu.Item key={DeviceCommand.Reboot}>重启</Menu.Item>
-            <Menu.Item key={DeviceCommand.Reset}>恢复出厂设置</Menu.Item>
+        const isOnline = device && device.state.isOnline
+        return <Menu onClick={onCommand}>
+            <Menu.Item key={DeviceCommand.Reboot} disabled={!isOnline}>重启</Menu.Item>
+            {
+                device && device.typeId !== DeviceType.Router &&
+                device.typeId !== DeviceType.Gateway &&
+                <Menu.Item key={DeviceCommand.ResetData} disabled={!isOnline}>重置数据</Menu.Item>
+            }
+            <Menu.Item key={DeviceCommand.Reset} disabled={!isOnline}>恢复出厂设置</Menu.Item>
         </Menu>
     }
 

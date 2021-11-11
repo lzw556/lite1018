@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { GetPropertyDataRequest, PagingDevicesRequest } from "../../../apis/device";
-import { Button, Card, Col, DatePicker, Row, Select, Space } from "antd";
+import {Button, Card, Col, DatePicker, Row, Select, Space} from "antd";
 import { CaretDownOutlined, DownloadOutlined } from "@ant-design/icons";
 import { Content } from "antd/lib/layout/layout";
 import { Device } from "../../../types/device";
@@ -14,6 +14,7 @@ import { DefaultHistoryDataOption } from "../../../constants/chart";
 import AssetSelect from "../../../components/assetSelect";
 import { GetFieldName } from "../../../constants/field";
 import { GetSensors } from "../../../types/device_type";
+import {EmptyLayout} from "../../layout";
 
 const { Option } = Select
 const { RangePicker } = DatePicker
@@ -25,7 +26,7 @@ const HistoryDataPage = () => {
     const [property, setProperty] = useState<any>()
     const [startDate, setStartDate] = useState<moment.Moment>(moment().startOf('day').subtract(7, 'd'))
     const [endDate, setEndDate] = useState<moment.Moment>(moment().endOf('day'))
-    const [option, setOption] = useState<any>(DefaultHistoryDataOption)
+    const [option, setOption] = useState<any>()
     const [downloadVisible, setDownloadVisible] = useState<boolean>(false)
     const [height] = useState<number>(window.innerHeight - 230)
 
@@ -73,9 +74,12 @@ const HistoryDataPage = () => {
 
     useEffect(() => {
         if (device && property && startDate && endDate) {
+            setOption(undefined)
             GetPropertyDataRequest(device.id, property.id, startDate.utc().unix(), endDate.utc().unix()).then(res => {
                 if (res.code === 200) {
-                    const series = Object.keys(res.data.fields).map(key => {
+                    const keys = Object.keys(res.data.fields)
+                    const legend = keys.map(key => GetFieldName(key))
+                    const series = keys.map(key => {
                         return { name: GetFieldName(key), type: 'line', areaStyle: { normal: {} }, data: res.data.fields[key] }
                     })
                     const xAxis = [{
@@ -83,12 +87,24 @@ const HistoryDataPage = () => {
                         boundaryGap: false,
                         data: res.data.time.map(item => moment.unix(item).local().format("YYYY-MM-DD HH:mm:ss"))
                     }]
-                    setOption(Object.assign({}, option, {
+                    setOption({
+                        ...DefaultHistoryDataOption,
+                        tooltip: {
+                            trigger: 'axis',
+                            formatter: function(params:any) {
+                                let relVal = params[0].name;
+                                for (let i = 0; i < params.length; i++) {
+                                    let value = Number(params[i].value).toFixed(3)
+                                    relVal += `<br/> ${params[i].marker} ${params[i].seriesName}: ${value}${res.data.unit}`
+                                }
+                                return relVal;
+                            }
+                        },
                         title: { text: res.data.name },
-                        tooltip: { formatter: `{b}<br/>{a}: {c}${res.data.unit}` },
-                        xAxis: xAxis,
-                        series: series
-                    }))
+                        legend: { data: legend },
+                        series,
+                        xAxis
+                    })
                 }
             })
         }
@@ -154,8 +170,10 @@ const HistoryDataPage = () => {
                         <br />
                         <Row justify="center">
                             <Col span={24}>
-                                <Card style={{ height: `${height}px` }}>
-                                    <ReactECharts option={option} style={{ height: `${height - 20}px` }} />
+                                <Card bordered={false} style={{ height: `${height}px` }}>
+                                    {
+                                        option? <ReactECharts option={option} style={{ height: `${height - 20}px`, border: "none"}} /> : <EmptyLayout description={"暂无数据"}/>
+                                    }
                                 </Card>
                             </Col>
                         </Row>

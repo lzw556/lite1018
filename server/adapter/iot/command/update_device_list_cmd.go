@@ -7,7 +7,7 @@ import (
 	"github.com/gogo/protobuf/proto"
 	pd "github.com/thetasensors/theta-cloud-lite/server/adapter/iot/proto"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
-	"github.com/thetasensors/theta-cloud-lite/server/pkg/units"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/utils"
 	"time"
 )
 
@@ -60,8 +60,8 @@ func (cmd updateDeviceListCmd) Payload() []byte {
 func toDeviceListItem(e entity.Device) *pd.DeviceListItem {
 	item := &pd.DeviceListItem{
 		Type: int32(e.TypeID),
-		Mac:  units.StringToBytes(binary.LittleEndian, e.MacAddress),
-		Name: units.StringToBytes(binary.BigEndian, fmt.Sprintf("%x", e.Name)),
+		Mac:  utils.StringToBytes(binary.LittleEndian, e.MacAddress),
+		Name: utils.StringToBytes(binary.BigEndian, fmt.Sprintf("%x", e.Name)),
 	}
 	return item
 }

@@ -13,7 +13,7 @@ var once sync.Once
 var config = bigcache.Config{
 	Shards:             1024,
 	LifeWindow:         10 * time.Minute,
-	CleanWindow:        5 * time.Minute,
+	CleanWindow:        0,
 	MaxEntriesInWindow: 1000 * 10 * 60,
 	MaxEntrySize:       500,
 	Verbose:            true,

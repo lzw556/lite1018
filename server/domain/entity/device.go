@@ -75,6 +75,11 @@ func (d Device) GetAlarmState(alarmID uint) uint {
 	return d.alarmState[alarmID]
 }
 
+func (d Device) GetAlarmStates() map[uint]uint {
+	_ = cache.GetStruct(fmt.Sprintf("device_alarm_state_%d", d.ID), &d.alarmState)
+	return d.alarmState
+}
+
 func (d Device) GetAlertLevel() uint {
 	_ = cache.GetStruct(fmt.Sprintf("device_alarm_state_%d", d.ID), &d.alarmState)
 	alertLevel := uint(0)

@@ -20,6 +20,8 @@ export function GetPrimaryProperty(properties: Property[], typeId: DeviceType) {
             return properties.find(p => p.name === "厚度")
         case DeviceType.AngleDip:
             return properties.find(p => p.name === "角度")
+        case DeviceType.VibrationTemperature3Axis:
+            return properties.find(p => p.name === "速度")
         default:
             return undefined
     }

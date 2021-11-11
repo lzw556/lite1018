@@ -10,7 +10,7 @@ import {
     Me,
     Network,
     NotFound,
-    ServerError,
+    ServerError, System,
     User
 } from "../views";
 import {
@@ -19,7 +19,7 @@ import {
     ClusterOutlined,
     DashboardOutlined,
     FolderOutlined,
-    LineChartOutlined,
+    LineChartOutlined, SettingOutlined,
     TeamOutlined,
     UserOutlined
 } from "@ant-design/icons";
@@ -45,12 +45,15 @@ const AppRoutes = [
     }
 ]
 
+const auth = true
+
 const ConsoleRoutes = [
     {
         name: "dashboard",
         path: "/dashboard",
         title: "监控大屏",
         hidden: false,
+        auth: auth,
         icon: DashboardOutlined,
     },
     {
@@ -59,6 +62,7 @@ const ConsoleRoutes = [
         title: "资产管理",
         icon: FolderOutlined,
         hidden: false,
+        auth: auth,
         children: [
             {
                 name: "assets",
@@ -66,7 +70,7 @@ const ConsoleRoutes = [
                 title: "资产列表",
                 component: Asset,
                 hidden: false,
-                auth: false,
+                auth: auth,
             },
         ],
     },
@@ -76,6 +80,7 @@ const ConsoleRoutes = [
         title: "设备管理",
         icon: AppstoreOutlined,
         hidden: false,
+        auth: auth,
         children: [
             {
                 name: "devices",
@@ -83,7 +88,7 @@ const ConsoleRoutes = [
                 title: "设备列表",
                 component: Device,
                 hidden: false,
-                auth: false,
+                auth: auth,
                 children: [
                     {
                         name: "deviceDetail",
@@ -91,7 +96,7 @@ const ConsoleRoutes = [
                         title: "设备详情",
                         component: DeviceDetail,
                         hidden: true,
-                        auth: false,
+                        auth: auth,
                     }
                 ]
             },
@@ -101,7 +106,7 @@ const ConsoleRoutes = [
                 title: "添加设备",
                 component: AddDevice,
                 hidden: false,
-                auth: false,
+                auth: auth,
             },
             {
                 name: "firmwares",
@@ -109,7 +114,7 @@ const ConsoleRoutes = [
                 title: "固件列表",
                 component: Firmware,
                 hidden: false,
-                auth: false,
+                auth: auth,
             }
         ]
     },
@@ -118,7 +123,7 @@ const ConsoleRoutes = [
         path: "/network-management",
         title: "网络管理",
         icon: ClusterOutlined,
-        hidden: false,
+        hidden: auth,
         children: [
             {
                 name: "networks",
@@ -126,7 +131,7 @@ const ConsoleRoutes = [
                 title: "网络列表",
                 component: Network,
                 hidden: false,
-                auth: false,
+                auth: auth,
             },
             {
                 name: "import",
@@ -134,7 +139,7 @@ const ConsoleRoutes = [
                 title: "导入网络",
                 component: ImportNetwork,
                 hidden: false,
-                auth: false
+                auth: auth
             }
         ]
     },
@@ -143,6 +148,7 @@ const ConsoleRoutes = [
         path: "/data-management",
         title: "数据管理",
         icon: LineChartOutlined,
+        auth: auth,
         children: [
             {
                 name: "history",
@@ -150,7 +156,7 @@ const ConsoleRoutes = [
                 title: "历史数据",
                 component: HistoryData,
                 hidden: false,
-                auth: false
+                auth: auth
             }
         ]
     },
@@ -160,6 +166,7 @@ const ConsoleRoutes = [
         title: "报警管理",
         icon: AlertOutlined,
         hidden: false,
+        auth: auth,
         children: [
             {
                 name: "alarmRecords",
@@ -167,7 +174,7 @@ const ConsoleRoutes = [
                 title: "报警列表",
                 component: AlarmRecord,
                 hidden: false,
-                auth: false
+                auth: auth
             },
             {
                 name: "alarmRules",
@@ -175,7 +182,7 @@ const ConsoleRoutes = [
                 title: "报警规则",
                 component: AlarmRule,
                 hidden: false,
-                auth: false,
+                auth: auth,
                 children: [
                     {
                         name: "addRule",
@@ -183,7 +190,7 @@ const ConsoleRoutes = [
                         title: "添加规则",
                         component: AddAlarmRule,
                         hidden: true,
-                        auth: false,
+                        auth: auth,
                     },
                     {
                         name: "addRuleTemplate",
@@ -191,7 +198,7 @@ const ConsoleRoutes = [
                         title: "创建规则模板",
                         component: AddAlarmRuleTemplate,
                         hidden: true,
-                        auth: false,
+                        auth: auth,
                     },
                     {
                         name: "editRuleTemplate",
@@ -199,7 +206,7 @@ const ConsoleRoutes = [
                         title: "编辑规则模板",
                         component: EditAlarmRuleTemplate,
                         hidden: true,
-                        auth: false,
+                        auth: auth,
                     }
                 ]
             },
@@ -210,7 +217,7 @@ const ConsoleRoutes = [
         path: "/user-management",
         title: "用户管理",
         component: User,
-        auth: false,
+        auth: auth,
         hidden: false,
         icon: TeamOutlined,
     },
@@ -219,9 +226,18 @@ const ConsoleRoutes = [
         path: "/me",
         title: "个人中心",
         component: Me,
-        auth: false,
+        auth: auth,
         hidden: false,
         icon: UserOutlined
+    },
+    {
+        name: "system",
+        path: "/system",
+        title: "系统管理",
+        component: System,
+        auth: auth,
+        hidden: false,
+        icon: SettingOutlined,
     }
 ]
 

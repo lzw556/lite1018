@@ -1,4 +1,4 @@
-import {Col, Row, Skeleton, Space, Tag} from "antd";
+import {Col, Row, Skeleton, Space, Tag, Typography} from "antd";
 import {FC} from "react";
 import {Device} from "../../../../types/device";
 import {DeviceType, DeviceTypeString} from "../../../../types/device_type";
@@ -14,6 +14,8 @@ export interface GatewayInformationProps {
     device: Device
     isLoading: boolean
 }
+
+const {Text} = Typography;
 
 const InformationCard: FC<GatewayInformationProps> = ({device, isLoading}) => {
 
@@ -51,9 +53,11 @@ const InformationCard: FC<GatewayInformationProps> = ({device, isLoading}) => {
                     MAC地址
                 </Col>
                 <Col span={6}>
-                    {
-                        device.macAddress.toUpperCase().macSeparator()
-                    }
+                    <Text copyable={{text: device.macAddress, tooltips: ["复制", "复制成功"]}}>
+                        {
+                            device.macAddress.toUpperCase().macSeparator()
+                        }
+                    </Text>
                 </Col>
                 <Col span={3} className="ts-detail-label">
                     型号

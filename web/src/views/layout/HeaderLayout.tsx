@@ -5,14 +5,23 @@ import "./layout.css"
 import { NavLink } from "react-router-dom";
 import logo from "../../assets/images/logo-dark.png";
 import { UserOutlined } from "@ant-design/icons";
-import { store } from "../../store";
+import { persistor, store } from "../../store";
+import {useState} from "react";
 
 
 const HeaderLayout = (props: any) => {
     const { hideConsole } = props
+    const [currentUser] = useState<any>(store.getState().auth.data.user)
+
+    const onLogout = () => {
+        persistor.purge().then(_ => {
+            window.location.reload()
+        })
+    }
+
     const menu = (
-        <Menu>
-            <Menu.Item>退出登录</Menu.Item>
+        <Menu onClick={onLogout}>
+            <Menu.Item key={1}>退出登录</Menu.Item>
         </Menu>
     )
 
@@ -28,7 +37,7 @@ const HeaderLayout = (props: any) => {
             <Col span={2}>
                 <Dropdown overlay={menu}>
                     <Space>
-                        <Button type={"text"} style={{color:"#fff"}}><UserOutlined />{store.getState().auth.data.user.username}</Button>
+                        <Button type={"text"} style={{color:"#fff"}}><UserOutlined />{currentUser?.username}</Button>
                     </Space>
                 </Dropdown>
             </Col>

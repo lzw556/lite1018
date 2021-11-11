@@ -5,10 +5,13 @@
     height: 100%;
     width: 100%;
     overflow-y: scroll;
+    text-align: center;
 }
 
 #login-page .logo {
-    padding-top: 8%
+    padding-top: 8%;
+    position: relative;
+    display: inline-block;
 }
 
 #login-page .title {
@@ -26,8 +29,8 @@
     background: linear-gradient(244deg, #2f3243, #c30d23 50%, #2f3243);
 }
 
-#login-page Form {
-    padding-top: 164px;
+#login-page .ts-login-form {
+    padding-top: 18%;
 }
 
 #login-page Form Button {

@@ -1,4 +1,4 @@
-import {Card, Carousel, Col, List, Row, Select, Skeleton, Statistic, Tag, Typography} from "antd";
+import {Col, Row, Statistic, Typography} from "antd";
 import EChartsReact from "echarts-for-react";
 import ShadowCard from "../../components/shadowCard";
 import {DefaultPieOption} from "../../constants/chart";
@@ -13,16 +13,13 @@ import {GetDevicesStatisticsRequest} from "../../apis/device";
 import {GetAlarmStatisticsRequest} from "../../apis/alarm";
 import moment from "moment/moment";
 import {AlarmStatistics} from "../../types/alarm_statistics";
-import {Device} from "../../types/device";
-import {LeftOutlined, RightOutlined} from "@ant-design/icons";
-import InfiniteScroll from "react-infinite-scroll-component";
-import {GetPrimaryProperty} from "../../types/property";
-import {GetFieldName} from "../../constants/field";
+import AssetStatistics from "./statistic/asset";
+import AlertStatistics from "./statistic/alert";
+import AlarmRecord from "./statistic/alarm_record";
 
 const {Title, Text} = Typography;
 
 const DashboardPage = () => {
-    const [height] = useState<number>(window.innerHeight)
     const [assetStatistics, setAssetStatistics] = useState<AssetStatistic[]>([]);
     const [deviceStatistics, setDeviceStatistics] = useState<DeviceStatistic[]>([]);
     const [alarmStatistics, setAlarmStatistics] = useState<AlarmStatistics>();
@@ -195,20 +192,6 @@ const DashboardPage = () => {
         </>
     }
 
-    const renderDeviceCard = (device: Device) => {
-        const property = GetPrimaryProperty(device.properties, device.typeId)
-        if (property) {
-            if (property.data && Object.keys(property.data.fields).length) {
-                const field = Object.keys(property.data.fields)[0]
-                return <Statistic title={GetFieldName(field)} valueStyle={{color: device.alertState === 3 ? ColorDanger : ColorHealth}} value={Number(property.data.fields[field]).toFixed(3)} suffix={property.unit}/>
-            }else {
-                return <Statistic title={property.name} value={"暂无数据"}/>
-            }
-
-        }
-        return <Statistic title={"未知属性"} value={"暂无数据"}/>
-    }
-
     useEffect(() => {
         fetchAssetStatistics().then()
         fetchDeviceStatistics().then()
@@ -244,90 +227,23 @@ const DashboardPage = () => {
                         </ShadowCard>
                     </Col>
                 </Row>
+                <Row justify={"start"}>
+                    <Col span={24}>
+                        <AssetStatistics values={assetStatistics}/>
+                    </Col>
+                </Row>
             </Col>
             <Col span={6}>
-            </Col>
-        </Row>
-        <Row justify={"start"}>
-            <Col span={18}>
-                <ShadowCard style={{position: "relative", height: `${height - 294}px`, margin: 4}}>
-                    <Carousel prevArrow={<LeftOutlined/>} nextArrow={<RightOutlined/>}
-                              arrows={true} dotPosition={"bottom"} dots={{className: "ts-carousel-color"}}
-                              style={{position: "relative", height: `${height - 330}px`, width: "100%"}}>
-                        {
-                            assetStatistics && assetStatistics.map((item: any, index: number) => {
-                                const total = item.devices.length
-                                const online = item.devices.filter((device: Device) => device?.state.isOnline).length
-                                const alert = item.devices.filter((device: Device) => device?.alertState === 3).length
-                                const noAccess = item.devices.filter((device: Device) => device?.accessState === 0).length
-                                return <div key={index}>
-                                    <Row justify={"start"} style={{textAlign: "center"}}>
-                                        <Col span={6}>
-                                            <Statistic title={"资产名称"} value={item.asset.name} valueStyle={{
-                                                color: `${item.status ? ColorDanger : ColorHealth}`,
-                                                fontWeight: "bold"
-                                            }}/>
-                                        </Col>
-                                        <Col span={4}>
-                                            <Statistic title={"设备总数"} value={total}/>
-                                        </Col>
-                                        <Col span={4}>
-                                            <Statistic title={"在线设备数"} value={online} valueStyle={{color: ColorHealth}}
-                                                       suffix={`/ ${total}`}/>
-                                        </Col>
-                                        <Col span={4}>
-                                            <Statistic title={"报警设备数"} value={alert} valueStyle={{color: ColorDanger}}
-                                                       suffix={`/ ${total}`}/>
-                                        </Col>
-                                        <Col span={4}>
-                                            <Statistic title={"未入网设备"} value={noAccess} valueStyle={{color: ColorWarn}}
-                                                       suffix={`/ ${total}`}/>
-                                        </Col>
-                                    </Row>
-                                    <Row justify={"start"} style={{paddingTop: "4px"}}>
-                                        <Col span={21} offset={1}>
-                                            <div
-                                                id="scrollableDiv"
-                                                style={{
-                                                    height: `${height - 440}px`,
-                                                    overflow: 'auto',
-                                                    padding: '8px',
-                                                    border: '0px solid rgba(140, 140, 140, 0.35)',
-                                                }}
-                                            >
-                                                <InfiniteScroll
-                                                    dataLength={item.devices.length}
-                                                    hasMore={false}
-                                                    loader={<Skeleton paragraph={{rows: 1}} active/>}
-                                                    scrollableTarget="scrollableDiv"
-                                                    style={{paddingTop: "8px"}}
-                                                    next={() => {
-                                                    }}>
-                                                    <List size={"small"} dataSource={item.devices}
-                                                          grid={{column: 4 }}
-                                                          renderItem={(device: Device) => {
-                                                              return <List.Item key={device.id}>
-                                                                  <ShadowCard bordered={false} hoverable={true} size={"small"}>
-                                                                      <Card.Meta avatar={() => {
-                                                                          return device.state.isOnline ?
-                                                                              <Tag color={ColorHealth}>在线</Tag> :
-                                                                              <Tag color={ColorWarn}>离线</Tag>
-                                                                      }} title={device.name} description={""}/>
-                                                                      {
-                                                                          renderDeviceCard(device)
-                                                                      }
-                                                                  </ShadowCard>
-                                                              </List.Item>
-                                                          }}/>
-                                                </InfiniteScroll>
-                                            </div>
-                                        </Col>
-                                    </Row>
-                                </div>
-                            })
-                        }
-                    </Carousel>
-                </ShadowCard>
+                <Row justify={"start"}>
+                    <Col span={24}>
+                        <AlertStatistics />
+                    </Col>
+                </Row>
+                <Row justify={"start"}>
+                    <Col span={24}>
+                        <AlarmRecord />
+                    </Col>
+                </Row>
             </Col>
         </Row>
     </DashboardLayout>

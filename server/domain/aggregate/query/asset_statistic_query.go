@@ -13,15 +13,17 @@ type AssetStatisticQuery struct {
 	po.Assets
 	DeviceMap map[uint][]entity.Device
 
-	propertyRepo   dependency.PropertyRepository
-	deviceDataRepo dependency.DeviceDataRepository
+	propertyRepo     dependency.PropertyRepository
+	deviceStatusRepo dependency.DeviceStatusRepository
+	deviceDataRepo   dependency.DeviceDataRepository
 }
 
 func NewAssetStatisticQuery() AssetStatisticQuery {
 	return AssetStatisticQuery{
-		DeviceMap:      map[uint][]entity.Device{},
-		propertyRepo:   repository.Property{},
-		deviceDataRepo: repository.DeviceData{},
+		DeviceMap:        map[uint][]entity.Device{},
+		propertyRepo:     repository.Property{},
+		deviceDataRepo:   repository.DeviceData{},
+		deviceStatusRepo: repository.DeviceStatus{},
 	}
 }
 
@@ -31,10 +33,9 @@ func (query AssetStatisticQuery) Statistic() ([]vo.AssetStatistic, error) {
 	for i, asset := range query.Assets {
 		result[i] = vo.NewAssetStatistic(asset)
 		if devices, ok := query.DeviceMap[asset.ID]; ok {
-			result[i].SetStatus(devices)
 			result[i].Devices, err = query.buildDevices(devices)
+			result[i].UpdateStatus()
 		}
-
 	}
 	return result, err
 }
@@ -46,6 +47,9 @@ func (query AssetStatisticQuery) buildDevices(devices []entity.Device) ([]vo.Dev
 		result[i] = vo.NewDevice(device)
 		if _, ok := propertyMap[device.TypeID]; !ok {
 			propertyMap[device.TypeID], _ = query.propertyRepo.FindByDeviceTypeID(context.TODO(), device.TypeID)
+		}
+		if status, err := query.deviceStatusRepo.Get(device.ID); err == nil {
+			result[i].State.DeviceStatus = status
 		}
 		result[i].SetProperties(propertyMap[device.TypeID])
 		query.setLastPropertiesData(&result[i])
