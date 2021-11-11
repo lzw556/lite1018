@@ -184,3 +184,13 @@ func (factory Alarm) buildFilterSpecs(filter request.AlarmFilter) ([]spec.Specif
 	}
 	return specs, nil
 }
+
+func (factory Alarm) NewAlarmRecordQuery(id uint) (*query.AlarmRecordQuery, error) {
+	e, err := factory.alarmRecordRepo.Get(context.TODO(), id)
+	if err != nil {
+		return nil, err
+	}
+	q := query.NewAlarmRecordQuery()
+	q.AlarmRecord = e
+	return &q, nil
+}

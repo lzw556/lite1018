@@ -14,6 +14,7 @@ export type Device = {
     wsn?: WsnSetting
     state?: any
     upgradeState?:any
+    alertState?:any
     accessState: number
     information?:any
     category: number

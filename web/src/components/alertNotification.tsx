@@ -8,7 +8,6 @@ const AlertNotification = () => {
     const [alert, setAlert] = useState<any>()
 
     useEffect(() => {
-        console.log(alertState)
         if (alertState) {
             setAlert(alertState)
         }

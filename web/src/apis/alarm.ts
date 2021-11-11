@@ -60,3 +60,7 @@ export function PagingAlarmRecordsRequest(page: number, size: number, from: numb
 export function GetAlarmStatisticsRequest(from: number, to: number, filter: any) {
     return request.get<AlarmStatistics>(`/alarmStatistics`, {from, to, filter}).then(res => res.data)
 }
+
+export function GetAlarmRecordRequest(id: number) {
+    return request.get<any>(`/alarmRecords/${id}`).then(res => res.data)
+}

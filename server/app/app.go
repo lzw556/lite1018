@@ -25,6 +25,7 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/task"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/utils"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/xlog"
+	"net/http"
 	"os"
 	"os/exec"
 	"os/signal"
@@ -103,7 +104,7 @@ func runApiServer(dist embed.FS) {
 		system.NewRouter(service.NewSystem()),
 	)
 	go func() {
-		if err := adapter.Api.Run(); err != nil {
+		if err := adapter.Api.Run(); err != nil && err != http.ErrServerClosed {
 			xlog.Error("api server start failed", err)
 			os.Exit(-1)
 		}

@@ -17,20 +17,20 @@ type Property struct {
 	po.Property
 	entity.Device
 
-	deviceStatusRepo dependency.DeviceStatusRepository
-	deviceDataRepo   dependency.DeviceDataRepository
-	alarmRuleRepo    dependency.AlarmRuleRepository
-	alarmRecordRepo  dependency.AlarmRecordRepository
+	deviceAlertStatusRepo dependency.DeviceAlertStatusRepository
+	deviceDataRepo        dependency.DeviceDataRepository
+	alarmRuleRepo         dependency.AlarmRuleRepository
+	alarmRecordRepo       dependency.AlarmRecordRepository
 }
 
 func NewProperty(p po.Property, d entity.Device) Property {
 	return Property{
-		Property:         p,
-		Device:           d,
-		deviceStatusRepo: repository.DeviceStatus{},
-		deviceDataRepo:   repository.DeviceData{},
-		alarmRuleRepo:    repository.AlarmRule{},
-		alarmRecordRepo:  repository.AlarmRecord{},
+		Property:              p,
+		Device:                d,
+		deviceAlertStatusRepo: repository.DeviceAlertStatus{},
+		deviceDataRepo:        repository.DeviceData{},
+		alarmRuleRepo:         repository.AlarmRule{},
+		alarmRecordRepo:       repository.AlarmRecord{},
 	}
 }
 
@@ -71,31 +71,33 @@ func (s Property) Alert(alarmID uint, value float32, level uint) {
 			return
 		}
 		s.Device.UpdateAlarmState(alarmID, level)
-		s.updateDeviceStatus()
 
 		alert := vo.NewAlert(rule.Rule.Field, level)
 		alert.Title = fmt.Sprintf("%s报警", rule.Name)
 		threshold := strconv.FormatFloat(float64(rule.Rule.Threshold), 'f', s.Property.Precision, 64)
 		alert.Content = fmt.Sprintf("设备【%s】的【%s】值%s设定阈值: %s%s", s.Device.Name, rule.Rule.Field, operation(rule.Rule.Operation), threshold, s.Property.Unit)
 		alert.SetDevice(s.Device)
+		s.updateDeviceAlertStatus(alarmID, rule.Rule.Field, fmt.Sprintf("属性【%s】值%s设定阈值: %s%s", rule.Rule.Field, operation(rule.Rule.Operation), threshold, s.Property.Unit))
 		alert.Notify()
 	}
 }
 
-func (s Property) updateDeviceStatus() {
-	if status, err := s.deviceStatusRepo.Get(s.Device.ID); err == nil {
-		level := status.AlertLevel
+func (s Property) updateDeviceAlertStatus(alarmID uint, field string, content string) {
+	status, err := s.deviceAlertStatusRepo.Get(s.Device.ID)
+	if err != nil {
+		status.Level = s.Device.GetAlertLevel()
+	} else {
 		if s.Device.GetAlertLevel() == 0 {
-			level = 0
-		} else if uint(status.AlertLevel) < s.Device.GetAlertLevel() {
-			level = int(s.GetAlertLevel())
+			status.Level = 0
+		} else if status.Level < s.Device.GetAlertLevel() {
+			status.Level = s.GetAlertLevel()
 		}
-		if level != status.AlertLevel {
-			status.AlertLevel = level
-			if err := s.deviceStatusRepo.Create(s.Device.ID, status); err != nil {
-				xlog.Error("update device status failed", err)
-			}
-		}
+	}
+	status.Alarm.ID = alarmID
+	status.Alarm.Field = field
+	status.Content = content
+	if err := s.deviceAlertStatusRepo.Create(s.Device.ID, &status); err != nil {
+		xlog.Error("update device status failed", err)
 	}
 }
 
@@ -107,7 +109,7 @@ func (s Property) Recovery(alarmID uint) {
 			return
 		}
 		s.Device.UpdateAlarmState(alarmID, 0)
-		s.updateDeviceStatus()
+		s.updateDeviceAlertStatus(alarmID, "", "")
 
 		alert := vo.NewAlert(rule.Rule.Field, 0)
 		alert.Title = fmt.Sprintf("%s报警", rule.Name)

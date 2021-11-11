@@ -19,6 +19,7 @@ import (
 type Alarm struct {
 	template   dependency.AlarmRuleTemplateRepository
 	repository dependency.AlarmRuleRepository
+	record     dependency.AlarmRecordRepository
 	factory    factory.Alarm
 }
 
@@ -26,6 +27,7 @@ func NewAlarm() alarm.Service {
 	return Alarm{
 		template:   repository.AlarmRuleTemplate{},
 		repository: repository.AlarmRule{},
+		record:     repository.AlarmRecord{},
 		factory:    factory.NewAlarm(),
 	}
 }
@@ -171,6 +173,14 @@ func (s Alarm) FindAlarmRecordsByPaginate(from, to int64, page, size int, req re
 	}
 	result, total := query.Paging()
 	return result, total, nil
+}
+
+func (s Alarm) GetAlarmRecord(recordID uint) (*vo.AlarmRecord, error) {
+	query, err := s.factory.NewAlarmRecordQuery(recordID)
+	if err != nil {
+		return nil, err
+	}
+	return query.Detail()
 }
 
 func (s Alarm) GetAlarmStatistics(from, to int64, req request.AlarmFilter) (vo.AlarmStatistics, error) {

@@ -1,4 +1,19 @@
-import {Button, Col, Dropdown, Input, Menu, message, Popconfirm, Row, Select, Space, Spin, Tag, Typography} from "antd";
+import {
+    Button,
+    Col,
+    Dropdown,
+    Input,
+    Menu,
+    message,
+    Popconfirm,
+    Popover,
+    Row,
+    Select,
+    Space,
+    Spin,
+    Tag,
+    Typography
+} from "antd";
 import {
     AppstoreAddOutlined,
     CaretDownOutlined,
@@ -23,7 +38,7 @@ import {DeviceType, DeviceTypeString} from "../../types/device_type";
 import EditSettingModal from "./edit/editSettingModal";
 import {Device} from "../../types/device";
 import EditBaseInfoModel from "./edit/editBaseInfoModel";
-import {ColorHealth, ColorWarn} from "../../constants/color";
+import {ColorDanger, ColorHealth, ColorWarn} from "../../constants/color";
 import Label from "../../components/label";
 import ReplaceMacModal from "./replace/replaceMacModal";
 import EditWsnSettingModal from "./edit/editWsnSettingModal";
@@ -34,6 +49,7 @@ import "../../string-extension";
 import DeviceUpgradeState from "./state/upgradeState";
 import {IsUpgrading} from "../../types/device_upgrade_status";
 import AssetSelect from "../../components/assetSelect";
+import {GetFieldName} from "../../constants/field";
 
 const {Search} = Input
 const {Option} = Select
@@ -173,14 +189,19 @@ const DevicePage = () => {
             dataIndex: 'state',
             key: 'state',
             render: (state: any, record:any) => {
-                if (connectionState && connectionState.id === record.id) {
-                    return <Tag color={connectionState.isOnline ? ColorHealth : ColorWarn}>
-                        {connectionState.isOnline ? "在线" : "离线"}
-                    </Tag>
+                if (connectionState) {
+                    state = connectionState
                 }
-                return <Tag color={state && state.isOnline ? ColorHealth : ColorWarn}>
-                    {state && state.isOnline ? "在线" : "离线"}
-                </Tag>
+                return <Space>
+                    {
+                        state && state.isOnline ? <Tag color={ColorHealth}>在线</Tag> : <Tag color={ColorWarn}>离线</Tag>
+                    }
+                    {
+                        record.alertState && record.alertState.level === 3 && <Popover content={record.alertState.content.replace(record.alertState.alarm.field, GetFieldName(record.alertState.alarm.field))}>
+                            <Tag color={ColorDanger}>报警</Tag>
+                        </Popover>
+                    }
+                </Space>
             }
         },
         {

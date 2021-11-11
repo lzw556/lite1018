@@ -6,6 +6,8 @@ import {PagingAlarmRecordsRequest} from "../../../apis/alarm";
 import moment from "moment";
 import {GetFieldName} from "../../../constants/field";
 import {OperationTranslate} from "../../../constants/rule";
+import "../iconfont.css"
+import {ColorDanger, ColorInfo, ColorWarn} from "../../../constants/color";
 
 const {Title} = Typography;
 
@@ -56,9 +58,20 @@ const AlarmRecord = () => {
                 <List size={"small"} dataSource={data}
                       renderItem={(record: any) => {
                           return <List.Item key={record.id}>
-                             <List.Item.Meta title={record.device.name} description={`当前【${GetFieldName(record.rule.field)}】值为: 
-                ${record.value.toFixed(record.property.precision)}${record.property.unit}\n
-                ${OperationTranslate(record.rule.operation)}设定的阈值:${record.rule.threshold.toFixed(record.property.precision)}${record.property.unit}`}/>
+                             <List.Item.Meta
+                                             title={`${moment.unix(record.timestamp).local().format("YYYY-MM-DD HH:mm:ss")}`}
+                                             description={`设备【${record.device.name}】当前【${GetFieldName(record.rule.field)}】值为:
+                                             ${record.value.toFixed(record.property.precision)}${record.property.unit}${OperationTranslate(record.rule.operation)}
+                                             设定的阈值:${record.rule.threshold.toFixed(record.property.precision)}${record.property.unit}`}/>
+                              {
+                                  record.level === 3 && <div className={"iconfont icon-weiwangguanicon-defuben-"} style={{color: ColorDanger}}/>
+                              }
+                              {
+                                  record.level === 2 && <div className={"iconfont icon-warning-filling"} style={{color: ColorWarn}}/>
+                              }
+                              {
+                                  record.level === 1 && <div className={"iconfont icon-info"} style={{color: ColorInfo}}/>
+                              }
                           </List.Item>
                       }}/>
             </InfiniteScroll>

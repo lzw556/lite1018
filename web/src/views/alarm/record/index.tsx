@@ -127,6 +127,7 @@ const AlarmRecordPage = () => {
             <Col span={24} style={{textAlign: "right"}}>
                 <RangePicker
                     value={[startDate, endDate]}
+                    allowClear={false}
                     onChange={(date, dateString) => {
                         if (dateString) {
                             setStartDate(moment(dateString[0]).startOf('day'))

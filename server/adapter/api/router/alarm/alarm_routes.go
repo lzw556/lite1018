@@ -106,6 +106,11 @@ func (r alarmRouter) pagingAlarmRecords(ctx *gin.Context) (interface{}, error) {
 	return response.NewPageResult(page, size, total, result), nil
 }
 
+func (r alarmRouter) getAlarmRecord(ctx *gin.Context) (interface{}, error) {
+	id := cast.ToUint(ctx.Param("id"))
+	return r.service.GetAlarmRecord(id)
+}
+
 func (r alarmRouter) alarmStatistics(ctx *gin.Context) (interface{}, error) {
 	from := cast.ToInt64(ctx.Query("from"))
 	to := cast.ToInt64(ctx.Query("to"))

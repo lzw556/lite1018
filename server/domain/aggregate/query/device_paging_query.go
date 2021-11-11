@@ -13,13 +13,15 @@ type DevicePagingQuery struct {
 	total         int64
 	PropertiesMap map[uint][]po.Property
 
-	deviceStatusRepo dependency.DeviceStatusRepository
+	deviceStatusRepo      dependency.DeviceStatusRepository
+	deviceAlertStatusRepo dependency.DeviceAlertStatusRepository
 }
 
 func NewDevicePagingQuery(total int64) DevicePagingQuery {
 	return DevicePagingQuery{
-		total:            total,
-		deviceStatusRepo: repository.DeviceStatus{},
+		total:                 total,
+		deviceStatusRepo:      repository.DeviceStatus{},
+		deviceAlertStatusRepo: repository.DeviceAlertStatus{},
 	}
 }
 
@@ -30,6 +32,7 @@ func (query DevicePagingQuery) Paging() ([]vo.Device, int64) {
 		result[i].SetProperties(query.PropertiesMap[device.TypeID])
 		result[i].SetUpgradeState(device)
 		result[i].State.DeviceStatus, _ = query.deviceStatusRepo.Get(device.ID)
+		result[i].AlertState.DeviceAlertStatus, _ = query.deviceAlertStatusRepo.Get(device.ID)
 	}
 	return result, query.total
 }

@@ -30,3 +30,9 @@ func (repo AlarmRecord) FindBySpecs(ctx context.Context, specs ...spec.Specifica
 	err := repo.DB(ctx).Scopes(spec.Scopes(specs)...).Find(&es).Error
 	return es, err
 }
+
+func (repo AlarmRecord) Get(ctx context.Context, id uint) (po.AlarmRecord, error) {
+	var e po.AlarmRecord
+	err := repo.DB(ctx).First(&e, id).Error
+	return e, err
+}

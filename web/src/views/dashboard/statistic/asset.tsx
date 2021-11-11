@@ -24,7 +24,7 @@ const AssetStatistics:FC<AssetStatisticsProps> = ({values}) => {
             if (property) {
                 if (property.data && Object.keys(property.data.fields).length) {
                     const field = Object.keys(property.data.fields)[0]
-                    return <Statistic title={GetFieldName(field)} valueStyle={{color: device.state.alertLevel === 3 ? ColorDanger : ColorHealth}} value={Number(property.data.fields[field]).toFixed(3)} suffix={property.unit}/>
+                    return <Statistic title={GetFieldName(field)} valueStyle={{color: device.alertState.level === 3 ? ColorDanger : ColorHealth}} value={Number(property.data.fields[field]).toFixed(3)} suffix={property.unit}/>
                 }else {
                     return <Statistic title={property.name} value={"暂无数据"}/>
                 }
@@ -41,7 +41,7 @@ const AssetStatistics:FC<AssetStatisticsProps> = ({values}) => {
                 values && values.map((item: any, index: number) => {
                     const total = item.devices.length
                     const online = item.devices.filter((device: Device) => device?.state.isOnline).length
-                    const alert = item.devices.filter((device: Device) => device?.state.alertLevel === 3).length
+                    const alert = item.devices.filter((device: Device) => device?.alertState.level === 3).length
                     const noAccess = item.devices.filter((device: Device) => device?.accessState === 0).length
                     return <div key={index}>
                         <Row justify={"start"} style={{textAlign: "center"}}>

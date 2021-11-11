@@ -13,17 +13,19 @@ type AssetStatisticQuery struct {
 	po.Assets
 	DeviceMap map[uint][]entity.Device
 
-	propertyRepo     dependency.PropertyRepository
-	deviceStatusRepo dependency.DeviceStatusRepository
-	deviceDataRepo   dependency.DeviceDataRepository
+	propertyRepo          dependency.PropertyRepository
+	deviceStatusRepo      dependency.DeviceStatusRepository
+	deviceAlertStatusRepo dependency.DeviceAlertStatusRepository
+	deviceDataRepo        dependency.DeviceDataRepository
 }
 
 func NewAssetStatisticQuery() AssetStatisticQuery {
 	return AssetStatisticQuery{
-		DeviceMap:        map[uint][]entity.Device{},
-		propertyRepo:     repository.Property{},
-		deviceDataRepo:   repository.DeviceData{},
-		deviceStatusRepo: repository.DeviceStatus{},
+		DeviceMap:             map[uint][]entity.Device{},
+		propertyRepo:          repository.Property{},
+		deviceDataRepo:        repository.DeviceData{},
+		deviceStatusRepo:      repository.DeviceStatus{},
+		deviceAlertStatusRepo: repository.DeviceAlertStatus{},
 	}
 }
 
@@ -50,6 +52,9 @@ func (query AssetStatisticQuery) buildDevices(devices []entity.Device) ([]vo.Dev
 		}
 		if status, err := query.deviceStatusRepo.Get(device.ID); err == nil {
 			result[i].State.DeviceStatus = status
+		}
+		if alert, err := query.deviceAlertStatusRepo.Get(device.ID); err == nil {
+			result[i].AlertState.DeviceAlertStatus = alert
 		}
 		result[i].SetProperties(propertyMap[device.TypeID])
 		query.setLastPropertiesData(&result[i])

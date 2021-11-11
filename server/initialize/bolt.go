@@ -10,6 +10,7 @@ func InitBuckets(db *bbolt.DB) {
 	buckets := []core.Bucket{
 		po.System{},
 		po.DeviceStatus{},
+		po.DeviceAlertStatus{},
 		po.DeviceData{},
 		po.DeviceInformation{},
 	}

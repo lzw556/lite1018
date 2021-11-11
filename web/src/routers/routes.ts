@@ -123,7 +123,8 @@ const ConsoleRoutes = [
         path: "/network-management",
         title: "网络管理",
         icon: ClusterOutlined,
-        hidden: auth,
+        hidden: false,
+        auth: auth,
         children: [
             {
                 name: "networks",

@@ -1,5 +1,6 @@
 import {Col, ConfigProvider, Empty, Pagination, Row, Table} from "antd";
 import {useEffect, useState} from "react";
+import zhCN from "antd/es/locale/zh_CN";
 
 export interface TableProps {
     columns?: {}[]
@@ -41,7 +42,7 @@ const TableLayout = (props: TableProps) => {
         return <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={emptyText}/>
     }
 
-    return <ConfigProvider renderEmpty={renderEmpty}>
+    return <ConfigProvider renderEmpty={renderEmpty} locale={zhCN}>
         <Row justify="center">
             <Col span={24}>
                 <Table rowKey={(record: any) => record.id} size={"small"} columns={columns} dataSource={data.result} pagination={false}
