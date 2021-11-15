@@ -20,18 +20,14 @@ func NewAsset() Asset {
 	}
 }
 
-func (factory Asset) NewAssetStatisticQuery() (*query.AssetStatisticQuery, error) {
+func (factory Asset) NewAssetStatisticQuery(assetID uint) (*query.AssetStatisticQuery, error) {
 	ctx := context.TODO()
-	es, err := factory.assetRepo.Find(ctx)
+	asset, err := factory.assetRepo.Get(ctx, assetID)
 	if err != nil {
 		return nil, err
 	}
 	q := query.NewAssetStatisticQuery()
-	for _, e := range es {
-		if _, ok := q.DeviceMap[e.ID]; !ok {
-			q.DeviceMap[e.ID], _ = factory.deviceRepo.FindBySpecs(ctx, spec.AssetSpec(e.ID))
-		}
-	}
-	q.Assets = es
+	q.Asset = asset
+	q.Devices, _ = factory.deviceRepo.FindBySpecs(ctx, spec.AssetSpec(asset.ID))
 	return &q, nil
 }

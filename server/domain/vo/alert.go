@@ -29,5 +29,5 @@ func (a *Alert) SetDevice(device entity.Device) {
 }
 
 func (a Alert) Notify() {
-	eventbus.Publish(eventbus.SocketEmit, "socket:alert", a)
+	eventbus.Publish(eventbus.SocketEmit, "socket::alert", a)
 }

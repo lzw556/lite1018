@@ -71,10 +71,30 @@ func (s Asset) GetAsset(assetID uint) (*vo.Asset, error) {
 	return &result, nil
 }
 
-func (s Asset) Statistic() ([]vo.AssetStatistic, error) {
-	cmd, err := s.factory.NewAssetStatisticQuery()
+func (s Asset) Statistic(assetID uint) (*vo.AssetStatistic, error) {
+	cmd, err := s.factory.NewAssetStatisticQuery(assetID)
 	if err != nil {
 		return nil, err
 	}
 	return cmd.Statistic()
+}
+
+func (s Asset) StatisticAll() ([]vo.AssetStatistic, error) {
+	assets, err := s.repository.Find(context.TODO())
+	if err != nil {
+		return nil, err
+	}
+	result := make([]vo.AssetStatistic, len(assets))
+	for i, e := range assets {
+		cmd, err := s.factory.NewAssetStatisticQuery(e.ID)
+		if err != nil {
+			return nil, err
+		}
+		statistic, err := cmd.Statistic()
+		if err != nil {
+			return nil, err
+		}
+		result[i] = *statistic
+	}
+	return result, nil
 }

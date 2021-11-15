@@ -7,6 +7,7 @@ import {Network} from "../../../types/network";
 import {Popover} from "antd";
 import "../../../string-extension"
 import DeviceInfoPopover from "./deviceInfoPopover";
+import AlertIcon from "../../../components/alertIcon";
 
 interface INode {
     id: string
@@ -82,6 +83,8 @@ const Graph: FC<GraphProps> = ({network, onNodeRemove, isEdit, height}) => {
                                  title={event.node.text}>
                             <div className={clazz} style={{textAlign: "center", position: "fixed", bottom: 0, top: 0, left: 0, right: 0}}>
                                 <a href={`#/device-management/devices?locale=deviceDetail&id=${event.node.data.device.id}`}>{event.node.text}</a>
+                                <br/>
+                                <AlertIcon state={event.node.data.device.alertState} popoverPlacement={"rightTop"}/>
                             </div>
                         </Popover>
                     </foreignObject>
@@ -90,7 +93,7 @@ const Graph: FC<GraphProps> = ({network, onNodeRemove, isEdit, height}) => {
         </Node>
     }
 
-    const renderEdge = (edge: EdgeProps) => {
+    const renderEdge = (_: EdgeProps) => {
         return <Edge remove={<Remove hidden={true}/>}/>
     }
 

@@ -5,19 +5,19 @@ import {DefaultPieOption} from "../../constants/chart";
 import {DashboardLayout} from "../layout";
 import "./index.css";
 import {useEffect, useState} from "react";
-import {GetAssetsStatisticsRequest} from "../../apis/asset";
 import {AssetStatistic} from "../../types/asset_statistic";
 import {ColorDanger, ColorHealth, ColorInfo, ColorWarn} from "../../constants/color";
 import {DeviceStatistic} from "../../types/device_statistic";
 import {GetDevicesStatisticsRequest} from "../../apis/device";
 import {GetAlarmStatisticsRequest} from "../../apis/alarm";
-import moment from "moment/moment";
 import {AlarmStatistics} from "../../types/alarm_statistics";
-import AssetStatistics from "./statistic/asset";
-import AlertStatistics from "./statistic/alert";
-import AlarmRecord from "./statistic/alarm_record";
+import moment from "moment";
+import AssetDashboardCard from "./assetDashboardCard";
+import AlarmRecordCard from "./alarmRecordCard";
+import AlertChartCard from "./alertChartCard";
+import {GetAllAssetStatisticsRequest} from "../../apis/asset";
 
-const {Title, Text} = Typography;
+const {Title} = Typography;
 
 const DashboardPage = () => {
     const [assetStatistics, setAssetStatistics] = useState<AssetStatistic[]>([]);
@@ -25,7 +25,7 @@ const DashboardPage = () => {
     const [alarmStatistics, setAlarmStatistics] = useState<AlarmStatistics>();
 
     const fetchAssetStatistics = async () => {
-        const res = await GetAssetsStatisticsRequest();
+        const res = await GetAllAssetStatisticsRequest();
         if (res.code === 200) {
             setAssetStatistics(res.data)
         }
@@ -34,12 +34,26 @@ const DashboardPage = () => {
     const renderAssetStatistics = () => {
         const total = assetStatistics.length
         const normal = assetStatistics.filter(item => item.status === 0).length
+        const legend = new Map<string, number>([
+            ['正常', normal],
+            ['异常', total - normal],
+        ]);
         const options = {
             ...DefaultPieOption,
+            legend: {
+                show: true,
+                orient: 'vertical',
+                left: 0,
+                formatter: function (name: string) {
+                    return `${name}(${legend.get(name)})`;
+                },
+            },
             series: [
                 {
                     ...DefaultPieOption.series[0],
                     name: '资产状态',
+                    radius: ['40%', '70%'],
+                    center: ['70%', '45%'],
                     data: [
                         {
                             value: normal,
@@ -66,20 +80,14 @@ const DashboardPage = () => {
                     labelLine: {
                         show: true,
                         length: 8,
-                        length2: 20,
+                        length2: 16,
                     },
                     startAngle: 60,
                 }
             ]
         }
-        return <Row>
-            <Col span={8}>
-                <br/>
-                <Text type={"secondary"}>{`总数: ${total}`}</Text><br/>
-                <Text type={"secondary"}>{`正常: ${normal}`}</Text><br/>
-                <Text type={"secondary"}>{`异常: ${total - normal}`}</Text>
-            </Col>
-            <Col span={16}>
+        return <Row justify={"start"}>
+            <Col span={24}>
                 <EChartsReact style={{height: "128px"}} option={options}/>
             </Col>
         </Row>
@@ -94,41 +102,59 @@ const DashboardPage = () => {
 
     const renderDeviceStatistics = () => {
         const total = deviceStatistics.length
-        const online = deviceStatistics.filter(item => item.status === 1).length
+        const info = deviceStatistics.filter(item => item.device.alertState?.level === 1).length
+        const warn = deviceStatistics.filter(item => item.device.alertState?.level === 2).length
+        const critical = deviceStatistics.filter(item => item.device.alertState?.level === 3).length
+        const legend = new Map<string, number>([
+            ['正常', total - info - warn - critical],
+            ['提示', info],
+            ['重要', warn],
+            ['紧急', critical],
+        ]);
         const options = {
             ...DefaultPieOption,
-            graphic: [
-                {
-                    type: 'text',
-                    left: 'center',
-                    top: '35%',
-                    style: {
-                        text: `在线率`,
-                    }
-                }
-            ],
+            legend: {
+                show: true,
+                orient: 'vertical',
+                left: 0,
+                formatter: function (name: string) {
+                    return `${name}(${legend.get(name)})`;
+                },
+            },
+            graphic: [],
             series: [
                 {
                     ...DefaultPieOption.series[0],
+                    radius: ['40%', '70%'],
+                    center: ['70%', '45%'],
                     name: '设备状态',
                     data: [
                         {
-                            value: online,
-                            name: '在线',
+                            value:  total - info - warn - critical,
+                            name: '正常',
                             itemStyle: {
                                 color: ColorHealth
-                            },
-                            label: {
-                                show: true,
-                                formatter: `{d}%`,
-                                position: 'outer',
                             }
                         },
                         {
-                            value: total - online,
-                            name: '离线',
+                            value: info,
+                            name: '提示',
+                            itemStyle: {
+                                color: ColorInfo
+                            },
+                        },
+                        {
+                            value:  warn,
+                            name: '重要',
                             itemStyle: {
                                 color: ColorWarn
+                            }
+                        },
+                        {
+                            value:  critical,
+                            name: '紧急',
+                            itemStyle: {
+                                color: ColorDanger
                             }
                         },
                     ],
@@ -142,27 +168,21 @@ const DashboardPage = () => {
                     labelLine: {
                         show: true,
                         length: 8,
-                        length2: 20,
+                        length2: 16,
                     },
                     startAngle: 60,
                 }
             ]
         }
         return <Row justify={"start"}>
-            <Col span={8}>
-                <br/>
-                <Text type={"secondary"}>{`总数: ${total}`}</Text><br/>
-                <Text type={"secondary"}>{`在线: ${online}`}</Text><br/>
-                <Text type={"secondary"}>{`离线: ${total - online}`}</Text>
-            </Col>
-            <Col span={16}>
+            <Col span={24}>
                 <EChartsReact style={{height: "128px"}} option={options}/>
             </Col>
         </Row>
     }
 
     const fetchAlarmStatistics = async () => {
-        const res = await GetAlarmStatisticsRequest(moment().startOf("day").utc().unix(), moment().endOf("day").utc().unix(), {});
+        const res = await GetAlarmStatisticsRequest(moment().local().startOf("day").unix(), moment().local().endOf("day").unix(), {});
         if (res.code === 200) {
             setAlarmStatistics(res.data)
         }
@@ -229,19 +249,19 @@ const DashboardPage = () => {
                 </Row>
                 <Row justify={"start"}>
                     <Col span={24}>
-                        <AssetStatistics values={assetStatistics}/>
+                        <AssetDashboardCard values={assetStatistics}/>
                     </Col>
                 </Row>
             </Col>
             <Col span={6}>
                 <Row justify={"start"}>
                     <Col span={24}>
-                        <AlertStatistics />
+                        <AlertChartCard />
                     </Col>
                 </Row>
                 <Row justify={"start"}>
                     <Col span={24}>
-                        <AlarmRecord />
+                        <AlarmRecordCard />
                     </Col>
                 </Row>
             </Col>

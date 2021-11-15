@@ -8,6 +8,7 @@ import (
 
 type AlarmStatisticsQuery struct {
 	po.AlarmRecords
+	Times []time.Time
 }
 
 func NewAlarmStatisticsQuery() AlarmStatisticsQuery {
@@ -26,12 +27,11 @@ func (query AlarmStatisticsQuery) Query() vo.AlarmStatistics {
 		temp[timeStr] = append(temp[timeStr], record)
 	}
 	result := vo.NewAlarmStatistics()
-	for i, t := range times {
-		if date, err := time.Parse("2006-01-02", t); err == nil {
-			result.AddTime(date)
-			result.Statistical(i, temp[t])
+	for i, t := range query.Times {
+		result.AddTime(t)
+		if statistic, ok := temp[t.Format("2006-01-02")]; ok {
+			result.Statistical(i, statistic)
 		}
-
 	}
 	return result
 }

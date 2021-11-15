@@ -10,8 +10,8 @@ import (
 )
 
 type AssetStatisticQuery struct {
-	po.Assets
-	DeviceMap map[uint][]entity.Device
+	po.Asset
+	Devices entity.Devices
 
 	propertyRepo          dependency.PropertyRepository
 	deviceStatusRepo      dependency.DeviceStatusRepository
@@ -21,7 +21,6 @@ type AssetStatisticQuery struct {
 
 func NewAssetStatisticQuery() AssetStatisticQuery {
 	return AssetStatisticQuery{
-		DeviceMap:             map[uint][]entity.Device{},
 		propertyRepo:          repository.Property{},
 		deviceDataRepo:        repository.DeviceData{},
 		deviceStatusRepo:      repository.DeviceStatus{},
@@ -29,17 +28,12 @@ func NewAssetStatisticQuery() AssetStatisticQuery {
 	}
 }
 
-func (query AssetStatisticQuery) Statistic() ([]vo.AssetStatistic, error) {
+func (query AssetStatisticQuery) Statistic() (*vo.AssetStatistic, error) {
 	var err error
-	result := make([]vo.AssetStatistic, len(query.Assets))
-	for i, asset := range query.Assets {
-		result[i] = vo.NewAssetStatistic(asset)
-		if devices, ok := query.DeviceMap[asset.ID]; ok {
-			result[i].Devices, err = query.buildDevices(devices)
-			result[i].UpdateStatus()
-		}
-	}
-	return result, err
+	result := vo.NewAssetStatistic(query.Asset)
+	result.Devices, err = query.buildDevices(query.Devices)
+	result.UpdateStatus()
+	return &result, err
 }
 
 func (query AssetStatisticQuery) buildDevices(devices []entity.Device) ([]vo.Device, error) {

@@ -1,6 +1,6 @@
 @font-face {
   font-family: "iconfont"; /* Project id  */
-  src: url('iconfont.ttf?t=1636614326574') format('truetype');
+  src: url('iconfont.ttf?t=1636945071556') format('truetype');
 }
 
 .iconfont {
@@ -11,7 +11,11 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-.icon-weiwangguanicon-defuben-:before {
+.icon-arrow-right:before {
+  content: "\e631";
+}
+
+.icon-critical:before {
   content: "\e670";
 }
 
@@ -19,7 +23,7 @@
   content: "\e652";
 }
 
-.icon-warning-filling:before {
+.icon-warning:before {
   content: "\e68b";
 }
 

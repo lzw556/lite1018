@@ -10,7 +10,6 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/domain/vo"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/xlog"
 	"strconv"
-	"time"
 )
 
 type Property struct {
@@ -65,7 +64,6 @@ func (s Property) Alert(alarmID uint, value float32, level uint) {
 			Value:      value,
 			Level:      level,
 		}
-		e.CreatedAt = time.Now().UTC()
 		if err := s.alarmRecordRepo.Create(ctx, &e); err != nil {
 			xlog.Error("create alarm record failed", err)
 			return
@@ -102,7 +100,12 @@ func (s Property) updateDeviceAlertStatus(alarmID uint, field string, content st
 }
 
 func (s Property) Recovery(alarmID uint) {
-	if s.Device.GetAlarmState(alarmID) != 0 {
+	status, err := s.deviceAlertStatusRepo.Get(s.Device.ID)
+	if err != nil {
+		xlog.Error("get device alert status failed", err)
+		return
+	}
+	if status.Level != 0 {
 		ctx := context.TODO()
 		rule, err := s.alarmRuleRepo.Get(ctx, alarmID)
 		if err != nil {

@@ -6,7 +6,6 @@ import {
     Menu,
     message,
     Popconfirm,
-    Popover,
     Row,
     Select,
     Space,
@@ -38,7 +37,7 @@ import {DeviceType, DeviceTypeString} from "../../types/device_type";
 import EditSettingModal from "./edit/editSettingModal";
 import {Device} from "../../types/device";
 import EditBaseInfoModel from "./edit/editBaseInfoModel";
-import {ColorDanger, ColorHealth, ColorWarn} from "../../constants/color";
+import {ColorHealth, ColorWarn} from "../../constants/color";
 import Label from "../../components/label";
 import ReplaceMacModal from "./replace/replaceMacModal";
 import EditWsnSettingModal from "./edit/editWsnSettingModal";
@@ -49,7 +48,8 @@ import "../../string-extension";
 import DeviceUpgradeState from "./state/upgradeState";
 import {IsUpgrading} from "../../types/device_upgrade_status";
 import AssetSelect from "../../components/assetSelect";
-import {GetFieldName} from "../../constants/field";
+import "../../assets/iconfont.css";
+import AlertIcon from "../../components/alertIcon";
 
 const {Search} = Input
 const {Option} = Select
@@ -189,17 +189,16 @@ const DevicePage = () => {
             dataIndex: 'state',
             key: 'state',
             render: (state: any, record:any) => {
-                if (connectionState) {
-                    state = connectionState
+                if (connectionState && connectionState.id === record.id) {
+                    return <Space>
+                        {
+                            connectionState.isOnline ? <Tag color={ColorHealth}>在线</Tag> : <Tag color={ColorWarn}>离线</Tag>
+                        }
+                    </Space>
                 }
                 return <Space>
                     {
                         state && state.isOnline ? <Tag color={ColorHealth}>在线</Tag> : <Tag color={ColorWarn}>离线</Tag>
-                    }
-                    {
-                        record.alertState && record.alertState.level === 3 && <Popover content={record.alertState.content.replace(record.alertState.alarm.field, GetFieldName(record.alertState.alarm.field))}>
-                            <Tag color={ColorDanger}>报警</Tag>
-                        </Popover>
                     }
                 </Space>
             }
@@ -213,6 +212,9 @@ const DevicePage = () => {
                     <Spin indicator={<LoadingOutlined/>}
                           size={"small"}
                           spinning={executeDevice ? executeDevice.id === record.id : false}/>
+                    {
+                        record.alertState && <AlertIcon popoverPlacement={"right"} state={record.alertState}/>
+                    }
                     <a href={`#/device-management/devices?locale=deviceDetail&id=${record.id}`}>{text}</a>
                     {
                         upgradeState && upgradeState.id == record.id && (<DeviceUpgradeState status={upgradeState.status} progress={upgradeState.progress}/>)

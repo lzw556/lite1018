@@ -12,14 +12,16 @@ import (
 type NetworkQuery struct {
 	entity.Network
 
-	deviceRepo       dependency.DeviceRepository
-	deviceStatusRepo dependency.DeviceStatusRepository
+	deviceRepo            dependency.DeviceRepository
+	deviceStatusRepo      dependency.DeviceStatusRepository
+	deviceAlertStatusRepo dependency.DeviceAlertStatusRepository
 }
 
 func NewNetworkQuery() NetworkQuery {
 	return NetworkQuery{
-		deviceRepo:       repository.Device{},
-		deviceStatusRepo: repository.DeviceStatus{},
+		deviceRepo:            repository.Device{},
+		deviceStatusRepo:      repository.DeviceStatus{},
+		deviceAlertStatusRepo: repository.DeviceAlertStatus{},
 	}
 }
 
@@ -34,6 +36,7 @@ func (query NetworkQuery) Detail() (*vo.Network, error) {
 		for i, device := range devices {
 			nodes[i] = vo.NewDevice(device)
 			nodes[i].State.DeviceStatus, _ = query.deviceStatusRepo.Get(device.ID)
+			nodes[i].AlertState.DeviceAlertStatus, _ = query.deviceAlertStatusRepo.Get(device.ID)
 		}
 		result.SetNodes(nodes)
 	}

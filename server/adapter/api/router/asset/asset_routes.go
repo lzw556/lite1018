@@ -39,8 +39,13 @@ func (r assetRouter) paging(ctx *gin.Context) (interface{}, error) {
 	return response.NewPageResult(page, size, total, result), nil
 }
 
-func (r assetRouter) statistic(_ *gin.Context) (interface{}, error) {
-	return r.service.Statistic()
+func (r assetRouter) statistic(ctx *gin.Context) (interface{}, error) {
+	id := cast.ToUint(ctx.Param("id"))
+	return r.service.Statistic(id)
+}
+
+func (r assetRouter) statisticAll(_ *gin.Context) (interface{}, error) {
+	return r.service.StatisticAll()
 }
 
 func (r assetRouter) removeByID(ctx *gin.Context) (interface{}, error) {

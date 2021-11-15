@@ -1,17 +1,17 @@
-import ShadowCard from "../../../components/shadowCard";
+import ShadowCard from "../../components/shadowCard";
 import {Divider, List, Skeleton, Typography} from "antd";
 import InfiniteScroll from "react-infinite-scroll-component";
 import {useEffect, useState} from "react";
-import {PagingAlarmRecordsRequest} from "../../../apis/alarm";
+import {PagingAlarmRecordsRequest} from "../../apis/alarm";
 import moment from "moment";
-import {GetFieldName} from "../../../constants/field";
-import {OperationTranslate} from "../../../constants/rule";
-import "../iconfont.css"
-import {ColorDanger, ColorInfo, ColorWarn} from "../../../constants/color";
+import {GetFieldName} from "../../constants/field";
+import {OperationTranslate} from "../../constants/rule";
+import {ColorDanger, ColorInfo, ColorWarn} from "../../constants/color";
+import "../../assets/iconfont.css"
 
 const {Title} = Typography;
 
-const AlarmRecord = () => {
+const AlarmRecordCard = () => {
     const [height] = useState(window.innerHeight - 470);
     const [startDate] = useState(moment().local().startOf("day").subtract(7, 'd'))
     const [endDate] = useState(moment().local().endOf("day"))
@@ -64,10 +64,10 @@ const AlarmRecord = () => {
                                              ${record.value.toFixed(record.property.precision)}${record.property.unit}${OperationTranslate(record.rule.operation)}
                                              设定的阈值:${record.rule.threshold.toFixed(record.property.precision)}${record.property.unit}`}/>
                               {
-                                  record.level === 3 && <div className={"iconfont icon-weiwangguanicon-defuben-"} style={{color: ColorDanger}}/>
+                                  record.level === 3 && <div className={"iconfont icon-critical"} style={{color: ColorDanger}}/>
                               }
                               {
-                                  record.level === 2 && <div className={"iconfont icon-warning-filling"} style={{color: ColorWarn}}/>
+                                  record.level === 2 && <div className={"iconfont icon-warning"} style={{color: ColorWarn}}/>
                               }
                               {
                                   record.level === 1 && <div className={"iconfont icon-info"} style={{color: ColorInfo}}/>
@@ -79,4 +79,4 @@ const AlarmRecord = () => {
     </ShadowCard>
 }
 
-export default AlarmRecord
+export default AlarmRecordCard

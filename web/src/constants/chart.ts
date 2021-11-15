@@ -123,14 +123,6 @@ export const DefaultMultiBarOption = {
 }
 
 export const DefaultPieOption = {
-    graphic: {
-        type: "text",
-        left: "center",
-        top: "35%",
-        style: {
-            text: "正常率",
-        }
-    },
     tooltip: {
         trigger: 'item',
         formatter: "{a} <br/>{b}: {c} ({d}%)"

@@ -1,6 +1,7 @@
 import {DeviceType} from "./device_type";
 import {WsnSetting} from "./wsn_setting";
 import {Property} from "./property";
+import {AlertState} from "./alert_state";
 
 export type Device = {
     id: number
@@ -14,7 +15,7 @@ export type Device = {
     wsn?: WsnSetting
     state?: any
     upgradeState?:any
-    alertState?:any
+    alertState?:AlertState
     accessState: number
     information?:any
     category: number

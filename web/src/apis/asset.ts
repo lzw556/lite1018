@@ -23,6 +23,10 @@ export function RemoveAssetRequest(id: number) {
     return request.delete(`/assets/${id}`).then(res => res.data)
 }
 
-export function GetAssetsStatisticsRequest() {
+export function GetAssetStatisticsRequest(id:number) {
+    return request.get<AssetStatistic>(`/assets/${id}/statistics`).then(res => res.data)
+}
+
+export function GetAllAssetStatisticsRequest() {
     return request.get<AssetStatistic[]>(`/assets/statistics`).then(res => res.data)
 }

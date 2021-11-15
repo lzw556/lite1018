@@ -153,14 +153,21 @@ func (factory Alarm) NewAlarmStatisticsQuery(from, to int64, req request.AlarmFi
 	if err != nil {
 		return nil, err
 	}
+	begin := time.Unix(from, 0)
+	end := time.Unix(to, 0)
 	specs = append(specs, spec.LevelsSpec(req.AlarmLevels))
-	specs = append(specs, spec.CreatedAtRangeSpec{time.Unix(from, 0), time.Unix(to, 0)})
+	specs = append(specs, spec.CreatedAtRangeSpec{begin, end})
 	es, err := factory.alarmRecordRepo.FindBySpecs(ctx, specs...)
 	if err != nil {
 		return nil, err
 	}
 	q := query.NewAlarmStatisticsQuery()
 	q.AlarmRecords = es
+	days := int(time.Unix(to, 0).Sub(time.Unix(from, 0)).Hours()) / 24
+	q.Times = []time.Time{begin}
+	for i := 0; i < days; i++ {
+		q.Times = append(q.Times, q.Times[i].Add(24*time.Hour))
+	}
 	return &q, nil
 }
 

@@ -13,6 +13,9 @@ const AlertNotification = () => {
         }
     }, [alertState])
 
+    const onAlertClose = () => {
+        setAlert(undefined)
+    }
 
     const renderAlert = () => {
         if (alert) {
@@ -21,26 +24,30 @@ const AlertNotification = () => {
                 case 1:
                     notification.info({
                         message: alert.title,
-                        description: content
+                        description: content,
+                        onClose: onAlertClose
                     })
                     break
                 case 2:
                     notification.warning({
                         message: alert.title,
-                        description: content
+                        description: content,
+                        onClose: onAlertClose
                     })
                     break
                 case 3:
                     notification.error({
                         message:alert.title,
                         description: content,
-                        duration: null
+                        duration: null,
+                        onClose: onAlertClose
                     })
                     break
                 default:
                     notification.success({
                         message: alert.title,
                         description: content,
+                        onClose: onAlertClose
                     })
                     break
             }

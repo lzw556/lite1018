@@ -1,8 +1,13 @@
 import {
-    AddAlarmRule, AddAlarmRuleTemplate,
-    AddDevice, AlarmRecord, AlarmRule,
-    Asset,
-    Device, DeviceDetail, EditAlarmRuleTemplate,
+    AddAlarmRule,
+    AddAlarmRuleTemplate,
+    AddDevice,
+    AlarmRecord,
+    AlarmRule,
+    Asset, AssetOverview,
+    Device,
+    DeviceDetail,
+    EditAlarmRuleTemplate,
     Firmware,
     HistoryData,
     ImportNetwork,
@@ -10,7 +15,8 @@ import {
     Me,
     Network,
     NotFound,
-    ServerError, System,
+    ServerError,
+    System,
     User
 } from "../views";
 import {
@@ -19,7 +25,8 @@ import {
     ClusterOutlined,
     DashboardOutlined,
     FolderOutlined,
-    LineChartOutlined, SettingOutlined,
+    LineChartOutlined,
+    SettingOutlined,
     TeamOutlined,
     UserOutlined
 } from "@ant-design/icons";
@@ -64,6 +71,14 @@ const ConsoleRoutes = [
         hidden: false,
         auth: auth,
         children: [
+            {
+                name: "assetOverview",
+                path: "/asset-management/assetOverview",
+                title: "概览",
+                component: AssetOverview,
+                hidden: false,
+                auth: auth,
+            },
             {
                 name: "assets",
                 path: "/asset-management/assets",
