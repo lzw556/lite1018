@@ -7,6 +7,7 @@ import DeviceTypeSelect from "../../../../components/deviceTypeSelect";
 import {AlarmRuleTemplate} from "../../../../types/alarm_rule_template";
 import {useHistory} from "react-router-dom";
 import {GetFieldName} from "../../../../constants/field";
+import MyBreadcrumb from "../../../../components/myBreadcrumb";
 
 const {Option} = Select
 
@@ -80,14 +81,10 @@ const RuleTemplate: FC<RuleTemplateProps> = ({defaultValue, onOk, okText}) => {
         })
     }
 
-    return <div>
-        <Row justify="center">
-            <Col span={24} style={{textAlign: "right"}}>
-            </Col>
-        </Row>
+    return <Content>
+        <MyBreadcrumb items={["报警管理", "报警规则", "添加模板"]}/>
         <Row justify="center">
             <Col span={24}>
-                <Content style={{paddingTop: "35px"}}>
                     <Card style={{padding: "10px"}}>
                         <Form form={form} labelCol={{span: 8}} labelAlign={"right"}>
                             <Row justify={"start"}>
@@ -190,10 +187,9 @@ const RuleTemplate: FC<RuleTemplateProps> = ({defaultValue, onOk, okText}) => {
                             </Row>
                         </Form>
                     </Card>
-                </Content>
             </Col>
         </Row>
-    </div>
+    </Content>
 }
 
 export default RuleTemplate

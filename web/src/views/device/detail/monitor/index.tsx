@@ -4,7 +4,7 @@ import {Button, Card, Col, DatePicker, Empty, Row, Select, Space} from "antd";
 import {DeviceType, GetSensors} from "../../../../types/device_type";
 import {GetChildrenRequest, GetDeviceDataRequest} from "../../../../apis/device";
 import moment from "moment";
-import {DefaultMonitorDataOption} from "../../../../constants/chart";
+import {DefaultMonitorDataOption, LineChartStyles} from "../../../../constants/chart";
 import ReactECharts from "echarts-for-react";
 import {ColorDanger} from "../../../../constants/color";
 import {AlarmRule} from "../../../../types/alarm_rule";
@@ -73,11 +73,11 @@ const MonitorPage: FC<MonitorPageProps> = ({device}) => {
             setOptions([])
             if (res.code === 200) {
                 setOptions(res.data.map(item => {
-                    const series = Object.keys(item.fields).map(key => {
+                    const series = Object.keys(item.fields).map((key, index) => {
                         return {
+                            ...LineChartStyles[index],
                             name: GetFieldName(key),
                             type: 'line',
-                            areaStyle: {normal: {}},
                             data: item.fields[key].map((value:any) => Number(value).toFixed(3)),
                             markLine: convertMarkLine(item.alarms, item.unit)
                         }

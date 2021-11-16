@@ -64,3 +64,7 @@ export function GetAlarmStatisticsRequest(from: number, to: number, filter: any)
 export function GetAlarmRecordRequest(id: number) {
     return request.get<any>(`/alarmRecords/${id}`).then(res => res.data)
 }
+
+export function RemoveAlarmRecordRequest(id: number) {
+    return request.delete(`/alarmRecords/${id}`).then(res => res.data)
+}

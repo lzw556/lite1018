@@ -26,6 +26,6 @@ type Service interface {
 
 	GetPropertyDataByID(deviceID uint, pID uint, from, to int64) (vo.PropertyData, error)
 	FindDeviceDataByID(deviceID uint, from, to int64) ([]vo.PropertyData, error)
-	RemoveDataByID(deviceID int, from, to int64) error
+	RemoveDataByID(deviceID uint, from, to int64) error
 	GetChildren(deviceID uint) ([]vo.Device, error)
 }

@@ -59,7 +59,7 @@ func SyncNetwork(network entity.Network, devices []entity.Device, timeout time.D
 		}
 		return SyncDeviceList(gateway, devices, timeout)
 	}
-	return response.BusinessErr(errcode.DeviceCommandSendFailedError, "")
+	return nil
 }
 
 func SyncNetworkLinkStatus(network entity.Network, devices []entity.Device, timeout time.Duration) {

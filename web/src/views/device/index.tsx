@@ -1,18 +1,4 @@
-import {
-    Button,
-    Col,
-    Dropdown,
-    Input,
-    Menu,
-    message,
-    Popconfirm,
-    Row,
-    Select,
-    Space,
-    Spin,
-    Tag,
-    Typography
-} from "antd";
+import {Button, Col, Dropdown, Input, Menu, message, Popconfirm, Row, Select, Space, Spin, Tag, Typography} from "antd";
 import {
     AppstoreAddOutlined,
     CaretDownOutlined,
@@ -50,10 +36,11 @@ import {IsUpgrading} from "../../types/device_upgrade_status";
 import AssetSelect from "../../components/assetSelect";
 import "../../assets/iconfont.css";
 import AlertIcon from "../../components/alertIcon";
+import MyBreadcrumb from "../../components/myBreadcrumb";
 
 const {Search} = Input
 const {Option} = Select
-const {Text} =Typography
+const {Text} = Typography
 
 const DevicePage = () => {
     const [table, setTable] = useState<TableProps>({data: {}, isLoading: false, pagination: true, refreshKey: 0})
@@ -188,11 +175,12 @@ const DevicePage = () => {
             title: '状态',
             dataIndex: 'state',
             key: 'state',
-            render: (state: any, record:any) => {
+            render: (state: any, record: any) => {
                 if (connectionState && connectionState.id === record.id) {
                     return <Space>
                         {
-                            connectionState.isOnline ? <Tag color={ColorHealth}>在线</Tag> : <Tag color={ColorWarn}>离线</Tag>
+                            connectionState.isOnline ? <Tag color={ColorHealth}>在线</Tag> :
+                                <Tag color={ColorWarn}>离线</Tag>
                         }
                     </Space>
                 }
@@ -217,7 +205,8 @@ const DevicePage = () => {
                     }
                     <a href={`#/device-management/devices?locale=deviceDetail&id=${record.id}`}>{text}</a>
                     {
-                        upgradeState && upgradeState.id == record.id && (<DeviceUpgradeState status={upgradeState.status} progress={upgradeState.progress}/>)
+                        upgradeState && upgradeState.id === record.id && (
+                            <DeviceUpgradeState status={upgradeState.status} progress={upgradeState.progress}/>)
                     }
                 </Space>
             }
@@ -226,7 +215,7 @@ const DevicePage = () => {
             title: 'MAC地址',
             dataIndex: 'macAddress',
             key: 'macAddress',
-            render: (text:string) => {
+            render: (text: string) => {
                 return <Text>
                     {
                         text.toUpperCase().macSeparator()
@@ -279,63 +268,55 @@ const DevicePage = () => {
         },
     ]
 
-    return <div>
-        <Row justify="center">
-            <Col span={24} style={{textAlign: "right"}}>
-                <Space>
-                    <Button type="primary" onClick={onAddDevice}>添加设备 <AppstoreAddOutlined/></Button>
-                </Space>
-            </Col>
-        </Row>
-        <Row justify="center">
-            <Col span={24}>
-                <Content style={{paddingTop: "15px"}}>
-                    <ShadowCard>
-                        <Row justify="center">
-                            <Col span={24}>
-                                <Space>
-                                    <Label name={"资产"}>
-                                        <AssetSelect bordered={false} style={{width: "120px"}} defaultValue={assetId}
-                                                     defaultActiveFirstOption={true}
-                                                     placeholder={"请选择资产"}
-                                                     onChange={onAssetChange} suffixIcon={<CaretDownOutlined/>}>
-                                            <Option key={0} value={0}>所有资产</Option>
-                                        </AssetSelect>
-                                    </Label>
-                                    <Input.Group compact>
-                                        <Select defaultValue={searchTarget} style={{width: "80px"}}
-                                                onChange={onTargetChange} suffixIcon={<CaretDownOutlined/>}>
-                                            <Option value={0}>名称</Option>
-                                            <Option value={1}>MAC</Option>
-                                        </Select>
-                                        <Search style={{width: "256px"}} placeholder={
-                                            searchTarget === 0 ? "请输入设备名称进行查询" : "请输入设备MAC进行查询"
-                                        }
-                                                onSearch={onSearch}
-                                                allowClear
-                                                enterButton/>
-                                    </Input.Group>
-                                </Space>
-                            </Col>
-                        </Row>
-                        <br/>
-                        <Row justify="center">
-                            <Col span={24}>
-                                <TableLayout
-                                    emptyText={"设备列表为空"}
-                                    columns={columns}
-                                    isLoading={table.isLoading}
-                                    pagination={table.pagination}
-                                    refreshKey={table.refreshKey}
-                                    data={table.data}
-                                    onChange={onChange}
-                                />
-                            </Col>
-                        </Row>
-                    </ShadowCard>
-                </Content>
-            </Col>
-        </Row>
+    return <Content>
+        <MyBreadcrumb items={["设备管理", "设备列表"]}>
+            <Space>
+                <Button type="primary" onClick={onAddDevice}>添加设备 <AppstoreAddOutlined/></Button>
+            </Space>
+        </MyBreadcrumb>
+        <ShadowCard>
+            <Row justify="center">
+                <Col span={24}>
+                    <Space>
+                        <Label name={"资产"}>
+                            <AssetSelect bordered={false} style={{width: "120px"}} defaultValue={assetId}
+                                         defaultActiveFirstOption={true}
+                                         placeholder={"请选择资产"}
+                                         onChange={onAssetChange} suffixIcon={<CaretDownOutlined/>}>
+                                <Option key={0} value={0}>所有资产</Option>
+                            </AssetSelect>
+                        </Label>
+                        <Input.Group compact>
+                            <Select defaultValue={searchTarget} style={{width: "80px"}}
+                                    onChange={onTargetChange} suffixIcon={<CaretDownOutlined/>}>
+                                <Option value={0}>名称</Option>
+                                <Option value={1}>MAC</Option>
+                            </Select>
+                            <Search style={{width: "256px"}} placeholder={
+                                searchTarget === 0 ? "请输入设备名称进行查询" : "请输入设备MAC进行查询"
+                            }
+                                    onSearch={onSearch}
+                                    allowClear
+                                    enterButton/>
+                        </Input.Group>
+                    </Space>
+                </Col>
+            </Row>
+            <br/>
+            <Row justify="center">
+                <Col span={24}>
+                    <TableLayout
+                        emptyText={"设备列表为空"}
+                        columns={columns}
+                        isLoading={table.isLoading}
+                        pagination={table.pagination}
+                        refreshKey={table.refreshKey}
+                        data={table.data}
+                        onChange={onChange}
+                    />
+                </Col>
+            </Row>
+        </ShadowCard>
         <ReplaceMacModal visible={replaceVisible} device={device} onCancel={() => {
             setDevice(undefined)
             setReplaceVisible(false)
@@ -373,7 +354,7 @@ const DevicePage = () => {
             setDevice(undefined)
             setUpgradeVisible(false)
         }}/>
-    </div>
+    </Content>
 }
 
 export default DevicePage

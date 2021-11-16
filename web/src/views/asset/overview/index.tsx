@@ -1,4 +1,4 @@
-import {Col, message, Row, Select} from "antd";
+import {message, Select, Space} from "antd";
 import Label from "../../../components/label";
 import {useEffect, useState} from "react";
 import {PagingAssetsRequest} from "../../../apis/asset";
@@ -6,6 +6,8 @@ import {Asset} from "../../../types/asset";
 import AssetStatistic from "./assetStatistic";
 import {useHistory, useLocation} from "react-router-dom";
 import {GetParamValue} from "../../../utils/path";
+import {Content} from "antd/es/layout/layout";
+import MyBreadcrumb from "../../../components/myBreadcrumb";
 
 const {Option} = Select;
 
@@ -38,11 +40,11 @@ const AssetOverview = () => {
         }
     }
 
-    return <div>
-        <Row justify="end">
-            <Col span={5} style={{textAlign: "center", backgroundColor: "#fff"}}>
+    return <Content>
+        <MyBreadcrumb items={["资产管理", "概览"]}>
+            <Space style={{backgroundColor: "white"}}>
                 <Label name={"资产"}>
-                    <Select style={{width: "150px"}} bordered={false} value={asset?.id} onChange={(value: number) => {
+                    <Select style={{width: "150px"}}  bordered={false} value={asset?.id} onChange={(value: number) => {
                         setAsset(assets?.find(asset => asset.id === value))
                     }}>
                         {
@@ -50,12 +52,12 @@ const AssetOverview = () => {
                         }
                     </Select>
                 </Label>
-            </Col>
-        </Row>
+            </Space>
+        </MyBreadcrumb>
         {
             asset && <AssetStatistic value={asset}/>
         }
-    </div>
+    </Content>
 }
 
 export default AssetOverview

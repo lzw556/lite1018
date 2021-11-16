@@ -58,13 +58,20 @@ const ConsoleLayout = (props: any) => {
         })
     }
 
+    const renderDefaultOpenKeys = () => {
+        const keys = pathname.split('/')
+        if (keys && keys.length > 1) {
+            return ['/' + keys[1]]
+        }
+        return ["/device-management"]
+    }
+
     return <Layout className="ts-console">
         <HeaderLayout hideConsole={true}/>
         <Layout>
             <Sider width={200} style={{background: "white", height: "100%", overflowY: "scroll", boxShadow: "0 2px 10px 0 rgba(0,0,0, 0.08)"}}>
                 <Menu mode="inline" className="ts-menu" defaultSelectedKeys={["devices"]}
-                      selectedKeys={[pathname]}
-                      defaultOpenKeys={['/device-management']}>
+                      selectedKeys={[pathname]} defaultOpenKeys={renderDefaultOpenKeys()}>
                     {
                         menus.map((item: any) => {
                             if (!item.hidden) {
@@ -83,12 +90,14 @@ const ConsoleLayout = (props: any) => {
                 </Menu>
             </Sider>
             <Layout style={{padding: "15px", background: "#eef0f5", overflowY: "scroll"}}>
-                <Breadcrumb className="ts-breadcrumb" style={{position: "absolute"}}>
-                    {
-                        renderBreadcrumbItems()
-                    }
-                </Breadcrumb>
-                <RouterGuard {...props} routes={routes}/>
+                {/*<Breadcrumb className="ts-breadcrumb">*/}
+                {/*    {*/}
+                {/*        renderBreadcrumbItems()*/}
+                {/*    }*/}
+                {/*</Breadcrumb>*/}
+                {/*<div style={{marginTop: "-30px"}}>*/}
+                    <RouterGuard {...props} routes={routes}/>
+                {/*</div>*/}
             </Layout>
         </Layout>
         <AlertNotification />

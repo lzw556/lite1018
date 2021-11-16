@@ -21,6 +21,7 @@ type Service interface {
 
 	GetAlarmRecord(recordID uint) (*vo.AlarmRecord, error)
 	FindAlarmRecordsByPaginate(from, to int64, page, size int, req request.AlarmFilter) ([]vo.AlarmRecord, int64, error)
+	RemoveAlarmRecord(recordID uint) error
 
 	GetAlarmStatistics(from, to int64, req request.AlarmFilter) (vo.AlarmStatistics, error)
 }

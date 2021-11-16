@@ -1,11 +1,13 @@
 import {useEffect, useState} from "react";
 import {GetSystemRequest} from "../../apis/system";
 import ShadowCard from "../../components/shadowCard";
-import {Col, Form, Progress, Row, Space, Statistic, Tag} from "antd";
+import {Col, Form, Progress, Row, Statistic, Tag} from "antd";
 import {System} from "../../types/system";
 import EChartsReact from "echarts-for-react";
 import {DefaultGaugeOption} from "../../constants/chart";
 import {ColorHealth} from "../../constants/color";
+import {Content} from "antd/es/layout/layout";
+import MyBreadcrumb from "../../components/myBreadcrumb";
 
 
 const SystemPage = () => {
@@ -48,15 +50,9 @@ const SystemPage = () => {
         return null
     }
 
-    return <div>
-        <Row justify="center">
-            <Col span={24} style={{textAlign: "right"}}>
-                <Space>
-                    {/*<Button type="primary" onClick={onReboot}>重启 <AppstoreAddOutlined/></Button>*/}
-                </Space>
-            </Col>
-        </Row>
-        <Row justify={"space-between"} style={{paddingTop: "35px"}}>
+    return <Content>
+        <MyBreadcrumb items={["系统管理"]}/>
+        <Row justify={"space-between"}>
             <Col span={12} style={{paddingRight: "4px"}}>
                 <ShadowCard title={"系统信息"} size={"small"} style={{height: "256px"}}>
                     <Form.Item label={"操作系统"} labelAlign={"left"} labelCol={{span: 12}} style={{marginBottom: "4px"}}>
@@ -139,7 +135,7 @@ const SystemPage = () => {
                 </ShadowCard>
             </Col>
         </Row>
-    </div>
+    </Content>
 }
 
 export default SystemPage

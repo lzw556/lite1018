@@ -13,6 +13,7 @@ import {DownOutlined} from "@ant-design/icons";
 import {DeviceCommand} from "../../../types/device_command";
 import SettingPage from "./setting";
 import {DeviceType} from "../../../types/device_type";
+import MyBreadcrumb from "../../../components/myBreadcrumb";
 
 const tabList = [
     {
@@ -80,12 +81,12 @@ const DeviceDetailPage = () => {
         return tabList
     }
 
-    const onCommand = ({key}:any) => {
+    const onCommand = ({key}: any) => {
         if (device) {
             SendDeviceCommandRequest(device.id, key).then(res => {
                 if (res.code === 200) {
                     message.success("发送成功").then()
-                }else {
+                } else {
                     message.error("发送失败").then()
                 }
             })
@@ -105,32 +106,28 @@ const DeviceDetailPage = () => {
         </Menu>
     }
 
-    return <div>
-        <Row justify="center">
-            <Col span={24} style={{textAlign: "right"}}>
-                <Space>
-                    <Dropdown overlay={renderCommandMenu}>
-                        <Button type={"primary"}>设备命令<DownOutlined/></Button>
-                    </Dropdown>
-                </Space>
-            </Col>
-        </Row>
+    return <Content>
+        <MyBreadcrumb items={["设备管理", "设备列表", "设备详情"]}>
+            <Space>
+                <Dropdown overlay={renderCommandMenu}>
+                    <Button type={"primary"}>设备命令<DownOutlined/></Button>
+                </Dropdown>
+            </Space>
+        </MyBreadcrumb>
         <Row justify="center">
             <Col span={24}>
-                <Content style={{paddingTop: "15px"}}>
-                    {
-                        device && <InformationCard device={device} isLoading={isLoading}/>
-                    }
-                    <br/>
-                    <ShadowCard size={"small"} tabList={renderTabList()} onTabChange={key => {
-                        setCurrentKey(key)
-                    }}>
-                        {contents.get(currentKey)}
-                    </ShadowCard>
-                </Content>
+                {
+                    device && <InformationCard device={device} isLoading={isLoading}/>
+                }
+                <br/>
+                <ShadowCard size={"small"} tabList={renderTabList()} onTabChange={key => {
+                    setCurrentKey(key)
+                }}>
+                    {contents.get(currentKey)}
+                </ShadowCard>
             </Col>
         </Row>
-    </div>
+    </Content>
 }
 
 export default DeviceDetailPage

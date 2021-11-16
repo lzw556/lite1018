@@ -44,6 +44,10 @@ export function DownloadDeviceDataRequest(id:number, pid:number, from:number, to
     return request.download<any>(`/devices/${id}/download/data`, {pid, from, to})
 }
 
+export function RemoveDeviceDataRequest(id:number, from:number, to:number) {
+    return request.delete(`/devices/${id}/data?from=${from}&to=${to}`).then(res => res.data)
+}
+
 export function ReplaceDeviceMacRequest(id:number, mac: string) {
     return request.patch(`/devices/${id}/mac/${mac}`, {}).then(res => res.data)
 }

@@ -113,7 +113,7 @@ func (r deviceRouter) downloadDataByID(ctx *gin.Context) (interface{}, error) {
 }
 
 func (r deviceRouter) removeDataByID(ctx *gin.Context) (interface{}, error) {
-	id := cast.ToInt(ctx.Param("id"))
+	id := cast.ToUint(ctx.Param("id"))
 	from := cast.ToInt64(ctx.Query("from"))
 	to := cast.ToInt64(ctx.Query("to"))
 	return nil, r.service.RemoveDataByID(id, from, to)

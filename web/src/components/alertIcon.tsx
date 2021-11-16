@@ -3,9 +3,11 @@ import {ColorDanger, ColorInfo, ColorWarn} from "../constants/color";
 import {FC} from "react";
 import {GetFieldName} from "../constants/field";
 import {TooltipPlacement} from "antd/lib/tooltip";
+import moment from "moment";
+import {AlertState} from "../types/alert_state";
 
 export interface AlertIconProps {
-    state: any
+    state: AlertState
     popoverPlacement: TooltipPlacement
 }
 
@@ -16,6 +18,7 @@ const AlertIcon: FC<AlertIconProps> = ({state, popoverPlacement}) => {
     const renderContent = (level:string, state:any, color:any) => {
         return <Space>
             <Tag color={color}>{level}</Tag>
+            <Text>{moment.unix(state.timestamp).local().format("YYYY-MM-DD HH:mm:ss")}</Text>
             <Text>{state.content.replace(state.alarm.field, GetFieldName(state.alarm.field))}</Text>
         </Space>
     }

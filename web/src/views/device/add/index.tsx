@@ -13,6 +13,7 @@ import {AddDeviceRequest} from "../../../apis/device";
 import {IPNSettingKeys} from "../form/item/ipnFormItem";
 import {WSNSettingKeys} from "../form/item/wsnFormItem";
 import ShadowCard from "../../../components/shadowCard";
+import MyBreadcrumb from "../../../components/myBreadcrumb";
 
 
 
@@ -112,65 +113,68 @@ const AddDevicePage = () => {
             })
     }
 
-    return <Content style={{paddingTop: "35px"}}>
-        <ShadowCard>
-            {
-                success && (<Result
-                    status="success"
-                    title="设备创建成功!"
-                    subTitle="您可以返回设备列表查看设备信息或者继续创建设备"
-                    extra={[
-                        <Button type="primary" key="devices" onClick={() => {
-                            window.location.hash = "device-management/devices"
-                        }}>
-                            返回设备列表
-                        </Button>,
-                        <Button key="add" onClick={() => {
-                            form.resetFields()
-                            setCurrent(0)
-                            setDeviceType(undefined)
-                            setSuccess(false)
-                        }}>继续创建设备</Button>,
-                    ]}
-                />)
-            }
-            <Row justify="space-between" hidden={success}>
-                <Col span={12}>
-                    <Steps
-                        current={current}
-                        className="site-navigation-steps"
-                        type="navigation"
-                        size="small">
-                        {
-                            steps.map(item => <Step key={item.title} title={item.title}/>)
-                        }
-                    </Steps>
-                    <Row>
-                        <Col span={20}>
-                            {renderFormItem()}
-                        </Col>
-                        <Col span={20} style={{textAlign: "right"}}>
-                            <br/>
-                            <br/>
-                            <Space>
-                                {
-                                    current < steps.length - 1 && (
-                                        <Button type="primary" onClick={onNext}>下一步</Button>)
-                                }
-                                {
-                                    current > 0 && (<Button onClick={() => setCurrent(current - 1)}>上一步</Button>)
-                                }
-                                {
-                                    current === steps.length - 1 && (
-                                        <Button type="primary" onClick={onComplete}>完成</Button>)
-                                }
-                            </Space>
-                        </Col>
-                    </Row>
-                </Col>
-            </Row>
-        </ShadowCard>
-    </Content>
+    return <>
+        <Content>
+            <MyBreadcrumb items={["设备管理", "添加设备"]}/>
+            <ShadowCard>
+                {
+                    success && (<Result
+                        status="success"
+                        title="设备创建成功!"
+                        subTitle="您可以返回设备列表查看设备信息或者继续创建设备"
+                        extra={[
+                            <Button type="primary" key="devices" onClick={() => {
+                                window.location.hash = "device-management/devices"
+                            }}>
+                                返回设备列表
+                            </Button>,
+                            <Button key="add" onClick={() => {
+                                form.resetFields()
+                                setCurrent(0)
+                                setDeviceType(undefined)
+                                setSuccess(false)
+                            }}>继续创建设备</Button>,
+                        ]}
+                    />)
+                }
+                <Row justify="space-between" hidden={success}>
+                    <Col span={12}>
+                        <Steps
+                            current={current}
+                            className="site-navigation-steps"
+                            type="navigation"
+                            size="small">
+                            {
+                                steps.map(item => <Step key={item.title} title={item.title}/>)
+                            }
+                        </Steps>
+                        <Row>
+                            <Col span={20}>
+                                {renderFormItem()}
+                            </Col>
+                            <Col span={20} style={{textAlign: "right"}}>
+                                <br/>
+                                <br/>
+                                <Space>
+                                    {
+                                        current < steps.length - 1 && (
+                                            <Button type="primary" onClick={onNext}>下一步</Button>)
+                                    }
+                                    {
+                                        current > 0 && (<Button onClick={() => setCurrent(current - 1)}>上一步</Button>)
+                                    }
+                                    {
+                                        current === steps.length - 1 && (
+                                            <Button type="primary" onClick={onComplete}>完成</Button>)
+                                    }
+                                </Space>
+                            </Col>
+                        </Row>
+                    </Col>
+                </Row>
+            </ShadowCard>
+        </Content>
+    </>
 }
 
 export default AddDevicePage

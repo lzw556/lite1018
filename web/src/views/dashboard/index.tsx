@@ -52,7 +52,7 @@ const DashboardPage = () => {
                 {
                     ...DefaultPieOption.series[0],
                     name: '资产状态',
-                    radius: ['40%', '70%'],
+                    radius: ['50%', '80%'],
                     center: ['70%', '45%'],
                     data: [
                         {
@@ -70,20 +70,7 @@ const DashboardPage = () => {
                             },
                         }
                     ],
-                    label: {
-                        show: true,
-                        formatter: '{d}%',
-                        position: 'outside',
-                        alignTo: 'labelLine',
-                        bleedMargin: 5,
-                    },
-                    labelLine: {
-                        show: true,
-                        length: 8,
-                        length2: 16,
-                    },
-                    startAngle: 60,
-                }
+                },
             ]
         }
         return <Row justify={"start"}>
@@ -125,7 +112,7 @@ const DashboardPage = () => {
             series: [
                 {
                     ...DefaultPieOption.series[0],
-                    radius: ['40%', '70%'],
+                    radius: ['50%', '80%'],
                     center: ['70%', '45%'],
                     name: '设备状态',
                     data: [
@@ -157,20 +144,7 @@ const DashboardPage = () => {
                                 color: ColorDanger
                             }
                         },
-                    ],
-                    label: {
-                        show: true,
-                        formatter: '{d}%',
-                        position: 'outside',
-                        alignTo: 'labelLine',
-                        bleedMargin: 5,
-                    },
-                    labelLine: {
-                        show: true,
-                        length: 8,
-                        length2: 16,
-                    },
-                    startAngle: 60,
+                    ]
                 }
             ]
         }

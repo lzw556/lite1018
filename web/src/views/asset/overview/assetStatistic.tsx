@@ -114,12 +114,12 @@ const AssetStatistic: FC<AssetStatisticProps> = ({value}) => {
     }, [value])
 
     return <>
-        <Row justify={"space-between"} gutter={16} style={{paddingTop: "15px"}}>
+        <Row justify={"space-between"} gutter={16}>
             <Col span={8}>
                 <ShadowCard hoverable={true}>
                     <Title level={4}>{assetStatistics?.asset.name}</Title>
                     {
-                        assetStatistics && assetStatistics.status == 3 ?
+                        assetStatistics && assetStatistics.status === 3 ?
                             <Statistic title={"状态"} value={"异常"}
                                        valueStyle={{color: ColorDanger, fontWeight: "bold"}}/> :
                             <Statistic title={"状态"} value={"正常"} valueStyle={{color: ColorHealth, fontWeight: "bold"}}/>

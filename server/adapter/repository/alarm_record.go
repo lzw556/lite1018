@@ -36,3 +36,7 @@ func (repo AlarmRecord) Get(ctx context.Context, id uint) (po.AlarmRecord, error
 	err := repo.DB(ctx).First(&e, id).Error
 	return e, err
 }
+
+func (repo AlarmRecord) Delete(ctx context.Context, id uint) error {
+	return repo.DB(ctx).Delete(&po.AlarmRecord{}, id).Error
+}

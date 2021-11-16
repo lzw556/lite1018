@@ -38,6 +38,7 @@ func (r *alarmRouter) initRoutes() {
 		// DELETE
 		router.NewDeleteRoute("alarmRuleTemplates/:id", r.removeAlarmRuleTemplate),
 		router.NewDeleteRoute("alarmRules/:id", r.removeAlarmRule),
+		router.NewDeleteRoute("alarmRecords/:id", r.removeAlarmRecord),
 	}
 }
 

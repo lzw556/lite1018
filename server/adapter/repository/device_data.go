@@ -70,3 +70,23 @@ func (repo DeviceData) Last(deviceID uint) (po.DeviceData, error) {
 	})
 	return e, err
 }
+
+func (repo DeviceData) Delete(deviceID uint, from, to time.Time) error {
+	err := repo.BoltDB().Update(func(tx *bbolt.Tx) error {
+		bucket := tx.Bucket([]byte(po.DeviceData{}.BucketName()))
+		if bucket != nil {
+			if dataBucket := bucket.Bucket(itob(deviceID)); dataBucket != nil {
+				c := dataBucket.Cursor()
+				min := []byte(from.Format("2006-01-02T15:04:05Z"))
+				max := []byte(to.Format("2006-01-02T15:04:05Z"))
+				for k, _ := c.Seek(min); k != nil && bytes.Compare(k, max) <= 0; k, _ = c.Next() {
+					if err := dataBucket.Delete(k); err != nil {
+						return err
+					}
+				}
+			}
+		}
+		return nil
+	})
+	return err
+}

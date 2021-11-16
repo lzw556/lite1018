@@ -1,4 +1,62 @@
 import {ColorHealth} from "./color";
+import * as echarts from 'echarts';
+
+export const LineChartStyles = [
+    {
+        itemStyle: {
+            normal: {
+                color: 'rgb(0,130,252)',
+            }
+        },
+        areaStyle: {
+            normal: {
+                color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+                    offset: 0,
+                    color: 'rgb(0,130,252)'
+                }, {
+                    offset: 1,
+                    color: 'rgb(255,255,255)'
+                }])
+            }
+        }
+    },
+    {
+        itemStyle: {
+            normal: {
+                color: 'rgb(253,216,69)',
+            }
+        },
+        areaStyle: {
+            normal: {
+                color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+                    offset: 0,
+                    color: 'rgb(253,216,69)'
+                }, {
+                    offset: 1,
+                    color: 'rgb(255,255,255)'
+                }])
+            }
+        }
+    },
+    {
+        itemStyle: {
+            normal: {
+                color: 'rgb(34,237,124)',
+            }
+        },
+        areaStyle: {
+            normal: {
+                color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+                    offset: 0,
+                    color: 'rgb(34,237,124)'
+                }, {
+                    offset: 1,
+                    color: 'rgb(255,255,255)'
+                }])
+            }
+        }
+    }
+]
 
 export const DefaultHistoryDataOption = {
     title: {
@@ -135,7 +193,7 @@ export const DefaultPieOption = {
     series: [
         {
             type: 'pie',
-            radius: ['40%', '70%'],
+            radius: ['70%'],
             center: ['50%', '40%'],
             avoidLabelOverlap: false,
             label: {
@@ -148,9 +206,6 @@ export const DefaultPieOption = {
                     fontSize: '10',
                     fontWeight: 'bold'
                 }
-            },
-            labelLine: {
-                show: false
             },
             data: []
         }
@@ -186,7 +241,10 @@ export const DefaultGaugeOption =  {
                 {
                     value: 50,
                 }
-            ]
+            ],
+            label: {
+                show: true
+            }
         }
     ]
 }

@@ -10,6 +10,7 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/domain/vo"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/xlog"
 	"strconv"
+	"time"
 )
 
 type Property struct {
@@ -94,6 +95,7 @@ func (s Property) updateDeviceAlertStatus(alarmID uint, field string, content st
 	status.Alarm.ID = alarmID
 	status.Alarm.Field = field
 	status.Content = content
+	status.Timestamp = time.Now().UTC().Unix()
 	if err := s.deviceAlertStatusRepo.Create(s.Device.ID, &status); err != nil {
 		xlog.Error("update device status failed", err)
 	}

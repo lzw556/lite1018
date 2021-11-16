@@ -1,4 +1,4 @@
-import {Button, Card, Col, message, Popconfirm, Row, Space} from "antd";
+import {Button, Col, message, Popconfirm, Row, Space} from "antd";
 import {useCallback, useState} from "react";
 import {Content} from "antd/lib/layout/layout";
 import {RemoveUserRequest, GetUserRequest, PagingUsersRequest} from "../../apis/user";
@@ -8,6 +8,7 @@ import {DeleteOutlined, EditOutlined, UserAddOutlined} from "@ant-design/icons";
 import AddUserModal from "./add";
 import EditUserModal from "./edit";
 import ShadowCard from "../../components/shadowCard";
+import MyBreadcrumb from "../../components/myBreadcrumb";
 
 const UserPage = () => {
     const [addUserVisible, setAddUserVisible] = useState<boolean>(false)
@@ -99,21 +100,18 @@ const UserPage = () => {
     ]
 
 
-    return <div>
-        <Row justify="center">
-            <Col span={24} style={{textAlign: "right"}}>
-                <Space>
-                    <Button type="primary" onClick={() => {
-                        setAddUserVisible(true)
-                    }}>
-                        添加用户 <UserAddOutlined />
-                    </Button>
-                </Space>
-            </Col>
-        </Row>
+    return <Content>
+        <MyBreadcrumb items={["用户管理", "用户列表"]}>
+            <Space>
+                <Button type="primary" onClick={() => {
+                    setAddUserVisible(true)
+                }}>
+                    添加用户 <UserAddOutlined />
+                </Button>
+            </Space>
+        </MyBreadcrumb>
         <Row justify="center">
             <Col span={24}>
-                <Content style={{paddingTop: "15px"}}>
                     <ShadowCard>
                         <TableLayout
                             columns={columns}
@@ -124,13 +122,12 @@ const UserPage = () => {
                             onChange={onChange}
                         />
                     </ShadowCard>
-                </Content>
             </Col>
         </Row>
         <AddUserModal visible={addUserVisible} onCancel={() => setAddUserVisible(false)} onSuccess={onAddUserSuccess}/>
         <EditUserModal user={user} visible={editUserVisible} onCancel={() => setEditUserVisible(false)}
                onSuccess={onEditUserSuccess}/>
-    </div>
+    </Content>
 }
 
 export default UserPage

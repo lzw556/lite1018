@@ -125,8 +125,12 @@ func (s Device) FindDeviceDataByID(deviceID uint, from, to int64) ([]vo.Property
 	return query.DataByRange(time.Unix(from, 0), time.Unix(to, 0))
 }
 
-func (Device) RemoveDataByID(deviceID int, from, to int64) error {
-	panic("implement me")
+func (s Device) RemoveDataByID(deviceID uint, from, to int64) error {
+	cmd, err := s.factory.NewDeviceRemoveCmd(deviceID)
+	if err != nil {
+		return err
+	}
+	return cmd.RemoveData(time.Unix(from, 0), time.Unix(to, 0))
 }
 
 func (s Device) ExecuteCommand(deviceID uint, cmdType uint) error {

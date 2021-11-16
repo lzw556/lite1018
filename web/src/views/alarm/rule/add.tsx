@@ -26,6 +26,7 @@ import {AddAlarmRuleRequest, CheckRuleNameRequest, PagingRuleTemplateRequest} fr
 import {defaultValidateMessages, numberRule} from "../../../constants/validateMessage";
 import {EmptyLayout} from "../../layout";
 import {GetFieldName} from "../../../constants/field";
+import MyBreadcrumb from "../../../components/myBreadcrumb";
 
 const {Option} = Select
 
@@ -48,7 +49,7 @@ const AddRulePage = () => {
                     setGroups(res.data)
                 }
             })
-            if (createType == 1) {
+            if (createType === 1) {
                 PagingRuleTemplateRequest(1, 100, deviceType).then(res => {
                     if (res.code === 200) {
                         setTemplates(res.data.result)
@@ -113,7 +114,7 @@ const AddRulePage = () => {
                     create_type: createType,
                     description: form.getFieldValue("description")
                 }
-                if (createType == 1) {
+                if (createType === 1) {
                     onCreateFromTemplates(req)
                 } else {
                     onCreateByCustom(req)
@@ -259,70 +260,69 @@ const AddRulePage = () => {
         }
     }
 
-    return <div>
-        <Content style={{paddingTop: "35px"}}>
-            <Card>
-                <Form form={form} labelAlign={"right"} validateMessages={defaultValidateMessages}>
-                    <Row justify={"space-between"}>
-                        <Col span={16}>
-                            <Form.Item label={"规则名称"} labelCol={{span: 4}} name={"name"} required
-                                       rules={[{validator: onNameValidator}]}>
-                                <Input placeholder={"请输入规则名称"} style={{width: "200px"}}/>
-                            </Form.Item>
-                        </Col>
-                    </Row>
-                    <Row justify={"space-between"}>
-                        <Col span={16}>
-                            <Form.Item label={"规则描述"} labelCol={{span: 4}} initialValue={""} name={"description"}>
-                                <Input.TextArea placeholder={"请输入规则描述"}/>
-                            </Form.Item>
-                        </Col>
-                    </Row>
-                    <Row justify={"space-between"}>
-                        <Col span={8} offset={1}>
-                            <Form.Item label={"创建方式"} name={"create_type"} initialValue={createType}>
-                                <Radio.Group buttonStyle="solid" style={{width: "200px"}} onChange={e => {
-                                    setCreateType(e.target.value)
-                                }}>
-                                    <Radio.Button value={0}>自定义创建</Radio.Button>
-                                    <Radio.Button value={1}>模板导入</Radio.Button>
-                                </Radio.Group>
-                            </Form.Item>
-                        </Col>
-                    </Row>
-                    <Row justify={"space-between"}>
-                        <Col span={16}>
-                            <Form.Item label={"设备类型"} name={"device_type"} labelCol={{span: 4}}
-                                       rules={[{required: true, message: "请先选择设备类型"}]}>
-                                <DeviceTypeSelect sensor={true} placeholder={"请选择设备类型"} style={{width: "200px"}}
-                                                  onChange={onDeviceTypeChanged}/>
-                            </Form.Item>
-                        </Col>
-                    </Row>
-                    <Row justify={"space-between"}>
-                        <Col span={7} offset={1}>
-                            <Card type={"inner"} size={"small"} title={"选择设备"}
-                                  style={{height: "256px", backgroundColor: "#f4f5f6"}}>
-                                <Tree
-                                    selectable={false}
-                                    checkable
-                                    showIcon
-                                    selectedKeys={selectedDevices}
-                                    style={{height: "100%", backgroundColor: "#f4f5f6"}}
-                                    treeData={convertTreeData()}
-                                    onCheck={onDevicesSelected}
-                                />
-                            </Card>
-                        </Col>
-                        <Col span={15}>
-                            {
-                                renderFormItem()
-                            }
-                        </Col>
-                    </Row>
-                </Form>
-            </Card>
-        </Content>
+    return <Content>
+        <MyBreadcrumb items={["报警管理", "报警规则", "添加规则"]}/>
+        <Card>
+            <Form form={form} labelAlign={"right"} validateMessages={defaultValidateMessages}>
+                <Row justify={"space-between"}>
+                    <Col span={16}>
+                        <Form.Item label={"规则名称"} labelCol={{span: 4}} name={"name"} required
+                                   rules={[{validator: onNameValidator}]}>
+                            <Input placeholder={"请输入规则名称"} style={{width: "200px"}}/>
+                        </Form.Item>
+                    </Col>
+                </Row>
+                <Row justify={"space-between"}>
+                    <Col span={16}>
+                        <Form.Item label={"规则描述"} labelCol={{span: 4}} initialValue={""} name={"description"}>
+                            <Input.TextArea placeholder={"请输入规则描述"}/>
+                        </Form.Item>
+                    </Col>
+                </Row>
+                <Row justify={"space-between"}>
+                    <Col span={8} offset={1}>
+                        <Form.Item label={"创建方式"} name={"create_type"} initialValue={createType}>
+                            <Radio.Group buttonStyle="solid" style={{width: "200px"}} onChange={e => {
+                                setCreateType(e.target.value)
+                            }}>
+                                <Radio.Button value={0}>自定义创建</Radio.Button>
+                                <Radio.Button value={1}>模板导入</Radio.Button>
+                            </Radio.Group>
+                        </Form.Item>
+                    </Col>
+                </Row>
+                <Row justify={"space-between"}>
+                    <Col span={16}>
+                        <Form.Item label={"设备类型"} name={"device_type"} labelCol={{span: 4}}
+                                   rules={[{required: true, message: "请先选择设备类型"}]}>
+                            <DeviceTypeSelect sensor={true} placeholder={"请选择设备类型"} style={{width: "200px"}}
+                                              onChange={onDeviceTypeChanged}/>
+                        </Form.Item>
+                    </Col>
+                </Row>
+                <Row justify={"space-between"}>
+                    <Col span={7} offset={1}>
+                        <Card type={"inner"} size={"small"} title={"选择设备"}
+                              style={{height: "256px", backgroundColor: "#f4f5f6"}}>
+                            <Tree
+                                selectable={false}
+                                checkable
+                                showIcon
+                                selectedKeys={selectedDevices}
+                                style={{height: "100%", backgroundColor: "#f4f5f6"}}
+                                treeData={convertTreeData()}
+                                onCheck={onDevicesSelected}
+                            />
+                        </Card>
+                    </Col>
+                    <Col span={15}>
+                        {
+                            renderFormItem()
+                        }
+                    </Col>
+                </Row>
+            </Form>
+        </Card>
         <Footer style={{position: "fixed", bottom: 0, right: 0, background: "transparent"}}>
             <Space>
                 <Button onClick={() => {
@@ -334,7 +334,8 @@ const AddRulePage = () => {
                 <Button type={"primary"} onClick={onSave}>创建</Button>
             </Space>
         </Footer>
-    </div>
+    </Content>
+
 }
 
 export default AddRulePage

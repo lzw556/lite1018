@@ -47,7 +47,11 @@ func (s Asset) UpdateAsset(assetID uint, req request.Asset) (*vo.Asset, error) {
 }
 
 func (s Asset) RemoveAsset(assetID uint) error {
-	return s.repository.Delete(context.TODO(), assetID)
+	cmd, err := s.factory.NewAssetRemoveCmd(assetID)
+	if err != nil {
+		return err
+	}
+	return cmd.Run()
 }
 
 func (s Asset) FindAssetsByPaginate(page, size int) ([]vo.Asset, int64, error) {

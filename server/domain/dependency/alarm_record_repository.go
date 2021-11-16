@@ -9,6 +9,8 @@ import (
 type AlarmRecordRepository interface {
 	Create(ctx context.Context, e *po.AlarmRecord) error
 	Get(ctx context.Context, id uint) (po.AlarmRecord, error)
+	Delete(ctx context.Context, id uint) error
+
 	PagingBySpecs(ctx context.Context, page, size int, specs ...spec.Specification) ([]po.AlarmRecord, int64, error)
 	FindBySpecs(ctx context.Context, specs ...spec.Specification) ([]po.AlarmRecord, error)
 }

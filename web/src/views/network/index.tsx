@@ -28,6 +28,7 @@ import {DeviceCommand} from "../../types/device_command";
 import {EmptyLayout} from "../layout";
 import useSocket from "../../socket";
 import _ from "lodash";
+import MyBreadcrumb from "../../components/myBreadcrumb";
 
 export interface DevicePopover {
     device: Device
@@ -304,14 +305,10 @@ const NetworkPage = () => {
         return <EmptyLayout description={"暂无网络"}/>
     }
 
-    return <>
-        <Row justify="center">
-            <Col span={24} style={{textAlign: "right"}}>
-            </Col>
-        </Row>
+    return <Content>
+        <MyBreadcrumb items={["网络管理", "网络列表"]}/>
         <Row justify="center">
             <Col span={24}>
-                <Content style={{paddingTop: "35px"}}>
                     <ShadowCard>
                         <Row justify="center">
                             <Col span={24}>
@@ -356,7 +353,6 @@ const NetworkPage = () => {
                             </Col>
                         </Row>
                     </ShadowCard>
-                </Content>
             </Col>
         </Row>
         <AccessDeviceModal parent={device}
@@ -366,7 +362,7 @@ const NetworkPage = () => {
                            onCancel={() => {
                                setAccessVisible(false)
                            }} onSuccess={onAccessDeviceSuccess}/>
-    </>
+    </Content>
 }
 
 export default NetworkPage

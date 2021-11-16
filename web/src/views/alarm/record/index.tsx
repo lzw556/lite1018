@@ -1,17 +1,18 @@
-import {Button, Card, Col, DatePicker, Popconfirm, Row, Select, Space, Tag} from "antd";
+import {Button, Card, Col, DatePicker, message, Popconfirm, Row, Select, Space, Tag} from "antd";
 import {Content} from "antd/lib/layout/layout";
 import Label from "../../../components/label";
 import {DeleteOutlined} from "@ant-design/icons";
 import {useCallback, useState} from "react";
 import moment from "moment";
 import TableLayout, {TableProps} from "../../layout/TableLayout";
-import {PagingAlarmRecordsRequest} from "../../../apis/alarm";
+import {PagingAlarmRecordsRequest, RemoveAlarmRecordRequest} from "../../../apis/alarm";
 import SensorSelect from "../../../components/sensorSelect";
 import {ColorDanger, ColorInfo, ColorWarn} from "../../../constants/color";
 import {DeviceTypeString} from "../../../types/device_type";
 import {OperationTranslate} from "../../../constants/rule";
 import AssetSelect from "../../../components/assetSelect";
 import {GetFieldName} from "../../../constants/field";
+import MyBreadcrumb from "../../../components/myBreadcrumb";
 
 const {Option} = Select
 const {RangePicker} = DatePicker
@@ -23,6 +24,7 @@ const AlarmRecordPage = () => {
     const [startDate, setStartDate] = useState<moment.Moment>(moment().startOf("day").subtract(1, "day"))
     const [endDate, setEndDate] = useState<moment.Moment>(moment().endOf("day"))
     const [alarmLevels, setAlarmLevels] = useState<number[]>([1, 2, 3])
+    const [selectedRowKeys, setSelectedRowKeys] = useState<number[]>([])
 
     const onAssetChanged = (value: any) => {
         setAssetId(value)
@@ -48,7 +50,18 @@ const AlarmRecordPage = () => {
     }, [assetId, deviceId, startDate, endDate, alarmLevels])
 
     const onDelete = (id: number) => {
+        RemoveAlarmRecordRequest(id).then(res => {
+            if (res.code === 200) {
+                message.success("删除成功").then()
+                onRefresh()
+            } else {
+                message.error("删除失败").then()
+            }
+        })
+    }
 
+    const onRefresh = () => {
+        setTable(Object.assign({}, table, {refreshKey: table.refreshKey + 1}))
     }
 
     const columns = [
@@ -104,7 +117,7 @@ const AlarmRecordPage = () => {
             dataIndex: 'timestamp',
             key: 'timestamp',
             render: (timestamp: number) => {
-                return moment(timestamp*1000).format("YYYY-MM-DD HH:mm:ss")
+                return moment(timestamp * 1000).format("YYYY-MM-DD HH:mm:ss")
             }
         },
         {
@@ -122,9 +135,9 @@ const AlarmRecordPage = () => {
         }
     ]
 
-    return <div>
-        <Row justify="center">
-            <Col span={24} style={{textAlign: "right"}}>
+    return <Content>
+        <MyBreadcrumb items={["报警管理", "报警列表"]}>
+            <Space>
                 <RangePicker
                     value={[startDate, endDate]}
                     allowClear={false}
@@ -134,57 +147,55 @@ const AlarmRecordPage = () => {
                             setEndDate(moment(dateString[1]).endOf('day'))
                         }
                     }}/>
-            </Col>
-        </Row>
+            </Space>
+        </MyBreadcrumb>
         <Row justify="center">
             <Col span={24}>
-                <Content style={{paddingTop: "15px"}}>
-                    <Card>
-                        <Row justify={"start"}>
-                            <Col span={24}>
-                                <Space>
-                                    <Label name={"资产"}>
-                                        <AssetSelect bordered={false} style={{width: "128px"}} defaultValue={assetId}
-                                                     defaultActiveFirstOption={true}
-                                                     placeholder={"请选择资产"}
-                                                     onChange={onAssetChanged}>
-                                            <Option key={0} value={0}>所有资产</Option>
-                                        </AssetSelect>
-                                    </Label>
-                                    <Label name={"设备"}>
-                                        <SensorSelect bordered={false} style={{width: "128px"}} value={deviceId}
-                                                      assetId={assetId} placeholder={"请选择设备"}
-                                                      onChange={onDeviceChanged}/>
-                                    </Label>
-                                    <Label name={"报警级别"}>
-                                        <Select bordered={false} mode={"multiple"} value={alarmLevels}
-                                                style={{width: "200px"}} onChange={value => {
-                                            if (value.length) {
-                                                setAlarmLevels(value)
-                                            } else {
-                                                setAlarmLevels([1, 2, 3])
-                                            }
-                                        }}>
-                                            <Option key={1} value={1}>提示</Option>
-                                            <Option key={2} value={2}>重要</Option>
-                                            <Option key={3} value={3}>紧急</Option>
-                                        </Select>
-                                    </Label>
-                                </Space>
-                            </Col>
-                        </Row>
-                        <br/>
-                        <Row justify={"start"}>
-                            <Col span={24}>
-                                <TableLayout columns={columns} isLoading={table.isLoading} pagination={table.pagination}
-                                             refreshKey={table.refreshKey} data={table.data} onChange={onChange}/>
-                            </Col>
-                        </Row>
-                    </Card>
-                </Content>
+                <Card>
+                    <Row justify={"start"}>
+                        <Col span={24}>
+                            <Space>
+                                <Label name={"资产"}>
+                                    <AssetSelect bordered={false} style={{width: "128px"}} defaultValue={assetId}
+                                                 defaultActiveFirstOption={true}
+                                                 placeholder={"请选择资产"}
+                                                 onChange={onAssetChanged}>
+                                        <Option key={0} value={0}>所有资产</Option>
+                                    </AssetSelect>
+                                </Label>
+                                <Label name={"设备"}>
+                                    <SensorSelect bordered={false} style={{width: "128px"}} value={deviceId}
+                                                  assetId={assetId} placeholder={"请选择设备"}
+                                                  onChange={onDeviceChanged}/>
+                                </Label>
+                                <Label name={"报警级别"}>
+                                    <Select bordered={false} mode={"multiple"} value={alarmLevels}
+                                            style={{width: "200px"}} onChange={value => {
+                                        if (value.length) {
+                                            setAlarmLevels(value)
+                                        } else {
+                                            setAlarmLevels([1, 2, 3])
+                                        }
+                                    }}>
+                                        <Option key={1} value={1}>提示</Option>
+                                        <Option key={2} value={2}>重要</Option>
+                                        <Option key={3} value={3}>紧急</Option>
+                                    </Select>
+                                </Label>
+                            </Space>
+                        </Col>
+                    </Row>
+                    <br/>
+                    <Row justify={"start"}>
+                        <Col span={24}>
+                            <TableLayout columns={columns} isLoading={table.isLoading} pagination={table.pagination}
+                                         refreshKey={table.refreshKey} data={table.data} onChange={onChange}/>
+                        </Col>
+                    </Row>
+                </Card>
             </Col>
         </Row>
-    </div>
+    </Content>
 }
 
 export default AlarmRecordPage

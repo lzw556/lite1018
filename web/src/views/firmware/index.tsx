@@ -6,6 +6,7 @@ import TableLayout, {DEFAULT_TABLE_PROPS, TableProps} from "../layout/TableLayou
 import {PagingFirmwaresRequest, RemoveFirmwareRequest, UploadFirmwareRequest} from "../../apis/firmware";
 import moment from "moment";
 import ShadowCard from "../../components/shadowCard";
+import MyBreadcrumb from "../../components/myBreadcrumb";
 
 
 const FirmwarePage = () => {
@@ -101,29 +102,26 @@ const FirmwarePage = () => {
         }
     ]
 
-    return <div>
-        <Row justify="center">
-            <Col span={24} style={{textAlign: "right"}}>
-                <Upload
-                    accept={".bin"}
-                    name="file"
-                    customRequest={onUpload}
-                    showUploadList={false}
-                    onChange={onFileChange}>
-                    <Button type="primary" loading={isUploading}>
-                        {
-                            isUploading ? "固件上传中" : "上传固件"
-                        }
-                        {
-                            isUploading ? null : <UploadOutlined />
-                        }
-                    </Button>
-                </Upload>
-            </Col>
-        </Row>
+    return <Content>
+        <MyBreadcrumb items={["设备管理", "固件列表"]}>
+            <Upload
+                accept={".bin"}
+                name="file"
+                customRequest={onUpload}
+                showUploadList={false}
+                onChange={onFileChange}>
+                <Button type="primary" loading={isUploading}>
+                    {
+                        isUploading ? "固件上传中" : "上传固件"
+                    }
+                    {
+                        isUploading ? null : <UploadOutlined />
+                    }
+                </Button>
+            </Upload>
+        </MyBreadcrumb>
         <Row justify="center">
             <Col span={24}>
-                <Content style={{paddingTop: "15px"}}>
                     <ShadowCard>
                         <TableLayout
                             emptyText={"固件列表为空"}
@@ -134,10 +132,9 @@ const FirmwarePage = () => {
                             pagination={true}
                             data={table.data}/>
                     </ShadowCard>
-                </Content>
             </Col>
         </Row>
-    </div>
+    </Content>
 }
 
 export default FirmwarePage

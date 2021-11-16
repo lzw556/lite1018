@@ -29,3 +29,11 @@ func (repo DeviceInformation) Get(id uint) (po.DeviceInformation, error) {
 	})
 	return e, err
 }
+
+func (repo DeviceInformation) Delete(id uint) error {
+	err := repo.BoltDB().Update(func(tx *bbolt.Tx) error {
+		bucket := tx.Bucket([]byte(po.DeviceInformation{}.BucketName()))
+		return bucket.Delete(itob(id))
+	})
+	return err
+}

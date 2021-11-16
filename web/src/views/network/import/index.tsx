@@ -1,4 +1,4 @@
-import {Button, Card, Col, Divider, Form, message, Result, Row, Select, Space, Upload} from "antd";
+import {Button, Card, Col, Divider, Form, message, Result, Row, Space, Upload} from "antd";
 import {Content} from "antd/lib/layout/layout";
 import {useEffect, useState} from "react";
 import {Canvas, Edge, Node, NodeProps, Remove} from "reaflow";
@@ -13,6 +13,7 @@ import CommunicationPeriodSelect from "../../../components/communicationPeriodSe
 import GroupSizeSelect from "../../../components/groupSizeSelect";
 import GroupIntervalSelect from "../../../components/groupIntervalSelect";
 import AssetSelect from "../../../components/assetSelect";
+import MyBreadcrumb from "../../../components/myBreadcrumb";
 
 const {Dragger} = Upload
 
@@ -74,29 +75,33 @@ const ImportNetworkPage = () => {
     }
 
     const onSave = () => {
-        form.validateFields().then(values => {
-            const req: NetworkRequestForm = {
-                asset_id: values.asset,
-                communication_period: values.communication_period,
-                communication_time_offset: values.communication_time_offset,
-                routing_tables: edges.map((e: any) => [e.to, e.from]),
-                devices: nodes.map((n: any) => {
-                    return {
-                        name: n.data.name,
-                        mac_address: n.data.address,
-                        type_id: n.data.type,
-                        ...JSON.parse(n.data.settings)
+        if (nodes && nodes.length) {
+            form.validateFields().then(values => {
+                const req: NetworkRequestForm = {
+                    asset_id: values.asset,
+                    communication_period: values.communication_period,
+                    communication_time_offset: values.communication_time_offset,
+                    routing_tables: edges.map((e: any) => [e.to, e.from]),
+                    devices: nodes.map((n: any) => {
+                        return {
+                            name: n.data.name,
+                            mac_address: n.data.address,
+                            type_id: n.data.type,
+                            ...JSON.parse(n.data.settings)
+                        }
+                    })
+                }
+                ImportNetworkRequest(req).then(res => {
+                    if (res.code === 200) {
+                        setSuccess(true)
+                    } else {
+                        message.error(`导入失败,${res.msg}`).then()
                     }
                 })
-            }
-            ImportNetworkRequest(req).then(res => {
-                if (res.code === 200) {
-                    setSuccess(true)
-                } else {
-                    message.error(`导入失败,${res.msg}`).then()
-                }
             })
-        })
+        } else {
+            message.error("不能导入空网络").then()
+        }
     }
 
     const onRemove = (node: any) => {
@@ -119,9 +124,11 @@ const ImportNetworkPage = () => {
     }
 
     const renderActionButton = () => {
-        return <Space>
-            <a onClick={() => setAddNodeVisible(true)}>添加设备</a>
-        </Space>
+        if (nodes && nodes.length) {
+            return <Space>
+                <a onClick={() => setAddNodeVisible(true)}>添加设备</a>
+            </Space>
+        }
     }
 
     useEffect(() => {
@@ -133,127 +140,123 @@ const ImportNetworkPage = () => {
         }
     }, [current])
 
-    return <div>
-        <Row justify="center">
-            <Col span={24} style={{textAlign: "right"}}>
-                <Space>
-                    {
-                        !success && (<Button type="primary" onClick={onSave}>保存网络<ImportOutlined/></Button>)
-                    }
-                </Space>
-            </Col>
-        </Row>
-        <Content style={{paddingTop: "15px"}}>
-            <ShadowCard>
-                <Form form={form} labelCol={{span: 8}}>
-                    {
-                        !success ?
-                            <Row justify="space-between">
-                                <Col span={16}>
-                                    <Card type="inner" size={"small"} title={"预览"} style={{height: `${height}px`}}
-                                          extra={renderActionButton()}>
-                                        <div className="graph" style={{height: `${height - 56}px`}}>
-                                            {
-                                                nodes.length ?
-                                                    <Canvas
-                                                        selections={nodes[current] ? [nodes[current].data.address] : []}
-                                                        nodes={nodes} edges={edges}
-                                                        direction="DOWN"
-                                                        onNodeLink={(event, from, to) => {
-                                                            setEdges([
-                                                                ...edges,
-                                                                {
-                                                                    id: to.id,
-                                                                    from: from.id,
-                                                                    to: to.id
-                                                                }
-                                                            ])
-                                                        }}
-                                                        node={(props: NodeProps) => (
-                                                            <Node
-                                                                onClick={(event, node) => {
-                                                                    const index = nodes.map((item: any) => item.id).indexOf(node.id)
-                                                                    setCurrent(index)
-                                                                }}
-                                                                remove={<Remove
-                                                                    hidden={props.properties.data.type === DeviceType.Gateway}/>}
-                                                                onRemove={(event, node) => {
-                                                                    onRemove(node)
-                                                                }}
-                                                            />
-                                                        )}
-                                                        edge={
-                                                            <Edge onRemove={(event, edge) => {
-                                                                const newEdges = edges.filter((item: any) => item.id !== edge.id)
-                                                                setEdges(newEdges)
-                                                                console.log(edge)
-                                                            }}/>
-                                                        }
-                                                    /> :
-                                                    <Dragger accept={".json"} beforeUpload={onBeforeUpload}
-                                                             showUploadList={false}>
-                                                        <p className="ant-upload-drag-icon">
-                                                            <InboxOutlined/>
-                                                        </p>
-                                                        <p className="ant-upload-text">点击或拖动网络模板文件到此区域</p>
-                                                        <p className="ant-upload-hint">
-                                                            请选择以.json结尾的文件,只支持单个网络模板文件的上传
-                                                        </p>
-                                                    </Dragger>
-                                            }
-                                        </div>
-                                    </Card>
-                                </Col>
-                                <Col span={8} style={{paddingLeft: "4px"}}>
-                                    <Card type="inner" size={"small"} title={"编辑"} style={{height: `${height}px`}}>
-                                        <Divider orientation={"left"} plain>基本信息</Divider>
-                                        <Form.Item label={"所属资产"} name="asset"
-                                                   rules={[{required: true, message: "请选择网络所属资产"}]}>
-                                            <AssetSelect defaultActiveFirstOption={false} placeholder={"请选择网络所属资产"}/>
-                                        </Form.Item>
-                                        <Divider orientation={"left"} plain>网络配置信息</Divider>
-                                        <Form.Item label="通讯周期" name="communication_period"
-                                                   rules={[{required: true, message: "请选择网络通讯周期"}]}>
-                                            <CommunicationPeriodSelect placeholder={"请选择网络通讯周期"}/>
-                                        </Form.Item>
-                                        <Form.Item label="通讯延时" name="communication_time_offset"
-                                                   rules={[{required: true}]}>
-                                            <CommunicationTimeOffsetSelect placeholder={"请选择网络通讯延时"}/>
-                                        </Form.Item>
-                                        <Form.Item label="每组设备数" name="group_size" initialValue={4}
-                                                   rules={[{required: true}]}>
-                                            <GroupSizeSelect placeholder={"请选择每组设备数"}/>
-                                        </Form.Item>
-                                        <Form.Item label="每组通信间隔" name="group_interval" rules={[{required: true}]}>
-                                            <GroupIntervalSelect placeholder={"请选择通信间隔"}/>
-                                        </Form.Item>
-                                        <br/>
-                                    </Card>
-                                </Col>
-                            </Row> :
-                            <Result
-                                status="success"
-                                title="网络导入成功"
-                                subTitle="您可以返回网络列表查看网络信息或者继续导入网络"
-                                extra={[
-                                    <Button type="primary" key="devices" onClick={() => {
-                                        window.location.hash = "network-management/networks"
-                                    }}>
-                                        返回网络列表
-                                    </Button>,
-                                    <Button key="add" onClick={() => {
-                                        form.resetFields()
-                                        setNodes([])
-                                        setEdges([])
-                                        setCurrent(0)
-                                        setSuccess(false)
-                                    }}>继续导入网络</Button>,
-                                ]}
-                            />
-                    }
-                </Form>
-            </ShadowCard>
-        </Content>
+    return <Content>
+        <MyBreadcrumb items={["网络管理", "导入网络"]}>
+            <Space>
+                {
+                    !success && (<Button type="primary" onClick={onSave}>保存网络<ImportOutlined/></Button>)
+                }
+            </Space>
+        </MyBreadcrumb>
+        <ShadowCard>
+            <Form form={form} labelCol={{span: 8}}>
+                {
+                    !success ?
+                        <Row justify="space-between">
+                            <Col span={16}>
+                                <Card type="inner" size={"small"} title={"预览"} style={{height: `${height}px`}}
+                                      extra={renderActionButton()}>
+                                    <div className="graph" style={{height: `${height - 56}px`}}>
+                                        {
+                                            nodes.length ?
+                                                <Canvas
+                                                    selections={nodes[current] ? [nodes[current].data.address] : []}
+                                                    nodes={nodes} edges={edges}
+                                                    direction="DOWN"
+                                                    onNodeLink={(event, from, to) => {
+                                                        setEdges([
+                                                            ...edges,
+                                                            {
+                                                                id: to.id,
+                                                                from: from.id,
+                                                                to: to.id
+                                                            }
+                                                        ])
+                                                    }}
+                                                    node={(props: NodeProps) => (
+                                                        <Node
+                                                            onClick={(event, node) => {
+                                                                const index = nodes.map((item: any) => item.id).indexOf(node.id)
+                                                                setCurrent(index)
+                                                            }}
+                                                            remove={<Remove
+                                                                hidden={props.properties.data.type === DeviceType.Gateway}/>}
+                                                            onRemove={(event, node) => {
+                                                                onRemove(node)
+                                                            }}
+                                                        />
+                                                    )}
+                                                    edge={
+                                                        <Edge onRemove={(event, edge) => {
+                                                            const newEdges = edges.filter((item: any) => item.id !== edge.id)
+                                                            setEdges(newEdges)
+                                                            console.log(edge)
+                                                        }}/>
+                                                    }
+                                                /> :
+                                                <Dragger accept={".json"} beforeUpload={onBeforeUpload}
+                                                         showUploadList={false}>
+                                                    <p className="ant-upload-drag-icon">
+                                                        <InboxOutlined/>
+                                                    </p>
+                                                    <p className="ant-upload-text">点击或拖动网络模板文件到此区域</p>
+                                                    <p className="ant-upload-hint">
+                                                        请选择以.json结尾的文件,只支持单个网络模板文件的上传
+                                                    </p>
+                                                </Dragger>
+                                        }
+                                    </div>
+                                </Card>
+                            </Col>
+                            <Col span={8} style={{paddingLeft: "4px"}}>
+                                <Card type="inner" size={"small"} title={"编辑"} style={{height: `${height}px`}}>
+                                    <Divider orientation={"left"} plain>基本信息</Divider>
+                                    <Form.Item label={"所属资产"} name="asset"
+                                               rules={[{required: true, message: "请选择网络所属资产"}]}>
+                                        <AssetSelect defaultActiveFirstOption={false} placeholder={"请选择网络所属资产"}/>
+                                    </Form.Item>
+                                    <Divider orientation={"left"} plain>网络配置信息</Divider>
+                                    <Form.Item label="通讯周期" name="communication_period"
+                                               rules={[{required: true, message: "请选择网络通讯周期"}]}>
+                                        <CommunicationPeriodSelect placeholder={"请选择网络通讯周期"}/>
+                                    </Form.Item>
+                                    <Form.Item label="通讯延时" name="communication_time_offset"
+                                               rules={[{required: true}]}>
+                                        <CommunicationTimeOffsetSelect placeholder={"请选择网络通讯延时"}/>
+                                    </Form.Item>
+                                    <Form.Item label="每组设备数" name="group_size" initialValue={4}
+                                               rules={[{required: true}]}>
+                                        <GroupSizeSelect placeholder={"请选择每组设备数"}/>
+                                    </Form.Item>
+                                    <Form.Item label="每组通信间隔" name="group_interval" rules={[{required: true}]}>
+                                        <GroupIntervalSelect placeholder={"请选择通信间隔"}/>
+                                    </Form.Item>
+                                    <br/>
+                                </Card>
+                            </Col>
+                        </Row> :
+                        <Result
+                            status="success"
+                            title="网络导入成功"
+                            subTitle="您可以返回网络列表查看网络信息或者继续导入网络"
+                            extra={[
+                                <Button type="primary" key="devices" onClick={() => {
+                                    window.location.hash = "network-management/networks"
+                                }}>
+                                    返回网络列表
+                                </Button>,
+                                <Button key="add" onClick={() => {
+                                    form.resetFields()
+                                    setNodes([])
+                                    setEdges([])
+                                    setCurrent(0)
+                                    setSuccess(false)
+                                }}>继续导入网络</Button>,
+                            ]}
+                        />
+                }
+            </Form>
+        </ShadowCard>
         <AddNodeModal visible={addNodeVisible} onCancel={() => setAddNodeVisible(false)} onSuccess={node => {
             setNodes([
                 ...nodes,
@@ -261,7 +264,7 @@ const ImportNetworkPage = () => {
             ])
             setAddNodeVisible(false)
         }}/>
-    </div>
+    </Content>
 }
 
 export default ImportNetworkPage

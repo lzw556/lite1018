@@ -8,6 +8,7 @@ import {InitializeAssetState} from "../../types/asset";
 import EditModal from "./editModal";
 import {DeleteOutlined, EditOutlined, FolderAddOutlined} from "@ant-design/icons";
 import ShadowCard from "../../components/shadowCard";
+import MyBreadcrumb from "../../components/myBreadcrumb";
 
 
 const AssetPage: FC = () => {
@@ -80,48 +81,44 @@ const AssetPage: FC = () => {
             key: 'action',
             render: (text: any, record: any) => (
                 <Space>
-                    <Button type="text" size="small" icon={<EditOutlined />}
+                    <Button type="text" size="small" icon={<EditOutlined/>}
                             onClick={() => onEdit(record.id)}/>
                     <Popconfirm placement="left" title="确认要删除该用户吗?" onConfirm={() => onDelete(record.id)}
                                 okText="删除" cancelText="取消">
-                        <Button type="text" size="small" icon={<DeleteOutlined />} danger/>
+                        <Button type="text" size="small" icon={<DeleteOutlined/>} danger/>
                     </Popconfirm>
                 </Space>
             ),
         }
     ]
 
-    return <div>
-        <Row justify="center">
-            <Col span={24} style={{textAlign: "right"}}>
-                <Button type="primary" onClick={() => {
-                    setAddAssetVisible(true)
-                }}>
-                    添加资产 <FolderAddOutlined />
-                </Button>
-            </Col>
-        </Row>
+    return <Content>
+        <MyBreadcrumb items={["资产管理", "资产列表"]}>
+            <Button type="primary" onClick={() => {
+                setAddAssetVisible(true)
+            }}>
+                添加资产 <FolderAddOutlined/>
+            </Button>
+        </MyBreadcrumb>
         <Row justify="center">
             <Col span={24}>
-                <Content style={{paddingTop: "15px"}}>
-                    <ShadowCard>
-                        <TableLayout
-                            emptyText={"资产列表为空"}
-                            columns={columns}
-                            isLoading={table.isLoading}
-                            refreshKey={table.refreshKey}
-                            onChange={onChange}
-                            pagination={true}
-                            data={table.data}/>
-                    </ShadowCard>
-                </Content>
+                <ShadowCard>
+                    <TableLayout
+                        emptyText={"资产列表为空"}
+                        columns={columns}
+                        isLoading={table.isLoading}
+                        refreshKey={table.refreshKey}
+                        onChange={onChange}
+                        pagination={true}
+                        data={table.data}/>
+                </ShadowCard>
             </Col>
         </Row>
         <AddModal visible={addAssetVisible} onCancel={() => setAddAssetVisible(false)}
                   onSuccess={onAddAssetSuccess}/>
         <EditModal visible={editAssetVisible} asset={asset} onCancel={() => setEditAssetVisible(false)}
                    onSuccess={onEditAssetSuccess}/>
-    </div>
+    </Content>
 }
 
 export default AssetPage

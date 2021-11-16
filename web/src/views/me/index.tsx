@@ -1,4 +1,4 @@
-import {Card, Col, Form, Input, message, Row} from "antd";
+import {Col, Form, Input, message, Row} from "antd";
 import {Content} from "antd/lib/layout/layout";
 import {useEffect, useState} from "react";
 import EditPassModal from "./edit/editPassModal";
@@ -6,6 +6,7 @@ import "./index.css";
 import {GetMyProfile, UpdateMyProfile} from "../../apis/profile";
 import {User} from "../../types/user";
 import ShadowCard from "../../components/shadowCard";
+import MyBreadcrumb from "../../components/myBreadcrumb";
 
 const MePage = () => {
     const [isPhoneEdit, setIsPhoneEdit] = useState<boolean>(false)
@@ -70,14 +71,10 @@ const MePage = () => {
         })
     }
 
-    return <div>
-        <Row justify="center">
-            <Col span={24} style={{textAlign: "right"}}>
-            </Col>
-        </Row>
+    return <Content>
+        <MyBreadcrumb items={["个人中心"]}/>
         <Row justify="center">
             <Col span={24}>
-                <Content style={{paddingTop: "35px"}}>
                     <ShadowCard title="基本信息" bordered={false}>
                         <Form form={form}>
                             <p>
@@ -147,7 +144,6 @@ const MePage = () => {
                             </Col>
                         </Row>
                     </ShadowCard>
-                </Content>
             </Col>
         </Row>
         <EditPassModal visible={isPassEdit} onSuccess={() => {
@@ -155,7 +151,7 @@ const MePage = () => {
         }} onCancel={() => {
             setIsPassEdit(false)
         }}/>
-    </div>
+    </Content>
 }
 
 export default MePage

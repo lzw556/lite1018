@@ -1,23 +1,25 @@
-import { useEffect, useState } from "react";
-import { GetPropertyDataRequest, PagingDevicesRequest } from "../../../apis/device";
+import {useEffect, useState} from "react";
+import {GetPropertyDataRequest, PagingDevicesRequest} from "../../../apis/device";
 import {Button, Card, Col, DatePicker, Row, Select, Space} from "antd";
-import { CaretDownOutlined, DownloadOutlined } from "@ant-design/icons";
-import { Content } from "antd/lib/layout/layout";
-import { Device } from "../../../types/device";
+import {CaretDownOutlined, DeleteOutlined, DownloadOutlined} from "@ant-design/icons";
+import {Content} from "antd/lib/layout/layout";
+import {Device} from "../../../types/device";
 import ReactECharts from "echarts-for-react";
 import moment from "moment";
 import LabelSelect from "../../../components/labelSelect";
 import Label from "../../../components/label";
-import DownloadDataModal from "../download";
 import ShadowCard from "../../../components/shadowCard";
-import { DefaultHistoryDataOption } from "../../../constants/chart";
+import {DefaultHistoryDataOption, LineChartStyles} from "../../../constants/chart";
 import AssetSelect from "../../../components/assetSelect";
-import { GetFieldName } from "../../../constants/field";
-import { GetSensors } from "../../../types/device_type";
+import {GetFieldName} from "../../../constants/field";
+import {GetSensors} from "../../../types/device_type";
 import {EmptyLayout} from "../../layout";
+import DownloadModal from "./modal/downloadModal";
+import RemoveModal from "./modal/removeModal";
+import MyBreadcrumb from "../../../components/myBreadcrumb";
 
-const { Option } = Select
-const { RangePicker } = DatePicker
+const {Option} = Select
+const {RangePicker} = DatePicker
 
 const HistoryDataPage = () => {
     const [devices, setDevices] = useState<Device[]>([])
@@ -28,7 +30,9 @@ const HistoryDataPage = () => {
     const [endDate, setEndDate] = useState<moment.Moment>(moment().endOf('day'))
     const [option, setOption] = useState<any>()
     const [downloadVisible, setDownloadVisible] = useState<boolean>(false)
+    const [removeVisible, setRemoveVisible] = useState<boolean>(false)
     const [height] = useState<number>(window.innerHeight - 230)
+    const [refreshKey, setRefreshKey] = useState<number>(0)
 
     const onAssetChange = (value: number) => {
         setAssetId(value)
@@ -79,8 +83,13 @@ const HistoryDataPage = () => {
                 if (res.code === 200) {
                     const keys = Object.keys(res.data.fields)
                     const legend = keys.map(key => GetFieldName(key))
-                    const series = keys.map(key => {
-                        return { name: GetFieldName(key), type: 'line', areaStyle: { normal: {} }, data: res.data.fields[key] }
+                    const series = keys.map((key, index) => {
+                        return {
+                            ...LineChartStyles[index],
+                            name: GetFieldName(key),
+                            type: 'line',
+                            data: res.data.fields[key]
+                        }
                     })
                     const xAxis = [{
                         type: 'category',
@@ -91,7 +100,7 @@ const HistoryDataPage = () => {
                         ...DefaultHistoryDataOption,
                         tooltip: {
                             trigger: 'axis',
-                            formatter: function(params:any) {
+                            formatter: function (params: any) {
                                 let relVal = params[0].name;
                                 for (let i = 0; i < params.length; i++) {
                                     let value = Number(params[i].value).toFixed(3)
@@ -100,93 +109,97 @@ const HistoryDataPage = () => {
                                 return relVal;
                             }
                         },
-                        title: { text: res.data.name },
-                        legend: { data: legend },
+                        title: {text: res.data.name},
+                        legend: {data: legend},
                         series,
                         xAxis
                     })
                 }
             })
         }
-    }, [property, startDate, endDate])
+    }, [property, startDate, endDate, refreshKey])
 
-    return <div>
-        <Row justify="center">
-            <Col span={24} style={{ textAlign: "right" }}>
-                <Space>
-                    <Button type="primary" onClick={() => {
-                        setDownloadVisible(true)
-                    }}>下载数据<DownloadOutlined /></Button>
-                </Space>
-            </Col>
-        </Row>
+    return <Content>
+        <MyBreadcrumb items={["数据管理", "历史数据"]}>
+            <Space>
+                <Button type="primary" onClick={() => {
+                    setDownloadVisible(true)
+                }}>下载数据<DownloadOutlined/></Button>
+                <Button type="default" danger onClick={_ => setRemoveVisible(true)}>清空数据<DeleteOutlined/></Button>
+            </Space>
+        </MyBreadcrumb>
         <Row justify="center">
             <Col span={24}>
-                <Content style={{ paddingTop: "15px" }}>
-                    <ShadowCard>
-                        <Row justify="center">
-                            <Col span={24}>
-                                <Space>
-                                    <Label name={"资产"}>
-                                        <AssetSelect style={{ width: "120px" }}
-                                            bordered={false}
-                                            defaultValue={assetId}
-                                            defaultActiveFirstOption={true}
-                                            placeholder={"请选择资产"}
-                                            onChange={onAssetChange}>
-                                            <Option key={0} value={0}>所有资产</Option>
-                                        </AssetSelect>
-                                    </Label>
-                                    <LabelSelect label={"设备"} placeholder={"请选择设备"} style={{ width: "120px" }}
-                                        onDropdownVisibleChange={onLoadDevices}
-                                        onChange={onDeviceChange} suffixIcon={<CaretDownOutlined />}>
-                                        {
-                                            devices.filter(item => GetSensors().includes(item.typeId)).map(item =>
-                                                <Option key={item.id} value={item.id}>{item.name}</Option>
-                                            )
-                                        }
-                                    </LabelSelect>
-                                    <LabelSelect label={"属性"} value={property?.id} placeholder={"请选择属性"} style={{ width: "120px" }}
-                                        onChange={onPropertyChange} suffixIcon={<CaretDownOutlined />}>
-                                        {
-                                            device ? device.properties.map(item =>
-                                                <Option key={item.id} value={item.id}>{item.name}</Option>
-                                            ) : null
-                                        }
-                                    </LabelSelect>
-                                    <RangePicker
-                                        allowClear={false}
-                                        value={[startDate, endDate]}
-                                        renderExtraFooter={renderExtraFooter}
-                                        onChange={(date, dateString) => {
-                                            if (dateString) {
-                                                setStartDate(moment(dateString[0]).startOf('day'))
-                                                setEndDate(moment(dateString[1]).endOf('day'))
-                                            }
-                                        }} />
-                                </Space>
-                            </Col>
-                        </Row>
-                        <br />
-                        <Row justify="center">
-                            <Col span={24}>
-                                <Card bordered={false} style={{ height: `${height}px` }}>
+                <ShadowCard>
+                    <Row justify="center">
+                        <Col span={24}>
+                            <Space>
+                                <Label name={"资产"}>
+                                    <AssetSelect style={{width: "120px"}}
+                                                 bordered={false}
+                                                 defaultValue={assetId}
+                                                 defaultActiveFirstOption={true}
+                                                 placeholder={"请选择资产"}
+                                                 onChange={onAssetChange}>
+                                        <Option key={0} value={0}>所有资产</Option>
+                                    </AssetSelect>
+                                </Label>
+                                <LabelSelect label={"设备"} placeholder={"请选择设备"} style={{width: "120px"}}
+                                             onDropdownVisibleChange={onLoadDevices}
+                                             onChange={onDeviceChange} suffixIcon={<CaretDownOutlined/>}>
                                     {
-                                        option? <ReactECharts option={option} style={{ height: `${height - 20}px`, border: "none"}} /> : <EmptyLayout description={"暂无数据"}/>
+                                        devices.filter(item => GetSensors().includes(item.typeId)).map(item =>
+                                            <Option key={item.id} value={item.id}>{item.name}</Option>
+                                        )
                                     }
-                                </Card>
-                            </Col>
-                        </Row>
-                    </ShadowCard>
-                </Content>
+                                </LabelSelect>
+                                <LabelSelect label={"属性"} value={property?.id} placeholder={"请选择属性"}
+                                             style={{width: "120px"}}
+                                             onChange={onPropertyChange} suffixIcon={<CaretDownOutlined/>}>
+                                    {
+                                        device ? device.properties.map(item =>
+                                            <Option key={item.id} value={item.id}>{item.name}</Option>
+                                        ) : null
+                                    }
+                                </LabelSelect>
+                                <RangePicker
+                                    allowClear={false}
+                                    value={[startDate, endDate]}
+                                    renderExtraFooter={renderExtraFooter}
+                                    onChange={(date, dateString) => {
+                                        if (dateString) {
+                                            setStartDate(moment(dateString[0]).startOf('day'))
+                                            setEndDate(moment(dateString[1]).endOf('day'))
+                                        }
+                                    }}/>
+                            </Space>
+                        </Col>
+                    </Row>
+                    <br/>
+                    <Row justify="center">
+                        <Col span={24}>
+                            <Card bordered={false} style={{height: `${height}px`}}>
+                                {
+                                    option ? <ReactECharts option={option}
+                                                           style={{height: `${height - 20}px`, border: "none"}}/> :
+                                        <EmptyLayout description={"暂无数据"}/>
+                                }
+                            </Card>
+                        </Col>
+                    </Row>
+                </ShadowCard>
             </Col>
         </Row>
-        <DownloadDataModal visible={downloadVisible} onCancel={() => {
+        <DownloadModal visible={downloadVisible} device={device} property={property} onCancel={() => {
             setDownloadVisible(false)
         }} onSuccess={() => {
             setDownloadVisible(false)
-        }} />
-    </div>
+        }}/>
+        <RemoveModal visible={removeVisible} device={device} onCancel={() => setRemoveVisible(false)} onSuccess={() => {
+            setRemoveVisible(false)
+            setRefreshKey(refreshKey + 1)
+        }}/>
+    </Content>
 }
 
 export default HistoryDataPage

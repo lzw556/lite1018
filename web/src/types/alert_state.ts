@@ -7,6 +7,7 @@ export type AlertState = {
     }
     level: number
     content: string
+    timestamp: number
 }
 
 export function GetAlertColor(state: AlertState | undefined) {

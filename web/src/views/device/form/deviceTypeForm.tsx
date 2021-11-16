@@ -1,13 +1,11 @@
 import {DeviceType} from "../../../types/device_type";
-import {Divider, Form, Select} from "antd";
+import {Divider, Form} from "antd";
 import SensorFormItem from "./item/sensorFormItem";
 import {DEFAULT_DEVICE_SETTING_IPN, DEFAULT_WSN_SETTING} from "../../../types/device_setting";
 import IpnFormItem from "./item/ipnFormItem";
 import WsnFormItem from "./item/wsnFormItem";
 import {useEffect} from "react";
 import DeviceTypeSelect from "../../../components/deviceTypeSelect";
-
-const {Option, OptGroup} = Select
 
 const DeviceTypeForm = (props: any) => {
     const {form, type, onChange} = props

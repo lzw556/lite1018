@@ -183,6 +183,10 @@ func (s Alarm) GetAlarmRecord(recordID uint) (*vo.AlarmRecord, error) {
 	return query.Detail()
 }
 
+func (s Alarm) RemoveAlarmRecord(recordID uint) error {
+	return s.record.Delete(context.TODO(), recordID)
+}
+
 func (s Alarm) GetAlarmStatistics(from, to int64, req request.AlarmFilter) (vo.AlarmStatistics, error) {
 	query, err := s.factory.NewAlarmStatisticsQuery(from, to, req)
 	if err != nil {
