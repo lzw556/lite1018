@@ -94,9 +94,10 @@ const AlarmRecordPage = () => {
                             </Space>
                         </Col>
                     </Row>
+                    <br/>
                     <Row justify={"start"}>
                         <Col span={24}>
-                            <Card bordered={false} tabList={tabList} activeTabKey={currentKey} size={"small"} onTabChange={key => {
+                            <Card tabList={tabList} activeTabKey={currentKey} size={"small"} onTabChange={key => {
                                 setCurrentKey(key)
                             }}>
                                 {contents.get(currentKey)}

@@ -2,11 +2,11 @@ import { Device } from "../../../../types/device";
 import { FC, useCallback, useEffect, useState } from "react";
 import { DeviceType, GetSensors } from "../../../../types/device_type";
 import Label from "../../../../components/label";
-import { Button, Col, DatePicker, Empty, Popconfirm, Row, Select, Space, Tag } from "antd";
+import {Button, Col, DatePicker, Empty, message, Popconfirm, Row, Select, Space, Tag} from "antd";
 import { GetChildrenRequest } from "../../../../apis/device";
 import moment from "moment";
 import { BarChartOutlined, DeleteOutlined } from "@ant-design/icons";
-import { GetAlarmStatisticsRequest, PagingAlarmRecordsRequest } from "../../../../apis/alarm";
+import {GetAlarmStatisticsRequest, PagingAlarmRecordsRequest, RemoveAlarmRecordRequest} from "../../../../apis/alarm";
 import TableLayout, { TableProps } from "../../../layout/TableLayout";
 import { ColorDanger, ColorInfo, ColorWarn } from "../../../../constants/color";
 import {
@@ -57,7 +57,8 @@ const AlertPage: FC<AlertPageProps> = ({ device }) => {
         if (selectedDevice) {
             const filter = {
                 device_id: selectedDevice,
-                levels: alarmLevels
+                levels: alarmLevels,
+                type: "active"
             }
             PagingAlarmRecordsRequest(current, size, dateRange[0].utc().unix(), dateRange[1].utc().unix(), filter).then(res => {
                 if (res.code === 200) {
@@ -110,6 +111,17 @@ const AlertPage: FC<AlertPageProps> = ({ device }) => {
         }
     }
 
+    const onDelete = (id: number) => {
+        RemoveAlarmRecordRequest(id).then(res => {
+            if (res.code === 200) {
+                message.success("删除成功").then()
+                setTable(Object.assign({}, table, {refreshKey: table.refreshKey + 1}))
+            } else {
+                message.error("删除失败").then()
+            }
+        })
+    }
+
     const columns = [
         {
             title: '名称',
@@ -156,7 +168,7 @@ const AlertPage: FC<AlertPageProps> = ({ device }) => {
             render: (_: any, record: any) => {
                 return <div>
                     <Popconfirm placement="left" title="确认要删除该规则吗?"
-                        okText="删除" cancelText="取消">
+                        okText="删除" cancelText="取消" onConfirm={() => onDelete(record.id)}>
                         <Button type="text" size="small" icon={<DeleteOutlined />} danger />
                     </Popconfirm>
                 </div>
