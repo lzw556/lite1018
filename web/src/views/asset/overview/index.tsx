@@ -44,7 +44,7 @@ const AssetOverview = () => {
         <MyBreadcrumb items={["资产管理", "概览"]}>
             <Space style={{backgroundColor: "white"}}>
                 <Label name={"资产"}>
-                    <Select style={{width: "150px"}}  bordered={false} value={asset?.id} onChange={(value: number) => {
+                    <Select style={{width: "150px", textAlign: "center"}}  bordered={false} value={asset?.id} onChange={(value: number) => {
                         setAsset(assets?.find(asset => asset.id === value))
                     }}>
                         {

@@ -61,8 +61,10 @@ func (repo DeviceData) Last(deviceID uint) (po.DeviceData, error) {
 			if dataBucket := bucket.Bucket(itob(deviceID)); dataBucket != nil {
 				c := dataBucket.Cursor()
 				_, v := c.Last()
-				if err := json.Unmarshal(v, &e); err != nil {
-					return err
+				if len(v) > 0 {
+					if err := json.Unmarshal(v, &e); err != nil {
+						return err
+					}
 				}
 			}
 		}

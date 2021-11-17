@@ -74,6 +74,5 @@ func (query AssetStatisticQuery) setLastPropertiesData(device *vo.Device) {
 			}
 		}
 	}
-
 	return
 }

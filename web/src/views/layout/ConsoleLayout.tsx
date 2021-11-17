@@ -1,10 +1,9 @@
-import {Breadcrumb, Layout, Menu} from "antd";
+import {Layout, Menu} from "antd";
 import "../../App.css";
 import "./layout.css"
 import {NavLink} from "react-router-dom";
 import RouterGuard from "../../routers/routerGuard";
 import {HeaderLayout} from "./index";
-import {GetParamValue} from "../../utils/path";
 import AlertNotification from "../../components/alertNotification";
 
 const {SubMenu} = Menu
@@ -29,34 +28,13 @@ const ConsoleLayout = (props: any) => {
         })
     }
 
-    const travel = (routes: [], callback: any) => {
-        routes.forEach((item: any) => {
-            callback(item)
-            if (item.children && item.children.length) {
-                travel(item.children, callback)
-            }
-        })
+    const flattenRoutes: any = (routes:any[]) => {
+        return routes.reduce((acc: any, curr: any) => {
+            acc.push(curr)
+            return acc.concat(curr.children ? flattenRoutes(curr.children) : [])
+        }, [])
     }
-
-    const routes: any[] = []
-    const breadcrumbItem: any = {}
-    travel(menus, (item: any) => {
-        routes.push(item)
-        breadcrumbItem[item.name] = item
-    })
-
-    const renderBreadcrumbItems = () => {
-        const items = pathname.split("/").map((path: string) => {
-            return breadcrumbItem[path]
-        })
-        const locale = GetParamValue(location.search, "locale")
-        if (locale) {
-            items.push(breadcrumbItem[locale])
-        }
-        return items.filter((item: any) => !!item).map((item: any) => {
-            return <Breadcrumb.Item key={item.name}>{item.title}</Breadcrumb.Item>
-        })
-    }
+    const routes = flattenRoutes(menus)
 
     const renderDefaultOpenKeys = () => {
         const keys = pathname.split('/')
@@ -90,14 +68,7 @@ const ConsoleLayout = (props: any) => {
                 </Menu>
             </Sider>
             <Layout style={{padding: "15px", background: "#eef0f5", overflowY: "scroll"}}>
-                {/*<Breadcrumb className="ts-breadcrumb">*/}
-                {/*    {*/}
-                {/*        renderBreadcrumbItems()*/}
-                {/*    }*/}
-                {/*</Breadcrumb>*/}
-                {/*<div style={{marginTop: "-30px"}}>*/}
-                    <RouterGuard {...props} routes={routes}/>
-                {/*</div>*/}
+                <RouterGuard {...props} routes={routes}/>
             </Layout>
         </Layout>
         <AlertNotification />

@@ -303,7 +303,7 @@ const AddRulePage = () => {
                 <Row justify={"space-between"}>
                     <Col span={7} offset={1}>
                         <Card type={"inner"} size={"small"} title={"选择设备"}
-                              style={{height: "256px", backgroundColor: "#f4f5f6"}}>
+                              style={{height: "512px", backgroundColor: "#f4f5f6"}}>
                             <Tree
                                 selectable={false}
                                 checkable

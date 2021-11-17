@@ -45,7 +45,7 @@ const AssetStatistic: FC<AssetStatisticProps> = ({value}) => {
         if (device.typeId !== DeviceType.Gateway && device.typeId !== DeviceType.Router) {
             const property = GetPrimaryProperty(device.properties, device.typeId)
             if (property) {
-                if (property.data && Object.keys(property.data.fields).length) {
+                if (property.data && property.data.fields && Object.keys(property.data.fields).length) {
                     const field = Object.keys(property.data.fields)[0]
                     const timestamp = property.data.time[0]
                     return <>
@@ -100,7 +100,6 @@ const AssetStatistic: FC<AssetStatisticProps> = ({value}) => {
             if (deviceStatus === 3) {
                 filters = filters.filter((device: Device) => device.accessState === 0)
             }
-            console.log(filters)
             filters = filters.filter((device: Device) => device.alertState ? alertLevels.includes(device.alertState.level) : true)
             return filters
         }

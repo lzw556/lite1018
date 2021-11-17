@@ -1,5 +1,5 @@
 import {FC, useCallback, useState} from "react";
-import {Button, Col, message, Popconfirm, Row, Space} from "antd";
+import {Button, message, Popconfirm, Space} from "antd";
 import {Content} from "antd/lib/layout/layout";
 import TableLayout, {TableProps} from "../layout/TableLayout";
 import {GetAssetRequest, PagingAssetsRequest, RemoveAssetRequest} from "../../apis/asset";
@@ -100,20 +100,16 @@ const AssetPage: FC = () => {
                 添加资产 <FolderAddOutlined/>
             </Button>
         </MyBreadcrumb>
-        <Row justify="center">
-            <Col span={24}>
-                <ShadowCard>
-                    <TableLayout
-                        emptyText={"资产列表为空"}
-                        columns={columns}
-                        isLoading={table.isLoading}
-                        refreshKey={table.refreshKey}
-                        onChange={onChange}
-                        pagination={true}
-                        data={table.data}/>
-                </ShadowCard>
-            </Col>
-        </Row>
+        <ShadowCard>
+            <TableLayout
+                emptyText={"资产列表为空"}
+                columns={columns}
+                isLoading={table.isLoading}
+                refreshKey={table.refreshKey}
+                onChange={onChange}
+                pagination={true}
+                data={table.data}/>
+        </ShadowCard>
         <AddModal visible={addAssetVisible} onCancel={() => setAddAssetVisible(false)}
                   onSuccess={onAddAssetSuccess}/>
         <EditModal visible={editAssetVisible} asset={asset} onCancel={() => setEditAssetVisible(false)}

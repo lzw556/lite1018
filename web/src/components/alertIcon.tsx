@@ -16,6 +16,7 @@ const {Text} = Typography
 const AlertIcon: FC<AlertIconProps> = ({state, popoverPlacement}) => {
 
     const renderContent = (level:string, state:any, color:any) => {
+        console.log(state.alarm.field)
         return <Space>
             <Tag color={color}>{level}</Tag>
             <Text>{moment.unix(state.timestamp).local().format("YYYY-MM-DD HH:mm:ss")}</Text>

@@ -3,6 +3,7 @@ import {Col, Form, Input, message, Modal, Row, Select} from "antd";
 import {FC, useState} from "react";
 import {defaultValidateMessages} from "../../../../constants/validateMessage";
 import {UpdateAlarmRuleRequest} from "../../../../apis/alarm";
+import {GetFieldName} from "../../../../constants/field";
 
 export interface EditProps {
     rule?: AlarmRule
@@ -36,7 +37,7 @@ const EditModal: FC<EditProps> = ({visible, rule, onCancel, onSuccess}) => {
                         message.error("阈值修改失败").then()
                     }
                 })
-            }).catch(e =>
+            }).catch(_ =>
                 setIsLoading(false)
             )
         }
@@ -48,7 +49,7 @@ const EditModal: FC<EditProps> = ({visible, rule, onCancel, onSuccess}) => {
             <Row justify={"start"}>
                 <Col span={24}>
                     <Form.Item label={"属性名称"} name="property"
-                               initialValue={rule ? `${rule.property.name}/${rule.rule.field}` : null}>
+                               initialValue={rule ? `${rule.property.name}/${GetFieldName(rule.rule.field)}` : null}>
                         <Input disabled/>
                     </Form.Item>
                 </Col>
