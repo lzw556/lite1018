@@ -159,7 +159,10 @@ func (s Alarm) RemoveAlarmRule(id uint) error {
 		return response.BusinessErr(errcode.AlarmRuleNotFoundError, "")
 	}
 	return transaction.Execute(context.TODO(), func(txCtx context.Context) error {
-		if err := s.repository.Delete(context.TODO(), e.ID); err != nil {
+		if err := s.repository.Delete(txCtx, e.ID); err != nil {
+			return err
+		}
+		if err := s.record.UpdateBySpecs(txCtx, map[string]interface{}{"status": 0}, spec.AlarmRule(e.ID)); err != nil {
 			return err
 		}
 		return adapter.RuleEngine.RemoveRules(e.Name)

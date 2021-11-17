@@ -189,6 +189,12 @@ func (factory Alarm) buildFilterSpecs(filter request.AlarmFilter) ([]spec.Specif
 			specs = append(specs, spec.DevicesSpec(deviceIDs))
 		}
 	}
+	switch filter.Type {
+	case "active":
+		specs = append(specs, spec.Status(1))
+	case "history":
+		specs = append(specs, spec.Status(0))
+	}
 	return specs, nil
 }
 

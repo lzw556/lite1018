@@ -13,4 +13,5 @@ type AlarmRecordRepository interface {
 
 	PagingBySpecs(ctx context.Context, page, size int, specs ...spec.Specification) ([]po.AlarmRecord, int64, error)
 	FindBySpecs(ctx context.Context, specs ...spec.Specification) ([]po.AlarmRecord, error)
+	UpdateBySpecs(ctx context.Context, updates map[string]interface{}, specs ...spec.Specification) error
 }

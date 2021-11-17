@@ -10,6 +10,7 @@ type AlarmRecord struct {
 	Rule       AlarmRuleContent `gorm:"type:json"`
 	Value      float32
 	Level      uint
+	Status     uint `gorm:"default:1;not null;"`
 }
 
 func (AlarmRecord) TableName() string {
