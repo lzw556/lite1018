@@ -1,7 +1,7 @@
 import {AlarmRule} from "../../../../types/alarm_rule";
 import {Col, Form, Input, message, Modal, Row, Select} from "antd";
 import {FC, useState} from "react";
-import {defaultValidateMessages} from "../../../../constants/validateMessage";
+import {defaultValidateMessages} from "../../../../constants/validator";
 import {UpdateAlarmRuleRequest} from "../../../../apis/alarm";
 import {GetFieldName} from "../../../../constants/field";
 

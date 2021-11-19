@@ -89,7 +89,17 @@ const MonitorPage: FC<MonitorPageProps> = ({device}) => {
                     }]
                     return Object.assign({}, DefaultMonitorDataOption, {
                         title: {text: item.name, textStyle: {fontSize: 14}},
-                        tooltip: {formatter: `{b}<br/>{a}: {c}${item.unit}`},
+                        tooltip: {
+                            trigger: 'axis',
+                            formatter: function (params: any) {
+                                let relVal = params[0].name;
+                                for (let i = 0; i < params.length; i++) {
+                                    let value = Number(params[i].value).toFixed(3)
+                                    relVal += `<br/> ${params[i].marker} ${params[i].seriesName}: ${value}${item.unit}`
+                                }
+                                return relVal;
+                            }
+                        },
                         xAxis: xAxis,
                         series: series
                     })

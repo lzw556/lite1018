@@ -6,9 +6,9 @@ export const defaultValidateMessages = {
     enum: "'${name}' must be one of [${enum}]",
     whitespace: "输入不能为空",
     date: {
-        format: "'${name}' is invalid for format date",
-        parse: "'${name}' could not be parsed as date",
-        invalid: "'${name}' is invalid date",
+        format: "日期格式错误",
+        parse: "日期格式错误",
+        invalid: "无效的日期",
     },
     types: {
         string: typeTemplate,
@@ -18,8 +18,8 @@ export const defaultValidateMessages = {
         number: "输入值不是有效数值",
         date: typeTemplate,
         boolean: typeTemplate,
-        integer: typeTemplate,
-        float: typeTemplate,
+        integer: "输入值不是有效数值",
+        float: "输入值不是有效数值",
         regexp: typeTemplate,
         email: typeTemplate,
         url: typeTemplate,
@@ -48,8 +48,41 @@ export const defaultValidateMessages = {
     },
 };
 
-export const numberRule: any = {
-    required: true, type: "number", transform(value: any) {
+
+export const Rules = {
+    required: () => {
+        return {required: true}
+    },
+    number: (): any => {
+        return {
+            required: true, type: "number", transform(value: number) {
+                if (value) {
+                    return Number(value)
+                }
+                return value
+            }
+        }
+    },
+    float: (): any => {
+        return {
+            required: true, type: "float", transform(value: any) {
+                if (value) {
+                    return parseFloat(value)
+                }
+                return value
+            }
+        }
+    }
+}
+
+export const Normalizes = {
+    float: (value: any) => {
+        if (value) {
+            return parseFloat(value)
+        }
+        return value
+    },
+    number: (value:any) => {
         if (value) {
             return Number(value)
         }

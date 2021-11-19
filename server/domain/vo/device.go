@@ -22,7 +22,7 @@ type Device struct {
 	State        DeviceState                `json:"state"`
 	AccessState  uint                       `json:"accessState"`
 	UpgradeState *entity.DeviceUpgradeState `json:"upgradeState,omitempty"`
-	AlertState   entity.DeviceAlertState    `json:"alertState,omitempty"`
+	AlertState   DeviceAlertState           `json:"alertState,omitempty"`
 }
 
 func NewDevice(e entity.Device) Device {

@@ -15,6 +15,7 @@ var SensorSettingKeys = map[uint][]string{
 	devicetype.BoltElongationType: {
 		"schedule0_sample_period",
 		"speed_object",
+		"pretightening_is_enabled",
 		"initial_pretightening_force",
 		"initial_pretightening_length",
 		"pretightening_k",

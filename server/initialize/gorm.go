@@ -19,6 +19,7 @@ func InitTables(db *gorm.DB) error {
 		&po.AlarmRule{},
 		&po.AlarmRuleTemplate{},
 		&po.AlarmRecord{},
+		&po.AlarmRecordAcknowledge{},
 	}
 	for _, table := range tables {
 		if !db.Migrator().HasTable(table) {

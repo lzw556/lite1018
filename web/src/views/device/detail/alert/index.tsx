@@ -2,11 +2,16 @@ import { Device } from "../../../../types/device";
 import { FC, useCallback, useEffect, useState } from "react";
 import { DeviceType, GetSensors } from "../../../../types/device_type";
 import Label from "../../../../components/label";
-import {Button, Col, DatePicker, Empty, message, Popconfirm, Row, Select, Space, Tag} from "antd";
+import {Button, Col, DatePicker, Dropdown, Empty, Menu, message, Popconfirm, Row, Select, Space, Tag} from "antd";
 import { GetChildrenRequest } from "../../../../apis/device";
 import moment from "moment";
-import { BarChartOutlined, DeleteOutlined } from "@ant-design/icons";
-import {GetAlarmStatisticsRequest, PagingAlarmRecordsRequest, RemoveAlarmRecordRequest} from "../../../../apis/alarm";
+import {BarChartOutlined, DeleteOutlined, EditOutlined} from "@ant-design/icons";
+import {
+    AcknowledgeAlarmRecordRequest,
+    GetAlarmStatisticsRequest,
+    PagingAlarmRecordsRequest,
+    RemoveAlarmRecordRequest
+} from "../../../../apis/alarm";
 import TableLayout, { TableProps } from "../../../layout/TableLayout";
 import { ColorDanger, ColorInfo, ColorWarn } from "../../../../constants/color";
 import {
@@ -122,6 +127,23 @@ const AlertPage: FC<AlertPageProps> = ({ device }) => {
         })
     }
 
+    const onAcknowledge = (id: number) => {
+        AcknowledgeAlarmRecordRequest(id).then(res => {
+            if (res.code === 200) {
+                message.success("处理成功").then()
+                setTable(Object.assign({}, table, {refreshKey: table.refreshKey + 1}))
+            }else {
+                message.error(res.msg).then()
+            }
+        })
+    }
+
+    const renderEditMenu = (record: any) => {
+        return <Menu onClick={() => onAcknowledge(record.id)}>
+            <Menu.Item disabled={record.acknowledged}>标记为已处理</Menu.Item>
+        </Menu>
+    }
+
     const columns = [
         {
             title: '名称',
@@ -162,16 +184,36 @@ const AlertPage: FC<AlertPageProps> = ({ device }) => {
             }
         },
         {
+            title: '状态',
+            dataIndex: 'status',
+            key: 'status',
+            render: (status: number) => {
+                switch (status) {
+                    case 1:
+                        return <Tag color="blue">已处理</Tag>
+                    case 2:
+                        return <Tag color="green">已恢复</Tag>
+                    default:
+                        return <Tag>未处理</Tag>
+                }
+            }
+        },
+        {
             title: '操作',
             key: 'action',
             width: 64,
             render: (_: any, record: any) => {
-                return <div>
+                return <Space>
+                    {
+                        <Dropdown overlay={renderEditMenu(record)}>
+                            <Button type={"text"} size={"small"} icon={<EditOutlined />}/>
+                        </Dropdown>
+                    }
                     <Popconfirm placement="left" title="确认要删除该规则吗?"
                         okText="删除" cancelText="取消" onConfirm={() => onDelete(record.id)}>
                         <Button type="text" size="small" icon={<DeleteOutlined />} danger />
                     </Popconfirm>
-                </div>
+                </Space>
             }
         }
     ]

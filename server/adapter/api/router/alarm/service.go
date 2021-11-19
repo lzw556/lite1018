@@ -20,6 +20,7 @@ type Service interface {
 	RemoveAlarmRule(id uint) error
 
 	GetAlarmRecord(recordID uint) (*vo.AlarmRecord, error)
+	AcknowledgeAlarmRecord(recordID, userID uint) error
 	FindAlarmRecordsByPaginate(from, to int64, page, size int, req request.AlarmFilter) ([]vo.AlarmRecord, int64, error)
 	RemoveAlarmRecord(recordID uint) error
 

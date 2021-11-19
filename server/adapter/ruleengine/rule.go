@@ -17,7 +17,7 @@ value = property.Value(data)
 if value %s %f {
 property.Alert(alarm, value, %d)
 }else {
-property.Recovery(alarm)
+property.Recovery(alarm, value)
 }
 }
 END`

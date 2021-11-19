@@ -117,7 +117,7 @@ const DashboardPage = () => {
                     name: '设备状态',
                     data: [
                         {
-                            value:  total - info - warn - critical,
+                            value: total - info - warn - critical,
                             name: '正常',
                             itemStyle: {
                                 color: ColorHealth
@@ -131,14 +131,14 @@ const DashboardPage = () => {
                             },
                         },
                         {
-                            value:  warn,
+                            value: warn,
                             name: '重要',
                             itemStyle: {
                                 color: ColorWarn
                             }
                         },
                         {
-                            value:  critical,
+                            value: critical,
                             name: '紧急',
                             itemStyle: {
                                 color: ColorDanger
@@ -163,24 +163,27 @@ const DashboardPage = () => {
     }
 
     const renderAlarmStatistics = () => {
-        const info = alarmStatistics ? alarmStatistics.info.reduce((acc: number, cur: number) => acc + cur, 0) : 0
-        const warning = alarmStatistics ? alarmStatistics.warn.reduce((acc: number, cur: number) => acc + cur, 0) : 0
-        const critical = alarmStatistics ? alarmStatistics.critical.reduce((acc: number, cur: number) => acc + cur, 0) : 0
+        const untreated = alarmStatistics ? alarmStatistics.untreated.reduce((acc: number, cur: number) => acc + cur, 0) : 0
+        const resolved = alarmStatistics ? alarmStatistics.resolved.reduce((acc: number, cur: number) => acc + cur, 0) : 0
+        const recovered = alarmStatistics ? alarmStatistics.recovered.reduce((acc: number, cur: number) => acc + cur, 0) : 0
+        const total = untreated + resolved + recovered
         return <>
             <Row justify={"center"} style={{textAlign: "center", height: "64px"}}>
                 <Col span={12}>
-                    <Statistic title={"总数"} value={info + warning + critical}/>
+                    <Statistic title={"总数"} value={total}/>
                 </Col>
                 <Col span={12}>
-                    <Statistic title={"紧急"} valueStyle={{color: ColorDanger, fontWeight: "bold"}} value={critical}/>
+                    {/*<a href={`#/alarm-management/alarmRecords?status=0`}>*/}
+                    <Statistic title={"未处理"} value={untreated}/>
+                    {/*</a>*/}
                 </Col>
             </Row>
             <Row justify={"start"} style={{textAlign: "center", height: "64px"}}>
                 <Col span={12}>
-                    <Statistic title={"重要"} valueStyle={{color: ColorWarn, fontWeight: "bold"}} value={warning}/>
+                    <Statistic title={"已恢复"} value={recovered}/>
                 </Col>
                 <Col span={12}>
-                    <Statistic title={"提示"} valueStyle={{color: ColorInfo, fontWeight: "bold"}} value={info}/>
+                    <Statistic title={"已处理"} value={resolved}/>
                 </Col>
             </Row>
         </>
@@ -197,7 +200,7 @@ const DashboardPage = () => {
             <Col span={18}>
                 <Row justify={"space-between"}>
                     <Col span={8}>
-                        <ShadowCard hoverable={true} style={{margin: 4}}>
+                        <ShadowCard style={{margin: 4}}>
                             <Title level={4}>资产统计</Title>
                             {
                                 renderAssetStatistics()
@@ -205,7 +208,7 @@ const DashboardPage = () => {
                         </ShadowCard>
                     </Col>
                     <Col span={8}>
-                        <ShadowCard hoverable={true} style={{margin: 4}}>
+                        <ShadowCard style={{margin: 4}}>
                             <Title level={4}>设备统计</Title>
                             {
                                 renderDeviceStatistics()
@@ -213,7 +216,7 @@ const DashboardPage = () => {
                         </ShadowCard>
                     </Col>
                     <Col span={8}>
-                        <ShadowCard hoverable={true} style={{margin: 4}}>
+                        <ShadowCard style={{margin: 4}}>
                             <Title level={4}>今日报警统计</Title>
                             {
                                 renderAlarmStatistics()
@@ -230,12 +233,12 @@ const DashboardPage = () => {
             <Col span={6}>
                 <Row justify={"start"}>
                     <Col span={24}>
-                        <AlertChartCard />
+                        <AlertChartCard/>
                     </Col>
                 </Row>
                 <Row justify={"start"}>
                     <Col span={24}>
-                        <AlarmRecordCard />
+                        <AlarmRecordCard/>
                     </Col>
                 </Row>
             </Col>

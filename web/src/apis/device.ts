@@ -73,7 +73,7 @@ export function GetChildrenRequest(id:number) {
 }
 
 export function GetDeviceSettingRequest(id:number) {
-    return request.get(`/devices/${id}/setting`).then(res => res.data)
+    return request.get<any>(`/devices/${id}/setting`).then(res => res.data)
 }
 
 export function GetDevicesStatisticsRequest() {

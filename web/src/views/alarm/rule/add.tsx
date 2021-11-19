@@ -23,7 +23,7 @@ import {GetPropertiesRequest} from "../../../apis/property";
 import {Footer} from "antd/es/layout/layout";
 import {useHistory} from "react-router-dom";
 import {AddAlarmRuleRequest, CheckRuleNameRequest, PagingRuleTemplateRequest} from "../../../apis/alarm";
-import {defaultValidateMessages, numberRule} from "../../../constants/validateMessage";
+import {defaultValidateMessages, Normalizes, Rules} from "../../../constants/validator";
 import {EmptyLayout} from "../../layout";
 import {GetFieldName} from "../../../constants/field";
 import MyBreadcrumb from "../../../components/myBreadcrumb";
@@ -239,7 +239,7 @@ const AddRulePage = () => {
                         </Form.Item>
                     </Col>
                     <Col span={5}>
-                        <Form.Item name={"threshold"} rules={[numberRule]}>
+                        <Form.Item name={"threshold"} normalize={Normalizes.float} rules={[Rules.number]}>
                             <Input placeholder={"报警阈值"} size={"middle"}
                                    suffix={property?.unit}/>
                         </Form.Item>

@@ -60,38 +60,4 @@ func (d Device) GetUpgradeState() DeviceUpgradeState {
 	return d.upgradeState
 }
 
-func (d Device) UpdateAlarmState(alarmID uint, level uint) {
-	key := fmt.Sprintf("device_alarm_state_%d", d.ID)
-	_ = cache.GetStruct(key, &d.alarmState)
-	if d.alarmState == nil {
-		d.alarmState = map[uint]uint{}
-	}
-	d.alarmState[alarmID] = level
-	_ = cache.SetStruct(key, d.alarmState)
-}
-
-func (d Device) GetAlarmState(alarmID uint) uint {
-	_ = cache.GetStruct(fmt.Sprintf("device_alarm_state_%d", d.ID), &d.alarmState)
-	return d.alarmState[alarmID]
-}
-
-func (d Device) GetAlarmStates() map[uint]uint {
-	_ = cache.GetStruct(fmt.Sprintf("device_alarm_state_%d", d.ID), &d.alarmState)
-	return d.alarmState
-}
-
-func (d Device) GetAlertLevel() uint {
-	_ = cache.GetStruct(fmt.Sprintf("device_alarm_state_%d", d.ID), &d.alarmState)
-	alertLevel := uint(0)
-	for _, v := range d.alarmState {
-		if alertLevel < v {
-			alertLevel = v
-		}
-		if alertLevel >= 3 {
-			break
-		}
-	}
-	return alertLevel
-}
-
 type Devices []Device

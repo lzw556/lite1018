@@ -73,7 +73,7 @@ func SyncNetworkLinkStatus(network entity.Network, devices []entity.Device, time
 	xlog.Infof("starting sync devices link status => [%s]", gateway.MacAddress)
 	if gateway.GetConnectionState().IsOnline {
 		cmd := newGetAllLinkStatusCmd()
-		payload, err := cmd.Execute(context.TODO(), gateway.MacAddress, gateway.MacAddress, 3*time.Second)
+		payload, err := cmd.Execute(context.TODO(), gateway.MacAddress, gateway.MacAddress, timeout)
 		if err != nil {
 			xlog.Errorf("sync devices link status failed:%v", err)
 			return

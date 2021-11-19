@@ -9,7 +9,6 @@ const socket = io.connect(":8291/", {
 
 const useSocket = () => {
     const [connectionState, setConnectionState] = useState<any>()
-    const [alertState, setAlertState] = useState<any>()
     const [upgradeState, setUpgradeState] = useState<any>()
 
     useEffect(() => {
@@ -34,22 +33,12 @@ const useSocket = () => {
                 })
             }
         })
-        socket.on("socket::alert", (res: ResponseResult<any>) => {
-            if (res.code === 200) {
-                setAlertState({
-                    title: res.data.title,
-                    content: res.data.content,
-                    field: res.data.field,
-                    level: res.data.level,
-                    data: res.data.data,
-                })
-            }
-        })
+
     }, [])
     return {
         connectionState,
         upgradeState,
-        alertState
+        socket
     }
 }
 

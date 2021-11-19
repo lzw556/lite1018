@@ -9,9 +9,8 @@ export interface SettingProps extends FormItemProps{
     device: Device
     name: string
     value?: any
-    editable: boolean
-    renderEdit: (value: any) => any
-    renderValue?: (value: any) => any
+    editable?: (value: any) => any
+    displayRender?: (value: any) => any
     onSuccess: (setting: any) => void
 }
 
@@ -20,15 +19,15 @@ const Setting: FC<SettingProps> = (props) => {
         device,
         name,
         value,
-        renderValue,
+        displayRender,
         editable,
-        renderEdit,
         onSuccess
     } = props
     const [editSetting, setEditSetting] = useState<boolean>(false)
     const [setting] = useState<any>({[name]: value})
 
     const onSave = (setting: any) => {
+        console.log(setting)
         UpdateDeviceSettingRequest(device.id, setting).then(res => {
             if (res.code === 200) {
                 message.success("保存成功").then()
@@ -45,7 +44,7 @@ const Setting: FC<SettingProps> = (props) => {
             if (editSetting) {
                 return <Space>
                     {
-                        renderEdit(setting)
+                        editable(setting)
                     }
                     <Button type={"text"} size={"small"} style={{color: ColorHealth}} onClick={() => {
                         onSave(setting)
@@ -57,7 +56,7 @@ const Setting: FC<SettingProps> = (props) => {
             } else {
                 return <Space>
                     {
-                        renderValue ? renderValue(setting[name]) : setting[name]
+                        displayRender ? displayRender(setting[name]) : setting[name]
                     }
                     <a onClick={() => setEditSetting(true)}><EditOutlined/></a>
                 </Space>

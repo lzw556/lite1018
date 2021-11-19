@@ -8,29 +8,29 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/po"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/vo"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/devicetype"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/xlog"
 	"strconv"
-	"time"
 )
 
 type Property struct {
 	po.Property
 	entity.Device
 
-	deviceAlertStatusRepo dependency.DeviceAlertStatusRepository
-	deviceDataRepo        dependency.DeviceDataRepository
-	alarmRuleRepo         dependency.AlarmRuleRepository
-	alarmRecordRepo       dependency.AlarmRecordRepository
+	deviceAlertStateRepo dependency.DeviceAlertStateRepository
+	deviceDataRepo       dependency.DeviceDataRepository
+	alarmRuleRepo        dependency.AlarmRuleRepository
+	alarmRecordRepo      dependency.AlarmRecordRepository
 }
 
 func NewProperty(p po.Property, d entity.Device) Property {
 	return Property{
-		Property:              p,
-		Device:                d,
-		deviceAlertStatusRepo: repository.DeviceAlertStatus{},
-		deviceDataRepo:        repository.DeviceData{},
-		alarmRuleRepo:         repository.AlarmRule{},
-		alarmRecordRepo:       repository.AlarmRecord{},
+		Property:             p,
+		Device:               d,
+		deviceAlertStateRepo: repository.DeviceAlertState{},
+		deviceDataRepo:       repository.DeviceData{},
+		alarmRuleRepo:        repository.AlarmRule{},
+		alarmRecordRepo:      repository.AlarmRecord{},
 	}
 }
 
@@ -51,76 +51,92 @@ func (s Property) CURRENT(deviceID uint, field string) *float32 {
 }
 
 func (s Property) Alert(alarmID uint, value float32, level uint) {
-	if s.Device.GetAlarmState(alarmID) != level {
-		ctx := context.TODO()
-		rule, err := s.alarmRuleRepo.Get(ctx, alarmID)
+	alertState, err := s.deviceAlertStateRepo.Get(s.Device.ID)
+	if err != nil {
+		return
+	}
+	if alertState.GetAlarmState(alarmID).Record.Level < level {
+		ctx := context.Background()
+		alarm, err := s.alarmRuleRepo.Get(ctx, alarmID)
 		if err != nil {
 			return
 		}
 		e := po.AlarmRecord{
 			AlarmID:    alarmID,
-			DeviceID:   rule.DeviceID,
+			DeviceID:   alarm.DeviceID,
 			PropertyID: s.Property.ID,
-			Rule:       rule.Rule,
+			Rule:       alarm.Rule,
 			Value:      value,
 			Level:      level,
+			Status:     po.AlarmRecordStatusUntreated,
 		}
 		if err := s.alarmRecordRepo.Create(ctx, &e); err != nil {
 			xlog.Error("create alarm record failed", err)
 			return
 		}
-		s.Device.UpdateAlarmState(alarmID, level)
-
-		alert := vo.NewAlert(rule.Rule.Field, level)
-		alert.Title = fmt.Sprintf("%s报警", rule.Name)
-		threshold := strconv.FormatFloat(float64(rule.Rule.Threshold), 'f', s.Property.Precision, 64)
-		alert.Content = fmt.Sprintf("设备【%s】的【%s】值%s设定阈值: %s%s", s.Device.Name, rule.Rule.Field, operation(rule.Rule.Operation), threshold, s.Property.Unit)
-		alert.SetDevice(s.Device)
-		s.updateDeviceAlertStatus(alarmID, rule.Rule.Field, fmt.Sprintf("属性【%s】值%s设定阈值: %s%s", rule.Rule.Field, operation(rule.Rule.Operation), threshold, s.Property.Unit))
-		alert.Notify()
-	}
-}
-
-func (s Property) updateDeviceAlertStatus(alarmID uint, field string, content string) {
-	status, err := s.deviceAlertStatusRepo.Get(s.Device.ID)
-	if err != nil {
-		status.Level = s.Device.GetAlertLevel()
-	} else {
-		if s.Device.GetAlertLevel() == 0 {
-			status.Level = 0
-		} else if status.Level < s.Device.GetAlertLevel() {
-			status.Level = s.GetAlertLevel()
+		alertState.UpdateAlarmState(alarmID, e)
+		if err := s.deviceAlertStateRepo.Save(s.Device.ID, &alertState); err != nil {
+			xlog.Error("update device alert state failed", err)
+			return
+		}
+		threshold := strconv.FormatFloat(float64(e.Rule.Threshold), 'f', s.Property.Precision, 64)
+		current := strconv.FormatFloat(float64(value), 'f', s.Property.Precision, 64)
+		message := vo.NewAlertMessage(
+			s.Device.Name,
+			devicetype.GetFieldName(e.Rule.Field),
+			fmt.Sprintf("%s%s", current, s.Property.Unit),
+			operation(e.Rule.Operation),
+			fmt.Sprintf("%s%s", threshold, s.Property.Unit),
+		)
+		notification := vo.NewAlertNotification(alarm.Name, vo.DefaultAlertNotificationTmpl)
+		if err := notification.Notify(message, e.Level, e.ID); err != nil {
+			return
 		}
 	}
-	status.Alarm.ID = alarmID
-	status.Alarm.Field = field
-	status.Content = content
-	status.Timestamp = time.Now().UTC().Unix()
-	if err := s.deviceAlertStatusRepo.Create(s.Device.ID, &status); err != nil {
-		xlog.Error("update device status failed", err)
-	}
 }
 
-func (s Property) Recovery(alarmID uint) {
-	status, err := s.deviceAlertStatusRepo.Get(s.Device.ID)
+func (s Property) Recovery(alarmID uint, value float32) {
+	alertState, err := s.deviceAlertStateRepo.Get(s.Device.ID)
 	if err != nil {
-		xlog.Error("get device alert status failed", err)
 		return
 	}
-	if status.Level != 0 {
+	if alertState.GetAlarmState(alarmID).Record.Level != 0 {
 		ctx := context.TODO()
-		rule, err := s.alarmRuleRepo.Get(ctx, alarmID)
+		alarm, err := s.alarmRuleRepo.Get(ctx, alarmID)
 		if err != nil {
 			return
 		}
-		s.Device.UpdateAlarmState(alarmID, 0)
-		s.updateDeviceAlertStatus(alarmID, "", "")
+		alarmState := alertState.GetAlarmState(alarm.ID)
+		if alarmState.Record.ID > 0 {
+			record, err := s.alarmRecordRepo.Get(ctx, alarmState.Record.ID)
+			if err != nil {
+				return
+			}
+			record.Status = po.AlarmRecordStatusRecovered
+			if err := s.alarmRecordRepo.Save(ctx, &record.AlarmRecord); err != nil {
+				xlog.Error("update alarm record status faield", err)
+				return
+			}
+		}
 
-		alert := vo.NewAlert(rule.Rule.Field, 0)
-		alert.Title = fmt.Sprintf("%s报警", rule.Name)
-		alert.Content = fmt.Sprintf("设备【%s】的【%s】值已恢复正常", s.Device.Name, rule.Rule.Field)
-		alert.SetDevice(s.Device)
-		alert.Notify()
+		alertState.RemoveAlarmState(alarm.ID)
+		if err := s.deviceAlertStateRepo.Save(s.Device.ID, &alertState); err != nil {
+			xlog.Error("update device alert state failed", err)
+			return
+		}
+
+		current := strconv.FormatFloat(float64(value), 'f', s.Property.Precision, 64)
+		message := vo.NewAlertMessage(
+			s.Device.Name,
+			devicetype.GetFieldName(alarm.Rule.Field),
+			fmt.Sprintf("%s%s", current, s.Property.Unit),
+			operation(alarm.Rule.Operation),
+			"",
+		)
+		notification := vo.NewAlertNotification(alarm.Name, vo.DefaultRecoveryNotificationTmpl)
+		if err := notification.Notify(message, 0, 0); err != nil {
+			return
+		}
 	}
 }
 

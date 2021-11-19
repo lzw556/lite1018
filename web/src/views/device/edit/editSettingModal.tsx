@@ -6,6 +6,7 @@ import {DEFAULT_DEVICE_SETTING_IPN} from "../../../types/device_setting";
 import SensorFormItem from "../form/item/sensorFormItem";
 import IpnFormItem from "../form/item/ipnFormItem";
 import {useState} from "react";
+import {defaultValidateMessages} from "../../../constants/validator";
 
 export interface EditSettingProps extends ModalProps{
     device?: Device
@@ -37,7 +38,11 @@ const EditSettingModal = (props:EditSettingProps) => {
 
     const onSave = () => {
         form.validateFields().then(values => {
-            console.log(values)
+            Object.keys(values).forEach(key => {
+                if (Number(values[key])) {
+                    values[key] = Number(values[key])
+                }
+            })
             if (device) {
                 setIsLoading(true)
                 UpdateDeviceSettingRequest(device.id, values).then(res => {
@@ -53,8 +58,8 @@ const EditSettingModal = (props:EditSettingProps) => {
         })
     }
 
-    return <Modal width={420} visible={visible} title={"设备配置"} okText={"更新"} onOk={onSave} cancelText={"取消"} onCancel={onCancel}  confirmLoading={isLoading}>
-        <Form form={form} labelCol={{span: 8}}>
+    return <Modal width={480} visible={visible} title={"设备配置"} okText={"更新"} onOk={onSave} cancelText={"取消"} onCancel={onCancel}  confirmLoading={isLoading}>
+        <Form form={form} labelCol={{span: 8}} validateMessages={defaultValidateMessages}>
             {
                 renderSettingFormItems()
             }

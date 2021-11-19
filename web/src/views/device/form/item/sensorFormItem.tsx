@@ -47,13 +47,7 @@ const SensorFormItem = (props: any) => {
             case DeviceType.BoltElongation:
                 return <div>
                     <SpeedObjectFormItem value={getDefaultSpeedObject()}/>
-                    <Divider orientation={"left"} plain><Button type="link" size="small" onClick={() => {
-                        setExpand(!expand)
-                    }
-                    }>{expand ? <UpOutlined/> : <DownOutlined/>} 高级配置</Button></Divider>
-                    {
-                        <PretighteningFormItem expand={expand}/>
-                    }
+                    <PretighteningFormItem enabled={!!device.sensors.pretightening_is_enabled}/>
                 </div>
         }
         return null
