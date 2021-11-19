@@ -1,12 +1,10 @@
 import {ColorDanger, ColorInfo, ColorWarn} from "../constants/color";
 
 export type AlertState = {
-    alarm: {
+    record: {
         id: number,
-        field: string
     }
     level: number
-    content: string
     timestamp: number
 }
 

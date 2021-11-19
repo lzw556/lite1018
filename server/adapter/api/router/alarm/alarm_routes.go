@@ -116,6 +116,12 @@ func (r alarmRouter) removeAlarmRecord(ctx *gin.Context) (interface{}, error) {
 	return nil, r.service.RemoveAlarmRecord(id)
 }
 
+func (r alarmRouter) acknowledgeAlarmRecord(ctx *gin.Context) (interface{}, error) {
+	id := cast.ToUint(ctx.Param("id"))
+	userID := ctx.GetUint("user_id")
+	return nil, r.service.AcknowledgeAlarmRecord(id, userID)
+}
+
 func (r alarmRouter) alarmStatistics(ctx *gin.Context) (interface{}, error) {
 	from := cast.ToInt64(ctx.Query("from"))
 	to := cast.ToInt64(ctx.Query("to"))

@@ -10,14 +10,14 @@ import (
 type DeviceStatisticQuery struct {
 	entity.Devices
 
-	deviceStatusRepo      dependency.DeviceStatusRepository
-	deviceAlertStatusRepo dependency.DeviceAlertStatusRepository
+	deviceStatusRepo     dependency.DeviceStatusRepository
+	deviceAlertStateRepo dependency.DeviceAlertStateRepository
 }
 
 func NewDeviceStatisticQuery() DeviceStatisticQuery {
 	return DeviceStatisticQuery{
-		deviceStatusRepo:      repository.DeviceStatus{},
-		deviceAlertStatusRepo: repository.DeviceAlertStatus{},
+		deviceStatusRepo:     repository.DeviceStatus{},
+		deviceAlertStateRepo: repository.DeviceAlertState{},
 	}
 }
 
@@ -25,7 +25,9 @@ func (query DeviceStatisticQuery) Statistic() ([]vo.DeviceStatistic, error) {
 	result := make([]vo.DeviceStatistic, len(query.Devices))
 	for i, device := range query.Devices {
 		result[i] = vo.NewDeviceStatistic(device)
-		result[i].Device.AlertState.DeviceAlertStatus, _ = query.deviceAlertStatusRepo.Get(device.ID)
+		if alert, err := query.deviceAlertStateRepo.Get(device.ID); err == nil {
+			result[i].Device.AlertState = vo.NewDeviceAlertState(alert)
+		}
 	}
 	return result, nil
 }

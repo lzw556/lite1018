@@ -4,12 +4,12 @@ import (
 	"context"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
-	"github.com/thetasensors/theta-cloud-lite/server/domain/po"
+	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/vo"
 )
 
 type AlarmRecordQuery struct {
-	po.AlarmRecord
+	entity.AlarmRecord
 
 	propertyRepo dependency.PropertyRepository
 }

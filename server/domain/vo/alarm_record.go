@@ -6,24 +6,28 @@ import (
 )
 
 type AlarmRecord struct {
-	ID        uint                   `json:"id"`
-	Name      string                 `json:"name"`
-	Device    map[string]interface{} `json:"device"`
-	Property  Property               `json:"property"`
-	Rule      AlarmRuleContent       `json:"rule"`
-	Level     uint                   `json:"level"`
-	Timestamp int64                  `json:"timestamp"`
-	Value     float32                `json:"value"`
-	Content   string                 `json:"content"`
+	ID           uint                   `json:"id"`
+	Name         string                 `json:"name"`
+	Device       map[string]interface{} `json:"device"`
+	Property     Property               `json:"property"`
+	Rule         AlarmRuleContent       `json:"rule"`
+	Level        uint                   `json:"level"`
+	Timestamp    int64                  `json:"timestamp"`
+	Value        float32                `json:"value"`
+	Content      string                 `json:"content"`
+	Status       uint                   `json:"status"`
+	Acknowledged bool                   `json:"acknowledged"`
 }
 
-func NewAlarmRecord(e po.AlarmRecord) AlarmRecord {
+func NewAlarmRecord(e entity.AlarmRecord) AlarmRecord {
 	return AlarmRecord{
-		ID:        e.ID,
-		Level:     e.Level,
-		Rule:      NewAlarmRuleContent(e.Rule),
-		Value:     e.Value,
-		Timestamp: e.CreatedAt.Unix(),
+		ID:           e.ID,
+		Level:        e.Level,
+		Rule:         NewAlarmRuleContent(e.Rule),
+		Value:        e.Value,
+		Timestamp:    e.CreatedAt.Unix(),
+		Status:       uint(e.Status),
+		Acknowledged: e.Acknowledged,
 	}
 }
 

@@ -118,7 +118,7 @@ const AssetStatistic: FC<AssetStatisticProps> = ({value}) => {
                 <ShadowCard hoverable={true}>
                     <Title level={4}>{assetStatistics?.asset.name}</Title>
                     {
-                        assetStatistics && assetStatistics.status === 3 ?
+                        assetStatistics && assetStatistics.status > 0 ?
                             <Statistic title={"状态"} value={"异常"}
                                        valueStyle={{color: ColorDanger, fontWeight: "bold"}}/> :
                             <Statistic title={"状态"} value={"正常"} valueStyle={{color: ColorHealth, fontWeight: "bold"}}/>
@@ -137,15 +137,19 @@ const AssetStatistic: FC<AssetStatisticProps> = ({value}) => {
                 <ShadowCard hoverable={true}>
                     <Title level={4}>今日报警统计</Title>
                     <Row justify={"start"}>
-                        <Col span={8}>
+                        <Col span={6}>
+                            <Statistic title={"未处理"}
+                                       value={alarmStatistics ? alarmStatistics.untreated.reduce((acc: number, cur: number) => acc + cur, 0) : 0}/>
+                        </Col>
+                        <Col span={6}>
                             <Statistic title={"提示"} valueStyle={{color: ColorInfo}}
                                        value={alarmStatistics ? alarmStatistics.info.reduce((acc: number, cur: number) => acc + cur, 0) : 0}/>
                         </Col>
-                        <Col span={8}>
+                        <Col span={6}>
                             <Statistic title={"重要"} valueStyle={{color: ColorWarn}}
                                        value={alarmStatistics ? alarmStatistics.warn.reduce((acc: number, cur: number) => acc + cur, 0) : 0}/>
                         </Col>
-                        <Col span={8}>
+                        <Col span={6}>
                             <Statistic title={"紧急"} valueStyle={{color: ColorDanger}}
                                        value={alarmStatistics ? alarmStatistics.critical.reduce((acc: number, cur: number) => acc + cur, 0) : 0}/>
                         </Col>
@@ -194,15 +198,17 @@ const AssetStatistic: FC<AssetStatisticProps> = ({value}) => {
                     <List size={"small"} dataSource={renderDatasource()}
                           grid={{column: 5}}
                           renderItem={(device: Device) => {
-                              return <List.Item key={device.id}>
-                                  <ShadowCard title={device.name} bordered={false} hoverable={true} size={"small"}
-                                              extra={device.alertState &&
-                                              <AlertIcon popoverPlacement={"top"} state={device.alertState}/>}>
-                                      {
-                                          renderDeviceCard(device)
-                                      }
-                                  </ShadowCard>
-                              </List.Item>
+                              return <a href={`#/device-management/devices?locale=deviceDetail&id=${device.id}`}>
+                                  <List.Item key={device.id}>
+                                      <ShadowCard title={device.name} bordered={false} hoverable={true} size={"small"}
+                                                  extra={device.alertState &&
+                                                  <AlertIcon popoverPlacement={"top"} state={device.alertState}/>}>
+                                          {
+                                              renderDeviceCard(device)
+                                          }
+                                      </ShadowCard>
+                                  </List.Item>
+                              </a>
                           }}/>
                 </Col>
             </Row>

@@ -26,14 +26,17 @@ func (r *alarmRouter) initRoutes() {
 		router.NewGetRoute("alarmRuleTemplates/:id", r.getAlarmRuleTemplate),
 		router.NewGetRoute("alarmRules", r.pagingAlarmRules),
 		router.NewGetRoute("alarmRules/:id", r.getAlarmRules),
+		router.NewGetRoute("alarmRules/check/:name", r.checkAlarmRule),
 		router.NewGetRoute("alarmRecords", r.pagingAlarmRecords),
 		router.NewGetRoute("alarmRecords/:id", r.getAlarmRecord),
-		router.NewGetRoute("alarmRules/check/:name", r.checkAlarmRule),
 		router.NewGetRoute("alarmStatistics", r.alarmStatistics),
 
 		// PUT
 		router.NewPutRoute("alarmRuleTemplates/:id", r.updateAlarmRuleTemplate),
 		router.NewPutRoute("alarmRules/:id", r.updateAlarmRule),
+
+		// PATCH
+		router.NewPatchRoute("alarmRecords/:id/acknowledge", r.acknowledgeAlarmRecord),
 
 		// DELETE
 		router.NewDeleteRoute("alarmRuleTemplates/:id", r.removeAlarmRuleTemplate),

@@ -1,13 +1,13 @@
 import {FC, useCallback, useState} from "react";
 import TableLayout, {TableProps} from "../../layout/TableLayout";
-import {PagingAlarmRecordsRequest, RemoveAlarmRecordRequest} from "../../../apis/alarm";
-import {Button, message, Popconfirm, Tag} from "antd";
+import {AcknowledgeAlarmRecordRequest, PagingAlarmRecordsRequest, RemoveAlarmRecordRequest} from "../../../apis/alarm";
+import {Button, Dropdown, Menu, message, Popconfirm, Space, Tag} from "antd";
 import {ColorDanger, ColorInfo, ColorWarn} from "../../../constants/color";
 import {DeviceTypeString} from "../../../types/device_type";
 import {GetFieldName} from "../../../constants/field";
 import {OperationTranslate} from "../../../constants/rule";
 import moment from "moment";
-import {DeleteOutlined} from "@ant-design/icons";
+import {DeleteOutlined, EditOutlined} from "@ant-design/icons";
 
 export interface AlarmRecordTableProps {
     type: "active" | "history"
@@ -16,9 +16,10 @@ export interface AlarmRecordTableProps {
     device: number;
     asset: number;
     levels: number[]
+    statuses: number[]
 }
 
-const AlarmRecordTable:FC<AlarmRecordTableProps> = ({type,start, stop, device, asset, levels}) => {
+const AlarmRecordTable: FC<AlarmRecordTableProps> = ({type, start, stop, device, asset, levels,statuses}) => {
     const [table, setTable] = useState<TableProps>({data: {}, isLoading: false, pagination: true, refreshKey: 0})
 
     const onChange = useCallback((current: number, size: number) => {
@@ -27,13 +28,14 @@ const AlarmRecordTable:FC<AlarmRecordTableProps> = ({type,start, stop, device, a
             asset_id: asset,
             levels: levels,
             type: type,
+            statuses: statuses,
         }
         PagingAlarmRecordsRequest(current, size, start, stop, filter).then(res => {
             if (res.code === 200) {
                 setTable(Object.assign({}, table, {data: res.data}))
             }
         })
-    }, [asset, device, start, stop, levels, type])
+    }, [asset, device, start, stop, levels, type, statuses])
 
     const onDelete = (id: number) => {
         RemoveAlarmRecordRequest(id).then(res => {
@@ -48,6 +50,23 @@ const AlarmRecordTable:FC<AlarmRecordTableProps> = ({type,start, stop, device, a
 
     const onRefresh = () => {
         setTable(Object.assign({}, table, {refreshKey: table.refreshKey + 1}))
+    }
+
+    const onAcknowledge = (id: number) => {
+        AcknowledgeAlarmRecordRequest(id).then(res => {
+            if (res.code === 200) {
+                onRefresh()
+                message.success("处理成功").then()
+            }else {
+                message.error(res.msg).then()
+            }
+        })
+    }
+
+    const renderEditMenu = (record: any) => {
+        return <Menu onClick={() => onAcknowledge(record.id)}>
+            <Menu.Item disabled={record.acknowledged}>标记为已处理</Menu.Item>
+        </Menu>
     }
 
     const columns = [
@@ -87,7 +106,6 @@ const AlarmRecordTable:FC<AlarmRecordTableProps> = ({type,start, stop, device, a
             dataIndex: 'rule',
             key: 'rule',
             render: (_: any, record: any) => {
-                console.log(record)
                 return `当前【${GetFieldName(record.rule.field)}】值为: 
                 ${record.value.toFixed(record.property.precision)}${record.property.unit}\n
                 ${OperationTranslate(record.rule.operation)}设定的阈值:${record.rule.threshold.toFixed(record.property.precision)}${record.property.unit}`
@@ -102,16 +120,36 @@ const AlarmRecordTable:FC<AlarmRecordTableProps> = ({type,start, stop, device, a
             }
         },
         {
+            title: '状态',
+            dataIndex: 'status',
+            key: 'status',
+            render: (status: number) => {
+                switch (status) {
+                    case 1:
+                        return <Tag color="blue">已处理</Tag>
+                    case 2:
+                        return <Tag color="green">已恢复</Tag>
+                    default:
+                        return <Tag>未处理</Tag>
+                }
+            }
+        },
+        {
             title: '操作',
             key: 'action',
             width: 64,
             render: (_: any, record: any) => {
-                return <div>
+                return <Space>
+                    {
+                        type === 'active' && <Dropdown overlay={renderEditMenu(record)}>
+                            <Button type={"text"} size={"small"} icon={<EditOutlined />}/>
+                        </Dropdown>
+                    }
                     <Popconfirm placement="left" title="确认要删除该规则吗?" onConfirm={() => onDelete(record.id)}
                                 okText="删除" cancelText="取消">
                         <Button type="text" size="small" icon={<DeleteOutlined/>} danger/>
                     </Popconfirm>
-                </div>
+                </Space>
             }
         }
     ]

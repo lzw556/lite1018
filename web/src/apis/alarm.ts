@@ -68,3 +68,7 @@ export function GetAlarmRecordRequest(id: number) {
 export function RemoveAlarmRecordRequest(id: number) {
     return request.delete(`/alarmRecords/${id}`).then(res => res.data)
 }
+
+export function AcknowledgeAlarmRecordRequest(id: number) {
+    return request.patch(`/alarmRecords/${id}/acknowledge`, null).then(res => res.data)
+}

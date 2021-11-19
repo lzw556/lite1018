@@ -19,7 +19,7 @@ type DeviceRemoveCmd struct {
 	deviceDataRepo        dependency.DeviceDataRepository
 	deviceRepo            dependency.DeviceRepository
 	deviceStatusRepo      dependency.DeviceStatusRepository
-	deviceAlertStatusRepo dependency.DeviceAlertStatusRepository
+	deviceAlertStateRepo  dependency.DeviceAlertStateRepository
 	deviceInformationRepo dependency.DeviceInformationRepository
 	networkRepo           dependency.NetworkRepository
 }
@@ -28,7 +28,7 @@ func NewDeviceRemoveCmd() DeviceRemoveCmd {
 	return DeviceRemoveCmd{
 		deviceRepo:            repository.Device{},
 		deviceDataRepo:        repository.DeviceData{},
-		deviceAlertStatusRepo: repository.DeviceAlertStatus{},
+		deviceAlertStateRepo:  repository.DeviceAlertState{},
 		deviceStatusRepo:      repository.DeviceStatus{},
 		deviceInformationRepo: repository.DeviceInformation{},
 		networkRepo:           repository.Network{},
@@ -49,7 +49,7 @@ func (cmd DeviceRemoveCmd) Run() error {
 			if err := cmd.deviceStatusRepo.Delete(cmd.Device.ID); err != nil {
 				return err
 			}
-			if err := cmd.deviceAlertStatusRepo.Delete(cmd.Device.ID); err != nil {
+			if err := cmd.deviceAlertStateRepo.Delete(cmd.Device.ID); err != nil {
 				return err
 			}
 		}

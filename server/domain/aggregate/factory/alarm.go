@@ -191,9 +191,12 @@ func (factory Alarm) buildFilterSpecs(filter request.AlarmFilter) ([]spec.Specif
 	}
 	switch filter.Type {
 	case "active":
-		specs = append(specs, spec.Status(1))
+		specs = append(specs, spec.IsActive(true))
 	case "history":
-		specs = append(specs, spec.Status(0))
+		specs = append(specs, spec.IsActive(false))
+	}
+	if len(filter.Statuses) > 0 {
+		specs = append(specs, spec.Statuses(filter.Statuses))
 	}
 	return specs, nil
 }
@@ -206,4 +209,14 @@ func (factory Alarm) NewAlarmRecordQuery(id uint) (*query.AlarmRecordQuery, erro
 	q := query.NewAlarmRecordQuery()
 	q.AlarmRecord = e
 	return &q, nil
+}
+
+func (factory Alarm) NewAlarmRecordCmd(id uint) (*command.AlarmRecordCmd, error) {
+	e, err := factory.alarmRecordRepo.Get(context.TODO(), id)
+	if err != nil {
+		return nil, err
+	}
+	cmd := command.NewAlarmRecordCmd()
+	cmd.AlarmRecord = e
+	return &cmd, nil
 }

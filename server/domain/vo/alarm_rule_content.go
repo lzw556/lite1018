@@ -1,6 +1,10 @@
 package vo
 
-import "github.com/thetasensors/theta-cloud-lite/server/domain/po"
+import (
+	"fmt"
+	"github.com/thetasensors/theta-cloud-lite/server/domain/po"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/devicetype"
+)
 
 type AlarmRuleContent struct {
 	Field     string  `json:"field"`
@@ -16,4 +20,18 @@ func NewAlarmRuleContent(e po.AlarmRuleContent) AlarmRuleContent {
 		Threshold: e.Threshold,
 		Operation: e.Operation,
 	}
+}
+
+func (c AlarmRuleContent) Description() string {
+	return fmt.Sprintf("属性【%s】的值: @%s设定的阈值:%.3f", devicetype.GetFieldName(c.Field), operation(c.Operation), c.Threshold)
+}
+
+func operation(op string) string {
+	switch op {
+	case ">", ">=":
+		return "高于"
+	case "<", "<=":
+		return "低于"
+	}
+	return ""
 }

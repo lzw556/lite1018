@@ -5,4 +5,5 @@ type AlarmFilter struct {
 	AssetID     uint   `json:"asset_id"`
 	AlarmLevels []uint `json:"levels"`
 	Type        string `json:"type"`
+	Statuses    []uint `json:"statuses"`
 }

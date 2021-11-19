@@ -76,16 +76,12 @@ func (cmd DeviceUpdateCmd) UpdateSetting(req request.DeviceSetting) error {
 	if err != nil {
 		return err
 	}
-	network, err := cmd.networkRepo.Get(ctx, cmd.Device.NetworkID)
-	if err != nil {
-		return err
-	}
-	gateway, err := cmd.deviceRepo.Get(ctx, network.GatewayID)
-	if err != nil {
-		return err
-	}
-	if cmd.Device.GetConnectionState().IsOnline {
-		command.SyncDeviceSettings(gateway, cmd.Device)
+	if network, err := cmd.networkRepo.Get(ctx, cmd.Device.NetworkID); err == nil {
+		if gateway, err := cmd.deviceRepo.Get(ctx, network.GatewayID); err == nil {
+			if gateway.GetConnectionState().IsOnline {
+				command.SyncDeviceSettings(gateway, cmd.Device)
+			}
+		}
 	}
 	return nil
 }

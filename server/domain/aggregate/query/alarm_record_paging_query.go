@@ -10,7 +10,7 @@ import (
 )
 
 type AlarmRecordPagingQuery struct {
-	po.AlarmRecords
+	entity.AlarmRecords
 
 	total         int64
 	deviceRepo    dependency.DeviceRepository

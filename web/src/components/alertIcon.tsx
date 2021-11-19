@@ -1,10 +1,12 @@
-import {Popover, Space, Tag, Typography} from "antd";
+import {Popover, Space, Spin, Tag, Typography} from "antd";
 import {ColorDanger, ColorInfo, ColorWarn} from "../constants/color";
-import {FC} from "react";
-import {GetFieldName} from "../constants/field";
+import {FC, useState} from "react";
 import {TooltipPlacement} from "antd/lib/tooltip";
-import moment from "moment";
 import {AlertState} from "../types/alert_state";
+import {GetAlarmRecordRequest} from "../apis/alarm";
+import moment from "moment";
+import {GetFieldName} from "../constants/field";
+import {OperationTranslate} from "../constants/rule";
 
 export interface AlertIconProps {
     state: AlertState
@@ -14,31 +16,45 @@ export interface AlertIconProps {
 const {Text} = Typography
 
 const AlertIcon: FC<AlertIconProps> = ({state, popoverPlacement}) => {
+    const [content, setContent] = useState<any>()
 
-    const renderContent = (level:string, state:any, color:any) => {
-        console.log(state.alarm.field)
-        return <Space>
-            <Tag color={color}>{level}</Tag>
-            <Text>{moment.unix(state.timestamp).local().format("YYYY-MM-DD HH:mm:ss")}</Text>
-            <Text>{state.content.replace(state.alarm.field, GetFieldName(state.alarm.field))}</Text>
-        </Space>
+    const onShow = (visible: boolean) => {
+        if (visible) {
+            setContent(<Spin spinning={true}>loading...</Spin>)
+            GetAlarmRecordRequest(state.record.id).then(res => {
+                if (res.code === 200) {
+                    setContent(<Space>
+                        {
+                            res.data.level == 3 && <Tag color={ColorDanger}>紧急</Tag>
+                        }
+                        {
+                            res.data.level == 2 && <Tag color={ColorWarn}>重要</Tag>
+                        }
+                        {
+                            res.data.level == 1 && <Tag color={ColorInfo}>提示</Tag>
+                        }
+                        <Text>{moment.unix(res.data.timestamp).local().format("YYYY-MM-DD HH:mm:ss")}</Text>
+                        <Text>{`【${GetFieldName(res.data.rule.field)}】值${OperationTranslate(res.data.rule.operation)}设定的阈值${res.data.rule.threshold}${res.data.property.unit}`}</Text>
+                    </Space>)
+                }else {
+                    setContent(<Text>{res.msg}</Text>)
+                }
+            })
+        }
     }
 
     const renderAlertPopover = () => {
         if (state.level > 0) {
             let icon = "icon-info"
             let color = ColorInfo
-            let level = "提示"
             if (state.level === 2) {
                 icon = "icon-warning"
                 color = ColorWarn
-                level = "重要"
-            }else if (state.level === 3) {
+            } else if (state.level === 3) {
                 icon = "icon-critical"
                 color = ColorDanger
-                level = "紧急"
             }
-            return <Popover placement={popoverPlacement} content={renderContent(level, state, color)}>
+            return <Popover placement={popoverPlacement} content={content} onVisibleChange={onShow}>
                 <span className={`iconfont ${icon}`} style={{color: color, cursor: "pointer"}}/>
             </Popover>
         }

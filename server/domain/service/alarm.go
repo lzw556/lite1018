@@ -186,6 +186,14 @@ func (s Alarm) GetAlarmRecord(recordID uint) (*vo.AlarmRecord, error) {
 	return query.Detail()
 }
 
+func (s Alarm) AcknowledgeAlarmRecord(recordID, userID uint) error {
+	cmd, err := s.factory.NewAlarmRecordCmd(recordID)
+	if err != nil {
+		return err
+	}
+	return cmd.AcknowledgeBy(userID)
+}
+
 func (s Alarm) RemoveAlarmRecord(recordID uint) error {
 	return s.record.Delete(context.TODO(), recordID)
 }
