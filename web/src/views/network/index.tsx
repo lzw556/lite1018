@@ -26,7 +26,7 @@ import NetworkSelect from "../../components/networkSelect";
 import {SendDeviceCommandRequest} from "../../apis/device";
 import {DeviceCommand} from "../../types/device_command";
 import {EmptyLayout} from "../layout";
-import useSocket from "../../socket";
+import useSocket, {SocketTopic} from "../../socket";
 import _ from "lodash";
 import MyBreadcrumb from "../../components/myBreadcrumb";
 
@@ -50,21 +50,23 @@ const NetworkPage = () => {
     const [removeNode, setRemoveNode] = useState<number[]>([])
     const [routingTables, setRoutingTables] = useState<any>()
     const [form] = Form.useForm()
-    const {connectionState} = useSocket()
+    const {PubSub} = useSocket()
 
     useEffect(() => {
-        if (connectionState && network) {
-            const newNetwork = _.cloneDeep(network)
-            newNetwork.nodes = newNetwork.nodes.map(item => {
-                if (item.id === connectionState.id) {
-                    item.state.isOnline = connectionState.isOnline
-                    item.state.connectAt = connectionState.connectAt
-                }
-                return item
-            })
-            setNetwork(newNetwork)
-        }
-    }, [connectionState])
+        PubSub.subscribe(SocketTopic.connectionState, (msg:string, state:any) => {
+            if (state && network) {
+                const newNetwork = _.cloneDeep(network)
+                newNetwork.nodes = newNetwork.nodes.map(item => {
+                    if (item.id === state.id) {
+                        item.state.isOnline = state.isOnline
+                        item.state.connectAt = state.connectAt
+                    }
+                    return item
+                })
+                setNetwork(newNetwork)
+            }
+        })
+    }, [network])
 
     const fetchNetwork = (id: number) => {
         GetNetworkRequest(id).then(res => {

@@ -9632,6 +9632,11 @@ public-encrypt@^4.0.0:
     randombytes "^2.0.1"
     safe-buffer "^5.1.2"
 
+pubsub-js@^1.9.4:
+  version "1.9.4"
+  resolved "https://registry.npmmirror.com/pubsub-js/download/pubsub-js-1.9.4.tgz#5c8678600e34e95b1269e96c17e1b51dab3ecb5a"
+  integrity sha512-hJYpaDvPH4w8ZX/0Fdf9ma1AwRgU353GfbaVfPjfJQf1KxZ2iHaHl3fAUw1qlJIR5dr4F3RzjGaWohYUEyoh7A==
+
 pump@^2.0.0:
   version "2.0.1"
   resolved "https://registry.nlark.com/pump/download/pump-2.0.1.tgz#12399add6e4cf7526d973cbc8b5ce2e2908b3909"
@@ -12315,16 +12320,6 @@ vendors@^1.0.0:
   version "1.0.4"
   resolved "https://registry.nlark.com/vendors/download/vendors-1.0.4.tgz#e2b800a53e7a29b93506c3cf41100d16c4c4ad8e"
   integrity sha1-4rgApT56Kbk1BsPPQRANFsTErY4=
-
-vis-data@^7.1.2:
-  version "7.1.2"
-  resolved "https://registry.nlark.com/vis-data/download/vis-data-7.1.2.tgz#b7d076ac79cb54f7c5e9c80f5b03b93cc8cc1fda"
-  integrity sha1-t9B2rHnLVPfF6cgPWwO5PMjMH9o=
-
-vis-network@^9.1.0:
-  version "9.1.0"
-  resolved "https://registry.nlark.com/vis-network/download/vis-network-9.1.0.tgz#511db833b68060f279bedc4a852671261d40204e"
-  integrity sha1-UR24M7aAYPJ5vtxKhSZxJh1AIE4=
 
 vm-browserify@^1.0.1:
   version "1.1.2"

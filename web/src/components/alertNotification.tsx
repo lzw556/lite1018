@@ -1,11 +1,10 @@
-import useSocket from "../socket";
+import useSocket, {SocketTopic} from "../socket";
 import {Button, message, notification, Space} from "antd";
 import {useEffect} from "react";
-import {ResponseResult} from "../types/response";
 import {AcknowledgeAlarmRecordRequest} from "../apis/alarm";
 
 const AlertNotification = () => {
-    const {socket} = useSocket()
+    const {PubSub} = useSocket()
 
     const onAcknowledge = (id: number) => {
         AcknowledgeAlarmRecordRequest(id).then(res => {
@@ -19,13 +18,9 @@ const AlertNotification = () => {
     }
 
     useEffect(() => {
-        if (socket) {
-            socket.on("socket::alertNotification", (res: ResponseResult<any>) => {
-                if (res.code === 200) {
-                    renderAlertNotification(res.data)
-                }
-            })
-        }
+        PubSub.subscribe(SocketTopic.alert, (msg:string, data:any) => {
+            renderAlertNotification(data)
+        })
     }, [])
 
     const renderButtons = (id: number) => {

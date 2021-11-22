@@ -10,7 +10,7 @@ import {
 import {Content} from "antd/lib/layout/layout";
 import {useHistory} from "react-router-dom";
 import TableLayout, {TableProps} from "../layout/TableLayout";
-import {useCallback, useState} from "react";
+import {useCallback, useEffect, useState} from "react";
 import {DeviceCommand} from "../../types/device_command";
 import {
     DeleteDeviceRequest,
@@ -27,7 +27,7 @@ import {ColorHealth, ColorWarn} from "../../constants/color";
 import Label from "../../components/label";
 import ReplaceMacModal from "./replace/replaceMacModal";
 import EditWsnSettingModal from "./edit/editWsnSettingModal";
-import useSocket from "../../socket";
+import useSocket, {SocketTopic} from "../../socket";
 import ShadowCard from "../../components/shadowCard";
 import UpgradeModal from "./upgrade";
 import "../../string-extension";
@@ -37,13 +37,14 @@ import AssetSelect from "../../components/assetSelect";
 import "../../assets/iconfont.css";
 import AlertIcon from "../../components/alertIcon";
 import MyBreadcrumb from "../../components/myBreadcrumb";
+import _ from "lodash";
 
 const {Search} = Input
 const {Option} = Select
 const {Text} = Typography
 
 const DevicePage = () => {
-    const [table, setTable] = useState<TableProps>({data: {}, isLoading: false, pagination: true, refreshKey: 0})
+    const [table, setTable] = useState<TableProps>({data: {result:[]}, isLoading: false, pagination: true, refreshKey: 0})
     const history = useHistory()
     const [assetId, setAssetId] = useState<number>(0)
     const [searchTarget, setSearchTarget] = useState<number>(0)
@@ -55,7 +56,37 @@ const DevicePage = () => {
     const [upgradeVisible, setUpgradeVisible] = useState<boolean>(false)
     const [replaceVisible, setReplaceVisible] = useState<boolean>(false)
     const [executeDevice, setExecuteDevice] = useState<Device>()
-    const {connectionState, upgradeState} = useSocket()
+    const {PubSub} = useSocket()
+
+    useEffect(() => {
+        PubSub.subscribe(SocketTopic.connectionState, (msg:string, state:any) => {
+            if (state && table.data.result) {
+                const data = _.cloneDeep(table.data)
+                data.result.forEach((item:Device) => {
+                    if (item.id === state.id) {
+                        item.state.isOnline = state.isOnline
+                    }
+                })
+                setTable({...table, data: data})
+            }
+        })
+        PubSub.subscribe(SocketTopic.upgradeState, (msg:string, state:any) => {
+            if (state && table.data.result) {
+                const data = _.cloneDeep(table.data)
+                data.result.forEach((item:Device) => {
+                    if (item.id === state.id) {
+                        item.upgradeState = state
+                    }
+                })
+                setTable({...table, data: data})
+            }
+        })
+
+        return () => {
+            PubSub.unsubscribe(SocketTopic.connectionState)
+            PubSub.unsubscribe(SocketTopic.upgradeState)
+        }
+    }, [table])
 
     const onAssetChange = (value: number) => {
         setAssetId(value)
@@ -133,7 +164,7 @@ const DevicePage = () => {
 
     const renderCommandMenus = (record: Device) => {
         const disabled = record.state && record.state.isOnline
-        const isUpgrading = upgradeState && IsUpgrading(upgradeState.status)
+        const isUpgrading = record.upgradeState && IsUpgrading(record.upgradeState.status)
         return <Menu onClick={(e) => {
             onCommand(record, e.key)
         }}>
@@ -175,15 +206,7 @@ const DevicePage = () => {
             title: '状态',
             dataIndex: 'state',
             key: 'state',
-            render: (state: any, record: any) => {
-                if (connectionState && connectionState.id === record.id) {
-                    return <Space>
-                        {
-                            connectionState.isOnline ? <Tag color={ColorHealth}>在线</Tag> :
-                                <Tag color={ColorWarn}>离线</Tag>
-                        }
-                    </Space>
-                }
+            render: (state: any) => {
                 return <Space>
                     {
                         state && state.isOnline ? <Tag color={ColorHealth}>在线</Tag> : <Tag color={ColorWarn}>离线</Tag>
@@ -205,8 +228,8 @@ const DevicePage = () => {
                     }
                     <a href={`#/device-management/devices?locale=deviceDetail&id=${record.id}`}>{text}</a>
                     {
-                        upgradeState && upgradeState.id === record.id && (
-                            <DeviceUpgradeState status={upgradeState.status} progress={upgradeState.progress}/>)
+                        record.upgradeState && (
+                            <DeviceUpgradeState status={record.upgradeState.status} progress={record.upgradeState.progress}/>)
                     }
                 </Space>
             }
