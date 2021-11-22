@@ -8,6 +8,7 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/domain/po"
 	spec "github.com/thetasensors/theta-cloud-lite/server/domain/specification"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/vo"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/calculate"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/xlog"
 	"time"
 )
@@ -91,10 +92,26 @@ func (query DeviceQuery) getPropertyData(property po.Property, data []po.DeviceD
 	for i, d := range data {
 		result.Time[i] = d.Time.UTC().Unix()
 		for k, v := range property.Fields {
-			result.Fields[k][i] = d.Values[v]
+			switch k {
+			case "corrosion_rate":
+				result.Fields[k][i] = query.calculateCorrosionRate(d, v, d.Time)
+			default:
+				result.Fields[k][i] = d.Values[v]
+			}
 		}
 	}
 	return result
+}
+
+func (query DeviceQuery) calculateCorrosionRate(current po.DeviceData, idx uint, t time.Time) float32 {
+	monthAgo, err := query.deviceDataRepo.Get(query.Device.ID, t.AddDate(0, -1, 0))
+	if err != nil {
+		return 0
+	}
+	if current.Time == monthAgo.Time {
+		return 0
+	}
+	return calculate.CorrosionRate(monthAgo.Values[idx], current.Values[idx], current.Time.Sub(monthAgo.Time).Seconds())
 }
 
 func (query DeviceQuery) DataByRange(from, to time.Time) ([]vo.PropertyData, error) {

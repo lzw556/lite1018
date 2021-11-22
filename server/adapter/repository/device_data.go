@@ -53,6 +53,51 @@ func (repo DeviceData) Find(deviceID uint, from, to time.Time) ([]po.DeviceData,
 	return es, err
 }
 
+func (repo DeviceData) Get(deviceID uint, time time.Time) (po.DeviceData, error) {
+	var e po.DeviceData
+	err := repo.BoltDB().View(func(tx *bbolt.Tx) error {
+		bucket := tx.Bucket([]byte(po.DeviceData{}.BucketName()))
+		if bucket != nil {
+			if dataBucket := bucket.Bucket(itob(deviceID)); dataBucket != nil {
+				c := dataBucket.Cursor()
+				current := []byte(time.Format("2006-01-02T15:04:05Z"))
+				var buf []byte
+				if k, v := c.Seek(current); k != nil {
+					buf = v
+				} else if bytes.Compare(k, current) <= 0 {
+					_, buf = c.Next()
+				}
+				if err := json.Unmarshal(buf, &e); err != nil {
+					return err
+				}
+			}
+		}
+		return nil
+	})
+	return e, err
+}
+
+func (repo DeviceData) Top(deviceID uint, limit int) ([]po.DeviceData, error) {
+	var es []po.DeviceData
+	err := repo.BoltDB().View(func(tx *bbolt.Tx) error {
+		bucket := tx.Bucket([]byte(po.DeviceData{}.BucketName()))
+		if bucket != nil {
+			if dataBucket := bucket.Bucket(itob(deviceID)); dataBucket != nil {
+				c := dataBucket.Cursor()
+				for k, v := c.Last(); k != nil && len(es) < limit; k, v = c.Prev() {
+					var e po.DeviceData
+					if err := json.Unmarshal(v, &e); err != nil {
+						return err
+					}
+					es = append(es, e)
+				}
+			}
+		}
+		return nil
+	})
+	return es, err
+}
+
 func (repo DeviceData) Last(deviceID uint) (po.DeviceData, error) {
 	var e po.DeviceData
 	err := repo.BoltDB().View(func(tx *bbolt.Tx) error {

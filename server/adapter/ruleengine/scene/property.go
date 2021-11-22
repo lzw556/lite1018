@@ -8,6 +8,7 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/po"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/vo"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/calculate"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/devicetype"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/xlog"
 	"strconv"
@@ -44,9 +45,20 @@ func (s Property) CURRENT(deviceID uint, field string) *float32 {
 		return nil
 	}
 	if idx, ok := s.Property.Fields[field]; ok {
-		current := data.Values[idx]
+		var current float32
+		switch field {
+		case "corrosion_rate":
+			monthAgo, err := s.deviceDataRepo.Get(deviceID, data.Time.AddDate(0, -1, 0))
+			if err != nil {
+				return nil
+			}
+			current = calculate.CorrosionRate(monthAgo.Values[idx], data.Values[idx], data.Time.Sub(monthAgo.Time).Seconds())
+		default:
+			current = data.Values[idx]
+		}
 		return &current
 	}
+
 	return nil
 }
 

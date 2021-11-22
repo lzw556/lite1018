@@ -25,6 +25,8 @@ export function GetFieldName(key:string) {
             return "加速度Z轴"
         case "thickness":
             return "厚度"
+        case "corrosion_rate":
+            return "腐蚀率"
         case "inclination":
             return "倾斜角"
         case "pitch":

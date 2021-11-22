@@ -49,8 +49,8 @@ const AssetStatistic: FC<AssetStatisticProps> = ({value}) => {
                     const field = Object.keys(property.data.fields)[0]
                     const timestamp = property.data.time[0]
                     return <>
-                        <Statistic title={GetFieldName(field)} valueStyle={{color: GetAlertColor(device.alertState)}}
-                                   value={Number(property.data.fields[field]).toFixed(3)} suffix={property.unit}/>
+                        <Statistic title={`${GetFieldName(field)}(单位:${property.unit})`} valueStyle={{color: GetAlertColor(device.alertState)}}
+                                   value={Number(property.data.fields[field]).toFixed(3)}/>
                         <Card.Meta description={`${moment.unix(timestamp).local().format("YYYY-MM-DD HH:mm:ss")}`}/>
                     </>
                 } else {

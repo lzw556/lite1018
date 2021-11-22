@@ -169,6 +169,16 @@ func initProperties(db *gorm.DB) error {
 			},
 		},
 		{
+			Name:         "腐蚀率",
+			DeviceTypeID: devicetype.NormalTemperatureCorrosionType,
+			SensorType:   devicetype.ThicknessSensor,
+			Unit:         "mm/a",
+			Precision:    3,
+			Fields: po.Fields{
+				"corrosion_rate": 0,
+			},
+		},
+		{
 			Name:         "温度",
 			DeviceTypeID: devicetype.NormalTemperatureCorrosionType,
 			SensorType:   devicetype.ThicknessSensor,
@@ -196,6 +206,16 @@ func initProperties(db *gorm.DB) error {
 			Precision:    3,
 			Fields: po.Fields{
 				"thickness": 0,
+			},
+		},
+		{
+			Name:         "腐蚀率",
+			DeviceTypeID: devicetype.HighTemperatureCorrosionType,
+			SensorType:   devicetype.ThicknessSensor,
+			Unit:         "mm/a",
+			Precision:    3,
+			Fields: po.Fields{
+				"corrosion_rate": 0,
 			},
 		},
 		{
