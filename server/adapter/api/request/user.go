@@ -10,6 +10,7 @@ type User struct {
 	Password string `json:"password"`
 	Email    string `json:"email"`
 	Phone    string `json:"phone"`
+	Role     uint   `json:"role"`
 }
 
 type Profile map[string]string

@@ -31,6 +31,8 @@ func _() {
 	_ = x[AlarmRuleNameExists-16001]
 	_ = x[AlarmRuleNotFoundError-16002]
 	_ = x[AlarmRecordAlreadyAcknowledgedError-16003]
+	_ = x[RoleExistsError-17001]
+	_ = x[RoleNotFoundError-17002]
 }
 
 const (
@@ -41,6 +43,7 @@ const (
 	_BusinessErrorCode_name_4 = "FirmwareNotFoundErrorFirmwareFormatErrorFirmwareExistsError"
 	_BusinessErrorCode_name_5 = "NetworkNotFoundError"
 	_BusinessErrorCode_name_6 = "AlarmRuleNameExistsAlarmRuleNotFoundErrorAlarmRecordAlreadyAcknowledgedError"
+	_BusinessErrorCode_name_7 = "RoleExistsErrorRoleNotFoundError"
 )
 
 var (
@@ -49,6 +52,7 @@ var (
 	_BusinessErrorCode_index_3 = [...]uint8{0, 19, 39, 61, 89, 118, 146, 173, 202}
 	_BusinessErrorCode_index_4 = [...]uint8{0, 21, 40, 59}
 	_BusinessErrorCode_index_6 = [...]uint8{0, 19, 41, 76}
+	_BusinessErrorCode_index_7 = [...]uint8{0, 15, 32}
 )
 
 func (i BusinessErrorCode) String() string {
@@ -72,6 +76,9 @@ func (i BusinessErrorCode) String() string {
 	case 16001 <= i && i <= 16003:
 		i -= 16001
 		return _BusinessErrorCode_name_6[_BusinessErrorCode_index_6[i]:_BusinessErrorCode_index_6[i+1]]
+	case 17001 <= i && i <= 17002:
+		i -= 17001
+		return _BusinessErrorCode_name_7[_BusinessErrorCode_index_7[i]:_BusinessErrorCode_index_7[i+1]]
 	default:
 		return "BusinessErrorCode(" + strconv.FormatInt(int64(i), 10) + ")"
 	}

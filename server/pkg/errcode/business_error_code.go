@@ -53,6 +53,11 @@ const (
 	AlarmRecordAlreadyAcknowledgedError
 )
 
+const (
+	RoleExistsError BusinessErrorCode = iota + 17001
+	RoleNotFoundError
+)
+
 var businessErrorMap = map[BusinessErrorCode]string{
 	UnknownBusinessError:                "未知错误",
 	SystemNotReadyError:                 "系统未初始化完成",
@@ -77,6 +82,8 @@ var businessErrorMap = map[BusinessErrorCode]string{
 	AlarmRuleNameExists:                 "规则名称已经存在",
 	AlarmRuleNotFoundError:              "报警规则不存在",
 	AlarmRecordAlreadyAcknowledgedError: "报警已被处理",
+	RoleExistsError:                     "角色已存在",
+	RoleNotFoundError:                   "角色不存在",
 }
 
 func GetErrMessage(code BusinessErrorCode) string {

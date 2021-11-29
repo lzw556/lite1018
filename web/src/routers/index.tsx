@@ -15,7 +15,6 @@ const AppRouter = () => {
                     })
                 }
                 <Route strict path="/dashboard" key="dashboard" component={() => {
-                    console.log(isLogin());
                     return  isLogin() ? <DashboardPage /> : <Redirect to="/login"/>
                 }}/>
                 <ConsolePage />

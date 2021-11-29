@@ -58,7 +58,7 @@ const AssetDashboardCard:FC<AssetDashboardCardProps> = ({values}) => {
                         <List size={"small"} dataSource={values}
                               grid={{column: 3}}
                               renderItem={(statistic: AssetStatistic) => {
-                                  return <a href={`#/asset-management/assetOverview?id=${statistic.asset.id}`}>
+                                  return <a href={`#/asset-management?locale=assetOverview&id=${statistic.asset.id}`}>
                                       <List.Item key={statistic.asset.id}>
                                           <ShadowCard title={statistic.asset.name} bordered={false} hoverable={true}
                                                       size={"small"} extra={renderAssetStatus(statistic)}>

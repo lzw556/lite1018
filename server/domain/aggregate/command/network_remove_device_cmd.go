@@ -33,7 +33,7 @@ func (cmd NetworkRemoveDevicesCmd) Run(req request.RemoveDevices) error {
 		if err := cmd.networkRepo.Save(ctx, &cmd.Network.Network); err != nil {
 			return err
 		}
-		return cmd.deviceRepo.UpdatesBySpecs(txCtx, map[string]interface{}{"network_id": 0}, spec.PrimaryKeysSpec(req.DeviceIDs))
+		return cmd.deviceRepo.UpdatesBySpecs(txCtx, map[string]interface{}{"network_id": 0}, spec.PrimaryKeyInSpec(req.DeviceIDs))
 	})
 	if err != nil {
 		return err

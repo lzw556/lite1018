@@ -54,6 +54,7 @@ func (s User) CreateUser(req request.User) error {
 	e.Password = req.Password
 	e.Email = req.Email
 	e.Phone = req.Phone
+	e.RoleID = req.Role
 	return s.repository.Create(ctx, &e)
 }
 
@@ -65,6 +66,7 @@ func (s User) UpdateUser(userID uint, req request.User) (*vo.User, error) {
 	}
 	e.Email = req.Email
 	e.Phone = req.Phone
+	e.RoleID = req.Role
 	if err := s.repository.Save(ctx, &e); err != nil {
 		return nil, err
 	}

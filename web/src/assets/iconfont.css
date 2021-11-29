@@ -1,6 +1,6 @@
 @font-face {
   font-family: "iconfont"; /* Project id  */
-  src: url('iconfont.ttf?t=1636945071556') format('truetype');
+  src: url('iconfont.ttf?t=1637809232464') format('truetype');
 }
 
 .iconfont {
@@ -11,19 +11,62 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-.icon-arrow-right:before {
+.icon-normal:before {
   content: "\e631";
 }
 
-.icon-critical:before {
+.icon-network-management:before {
+  content: "\e62e";
+}
+
+.icon-icon-critical:before {
   content: "\e670";
+}
+
+.icon-offline:before {
+  content: "\e712";
+}
+
+.icon-me:before {
+  content: "\e71d";
 }
 
 .icon-info:before {
   content: "\e652";
 }
 
+.icon-system:before {
+  content: "\e619";
+}
+
 .icon-warning:before {
   content: "\e68b";
 }
 
+.icon-data-management:before {
+  content: "\e68c";
+}
+
+.icon-alarm-management:before {
+  content: "\e601";
+}
+
+.icon-user-management:before {
+  content: "\e699";
+}
+
+.icon-asset-management:before {
+  content: "\e6a0";
+}
+
+.icon-device-management:before {
+  content: "\e697";
+}
+
+.icon-dashboard:before {
+  content: "\e67c";
+}
+
+.icon-console:before {
+  content: "\e61f";
+}

@@ -1,5 +1,4 @@
 import React, {FC, useEffect, useState} from 'react';
-import {useHistory} from "react-router-dom";
 import {Button, Col, Form, Input, message, Row, Space, Typography} from 'antd';
 import {LoginRequest} from "../../apis/user";
 import logo from '../../assets/images/logo-dark.png';
@@ -14,8 +13,7 @@ import {KeyOutlined, UserOutlined} from "@ant-design/icons";
 const LoginPage: FC = () => {
     const [isLoading, setIsLoading] = useState<boolean>(false)
     const dispatch = useDispatch()
-    const history = useHistory()
-    
+
     const login = (values: any) => {
         setIsLoading(true)
         LoginRequest(values.username, values.password).then((res) => {
@@ -23,7 +21,7 @@ const LoginPage: FC = () => {
             if (res.code === 200) {
                 message.success("登录成功").then()
                 dispatch(userLoginSuccess(res.data))
-                history.push('/')
+                window.location.hash = "/dashboard"
             }else {
                 message.error(res.msg).then()
             }

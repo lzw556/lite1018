@@ -2,6 +2,7 @@ import {Redirect, Route} from "react-router-dom";
 import {isLogin} from "../utils/session";
 import {GetParamValue} from "../utils/path";
 
+const views = require("../views");
 
 const RouterGuard = (props: any) => {
     const {routes, location} = props;
@@ -19,29 +20,23 @@ const RouterGuard = (props: any) => {
         return location.pathname
     }
 
-    const match = (source: any, target: string) => {
-        if (pathname === target) {
-            const index = source.path.indexOf(":")
-            if (index < 0) {
-                return source.path === target
-            }
-            return source.path.substring(0, index) === target.substring(0, index)
-        }
-        return source.name === target
+    if (routes.length === 0) {
+        return <Redirect to={"/403"}/>
     }
 
-    const target = routes.find((item: any) => match(item, decodeLocation()))
-    if (target && !target.auth) {
-        return <Route exact path={target.path} key={target.path} component={target.component}/>
-    }
-    if (isLogin()) {
-        if (target) {
-            return <Route exact path={target.path} key={target.path} component={target.component}/>
+    const target = routes.find((item: any) => item.name === decodeLocation())
+    if (target && views[target.view]) {
+        const component = views[target.view]
+        if (!target.isAuth) {
+            return <Route exact path={target.path} key={target.name} component={component}/>
+        }
+        if (isLogin()) {
+            return <Route exact path={target.path} key={target.name} component={component}/>
         } else {
-            return <Redirect to="/404"/>
+            return <Redirect to="/login"/>
         }
     } else {
-        return <Redirect to="/login"/>
+        return <Redirect to="/404"/>
     }
 }
 

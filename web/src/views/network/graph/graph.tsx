@@ -8,6 +8,8 @@ import {Popover} from "antd";
 import "../../../string-extension"
 import DeviceInfoPopover from "./deviceInfoPopover";
 import AlertIcon from "../../../components/alertIcon";
+import "../../../assets/iconfont.css"
+import {ColorHealth, ColorWarn} from "../../../constants/color";
 
 interface INode {
     id: string
@@ -67,6 +69,14 @@ const Graph: FC<GraphProps> = ({network, onNodeRemove, isEdit, height}) => {
         }
     }
 
+    const renderDeviceState = (device:Device) => {
+        if (device.alertState && device.alertState.level > 0) {
+            return <AlertIcon state={device.alertState} popoverPlacement={"rightTop"}/>
+        }else {
+            return  device.state.isOnline ? <span className={"iconfont icon-normal"} style={{color: ColorHealth, cursor: "pointer"}}/> : <span className={"iconfont icon-offline"} style={{color: ColorWarn, cursor: "pointer"}}/>
+        }
+    }
+
     const renderNode = (props: NodeProps) => {
         const clazz = props.properties.data.device.state.isOnline ? "ts-online" : "ts-offline"
         return <Node
@@ -84,7 +94,9 @@ const Graph: FC<GraphProps> = ({network, onNodeRemove, isEdit, height}) => {
                             <div className={clazz} style={{textAlign: "center", position: "fixed", bottom: 0, top: 0, left: 0, right: 0}}>
                                 <a href={`#/device-management/devices?locale=deviceDetail&id=${event.node.data.device.id}`}>{event.node.text}</a>
                                 <br/>
-                                <AlertIcon state={event.node.data.device.alertState} popoverPlacement={"rightTop"}/>
+                                {
+                                    renderDeviceState(event.node.data.device)
+                                }
                             </div>
                         </Popover>
                     </foreignObject>

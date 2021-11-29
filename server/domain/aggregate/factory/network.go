@@ -51,7 +51,7 @@ func (factory Network) NewNetworksQuery(assetID uint) (*query.NetworksQuery, err
 	for i, e := range es {
 		ids[i] = e.NetworkID
 	}
-	networks, err := factory.networkRepo.FindBySpecs(ctx, spec.PrimaryKeysSpec(ids))
+	networks, err := factory.networkRepo.FindBySpecs(ctx, spec.PrimaryKeyInSpec(ids))
 	if err != nil {
 		return nil, err
 	}

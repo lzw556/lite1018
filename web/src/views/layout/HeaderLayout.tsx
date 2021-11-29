@@ -2,9 +2,10 @@ import { Header } from "antd/es/layout/layout";
 import { Button, Col, Dropdown, Menu, Row, Space } from "antd";
 import "../../App.css";
 import "./layout.css"
+import "../../assets/iconfont.css"
 import { NavLink } from "react-router-dom";
 import logo from "../../assets/images/logo-dark.png";
-import { UserOutlined } from "@ant-design/icons";
+import {CreditCardOutlined, DashboardOutlined, UserOutlined} from "@ant-design/icons";
 import { persistor, store } from "../../store";
 import {useState} from "react";
 
@@ -42,7 +43,14 @@ const HeaderLayout = (props: any) => {
                 </Dropdown>
             </Col>
             <Col span={2} hidden={hideConsole}>
-                <NavLink to="/device-management/devices" className="ts-menu">控制台</NavLink>
+                <Space>
+                    <NavLink to="/device-management?locale=devices" className="ts-menu"><CreditCardOutlined /> 控制台</NavLink>
+                </Space>
+            </Col>
+            <Col span={2} hidden={!hideConsole}>
+                <Space>
+                    <NavLink to="/dashboard" className="ts-menu"><DashboardOutlined /> 监控大屏</NavLink>
+                </Space>
             </Col>
         </Row>
     </Header>

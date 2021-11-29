@@ -11,8 +11,10 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/asset"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/device"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/firmware"
+	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/menu"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/network"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/property"
+	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/role"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/system"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/user"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/iot"
@@ -95,6 +97,8 @@ func runApiServer(dist embed.FS) {
 	adapter.Api.UseMiddleware(middleware.NewJWT("/login"))
 	adapter.Api.RegisterRouters(
 		user.NewRouter(service.NewUser()),
+		menu.NewRouter(service.NewMenu()),
+		role.NewRouter(service.NewRole()),
 		asset.NewRouter(service.NewAsset()),
 		device.NewRouter(service.NewDevice()),
 		property.NewRouter(service.NewProperty()),

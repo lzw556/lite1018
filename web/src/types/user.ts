@@ -4,6 +4,7 @@ export type User = {
     email: string
     phone: string
     password: string
+    role: number
 }
 
 export const InitializeUserState: User = {
@@ -12,4 +13,5 @@ export const InitializeUserState: User = {
     email: "",
     phone: "",
     password: "",
+    role:0,
 }

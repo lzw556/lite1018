@@ -7,6 +7,7 @@ type User struct {
 	Username string `json:"username"`
 	Email    string `json:"email"`
 	Phone    string `json:"phone"`
+	Role     uint   `json:"role"`
 }
 
 func NewUser(e po.User) User {
@@ -15,5 +16,6 @@ func NewUser(e po.User) User {
 		Username: e.Username,
 		Email:    e.Email,
 		Phone:    e.Phone,
+		Role:     e.RoleID,
 	}
 }

@@ -31,11 +31,11 @@ const AlarmRulePage = () => {
 
     const renderAddButton = () => {
         if (currentKey === "rules") {
-            return <Button href="#/alarm-management/alarmRules?locale=addRule" type="primary">
+            return <Button href="#/alarm-management/alarmRules?locale=addAlarmRule" type="primary">
                 添加规则 <PlusOutlined/>
             </Button>
         } else if (currentKey === "templates") {
-            return <Button href="#/alarm-management/alarmRules?locale=addRuleTemplate" type="primary">
+            return <Button href="#/alarm-management/alarmRules?locale=addAlarmRuleTemplate" type="primary">
                 创建规则模板 <PlusOutlined/>
             </Button>
         }

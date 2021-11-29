@@ -20,7 +20,7 @@ export function GetUserRequest(id:number) {
 }
 
 export function UpdateUserRequest(id:number, user:any) {
-    return request.put<User>(`/users/${id}`, {phone:user.phone, email:user.email}).then(res => res.data)
+    return request.put<User>(`/users/${id}`, user).then(res => res.data)
 }
 
 export function LoginRequest(username: string, password: string) {

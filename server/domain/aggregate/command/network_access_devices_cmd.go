@@ -33,7 +33,7 @@ func (cmd NetworkAccessDevicesCmd) Run() error {
 		if err := cmd.networkRepo.Save(txCtx, &cmd.Network.Network); err != nil {
 			return err
 		}
-		spec := specification.PrimaryKeysSpec{}
+		spec := specification.PrimaryKeyInSpec{}
 		for _, child := range cmd.Children {
 			spec = append(spec, child.ID)
 		}

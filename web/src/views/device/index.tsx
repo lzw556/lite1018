@@ -1,11 +1,10 @@
 import {Button, Col, Dropdown, Input, Menu, message, Popconfirm, Row, Select, Space, Spin, Tag, Typography} from "antd";
 import {
-    AppstoreAddOutlined,
     CaretDownOutlined,
     CodeOutlined,
     DeleteOutlined,
     EditOutlined,
-    LoadingOutlined
+    LoadingOutlined, PlusOutlined
 } from "@ant-design/icons";
 import {Content} from "antd/lib/layout/layout";
 import {useHistory} from "react-router-dom";
@@ -294,7 +293,7 @@ const DevicePage = () => {
     return <Content>
         <MyBreadcrumb items={["设备管理", "设备列表"]}>
             <Space>
-                <Button type="primary" onClick={onAddDevice}>添加设备 <AppstoreAddOutlined/></Button>
+                <Button type="primary" onClick={onAddDevice}>添加设备 <PlusOutlined/></Button>
             </Space>
         </MyBreadcrumb>
         <ShadowCard>

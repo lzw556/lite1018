@@ -6,7 +6,7 @@ import {GetAssetRequest, PagingAssetsRequest, RemoveAssetRequest} from "../../ap
 import AddModal from "./addModal";
 import {InitializeAssetState} from "../../types/asset";
 import EditModal from "./editModal";
-import {DeleteOutlined, EditOutlined, FolderAddOutlined} from "@ant-design/icons";
+import {DeleteOutlined, EditOutlined, PlusOutlined} from "@ant-design/icons";
 import ShadowCard from "../../components/shadowCard";
 import MyBreadcrumb from "../../components/myBreadcrumb";
 
@@ -97,7 +97,7 @@ const AssetPage: FC = () => {
             <Button type="primary" onClick={() => {
                 setAddAssetVisible(true)
             }}>
-                添加资产 <FolderAddOutlined/>
+                添加资产 <PlusOutlined/>
             </Button>
         </MyBreadcrumb>
         <ShadowCard>

@@ -9,6 +9,7 @@ require (
 	github.com/allegro/bigcache/v3 v3.0.0
 	github.com/asaskevich/EventBus v0.0.0-20200907212545-49d423059eef
 	github.com/bilibili/gengine v1.5.7
+	github.com/casbin/casbin/v2 v2.39.1 // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/eclipse/paho.mqtt.golang v1.3.5
 	github.com/fvbock/endless v0.0.0-20170109170031-447134032cb6 // indirect

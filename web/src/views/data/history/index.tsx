@@ -182,7 +182,7 @@ const HistoryDataPage = () => {
                                 {
                                     option ? <ReactECharts option={option}
                                                            style={{height: `${height - 20}px`, border: "none"}}/> :
-                                        <EmptyLayout description={"暂无数据"}/>
+                                        <EmptyLayout description={"暂无数据"} style={{height: `${height}px`}}/>
                                 }
                             </Card>
                         </Col>

@@ -4,13 +4,16 @@ import {Form, Tag} from "antd";
 import "../../../string-extension"
 import {ColorHealth, ColorWarn} from "../../../constants/color";
 import "./graph.css"
-import moment from "moment/moment";
+import moment from "moment";
 
 export interface DeviceInfoPopoverProps {
     device: Device
 }
 
 const DeviceInfoPopover:FC<DeviceInfoPopoverProps> = ({device}) => {
+
+    console.log(device.state.connectedAt)
+
     return <Form size={"small"}>
         <Form.Item label={"MAC地址"} className={"ts-form-item"}>
             {
@@ -34,7 +37,9 @@ const DeviceInfoPopover:FC<DeviceInfoPopoverProps> = ({device}) => {
         </Form.Item>
         <Form.Item label={"最近连接时间"} className={"ts-form-item"}>
             {
-                moment(device.state.connectAt).local().format("YYYY-MM-DD HH:mm:ss")
+                device.state && device.state.connectedAt ?
+                    moment.unix(device.state.connectedAt).local().format("YYYY-MM-DD HH:mm:ss") :
+                    "-"
             }
         </Form.Item>
     </Form>
