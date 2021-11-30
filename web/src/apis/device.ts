@@ -17,7 +17,7 @@ export function PagingDevicesRequest(assetId:number, page:number, size: number, 
 }
 
 export function UpdateDeviceSettingRequest(id:number, setting:any) {
-    return request.patch(`/devices/${id}/setting`, setting).then(res => res.data)
+    return request.patch(`/devices/${id}/settings`, setting).then(res => res.data)
 }
 
 export function GetDeviceRequest(id:number) {
@@ -32,12 +32,8 @@ export function DeleteDeviceRequest(id:number) {
     return request.delete(`/devices/${id}`).then(res => res.data)
 }
 
-export function GetPropertyDataRequest(id:number, pid:number, from:number, to:number) {
-    return request.get<PropertyData>(`/devices/${id}/property/${pid}/data`, {from, to}).then(res => res.data)
-}
-
-export function GetDeviceDataRequest(id:number, from:number, to:number) {
-    return request.get<PropertyData[]>(`/devices/${id}/data`, {from, to}).then(res => res.data)
+export function GetDeviceDataRequest(id:number, pid:number, from:number, to:number) {
+    return request.get<PropertyData[] | PropertyData>(`/devices/${id}/data`, {from, to, pid}).then(res => res.data)
 }
 
 export function DownloadDeviceDataRequest(id:number, pid:number, from:number, to:number) {
@@ -73,7 +69,7 @@ export function GetChildrenRequest(id:number) {
 }
 
 export function GetDeviceSettingRequest(id:number) {
-    return request.get<any>(`/devices/${id}/setting`).then(res => res.data)
+    return request.get<any>(`/devices/${id}/settings`).then(res => res.data)
 }
 
 export function GetDevicesStatisticsRequest() {

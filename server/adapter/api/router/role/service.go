@@ -11,5 +11,7 @@ type Service interface {
 	GetRolesByPaginate(page, size int) ([]vo.Role, int64, error)
 
 	GetRole(id uint) (*vo.Role, error)
+	GetCasbinByUserID(id uint) (*vo.Casbin, error)
 	AllocMenus(id uint, req request.AllocMenus) error
+	AllocPermissions(id uint, req request.AllocPermissions) error
 }

@@ -5,6 +5,7 @@ import {Device} from "../../../types/device";
 import {GetDeviceFirmwaresRequest} from "../../../apis/firmware";
 import moment from "moment/moment";
 import {DeviceUpgradeRequest} from "../../../apis/device";
+import {DeviceCommand} from "../../../types/device_command";
 
 export interface UpgradeModalProps {
     visible: boolean
@@ -73,7 +74,7 @@ const UpgradeModal: FC<UpgradeModalProps> = ({visible, device, onCancel, onSucce
     const onUpgrade = () => {
         if (device) {
             setIsLoading(true)
-            DeviceUpgradeRequest(device.id, {firmware_id: firmware.id}).then(res => {
+            DeviceUpgradeRequest(device.id, {firmware_id: firmware.id, type:DeviceCommand.Upgrade}).then(res => {
                 setIsLoading(false)
                 if (res.code === 200) {
                     message.success("命令发送成功").then()

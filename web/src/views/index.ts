@@ -19,8 +19,9 @@ export const EditAlarmRuleTemplate = lazy(() => import('./alarm/rule/template/ed
 export const Firmware = lazy(() => import('./firmware'))
 export const User = lazy(() => import('./user'))
 export const Me = lazy(() => import('./me'))
-export const Role = lazy(() => import('./superAdmin/role'))
-export const Menu = lazy(() => import('./superAdmin/menu'))
+export const Role = lazy(() => import('./system/role'))
+export const Menu = lazy(() => import('./system/menu'))
+export const Permission = lazy(() => import('./system/permission'))
 export const System = lazy(() => import('./system'))
 
 export const Unauthorized = lazy(() => import('./403'))

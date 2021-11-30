@@ -85,19 +85,15 @@ func (r deviceRouter) removeByID(ctx *gin.Context) (interface{}, error) {
 	return nil, r.service.RemoveDevice(id)
 }
 
-func (r deviceRouter) findPropertyDataByID(ctx *gin.Context) (interface{}, error) {
-	id := cast.ToUint(ctx.Param("id"))
-	propertyID := cast.ToUint(ctx.Param("pid"))
-	from := cast.ToInt64(ctx.Query("from"))
-	to := cast.ToInt64(ctx.Query("to"))
-	return r.service.GetPropertyDataByID(id, propertyID, from, to)
-}
-
 func (r deviceRouter) findDataByID(ctx *gin.Context) (interface{}, error) {
 	id := cast.ToUint(ctx.Param("id"))
+	pid := cast.ToUint(ctx.Query("pid"))
 	from := cast.ToInt64(ctx.Query("from"))
 	to := cast.ToInt64(ctx.Query("to"))
-	return r.service.FindDeviceDataByID(id, from, to)
+	if pid == 0 {
+		return r.service.FindDeviceDataByID(id, from, to)
+	}
+	return r.service.GetPropertyDataByID(id, pid, from, to)
 }
 
 func (r deviceRouter) downloadDataByID(ctx *gin.Context) (interface{}, error) {
@@ -135,10 +131,8 @@ func (r deviceRouter) upgrade(ctx *gin.Context) (interface{}, error) {
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		return nil, response.InvalidParameterError(err.Error())
 	}
-	return nil, r.service.ExecuteDeviceUpgrade(id, req)
-}
-
-func (r deviceRouter) cancelUpgrade(ctx *gin.Context) (interface{}, error) {
-	id := cast.ToUint(ctx.Param("id"))
+	if req.Type == 1 {
+		return nil, r.service.ExecuteDeviceUpgrade(id, req)
+	}
 	return nil, r.service.ExecuteDeviceCancelUpgrade(id)
 }

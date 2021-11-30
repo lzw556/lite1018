@@ -4,8 +4,10 @@ import {CheckOutlined, CloseOutlined, EditOutlined} from "@ant-design/icons";
 import {UpdateDeviceSettingRequest} from "../../../../apis/device";
 import {Device} from "../../../../types/device";
 import {ColorHealth} from "../../../../constants/color";
+import HasPermission from "../../../../permission";
+import {Permission} from "../../../../permission/permission";
 
-export interface SettingProps extends FormItemProps{
+export interface SettingProps extends FormItemProps {
     device: Device
     name: string
     value?: any
@@ -27,7 +29,6 @@ const Setting: FC<SettingProps> = (props) => {
     const [setting] = useState<any>({[name]: value})
 
     const onSave = (setting: any) => {
-        console.log(setting)
         UpdateDeviceSettingRequest(device.id, setting).then(res => {
             if (res.code === 200) {
                 message.success("保存成功").then()
@@ -58,7 +59,9 @@ const Setting: FC<SettingProps> = (props) => {
                     {
                         displayRender ? displayRender(setting[name]) : setting[name]
                     }
-                    <a onClick={() => setEditSetting(true)}><EditOutlined/></a>
+                    <HasPermission value={Permission.DeviceSettingsEdit}>
+                        <a onClick={() => setEditSetting(true)}><EditOutlined/></a>
+                    </HasPermission>
                 </Space>
             }
         } else {

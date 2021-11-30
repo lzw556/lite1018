@@ -7,6 +7,8 @@ import RulesPage from "./list";
 import RuleTemplatesPage from "./template";
 import ShadowCard from "../../../components/shadowCard";
 import MyBreadcrumb from "../../../components/myBreadcrumb";
+import HasPermission from "../../../permission";
+import {Permission} from "../../../permission/permission";
 
 
 const tabList = [
@@ -31,13 +33,17 @@ const AlarmRulePage = () => {
 
     const renderAddButton = () => {
         if (currentKey === "rules") {
-            return <Button href="#/alarm-management/alarmRules?locale=addAlarmRule" type="primary">
-                添加规则 <PlusOutlined/>
-            </Button>
+            return <HasPermission value={Permission.AlarmRuleAdd}>
+                <Button href="#/alarm-management/alarmRules?locale=addAlarmRule" type="primary">
+                    创建规则 <PlusOutlined/>
+                </Button>
+            </HasPermission>
         } else if (currentKey === "templates") {
-            return <Button href="#/alarm-management/alarmRules?locale=addAlarmRuleTemplate" type="primary">
-                创建规则模板 <PlusOutlined/>
-            </Button>
+            return <HasPermission value={Permission.AlarmRuleTemplateAdd}>
+                <Button href="#/alarm-management/alarmRules?locale=addAlarmRuleTemplate" type="primary">
+                    创建规则模板 <PlusOutlined/>
+                </Button>
+            </HasPermission>
         }
     }
 

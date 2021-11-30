@@ -52,6 +52,7 @@ func (m JWT) WrapHandler() gin.HandlerFunc {
 				response.UnauthorizedWithError(ctx, response.BusinessErr(errcode.InvalidTokenError, err.Error()))
 			}
 			ctx.Set("user_id", tokenClaims.UserID)
+			ctx.Set("role_id", tokenClaims.RoleID)
 			ctx.Next()
 			return
 		default:

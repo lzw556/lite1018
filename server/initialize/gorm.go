@@ -13,6 +13,7 @@ func InitTables(db *gorm.DB) error {
 		&po.Role{},
 		&po.Menu{},
 		&po.RoleMenuRelation{},
+		&po.Permission{},
 		&po.Asset{},
 		&po.Device{},
 		&po.Property{},
@@ -23,7 +24,6 @@ func InitTables(db *gorm.DB) error {
 		&po.AlarmRecord{},
 		&po.AlarmRecordAcknowledge{},
 	}
-	//db.Migrator().DropTable(&po.Menu{}, &po.RoleMenuRelation{})
 	for _, table := range tables {
 		if !db.Migrator().HasTable(table) {
 			if err := db.Migrator().CreateTable(table); err != nil {
@@ -53,6 +53,9 @@ func InitTables(db *gorm.DB) error {
 		return err
 	}
 	if err := initMenus(db); err != nil {
+		return err
+	}
+	if err := initPermissions(db); err != nil {
 		return err
 	}
 	return nil
@@ -357,6 +360,7 @@ func initMenus(db *gorm.DB) error {
 			ParentID: 1,
 			IsAuth:   true,
 			Hidden:   false,
+			Sort:     0,
 		},
 		{
 			ID:       4,
@@ -367,6 +371,7 @@ func initMenus(db *gorm.DB) error {
 			ParentID: 1,
 			IsAuth:   true,
 			Hidden:   false,
+			Sort:     2,
 		},
 		{
 			ID:       5,
@@ -552,6 +557,330 @@ func initMenus(db *gorm.DB) error {
 	}
 	for _, menu := range menus {
 		err := db.FirstOrCreate(&menu, map[string]interface{}{"id": menu.ID}).Error
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func initPermissions(db *gorm.DB) error {
+	permissions := []po.Permission{
+		{
+			Path:        "devices/:id",
+			Method:      "GET",
+			Description: "查看单个设备",
+			Group:       "设备模块",
+		},
+		{
+			Path:        "devices/:id",
+			Method:      "PUT",
+			Description: "更新设备信息",
+			Group:       "设备模块",
+		},
+		{
+			Path:        "devices/:id",
+			Method:      "DELETE",
+			Description: "删除设备",
+			Group:       "设备模块",
+		},
+		{
+			Path:        "devices",
+			Method:      "POST",
+			Description: "添加设备",
+			Group:       "设备模块",
+		},
+		{
+			Path:        "devices",
+			Method:      "GET",
+			Description: "查看设备列表",
+			Group:       "设备模块",
+		},
+		{
+			Path:        "devices/statistics",
+			Method:      "GET",
+			Description: "设备统计信息",
+			Group:       "设备模块",
+		},
+		{
+			Path:        "devices/groupBy/asset",
+			Method:      "GET",
+			Description: "设备分组展示",
+			Group:       "设备模块",
+		},
+		{
+			Path:        "devices/:id/children",
+			Method:      "GET",
+			Description: "查看子设备",
+			Group:       "设备模块",
+		},
+		{
+			Path:        "devices/:id/settings",
+			Method:      "PATCH",
+			Description: "编辑设备配置",
+			Group:       "设备模块",
+		},
+		{
+			Path:        "devices/:id/mac/:mac",
+			Method:      "PATCH",
+			Description: "替换设备",
+			Group:       "设备模块",
+		},
+		{
+			Path:        "devices/:id",
+			Method:      "DELETE",
+			Description: "删除设备",
+			Group:       "设备模块",
+		},
+		{
+			Path:        "devices/:id/upgrade",
+			Method:      "POST",
+			Description: "设备升级",
+			Group:       "设备模块",
+		},
+		{
+			Path:        "devices/:id/commands/:cmd",
+			Method:      "POST",
+			Description: "设备命令",
+			Group:       "设备模块",
+		},
+		{
+			Path:        "devices/:id/data",
+			Method:      "GET",
+			Description: "查看设备数据",
+			Group:       "数据模块",
+		},
+		{
+			Path:        "devices/:id/download/data",
+			Method:      "GET",
+			Description: "下载设备数据",
+			Group:       "数据模块",
+		},
+		{
+			Path:        "devices/:id/data",
+			Method:      "DELETE",
+			Description: "删除设备数据",
+			Group:       "数据模块",
+		},
+		{
+			Path:        "assets/:id/statistics",
+			Method:      "GET",
+			Description: "单个资产统计信息",
+			Group:       "资产模块",
+		},
+		{
+			Path:        "assets/statistics",
+			Method:      "GET",
+			Description: "所有资产统计信息",
+			Group:       "资产模块",
+		},
+		{
+			Path:        "assets/:id",
+			Method:      "GET",
+			Description: "查看单个资产",
+			Group:       "资产模块",
+		},
+		{
+			Path:        "assets",
+			Method:      "GET",
+			Description: "查看资产列表",
+			Group:       "资产模块",
+		},
+		{
+			Path:        "assets",
+			Method:      "POST",
+			Description: "添加资产",
+			Group:       "资产模块",
+		},
+		{
+			Path:        "assets/:id",
+			Method:      "PUT",
+			Description: "编辑资产信息",
+			Group:       "资产模块",
+		},
+		{
+			Path:        "assets/:id",
+			Method:      "DELETE",
+			Description: "删除资产",
+			Group:       "资产模块",
+		},
+		{
+			Path:        "alarmStatistics",
+			Method:      "GET",
+			Description: "报警统计信息",
+			Group:       "报警模块",
+		},
+		{
+			Path:        "alarmRecords",
+			Method:      "GET",
+			Description: "查看报警记录列表",
+			Group:       "报警模块",
+		},
+		{
+			Path:        "alarmRecords/:id",
+			Method:      "GET",
+			Description: "查看单个报警记录",
+			Group:       "报警模块",
+		},
+		{
+			Path:        "alarmRecords/:id/acknowledge",
+			Method:      "PATCH",
+			Description: "报警处理",
+			Group:       "报警模块",
+		},
+		{
+			Path:        "alarmRecords/:id",
+			Method:      "DELETE",
+			Description: "删除报警记录",
+			Group:       "报警模块",
+		},
+		{
+			Path:        "alarmRules",
+			Method:      "POST",
+			Description: "添加报警规则",
+			Group:       "报警模块",
+		},
+		{
+			Path:        "alarmRules/:id",
+			Method:      "PUT",
+			Description: "编辑报警规则",
+			Group:       "报警模块",
+		},
+		{
+			Path:        "alarmRules",
+			Method:      "GET",
+			Description: "查看报警规则列表",
+			Group:       "报警模块",
+		},
+		{
+			Path:        "alarmRules/:id",
+			Method:      "GET",
+			Description: "查看单个报警规则",
+			Group:       "报警模块",
+		},
+		{
+			Path:        "alarmRules/:id",
+			Method:      "DELETE",
+			Description: "删除报警规则",
+			Group:       "报警模块",
+		},
+		{
+			Path:        "alarmRuleTemplates",
+			Method:      "POST",
+			Description: "添加报警规则模板",
+			Group:       "报警模块",
+		},
+		{
+			Path:        "alarmRuleTemplates",
+			Method:      "GET",
+			Description: "查看报警规则模板列表",
+			Group:       "报警模块",
+		},
+		{
+			Path:        "alarmRuleTemplates/:id",
+			Method:      "GET",
+			Description: "查看单个报警规则模板",
+			Group:       "报警模块",
+		},
+		{
+			Path:        "alarmRuleTemplates/:id",
+			Method:      "PUT",
+			Description: "编辑报警规则模板",
+			Group:       "报警模块",
+		},
+		{
+			Path:        "alarmRuleTemplates/:id",
+			Method:      "DELETE",
+			Description: "删除报警规则模板",
+			Group:       "报警模块",
+		},
+		{
+			Path:        "users",
+			Method:      "POST",
+			Description: "添加用户",
+			Group:       "用户模块",
+		},
+		{
+			Path:        "users/:id",
+			Method:      "PUT",
+			Description: "编辑用户",
+			Group:       "用户模块",
+		},
+		{
+			Path:        "users/:id",
+			Method:      "DELETE",
+			Description: "删除用户",
+			Group:       "用户模块",
+		},
+		{
+			Path:        "users/:id",
+			Method:      "GET",
+			Description: "查看单个用户信息",
+			Group:       "用户模块",
+		},
+		{
+			Path:        "users",
+			Method:      "GET",
+			Description: "查看用户列表",
+			Group:       "用户模块",
+		},
+		{
+			Path:        "networks",
+			Method:      "POST",
+			Description: "导入网络",
+			Group:       "网络模块",
+		},
+		{
+			Path:        "networks",
+			Method:      "GET",
+			Description: "查看网络列表",
+			Group:       "网络模块",
+		},
+		{
+			Path:        "networks/:id",
+			Method:      "GET",
+			Description: "查看单个网络信息",
+			Group:       "网络模块",
+		},
+		{
+			Path:        "networks/:id/export",
+			Method:      "GET",
+			Description: "导出网络",
+			Group:       "网络模块",
+		},
+		{
+			Path:        "networks/setting",
+			Method:      "PUT",
+			Description: "编辑网络配置",
+			Group:       "网络模块",
+		},
+		{
+			Path:        "networks/:id",
+			Method:      "PUT",
+			Description: "编辑网络信息",
+			Group:       "网络模块",
+		},
+		{
+			Path:        "networks/:id/sync",
+			Method:      "PUT",
+			Description: "同步网络",
+			Group:       "网络模块",
+		},
+		{
+			Path:        "networks/:id/devices",
+			Method:      "PATCH",
+			Description: "接入设备",
+			Group:       "网络模块",
+		},
+		{
+			Path:        "networks/:id/devices",
+			Method:      "DELETE",
+			Description: "移除设备",
+			Group:       "网络模块",
+		},
+	}
+	for _, permission := range permissions {
+		err := db.FirstOrCreate(&permission, map[string]interface{}{"path": permission.Path, "method": permission.Method}).Error
 		if err != nil {
 			return err
 		}

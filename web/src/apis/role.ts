@@ -21,3 +21,11 @@ export function GetRoleRequest(id:number) {
 export function AllocMenusRequest(id:number, ids:number[]) {
     return request.patch(`/roles/${id}/menus`, {ids}).then(res => res.data)
 }
+
+export function AllocPermissionsRequest(id:number, ids:number[]) {
+    return request.patch(`/roles/${id}/permissions`, {ids}).then(res => res.data)
+}
+
+export function GetCasbinRequest() {
+    return request.get<any>(`/my/casbin`).then(res => res.data)
+}

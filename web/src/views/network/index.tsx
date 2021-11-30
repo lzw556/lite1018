@@ -29,6 +29,8 @@ import {EmptyLayout} from "../layout";
 import useSocket, {SocketTopic} from "../../socket";
 import _ from "lodash";
 import MyBreadcrumb from "../../components/myBreadcrumb";
+import HasPermission from "../../permission";
+import userPermission, {Permission} from "../../permission/permission";
 
 export interface DevicePopover {
     device: Device
@@ -51,6 +53,7 @@ const NetworkPage = () => {
     const [routingTables, setRoutingTables] = useState<any>()
     const [form] = Form.useForm()
     const {PubSub} = useSocket()
+    const {hasPermission} = userPermission()
 
     useEffect(() => {
         PubSub.subscribe(SocketTopic.connectionState, (msg:string, state:any) => {
@@ -143,18 +146,21 @@ const NetworkPage = () => {
             return <Menu onClick={(e) => {
                 onMenuClick(network, e.key)
             }}>
-                <Menu.Item key={1}>
-                    接入设备
-                </Menu.Item>
-                <Menu.Item key={2}>
-                    导出网络
-                </Menu.Item>
-                <Menu.Item key={3} disabled={!isOnline}>
-                    继续组网
-                </Menu.Item>
-                <Menu.Item key={4} disabled={!isOnline}>
-                    同步网络
-                </Menu.Item>
+                {
+                    hasPermission(Permission.NetworkAccessDevices) &&
+                    <Menu.Item key={1}>接入设备</Menu.Item>
+                }
+                {
+                    hasPermission(Permission.NetworkExport) &&
+                    <Menu.Item key={2}>导出网络</Menu.Item>
+                }
+                {
+                    hasPermission(Permission.DeviceCommand) &&
+                    (<>
+                        <Menu.Item key={3} disabled={!isOnline}>继续组网</Menu.Item>
+                        <Menu.Item key={4} disabled={!isOnline}>同步网络</Menu.Item>
+                    </>)
+                }
             </Menu>
         }
         return <div/>
@@ -163,11 +169,13 @@ const NetworkPage = () => {
     const renderActionButton = () => {
         if (network) {
             return <Space>
-                <Button size={"small"} type={"link"} hidden={isNetworkEdit}
-                        onClick={() => setIsNetworkEdit(!isNetworkEdit)}>编辑</Button>
-                <Button size={"small"} type={"link"} hidden={!isNetworkEdit} onClick={onSaveNetwork}>保存</Button>
-                <Button size={"small"} type={"link"} hidden={!isNetworkEdit}
-                        onClick={() => setIsNetworkEdit(!isNetworkEdit)}>取消</Button>
+                <HasPermission value={Permission.NetworkRemoveDevices}>
+                    <Button size={"small"} type={"link"} hidden={isNetworkEdit}
+                            onClick={() => setIsNetworkEdit(!isNetworkEdit)}>编辑</Button>
+                    <Button size={"small"} type={"link"} hidden={!isNetworkEdit} onClick={onSaveNetwork}>保存</Button>
+                    <Button size={"small"} type={"link"} hidden={!isNetworkEdit}
+                            onClick={() => setIsNetworkEdit(!isNetworkEdit)}>取消</Button>
+                </HasPermission>
                 <Dropdown overlay={renderMoreAction}>
                     <Button size={"small"} type={"text"} icon={<UnorderedListOutlined/>}/>
                 </Dropdown>
@@ -200,9 +208,11 @@ const NetworkPage = () => {
     const renderEditButton = () => {
         if (network) {
             return <Space>
-                <Button size={"small"} type={"link"} hidden={!isEdit} onClick={onSave}>保存</Button>
-                <Button size={"small"} type={"link"} hidden={!isEdit} onClick={() => setIsEdit(!isEdit)}>取消</Button>
-                <Button size={"small"} type={"link"} hidden={isEdit} onClick={() => setIsEdit(!isEdit)}>编辑</Button>
+                <HasPermission value={Permission.NetworkEdit}>
+                    <Button size={"small"} type={"link"} hidden={!isEdit} onClick={onSave}>保存</Button>
+                    <Button size={"small"} type={"link"} hidden={!isEdit} onClick={() => setIsEdit(!isEdit)}>取消</Button>
+                    <Button size={"small"} type={"link"} hidden={isEdit} onClick={() => setIsEdit(!isEdit)}>编辑</Button>
+                </HasPermission>
             </Space>
         }
     }

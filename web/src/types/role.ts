@@ -3,4 +3,5 @@ export type Role = {
     name: string;
     description: string;
     menus: number[]
+    permissions: string[][]
 }

@@ -9,6 +9,8 @@ import EditModal from "../modal/editModal";
 import {AlarmRule} from "../../../../types/alarm_rule";
 import SensorSelect from "../../../../components/sensorSelect";
 import AssetSelect from "../../../../components/assetSelect";
+import HasPermission from "../../../../permission";
+import {Permission} from "../../../../permission/permission";
 
 
 const {Option} = Select
@@ -91,17 +93,22 @@ const RulesPage = () => {
             title: '操作',
             key: 'action',
             width: 200,
+            shouldCellUpdate: () => false,
             render: (_: any, record: any) => {
-                return <div>
-                    <Button type={"link"} size={"small"} onClick={() => {
-                        onEdit(record.id)
-                    }}>修改阈值</Button>
-                    <Divider type={"vertical"}/>
-                    <Popconfirm placement="left" title="确认要删除该规则吗?" onConfirm={() => onDelete(record.id)}
-                                okText="删除" cancelText="取消">
-                        <Button type="text" size="small" danger>删除</Button>
-                    </Popconfirm>
-                </div>
+                return <>
+                    <HasPermission value={Permission.AlarmRuleEdit}>
+                        <Button type={"link"} size={"small"} onClick={() => {
+                            onEdit(record.id)
+                        }}>修改阈值</Button>
+                    </HasPermission>
+                    <HasPermission value={Permission.AlarmRuleDelete}>
+                        <Divider type={"vertical"}/>
+                        <Popconfirm placement="left" title="确认要删除该规则吗?" onConfirm={() => onDelete(record.id)}
+                                    okText="删除" cancelText="取消">
+                            <Button type="text" size="small" danger>删除</Button>
+                        </Popconfirm>
+                    </HasPermission>
+                </>
             }
         }
     ]

@@ -10,12 +10,14 @@ require (
 	github.com/asaskevich/EventBus v0.0.0-20200907212545-49d423059eef
 	github.com/bilibili/gengine v1.5.7
 	github.com/casbin/casbin/v2 v2.39.1 // indirect
+	github.com/casbin/gorm-adapter/v3 v3.4.6 // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/eclipse/paho.mqtt.golang v1.3.5
 	github.com/fvbock/endless v0.0.0-20170109170031-447134032cb6 // indirect
 	github.com/gin-contrib/cors v1.3.1
 	github.com/gin-contrib/static v0.0.1
 	github.com/gin-gonic/gin v1.7.4
+	github.com/go-kit/kit v0.10.0 // indirect
 	github.com/gogo/protobuf v1.3.2
 	github.com/golang/protobuf v1.5.2
 	github.com/googollee/go-socket.io v1.6.1
@@ -37,7 +39,7 @@ require (
 	golang.org/x/sys v0.0.0-20211025201205-69cdffdb9359 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0
 	gorm.io/driver/mysql v1.1.2
-	gorm.io/driver/postgres v1.1.0
+	gorm.io/driver/postgres v1.2.2
 	gorm.io/driver/sqlite v1.1.5
-	gorm.io/gorm v1.21.15
+	gorm.io/gorm v1.22.3
 )

@@ -26,9 +26,11 @@ func (r *roleRouter) initRoutes() {
 		// GET
 		router.NewGetRoute("/roles", r.paging),
 		router.NewGetRoute("/roles/:id", r.get),
+		router.NewGetRoute("/my/casbin", r.casbin),
 
 		// PATCH
 		router.NewPatchRoute("/roles/:id/menus", r.allocMenus),
+		router.NewPatchRoute("/roles/:id/permissions", r.allocPermissions),
 	}
 }
 

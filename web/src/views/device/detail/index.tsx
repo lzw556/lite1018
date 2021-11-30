@@ -14,6 +14,8 @@ import {DeviceCommand} from "../../../types/device_command";
 import SettingPage from "./setting";
 import {DeviceType} from "../../../types/device_type";
 import MyBreadcrumb from "../../../components/myBreadcrumb";
+import HasPermission from "../../../permission";
+import {Permission} from "../../../permission/permission";
 
 const tabList = [
     {
@@ -109,9 +111,11 @@ const DeviceDetailPage = () => {
     return <Content>
         <MyBreadcrumb items={["设备管理", "设备列表", "设备详情"]}>
             <Space>
-                <Dropdown overlay={renderCommandMenu}>
-                    <Button type={"primary"}>设备命令<DownOutlined/></Button>
-                </Dropdown>
+                <HasPermission value={Permission.DeviceCommand}>
+                    <Dropdown overlay={renderCommandMenu}>
+                        <Button type={"primary"}>设备命令<DownOutlined/></Button>
+                    </Dropdown>
+                </HasPermission>
             </Space>
         </MyBreadcrumb>
         <Row justify="center">

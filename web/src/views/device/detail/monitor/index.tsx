@@ -69,9 +69,9 @@ const MonitorPage: FC<MonitorPageProps> = ({device}) => {
 
     const fetchDeviceData = (id: number) => {
         setSelectedDevice(id)
-        GetDeviceDataRequest(id, startDate.utc().unix(), endDate.utc().unix()).then(res => {
+        GetDeviceDataRequest(id, 0, startDate.utc().unix(), endDate.utc().unix()).then(res => {
             setOptions([])
-            if (res.code === 200) {
+            if (res.code === 200 && Array.isArray(res.data)) {
                 setOptions(res.data.map(item => {
                     const series = Object.keys(item.fields).map((key, index) => {
                         return {

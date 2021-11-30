@@ -2,6 +2,7 @@ package jwt
 
 import (
 	jwt "github.com/dgrijalva/jwt-go"
+	"strconv"
 )
 
 var secretKey = []byte("tiny-iot-server")
@@ -9,13 +10,15 @@ var secretKey = []byte("tiny-iot-server")
 type Claims struct {
 	UserID   uint   `json:"user_id"`
 	Username string `json:"username"`
+	RoleID   string `json:"role_id"`
 	jwt.StandardClaims
 }
 
-func GenerateToken(userID uint, username string) (string, error) {
+func GenerateToken(userID uint, username string, roleID uint) (string, error) {
 	claims := Claims{
 		UserID:   userID,
 		Username: username,
+		RoleID:   strconv.Itoa(int(roleID)),
 	}
 	claims.Issuer = "tiny-iot"
 

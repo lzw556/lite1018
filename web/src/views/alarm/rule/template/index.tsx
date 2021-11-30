@@ -6,6 +6,8 @@ import Label from "../../../../components/label";
 import DeviceTypeSelect from "../../../../components/deviceTypeSelect";
 import {DeviceType, DeviceTypeString} from "../../../../types/device_type";
 import {DeleteOutlined, EditOutlined} from "@ant-design/icons";
+import HasPermission from "../../../../permission";
+import {Permission} from "../../../../permission/permission";
 
 const {Option} = Select
 
@@ -59,14 +61,19 @@ const RuleTemplatesPage = () => {
         {
             title: '操作',
             key: 'action',
+            shouldCellUpdate: () => false,
             render: (text: any, record: any) => (
                 <Space>
-                    <Button type="text" size="small" href={`#/alarm-management/alarmRules?locale=editRuleTemplate&templateId=${record.id}`}
-                            icon={<EditOutlined/>}/>
-                    <Popconfirm placement="left" title="确认要删除该模板吗?" onConfirm={() => onDelete(record.id)}
-                                okText="删除" cancelText="取消">
-                        <Button type="text" size="small" icon={<DeleteOutlined/>} danger/>
-                    </Popconfirm>
+                    <HasPermission value={Permission.AlarmRuleTemplateEdit}>
+                        <Button type="text" size="small" href={`#/alarm-management/alarmRules?locale=editRuleTemplate&templateId=${record.id}`}
+                                icon={<EditOutlined/>}/>
+                    </HasPermission>
+                    <HasPermission value={Permission.AlarmRuleTemplateDelete}>
+                        <Popconfirm placement="left" title="确认要删除该模板吗?" onConfirm={() => onDelete(record.id)}
+                                    okText="删除" cancelText="取消">
+                            <Button type="text" size="small" icon={<DeleteOutlined/>} danger/>
+                        </Popconfirm>
+                    </HasPermission>
                 </Space>
             ),
         },

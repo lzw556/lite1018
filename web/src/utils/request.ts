@@ -18,8 +18,18 @@ axios.interceptors.response.use(<T>(response:AxiosResponse<T>) => {
     }
     return response
 }, error => {
-    console.log(error)
-    window.location.hash = '/500'
+    switch (error.response.status) {
+        case 403:
+            window.location.hash = '/403'
+            break
+        case 404:
+            window.location.hash = '/404'
+            break
+        default:
+            window.location.hash = '/500'
+            break
+    }
+    return Promise.reject(error)
 })
 
 

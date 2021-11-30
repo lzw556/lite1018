@@ -35,7 +35,7 @@ func (s User) Login(req request.Login) (*vo.AccessToken, error) {
 	if err := bcrypt.CompareHashAndPassword([]byte(e.Password), []byte(req.Password)); err != nil {
 		return nil, response.BusinessErr(errcode.InvalidUsernameOrPasswordError, err.Error())
 	}
-	token, err := jwt.GenerateToken(e.ID, e.Username)
+	token, err := jwt.GenerateToken(e.ID, e.Username, e.RoleID)
 	if err != nil {
 		return nil, response.BusinessErr(errcode.InvalidUsernameOrPasswordError, err.Error())
 	}

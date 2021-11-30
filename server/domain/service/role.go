@@ -70,10 +70,27 @@ func (s Role) AllocMenus(id uint, req request.AllocMenus) error {
 	return cmd.AllocMenus(req.IDs)
 }
 
+func (s Role) AllocPermissions(id uint, req request.AllocPermissions) error {
+	cmd, err := s.factory.NewRoleCmd(id)
+	if err != nil {
+		return err
+	}
+	return cmd.AllocPermissions(req.IDs)
+}
+
 func (s Role) GetRole(id uint) (*vo.Role, error) {
 	query, err := s.factory.NewRoleQuery(id)
 	if err != nil {
 		return nil, err
 	}
-	return query.GetWithMenus()
+	return query.Detail()
+}
+
+func (s Role) GetCasbinByUserID(id uint) (*vo.Casbin, error) {
+	query, err := s.factory.NewRoleQueryByUserID(id)
+	if err != nil {
+		return nil, err
+	}
+	result := query.Casbin()
+	return result, nil
 }

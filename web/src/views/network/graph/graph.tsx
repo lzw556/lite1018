@@ -10,6 +10,7 @@ import DeviceInfoPopover from "./deviceInfoPopover";
 import AlertIcon from "../../../components/alertIcon";
 import "../../../assets/iconfont.css"
 import {ColorHealth, ColorWarn} from "../../../constants/color";
+import userPermission, {Permission} from "../../../permission/permission";
 
 interface INode {
     id: string
@@ -27,7 +28,7 @@ interface IEdge {
 
 export interface GraphProps {
     network: Network
-    onNodeRemove?: (id: number, routingTables:any) => void
+    onNodeRemove?: (id: number, routingTables: any) => void
     isEdit: boolean
     height: number
 }
@@ -35,6 +36,7 @@ export interface GraphProps {
 const Graph: FC<GraphProps> = ({network, onNodeRemove, isEdit, height}) => {
     const [data, setData] = useState<{ nodes: INode[], edges: IEdge[] }>()
     const [selections, setSelections] = useState<string[]>([])
+    const {hasPermission} = userPermission()
 
     useEffect(() => {
         const nodes = network.nodes.map(item => {
@@ -69,11 +71,13 @@ const Graph: FC<GraphProps> = ({network, onNodeRemove, isEdit, height}) => {
         }
     }
 
-    const renderDeviceState = (device:Device) => {
+    const renderDeviceState = (device: Device) => {
         if (device.alertState && device.alertState.level > 0) {
             return <AlertIcon state={device.alertState} popoverPlacement={"rightTop"}/>
-        }else {
-            return  device.state.isOnline ? <span className={"iconfont icon-normal"} style={{color: ColorHealth, cursor: "pointer"}}/> : <span className={"iconfont icon-offline"} style={{color: ColorWarn, cursor: "pointer"}}/>
+        } else {
+            return device.state.isOnline ?
+                <span className={"iconfont icon-normal"} style={{color: ColorHealth, cursor: "pointer"}}/> :
+                <span className={"iconfont icon-offline"} style={{color: ColorWarn, cursor: "pointer"}}/>
         }
     }
 
@@ -91,8 +95,13 @@ const Graph: FC<GraphProps> = ({network, onNodeRemove, isEdit, height}) => {
                     <foreignObject height={event.height} width={event.width} x={0} y={0}>
                         <Popover placement={"bottom"} content={<DeviceInfoPopover device={event.node.data.device}/>}
                                  title={event.node.text}>
-                            <div className={clazz} style={{textAlign: "center", position: "fixed", bottom: 0, top: 0, left: 0, right: 0}}>
-                                <a href={`#/device-management/devices?locale=deviceDetail&id=${event.node.data.device.id}`}>{event.node.text}</a>
+                            <div className={clazz}
+                                 style={{textAlign: "center", position: "fixed", bottom: 0, top: 0, left: 0, right: 0}}>
+                                {
+                                    hasPermission(Permission.DeviceDetail) ?
+                                        <a href={`#/device-management/devices?locale=deviceDetail&id=${event.node.data.device.id}`}>{event.node.text}</a> :
+                                        event.node.text
+                                }
                                 <br/>
                                 {
                                     renderDeviceState(event.node.data.device)

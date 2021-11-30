@@ -8,3 +8,7 @@ type Role struct {
 type AllocMenus struct {
 	IDs []uint `json:"ids"`
 }
+
+type AllocPermissions struct {
+	IDs []uint `json:"ids"`
+}

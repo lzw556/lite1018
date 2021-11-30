@@ -21,4 +21,5 @@ type DeviceSetting map[string]interface{}
 
 type DeviceUpgrade struct {
 	FirmwareID uint `json:"firmware_id"`
+	Type       uint `json:"type"`
 }

@@ -43,7 +43,21 @@ func (r roleRouter) allocMenus(ctx *gin.Context) (interface{}, error) {
 	return nil, r.service.AllocMenus(id, req)
 }
 
+func (r roleRouter) allocPermissions(ctx *gin.Context) (interface{}, error) {
+	id := cast.ToUint(ctx.Param("id"))
+	var req request.AllocPermissions
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		return nil, response.InvalidParameterError(err.Error())
+	}
+	return nil, r.service.AllocPermissions(id, req)
+}
+
 func (r roleRouter) get(ctx *gin.Context) (interface{}, error) {
 	id := cast.ToUint(ctx.Param("id"))
 	return r.service.GetRole(id)
+}
+
+func (r roleRouter) casbin(ctx *gin.Context) (interface{}, error) {
+	userID := cast.ToUint(ctx.MustGet("user_id"))
+	return r.service.GetCasbinByUserID(userID)
 }

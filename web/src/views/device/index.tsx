@@ -4,7 +4,8 @@ import {
     CodeOutlined,
     DeleteOutlined,
     EditOutlined,
-    LoadingOutlined, PlusOutlined
+    LoadingOutlined,
+    PlusOutlined
 } from "@ant-design/icons";
 import {Content} from "antd/lib/layout/layout";
 import {useHistory} from "react-router-dom";
@@ -13,7 +14,7 @@ import {useCallback, useEffect, useState} from "react";
 import {DeviceCommand} from "../../types/device_command";
 import {
     DeleteDeviceRequest,
-    DeviceCancelUpgradeRequest,
+    DeviceUpgradeRequest,
     GetDeviceRequest,
     PagingDevicesRequest,
     SendDeviceCommandRequest
@@ -37,13 +38,20 @@ import "../../assets/iconfont.css";
 import AlertIcon from "../../components/alertIcon";
 import MyBreadcrumb from "../../components/myBreadcrumb";
 import _ from "lodash";
+import HasPermission from "../../permission";
+import userPermission, {Permission} from "../../permission/permission";
 
 const {Search} = Input
 const {Option} = Select
 const {Text} = Typography
 
 const DevicePage = () => {
-    const [table, setTable] = useState<TableProps>({data: {result:[]}, isLoading: false, pagination: true, refreshKey: 0})
+    const [table, setTable] = useState<TableProps>({
+        data: {result: []},
+        isLoading: false,
+        pagination: true,
+        refreshKey: 0
+    })
     const history = useHistory()
     const [assetId, setAssetId] = useState<number>(0)
     const [searchTarget, setSearchTarget] = useState<number>(0)
@@ -56,12 +64,13 @@ const DevicePage = () => {
     const [replaceVisible, setReplaceVisible] = useState<boolean>(false)
     const [executeDevice, setExecuteDevice] = useState<Device>()
     const {PubSub} = useSocket()
+    const {hasPermission} = userPermission()
 
     useEffect(() => {
-        PubSub.subscribe(SocketTopic.connectionState, (msg:string, state:any) => {
+        PubSub.subscribe(SocketTopic.connectionState, (msg: string, state: any) => {
             if (state && table.data.result) {
                 const data = _.cloneDeep(table.data)
-                data.result.forEach((item:Device) => {
+                data.result.forEach((item: Device) => {
                     if (item.id === state.id) {
                         item.state.isOnline = state.isOnline
                     }
@@ -69,10 +78,10 @@ const DevicePage = () => {
                 setTable({...table, data: data})
             }
         })
-        PubSub.subscribe(SocketTopic.upgradeState, (msg:string, state:any) => {
+        PubSub.subscribe(SocketTopic.upgradeState, (msg: string, state: any) => {
             if (state && table.data.result) {
                 const data = _.cloneDeep(table.data)
-                data.result.forEach((item:Device) => {
+                data.result.forEach((item: Device) => {
                     if (item.id === state.id) {
                         item.upgradeState = state
                     }
@@ -143,8 +152,12 @@ const DevicePage = () => {
                 setUpgradeVisible(true)
                 break
             case DeviceCommand.CancelUpgrade:
-                DeviceCancelUpgradeRequest(device.id).then(res => {
-                    console.log(res)
+                DeviceUpgradeRequest(device.id, {type: DeviceCommand.CancelUpgrade}).then(res => {
+                    if (res.code === 200) {
+                        message.success("取消升级成功").then()
+                    } else {
+                        message.error(`取消升级失败,${res.msg}`).then()
+                    }
                 })
                 break
             default:
@@ -167,10 +180,20 @@ const DevicePage = () => {
         return <Menu onClick={(e) => {
             onCommand(record, e.key)
         }}>
-            <Menu.Item key={DeviceCommand.Reboot} disabled={!disabled} hidden={isUpgrading}>重启</Menu.Item>
-            <Menu.Item key={DeviceCommand.Upgrade} disabled={!disabled} hidden={isUpgrading}>固件升级</Menu.Item>
-            <Menu.Item key={DeviceCommand.CancelUpgrade} hidden={!isUpgrading}>取消升级</Menu.Item>
-            <Menu.Item key={DeviceCommand.Reset} disabled={!disabled} hidden={isUpgrading}>恢复出厂设置</Menu.Item>
+            {
+                hasPermission(Permission.DeviceCommand) &&
+                (<>
+                    <Menu.Item key={DeviceCommand.Reboot} disabled={!disabled} hidden={isUpgrading}>重启</Menu.Item>
+                    <Menu.Item key={DeviceCommand.Reset} disabled={!disabled} hidden={isUpgrading}>恢复出厂设置</Menu.Item>
+                </>)
+            }
+            {
+                hasPermission(Permission.DeviceUpgrade) &&
+                (<>
+                    <Menu.Item key={DeviceCommand.Upgrade} disabled={!disabled} hidden={isUpgrading}>固件升级</Menu.Item>
+                    <Menu.Item key={DeviceCommand.CancelUpgrade} hidden={!isUpgrading}>取消升级</Menu.Item>
+                </>)
+            }
         </Menu>
     }
 
@@ -193,10 +216,20 @@ const DevicePage = () => {
         return <Menu onClick={(e) => {
             onEdit(record.id, e.key)
         }} disabled={isUpgrading}>
-            <Menu.Item key={0}>替换设备</Menu.Item>
-            <Menu.Item key={1}>编辑设备信息</Menu.Item>
-            {record.typeId !== DeviceType.Router && <Menu.Item key={2}>更新设备配置</Menu.Item>}
-            {record.typeId === DeviceType.Gateway && <Menu.Item key={3}>更新网络参数</Menu.Item>}
+            {
+                hasPermission(Permission.DeviceReplace) && <Menu.Item key={0}>替换设备</Menu.Item>
+            }
+            {
+                hasPermission(Permission.DeviceEdit) && <Menu.Item key={1}>编辑设备信息</Menu.Item>
+            }
+            {
+                hasPermission(Permission.DeviceSettingsEdit) && record.typeId !== DeviceType.Router &&
+                <Menu.Item key={2} hidden={!hasPermission(Permission.DeviceSettingsEdit)}>更新设备配置</Menu.Item>
+            }
+            {
+                hasPermission(Permission.NetworkSettingEdit) && record.typeId === DeviceType.Gateway &&
+                <Menu.Item key={3}>更新网络参数</Menu.Item>
+            }
         </Menu>
     }
 
@@ -225,10 +258,14 @@ const DevicePage = () => {
                     {
                         record.alertState && <AlertIcon popoverPlacement={"right"} state={record.alertState}/>
                     }
-                    <a href={`#/device-management/devices?locale=deviceDetail&id=${record.id}`}>{text}</a>
+                    {
+                        hasPermission(Permission.DeviceDetail) ?
+                            <a href={`#/device-management/devices?locale=deviceDetail&id=${record.id}`}>{text}</a> : text
+                    }
                     {
                         record.upgradeState && (
-                            <DeviceUpgradeState status={record.upgradeState.status} progress={record.upgradeState.progress}/>)
+                            <DeviceUpgradeState status={record.upgradeState.status}
+                                                progress={record.upgradeState.progress}/>)
                     }
                 </Space>
             }
@@ -272,6 +309,7 @@ const DevicePage = () => {
         {
             title: '操作',
             key: 'action',
+            shouldCellUpdate: (_: any, _: any) => false,
             render: (text: any, record: any) => {
                 const isUpgrading = record.upgradeState && record.upgradeState.status >= 1 && record.upgradeState.status <= 3
                 return <Space>
@@ -281,10 +319,12 @@ const DevicePage = () => {
                     <Dropdown overlay={renderCommandMenus(record)}>
                         <Button type="text" icon={<CodeOutlined/>}/>
                     </Dropdown>
-                    <Popconfirm placement="left" title="确认要删除该设备吗?" onConfirm={() => onDelete(record.id)}
-                                okText="删除" cancelText="取消">
-                        <Button type="text" size="small" icon={<DeleteOutlined/>} danger disabled={isUpgrading}/>
-                    </Popconfirm>
+                    <HasPermission value={Permission.DeviceDelete}>
+                        <Popconfirm placement="left" title="确认要删除该设备吗?" onConfirm={() => onDelete(record.id)}
+                                    okText="删除" cancelText="取消">
+                            <Button type="text" size="small" icon={<DeleteOutlined/>} danger disabled={isUpgrading}/>
+                        </Popconfirm>
+                    </HasPermission>
                 </Space>
             },
         },
@@ -293,7 +333,11 @@ const DevicePage = () => {
     return <Content>
         <MyBreadcrumb items={["设备管理", "设备列表"]}>
             <Space>
-                <Button type="primary" onClick={onAddDevice}>添加设备 <PlusOutlined/></Button>
+                {
+                    hasPermission(Permission.DeviceAdd) &&
+                    <Button type="primary" onClick={onAddDevice}>添加设备 <PlusOutlined/></Button>
+
+                }
             </Space>
         </MyBreadcrumb>
         <ShadowCard>

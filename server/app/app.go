@@ -13,6 +13,7 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/firmware"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/menu"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/network"
+	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/permission"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/property"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/role"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/system"
@@ -94,11 +95,12 @@ func runIoTServer() {
 func runApiServer(dist embed.FS) {
 	adapter.Api = api.NewAdapter()
 	adapter.Api.StaticFS(dist)
-	adapter.Api.UseMiddleware(middleware.NewJWT("/login"))
+	adapter.Api.UseMiddleware(middleware.NewJWT("/login"), middleware.NewCasbinRbac("/login", "/my/*", "/*/check*"))
 	adapter.Api.RegisterRouters(
 		user.NewRouter(service.NewUser()),
 		menu.NewRouter(service.NewMenu()),
 		role.NewRouter(service.NewRole()),
+		permission.NewRouter(service.NewPermission()),
 		asset.NewRouter(service.NewAsset()),
 		device.NewRouter(service.NewDevice()),
 		property.NewRouter(service.NewProperty()),

@@ -85,4 +85,4 @@ const MenuDrawer: FC<MenuDrawerProps> = (props) => {
     </Drawer>
 }
 
-export default MenuDrawer
+export default MenuDrawer;

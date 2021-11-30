@@ -10,11 +10,13 @@ import AddRoleModal from "./modal/add";
 import EditRoleModal from "./modal/edit";
 import {Role} from "../../../types/role";
 import MenuDrawer from "./menuDrawer";
+import PermissionDrawer from "./permissionDrawer";
 
 const RolePage = () => {
     const [addVisible, setAddVisible] = useState(false);
     const [editVisible, setEditVisible] = useState(false);
     const [menuVisible, setMenuVisible] = useState(false);
+    const [permissionVisible, setPermissionVisible] = useState(false);
     const [role, setRole] = useState<Role>()
     const [table, setTable] = useState<TableProps>({
         refreshKey: 0,
@@ -35,12 +37,23 @@ const RolePage = () => {
         setTable({...table, refreshKey: table.refreshKey + 1})
     }
 
-    const onAllocMenus = (id:number) => {
+    const onAllocMenus = (id: number) => {
         GetRoleRequest(id).then(res => {
             if (res.code === 200) {
                 setRole(res.data)
                 setMenuVisible(true)
-            }else {
+            } else {
+                message.error(res.msg)
+            }
+        })
+    }
+
+    const onAllocPermissions = (id: number) => {
+        GetRoleRequest(id).then(res => {
+            if (res.code === 200) {
+                setRole(res.data)
+                setPermissionVisible(true)
+            } else {
                 message.error(res.msg)
             }
         })
@@ -60,11 +73,14 @@ const RolePage = () => {
         {
             title: '操作',
             key: 'action',
-            render: (text:string, record:any) => {
+            render: (text: string, record: any) => {
                 return <Space>
                     <Button type={"link"} size={"small"} onClick={() => {
                         onAllocMenus(record.id)
                     }}>分配菜单</Button>
+                    <Button type={"link"} size={"small"} onClick={() => {
+                        onAllocPermissions(record.id)
+                    }}>分配权限</Button>
                     <Button type="text" size="small" icon={<EditOutlined/>} onClick={() => {
                         setEditVisible(true)
                         setRole(record)
@@ -80,7 +96,7 @@ const RolePage = () => {
 
     return <Content>
         <MyBreadcrumb items={["系统管理", "角色管理"]}>
-                <Button type={"primary"} onClick={() => setAddVisible(true)}>添加角色 <PlusOutlined /></Button>
+            <Button type={"primary"} onClick={() => setAddVisible(true)}>添加角色 <PlusOutlined/></Button>
         </MyBreadcrumb>
         <ShadowCard>
             <TableLayout
@@ -103,6 +119,7 @@ const RolePage = () => {
             }
         }/>
         <MenuDrawer role={role} visible={menuVisible} onCancel={() => setMenuVisible(false)}/>
+        <PermissionDrawer role={role} visible={permissionVisible} onCancel={() => setPermissionVisible(false)}/>
     </Content>
 }
 

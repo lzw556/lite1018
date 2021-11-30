@@ -1,5 +1,5 @@
 import {useEffect, useState} from "react";
-import {GetPropertyDataRequest, PagingDevicesRequest} from "../../../apis/device";
+import {GetDeviceDataRequest, PagingDevicesRequest} from "../../../apis/device";
 import {Button, Card, Col, DatePicker, Row, Select, Space} from "antd";
 import {CaretDownOutlined, DeleteOutlined, DownloadOutlined} from "@ant-design/icons";
 import {Content} from "antd/lib/layout/layout";
@@ -17,6 +17,8 @@ import {EmptyLayout} from "../../layout";
 import DownloadModal from "./modal/downloadModal";
 import RemoveModal from "./modal/removeModal";
 import MyBreadcrumb from "../../../components/myBreadcrumb";
+import HasPermission from "../../../permission";
+import {Permission} from "../../../permission/permission";
 
 const {Option} = Select
 const {RangePicker} = DatePicker
@@ -77,55 +79,61 @@ const HistoryDataPage = () => {
     }
 
     useEffect(() => {
-        if (device && property && startDate && endDate) {
-            setOption(undefined)
-            GetPropertyDataRequest(device.id, property.id, startDate.utc().unix(), endDate.utc().unix()).then(res => {
-                if (res.code === 200) {
-                    const keys = Object.keys(res.data.fields)
-                    const legend = keys.map(key => GetFieldName(key))
-                    const series = keys.map((key, index) => {
-                        return {
-                            ...LineChartStyles[index],
-                            name: GetFieldName(key),
-                            type: 'line',
-                            data: res.data.fields[key]
-                        }
-                    })
-                    const xAxis = [{
-                        type: 'category',
-                        boundaryGap: false,
-                        data: res.data.time.map(item => moment.unix(item).local().format("YYYY-MM-DD HH:mm:ss"))
-                    }]
-                    setOption({
-                        ...DefaultHistoryDataOption,
-                        tooltip: {
-                            trigger: 'axis',
-                            formatter: function (params: any) {
-                                let relVal = params[0].name;
-                                for (let i = 0; i < params.length; i++) {
-                                    let value = Number(params[i].value).toFixed(3)
-                                    relVal += `<br/> ${params[i].marker} ${params[i].seriesName}: ${value}${res.data.unit}`
-                                }
-                                return relVal;
+            if (device && property && startDate && endDate) {
+                setOption(undefined)
+                GetDeviceDataRequest(device.id, property.id, startDate.utc().unix(), endDate.utc().unix()).then(res => {
+                    if (res.code === 200 && !Array.isArray(res.data)) {
+                        const {fields, time, name, unit} = res.data
+                        const keys = Object.keys(res.data.fields)
+                        const legend = keys.map(key => GetFieldName(key))
+                        const series = keys.map((key, index) => {
+                            return {
+                                ...LineChartStyles[index],
+                                name: GetFieldName(key),
+                                type: 'line',
+                                data: fields[key]
                             }
-                        },
-                        title: {text: res.data.name},
-                        legend: {data: legend},
-                        series,
-                        xAxis
-                    })
-                }
-            })
-        }
-    }, [property, startDate, endDate, refreshKey])
+                        })
+                        const xAxis = [{
+                            type: 'category',
+                            boundaryGap: false,
+                            data: time.map(item => moment.unix(item).local().format("YYYY-MM-DD HH:mm:ss"))
+                        }]
+                        setOption({
+                            ...DefaultHistoryDataOption,
+                            tooltip: {
+                                trigger: 'axis',
+                                formatter: function (params: any) {
+                                    let relVal = params[0].name;
+                                    for (let i = 0; i < params.length; i++) {
+                                        let value = Number(params[i].value).toFixed(3)
+                                        relVal += `<br/> ${params[i].marker} ${params[i].seriesName}: ${value}${unit}`
+                                    }
+                                    return relVal;
+                                }
+                            },
+                            title: {text: name},
+                            legend: {data: legend},
+                            series,
+                            xAxis
+                        })
+                    }
+                })
+            }
+        }, [property, startDate, endDate, refreshKey]
+    )
 
     return <Content>
         <MyBreadcrumb items={["数据管理", "历史数据"]}>
             <Space>
-                <Button type="primary" onClick={() => {
-                    setDownloadVisible(true)
-                }}>下载数据<DownloadOutlined/></Button>
-                <Button type="default" danger onClick={_ => setRemoveVisible(true)}>清空数据<DeleteOutlined/></Button>
+                <HasPermission value={Permission.DeviceDataDownload}>
+                    <Button type="primary" onClick={() => {
+                        setDownloadVisible(true)
+                    }}>下载数据<DownloadOutlined/></Button>
+                </HasPermission>
+                <HasPermission value={Permission.DeviceDataDelete}>
+                    <Button type="default" danger onClick={_ => setRemoveVisible(true)}>清空数据<DeleteOutlined/></Button>
+                </HasPermission>
             </Space>
         </MyBreadcrumb>
         <Row justify="center">
