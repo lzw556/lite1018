@@ -1,5 +1,5 @@
 import {Asset} from "../../../types/asset";
-import {Card, Col, List, Row, Select, Space, Statistic, Typography} from "antd";
+import {Card, Col, List, Row, Select, Skeleton, Space, Statistic, Typography} from "antd";
 import ShadowCard from "../../../components/shadowCard";
 import {ColorDanger, ColorHealth, ColorInfo, ColorWarn} from "../../../constants/color";
 import {FC, useEffect, useState} from "react";
@@ -13,6 +13,7 @@ import {GetPrimaryProperty} from "../../../types/property";
 import {GetFieldName} from "../../../constants/field";
 import {GetAlertColor} from "../../../types/alert_state";
 import Label from "../../../components/label";
+import userPermission, {Permission} from "../../../permission/permission";
 
 const {Title} = Typography
 const {Option} = Select
@@ -26,6 +27,7 @@ const AssetStatistic: FC<AssetStatisticProps> = ({value}) => {
     const [assetStatistics, setAssetStatistics] = useState<any>();
     const [deviceStatus, setDeviceStatus] = useState<number>(0);
     const [alertLevels, setAlertLevels] = useState<number[]>([0, 1, 2, 3]);
+    const {hasPermission} = userPermission();
 
     const fetchAlarmStatistics = async () => {
         const res = await GetAlarmStatisticsRequest(moment().local().startOf("day").unix(), moment().local().endOf("day").unix(), {asset_id: value.id})
@@ -116,44 +118,50 @@ const AssetStatistic: FC<AssetStatisticProps> = ({value}) => {
         <Row justify={"space-between"} gutter={16}>
             <Col span={8}>
                 <ShadowCard hoverable={true}>
-                    <Title level={4}>{assetStatistics?.asset.name}</Title>
-                    {
-                        assetStatistics && assetStatistics.status > 0 ?
-                            <Statistic title={"状态"} value={"异常"}
-                                       valueStyle={{color: ColorDanger, fontWeight: "bold"}}/> :
-                            <Statistic title={"状态"} value={"正常"} valueStyle={{color: ColorHealth, fontWeight: "bold"}}/>
-                    }
+                    <Skeleton loading={!assetStatistics} active>
+                        <Title level={4}>{assetStatistics?.asset.name}</Title>
+                        {
+                            assetStatistics && assetStatistics.status > 0 ?
+                                <Statistic title={"状态"} value={"异常"}
+                                           valueStyle={{color: ColorDanger, fontWeight: "bold"}}/> :
+                                <Statistic title={"状态"} value={"正常"} valueStyle={{color: ColorHealth, fontWeight: "bold"}}/>
+                        }
+                    </Skeleton>
                 </ShadowCard>
             </Col>
             <Col span={8}>
                 <ShadowCard hoverable={true}>
-                    <Title level={4}>设备统计</Title>
-                    {
-                        renderDeviceStatisticCard()
-                    }
+                    <Skeleton loading={!assetStatistics} active>
+                        <Title level={4}>设备统计</Title>
+                        {
+                            renderDeviceStatisticCard()
+                        }
+                    </Skeleton>
                 </ShadowCard>
             </Col>
             <Col span={8}>
                 <ShadowCard hoverable={true}>
-                    <Title level={4}>今日报警统计</Title>
-                    <Row justify={"start"}>
-                        <Col span={6}>
-                            <Statistic title={"未处理"}
-                                       value={alarmStatistics ? alarmStatistics.untreated.reduce((acc: number, cur: number) => acc + cur, 0) : 0}/>
-                        </Col>
-                        <Col span={6}>
-                            <Statistic title={"提示"} valueStyle={{color: ColorInfo}}
-                                       value={alarmStatistics ? alarmStatistics.info.reduce((acc: number, cur: number) => acc + cur, 0) : 0}/>
-                        </Col>
-                        <Col span={6}>
-                            <Statistic title={"重要"} valueStyle={{color: ColorWarn}}
-                                       value={alarmStatistics ? alarmStatistics.warn.reduce((acc: number, cur: number) => acc + cur, 0) : 0}/>
-                        </Col>
-                        <Col span={6}>
-                            <Statistic title={"紧急"} valueStyle={{color: ColorDanger}}
-                                       value={alarmStatistics ? alarmStatistics.critical.reduce((acc: number, cur: number) => acc + cur, 0) : 0}/>
-                        </Col>
-                    </Row>
+                    <Skeleton loading={!alarmStatistics} active>
+                        <Title level={4}>今日报警统计</Title>
+                        <Row justify={"start"}>
+                            <Col span={6}>
+                                <Statistic title={"未处理"}
+                                           value={alarmStatistics ? alarmStatistics.untreated.reduce((acc: number, cur: number) => acc + cur, 0) : 0}/>
+                            </Col>
+                            <Col span={6}>
+                                <Statistic title={"提示"} valueStyle={{color: ColorInfo}}
+                                           value={alarmStatistics ? alarmStatistics.info.reduce((acc: number, cur: number) => acc + cur, 0) : 0}/>
+                            </Col>
+                            <Col span={6}>
+                                <Statistic title={"重要"} valueStyle={{color: ColorWarn}}
+                                           value={alarmStatistics ? alarmStatistics.warn.reduce((acc: number, cur: number) => acc + cur, 0) : 0}/>
+                            </Col>
+                            <Col span={6}>
+                                <Statistic title={"紧急"} valueStyle={{color: ColorDanger}}
+                                           value={alarmStatistics ? alarmStatistics.critical.reduce((acc: number, cur: number) => acc + cur, 0) : 0}/>
+                            </Col>
+                        </Row>
+                    </Skeleton>
                 </ShadowCard>
             </Col>
         </Row>
@@ -198,8 +206,20 @@ const AssetStatistic: FC<AssetStatisticProps> = ({value}) => {
                     <List size={"small"} dataSource={renderDatasource()}
                           grid={{column: 5}}
                           renderItem={(device: Device) => {
-                              return <a href={`#/device-management/devices?locale=deviceDetail&id=${device.id}`}>
-                                  <List.Item key={device.id}>
+                              if (hasPermission(Permission.DeviceDetail)) {
+                                  return <a href={`#/device-management/devices?locale=deviceDetail&id=${device.id}`}>
+                                      <List.Item key={device.id}>
+                                          <ShadowCard title={device.name} bordered={false} hoverable={true} size={"small"}
+                                                      extra={device.alertState &&
+                                                      <AlertIcon popoverPlacement={"top"} state={device.alertState}/>}>
+                                              {
+                                                  renderDeviceCard(device)
+                                              }
+                                          </ShadowCard>
+                                      </List.Item>
+                                  </a>
+                              }else {
+                                  return <List.Item key={device.id}>
                                       <ShadowCard title={device.name} bordered={false} hoverable={true} size={"small"}
                                                   extra={device.alertState &&
                                                   <AlertIcon popoverPlacement={"top"} state={device.alertState}/>}>
@@ -208,7 +228,7 @@ const AssetStatistic: FC<AssetStatisticProps> = ({value}) => {
                                           }
                                       </ShadowCard>
                                   </List.Item>
-                              </a>
+                              }
                           }}/>
                 </Col>
             </Row>

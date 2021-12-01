@@ -9,6 +9,8 @@ import EditModal from "./editModal";
 import {DeleteOutlined, EditOutlined, PlusOutlined} from "@ant-design/icons";
 import ShadowCard from "../../components/shadowCard";
 import MyBreadcrumb from "../../components/myBreadcrumb";
+import HasPermission from "../../permission";
+import {Permission} from "../../permission/permission";
 
 
 const AssetPage: FC = () => {
@@ -79,16 +81,20 @@ const AssetPage: FC = () => {
         {
             title: '操作',
             key: 'action',
-            render: (text: any, record: any) => (
-                <Space>
-                    <Button type="text" size="small" icon={<EditOutlined/>}
-                            onClick={() => onEdit(record.id)}/>
-                    <Popconfirm placement="left" title="确认要删除该用户吗?" onConfirm={() => onDelete(record.id)}
-                                okText="删除" cancelText="取消">
-                        <Button type="text" size="small" icon={<DeleteOutlined/>} danger/>
-                    </Popconfirm>
+            render: (text: any, record: any) => {
+                return <Space>
+                    <HasPermission value={Permission.AssetEdit}>
+                        <Button type="text" size="small" icon={<EditOutlined/>}
+                                onClick={() => onEdit(record.id)}/>
+                    </HasPermission>
+                    <HasPermission value={Permission.AssetDelete}>
+                        <Popconfirm placement="left" title="确认要删除该资产吗?" onConfirm={() => onDelete(record.id)}
+                                    okText="删除" cancelText="取消">
+                            <Button type="text" size="small" icon={<DeleteOutlined/>} danger/>
+                        </Popconfirm>
+                    </HasPermission>
                 </Space>
-            ),
+            },
         }
     ]
 

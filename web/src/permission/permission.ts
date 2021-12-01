@@ -17,6 +17,7 @@ export const Permission = {
     DeviceDetail: {path: "devices/:id", method: "GET"},
     DeviceDataDelete: {path: "devices/:id/data", method: "DELETE"},
     DeviceDataDownload: {path: "devices/:id/download/data", method: "GET"},
+    DeviceData: {path: "devices/:id/data", method: "GET"},
     NetworkSettingEdit: {path: "networks/setting", method: "PUT"},
     NetworkRemoveDevices: {path: "networks/:id/devices", method: "DELETE"},
     NetworkAccessDevices: {path: "networks/:id/devices", method: "PATCH"},
@@ -28,6 +29,14 @@ export const Permission = {
     AlarmRuleTemplateAdd: {path: "alarmRuleTemplates", method: "POST"},
     AlarmRuleTemplateEdit: {path: "alarmRuleTemplates/:id", method: "PUT"},
     AlarmRuleTemplateDelete: {path: "alarmRuleTemplates/:id", method: "DELETE"},
+    AssetAdd: {path: "assets", method: "POST"},
+    AssetEdit: {path: "assets/:id", method: "PUT"},
+    AssetDelete: {path: "assets/:id", method: "DELETE"},
+    UserAdd: {path: "users", method: "POST"},
+    UserEdit: {path: "users/:id", method: "PUT"},
+    UserDelete: {path: "users/:id", method: "DELETE"},
+    FirmwareAdd: {path: "firmwares", method: "POST"},
+    FirmwareDelete: {path: "firmwares/:id", method: "DELETE"},
 }
 
 let enforcer: Enforcer | null = null

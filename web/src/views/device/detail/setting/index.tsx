@@ -6,6 +6,7 @@ import "../../index.css"
 import {DeviceType} from "../../../../types/device_type";
 import SensorSetting from "./sensor";
 import {Skeleton} from "antd";
+import {EmptyLayout} from "../../../layout";
 
 export interface SettingPageProps {
     device?: Device
@@ -36,6 +37,7 @@ const SettingPage:FC<SettingPageProps> = ({device}) => {
                     return <SensorSetting device={device} values={setting.sensors}/>
                 }
             }
+            return <EmptyLayout description={"暂无配置信息"}/>
         }
         return <div>
 

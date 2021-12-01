@@ -117,6 +117,21 @@ func (s Device) GetPropertyDataByID(deviceID uint, pID uint, from, to int64) (vo
 	return query.PropertyDataByRange(pID, time.Unix(from, 0), time.Unix(to, 0))
 }
 
+func (s Device) GetPropertyDataByIDs(deviceID uint, pIDs []uint, from, to int64) (vo.PropertiesData, error) {
+	query, err := s.factory.NewDeviceQuery(deviceID)
+	if err != nil {
+		return nil, err
+	}
+	result := make([]vo.PropertyData, len(pIDs))
+	for i, pid := range pIDs {
+		result[i], err = query.PropertyDataByRange(pid, time.Unix(from, 0), time.Unix(to, 0))
+		if err != nil {
+			return nil, err
+		}
+	}
+	return result, nil
+}
+
 func (s Device) FindDeviceDataByID(deviceID uint, from, to int64) ([]vo.PropertyData, error) {
 	query, err := s.factory.NewDeviceQuery(deviceID)
 	if err != nil {

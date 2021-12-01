@@ -25,6 +25,7 @@ type Service interface {
 	UpdateDeviceSetting(deviceID uint, req request.DeviceSetting) error
 
 	GetPropertyDataByID(deviceID uint, pID uint, from, to int64) (vo.PropertyData, error)
+	GetPropertyDataByIDs(deviceID uint, pIDs []uint, from, to int64) (vo.PropertiesData, error)
 	FindDeviceDataByID(deviceID uint, from, to int64) ([]vo.PropertyData, error)
 	RemoveDataByID(deviceID uint, from, to int64) error
 	GetChildren(deviceID uint) ([]vo.Device, error)

@@ -36,8 +36,8 @@ export function GetDeviceDataRequest(id:number, pid:number, from:number, to:numb
     return request.get<PropertyData[] | PropertyData>(`/devices/${id}/data`, {from, to, pid}).then(res => res.data)
 }
 
-export function DownloadDeviceDataRequest(id:number, pid:number, from:number, to:number) {
-    return request.download<any>(`/devices/${id}/download/data`, {pid, from, to})
+export function DownloadDeviceDataRequest(id:number, pids:string, from:number, to:number) {
+    return request.download<any>(`/devices/${id}/download/data`, {pids, from, to})
 }
 
 export function RemoveDeviceDataRequest(id:number, from:number, to:number) {

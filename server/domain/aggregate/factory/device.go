@@ -48,6 +48,8 @@ func (factory Device) NewDeviceCreateCmd(req request.Device) (command.DeviceCrea
 		return factory.newRouterCreateCmd(e.Device, req)
 	case devicetype.BoltLooseningType,
 		devicetype.BoltElongationType,
+		devicetype.VibrationTemperature3AxisType,
+		devicetype.AngleDipType,
 		devicetype.NormalTemperatureCorrosionType,
 		devicetype.HighTemperatureCorrosionType:
 		return factory.newSensorCreateCmd(e.Device, req)

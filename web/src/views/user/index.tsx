@@ -1,7 +1,7 @@
 import {Button, Col, message, Popconfirm, Row, Space} from "antd";
 import {useCallback, useState} from "react";
 import {Content} from "antd/lib/layout/layout";
-import {RemoveUserRequest, GetUserRequest, PagingUsersRequest} from "../../apis/user";
+import {GetUserRequest, PagingUsersRequest, RemoveUserRequest} from "../../apis/user";
 import TableLayout, {TableProps} from "../layout/TableLayout";
 import {InitializeUserState} from "../../types/user";
 import {DeleteOutlined, EditOutlined, UserAddOutlined} from "@ant-design/icons";
@@ -9,6 +9,8 @@ import AddUserModal from "./add";
 import EditUserModal from "./edit";
 import ShadowCard from "../../components/shadowCard";
 import MyBreadcrumb from "../../components/myBreadcrumb";
+import HasPermission from "../../permission";
+import {Permission} from "../../permission/permission";
 
 const UserPage = () => {
     const [addUserVisible, setAddUserVisible] = useState<boolean>(false)
@@ -86,16 +88,20 @@ const UserPage = () => {
         {
             title: '操作',
             key: 'action',
-            render: (text: any, record: any) => (
-                <Space>
-                    <Button type="text" size="small" icon={<EditOutlined />}
-                            onClick={() => onEdit(record.id)}/>
-                    <Popconfirm placement="left" title="确认要删除该用户吗?" onConfirm={() => onDelete(record.id)}
-                                okText="删除" cancelText="取消">
-                        <Button type="text" size="small" icon={<DeleteOutlined />} danger/>
-                    </Popconfirm>
+            render: (text: any, record: any) => {
+                return <Space>
+                    <HasPermission value={Permission.UserEdit}>
+                        <Button type="text" size="small" icon={<EditOutlined/>}
+                                onClick={() => onEdit(record.id)}/>
+                    </HasPermission>
+                    <HasPermission value={Permission.UserDelete}>
+                        <Popconfirm placement="left" title="确认要删除该用户吗?" onConfirm={() => onDelete(record.id)}
+                                    okText="删除" cancelText="取消">
+                            <Button type="text" size="small" icon={<DeleteOutlined/>} danger/>
+                        </Popconfirm>
+                    </HasPermission>
                 </Space>
-            ),
+            },
         },
     ]
 
@@ -103,30 +109,31 @@ const UserPage = () => {
     return <Content>
         <MyBreadcrumb items={["用户管理", "用户列表"]}>
             <Space>
-                <Button type="primary" onClick={() => {
-                    setAddUserVisible(true)
-                }}>
-                    添加用户 <UserAddOutlined />
-                </Button>
+                <HasPermission value={Permission.UserAdd}>
+                    <Button type="primary"
+                            onClick={() => setAddUserVisible(true)}>
+                        添加用户 <UserAddOutlined/>
+                    </Button>
+                </HasPermission>
             </Space>
         </MyBreadcrumb>
         <Row justify="center">
             <Col span={24}>
-                    <ShadowCard>
-                        <TableLayout
-                            columns={columns}
-                            data={table.data}
-                            isLoading={table.isLoading}
-                            refreshKey={table.refreshKey}
-                            pagination={true}
-                            onChange={onChange}
-                        />
-                    </ShadowCard>
+                <ShadowCard>
+                    <TableLayout
+                        columns={columns}
+                        data={table.data}
+                        isLoading={table.isLoading}
+                        refreshKey={table.refreshKey}
+                        pagination={true}
+                        onChange={onChange}
+                    />
+                </ShadowCard>
             </Col>
         </Row>
         <AddUserModal visible={addUserVisible} onCancel={() => setAddUserVisible(false)} onSuccess={onAddUserSuccess}/>
         <EditUserModal user={user} visible={editUserVisible} onCancel={() => setEditUserVisible(false)}
-               onSuccess={onEditUserSuccess}/>
+                       onSuccess={onEditUserSuccess}/>
     </Content>
 }
 

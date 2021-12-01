@@ -15,7 +15,8 @@ import SettingPage from "./setting";
 import {DeviceType} from "../../../types/device_type";
 import MyBreadcrumb from "../../../components/myBreadcrumb";
 import HasPermission from "../../../permission";
-import {Permission} from "../../../permission/permission";
+import userPermission, {Permission} from "../../../permission/permission";
+import HistoryDataPage from "./data";
 
 const tabList = [
     {
@@ -23,27 +24,28 @@ const tabList = [
         tab: "监控",
     },
     {
+        key: "settings",
+        tab: "配置信息",
+    },
+    {
         key: "alert",
         tab: "报警记录"
     },
-    // {
-    //     key: "event",
-    //     tab: "事件",
-    // }
 ]
 
 const DeviceDetailPage = () => {
-    const location = useLocation<any>()
-    const history = useHistory()
-    const [device, setDevice] = useState<Device>()
-    const [isLoading, setIsLoading] = useState<boolean>(false)
-    const [currentKey, setCurrentKey] = useState<string>("monitor")
+    const location = useLocation<any>();
+    const history = useHistory();
+    const [device, setDevice] = useState<Device>();
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [currentKey, setCurrentKey] = useState<string>("monitor");
+    const {hasPermission} = userPermission();
 
     const contents = new Map<string, any>([
         ["monitor", <MonitorPage device={device}/>],
         ["alert", <AlertPage device={device}/>],
-        ["setting", <SettingPage device={device}/>],
-        // ["event", <a/>]
+        ["settings", <SettingPage device={device}/>],
+        ["historyData", <HistoryDataPage device={device}/>]
     ])
 
     const fetchDevice = useCallback(() => {
@@ -70,14 +72,16 @@ const DeviceDetailPage = () => {
     }, [fetchDevice])
 
     const renderTabList = () => {
-        if (device && device.typeId !== DeviceType.Router) {
+        if (device &&
+            device.typeId !== DeviceType.Router &&
+            device.typeId !== DeviceType.Gateway &&
+            hasPermission(Permission.DeviceData)) {
             return [
-                tabList[0],
+                ...tabList,
                 {
-                    key: "setting",
-                    tab: "配置信息"
-                },
-                ...tabList.slice(1)
+                    key: "historyData",
+                    tab: "历史数据"
+                }
             ]
         }
         return tabList

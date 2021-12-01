@@ -127,7 +127,7 @@ const DevicePage = () => {
     }
 
     const onAddDevice = () => {
-        history.push("/device-management/add")
+        history.push("/device-management?locale=addDevice")
     }
 
     const onDelete = (id: number) => {
@@ -309,7 +309,7 @@ const DevicePage = () => {
         {
             title: '操作',
             key: 'action',
-            shouldCellUpdate: (_: any, _: any) => false,
+            shouldCellUpdate: () => false,
             render: (text: any, record: any) => {
                 const isUpgrading = record.upgradeState && record.upgradeState.status >= 1 && record.upgradeState.status <= 3
                 return <Space>

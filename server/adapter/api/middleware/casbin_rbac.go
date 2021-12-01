@@ -27,13 +27,12 @@ func (m CasbinRbac) WrapHandler() gin.HandlerFunc {
 				return
 			}
 		}
-		if m.isSuperAdmin(ctx) {
-			ctx.Next()
-			return
-		}
 		path := strings.TrimPrefix(ctx.Request.URL.Path, "/api/")
 		method := ctx.Request.Method
 		roleID := ctx.GetString("role_id")
+		if m.isSuperAdmin(ctx) {
+			roleID = "admin"
+		}
 		if ok, _ := casbin.Enforcer().Enforce(roleID, path, method); ok {
 			ctx.Next()
 			return

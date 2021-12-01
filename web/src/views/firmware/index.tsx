@@ -7,6 +7,8 @@ import {PagingFirmwaresRequest, RemoveFirmwareRequest, UploadFirmwareRequest} fr
 import moment from "moment";
 import ShadowCard from "../../components/shadowCard";
 import MyBreadcrumb from "../../components/myBreadcrumb";
+import HasPermission from "../../permission";
+import {Permission} from "../../permission/permission";
 
 
 const FirmwarePage = () => {
@@ -93,10 +95,12 @@ const FirmwarePage = () => {
             key: 'action',
             render: (text: any, record: any) => (
                 <Space>
-                    <Popconfirm placement="left" title="确认要删除该用户吗?" onConfirm={() => onDelete(record.id)}
-                                okText="删除" cancelText="取消">
-                        <Button type="text" size="small" icon={<DeleteOutlined />} danger/>
-                    </Popconfirm>
+                    <HasPermission value={Permission.FirmwareDelete}>
+                        <Popconfirm placement="left" title="确认要删除该用户吗?" onConfirm={() => onDelete(record.id)}
+                                    okText="删除" cancelText="取消">
+                            <Button type="text" size="small" icon={<DeleteOutlined />} danger/>
+                        </Popconfirm>
+                    </HasPermission>
                 </Space>
             ),
         }
@@ -104,21 +108,23 @@ const FirmwarePage = () => {
 
     return <Content>
         <MyBreadcrumb items={["设备管理", "固件列表"]}>
-            <Upload
-                accept={".bin"}
-                name="file"
-                customRequest={onUpload}
-                showUploadList={false}
-                onChange={onFileChange}>
-                <Button type="primary" loading={isUploading}>
-                    {
-                        isUploading ? "固件上传中" : "上传固件"
-                    }
-                    {
-                        isUploading ? null : <UploadOutlined />
-                    }
-                </Button>
-            </Upload>
+            <HasPermission value={Permission.FirmwareAdd}>
+                <Upload
+                    accept={".bin"}
+                    name="file"
+                    customRequest={onUpload}
+                    showUploadList={false}
+                    onChange={onFileChange}>
+                    <Button type="primary" loading={isUploading}>
+                        {
+                            isUploading ? "固件上传中" : "上传固件"
+                        }
+                        {
+                            isUploading ? null : <UploadOutlined />
+                        }
+                    </Button>
+                </Upload>
+            </HasPermission>
         </MyBreadcrumb>
         <Row justify="center">
             <Col span={24}>
