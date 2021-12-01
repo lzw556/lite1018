@@ -1,4 +1,4 @@
-import {Button, Drawer, DrawerProps, message, Space, Tree} from "antd";
+import {Button, Drawer, DrawerProps, Space, Tree} from "antd";
 import {Role} from "../../../types/role";
 import {FC, useEffect, useState} from "react";
 import {GetPermissionsWithGroupRequest} from "../../../apis/permission";
@@ -9,7 +9,7 @@ export interface PermissionDrawerProps extends DrawerProps {
     onCancel: () => void
 }
 
-const PermissionDrawer:FC<PermissionDrawerProps> = (props) => {
+const PermissionDrawer: FC<PermissionDrawerProps> = (props) => {
     const {role, visible, onCancel} = props;
     const [permissions, setPermissions] = useState<any>();
     const [checkPermissions, setCheckPermissions] = useState<number[]>([]);
@@ -29,25 +29,20 @@ const PermissionDrawer:FC<PermissionDrawerProps> = (props) => {
 
     const onSave = () => {
         if (role) {
-            AllocPermissionsRequest(role.id, checkPermissions).then(res => {
-                if (res.code === 200) {
-                    message.success('保存成功')
-                    onCancel()
-                }else {
-                    message.error(res.msg)
-                }
+            AllocPermissionsRequest(role.id, checkPermissions).then(_ => {
+                onCancel()
             })
         }
     }
 
     const renderDefaultCheckedKeys = () => {
         if (role) {
-            const ps = role.permissions.map((item:any) => `${item[0]}::${item[1]}`)
+            const ps = role.permissions.map((item: any) => `${item[0]}::${item[1]}`)
             const checked: any[] = []
             Object.keys(permissions).forEach(key => {
-                permissions[key].filter((item:any) => {
+                permissions[key].filter((item: any) => {
                     return ps.includes(`${item.path}::${item.method}`)
-                }).forEach((item:any) => {
+                }).forEach((item: any) => {
                     checked.push(item.id)
                 })
             })
@@ -63,7 +58,7 @@ const PermissionDrawer:FC<PermissionDrawerProps> = (props) => {
         </Space>
     }
 
-    const onCheck = (checkKeys:any, e:any) => {
+    const onCheck = (checkKeys: any, e: any) => {
         setCheckPermissions(checkKeys)
     }
 
@@ -74,7 +69,7 @@ const PermissionDrawer:FC<PermissionDrawerProps> = (props) => {
                 title: key,
                 key: key,
                 checkable: false,
-                children: permissions[key].map((item:any) => {
+                children: permissions[key].map((item: any) => {
                     return {
                         title: item.description,
                         key: item.id,
@@ -87,7 +82,9 @@ const PermissionDrawer:FC<PermissionDrawerProps> = (props) => {
 
     const convertPermissionTree = () => {
         if (permissions && visible) {
-            return <Tree checkable defaultExpandAll={true} showIcon={true} selectable={false} defaultCheckedKeys={renderDefaultCheckedKeys()} treeData={convertTreeData()} onCheck={onCheck}/>
+            return <Tree checkable defaultExpandAll={true} showIcon={true} selectable={false}
+                         defaultCheckedKeys={renderDefaultCheckedKeys()} treeData={convertTreeData()}
+                         onCheck={onCheck}/>
         }
     }
 

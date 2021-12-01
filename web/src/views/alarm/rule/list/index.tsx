@@ -3,7 +3,7 @@ import {useCallback, useState} from "react";
 import {GetAlarmRuleRequest, PagingAlarmRulesRequest, RemoveAlarmRuleRequest} from "../../../../apis/alarm";
 import {Device} from "../../../../types/device";
 import {DeviceTypeString} from "../../../../types/device_type";
-import {Button, Col, Divider, message, Popconfirm, Row, Select, Space} from "antd";
+import {Button, Col, Divider, Popconfirm, Row, Select, Space} from "antd";
 import Label from "../../../../components/label";
 import EditModal from "../modal/editModal";
 import {AlarmRule} from "../../../../types/alarm_rule";
@@ -35,25 +35,14 @@ const RulesPage = () => {
     }
 
     const onEdit = (id: number) => {
-        GetAlarmRuleRequest(id).then(res => {
-            if (res.code === 200) {
-                setRule(res.data)
-                setEditVisible(true)
-            } else {
-                message.error(res.msg).then()
-            }
+        GetAlarmRuleRequest(id).then(data => {
+            setRule(data)
+            setEditVisible(true)
         })
     }
 
     const onDelete = (id: number) => {
-        RemoveAlarmRuleRequest(id).then(res => {
-            if (res.code === 200) {
-                message.success("删除成功").then()
-                onRefresh()
-            } else {
-                message.error("删除失败").then()
-            }
-        })
+        RemoveAlarmRuleRequest(id).then(_ => onRefresh())
     }
 
     const columns = [
@@ -115,10 +104,8 @@ const RulesPage = () => {
 
     const onChange = useCallback((current: number, size: number) => {
         onLoading(true)
-        PagingAlarmRulesRequest(assetId, deviceId, current, size).then(res => {
-            if (res.code === 200) {
-                setTable(Object.assign({}, table, {data: res.data}))
-            }
+        PagingAlarmRulesRequest(assetId, deviceId, current, size).then(data => {
+            setTable(Object.assign({}, table, {data: data}))
         })
     }, [assetId, deviceId])
 
@@ -148,7 +135,8 @@ const RulesPage = () => {
         <br/>
         <Row justify={"start"}>
             <Col span={24}>
-                <TableLayout emptyText={"报警规则列表为空"} columns={columns} isLoading={table.isLoading} pagination={table.pagination}
+                <TableLayout emptyText={"报警规则列表为空"} columns={columns} isLoading={table.isLoading}
+                             pagination={table.pagination}
                              refreshKey={table.refreshKey} data={table.data} onChange={onChange}/>
             </Col>
         </Row>

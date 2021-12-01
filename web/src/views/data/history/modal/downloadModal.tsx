@@ -24,12 +24,10 @@ const DownloadModal: FC<DownloadModalProps> = (props) => {
 
     useEffect(() => {
         if (visible) {
-            PagingAssetsRequest(1, 100).then(res => {
-                if (res.code === 200) {
-                    setOptions(res.data.result.map(item => {
-                        return {value: item.id, label: item.name, isLeaf: false}
-                    }))
-                }
+            PagingAssetsRequest(1, 100).then(data => {
+                setOptions(data.result.map(item => {
+                    return {value: item.id, label: item.name, isLeaf: false}
+                }))
                 if (device) {
                     form.setFieldsValue({
                         properties: [device?.name, property?.name]
@@ -44,18 +42,16 @@ const DownloadModal: FC<DownloadModalProps> = (props) => {
     const onLoadData = (selectedOptions: any) => {
         if (selectedOptions.length === 1) {
             const target = selectedOptions[0]
-            PagingDevicesRequest(target.value, 1, 100, {}).then(res => {
-                if (res.code === 200) {
-                    target.children = res.data.result.filter(item => item.category === 3).map(item => {
-                        return {
-                            value: item.id, label: item.name, isLeaf: false, data: item,
-                            children: item.properties.map(property => {
-                                return {value: property.id, label: property.name, data: property}
-                            })
-                        }
-                    })
-                    setOptions([...options])
-                }
+            PagingDevicesRequest(target.value, 1, 100, {}).then(data => {
+                target.children = data.result.filter(item => item.category === 3).map(item => {
+                    return {
+                        value: item.id, label: item.name, isLeaf: false, data: item,
+                        children: item.properties.map(property => {
+                            return {value: property.id, label: property.name, data: property}
+                        })
+                    }
+                })
+                setOptions([...options])
             })
         }
     }
@@ -80,7 +76,7 @@ const DownloadModal: FC<DownloadModalProps> = (props) => {
         <Form form={form}>
             <Form.Item label={"设备属性"} name={"properties"} required>
                 <Cascader style={{width: "252px"}} placeholder={"请选择设备属性"} options={options} loadData={onLoadData}
-                          onChange={(value: any, selectedOptions:any) => {
+                          onChange={(value: any, selectedOptions: any) => {
                               if (selectedOptions) {
                                   setSelectedDevice(selectedOptions[1].data)
                                   setSelectedProperty(selectedOptions[2].data)

@@ -52,15 +52,12 @@ const DeviceDetailPage = () => {
         const id = GetParamValue(location.search, "id")
         if (id && !!Number(id)) {
             setIsLoading(true)
-            GetDeviceRequest(Number(id)).then(res => {
-                setIsLoading(false)
-                if (res.code === 200) {
-                    setDevice(res.data)
-                } else {
-                    message.error("设备不存在").then()
-                    history.push({pathname: "/device-management/devices"})
-                }
-            })
+            GetDeviceRequest(Number(id))
+                .then(data => {
+                    setDevice(data)
+                    setIsLoading(false)
+                })
+                .catch(_ => history.push({pathname: "/device-management/devices"}))
         } else {
             message.error("设备不存在").then()
             history.push({pathname: "/device-management/devices"})
@@ -113,7 +110,7 @@ const DeviceDetailPage = () => {
     }
 
     return <Content>
-        <MyBreadcrumb items={["设备管理", "设备列表", "设备详情"]}>
+        <MyBreadcrumb>
             <Space>
                 <HasPermission value={Permission.DeviceCommand}>
                     <Dropdown overlay={renderCommandMenu}>

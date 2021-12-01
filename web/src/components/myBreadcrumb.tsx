@@ -1,19 +1,44 @@
 import {Breadcrumb, Col, Row} from "antd";
-import {FC} from "react";
+import {FC, useEffect, useState} from "react";
+import {useLocation} from "react-router-dom";
+import {GetParamValue} from "../utils/path";
+import {getMenus} from "../utils/session";
+import {SecondaryRoutes} from "../routers/routes";
 
 export interface MyBreadcrumbProps {
-    items: any[]
     children?: any
 }
 
-const MyBreadcrumb:FC<MyBreadcrumbProps> = ({items,children}) => {
+const flattenRoutes: any = (children: any) => {
+    return children.reduce((acc: any, curr: any) => {
+        acc.push(curr)
+        return acc.concat(curr.children ? flattenRoutes(curr.children) : [])
+    }, [])
+}
+
+const routes = flattenRoutes(getMenus()).concat(SecondaryRoutes)
+
+const MyBreadcrumb:FC<MyBreadcrumbProps> = ({children}) => {
+    const location = useLocation()
+    const locale = GetParamValue(location.search, "locale")
+    const [items, setItems] = useState([])
+
+    useEffect(() => {
+        console.log(routes.filter((route:any) => locale?.split("/").includes(route.name)))
+        setItems(routes.filter((route:any) => locale?.split("/").includes(route.name)))
+    }, [])
 
     return <Row justify={"space-between"} style={{paddingBottom: "8px"}}>
         <Col span={12}>
             <Breadcrumb style={{fontSize: "16pt", fontWeight: "bold"}}>
                 {
-                    items.map((item, index) => {
-                        return <Breadcrumb.Item key={index}>{item}</Breadcrumb.Item>
+                    items.map((route:any, index:number) => {
+                        if (items.length-1 === index) {
+                            return <Breadcrumb.Item key={route.name}>{route.title}</Breadcrumb.Item>
+                        }
+                        return <a href={`#${route.path}?locale=${route.name}`}>
+                            <Breadcrumb.Item key={route.name}>{route.title}</Breadcrumb.Item>
+                        </a>
                     })
                 }
             </Breadcrumb>

@@ -1,4 +1,4 @@
-import {Form, Input, message, Modal} from "antd";
+import {Form, Input, Modal} from "antd";
 import {useEffect, useState} from "react";
 import {UpdateUserRequest} from "../../../apis/user";
 import {User} from "../../../types/user";
@@ -31,12 +31,9 @@ const EditUserModal = (props: EditUserProps) => {
     const onSave = () => {
         setIsLoading(true)
         form.validateFields(["role"]).then(values => {
-            UpdateUserRequest(user.id, values).then(res => {
+            UpdateUserRequest(user.id, values).then(_ => {
                 setIsLoading(false)
-                if (res.code === 200) {
-                    onSuccess()
-                    message.success("保存成功").then()
-                }
+                onSuccess()
             })
         }).catch(e => {
             setIsLoading(false)
@@ -56,7 +53,8 @@ const EditUserModal = (props: EditUserProps) => {
         <Form form={form} labelCol={{span: 8}}>
             {
                 user.id !== 1 &&
-                <Form.Item name={"role"} label={"用户角色"} initialValue={user.role ? user.role : null} rules={[Rules.required]}>
+                <Form.Item name={"role"} label={"用户角色"} initialValue={user.role ? user.role : null}
+                           rules={[Rules.required]}>
                     <RoleSelect placeholder={"请选择角色"}/>
                 </Form.Item>
             }

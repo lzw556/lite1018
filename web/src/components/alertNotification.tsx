@@ -7,18 +7,14 @@ const AlertNotification = () => {
     const {PubSub} = useSocket()
 
     const onAcknowledge = (id: number) => {
-        AcknowledgeAlarmRecordRequest(id).then(res => {
-            if (res.code === 200) {
-                notification.close(String(id))
-                message.success("确认报警成功").then()
-            }else {
-                message.error(res.msg).then()
-            }
+        AcknowledgeAlarmRecordRequest(id).then(_ => {
+            notification.close(String(id))
+            message.success("确认报警成功").then()
         })
     }
 
     useEffect(() => {
-        PubSub.subscribe(SocketTopic.alert, (msg:string, data:any) => {
+        PubSub.subscribe(SocketTopic.alert, (msg: string, data: any) => {
             renderAlertNotification(data)
         })
     }, [])

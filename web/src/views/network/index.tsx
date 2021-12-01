@@ -56,7 +56,7 @@ const NetworkPage = () => {
     const {hasPermission} = userPermission()
 
     useEffect(() => {
-        PubSub.subscribe(SocketTopic.connectionState, (msg:string, state:any) => {
+        PubSub.subscribe(SocketTopic.connectionState, (msg: string, state: any) => {
             if (state && network) {
                 const newNetwork = _.cloneDeep(network)
                 newNetwork.nodes = newNetwork.nodes.map(item => {
@@ -72,12 +72,10 @@ const NetworkPage = () => {
     }, [network])
 
     const fetchNetwork = (id: number) => {
-        GetNetworkRequest(id).then(res => {
-            if (res.code === 200) {
-                setNetwork(res.data)
-                setIsNetworkEdit(false)
-                setIsEdit(false)
-            }
+        GetNetworkRequest(id).then(data => {
+            setNetwork(data)
+            setIsNetworkEdit(false)
+            setIsEdit(false)
         })
     }
 
@@ -127,13 +125,8 @@ const NetworkPage = () => {
 
     const onSaveNetwork = () => {
         if (network && removeNode && removeNode.length) {
-            RemoveDevicesRequest(network.id, {device_ids: removeNode, routing_tables: routingTables}).then(res => {
-                if (res.code === 200) {
-                    fetchNetwork(network.id)
-                    message.success("保存成功").then()
-                } else {
-                    message.error("保存失败").then()
-                }
+            RemoveDevicesRequest(network.id, {device_ids: removeNode, routing_tables: routingTables}).then(_ => {
+                fetchNetwork(network.id)
             })
         } else {
             setIsNetworkEdit(!isNetworkEdit)
@@ -318,53 +311,53 @@ const NetworkPage = () => {
     }
 
     return <Content>
-        <MyBreadcrumb items={["网络管理", "网络列表"]}/>
+        <MyBreadcrumb/>
         <Row justify="center">
             <Col span={24}>
-                    <ShadowCard>
-                        <Row justify="center">
-                            <Col span={24}>
-                                <Space>
-                                    <Label name={"资产"}>
-                                        <AssetSelect bordered={false} style={{width: "150px"}} defaultValue={assetId}
-                                                     defaultActiveFirstOption={true}
-                                                     placeholder={"请选择资产"}
-                                                     onChange={onAssetChange}>
-                                            <Option key={0} value={0}>所有资产</Option>
-                                        </AssetSelect>
-                                    </Label>
-                                    <Label name={"网络"}>
-                                        <NetworkSelect value={network?.id} bordered={false}
-                                                       defaultActiveFirstOption={true} style={{width: "150px"}}
-                                                       placeholder={"暂无网络"} asset={assetId} onChange={value => {
-                                            value ? fetchNetwork(value) : setNetwork(undefined)
-                                        }} onDefaultSelect={value => {
-                                            value ? fetchNetwork(value) : setNetwork(undefined)
-                                        }}/>
-                                    </Label>
-                                </Space>
-                            </Col>
-                        </Row>
-                        <br/>
-                        <Row justify="space-between" style={{height: `${height}px`}}>
-                            <Col span={17} style={{paddingRight: "4px", height: "100%"}}>
-                                <Card type="inner" size={"small"} title={"拓扑图"} style={{height: "100%"}}
-                                      extra={renderActionButton()}>
-                                    {
-                                        renderNetworkGraph()
-                                    }
-                                </Card>
-                            </Col>
-                            <Col span={7} style={{height: "100%"}}>
-                                <Card type={"inner"} title={"基本信息"} size={"small"}
-                                      style={{height: "100%"}} extra={renderEditButton()}>
-                                    {
-                                        renderBasicInfo()
-                                    }
-                                </Card>
-                            </Col>
-                        </Row>
-                    </ShadowCard>
+                <ShadowCard>
+                    <Row justify="center">
+                        <Col span={24}>
+                            <Space>
+                                <Label name={"资产"}>
+                                    <AssetSelect bordered={false} style={{width: "150px"}} defaultValue={assetId}
+                                                 defaultActiveFirstOption={true}
+                                                 placeholder={"请选择资产"}
+                                                 onChange={onAssetChange}>
+                                        <Option key={0} value={0}>所有资产</Option>
+                                    </AssetSelect>
+                                </Label>
+                                <Label name={"网络"}>
+                                    <NetworkSelect value={network?.id} bordered={false}
+                                                   defaultActiveFirstOption={true} style={{width: "150px"}}
+                                                   placeholder={"暂无网络"} asset={assetId} onChange={value => {
+                                        value ? fetchNetwork(value) : setNetwork(undefined)
+                                    }} onDefaultSelect={value => {
+                                        value ? fetchNetwork(value) : setNetwork(undefined)
+                                    }}/>
+                                </Label>
+                            </Space>
+                        </Col>
+                    </Row>
+                    <br/>
+                    <Row justify="space-between" style={{height: `${height}px`}}>
+                        <Col span={17} style={{paddingRight: "4px", height: "100%"}}>
+                            <Card type="inner" size={"small"} title={"拓扑图"} style={{height: "100%"}}
+                                  extra={renderActionButton()}>
+                                {
+                                    renderNetworkGraph()
+                                }
+                            </Card>
+                        </Col>
+                        <Col span={7} style={{height: "100%"}}>
+                            <Card type={"inner"} title={"基本信息"} size={"small"}
+                                  style={{height: "100%"}} extra={renderEditButton()}>
+                                {
+                                    renderBasicInfo()
+                                }
+                            </Card>
+                        </Col>
+                    </Row>
+                </ShadowCard>
             </Col>
         </Row>
         <AccessDeviceModal parent={device}

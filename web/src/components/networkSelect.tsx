@@ -16,11 +16,9 @@ const NetworkSelect: FC<NetworkSelectProps> = (props) => {
     const {asset, onDefaultSelect} = props
 
     useEffect(() => {
-        GetNetworksRequest(asset).then(res => {
-            if (res.code === 200) {
-                setNetworks(res.data)
-                onDefaultSelect(res.data[0]?.id)
-            }
+        GetNetworksRequest(asset).then(data => {
+            setNetworks(data)
+            onDefaultSelect(data[0]?.id)
         })
     }, [asset])
 

@@ -114,11 +114,9 @@ const DevicePage = () => {
             target: searchTarget === 0 ? "name" : "mac_address",
             text: searchText
         }
-        PagingDevicesRequest(assetId, current, size, condition).then(res => {
+        PagingDevicesRequest(assetId, current, size, condition).then(data => {
             onLoading(false)
-            if (res.code === 200) {
-                setTable(Object.assign({}, table, {data: res.data}))
-            }
+            setTable(Object.assign({}, table, {data: data}))
         })
     }, [assetId, searchText])
 
@@ -131,14 +129,7 @@ const DevicePage = () => {
     }
 
     const onDelete = (id: number) => {
-        DeleteDeviceRequest(id).then(res => {
-            if (res.code === 200) {
-                message.success("删除成功").then()
-                onRefresh()
-            } else {
-                message.error(`删除失败,${res.msg}`).then()
-            }
-        })
+        DeleteDeviceRequest(id).then(_ => onRefresh())
     }
 
     const onRefresh = () => {
@@ -198,16 +189,12 @@ const DevicePage = () => {
     }
 
     const onEdit = (id: number, key: any) => {
-        GetDeviceRequest(id).then(res => {
-            if (res.code === 200) {
-                setDevice(res.data)
-                setReplaceVisible(key === "0")
-                setEditBaseInfoVisible(key === "1")
-                setEditSettingVisible(key === "2")
-                setEditWsnSettingVisible(key === "3")
-            } else {
-                message.error(res.msg).then()
-            }
+        GetDeviceRequest(id).then(data => {
+            setDevice(data)
+            setReplaceVisible(key === "0")
+            setEditBaseInfoVisible(key === "1")
+            setEditSettingVisible(key === "2")
+            setEditWsnSettingVisible(key === "3")
         })
     }
 
@@ -260,7 +247,7 @@ const DevicePage = () => {
                     }
                     {
                         hasPermission(Permission.DeviceDetail) ?
-                            <a href={`#/device-management/devices?locale=deviceDetail&id=${record.id}`}>{text}</a> : text
+                            <a href={`#/device-management?locale=devices/deviceDetail&id=${record.id}`}>{text}</a> : text
                     }
                     {
                         record.upgradeState && (
@@ -331,7 +318,7 @@ const DevicePage = () => {
     ]
 
     return <Content>
-        <MyBreadcrumb items={["设备管理", "设备列表"]}>
+        <MyBreadcrumb>
             <Space>
                 {
                     hasPermission(Permission.DeviceAdd) &&

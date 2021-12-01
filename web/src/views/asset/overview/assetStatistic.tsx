@@ -29,18 +29,13 @@ const AssetStatistic: FC<AssetStatisticProps> = ({value}) => {
     const [alertLevels, setAlertLevels] = useState<number[]>([0, 1, 2, 3]);
     const {hasPermission} = userPermission();
 
-    const fetchAlarmStatistics = async () => {
-        const res = await GetAlarmStatisticsRequest(moment().local().startOf("day").unix(), moment().local().endOf("day").unix(), {asset_id: value.id})
-        if (res.code === 200) {
-            setAlarmStatistics(res.data)
-        }
+    const fetchAlarmStatistics = () => {
+        GetAlarmStatisticsRequest(moment().local().startOf("day").unix(), moment().local().endOf("day").unix(), {asset_id: value.id})
+            .then(setAlarmStatistics)
     }
 
-    const fetchAssetStatistics = async () => {
-        const res = await GetAssetStatisticsRequest(value.id)
-        if (res.code === 200) {
-            setAssetStatistics(res.data)
-        }
+    const fetchAssetStatistics = () => {
+        GetAssetStatisticsRequest(value.id).then(setAssetStatistics)
     }
 
     const renderDeviceCard = (device: Device) => {
@@ -109,8 +104,8 @@ const AssetStatistic: FC<AssetStatisticProps> = ({value}) => {
 
     useEffect(() => {
         if (value) {
-            fetchAlarmStatistics().then()
-            fetchAssetStatistics().then()
+            fetchAlarmStatistics()
+            fetchAssetStatistics()
         }
     }, [value])
 
@@ -207,7 +202,7 @@ const AssetStatistic: FC<AssetStatisticProps> = ({value}) => {
                           grid={{column: 5}}
                           renderItem={(device: Device) => {
                               if (hasPermission(Permission.DeviceDetail)) {
-                                  return <a href={`#/device-management/devices?locale=deviceDetail&id=${device.id}`}>
+                                  return <a href={`#/device-management?locale=assetOverview/deviceDetail&id=${device.id}`}>
                                       <List.Item key={device.id}>
                                           <ShadowCard title={device.name} bordered={false} hoverable={true} size={"small"}
                                                       extra={device.alertState &&

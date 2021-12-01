@@ -15,13 +15,13 @@ const FirmwarePage = () => {
     const [isUploading, setIsUploading] = useState<boolean>(false)
     const [table, setTable] = useState<TableProps>(DEFAULT_TABLE_PROPS)
 
-    const onFileChange = (info:any) => {
+    const onFileChange = (info: any) => {
         if (info.file.status === 'uploading') {
             setIsUploading(true)
         }
     }
 
-    const onUpload = (options:any) => {
+    const onUpload = (options: any) => {
         const formData = new FormData()
         formData.append("file", options.file)
         UploadFirmwareRequest(formData).then(res => {
@@ -29,7 +29,7 @@ const FirmwarePage = () => {
             if (res.code === 200) {
                 onRefresh()
                 message.success("固件上传成功").then()
-            }else {
+            } else {
                 message.error(`上传失败,${res.msg}`).then()
             }
         })
@@ -41,11 +41,9 @@ const FirmwarePage = () => {
 
     const onChange = useCallback((current: number, size: number) => {
         onLoading(true)
-        PagingFirmwaresRequest(current, size).then(res => {
+        PagingFirmwaresRequest(current, size).then(data => {
             onLoading(false)
-            if (res.code === 200) {
-                setTable(old => Object.assign({}, old, {data: res.data}))
-            }
+            setTable(old => Object.assign({}, old, {data: data}))
         })
     }, [])
 
@@ -53,14 +51,8 @@ const FirmwarePage = () => {
         setTable(old => Object.assign({}, old, {refreshKey: old.refreshKey + 1}))
     }
 
-    const onDelete = async (id:number) => {
-        const res = await RemoveFirmwareRequest(id)
-        if (res.code === 200) {
-            onRefresh()
-            message.success("删除成功").then()
-        }else {
-            message.error("删除失败").then()
-        }
+    const onDelete = (id: number) => {
+        RemoveFirmwareRequest(id).then(_ => onRefresh())
     }
 
     const columns = [
@@ -88,7 +80,7 @@ const FirmwarePage = () => {
             title: '编译时间',
             dataIndex: 'buildTime',
             key: 'buildTime',
-            render: (text:number) => moment.unix(text).local().format("yyyy-MM-DD HH:mm:ss")
+            render: (text: number) => moment.unix(text).local().format("yyyy-MM-DD HH:mm:ss")
         },
         {
             title: '操作',
@@ -98,7 +90,7 @@ const FirmwarePage = () => {
                     <HasPermission value={Permission.FirmwareDelete}>
                         <Popconfirm placement="left" title="确认要删除该用户吗?" onConfirm={() => onDelete(record.id)}
                                     okText="删除" cancelText="取消">
-                            <Button type="text" size="small" icon={<DeleteOutlined />} danger/>
+                            <Button type="text" size="small" icon={<DeleteOutlined/>} danger/>
                         </Popconfirm>
                     </HasPermission>
                 </Space>
@@ -107,7 +99,7 @@ const FirmwarePage = () => {
     ]
 
     return <Content>
-        <MyBreadcrumb items={["设备管理", "固件列表"]}>
+        <MyBreadcrumb>
             <HasPermission value={Permission.FirmwareAdd}>
                 <Upload
                     accept={".bin"}
@@ -120,7 +112,7 @@ const FirmwarePage = () => {
                             isUploading ? "固件上传中" : "上传固件"
                         }
                         {
-                            isUploading ? null : <UploadOutlined />
+                            isUploading ? null : <UploadOutlined/>
                         }
                     </Button>
                 </Upload>
@@ -128,16 +120,16 @@ const FirmwarePage = () => {
         </MyBreadcrumb>
         <Row justify="center">
             <Col span={24}>
-                    <ShadowCard>
-                        <TableLayout
-                            emptyText={"固件列表为空"}
-                            columns={columns}
-                            isLoading={table.isLoading}
-                            refreshKey={table.refreshKey}
-                            onChange={onChange}
-                            pagination={true}
-                            data={table.data}/>
-                    </ShadowCard>
+                <ShadowCard>
+                    <TableLayout
+                        emptyText={"固件列表为空"}
+                        columns={columns}
+                        isLoading={table.isLoading}
+                        refreshKey={table.refreshKey}
+                        onChange={onChange}
+                        pagination={true}
+                        data={table.data}/>
+                </ShadowCard>
             </Col>
         </Row>
     </Content>

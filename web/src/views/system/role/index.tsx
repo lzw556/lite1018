@@ -1,16 +1,18 @@
 import MyBreadcrumb from "../../../components/myBreadcrumb";
-import {Button, message, Popconfirm, Space} from "antd";
+import {Button, Popconfirm, Space} from "antd";
 import {DeleteOutlined, EditOutlined, PlusOutlined} from "@ant-design/icons";
 import {Content} from "antd/es/layout/layout";
 import TableLayout, {TableProps} from "../../layout/TableLayout";
 import ShadowCard from "../../../components/shadowCard";
 import {useCallback, useState} from "react";
-import {GetRoleRequest, PagingRolesRequest} from "../../../apis/role";
+import {GetRoleRequest, PagingRolesRequest, RemoveRoleRequest} from "../../../apis/role";
 import AddRoleModal from "./modal/add";
 import EditRoleModal from "./modal/edit";
 import {Role} from "../../../types/role";
 import MenuDrawer from "./menuDrawer";
 import PermissionDrawer from "./permissionDrawer";
+import HasPermission from "../../../permission";
+import {Permission} from "../../../permission/permission";
 
 const RolePage = () => {
     const [addVisible, setAddVisible] = useState(false);
@@ -26,10 +28,8 @@ const RolePage = () => {
     })
 
     const onChange = useCallback((current, size) => {
-        PagingRolesRequest(current, size).then(res => {
-            if (res.code === 200) {
-                setTable({...table, data: res.data})
-            }
+        PagingRolesRequest(current, size).then(data => {
+            setTable({...table, data: data})
         })
     }, [])
 
@@ -38,24 +38,22 @@ const RolePage = () => {
     }
 
     const onAllocMenus = (id: number) => {
-        GetRoleRequest(id).then(res => {
-            if (res.code === 200) {
-                setRole(res.data)
-                setMenuVisible(true)
-            } else {
-                message.error(res.msg)
-            }
+        GetRoleRequest(id).then(data => {
+            setRole(data)
+            setMenuVisible(true)
         })
     }
 
     const onAllocPermissions = (id: number) => {
-        GetRoleRequest(id).then(res => {
-            if (res.code === 200) {
-                setRole(res.data)
-                setPermissionVisible(true)
-            } else {
-                message.error(res.msg)
-            }
+        GetRoleRequest(id).then(data => {
+            setRole(data)
+            setPermissionVisible(true)
+        })
+    }
+
+    const onDelete = (id: number) => {
+        RemoveRoleRequest(id).then(_ => {
+                onRefresh()
         })
     }
 
@@ -75,28 +73,40 @@ const RolePage = () => {
             key: 'action',
             render: (text: string, record: any) => {
                 return <Space>
-                    <Button type={"link"} size={"small"} onClick={() => {
-                        onAllocMenus(record.id)
-                    }}>分配菜单</Button>
-                    <Button type={"link"} size={"small"} onClick={() => {
-                        onAllocPermissions(record.id)
-                    }}>分配权限</Button>
-                    <Button type="text" size="small" icon={<EditOutlined/>} onClick={() => {
-                        setEditVisible(true)
-                        setRole(record)
-                    }}/>
-                    <Popconfirm placement="left" title="确认要删除该角色吗?"
-                                okText="删除" cancelText="取消">
-                        <Button type="text" size="small" icon={<DeleteOutlined/>} danger/>
-                    </Popconfirm>
+                    <HasPermission value={Permission.RoleAllocMenus}>
+                        <Button type={"link"} size={"small"} onClick={() => {
+                            onAllocMenus(record.id)
+                        }}>分配菜单</Button>
+                    </HasPermission>
+                    <HasPermission value={Permission.RoleAllocPermissions}>
+                        <Button type={"link"} size={"small"} onClick={() => {
+                            onAllocPermissions(record.id)
+                        }}>分配权限</Button>
+                    </HasPermission>
+                    <HasPermission value={Permission.RoleEdit}>
+                        <Button type="text" size="small" icon={<EditOutlined/>} onClick={() => {
+                            setEditVisible(true)
+                            setRole(record)
+                        }}/>
+                    </HasPermission>
+                    <HasPermission value={Permission.RoleDelete}>
+                        <Popconfirm placement="left" title="确认要删除该角色吗?"
+                                    okText="删除" cancelText="取消" onConfirm={() => {
+                            onDelete(record.id)
+                        }}>
+                            <Button type="text" size="small" icon={<DeleteOutlined/>} danger/>
+                        </Popconfirm>
+                    </HasPermission>
                 </Space>
             },
         }
     ]
 
     return <Content>
-        <MyBreadcrumb items={["系统管理", "角色管理"]}>
-            <Button type={"primary"} onClick={() => setAddVisible(true)}>添加角色 <PlusOutlined/></Button>
+        <MyBreadcrumb>
+            <HasPermission value={Permission.RoleAdd}>
+                <Button type={"primary"} onClick={() => setAddVisible(true)}>添加角色 <PlusOutlined/></Button>
+            </HasPermission>
         </MyBreadcrumb>
         <ShadowCard>
             <TableLayout

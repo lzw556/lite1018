@@ -61,3 +61,8 @@ func (r roleRouter) casbin(ctx *gin.Context) (interface{}, error) {
 	userID := cast.ToUint(ctx.MustGet("user_id"))
 	return r.service.GetCasbinByUserID(userID)
 }
+
+func (r roleRouter) removeByID(ctx *gin.Context) (interface{}, error) {
+	id := cast.ToUint(ctx.Param("id"))
+	return nil, r.service.RemoveRoleByID(id)
+}

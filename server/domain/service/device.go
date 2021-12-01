@@ -94,7 +94,7 @@ func (s Device) GetDeviceSetting(deviceID uint) (*vo.DeviceSetting, error) {
 }
 
 func (s Device) CheckDeviceMacAddress(mac string) error {
-	_, err := s.repository.GetBySpecs(context.TODO(), spec.DeviceMacSpec(mac))
+	_, err := s.repository.GetBySpecs(context.TODO(), spec.DeviceMacEqSpec(mac))
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil
 	}

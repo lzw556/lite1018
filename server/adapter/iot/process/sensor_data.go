@@ -60,7 +60,7 @@ func (p SensorData) Process(ctx *iot.Context, msg iot.Message) error {
 			if err := p.deviceDataRepo.Create(e); err != nil {
 				return fmt.Errorf("save device %s data failed: %v", device.MacAddress, err)
 			}
-			rules, err := p.alarmRuleRepo.FindBySpecs(context.TODO(), spec.DevicesSpec{device.ID})
+			rules, err := p.alarmRuleRepo.FindBySpecs(context.TODO(), spec.DeviceInSpec{device.ID})
 			if err != nil {
 				return fmt.Errorf("find device %s alarm rules faield: %v", device.MacAddress, err)
 			}

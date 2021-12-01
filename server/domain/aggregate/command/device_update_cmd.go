@@ -40,7 +40,7 @@ func (cmd DeviceUpdateCmd) UpdateBaseInfo(req request.Device) error {
 		if err != nil {
 			return err
 		}
-		devices, err := cmd.deviceRepo.FindBySpecs(ctx, spec.NetworkSpec(cmd.Device.NetworkID))
+		devices, err := cmd.deviceRepo.FindBySpecs(ctx, spec.NetworkEqSpec(cmd.Device.NetworkID))
 		if err != nil {
 			return err
 		}
@@ -111,7 +111,7 @@ func (cmd DeviceUpdateCmd) updateSensorSetting() error {
 
 func (cmd DeviceUpdateCmd) Replace(mac string) error {
 	ctx := context.TODO()
-	_, err := cmd.deviceRepo.GetBySpecs(ctx, spec.DeviceMacSpec(mac))
+	_, err := cmd.deviceRepo.GetBySpecs(ctx, spec.DeviceMacEqSpec(mac))
 	if !errors.Is(err, gorm.ErrRecordNotFound) {
 		return response.BusinessErr(errcode.DeviceMacExistsError, "")
 	}

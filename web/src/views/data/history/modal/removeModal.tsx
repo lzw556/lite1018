@@ -1,4 +1,4 @@
-import {Cascader, DatePicker, Form, message, Modal, ModalProps} from "antd";
+import {Cascader, DatePicker, Form, Modal, ModalProps} from "antd";
 import moment from "moment";
 import {FC, useEffect, useState} from "react";
 import {Device} from "../../../../types/device";
@@ -22,15 +22,13 @@ const RemoveModal: FC<RemoveModalProps> = (props) => {
 
     useEffect(() => {
         if (visible) {
-            PagingAssetsRequest(1, 100).then(res => {
-                if (res.code === 200) {
-                    setOptions(res.data.result.map(item => {
-                        return {value: item.id, label: item.name, isLeaf: false}
-                    }))
-                    form.setFieldsValue({
-                        device: [device?.name]
-                    })
-                }
+            PagingAssetsRequest(1, 100).then(data => {
+                setOptions(data.result.map(item => {
+                    return {value: item.id, label: item.name, isLeaf: false}
+                }))
+                form.setFieldsValue({
+                    device: [device?.name]
+                })
             })
             setSelectedDevice(device)
         }
@@ -38,34 +36,25 @@ const RemoveModal: FC<RemoveModalProps> = (props) => {
 
     const onLoadData = (selectedOptions: any) => {
         const target = selectedOptions[selectedOptions.length - 1]
-        PagingDevicesRequest(target.value, 1, 100, {}).then(res => {
-            if (res.code === 200) {
-                target.children = res.data.result.filter(item => item.category === 3).map(item => {
-                    return {
-                        value: item.id, label: item.name, isLeaf: true, data: item,
-                    }
-                })
-                setOptions([...options])
-            }
+        PagingDevicesRequest(target.value, 1, 100, {}).then(data => {
+            target.children = data.result.filter(item => item.category === 3).map(item => {
+                return {
+                    value: item.id, label: item.name, isLeaf: true, data: item,
+                }
+            })
+            setOptions([...options])
         })
     }
 
     const onDelete = () => {
-        RemoveDeviceDataRequest(selectedDevice.id, startDate.utc().unix(), endDate.utc().unix()).then(res => {
-            if (res.code === 200) {
-                message.success("数据删除成功").then()
-                onSuccess()
-            }else {
-                message.error(res.msg).then()
-            }
-        })
+        RemoveDeviceDataRequest(selectedDevice.id, startDate.utc().unix(), endDate.utc().unix()).then(_ => onSuccess)
     }
 
     return <Modal {...props} width={390} title={"数据清空"} okText={"清空"} onOk={onDelete} cancelText={"取消"}>
         <Form form={form} labelCol={{span: 6}} labelAlign={"right"}>
             <Form.Item label={"设备"} name={"device"} required>
                 <Cascader style={{width: "252px"}} placeholder={"请选择设备"} options={options} loadData={onLoadData}
-                          onChange={(value:any, selectedOptions:any) => {
+                          onChange={(value: any, selectedOptions: any) => {
                               if (selectedOptions) {
                                   setSelectedDevice(selectedOptions[1].data)
                               }

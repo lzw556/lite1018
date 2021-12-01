@@ -50,6 +50,10 @@ func (repo User) Updates(ctx context.Context, e *po.User, updates map[string]int
 	return repo.DB(ctx).Model(e).Updates(updates).Error
 }
 
+func (repo User) UpdatesBySpecs(ctx context.Context, updates map[string]interface{}, specs ...spec.Specification) error {
+	return repo.DB(ctx).Model(&po.User{}).Scopes(spec.Scopes(specs)...).Updates(updates).Error
+}
+
 func (repo User) Delete(ctx context.Context, id uint) error {
 	return repo.DB(ctx).Delete(&po.User{}, id).Error
 }

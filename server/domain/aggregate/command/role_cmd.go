@@ -17,12 +17,16 @@ type RoleCmd struct {
 
 	roleMenuRepo   dependency.RoleMenuRelationRepository
 	permissionRepo dependency.PermissionRepository
+	userRepo       dependency.UserRepository
+	roleRepo       dependency.RoleRepository
 }
 
 func NewRoleCmd() RoleCmd {
 	return RoleCmd{
 		roleMenuRepo:   repository.RoleMenuRelation{},
 		permissionRepo: repository.Permission{},
+		userRepo:       repository.User{},
+		roleRepo:       repository.Role{},
 	}
 }
 
@@ -65,4 +69,20 @@ func (cmd RoleCmd) AllocPermissions(ids []uint) error {
 		return err
 	}
 	return nil
+}
+
+func (cmd RoleCmd) Remove() error {
+	casbin.Clear(0, strconv.Itoa(int(cmd.Role.ID)))
+	return transaction.Execute(context.TODO(), func(txCtx context.Context) error {
+		if err := cmd.roleRepo.Delete(txCtx, cmd.Role.ID); err != nil {
+			return err
+		}
+		if err := cmd.roleMenuRepo.DeleteBySpecs(txCtx, spec.RoleEqSpec(cmd.Role.ID)); err != nil {
+			return err
+		}
+		updates := map[string]interface{}{
+			"role_id": 0,
+		}
+		return cmd.userRepo.UpdatesBySpecs(txCtx, updates, spec.RoleEqSpec(cmd.Role.ID))
+	})
 }

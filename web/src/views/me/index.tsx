@@ -16,11 +16,7 @@ const MePage = () => {
     const [form] = Form.useForm()
 
     useEffect(() => {
-        GetMyProfile().then(res => {
-            if (res.code === 200) {
-                setUser(res.data)
-            }
-        })
+        GetMyProfile().then(setUser)
     }, [])
 
     const renderPhone = () => {
@@ -72,7 +68,7 @@ const MePage = () => {
     }
 
     return <Content>
-        <MyBreadcrumb items={["个人中心"]}/>
+        <MyBreadcrumb/>
         <Row justify="center">
             <Col span={24}>
                     <ShadowCard title="基本信息" bordered={false}>

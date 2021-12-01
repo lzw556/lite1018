@@ -1,4 +1,4 @@
-import {Form, message, Modal, ModalProps} from "antd";
+import {Form, Modal, ModalProps} from "antd";
 import {Device} from "../../../types/device";
 import {UpdateDeviceSettingRequest} from "../../../apis/device";
 import {DeviceType} from "../../../types/device_type";
@@ -8,13 +8,13 @@ import IpnFormItem from "../form/item/ipnFormItem";
 import {useState} from "react";
 import {defaultValidateMessages} from "../../../constants/validator";
 
-export interface EditSettingProps extends ModalProps{
+export interface EditSettingProps extends ModalProps {
     device?: Device
     visible: boolean
-    onSuccess:() => void
+    onSuccess: () => void
 }
 
-const EditSettingModal = (props:EditSettingProps) => {
+const EditSettingModal = (props: EditSettingProps) => {
     const {device, visible, onCancel, onSuccess} = props
     const [form] = Form.useForm()
     const [isLoading, setIsLoading] = useState<boolean>(false)
@@ -45,20 +45,16 @@ const EditSettingModal = (props:EditSettingProps) => {
             })
             if (device) {
                 setIsLoading(true)
-                UpdateDeviceSettingRequest(device.id, values).then(res => {
+                UpdateDeviceSettingRequest(device.id, values).then(_ => {
                     setIsLoading(false)
-                    if (res.code === 200) {
-                        onSuccess()
-                        message.success("更新配置成功").then()
-                    }else {
-                        message.error("更新配置失败").then()
-                    }
+                    onSuccess()
                 })
             }
         })
     }
 
-    return <Modal width={480} visible={visible} title={"设备配置"} okText={"更新"} onOk={onSave} cancelText={"取消"} onCancel={onCancel}  confirmLoading={isLoading}>
+    return <Modal width={480} visible={visible} title={"设备配置"} okText={"更新"} onOk={onSave} cancelText={"取消"}
+                  onCancel={onCancel} confirmLoading={isLoading}>
         <Form form={form} labelCol={{span: 8}} validateMessages={defaultValidateMessages}>
             {
                 renderSettingFormItems()

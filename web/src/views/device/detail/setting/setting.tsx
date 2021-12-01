@@ -1,5 +1,5 @@
 import {FC, useState} from "react";
-import {Button, Form, FormItemProps, message, Space} from "antd";
+import {Button, Form, FormItemProps, Space} from "antd";
 import {CheckOutlined, CloseOutlined, EditOutlined} from "@ant-design/icons";
 import {UpdateDeviceSettingRequest} from "../../../../apis/device";
 import {Device} from "../../../../types/device";
@@ -29,14 +29,9 @@ const Setting: FC<SettingProps> = (props) => {
     const [setting] = useState<any>({[name]: value})
 
     const onSave = (setting: any) => {
-        UpdateDeviceSettingRequest(device.id, setting).then(res => {
-            if (res.code === 200) {
-                message.success("保存成功").then()
-                setEditSetting(false)
-                onSuccess(setting)
-            } else {
-                message.error("保存失败").then()
-            }
+        UpdateDeviceSettingRequest(device.id, setting).then(_ => {
+            setEditSetting(false)
+            onSuccess(setting)
         })
     }
 

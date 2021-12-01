@@ -29,9 +29,9 @@ func (r *deviceRouter) initRoutes() {
 		router.NewGetRoute("devices/:id", r.getByID),
 		router.NewGetRoute("devices/:id/children", r.getChildren),
 		router.NewGetRoute("devices/:id/settings", r.getSettingByID),
-		router.NewGetRoute("devices/checkMacAddress/:mac", r.checkMacAddress),
 		router.NewGetRoute("devices/:id/data", r.findDataByID),
 		router.NewGetRoute("devices/:id/download/data", r.downloadDataByID),
+		router.NewGetRoute("check/devices/:mac", r.checkMacAddress),
 
 		// PUT
 		router.NewPutRoute("devices/:id", r.updateByID),

@@ -94,3 +94,11 @@ func (s Role) GetCasbinByUserID(id uint) (*vo.Casbin, error) {
 	result := query.Casbin()
 	return result, nil
 }
+
+func (s Role) RemoveRoleByID(id uint) error {
+	cmd, err := s.factory.NewRoleCmd(id)
+	if err != nil {
+		return err
+	}
+	return cmd.Remove()
+}

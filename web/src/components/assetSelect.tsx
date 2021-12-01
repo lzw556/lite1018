@@ -9,19 +9,17 @@ const {Option} = Select
 export interface AssetSelectProps extends SelectProps<any> {
 }
 
-const AssetSelect:FC<AssetSelectProps> = (props: AssetSelectProps) => {
+const AssetSelect: FC<AssetSelectProps> = (props: AssetSelectProps) => {
     const [assets, setAssets] = useState<Asset[]>([])
     const {children} = props
 
     useEffect(() => {
-        PagingAssetsRequest(1, 100).then(res => {
-            if (res.code === 200) {
-                setAssets(res.data.result)
-            }
+        PagingAssetsRequest(1, 100).then(data => {
+            setAssets(data.result)
         })
     }, [])
 
-    return <Select {...props} suffixIcon={<CaretDownOutlined />}>
+    return <Select {...props} suffixIcon={<CaretDownOutlined/>}>
         {
             children
         }

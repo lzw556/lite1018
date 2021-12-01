@@ -2,13 +2,13 @@ package specification
 
 import "gorm.io/gorm"
 
-type NetworkSpec uint
+type NetworkEqSpec uint
 
-func (NetworkSpec) IsSpecifiedBy(v interface{}) bool {
+func (NetworkEqSpec) IsSpecifiedBy(v interface{}) bool {
 	return true
 }
 
-func (s NetworkSpec) Scope() func(db *gorm.DB) *gorm.DB {
+func (s NetworkEqSpec) Scope() func(db *gorm.DB) *gorm.DB {
 	return func(db *gorm.DB) *gorm.DB {
 		return db.Where("network_id = ?", s)
 	}

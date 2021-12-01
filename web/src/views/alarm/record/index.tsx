@@ -57,7 +57,7 @@ const AlarmRecordPage = () => {
     ])
 
     return <Content>
-        <MyBreadcrumb items={["报警管理", "报警列表"]}>
+        <MyBreadcrumb>
             <Space>
                 <RangePicker
                     value={[startDate, endDate]}

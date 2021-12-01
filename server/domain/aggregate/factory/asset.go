@@ -29,7 +29,7 @@ func (factory Asset) NewAssetStatisticQuery(assetID uint) (*query.AssetStatistic
 	}
 	q := query.NewAssetStatisticQuery()
 	q.Asset = asset
-	q.Devices, _ = factory.deviceRepo.FindBySpecs(ctx, spec.AssetSpec(asset.ID))
+	q.Devices, _ = factory.deviceRepo.FindBySpecs(ctx, spec.AssetEqSpec(asset.ID))
 	return &q, nil
 }
 

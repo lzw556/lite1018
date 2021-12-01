@@ -33,7 +33,7 @@ func NewAssetRemoveCmd() AssetRemoveCmd {
 
 func (cmd AssetRemoveCmd) Run() error {
 	ctx := context.TODO()
-	devices, err := cmd.deviceRepo.FindBySpecs(ctx, spec.AssetSpec(cmd.Asset.ID))
+	devices, err := cmd.deviceRepo.FindBySpecs(ctx, spec.AssetEqSpec(cmd.Asset.ID))
 	if err != nil {
 		return err
 	}
@@ -45,7 +45,7 @@ func (cmd AssetRemoveCmd) Run() error {
 		if err := cmd.assetRepo.Delete(txCtx, cmd.Asset.ID); err != nil {
 			return err
 		}
-		if err := cmd.deviceRepo.DeleteBySpecs(txCtx, spec.AssetSpec(cmd.Asset.ID)); err != nil {
+		if err := cmd.deviceRepo.DeleteBySpecs(txCtx, spec.AssetEqSpec(cmd.Asset.ID)); err != nil {
 			return err
 		}
 		for _, device := range devices {

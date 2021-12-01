@@ -127,7 +127,7 @@ func (query DeviceQuery) DataByRange(from, to time.Time) ([]vo.PropertyData, err
 	result := make([]vo.PropertyData, len(properties))
 	for i, property := range properties {
 		result[i] = query.getPropertyData(property, data)
-		alarmRules, err := query.alarmRuleRepo.FindBySpecs(ctx, spec.PropertySpec(property.ID))
+		alarmRules, err := query.alarmRuleRepo.FindBySpecs(ctx, spec.PropertyEqSpec(property.ID))
 		if err != nil {
 			return nil, err
 		}

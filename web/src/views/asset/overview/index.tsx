@@ -18,11 +18,9 @@ const AssetOverview = () => {
     const [asset, setAsset] = useState<Asset>()
 
     useEffect(() => {
-        PagingAssetsRequest(1, 100).then(res => {
-            if (res.code === 200) {
-                setAssets(res.data.result)
-                selectAsset(res.data.result)
-            }
+        PagingAssetsRequest(1, 100).then(data => {
+                setAssets(data.result)
+                selectAsset(data.result)
         })
     }, [])
 
@@ -41,7 +39,7 @@ const AssetOverview = () => {
     }
 
     return <Content>
-        <MyBreadcrumb items={["资产管理", "概览"]}>
+        <MyBreadcrumb>
             <Space style={{backgroundColor: "white"}}>
                 <Label name={"资产"}>
                     <Select style={{width: "150px", textAlign: "center"}}  bordered={false} value={asset?.id} onChange={(value: number) => {

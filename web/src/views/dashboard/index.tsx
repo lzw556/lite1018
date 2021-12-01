@@ -24,11 +24,8 @@ const DashboardPage = () => {
     const [deviceStatistics, setDeviceStatistics] = useState<DeviceStatistic[]>([]);
     const [alarmStatistics, setAlarmStatistics] = useState<AlarmStatistics>();
 
-    const fetchAssetStatistics = async () => {
-        const res = await GetAllAssetStatisticsRequest();
-        if (res.code === 200) {
-            setAssetStatistics(res.data)
-        }
+    const fetchAssetStatistics = () => {
+        GetAllAssetStatisticsRequest().then(setAssetStatistics)
     }
 
     const renderAssetStatistics = () => {
@@ -80,11 +77,8 @@ const DashboardPage = () => {
         </Row>
     }
 
-    const fetchDeviceStatistics = async () => {
-        const res = await GetDevicesStatisticsRequest();
-        if (res.code === 200) {
-            setDeviceStatistics(res.data)
-        }
+    const fetchDeviceStatistics = () => {
+        GetDevicesStatisticsRequest().then(setDeviceStatistics);
     }
 
     const renderDeviceStatistics = () => {
@@ -155,11 +149,9 @@ const DashboardPage = () => {
         </Row>
     }
 
-    const fetchAlarmStatistics = async () => {
-        const res = await GetAlarmStatisticsRequest(moment().local().startOf("day").unix(), moment().local().endOf("day").unix(), {});
-        if (res.code === 200) {
-            setAlarmStatistics(res.data)
-        }
+    const fetchAlarmStatistics = () => {
+        GetAlarmStatisticsRequest(moment().local().startOf("day").unix(), moment().local().endOf("day").unix(), {})
+            .then(setAlarmStatistics)
     }
 
     const renderAlarmStatistics = () => {
@@ -190,9 +182,9 @@ const DashboardPage = () => {
     }
 
     useEffect(() => {
-        fetchAssetStatistics().then()
-        fetchDeviceStatistics().then()
-        fetchAlarmStatistics().then()
+        fetchAssetStatistics()
+        fetchDeviceStatistics()
+        fetchAlarmStatistics()
     }, [])
 
     return <DashboardLayout>

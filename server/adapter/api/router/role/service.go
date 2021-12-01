@@ -10,6 +10,8 @@ type Service interface {
 	UpdateRole(id uint, req request.Role) error
 	GetRolesByPaginate(page, size int) ([]vo.Role, int64, error)
 
+	RemoveRoleByID(id uint) error
+
 	GetRole(id uint) (*vo.Role, error)
 	GetCasbinByUserID(id uint) (*vo.Casbin, error)
 	AllocMenus(id uint, req request.AllocMenus) error

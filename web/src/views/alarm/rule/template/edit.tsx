@@ -1,5 +1,5 @@
 import RuleTemplate from "./ruleTemplate";
-import {useHistory, useLocation, useParams} from "react-router-dom";
+import {useHistory, useLocation} from "react-router-dom";
 import {useCallback, useEffect, useState} from "react";
 import {GetRuleTemplateRequest, UpdateRuleTemplateRequest} from "../../../../apis/alarm";
 import {AlarmRuleTemplate} from "../../../../types/alarm_rule_template";
@@ -14,14 +14,11 @@ const EditRuleTemplatePage = () => {
     const fetchTemplate = useCallback(() => {
         const templateId = GetParamValue(location.search, "templateId")
         if (templateId && !!Number(templateId)) {
-            GetRuleTemplateRequest(Number(templateId)).then(res => {
-                if (res.code === 200) {
-                    setTemplate(res.data)
-                }else {
-                    message.error("模板不存在").then()
+            GetRuleTemplateRequest(Number(templateId))
+                .then(data => setTemplate(data))
+                .catch(_ => {
                     history.push({pathname: "/alarm-management/alarmRules", state: {tab: "templates"}})
-                }
-            })
+                })
         }else {
             message.error("模板不存在").then()
             history.push({pathname: "/alarm-management/alarmRules", state: {tab: "templates"}})
@@ -33,14 +30,10 @@ const EditRuleTemplatePage = () => {
     }, [fetchTemplate])
 
     const onSave = (value: any) => {
-        UpdateRuleTemplateRequest(value.id, value).then(res => {
-            if (res.code === 200) {
-                message.success("模板保存成功").then()
+        UpdateRuleTemplateRequest(value.id, value)
+            .then(_ => {
                 history.push({pathname: "/alarm-management/alarmRules", state: {tab: "templates"}})
-            }else {
-                message.error("模板保存失败").then()
-            }
-        })
+            })
     }
 
     const render = () => {

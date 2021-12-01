@@ -1,4 +1,4 @@
-import {Form, Input, message, Modal} from "antd";
+import {Form, Input, Modal} from "antd";
 import {Device} from "../../../types/device";
 import {FC} from "react";
 import {ReplaceDeviceMacRequest} from "../../../apis/device";
@@ -16,14 +16,7 @@ const ReplaceMacModal: FC<ReplaceMacProps> = ({visible, device, onCancel, onSucc
     const onSave = () => {
         form.validateFields().then(values => {
             if (device) {
-                ReplaceDeviceMacRequest(device.id, values.mac).then(res => {
-                    if (res.code === 200) {
-                        message.success("替换成功").then()
-                        onSuccess()
-                    } else {
-                        message.error(`替换失败,${res.msg}`).then()
-                    }
-                })
+                ReplaceDeviceMacRequest(device.id, values.mac).then(_ => onSuccess)
             }
         })
     }

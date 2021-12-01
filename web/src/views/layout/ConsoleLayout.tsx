@@ -6,9 +6,9 @@ import RouterGuard from "../../routers/routerGuard";
 import {HeaderLayout} from "./index";
 import AlertNotification from "../../components/alertNotification";
 import "../../assets/iconfont.css"
-import {SecondaryRoutes} from "../../routers/routes";
 import React from "react";
 import {GetParamValue} from "../../utils/path";
+import {SecondaryRoutes} from "../../routers/routes";
 
 const {SubMenu} = Menu
 const {Sider} = Layout
@@ -34,14 +34,10 @@ const ConsoleLayout = (props: any) => {
     }
 
     const flattenRoutes: any = (children: any) => {
-        const routes = children.reduce((acc: any, curr: any) => {
+        return children.reduce((acc: any, curr: any) => {
             acc.push(curr)
             return acc.concat(curr.children ? flattenRoutes(curr.children) : [])
         }, [])
-        if (routes.length) {
-            return SecondaryRoutes.concat(routes)
-        }
-        return []
     }
 
     return <Layout className="ts-console">
@@ -56,7 +52,7 @@ const ConsoleLayout = (props: any) => {
                 {
                     menus && menus.length &&
                     <Menu mode="inline" className="ts-menu" defaultSelectedKeys={["devices"]}
-                          selectedKeys={locale ? [locale] : []} defaultOpenKeys={[pathname.replace("/", "")]}>
+                          selectedKeys={locale ? locale.split("/") : []} defaultOpenKeys={[pathname.replace("/", "")]}>
                         {
                             menus && menus.map((item: any) => {
                                 if (!item.hidden) {
@@ -80,7 +76,7 @@ const ConsoleLayout = (props: any) => {
             </Sider>
             <Layout style={{padding: "15px", background: "#eef0f5", overflowY: "scroll"}}>
                 {
-                    <RouterGuard {...props} routes={flattenRoutes(menus)}/>
+                    <RouterGuard {...props} routes={SecondaryRoutes.concat(flattenRoutes(menus))}/>
                 }
             </Layout>
         </Layout>

@@ -48,7 +48,7 @@ const PermissionPage = () => {
     ]
 
     return <Content>
-        <MyBreadcrumb items={["系统管理", "权限管理"]}>
+        <MyBreadcrumb>
             <Button type={"primary"} onClick={() => setAddVisible(true)}>添加权限 <PlusOutlined/></Button>
         </MyBreadcrumb>
         <ShadowCard>

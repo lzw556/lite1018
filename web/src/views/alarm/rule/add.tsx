@@ -44,23 +44,13 @@ const AddRulePage = () => {
 
     useEffect(() => {
         if (deviceType) {
-            GetDeviceGroupByAsset(deviceType).then(res => {
-                if (res.code === 200) {
-                    setGroups(res.data)
-                }
-            })
+            GetDeviceGroupByAsset(deviceType).then(setGroups)
             if (createType === 1) {
-                PagingRuleTemplateRequest(1, 100, deviceType).then(res => {
-                    if (res.code === 200) {
-                        setTemplates(res.data.result)
-                    }
-                })
+                PagingRuleTemplateRequest(1, 100, deviceType)
+                    .then(setTemplates)
             } else {
-                GetPropertiesRequest(deviceType).then(res => {
-                    if (res.code === 200) {
-                        setProperties(res.data)
-                    }
-                })
+                GetPropertiesRequest(deviceType)
+                    .then(setProperties)
             }
         }
     }, [createType, deviceType])
@@ -155,14 +145,7 @@ const AddRulePage = () => {
     }
 
     const createAlarmRule = (params: any) => {
-        AddAlarmRuleRequest(params).then(res => {
-            if (res.code === 200) {
-                message.success("添加成功").then()
-                history.goBack()
-            } else {
-                message.error("添加失败").then()
-            }
-        })
+        AddAlarmRuleRequest(params).then(_ => history.goBack())
     }
 
     const onDevicesSelected = (keys: any) => {
@@ -175,13 +158,7 @@ const AddRulePage = () => {
                 reject("输入不能为空")
                 return
             }
-            CheckRuleNameRequest(value).then(res => {
-                if (res.code === 200) {
-                    resolve(null)
-                } else {
-                    reject(res.msg)
-                }
-            })
+            CheckRuleNameRequest(value).then()
         })
     }
 
@@ -261,7 +238,7 @@ const AddRulePage = () => {
     }
 
     return <Content>
-        <MyBreadcrumb items={["报警管理", "报警规则", "添加规则"]}/>
+        <MyBreadcrumb/>
         <Card>
             <Form form={form} labelAlign={"right"} validateMessages={defaultValidateMessages}>
                 <Row justify={"space-between"}>

@@ -33,14 +33,14 @@ func (r root) Next() Processor {
 
 func (r root) Process(ctx *iot.Context, msg iot.Message) error {
 	c := context.TODO()
-	device, err := r.deviceRepo.GetBySpecs(c, spec.DeviceMacSpec(msg.Body.Device))
+	device, err := r.deviceRepo.GetBySpecs(c, spec.DeviceMacEqSpec(msg.Body.Device))
 	if err != nil {
 		return fmt.Errorf("device %s not found: %v", msg.Body.Device, err)
 	}
 	if device.NetworkID == 0 {
 		return fmt.Errorf("device %s unregistered", device.MacAddress)
 	}
-	gateway, err := r.deviceRepo.GetBySpecs(c, spec.DeviceMacSpec(msg.Body.Gateway))
+	gateway, err := r.deviceRepo.GetBySpecs(c, spec.DeviceMacEqSpec(msg.Body.Gateway))
 	if err != nil {
 		return fmt.Errorf("gateway %s not found: %v", msg.Body.Gateway, err)
 	}

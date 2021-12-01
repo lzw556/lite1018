@@ -38,7 +38,7 @@ func (factory Firmware) NewFirmwaresQuery(deviceID uint) (*query.FirmwaresQuery,
 	if info.ProductID == 0 {
 		return nil, fmt.Errorf("unknown device product id")
 	}
-	es, err := factory.firmwareRepo.FindBySpecs(ctx, spec.ProductIDSpec(info.ProductID))
+	es, err := factory.firmwareRepo.FindBySpecs(ctx, spec.ProductIDEqSpec(info.ProductID))
 	if err != nil {
 		return nil, err
 	}

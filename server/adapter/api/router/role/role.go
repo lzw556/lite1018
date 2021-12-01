@@ -31,6 +31,9 @@ func (r *roleRouter) initRoutes() {
 		// PATCH
 		router.NewPatchRoute("/roles/:id/menus", r.allocMenus),
 		router.NewPatchRoute("/roles/:id/permissions", r.allocPermissions),
+
+		// DELETE
+		router.NewDeleteRoute("/roles/:id", r.removeByID),
 	}
 }
 

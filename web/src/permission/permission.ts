@@ -37,21 +37,23 @@ export const Permission = {
     UserDelete: {path: "users/:id", method: "DELETE"},
     FirmwareAdd: {path: "firmwares", method: "POST"},
     FirmwareDelete: {path: "firmwares/:id", method: "DELETE"},
+    RoleAdd: {path: "roles", method: "POST"},
+    RoleEdit: {path: "roles/:id", method: "PUT"},
+    RoleDelete: {path: "roles/:id", method: "DELETE"},
+    RoleAllocMenus: {path: "roles/:id/menus", method: "PATCH"},
+    RoleAllocPermissions: {path: "roles/:id/permissions", method: "PATCH"},
 }
 
 let enforcer: Enforcer | null = null
 let subject: null = null
 
-GetCasbinRequest().then(res => {
-    if (res.code === 200) {
-        console.log(res.data)
-        const model = newModel(res.data.model);
-        const adapter = new MemoryAdapter(res.data.rules);
-        newEnforcer(model, adapter).then(value => {
-            enforcer = value
-            subject = res.data.subject
-        });
-    }
+GetCasbinRequest().then(data => {
+    const model = newModel(data.model);
+    const adapter = new MemoryAdapter(data.rules);
+    newEnforcer(model, adapter).then(value => {
+        enforcer = value
+        subject = data.subject
+    });
 })
 
 const userPermission = () => {

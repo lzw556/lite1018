@@ -41,7 +41,7 @@ const SecondaryRoutes: Menu[] = [
     {
         id: 100,
         name: "deviceDetail",
-        path: "/device-management/devices",
+        path: "/device-management",
         title: "设备详情",
         view: "DeviceDetail",
         icon: "",
@@ -52,7 +52,7 @@ const SecondaryRoutes: Menu[] = [
     {
         id: 101,
         name: "addAlarmRule",
-        path: "/alarm-management/alarmRules",
+        path: "/alarm-management",
         title: "添加规则",
         view: "AddAlarmRule",
         icon: "",
@@ -63,7 +63,7 @@ const SecondaryRoutes: Menu[] = [
     {
         id: 102,
         name: "addAlarmRuleTemplate",
-        path: "/alarm-management/alarmRules",
+        path: "/alarm-management",
         title: "添加规则模板",
         view: "AddAlarmRuleTemplate",
         icon: "",
@@ -74,7 +74,7 @@ const SecondaryRoutes: Menu[] = [
     {
         id: 103,
         name: "editAlarmRuleTemplate",
-        path: "/alarm-management/alarmRules",
+        path: "/alarm-management",
         title: "编辑规则模板",
         view: "EditAlarmRuleTemplate",
         icon: "",

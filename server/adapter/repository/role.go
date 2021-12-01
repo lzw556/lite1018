@@ -38,6 +38,10 @@ func (repo Role) Get(ctx context.Context, id uint) (po.Role, error) {
 	return e, err
 }
 
+func (repo Role) Delete(ctx context.Context, id uint) error {
+	return repo.DB(ctx).Delete(&po.Role{}, id).Error
+}
+
 func (repo Role) GetBySpecs(ctx context.Context, specs ...spec.Specification) (po.Role, error) {
 	var e po.Role
 	err := repo.DB(ctx).Scopes(spec.Scopes(specs)...).First(&e).Error

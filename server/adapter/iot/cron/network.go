@@ -36,7 +36,7 @@ func (n Network) Spec() string {
 
 func (n Network) Run() {
 	xlog.Infof("start running network job => [%d-%s]", n.Network.ID, n.Network.Name)
-	devices, err := n.deviceRepo.FindBySpecs(context.TODO(), spec.NetworkSpec(n.Network.ID))
+	devices, err := n.deviceRepo.FindBySpecs(context.TODO(), spec.NetworkEqSpec(n.Network.ID))
 	if err != nil {
 		xlog.Errorf("run network %d job failed: %v", n.Network.ID, err)
 	}

@@ -38,7 +38,7 @@ func (cmd NetworkRemoveDevicesCmd) Run(req request.RemoveDevices) error {
 	if err != nil {
 		return err
 	}
-	devices, err := cmd.deviceRepo.FindBySpecs(ctx, spec.NetworkSpec(cmd.Network.ID))
+	devices, err := cmd.deviceRepo.FindBySpecs(ctx, spec.NetworkEqSpec(cmd.Network.ID))
 	if err != nil {
 		return err
 	}

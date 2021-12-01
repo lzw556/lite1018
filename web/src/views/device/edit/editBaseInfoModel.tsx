@@ -1,4 +1,4 @@
-import {Form, Input, message, Modal} from "antd";
+import {Form, Input, Modal} from "antd";
 import {useEffect, useState} from "react";
 import {DeviceType} from "../../../types/device_type";
 import {UpdateDeviceRequest} from "../../../apis/device";
@@ -21,14 +21,9 @@ const EditBaseInfoModel = (props: any) => {
     const onSave = () => {
         form.validateFields().then(values => {
             setIsLoading(true)
-            UpdateDeviceRequest(device.id, values.name).then(res => {
+            UpdateDeviceRequest(device.id, values.name).then(_ => {
                 setIsLoading(false)
-                if (res.code === 200) {
-                    message.success("更新成功").then()
-                    onSuccess()
-                }else {
-                    message.error(`更新失败,${res.msg}`).then()
-                }
+                onSuccess()
             })
         })
     }
@@ -38,7 +33,7 @@ const EditBaseInfoModel = (props: any) => {
             switch (device.typeId) {
                 case DeviceType.Gateway:
                     return <Form.Item label={"所属资产"} name={"asset"}>
-                        <AssetSelect />
+                        <AssetSelect/>
                     </Form.Item>
                 case DeviceType.NormalTemperatureCorrosion:
                 case DeviceType.HighTemperatureCorrosion:

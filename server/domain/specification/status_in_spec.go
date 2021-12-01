@@ -4,13 +4,13 @@ import (
 	"gorm.io/gorm"
 )
 
-type Statuses []uint
+type StatusInSpec []uint
 
-func (s Statuses) IsSpecifiedBy(v interface{}) bool {
+func (s StatusInSpec) IsSpecifiedBy(v interface{}) bool {
 	return true
 }
 
-func (s Statuses) Scope() func(db *gorm.DB) *gorm.DB {
+func (s StatusInSpec) Scope() func(db *gorm.DB) *gorm.DB {
 	return func(db *gorm.DB) *gorm.DB {
 		return db.Where("status IN ?", s)
 	}

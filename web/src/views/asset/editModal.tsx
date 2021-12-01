@@ -1,5 +1,5 @@
 import {Asset} from "../../types/asset";
-import {Form, message} from "antd";
+import {Form} from "antd";
 import {useEffect, useState} from "react";
 import {UpdateAssetRequest} from "../../apis/asset";
 import AssetModal from "./assetModal";
@@ -27,13 +27,10 @@ const EditModal = (props: EditAssetProps) => {
     const onSave = () => {
         setIsLoading(true)
         form.validateFields().then(values => {
-            UpdateAssetRequest(asset.id, values.name).then(res => {
+            UpdateAssetRequest(asset.id, values.name).then(_ => {
                 setIsLoading(false)
-                if (res.code === 200) {
-                    onSuccess()
-                    message.success("保存成功").then()
-                }
-            })
+                onSuccess()
+            }).catch(_ => setIsLoading(false))
         }).catch(_ =>
             setIsLoading(false)
         )

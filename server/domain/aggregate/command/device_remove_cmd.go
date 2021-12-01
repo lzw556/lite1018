@@ -59,7 +59,7 @@ func (cmd DeviceRemoveCmd) Run() error {
 	if err != nil {
 		return err
 	}
-	devices, err := cmd.deviceRepo.FindBySpecs(context.TODO(), spec.NetworkSpec(cmd.Network.ID))
+	devices, err := cmd.deviceRepo.FindBySpecs(context.TODO(), spec.NetworkEqSpec(cmd.Network.ID))
 	if err != nil {
 		return err
 	}

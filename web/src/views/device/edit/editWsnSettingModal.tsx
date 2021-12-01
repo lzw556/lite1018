@@ -1,4 +1,4 @@
-import {Form, message, Modal} from "antd";
+import {Form, Modal} from "antd";
 import {FC, useState} from "react";
 import WsnFormItem from "../form/item/wsnFormItem";
 import {Device} from "../../../types/device";
@@ -21,14 +21,9 @@ const EditWsnSettingModal: FC<EditWsnSettingProps> = ({visible, device, onCancel
         form.validateFields().then(values => {
             if (device) {
                 setIsLoading(true)
-                UpdateNetworkSettingRequest(device.id, values).then(res => {
+                UpdateNetworkSettingRequest(device.id, values).then(_ => {
                     setIsLoading(false)
-                    if (res.code === 200) {
-                        message.success("更新成功").then()
-                        onSuccess()
-                    } else {
-                        message.error("更新失败").then()
-                    }
+                    onSuccess()
                 })
             }
         })

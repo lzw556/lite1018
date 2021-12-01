@@ -431,16 +431,6 @@ func initMenus(db *gorm.DB) error {
 			Hidden:   false,
 		},
 		{
-			ID:       22,
-			Title:    "设备详情",
-			Name:     "deviceDetail",
-			ParentID: 8,
-			Path:     "/device-management",
-			View:     "DeviceDetail",
-			IsAuth:   true,
-			Hidden:   true,
-		},
-		{
 			ID:       11,
 			Title:    "固件列表",
 			Name:     "firmwares",
@@ -555,7 +545,7 @@ func initPermissions(db *gorm.DB) error {
 		{
 			Path:        "devices/:id",
 			Method:      "PUT",
-			Description: "更新设备信息",
+			Description: "编辑设备信息",
 			Group:       "设备模块",
 		},
 		{
@@ -869,6 +859,48 @@ func initPermissions(db *gorm.DB) error {
 			Method:      "DELETE",
 			Description: "移除设备",
 			Group:       "网络模块",
+		},
+		{
+			Path:        "roles",
+			Method:      "POST",
+			Description: "添加角色",
+			Group:       "系统模块",
+		},
+		{
+			Path:        "roles/:id",
+			Method:      "PUT",
+			Description: "编辑角色信息",
+			Group:       "系统模块",
+		},
+		{
+			Path:        "roles",
+			Method:      "GET",
+			Description: "查看角色列表",
+			Group:       "系统模块",
+		},
+		{
+			Path:        "roles/:id",
+			Method:      "GET",
+			Description: "查看单个角色",
+			Group:       "系统模块",
+		},
+		{
+			Path:        "roles/:id/menus",
+			Method:      "PATCH",
+			Description: "角色分配菜单",
+			Group:       "系统模块",
+		},
+		{
+			Path:        "roles/:id/permissions",
+			Method:      "PATCH",
+			Description: "角色分配权限",
+			Group:       "系统模块",
+		},
+		{
+			Path:        "roles/:id",
+			Method:      "DELETE",
+			Description: "删除角色",
+			Group:       "系统模块",
 		},
 	}
 	for _, permission := range permissions {

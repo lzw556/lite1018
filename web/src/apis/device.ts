@@ -3,37 +3,38 @@ import {PageResult} from "../types/page";
 import {Device} from "../types/device";
 import {PropertyData} from "../types/property_data";
 import {DeviceStatistic} from "../types/device_statistic";
+import {DeleteResponse, GetResponse, PostResponse, PutResponse} from "../utils/response";
 
 export function CheckMacAddressRequest(mac: string) {
-    return request.get(`/devices/checkMacAddress/${mac}`).then(res => res.data)
+    return request.get(`/check/devices/${mac}`).then(GetResponse)
 }
 
 export function AddDeviceRequest(device: any) {
-    return request.post("/devices", device).then(res => res.data)
+    return request.post("/devices", device).then(PostResponse)
 }
 
 export function PagingDevicesRequest(assetId:number, page:number, size: number, search:any) {
-    return request.get<PageResult<Device[]>>("/devices", {assetId, page, size, search}).then(res => res.data)
+    return request.get<PageResult<Device[]>>("/devices", {assetId, page, size, search}).then(GetResponse)
 }
 
 export function UpdateDeviceSettingRequest(id:number, setting:any) {
-    return request.patch(`/devices/${id}/settings`, setting).then(res => res.data)
+    return request.patch(`/devices/${id}/settings`, setting).then(PutResponse)
 }
 
 export function GetDeviceRequest(id:number) {
-    return request.get<Device>(`/devices/${id}`).then(res => res.data)
+    return request.get<Device>(`/devices/${id}`).then(GetResponse)
 }
 
 export function UpdateDeviceRequest(id:number, name:string) {
-    return request.put(`/devices/${id}`, {name}).then(res => res.data)
+    return request.put(`/devices/${id}`, {name}).then(PutResponse)
 }
 
 export function DeleteDeviceRequest(id:number) {
-    return request.delete(`/devices/${id}`).then(res => res.data)
+    return request.delete(`/devices/${id}`).then(DeleteResponse)
 }
 
 export function GetDeviceDataRequest(id:number, pid:number, from:number, to:number) {
-    return request.get<PropertyData[] | PropertyData>(`/devices/${id}/data`, {from, to, pid}).then(res => res.data)
+    return request.get<PropertyData[] | PropertyData>(`/devices/${id}/data`, {from, to, pid}).then(GetResponse)
 }
 
 export function DownloadDeviceDataRequest(id:number, pids:string, from:number, to:number) {
@@ -41,11 +42,11 @@ export function DownloadDeviceDataRequest(id:number, pids:string, from:number, t
 }
 
 export function RemoveDeviceDataRequest(id:number, from:number, to:number) {
-    return request.delete(`/devices/${id}/data?from=${from}&to=${to}`).then(res => res.data)
+    return request.delete(`/devices/${id}/data?from=${from}&to=${to}`).then(DeleteResponse)
 }
 
 export function ReplaceDeviceMacRequest(id:number, mac: string) {
-    return request.patch(`/devices/${id}/mac/${mac}`, {}).then(res => res.data)
+    return request.patch(`/devices/${id}/mac/${mac}`, {}).then(PutResponse)
 }
 
 export function SendDeviceCommandRequest(id:number, cmd:any) {
@@ -61,17 +62,17 @@ export function DeviceCancelUpgradeRequest(id:number) {
 }
 
 export function GetDeviceGroupByAsset(deviceType: number) {
-    return request.get(`/devices/groupBy/asset`, {device_type: deviceType}).then(res => res.data)
+    return request.get(`/devices/groupBy/asset`, {device_type: deviceType}).then(GetResponse)
 }
 
 export function GetChildrenRequest(id:number) {
-    return request.get<Device[]>(`/devices/${id}/children`).then(res => res.data)
+    return request.get<Device[]>(`/devices/${id}/children`).then(GetResponse)
 }
 
 export function GetDeviceSettingRequest(id:number) {
-    return request.get<any>(`/devices/${id}/settings`).then(res => res.data)
+    return request.get<any>(`/devices/${id}/settings`).then(GetResponse)
 }
 
 export function GetDevicesStatisticsRequest() {
-    return request.get<DeviceStatistic[]>(`/devices/statistics`).then(res => res.data)
+    return request.get<DeviceStatistic[]>(`/devices/statistics`).then(GetResponse)
 }

@@ -44,10 +44,8 @@ const HistoryDataPage = () => {
 
     const onLoadDevices = (open: any) => {
         if (open) {
-            PagingDevicesRequest(assetId, 1, 100, {}).then(res => {
-                if (res.code === 200) {
-                    setDevices(res.data.result)
-                }
+            PagingDevicesRequest(assetId, 1, 100, {}).then(data => {
+                setDevices(data.result)
             })
         }
     }
@@ -81,10 +79,10 @@ const HistoryDataPage = () => {
     useEffect(() => {
             if (device && property && startDate && endDate) {
                 setOption(undefined)
-                GetDeviceDataRequest(device.id, property.id, startDate.utc().unix(), endDate.utc().unix()).then(res => {
-                    if (res.code === 200 && !Array.isArray(res.data)) {
-                        const {fields, time, name, unit} = res.data
-                        const keys = Object.keys(res.data.fields)
+                GetDeviceDataRequest(device.id, property.id, startDate.utc().unix(), endDate.utc().unix()).then(data => {
+                    if (!Array.isArray(data)) {
+                        const {fields, time, name, unit} = data
+                        const keys = Object.keys(data.fields)
                         const legend = keys.map(key => GetFieldName(key))
                         const series = keys.map((key, index) => {
                             return {
@@ -124,7 +122,7 @@ const HistoryDataPage = () => {
     )
 
     return <Content>
-        <MyBreadcrumb items={["数据管理", "历史数据"]}>
+        <MyBreadcrumb>
             <Space>
                 <HasPermission value={Permission.DeviceDataDownload}>
                     <Button type="primary" onClick={() => {

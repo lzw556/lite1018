@@ -1,5 +1,5 @@
 import {FC, useEffect, useState} from "react";
-import {Button, Card, Col, DatePicker, message, Modal, Row, Select, Space} from "antd";
+import {Button, Card, Col, DatePicker, Modal, Row, Select, Space} from "antd";
 import {CaretDownOutlined, DeleteOutlined, DownloadOutlined} from "@ant-design/icons";
 import {Content} from "antd/lib/layout/layout";
 import {Device} from "../../../../types/device";
@@ -52,10 +52,10 @@ const HistoryDataPage: FC<DeviceDataProps> = ({device}) => {
     useEffect(() => {
             if (device && property && startDate && endDate) {
                 setOption(undefined)
-                GetDeviceDataRequest(device.id, property.id, startDate.utc().unix(), endDate.utc().unix()).then(res => {
-                    if (res.code === 200 && !Array.isArray(res.data)) {
-                        const {fields, time, name, unit} = res.data
-                        const keys = Object.keys(res.data.fields)
+                GetDeviceDataRequest(device.id, property.id, startDate.utc().unix(), endDate.utc().unix()).then(data => {
+                    if (!Array.isArray(data)) {
+                        const {fields, time, name, unit} = data
+                        const keys = Object.keys(data.fields)
                         const legend = keys.map(key => GetFieldName(key))
                         const series = keys.map((key, index) => {
                             return {
@@ -102,14 +102,7 @@ const HistoryDataPage: FC<DeviceDataProps> = ({device}) => {
                 okText: "确定",
                 cancelText: "取消",
                 onOk: close => {
-                    RemoveDeviceDataRequest(device.id, startDate.utc().unix(), endDate.utc().unix()).then(res => {
-                        if (res.code === 200) {
-                            message.success("数据删除成功").then()
-                            close()
-                        }else {
-                            message.error(res.msg).then()
-                        }
-                    })
+                    RemoveDeviceDataRequest(device.id, startDate.utc().unix(), endDate.utc().unix()).then(_ => close)
                 },
             })
         }

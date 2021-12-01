@@ -33,7 +33,7 @@ func NewFirmware() firmware.Service {
 
 func (s Firmware) CreateFirmware(req request.Firmware) error {
 	ctx := context.TODO()
-	e, err := s.repository.GetBySpecs(ctx, spec.FirmwareCrc(req.Crc))
+	e, err := s.repository.GetBySpecs(ctx, spec.CrcEqSpec(req.Crc))
 	if !errors.Is(err, gorm.ErrRecordNotFound) {
 		return response.BusinessErr(errcode.FirmwareExistsError, req.Crc)
 	}

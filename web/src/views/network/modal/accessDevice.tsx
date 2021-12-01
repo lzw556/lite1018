@@ -1,4 +1,4 @@
-import {Form, message, Modal, Select} from "antd";
+import {Form, Modal, Select} from "antd";
 import {FC, useState} from "react";
 import {Device} from "../../../types/device";
 import {PagingDevicesRequest} from "../../../apis/device";
@@ -23,20 +23,16 @@ const AccessDeviceModal: FC<AccessDeviceModalProps> = ({visible, parent, assetId
 
     const onLoadParents = (open: any) => {
         if (open) {
-            PagingDevicesRequest(assetId, 1, 100, {target: "network_id", text: networkId}).then(res => {
-                if (res.code === 200) {
-                    setParents(res.data.result)
-                }
+            PagingDevicesRequest(assetId, 1, 100, {target: "network_id", text: networkId}).then(data => {
+                setParents(data.result)
             })
         }
     }
 
     const onLoadDevices = (open: any) => {
         if (open) {
-            PagingDevicesRequest(assetId, 1, 100, {target: "network_id", text: 0}).then(res => {
-                if (res.code === 200) {
-                    setDevices(res.data.result)
-                }
+            PagingDevicesRequest(assetId, 1, 100, {target: "network_id", text: 0}).then(data => {
+                setDevices(data.result)
             })
         }
     }
@@ -44,14 +40,9 @@ const AccessDeviceModal: FC<AccessDeviceModalProps> = ({visible, parent, assetId
     const onSave = () => {
         form.validateFields().then(values => {
             setIsLoading(true)
-            AccessDevicesRequest(networkId, values.parent, values.devices).then(res => {
+            AccessDevicesRequest(networkId, values.parent, values.devices).then(_ => {
                 setIsLoading(false)
-                if (res.code === 200) {
-                    message.success("设备接入成功").then()
-                    onSuccess(networkId)
-                } else {
-                    message.error("设备接入失败").then()
-                }
+                onSuccess(networkId)
             })
         }).catch(e => setIsLoading(false))
     }

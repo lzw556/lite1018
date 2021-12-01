@@ -4,13 +4,13 @@ import (
 	"gorm.io/gorm"
 )
 
-type CategorySpec uint
+type CategoryEqSpec uint
 
-func (s CategorySpec) IsSpecifiedBy(v interface{}) bool {
+func (s CategoryEqSpec) IsSpecifiedBy(v interface{}) bool {
 	return true
 }
 
-func (s CategorySpec) Scope() func(db *gorm.DB) *gorm.DB {
+func (s CategoryEqSpec) Scope() func(db *gorm.DB) *gorm.DB {
 	return func(db *gorm.DB) *gorm.DB {
 		return db.Where("category = ?", s)
 	}

@@ -1,5 +1,5 @@
 import {FC, useCallback, useState} from "react";
-import {Button, message, Popconfirm, Space} from "antd";
+import {Button, Popconfirm, Space} from "antd";
 import {Content} from "antd/lib/layout/layout";
 import TableLayout, {TableProps} from "../layout/TableLayout";
 import {GetAssetRequest, PagingAssetsRequest, RemoveAssetRequest} from "../../apis/asset";
@@ -26,11 +26,11 @@ const AssetPage: FC = () => {
 
     const onChange = useCallback((current: number, size: number) => {
         onLoading(true)
-        PagingAssetsRequest(current, size).then(res => {
+        PagingAssetsRequest(current, size).then(data => {
             onLoading(false)
-            if (res.code === 200) {
-                setTable(old => Object.assign({}, old, {data: res.data}))
-            }
+            setTable(old => Object.assign({}, old, {data: data}))
+        }).catch((_) => {
+            onLoading(false)
         })
     }, [])
 
@@ -53,23 +53,14 @@ const AssetPage: FC = () => {
     }
 
     const onDelete = async (id: number) => {
-        const res = await RemoveAssetRequest(id)
-        if (res.code === 200) {
-            onRefresh()
-            message.success("删除成功").then()
-        } else {
-            message.error(res.msg).then()
-        }
+        RemoveAssetRequest(id).then(_ => onRefresh())
     }
 
     const onEdit = async (id: number) => {
-        const res = await GetAssetRequest(id)
-        if (res.code === 200) {
-            setAsset(res.data)
+        GetAssetRequest(id).then(data => {
+            setAsset(data)
             setEditAssetVisible(true)
-        } else {
-            message.error(res.msg).then()
-        }
+        })
     }
 
     const columns = [
@@ -99,7 +90,7 @@ const AssetPage: FC = () => {
     ]
 
     return <Content>
-        <MyBreadcrumb items={["资产管理", "资产列表"]}>
+        <MyBreadcrumb>
             <Button type="primary" onClick={() => {
                 setAddAssetVisible(true)
             }}>

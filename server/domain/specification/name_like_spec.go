@@ -5,13 +5,13 @@ import (
 	"gorm.io/gorm"
 )
 
-type NameLike string
+type NameLikeSpec string
 
-func (s NameLike) IsSpecifiedBy(v interface{}) bool {
+func (s NameLikeSpec) IsSpecifiedBy(v interface{}) bool {
 	return true
 }
 
-func (s NameLike) Scope() func(db *gorm.DB) *gorm.DB {
+func (s NameLikeSpec) Scope() func(db *gorm.DB) *gorm.DB {
 	return func(db *gorm.DB) *gorm.DB {
 		if len(s) > 0 {
 			return db.Where("name LIKE ?", fmt.Sprintf("%s%%", s))

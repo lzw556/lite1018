@@ -17,10 +17,8 @@ const SensorSelect: FC<SensorSelectProps> = (props) => {
 
     const onLoadDevices = (open: any) => {
         if (open) {
-            PagingDevicesRequest(assetId, 1, 100, {}).then(res => {
-                if (res.code === 200) {
-                    setDevices(res.data.result.filter(item => item.category === 3))
-                }
+            PagingDevicesRequest(assetId, 1, 100, {}).then(data => {
+                setDevices(data.result.filter(item => item.category === 3))
             })
         }
     }

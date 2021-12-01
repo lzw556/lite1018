@@ -1,4 +1,4 @@
-import {Button, Col, Form, message, Result, Row, Space, Steps} from "antd";
+import {Button, Col, Form, Result, Row, Space, Steps} from "antd";
 import {Content} from "antd/es/layout/layout";
 import {useState} from "react";
 import BaseInfoForm from "../form/baseInfoForm";
@@ -95,13 +95,7 @@ const AddDevicePage = () => {
                     }
                     break
             }
-            AddDeviceRequest(requestForm).then(res => {
-                if (res.code === 200) {
-                    setSuccess(true)
-                }else {
-                    message.error("添加失败").then()
-                }
-            })
+            AddDeviceRequest(requestForm).then(_ => setSuccess(true))
         })
     }
 
@@ -115,7 +109,7 @@ const AddDevicePage = () => {
 
     return <>
         <Content>
-            <MyBreadcrumb items={["设备管理", "添加设备"]}/>
+            <MyBreadcrumb/>
             <ShadowCard>
                 {
                     success && (<Result

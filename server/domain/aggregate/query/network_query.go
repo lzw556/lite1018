@@ -31,7 +31,7 @@ func (query NetworkQuery) Detail() (*vo.Network, error) {
 	if gateway, err := query.deviceRepo.Get(ctx, query.Network.GatewayID); err == nil {
 		result.AddGateway(gateway)
 	}
-	if devices, err := query.deviceRepo.FindBySpecs(ctx, spec.NetworkSpec(query.Network.ID)); err == nil {
+	if devices, err := query.deviceRepo.FindBySpecs(ctx, spec.NetworkEqSpec(query.Network.ID)); err == nil {
 		nodes := make([]vo.Device, len(devices))
 		for i, device := range devices {
 			nodes[i] = vo.NewDevice(device)

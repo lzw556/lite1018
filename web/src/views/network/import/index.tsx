@@ -91,13 +91,7 @@ const ImportNetworkPage = () => {
                         }
                     })
                 }
-                ImportNetworkRequest(req).then(res => {
-                    if (res.code === 200) {
-                        setSuccess(true)
-                    } else {
-                        message.error(`导入失败,${res.msg}`).then()
-                    }
-                })
+                ImportNetworkRequest(req).then(_ => setSuccess(true))
             })
         } else {
             message.error("不能导入空网络").then()
@@ -141,7 +135,7 @@ const ImportNetworkPage = () => {
     }, [current])
 
     return <Content>
-        <MyBreadcrumb items={["网络管理", "导入网络"]}>
+        <MyBreadcrumb>
             <Space>
                 {
                     !success && (<Button type="primary" onClick={onSave}>保存网络<ImportOutlined/></Button>)

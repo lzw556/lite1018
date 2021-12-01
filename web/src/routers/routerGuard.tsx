@@ -15,7 +15,8 @@ const RouterGuard = (props: any) => {
     const decodeLocation = () => {
         const locale = GetParamValue(location.search, "locale")
         if (locale) {
-            return locale
+            const paths = locale.split("/")
+            return paths[paths.length - 1]
         }
         return location.pathname
     }

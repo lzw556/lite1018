@@ -14,11 +14,7 @@ const SystemPage = () => {
     const [data, setData] = useState<System>();
 
     useEffect(() => {
-        GetSystemRequest().then(res => {
-            if (res.code === 200) {
-                setData(res.data)
-            }
-        })
+        GetSystemRequest().then(setData)
     }, [])
 
     const renderUsedChart = (value: number) => {
@@ -51,7 +47,7 @@ const SystemPage = () => {
     }
 
     return <Content>
-        <MyBreadcrumb items={["系统管理"]}/>
+        <MyBreadcrumb/>
         <Row justify={"space-between"}>
             <Col span={12} style={{paddingRight: "4px"}}>
                 <ShadowCard title={"系统信息"} size={"small"} style={{height: "256px"}}>

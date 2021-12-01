@@ -29,13 +29,11 @@ const MonitorPage: FC<MonitorPageProps> = ({device}) => {
     useEffect(() => {
         if (device) {
             if (device.typeId === DeviceType.Gateway || device.typeId === DeviceType.Router) {
-                GetChildrenRequest(device.id).then(res => {
-                    if (res.code === 200) {
-                        const result = res.data.filter(item => GetSensors().includes(item.typeId))
-                        setDevices(result)
-                        if (result.length > 0) {
-                            fetchDeviceData(result[0].id)
-                        }
+                GetChildrenRequest(device.id).then(data => {
+                    const result = data.filter(item => GetSensors().includes(item.typeId))
+                    setDevices(result)
+                    if (result.length > 0) {
+                        fetchDeviceData(result[0].id)
                     }
                 })
             } else {
@@ -69,16 +67,16 @@ const MonitorPage: FC<MonitorPageProps> = ({device}) => {
 
     const fetchDeviceData = (id: number) => {
         setSelectedDevice(id)
-        GetDeviceDataRequest(id, 0, startDate.utc().unix(), endDate.utc().unix()).then(res => {
+        GetDeviceDataRequest(id, 0, startDate.utc().unix(), endDate.utc().unix()).then(data => {
             setOptions([])
-            if (res.code === 200 && Array.isArray(res.data)) {
-                setOptions(res.data.map(item => {
+            if (Array.isArray(data)) {
+                setOptions(data.map(item => {
                     const series = Object.keys(item.fields).map((key, index) => {
                         return {
                             ...LineChartStyles[index],
                             name: GetFieldName(key),
                             type: 'line',
-                            data: item.fields[key].map((value:any) => Number(value).toFixed(3)),
+                            data: item.fields[key].map((value: any) => Number(value).toFixed(3)),
                             markLine: convertMarkLine(item.alarms, item.unit)
                         }
                     })
@@ -109,10 +107,10 @@ const MonitorPage: FC<MonitorPageProps> = ({device}) => {
     }
 
     const renderDeviceSelect = () => {
-        if (device){
+        if (device) {
             if (device.typeId === DeviceType.Gateway || device.typeId === DeviceType.Router) {
                 return <Label name={"设备"}>
-                    <Select style={{width:"128px"}} bordered={false} defaultActiveFirstOption={true}
+                    <Select style={{width: "128px"}} bordered={false} defaultActiveFirstOption={true}
                             defaultValue={devices?.length ? devices[0].id : undefined} onChange={onDeviceChanged}>
                         {
                             devices?.map(item => (<Option key={item.id} value={item.id}>{item.name}</Option>))
@@ -158,7 +156,7 @@ const MonitorPage: FC<MonitorPageProps> = ({device}) => {
                                         setEndDate(moment(dateString[1]).endOf('day'))
                                     }
                                 }}/>
-                            <Button icon={<ReloadOutlined />} onClick={onReload}/>
+                            <Button icon={<ReloadOutlined/>} onClick={onReload}/>
                         </Space>
                     </Col>
                 </Row>

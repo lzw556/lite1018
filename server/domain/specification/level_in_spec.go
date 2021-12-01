@@ -4,13 +4,13 @@ import (
 	"gorm.io/gorm"
 )
 
-type LevelsSpec []uint
+type LevelInSpec []uint
 
-func (s LevelsSpec) IsSpecifiedBy(v interface{}) bool {
+func (s LevelInSpec) IsSpecifiedBy(v interface{}) bool {
 	return true
 }
 
-func (s LevelsSpec) Scope() func(db *gorm.DB) *gorm.DB {
+func (s LevelInSpec) Scope() func(db *gorm.DB) *gorm.DB {
 	return func(db *gorm.DB) *gorm.DB {
 		if len(s) > 0 {
 			return db.Where("level IN ?", s)

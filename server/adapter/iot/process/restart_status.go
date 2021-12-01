@@ -42,7 +42,7 @@ func (p RestartStatus) Process(ctx *iot.Context, msg iot.Message) error {
 			if err != nil {
 				return fmt.Errorf("network not found: %v", err)
 			}
-			devices, err := p.deviceRepo.FindBySpecs(c, spec.NetworkSpec(network.ID))
+			devices, err := p.deviceRepo.FindBySpecs(c, spec.NetworkEqSpec(network.ID))
 			if err != nil {
 				return fmt.Errorf("find device list failed: %v", err)
 			}

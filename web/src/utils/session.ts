@@ -1,4 +1,5 @@
 import {store} from "../store";
+import {Menu} from "../types/menu";
 
 
 export const isLogin = (): boolean => {
@@ -7,4 +8,8 @@ export const isLogin = (): boolean => {
 
 export const getToken = (): string => {
     return store.getState().auth.data.token
+}
+
+export const getMenus = (): Menu[] => {
+    return store.getState().menu.data
 }

@@ -26,11 +26,7 @@ const UpgradeModal: FC<UpgradeModalProps> = ({visible, device, onCancel, onSucce
         if (device && visible) {
             form.resetFields()
             setFirmware(undefined)
-            GetDeviceFirmwaresRequest(device.id).then(res => {
-                if (res.code === 200) {
-                    setFirmwares(res.data)
-                }
-            })
+            GetDeviceFirmwaresRequest(device.id).then(setFirmwares)
         }
     }, [device])
 

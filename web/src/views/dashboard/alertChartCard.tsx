@@ -16,23 +16,21 @@ const AlertChartCard = () => {
     const [endTime] = useState(moment().local().endOf("day"))
 
     useEffect(() => {
-        GetAlarmStatisticsRequest(beginTime.unix(), endTime.unix(), {}).then(res => {
-            if (res.code === 200) {
-                const {info, warn, critical, time} = res.data
-                const series = [
-                    {name: AlarmLevelInfo, type: "bar", data: info, color: ColorInfo},
-                    {name: AlarmLevelWarn, type: "bar", data: warn, color: ColorWarn},
-                    {name: AlarmLevelCritical, type: "bar", data: critical, color: ColorDanger},
-                ]
-                setOption({
-                    ...DefaultMultiBarOption,
-                    xAxis: {
-                        ...DefaultMultiBarOption.xAxis,
-                        data: time.map(item => moment.unix(item).local().format("MM/DD"))
-                    },
-                    series: series
-                })
-            }
+        GetAlarmStatisticsRequest(beginTime.unix(), endTime.unix(), {}).then(data => {
+            const {info, warn, critical, time} = data
+            const series = [
+                {name: AlarmLevelInfo, type: "bar", data: info, color: ColorInfo},
+                {name: AlarmLevelWarn, type: "bar", data: warn, color: ColorWarn},
+                {name: AlarmLevelCritical, type: "bar", data: critical, color: ColorDanger},
+            ]
+            setOption({
+                ...DefaultMultiBarOption,
+                xAxis: {
+                    ...DefaultMultiBarOption.xAxis,
+                    data: time.map(item => moment.unix(item).local().format("MM/DD"))
+                },
+                series: series
+            })
         })
     }, [])
 

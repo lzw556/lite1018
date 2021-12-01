@@ -34,7 +34,7 @@ func NewDevice() Device {
 
 func (factory Device) NewDeviceCreateCmd(req request.Device) (command.DeviceCreateCmd, error) {
 	ctx := context.TODO()
-	e, err := factory.deviceRepo.GetBySpecs(ctx, spec.DeviceMacSpec(req.MacAddress))
+	e, err := factory.deviceRepo.GetBySpecs(ctx, spec.DeviceMacEqSpec(req.MacAddress))
 	if !errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, response.BusinessErr(errcode.DeviceMacExistsError, req.MacAddress)
 	}
@@ -131,7 +131,7 @@ func (factory Device) NewDeviceQuery(id uint) (*query.DeviceQuery, error) {
 
 func (factory Device) NewDeviceGroupByQuery(deviceType uint) (*query.DeviceGroupByQuery, error) {
 	ctx := context.TODO()
-	es, err := factory.deviceRepo.FindBySpecs(ctx, spec.TypeSpec(deviceType))
+	es, err := factory.deviceRepo.FindBySpecs(ctx, spec.TypeEqSpec(deviceType))
 	if err != nil {
 		return nil, err
 	}
@@ -143,15 +143,15 @@ func (factory Device) NewDeviceGroupByQuery(deviceType uint) (*query.DeviceGroup
 func (factory Device) NewDevicePagingQuery(assetID, page, size int, req request.DeviceSearch) (*query.DevicePagingQuery, error) {
 	ctx := context.TODO()
 	specs := []spec.Specification{
-		spec.AssetSpec(assetID),
+		spec.AssetEqSpec(assetID),
 	}
 	switch req.Target {
 	case "name":
-		specs = append(specs, spec.DeviceNameSpec(cast.ToString(req.Text)))
+		specs = append(specs, spec.DeviceNameEqSpec(cast.ToString(req.Text)))
 	case "mac_address":
-		specs = append(specs, spec.DeviceMacSpec(cast.ToString(req.Text)))
+		specs = append(specs, spec.DeviceMacEqSpec(cast.ToString(req.Text)))
 	case "network_id":
-		specs = append(specs, spec.NetworkSpec(cast.ToUint(req.Text)))
+		specs = append(specs, spec.NetworkEqSpec(cast.ToUint(req.Text)))
 	}
 	es, total, err := factory.deviceRepo.PagingBySpecs(ctx, page, size, specs...)
 	if err != nil {
@@ -200,7 +200,7 @@ func (factory Device) NewDeviceChildrenQuery(id uint) (*query.DeviceChildrenQuer
 	}
 	macs := network.GetChildren(e.MacAddress)
 	if len(macs) > 0 {
-		children, err := factory.deviceRepo.FindBySpecs(ctx, spec.DeviceMacsSpec(macs))
+		children, err := factory.deviceRepo.FindBySpecs(ctx, spec.DeviceMacInSpec(macs))
 		if err != nil {
 			return nil, err
 		}

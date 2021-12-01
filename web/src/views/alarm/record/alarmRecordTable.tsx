@@ -1,7 +1,7 @@
 import {FC, useCallback, useState} from "react";
 import TableLayout, {TableProps} from "../../layout/TableLayout";
 import {AcknowledgeAlarmRecordRequest, PagingAlarmRecordsRequest, RemoveAlarmRecordRequest} from "../../../apis/alarm";
-import {Button, Dropdown, Menu, message, Popconfirm, Space, Tag} from "antd";
+import {Button, Dropdown, Menu, Popconfirm, Space, Tag} from "antd";
 import {ColorDanger, ColorInfo, ColorWarn} from "../../../constants/color";
 import {DeviceTypeString} from "../../../types/device_type";
 import {GetFieldName} from "../../../constants/field";
@@ -19,7 +19,7 @@ export interface AlarmRecordTableProps {
     statuses: number[]
 }
 
-const AlarmRecordTable: FC<AlarmRecordTableProps> = ({type, start, stop, device, asset, levels,statuses}) => {
+const AlarmRecordTable: FC<AlarmRecordTableProps> = ({type, start, stop, device, asset, levels, statuses}) => {
     const [table, setTable] = useState<TableProps>({data: {}, isLoading: false, pagination: true, refreshKey: 0})
 
     const onChange = useCallback((current: number, size: number) => {
@@ -30,22 +30,13 @@ const AlarmRecordTable: FC<AlarmRecordTableProps> = ({type, start, stop, device,
             type: type,
             statuses: statuses,
         }
-        PagingAlarmRecordsRequest(current, size, start, stop, filter).then(res => {
-            if (res.code === 200) {
-                setTable(Object.assign({}, table, {data: res.data}))
-            }
+        PagingAlarmRecordsRequest(current, size, start, stop, filter).then(data => {
+            setTable(Object.assign({}, table, {data: data}))
         })
     }, [asset, device, start, stop, levels, type, statuses])
 
     const onDelete = (id: number) => {
-        RemoveAlarmRecordRequest(id).then(res => {
-            if (res.code === 200) {
-                message.success("删除成功").then()
-                onRefresh()
-            } else {
-                message.error("删除失败").then()
-            }
-        })
+        RemoveAlarmRecordRequest(id).then(_ => onRefresh())
     }
 
     const onRefresh = () => {
@@ -53,14 +44,7 @@ const AlarmRecordTable: FC<AlarmRecordTableProps> = ({type, start, stop, device,
     }
 
     const onAcknowledge = (id: number) => {
-        AcknowledgeAlarmRecordRequest(id).then(res => {
-            if (res.code === 200) {
-                onRefresh()
-                message.success("处理成功").then()
-            }else {
-                message.error(res.msg).then()
-            }
-        })
+        AcknowledgeAlarmRecordRequest(id).then(_ => onRefresh())
     }
 
     const renderEditMenu = (record: any) => {
@@ -142,7 +126,7 @@ const AlarmRecordTable: FC<AlarmRecordTableProps> = ({type, start, stop, device,
                 return <Space>
                     {
                         type === 'active' && <Dropdown overlay={renderEditMenu(record)}>
-                            <Button type={"text"} size={"small"} icon={<EditOutlined />}/>
+                            <Button type={"text"} size={"small"} icon={<EditOutlined/>}/>
                         </Dropdown>
                     }
                     <Popconfirm placement="left" title="确认要删除该规则吗?" onConfirm={() => onDelete(record.id)}

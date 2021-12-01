@@ -52,7 +52,7 @@ func (s Alarm) CreateAlarmRuleTemplate(req request.AlarmRuleTemplate) error {
 }
 
 func (s Alarm) FindAlarmRuleTemplatesByPaginate(page, size int, deviceType uint) ([]vo.AlarmRuleTemplate, int64, error) {
-	es, total, err := s.template.PagingBySpecs(context.TODO(), page, size, spec.DeviceTypeSpec(deviceType))
+	es, total, err := s.template.PagingBySpecs(context.TODO(), page, size, spec.DeviceTypeEqSpec(deviceType))
 	if err != nil {
 		return nil, 0, err
 	}
@@ -101,7 +101,7 @@ func (s Alarm) RemoveAlarmRuleTemplate(id uint) error {
 }
 
 func (s Alarm) CheckAlarmRule(name string) error {
-	es, err := s.repository.FindBySpecs(context.TODO(), spec.NameLike(name))
+	es, err := s.repository.FindBySpecs(context.TODO(), spec.NameLikeSpec(name))
 	if err != nil {
 		return err
 	}
@@ -162,7 +162,7 @@ func (s Alarm) RemoveAlarmRule(id uint) error {
 		if err := s.repository.Delete(txCtx, e.ID); err != nil {
 			return err
 		}
-		if err := s.record.UpdateBySpecs(txCtx, map[string]interface{}{"status": 0}, spec.AlarmRule(e.ID)); err != nil {
+		if err := s.record.UpdateBySpecs(txCtx, map[string]interface{}{"status": 0}, spec.AlarmRuleEqSpec(e.ID)); err != nil {
 			return err
 		}
 		return adapter.RuleEngine.RemoveRules(e.Name)

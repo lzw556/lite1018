@@ -99,7 +99,7 @@ const Graph: FC<GraphProps> = ({network, onNodeRemove, isEdit, height}) => {
                                  style={{textAlign: "center", position: "fixed", bottom: 0, top: 0, left: 0, right: 0}}>
                                 {
                                     hasPermission(Permission.DeviceDetail) ?
-                                        <a href={`#/device-management/devices?locale=deviceDetail&id=${event.node.data.device.id}`}>{event.node.text}</a> :
+                                        <a href={`#/device-management?locale=networks/deviceDetail&id=${event.node.data.device.id}`}>{event.node.text}</a> :
                                         event.node.text
                                 }
                                 <br/>

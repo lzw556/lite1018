@@ -2,13 +2,13 @@ package specification
 
 import "gorm.io/gorm"
 
-type GatewaySpec uint
+type GatewayEqSpec uint
 
-func (GatewaySpec) IsSpecifiedBy(v interface{}) bool {
+func (GatewayEqSpec) IsSpecifiedBy(v interface{}) bool {
 	return true
 }
 
-func (s GatewaySpec) Scope() func(db *gorm.DB) *gorm.DB {
+func (s GatewayEqSpec) Scope() func(db *gorm.DB) *gorm.DB {
 	return func(db *gorm.DB) *gorm.DB {
 		return db.Where("gateway_id = ?", s)
 	}

@@ -40,7 +40,7 @@ func (p LinkStatus) Process(ctx *iot.Context, msg iot.Message) error {
 	if err := json.Unmarshal([]byte(m.Status), &linkStatus); err != nil {
 		return err
 	}
-	device, err := p.deviceRepo.GetBySpecs(context.TODO(), spec.DeviceMacSpec(linkStatus.Address))
+	device, err := p.deviceRepo.GetBySpecs(context.TODO(), spec.DeviceMacEqSpec(linkStatus.Address))
 	if err != nil {
 		return fmt.Errorf("device [%s] not found: %v", linkStatus.Address, err)
 	}

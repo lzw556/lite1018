@@ -1,4 +1,4 @@
-import {Form, Input, message, Modal} from "antd";
+import {Form, Input, Modal} from "antd";
 import {FC, useState} from "react";
 import {UpdateMyPass} from "../../../apis/profile";
 
@@ -15,17 +15,11 @@ const EditPassModal: FC<EditPassProps> = ({visible, onSuccess, onCancel}) => {
     const onSave = () => {
         form.validateFields().then(values => {
             setIsLoading(true)
-            UpdateMyPass({old: values.pwd, new: values.confirmPwd}).then(res => {
+            UpdateMyPass({old: values.pwd, new: values.confirmPwd}).then(_ => {
                 setIsLoading(false)
-                if (res.code === 200) {
-                    message.success("密码修改成功").then()
-                    onSuccess()
-                } else {
-                    message.error(`修改失败,${res.msg}`).then()
-                }
+                onSuccess()
             })
         }).catch(e => {
-            console.log(e)
             setIsLoading(false)
         })
     }

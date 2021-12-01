@@ -1,5 +1,5 @@
 import {AlarmRule} from "../../../../types/alarm_rule";
-import {Col, Form, Input, message, Modal, Row, Select} from "antd";
+import {Col, Form, Input, Modal, Row, Select} from "antd";
 import {FC, useState} from "react";
 import {defaultValidateMessages} from "../../../../constants/validator";
 import {UpdateAlarmRuleRequest} from "../../../../apis/alarm";
@@ -29,14 +29,7 @@ const EditModal: FC<EditProps> = ({visible, rule, onCancel, onSuccess}) => {
                         threshold: parseFloat(values.threshold),
                     },
                     level: values.level,
-                }).then(res => {
-                    if (res.code === 200) {
-                        message.success("阈值成功成功").then()
-                        onSuccess()
-                    }else {
-                        message.error("阈值修改失败").then()
-                    }
-                })
+                }).then(_ => onSuccess)
             }).catch(_ =>
                 setIsLoading(false)
             )

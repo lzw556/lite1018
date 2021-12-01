@@ -34,14 +34,7 @@ const RuleTemplatesPage = () => {
     }
 
     const onDelete = (id: number) => {
-        RemoveRuleTemplateRequest(id).then(res => {
-            if (res.code === 200) {
-                onRefresh()
-                message.success("模板删除成功").then()
-            }else {
-                message.error("模板删除失败").then()
-            }
-        })
+        RemoveRuleTemplateRequest(id).then(_ => onRefresh())
     }
 
     const columns = [
@@ -65,7 +58,7 @@ const RuleTemplatesPage = () => {
             render: (text: any, record: any) => (
                 <Space>
                     <HasPermission value={Permission.AlarmRuleTemplateEdit}>
-                        <Button type="text" size="small" href={`#/alarm-management/alarmRules?locale=editRuleTemplate&templateId=${record.id}`}
+                        <Button type="text" size="small" href={`#/alarm-management?locale=alarmRules/editRuleTemplate&templateId=${record.id}`}
                                 icon={<EditOutlined/>}/>
                     </HasPermission>
                     <HasPermission value={Permission.AlarmRuleTemplateDelete}>

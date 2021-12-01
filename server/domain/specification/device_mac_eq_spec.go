@@ -4,13 +4,13 @@ import (
 	"gorm.io/gorm"
 )
 
-type DeviceMacSpec string
+type DeviceMacEqSpec string
 
-func (s DeviceMacSpec) IsSpecifiedBy(v interface{}) bool {
+func (s DeviceMacEqSpec) IsSpecifiedBy(v interface{}) bool {
 	return true
 }
 
-func (s DeviceMacSpec) Scope() func(db *gorm.DB) *gorm.DB {
+func (s DeviceMacEqSpec) Scope() func(db *gorm.DB) *gorm.DB {
 	return func(db *gorm.DB) *gorm.DB {
 		if len(s) > 0 {
 			return db.Where("mac_address = ?", s)

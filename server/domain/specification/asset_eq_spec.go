@@ -2,13 +2,13 @@ package specification
 
 import "gorm.io/gorm"
 
-type AssetSpec uint
+type AssetEqSpec uint
 
-func (s AssetSpec) IsSpecifiedBy(v interface{}) bool {
+func (s AssetEqSpec) IsSpecifiedBy(v interface{}) bool {
 	return true
 }
 
-func (s AssetSpec) Scope() func(db *gorm.DB) *gorm.DB {
+func (s AssetEqSpec) Scope() func(db *gorm.DB) *gorm.DB {
 	return func(db *gorm.DB) *gorm.DB {
 		if s > 0 {
 			return db.Where("asset_id = ?", s)

@@ -28,7 +28,7 @@ func NewUser() user.Service {
 
 func (s User) Login(req request.Login) (*vo.AccessToken, error) {
 	ctx := context.TODO()
-	e, err := s.repository.GetBySpecs(ctx, spec.UsernameSpec(req.Username))
+	e, err := s.repository.GetBySpecs(ctx, spec.UsernameEqSpec(req.Username))
 	if err != nil {
 		return nil, response.BusinessErr(errcode.UserNotFoundError, err.Error())
 	}
@@ -46,7 +46,7 @@ func (s User) Login(req request.Login) (*vo.AccessToken, error) {
 
 func (s User) CreateUser(req request.User) error {
 	ctx := context.TODO()
-	e, err := s.repository.GetBySpecs(ctx, spec.UsernameSpec(req.Username))
+	e, err := s.repository.GetBySpecs(ctx, spec.UsernameEqSpec(req.Username))
 	if !errors.Is(err, gorm.ErrRecordNotFound) {
 		return response.BusinessErr(errcode.UserExistsError, "")
 	}

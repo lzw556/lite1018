@@ -4,13 +4,13 @@ import (
 	"gorm.io/gorm"
 )
 
-type TypeSpec uint
+type TypeEqSpec uint
 
-func (s TypeSpec) IsSpecifiedBy(v interface{}) bool {
+func (s TypeEqSpec) IsSpecifiedBy(v interface{}) bool {
 	return true
 }
 
-func (s TypeSpec) Scope() func(db *gorm.DB) *gorm.DB {
+func (s TypeEqSpec) Scope() func(db *gorm.DB) *gorm.DB {
 	return func(db *gorm.DB) *gorm.DB {
 		return db.Where("type_id = ?", s)
 	}

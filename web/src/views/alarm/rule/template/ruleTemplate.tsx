@@ -27,11 +27,7 @@ const RuleTemplate: FC<RuleTemplateProps> = ({defaultValue, onOk, okText}) => {
 
     useEffect(() => {
         if (deviceType) {
-            GetPropertiesRequest(deviceType).then(res => {
-                if (res.code === 200) {
-                    setProperties(res.data)
-                }
-            })
+            GetPropertiesRequest(deviceType).then(setProperties)
         }
     }, [deviceType])
 
@@ -82,7 +78,7 @@ const RuleTemplate: FC<RuleTemplateProps> = ({defaultValue, onOk, okText}) => {
     }
 
     return <Content>
-        <MyBreadcrumb items={["报警管理", "报警规则", "添加模板"]}/>
+        <MyBreadcrumb/>
         <Row justify="center">
             <Col span={24}>
                     <Card style={{padding: "10px"}}>

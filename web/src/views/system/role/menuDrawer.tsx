@@ -1,4 +1,4 @@
-import {Button, Drawer, DrawerProps, message, Space, Tree} from "antd";
+import {Button, Drawer, DrawerProps, Space, Tree} from "antd";
 import {FC, useEffect, useState} from "react";
 import {Role} from "../../../types/role";
 import {GetMenusTreeRequest} from "../../../apis/menu";
@@ -18,11 +18,9 @@ const MenuDrawer: FC<MenuDrawerProps> = (props) => {
 
     useEffect(() => {
         if (role) {
-            GetMenusTreeRequest().then(res => {
-                if (res.code === 200) {
-                    setMenus(res.data)
-                    setCheckMenus(role.menus)
-                }
+            GetMenusTreeRequest().then(data => {
+                setMenus(data)
+                setCheckMenus(role.menus)
             })
         } else {
             onCancel()
@@ -31,11 +29,8 @@ const MenuDrawer: FC<MenuDrawerProps> = (props) => {
 
     const onSave = () => {
         if (role) {
-            AllocMenusRequest(role.id, checkMenus).then(res => {
-                if (res.code === 200) {
-                    onCancel()
-                    message.success("分配成功")
-                }
+            AllocMenusRequest(role.id, checkMenus).then(_ => {
+                onCancel()
             })
         }
     }
@@ -47,18 +42,20 @@ const MenuDrawer: FC<MenuDrawerProps> = (props) => {
         </Space>
     }
 
-    const onCheck = (checkKeys:any, e:any) => {
+    const onCheck = (checkKeys: any, e: any) => {
         setCheckMenus(checkKeys.concat(e.halfCheckedKeys))
     }
 
     const renderDefaultCheckedKeys = () => {
         const parentKeys = menus?.filter(menu => menu.path === '').map(menu => menu.id)
-        return  role?.menus.filter(id => !parentKeys?.includes(id))
+        return role?.menus.filter(id => !parentKeys?.includes(id))
     }
 
     const renderMenusTree = () => {
         if (menus && visible) {
-            return <Tree checkable defaultExpandAll={true} showIcon={true} selectable={false} defaultCheckedKeys={renderDefaultCheckedKeys()} treeData={convertTreeData(menus)} onCheck={onCheck}/>
+            return <Tree checkable defaultExpandAll={true} showIcon={true} selectable={false}
+                         defaultCheckedKeys={renderDefaultCheckedKeys()} treeData={convertTreeData(menus)}
+                         onCheck={onCheck}/>
         }
     }
 

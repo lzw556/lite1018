@@ -1,4 +1,4 @@
-import {Button, Col, message, Popconfirm, Row, Space} from "antd";
+import {Button, Col, Popconfirm, Row, Space} from "antd";
 import {useCallback, useState} from "react";
 import {Content} from "antd/lib/layout/layout";
 import {GetUserRequest, PagingUsersRequest, RemoveUserRequest} from "../../apis/user";
@@ -25,11 +25,9 @@ const UserPage = () => {
 
     const onChange = useCallback((current: number, size: number) => {
         onLoading(true)
-        PagingUsersRequest(current, size).then(res => {
+        PagingUsersRequest(current, size).then(data => {
             onLoading(false)
-            if (res.code === 200) {
-                setTable(old => Object.assign({}, old, {data: res.data}))
-            }
+            setTable(old => Object.assign({}, old, {data: data}))
         })
     }, [])
 
@@ -51,22 +49,15 @@ const UserPage = () => {
         setTable(old => Object.assign({}, old, {refreshKey: old.refreshKey + 1}))
     }
 
-    const onDelete = async (id: number) => {
-        const res = await RemoveUserRequest(id)
-        if (res.code === 200) {
-            message.success("删除成功").then()
-            onRefresh()
-        } else {
-            message.error(res.msg).then()
-        }
+    const onDelete = (id: number) => {
+        RemoveUserRequest(id).then(_ => onRefresh())
     }
 
     const onEdit = async (id: number) => {
-        const res = await GetUserRequest(id)
-        if (res.code === 200) {
-            setUser(res.data)
+        GetUserRequest(id).then(data => {
+            setUser(data)
             setEditUserVisible(true)
-        }
+        })
     }
 
     const columns = [
@@ -107,7 +98,7 @@ const UserPage = () => {
 
 
     return <Content>
-        <MyBreadcrumb items={["用户管理", "用户列表"]}>
+        <MyBreadcrumb>
             <Space>
                 <HasPermission value={Permission.UserAdd}>
                     <Button type="primary"

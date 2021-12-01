@@ -1,4 +1,3 @@
-import {message} from "antd";
 import {useEffect, useState} from "react";
 import {useForm} from "antd/es/form/Form";
 import {AddAssetRequest} from "../../apis/asset";
@@ -24,12 +23,11 @@ const AddModal = (props: AddAssetProps) => {
     const onAdd = () => {
         setIsLoading(true)
         form.validateFields(["name"]).then(values => {
-            AddAssetRequest(values.name).then(res => {
+            AddAssetRequest(values.name).then(_ => {
                 setIsLoading(false)
-                if (res.code === 200) {
-                    message.success("添加成功").then()
-                    onSuccess()
-                }
+                onSuccess()
+            }).catch(_ => {
+                setIsLoading(false)
             })
         }).catch(_ => {
             setIsLoading(false)

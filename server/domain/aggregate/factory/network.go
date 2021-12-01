@@ -43,7 +43,7 @@ func (factory Network) NewNetworkQuery(networkID uint) (*query.NetworkQuery, err
 
 func (factory Network) NewNetworksQuery(assetID uint) (*query.NetworksQuery, error) {
 	ctx := context.TODO()
-	es, err := factory.deviceRepo.FindBySpecs(ctx, spec.AssetSpec(assetID), spec.TypeSpec(devicetype.GatewayType))
+	es, err := factory.deviceRepo.FindBySpecs(ctx, spec.AssetEqSpec(assetID), spec.TypeEqSpec(devicetype.GatewayType))
 	if err != nil {
 		return nil, err
 	}
@@ -117,7 +117,7 @@ func (factory Network) NewNetworkCreateCmd(req request.ImportNetwork) (*command.
 	// 构建网络中的设备实体
 	cmd.Devices = make([]po.Device, len(req.Devices))
 	for i, device := range req.Devices {
-		e, err := factory.deviceRepo.GetBySpecs(ctx, spec.DeviceMacSpec(device.MacAddress))
+		e, err := factory.deviceRepo.GetBySpecs(ctx, spec.DeviceMacEqSpec(device.MacAddress))
 		if !errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, response.BusinessErr(errcode.DeviceMacExistsError, device.MacAddress)
 		}
@@ -150,7 +150,7 @@ func (factory Network) NewNetworkExportCmd(networkID uint) (*command.NetworkExpo
 	}
 	cmd := command.NewNetworkExportCmd()
 	cmd.Network = e
-	devices, err := factory.deviceRepo.FindBySpecs(ctx, spec.NetworkSpec(e.ID))
+	devices, err := factory.deviceRepo.FindBySpecs(ctx, spec.NetworkEqSpec(e.ID))
 	if err != nil {
 		return nil, err
 	}
@@ -164,7 +164,7 @@ func (factory Network) NewNetworkUpdateCmd(gatewayID uint) (*command.NetworkUpda
 	if err != nil {
 		return nil, response.BusinessErr(errcode.DeviceNotFoundError, "")
 	}
-	e, err := factory.networkRepo.GetBySpecs(ctx, spec.GatewaySpec(gateway.ID))
+	e, err := factory.networkRepo.GetBySpecs(ctx, spec.GatewayEqSpec(gateway.ID))
 	if err != nil {
 		return nil, response.BusinessErr(errcode.NetworkNotFoundError, "")
 	}
@@ -180,7 +180,7 @@ func (factory Network) NewNetworkSyncCmd(networkID uint) (*command.NetworkSyncCo
 	if err != nil {
 		return nil, response.BusinessErr(errcode.NetworkNotFoundError, "")
 	}
-	devices, err := factory.deviceRepo.FindBySpecs(ctx, spec.NetworkSpec(network.ID))
+	devices, err := factory.deviceRepo.FindBySpecs(ctx, spec.NetworkEqSpec(network.ID))
 	if err != nil {
 		return nil, response.BusinessErr(errcode.DeviceNotFoundError, "")
 	}

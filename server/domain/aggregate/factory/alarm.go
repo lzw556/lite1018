@@ -135,7 +135,7 @@ func (factory Alarm) NewAlarmRecordPagingQuery(from, to int64, page, size int, r
 	if err != nil {
 		return nil, err
 	}
-	specs = append(specs, spec.LevelsSpec(req.AlarmLevels))
+	specs = append(specs, spec.LevelInSpec(req.AlarmLevels))
 	specs = append(specs, spec.CreatedAtRangeSpec{time.Unix(from, 0), time.Unix(to, 0)})
 
 	es, total, err := factory.alarmRecordRepo.PagingBySpecs(ctx, page, size, specs...)
@@ -155,7 +155,7 @@ func (factory Alarm) NewAlarmStatisticsQuery(from, to int64, req request.AlarmFi
 	}
 	begin := time.Unix(from, 0)
 	end := time.Unix(to, 0)
-	specs = append(specs, spec.LevelsSpec(req.AlarmLevels))
+	specs = append(specs, spec.LevelInSpec(req.AlarmLevels))
 	specs = append(specs, spec.CreatedAtRangeSpec{begin, end})
 	es, err := factory.alarmRecordRepo.FindBySpecs(ctx, specs...)
 	if err != nil {
@@ -175,10 +175,10 @@ func (factory Alarm) buildFilterSpecs(filter request.AlarmFilter) ([]spec.Specif
 	ctx := context.TODO()
 	specs := make([]spec.Specification, 0)
 	if filter.DeviceID != 0 {
-		specs = append(specs, spec.DevicesSpec{filter.DeviceID})
+		specs = append(specs, spec.DeviceInSpec{filter.DeviceID})
 	} else {
 		if filter.AssetID != 0 {
-			devices, err := factory.deviceRepo.FindBySpecs(ctx, spec.AssetSpec(filter.AssetID))
+			devices, err := factory.deviceRepo.FindBySpecs(ctx, spec.AssetEqSpec(filter.AssetID))
 			if err != nil {
 				return nil, err
 			}
@@ -186,17 +186,17 @@ func (factory Alarm) buildFilterSpecs(filter request.AlarmFilter) ([]spec.Specif
 			for i, device := range devices {
 				deviceIDs[i] = device.ID
 			}
-			specs = append(specs, spec.DevicesSpec(deviceIDs))
+			specs = append(specs, spec.DeviceInSpec(deviceIDs))
 		}
 	}
 	switch filter.Type {
 	case "active":
-		specs = append(specs, spec.IsActive(true))
+		specs = append(specs, spec.IsActiveSpec(true))
 	case "history":
-		specs = append(specs, spec.IsActive(false))
+		specs = append(specs, spec.IsActiveSpec(false))
 	}
 	if len(filter.Statuses) > 0 {
-		specs = append(specs, spec.Statuses(filter.Statuses))
+		specs = append(specs, spec.StatusInSpec(filter.Statuses))
 	}
 	return specs, nil
 }

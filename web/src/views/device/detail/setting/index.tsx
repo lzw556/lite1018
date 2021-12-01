@@ -12,18 +12,16 @@ export interface SettingPageProps {
     device?: Device
 }
 
-const SettingPage:FC<SettingPageProps> = ({device}) => {
+const SettingPage: FC<SettingPageProps> = ({device}) => {
     const [setting, setSetting] = useState<any>()
     const [isLoading, setIsLoading] = useState<boolean>(false)
 
     useEffect(() => {
         if (device) {
             setIsLoading(true)
-            GetDeviceSettingRequest(device.id).then(res => {
+            GetDeviceSettingRequest(device.id).then(data => {
                 setIsLoading(false)
-                if (res.code === 200) {
-                    setSetting(res.data)
-                }
+                setSetting(data)
             })
         }
     }, [device])
@@ -33,7 +31,7 @@ const SettingPage:FC<SettingPageProps> = ({device}) => {
             if (setting) {
                 if (device.typeId === DeviceType.Gateway) {
                     return <IPNSetting device={device} values={setting.ipn}/>
-                }else if(device.typeId !== DeviceType.Router){
+                } else if (device.typeId !== DeviceType.Router) {
                     return <SensorSetting device={device} values={setting.sensors}/>
                 }
             }
