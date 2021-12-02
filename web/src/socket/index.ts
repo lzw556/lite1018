@@ -29,7 +29,6 @@ const useSocket = () => {
                 console.log(data)
             })
             socket.on('socket::deviceConnectionStateChanged', (res: ResponseResult<any>) => {
-                console.log(res)
                 if (res.code === 200) {
                     PubSub.publish(SocketTopic.connectionState, {
                         id: res.data.id,
@@ -39,7 +38,7 @@ const useSocket = () => {
                 }
             })
             socket.on('socket::deviceUpgradeStateChanged', (res: ResponseResult<any>) => {
-                if (res.code == 200) {
+                if (res.code === 200) {
                     PubSub.publish(SocketTopic.upgradeState, {
                         id: res.data.id,
                         status: res.data.upgradeState.status,

@@ -1,5 +1,5 @@
 import { Header } from "antd/es/layout/layout";
-import { Button, Col, Dropdown, Menu, Row, Space } from "antd";
+import { Button, Col, Dropdown, Menu, Row, Space, Typography } from "antd";
 import "../../App.css";
 import "./layout.css"
 import "../../assets/iconfont.css"
@@ -8,11 +8,18 @@ import logo from "../../assets/images/logo-dark.png";
 import {CreditCardOutlined, DashboardOutlined, UserOutlined} from "@ant-design/icons";
 import { persistor, store } from "../../store";
 import {useState} from "react";
+import moment from "moment";
 
+const { Text } = Typography;
 
 const HeaderLayout = (props: any) => {
     const { hideConsole } = props
     const [currentUser] = useState<any>(store.getState().auth.data.user)
+    const [now, setNow] = useState<string>(moment().format("YYYY-MM-DD HH:mm:ss"))
+
+    setInterval(() => {
+        setNow(moment().format("YYYY-MM-DD HH:mm:ss"))
+    }, 1000)
 
     const onLogout = () => {
         persistor.purge().then(_ => {
@@ -34,7 +41,12 @@ const HeaderLayout = (props: any) => {
                     云监控平台
                 </Space>
             </Col>
-            <Col span={10} />
+            <Col span={8}/>
+            <Col offset={2} span={4}>
+                <Space>
+                    <Text style={{color: "white"}} strong>{now}</Text>
+                </Space>
+            </Col>
             <Col span={2}>
                 <Dropdown overlay={menu}>
                     <Space>

@@ -164,6 +164,20 @@ const AlertPage: FC<AlertPageProps> = ({device}) => {
             }
         },
         {
+            title: '持续时间',
+            dataIndex: 'updatedAt',
+            key: 'updatedAt',
+            render: (updatedAt: number, record: any) => {
+                switch (record.status) {
+                    case 1:
+                    case 2:
+                        return moment.unix(record.timestamp).local().from(moment.unix(updatedAt).local(), true)
+                    default:
+                        return moment.unix(record.timestamp).local().fromNow(true)
+                }
+            }
+        },
+        {
             title: '状态',
             dataIndex: 'status',
             key: 'status',

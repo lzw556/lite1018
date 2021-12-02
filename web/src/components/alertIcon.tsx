@@ -21,24 +21,22 @@ const AlertIcon: FC<AlertIconProps> = ({state, popoverPlacement}) => {
     const onShow = (visible: boolean) => {
         if (visible) {
             setContent(<Spin spinning={true}>loading...</Spin>)
-            GetAlarmRecordRequest(state.record.id).then(res => {
-                if (res.code === 200) {
-                    setContent(<Space>
-                        {
-                            res.data.level == 3 && <Tag color={ColorDanger}>紧急</Tag>
-                        }
-                        {
-                            res.data.level == 2 && <Tag color={ColorWarn}>重要</Tag>
-                        }
-                        {
-                            res.data.level == 1 && <Tag color={ColorInfo}>提示</Tag>
-                        }
-                        <Text>{moment.unix(res.data.timestamp).local().format("YYYY-MM-DD HH:mm:ss")}</Text>
-                        <Text>{`【${GetFieldName(res.data.rule.field)}】值${OperationTranslate(res.data.rule.operation)}设定的阈值${res.data.rule.threshold}${res.data.property.unit}`}</Text>
-                    </Space>)
-                }else {
-                    setContent(<Text>{res.msg}</Text>)
-                }
+            GetAlarmRecordRequest(state.record.id).then(data => {
+                setContent(<Space>
+                    {
+                        data.level === 3 && <Tag color={ColorDanger}>紧急</Tag>
+                    }
+                    {
+                        data.level === 2 && <Tag color={ColorWarn}>重要</Tag>
+                    }
+                    {
+                        data.level === 1 && <Tag color={ColorInfo}>提示</Tag>
+                    }
+                    <Text>{moment.unix(data.timestamp).local().format("YYYY-MM-DD HH:mm:ss")}</Text>
+                    <Text>{`【${GetFieldName(data.rule.field)}】值${OperationTranslate(data.rule.operation)}设定的阈值${data.rule.threshold}${data.property.unit}`}</Text>
+                </Space>)
+            }).catch(e => {
+                setContent(<Space>{e}</Space>)
             })
         }
     }

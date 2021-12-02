@@ -11,6 +11,10 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.icon-clock:before {
+  content: "\eaa6";
+}
+
 .icon-normal:before {
   content: "\e631";
 }

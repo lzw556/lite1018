@@ -5,7 +5,10 @@ import './index.css';
 import reportWebVitals from './reportWebVitals';
 import {StoreContext} from 'redux-react-hook';
 import AppRouter from "./routers";
+import moment from "moment";
+import 'moment/locale/zh-cn';
 
+moment.locale('zh-cn');
 
 ReactDOM.render(
     <StoreContext.Provider value={store}>

@@ -15,7 +15,7 @@ export function PagingRuleTemplateRequest(current: number, size: number, deviceT
         page: current,
         size: size,
         device_type: deviceType,
-    }).then(res => res.data)
+    }).then(GetResponse)
 }
 
 export function GetRuleTemplateRequest(id: number) {

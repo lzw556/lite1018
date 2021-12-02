@@ -80,6 +80,9 @@ const UserPage = () => {
             title: '操作',
             key: 'action',
             render: (text: any, record: any) => {
+                if (record.id === 1) {
+                    return <div/>
+                }
                 return <Space>
                     <HasPermission value={Permission.UserEdit}>
                         <Button type="text" size="small" icon={<EditOutlined/>}
