@@ -7,27 +7,18 @@ import SensorSelect from "../../../components/sensorSelect";
 import AssetSelect from "../../../components/assetSelect";
 import MyBreadcrumb from "../../../components/myBreadcrumb";
 import AlarmRecordTable from "./alarmRecordTable";
-import {useLocation} from "react-router-dom";
-import {GetParamValue} from "../../../utils/path";
 
 const {Option} = Select
 const {RangePicker} = DatePicker
 
 const AlarmRecordPage = () => {
-    const location = useLocation<any>()
     const [assetId, setAssetId] = useState<number>(0)
     const [deviceId, setDeviceId] = useState<number>(0)
     const [startDate, setStartDate] = useState<moment.Moment>(moment().startOf("day").subtract(1, "day"))
     const [endDate, setEndDate] = useState<moment.Moment>(moment().endOf("day"))
     const [alarmLevels, setAlarmLevels] = useState<number[]>([1, 2, 3])
     const [currentKey, setCurrentKey] = useState<string>("active")
-    const [statuses, setStatuses] = useState<number[]>(() => {
-        const status = GetParamValue(location.search, "status")
-        if (status) {
-            return [Number(status)]
-        }
-        return [0,1,2]
-    })
+    const [statuses] = useState<number[]>([0, 1, 2])
 
     const onAssetChanged = (value: any) => {
         setAssetId(value)
@@ -101,20 +92,6 @@ const AlarmRecordPage = () => {
                                         <Option key={1} value={1}>提示</Option>
                                         <Option key={2} value={2}>重要</Option>
                                         <Option key={3} value={3}>紧急</Option>
-                                    </Select>
-                                </Label>
-                                <Label name={"状态"}>
-                                    <Select bordered={false} mode={"multiple"} value={statuses}
-                                            style={{width: "250px"}} onChange={value => {
-                                        if (value.length) {
-                                            setStatuses(value)
-                                        } else {
-                                            setStatuses([0, 1, 2])
-                                        }
-                                    }}>
-                                        <Option key={0} value={0}>未处理</Option>
-                                        <Option key={1} value={1}>已处理</Option>
-                                        <Option key={2} value={2}>已恢复</Option>
                                     </Select>
                                 </Label>
                             </Space>

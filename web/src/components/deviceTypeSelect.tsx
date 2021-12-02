@@ -6,7 +6,7 @@ import {CaretDownOutlined} from "@ant-design/icons";
 const {Option, OptGroup} = Select
 
 export interface DeviceTypeSelectProps extends SelectProps<any> {
-    sensor: boolean
+    sensor: any
 }
 
 const DeviceTypeSelect: FC<DeviceTypeSelectProps> = (props) => {

@@ -296,7 +296,6 @@ const DevicePage = () => {
         {
             title: '操作',
             key: 'action',
-            shouldCellUpdate: () => false,
             render: (text: any, record: any) => {
                 const isUpgrading = record.upgradeState && record.upgradeState.status >= 1 && record.upgradeState.status <= 3
                 return <Space>

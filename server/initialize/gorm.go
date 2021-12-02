@@ -615,6 +615,18 @@ func initPermissions(db *gorm.DB) error {
 			Group:       "设备模块",
 		},
 		{
+			Path:        "devices/:id/firmwares",
+			Method:      "GET",
+			Description: "查看设备固件列表",
+			Group:       "设备模块",
+		},
+		{
+			Path:        "firmwares",
+			Method:      "GET",
+			Description: "查看固件列表",
+			Group:       "设备模块",
+		},
+		{
 			Path:        "firmwares",
 			Method:      "POST",
 			Description: "固件上传",

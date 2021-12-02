@@ -17,7 +17,11 @@ const BaseInfoForm = (props: any) => {
                 reject("请输入正确的MAC地址")
                 return
             }
-            CheckMacAddressRequest(value).then()
+            CheckMacAddressRequest(value).then(
+                resolve
+            ).catch(_ => {
+                reject("MAC地址已存在")
+            })
         })
     }
 

@@ -235,7 +235,7 @@ const ImportNetworkPage = () => {
                             subTitle="您可以返回网络列表查看网络信息或者继续导入网络"
                             extra={[
                                 <Button type="primary" key="devices" onClick={() => {
-                                    window.location.hash = "network-management/networks"
+                                    window.location.hash = "network-management?locale=networks"
                                 }}>
                                     返回网络列表
                                 </Button>,
