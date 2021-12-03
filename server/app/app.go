@@ -95,7 +95,7 @@ func runIoTServer() {
 func runApiServer(dist embed.FS) {
 	adapter.Api = api.NewAdapter()
 	adapter.Api.StaticFS(dist)
-	adapter.Api.UseMiddleware(middleware.NewJWT("/login"), middleware.NewCasbinRbac("/login", "/my/*", "/check/*"))
+	adapter.Api.UseMiddleware(middleware.NewJWT("/login"), middleware.NewCasbinRbac("/login", "/my/*", "/check/*", "/menus/*", "/permissions/*"))
 	adapter.Api.RegisterRouters(
 		user.NewRouter(service.NewUser()),
 		menu.NewRouter(service.NewMenu()),

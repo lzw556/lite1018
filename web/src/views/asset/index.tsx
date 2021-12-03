@@ -85,7 +85,7 @@ const AssetPage: FC = () => {
                         </Popconfirm>
                     </HasPermission>
                 </Space>
-            },
+            }
         }
     ]
 
@@ -100,6 +100,7 @@ const AssetPage: FC = () => {
         <ShadowCard>
             <TableLayout
                 emptyText={"资产列表为空"}
+                permissions={[Permission.AssetDelete, Permission.AssetEdit]}
                 columns={columns}
                 isLoading={table.isLoading}
                 refreshKey={table.refreshKey}

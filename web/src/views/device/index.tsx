@@ -39,7 +39,7 @@ import AlertIcon from "../../components/alertIcon";
 import MyBreadcrumb from "../../components/myBreadcrumb";
 import _ from "lodash";
 import HasPermission from "../../permission";
-import userPermission, {Permission} from "../../permission/permission";
+import usePermission, {Permission} from "../../permission/permission";
 
 const {Search} = Input
 const {Option} = Select
@@ -64,7 +64,7 @@ const DevicePage = () => {
     const [replaceVisible, setReplaceVisible] = useState<boolean>(false)
     const [executeDevice, setExecuteDevice] = useState<Device>()
     const {PubSub} = useSocket()
-    const {hasPermission} = userPermission()
+    const {hasPermission, hasPermissions} = usePermission()
 
     useEffect(() => {
         PubSub.subscribe(SocketTopic.connectionState, (msg: string, state: any) => {
@@ -179,7 +179,7 @@ const DevicePage = () => {
                 </>)
             }
             {
-                hasPermission(Permission.DeviceUpgrade) &&
+                hasPermissions(Permission.DeviceUpgrade, Permission.DeviceFirmwares) &&
                 (<>
                     <Menu.Item key={DeviceCommand.Upgrade} disabled={!disabled} hidden={isUpgrading}>固件升级</Menu.Item>
                     <Menu.Item key={DeviceCommand.CancelUpgrade} hidden={!isUpgrading}>取消升级</Menu.Item>
@@ -211,7 +211,7 @@ const DevicePage = () => {
             }
             {
                 hasPermission(Permission.DeviceSettingsEdit) && record.typeId !== DeviceType.Router &&
-                <Menu.Item key={2} hidden={!hasPermission(Permission.DeviceSettingsEdit)}>更新设备配置</Menu.Item>
+                <Menu.Item key={2}>更新设备配置</Menu.Item>
             }
             {
                 hasPermission(Permission.NetworkSettingEdit) && record.typeId === DeviceType.Gateway &&
@@ -300,10 +300,12 @@ const DevicePage = () => {
                 const isUpgrading = record.upgradeState && record.upgradeState.status >= 1 && record.upgradeState.status <= 3
                 return <Space>
                     <Dropdown overlay={renderEditMenus(record)}>
-                        <Button type="text" size="small" icon={<EditOutlined/>}/>
+                        <Button type="text" size="small" icon={<EditOutlined/>}
+                                hidden={!(hasPermission(Permission.DeviceEdit) || hasPermission(Permission.DeviceSettingsEdit) || hasPermission(Permission.DeviceReplace) || hasPermission(Permission.NetworkSettingEdit))}/>
                     </Dropdown>
                     <Dropdown overlay={renderCommandMenus(record)}>
-                        <Button type="text" icon={<CodeOutlined/>}/>
+                        <Button type="text" icon={<CodeOutlined/>}
+                                hidden={!(hasPermission(Permission.DeviceCommand) || hasPermissions(Permission.DeviceUpgrade, Permission.DeviceFirmwares))}/>
                     </Dropdown>
                     <HasPermission value={Permission.DeviceDelete}>
                         <Popconfirm placement="left" title="确认要删除该设备吗?" onConfirm={() => onDelete(record.id)}
@@ -360,6 +362,7 @@ const DevicePage = () => {
                     <TableLayout
                         emptyText={"设备列表为空"}
                         columns={columns}
+                        permissions={[Permission.DeviceEdit, Permission.DeviceReplace, Permission.DeviceCommand, Permission.DeviceUpgrade, Permission.DeviceFirmwares, Permission.DeviceDelete, Permission.DeviceSettingsEdit, Permission.NetworkSettingEdit]}
                         isLoading={table.isLoading}
                         pagination={table.pagination}
                         refreshKey={table.refreshKey}

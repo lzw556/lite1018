@@ -1,6 +1,7 @@
 import {Col, ConfigProvider, Empty, Pagination, Row, Table} from "antd";
 import {useEffect, useState} from "react";
 import zhCN from "antd/es/locale/zh_CN";
+import usePermission, {PermissionType} from "../../permission/permission";
 
 export interface TableProps {
     columns?: {}[]
@@ -9,6 +10,7 @@ export interface TableProps {
     refreshKey: number
     data: any
     emptyText?: string
+    permissions? : PermissionType[]
     onChange?: (current: number, size: number) => void
 }
 
@@ -16,16 +18,17 @@ export const DEFAULT_TABLE_PROPS: TableProps = {
     data: {},
     isLoading: false,
     pagination: true,
-    refreshKey: 0
+    refreshKey: 0,
 }
 
 const TableLayout = (props: TableProps) => {
-    const {columns, data, isLoading, onChange, pagination, refreshKey, emptyText} = props
-    const [current, setCurrent] = useState<number>(1)
-    const [size, setSize] = useState<number>(10)
+    const {columns, data, isLoading, onChange, pagination, refreshKey, emptyText, permissions} = props;
+    const [current, setCurrent] = useState<number>(1);
+    const [size, setSize] = useState<number>(10);
+    const {hasPermission} = usePermission();
 
     const onPageChange = (current: number) => {
-        setCurrent(current)
+        setCurrent(current);
     }
 
     const onPageSizeChange = (current: number, size: number) => {
@@ -42,10 +45,18 @@ const TableLayout = (props: TableProps) => {
         return <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={emptyText}/>
     }
 
+    const renderColumns = () => {
+        if (permissions && permissions.every((permission:PermissionType) => !hasPermission(permission))) {
+            return columns?.filter((item:any) => item.key !== "action")
+        }
+        return columns
+    }
+
     return <ConfigProvider renderEmpty={renderEmpty} locale={zhCN}>
         <Row justify="center">
             <Col span={24}>
-                <Table rowKey={(record: any) => record.id} size={"small"} columns={columns} dataSource={data.result} pagination={false}
+                <Table rowKey={(record: any) => record.id} size={"small"} columns={renderColumns()} dataSource={data.result}
+                       pagination={false}
                        loading={isLoading}/>
             </Col>
         </Row>

@@ -5,8 +5,10 @@ const ServerErrorPage: FC = () => {
     return <Result
         status="500"
         title="500"
-        subTitle="Sorry, something went wrong."
-        extra={<Button type="primary">Back Home</Button>}
+        subTitle="对不起，服务器出错了"
+        extra={<Button type="primary" onClick={() => {
+            window.location.hash = "/"
+        }}>返回首页</Button>}
     />
 }
 
