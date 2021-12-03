@@ -586,6 +586,12 @@ func initPermissions(db *gorm.DB) error {
 		},
 		{
 			Path:        "devices/:id/settings",
+			Method:      "GET",
+			Description: "查看设备配置信息",
+			Group:       "设备模块",
+		},
+		{
+			Path:        "devices/:id/settings",
 			Method:      "PATCH",
 			Description: "编辑设备配置",
 			Group:       "设备模块",

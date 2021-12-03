@@ -116,6 +116,7 @@ const UserPage = () => {
                 <ShadowCard>
                     <TableLayout
                         columns={columns}
+                        permissions={[Permission.UserDelete, Permission.UserEdit]}
                         data={table.data}
                         isLoading={table.isLoading}
                         refreshKey={table.refreshKey}

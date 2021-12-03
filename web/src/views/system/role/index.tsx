@@ -12,7 +12,7 @@ import {Role} from "../../../types/role";
 import MenuDrawer from "./menuDrawer";
 import PermissionDrawer from "./permissionDrawer";
 import HasPermission from "../../../permission";
-import {Permission} from "../../../permission/permission";
+import usePermission, {Permission} from "../../../permission/permission";
 
 const RolePage = () => {
     const [addVisible, setAddVisible] = useState(false);
@@ -26,6 +26,7 @@ const RolePage = () => {
         isLoading: false,
         pagination: true
     })
+    const {hasPermission} = usePermission()
 
     const onChange = useCallback((current, size) => {
         PagingRolesRequest(current, size).then(data => {
@@ -73,22 +74,25 @@ const RolePage = () => {
             key: 'action',
             render: (text: string, record: any) => {
                 return <Space>
-                    <HasPermission value={Permission.RoleAllocMenus}>
+                    {
+                        hasPermission(Permission.RoleAllocMenus) &&
                         <Button type={"link"} size={"small"} onClick={() => {
                             onAllocMenus(record.id)
                         }}>分配菜单</Button>
-                    </HasPermission>
-                    <HasPermission value={Permission.RoleAllocPermissions}>
+                    }
+                    {
+                        hasPermission(Permission.RoleAllocPermissions) &&
                         <Button type={"link"} size={"small"} onClick={() => {
                             onAllocPermissions(record.id)
                         }}>分配权限</Button>
-                    </HasPermission>
-                    <HasPermission value={Permission.RoleEdit}>
+                    }
+                    {
+                        hasPermission(Permission.RoleEdit) &&
                         <Button type="text" size="small" icon={<EditOutlined/>} onClick={() => {
                             setEditVisible(true)
                             setRole(record)
                         }}/>
-                    </HasPermission>
+                    }
                     <HasPermission value={Permission.RoleDelete}>
                         <Popconfirm placement="left" title="确认要删除该角色吗?"
                                     okText="删除" cancelText="取消" onConfirm={() => {
@@ -111,6 +115,7 @@ const RolePage = () => {
         <ShadowCard>
             <TableLayout
                 emptyText={"角色列表为空"}
+                permissions={[Permission.RoleAllocMenus, Permission.RoleAllocPermissions, Permission.RoleDelete]}
                 columns={columns}
                 isLoading={table.isLoading}
                 refreshKey={table.refreshKey}

@@ -37,7 +37,7 @@ func (r *deviceRouter) initRoutes() {
 		router.NewPutRoute("devices/:id", r.updateByID),
 
 		// PATCH
-		router.NewPatchRoute("devices/:id/setting", r.updateSettingByID),
+		router.NewPatchRoute("devices/:id/settings", r.updateSettingByID),
 		router.NewPatchRoute("devices/:id/mac/:mac", r.replaceByID),
 
 		// DELETE
