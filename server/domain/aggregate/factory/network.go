@@ -60,38 +60,6 @@ func (factory Network) NewNetworksQuery(assetID uint) (*query.NetworksQuery, err
 	return &q, nil
 }
 
-func (factory Network) NewNetworkRemoveDeviceCmd(networkID uint) (*command.NetworkRemoveDevicesCmd, error) {
-	ctx := context.TODO()
-	network, err := factory.networkRepo.Get(ctx, networkID)
-	if err != nil {
-		return nil, response.BusinessErr(errcode.NetworkNotFoundError, "")
-	}
-	cmd := command.NewNetworkRemoveDevicesCmd()
-	cmd.Network = network
-	return &cmd, nil
-}
-
-func (factory Network) NewNetworkAccessDevicesCmd(networkID uint, req request.AccessDevices) (*command.NetworkAccessDevicesCmd, error) {
-	ctx := context.TODO()
-	network, err := factory.networkRepo.Get(ctx, networkID)
-	if err != nil {
-		return nil, response.BusinessErr(errcode.NetworkNotFoundError, "")
-	}
-	parent, err := factory.deviceRepo.Get(ctx, req.Parent)
-	if err != nil {
-		return nil, response.BusinessErr(errcode.DeviceNotFoundError, "")
-	}
-	children, err := factory.deviceRepo.Find(ctx, req.Children...)
-	if err != nil {
-		return nil, response.BusinessErr(errcode.DeviceNotFoundError, "")
-	}
-	cmd := command.NewNetworkAccessDevicesCmd()
-	cmd.Network = network
-	cmd.Parent = parent
-	cmd.Children = children
-	return &cmd, nil
-}
-
 func (factory Network) NewNetworkCreateCmd(req request.ImportNetwork) (*command.NetworkCreateCmd, error) {
 	ctx := context.TODO()
 	asset, err := factory.assetRepo.Get(ctx, req.AssetID)
@@ -174,6 +142,22 @@ func (factory Network) NewNetworkUpdateCmd(gatewayID uint) (*command.NetworkUpda
 	return &cmd, nil
 }
 
+func (factory Network) NewNetworkUpdateCmdByID(id uint) (*command.NetworkUpdateCmd, error) {
+	ctx := context.TODO()
+	network, err := factory.networkRepo.Get(ctx, id)
+	if err != nil {
+		return nil, response.BusinessErr(errcode.NetworkNotFoundError, "")
+	}
+	gateway, err := factory.deviceRepo.Get(ctx, network.GatewayID)
+	if err != nil {
+		return nil, response.BusinessErr(errcode.DeviceNotFoundError, "")
+	}
+	cmd := command.NewNetworkUpdateCmd()
+	cmd.Network = network
+	cmd.Gateway = gateway
+	return &cmd, nil
+}
+
 func (factory Network) NewNetworkSyncCmd(networkID uint) (*command.NetworkSyncCommand, error) {
 	ctx := context.TODO()
 	network, err := factory.networkRepo.Get(ctx, networkID)
@@ -187,5 +171,16 @@ func (factory Network) NewNetworkSyncCmd(networkID uint) (*command.NetworkSyncCo
 	cmd := command.NewNetworkSyncCommand()
 	cmd.Network = network
 	cmd.Devices = devices
+	return &cmd, nil
+}
+
+func (factory Network) NewNetworkRemoveCmd(networkID uint) (*command.NetworkRemoveCmd, error) {
+	ctx := context.TODO()
+	network, err := factory.networkRepo.Get(ctx, networkID)
+	if err != nil {
+		return nil, response.BusinessErr(errcode.NetworkNotFoundError, "")
+	}
+	cmd := command.NewNetworkRemoveCmd()
+	cmd.Network = network
 	return &cmd, nil
 }

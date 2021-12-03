@@ -3,11 +3,15 @@ package command
 import (
 	"context"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/request"
+	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/response"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/iot/command"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
+	spec "github.com/thetasensors/theta-cloud-lite/server/domain/specification"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/vo"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/errcode"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/transaction"
 	"time"
 )
 
@@ -16,11 +20,13 @@ type NetworkUpdateCmd struct {
 	Gateway entity.Device
 
 	networkRepo dependency.NetworkRepository
+	deviceRepo  dependency.DeviceRepository
 }
 
 func NewNetworkUpdateCmd() NetworkUpdateCmd {
 	return NetworkUpdateCmd{
 		networkRepo: repository.Network{},
+		deviceRepo:  repository.Device{},
 	}
 }
 
@@ -48,6 +54,56 @@ func (cmd NetworkUpdateCmd) UpdateSetting(req request.WSN) error {
 	if err != nil {
 		return err
 	}
-	command.SyncWsnSettings(cmd.Network, cmd.Gateway, true, 3*time.Second)
+	go command.SyncWsnSettings(cmd.Network, cmd.Gateway, true, 3*time.Second)
+	return nil
+}
+
+func (cmd NetworkUpdateCmd) AccessDevices(parentID uint, childrenID []uint) error {
+	ctx := context.TODO()
+	parent, err := cmd.deviceRepo.Get(ctx, parentID)
+	if err != nil {
+		return response.BusinessErr(errcode.DeviceNotFoundError, "")
+	}
+	children, err := cmd.deviceRepo.FindBySpecs(ctx, spec.PrimaryKeyInSpec(childrenID))
+	if err != nil {
+		return err
+	}
+	cmd.Network.AccessDevices(parent, children)
+	err = transaction.Execute(context.TODO(), func(txCtx context.Context) error {
+		if err := cmd.networkRepo.Save(txCtx, &cmd.Network.Network); err != nil {
+			return err
+		}
+		return cmd.deviceRepo.UpdatesBySpecs(txCtx, map[string]interface{}{"network_id": cmd.Network.ID}, spec.PrimaryKeyInSpec(childrenID))
+	})
+	if err != nil {
+		return err
+	}
+	gateway, err := cmd.deviceRepo.Get(ctx, cmd.Network.GatewayID)
+	if err != nil {
+		return err
+	}
+	for _, child := range children {
+		go command.AddDevice(gateway, child, parent.MacAddress)
+	}
+	return nil
+}
+
+func (cmd NetworkUpdateCmd) RemoveDevices(req request.RemoveDevices) error {
+	ctx := context.TODO()
+	err := transaction.Execute(ctx, func(txCtx context.Context) error {
+		cmd.Network.UpdateRoutingTables(req.RoutingTables)
+		if err := cmd.networkRepo.Save(txCtx, &cmd.Network.Network); err != nil {
+			return err
+		}
+		return cmd.deviceRepo.UpdatesBySpecs(txCtx, map[string]interface{}{"network_id": 0}, spec.PrimaryKeyInSpec(req.DeviceIDs))
+	})
+	if err != nil {
+		return err
+	}
+	devices, err := cmd.deviceRepo.FindBySpecs(ctx, spec.NetworkEqSpec(cmd.Network.ID))
+	if err != nil {
+		return err
+	}
+	go command.SyncNetwork(cmd.Network, devices, 3*time.Second)
 	return nil
 }

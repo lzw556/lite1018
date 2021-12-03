@@ -181,12 +181,27 @@ const AlertPage: FC<AlertPageProps> = ({device}) => {
             title: '状态',
             dataIndex: 'status',
             key: 'status',
+            filters: [
+                {
+                    text: '未处理',
+                    value: 0
+                },
+                {
+                    text: '手动处理',
+                    value: 1
+                },
+                {
+                    text: '系统自动处理',
+                    value: 2
+                }
+            ],
+            onFilter: (value: number, record: any) => record.status === value,
             render: (status: number) => {
                 switch (status) {
                     case 1:
-                        return <Tag color="blue">已处理</Tag>
+                        return <Tag color="blue">手动处理</Tag>
                     case 2:
-                        return <Tag color="green">已恢复</Tag>
+                        return <Tag color="green">系统自动处理</Tag>
                     default:
                         return <Tag>未处理</Tag>
                 }
@@ -256,7 +271,7 @@ const AlertPage: FC<AlertPageProps> = ({device}) => {
                 <br/>
                 <Row justify={"start"}>
                     <Col span={24}>
-                        <TableLayout columns={columns} isLoading={table.isLoading} pagination={table.pagination}
+                        <TableLayout emptyText={"报警记录列表为空"} columns={columns} isLoading={table.isLoading} pagination={table.pagination}
                                      refreshKey={table.refreshKey} data={table.data} onChange={onChange}/>
                     </Col>
                 </Row>

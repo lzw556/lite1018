@@ -11,6 +11,7 @@ type Service interface {
 	CreateNetwork(req request.ImportNetwork) error
 
 	UpdateNetwork(networkID uint, req request.Network) (*vo.Network, error)
+	RemoveNetwork(networkID uint) error
 	UpdateSetting(gatewayID uint, req request.WSN) error
 
 	ExportNetwork(networkID uint) (*vo.NetworkExportFile, error)

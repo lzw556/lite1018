@@ -1,7 +1,8 @@
-import {Button, Card, Col, Dropdown, Form, Input, Menu, message, Row, Select, Space, Tooltip} from "antd";
+import {Button, Card, Col, Dropdown, Form, Input, Menu, message, Modal, Row, Select, Space, Tooltip} from "antd";
 import {Content} from "antd/lib/layout/layout";
-import {useEffect, useState} from "react";
+import {useState} from "react";
 import {
+    DeleteNetworkRequest,
     ExportNetworkRequest,
     GetNetworkRequest,
     RemoveDevicesRequest,
@@ -26,8 +27,7 @@ import NetworkSelect from "../../components/networkSelect";
 import {SendDeviceCommandRequest} from "../../apis/device";
 import {DeviceCommand} from "../../types/device_command";
 import {EmptyLayout} from "../layout";
-import useSocket, {SocketTopic} from "../../socket";
-import _ from "lodash";
+import useSocket from "../../socket";
 import MyBreadcrumb from "../../components/myBreadcrumb";
 import HasPermission from "../../permission";
 import userPermission, {Permission} from "../../permission/permission";
@@ -55,21 +55,21 @@ const NetworkPage = () => {
     const {PubSub} = useSocket()
     const {hasPermission} = userPermission()
 
-    useEffect(() => {
-        PubSub.subscribe(SocketTopic.connectionState, (msg: string, state: any) => {
-            if (state && network) {
-                const newNetwork = _.cloneDeep(network)
-                newNetwork.nodes = newNetwork.nodes.map(item => {
-                    if (item.id === state.id) {
-                        item.state.isOnline = state.isOnline
-                        item.state.connectAt = state.connectAt
-                    }
-                    return item
-                })
-                setNetwork(newNetwork)
-            }
-        })
-    }, [network])
+    // useEffect(() => {
+    //     PubSub.subscribe(SocketTopic.connectionState, (msg: string, state: any) => {
+    //         if (state && network) {
+    //             const newNetwork = _.cloneDeep(network)
+    //             newNetwork.nodes = newNetwork.nodes.map(item => {
+    //                 if (item.id === state.id) {
+    //                     item.state.isOnline = state.isOnline
+    //                     item.state.connectAt = state.connectAt
+    //                 }
+    //                 return item
+    //             })
+    //             setNetwork(newNetwork)
+    //         }
+    //     })
+    // }, [network])
 
     const fetchNetwork = (id: number) => {
         GetNetworkRequest(id).then(data => {
@@ -120,6 +120,21 @@ const NetworkPage = () => {
                         message.error("网络同步失败").then()
                     }
                 })
+                break
+            case "5":
+                Modal.confirm({
+                    title: "删除网络提示",
+                    content: `确认要删除【${n.name}】网络以及下面所有设备吗？`,
+                    okText: "确认",
+                    cancelText: "取消",
+                    onOk: (close) => {
+                        DeleteNetworkRequest(n.id).then(_ => {
+                            close()
+                            window.location.reload()
+                        })
+                    }
+                })
+                break
         }
     }
 
@@ -153,6 +168,10 @@ const NetworkPage = () => {
                         <Menu.Item key={3} disabled={!isOnline}>继续组网</Menu.Item>
                         <Menu.Item key={4} disabled={!isOnline}>同步网络</Menu.Item>
                     </>)
+                }
+                {
+                    hasPermission(Permission.NetworkDelete) &&
+                    <Menu.Item key={5}>删除网络</Menu.Item>
                 }
             </Menu>
         }

@@ -615,6 +615,18 @@ func initPermissions(db *gorm.DB) error {
 			Group:       "设备模块",
 		},
 		{
+			Path:        "devices/:id/firmwares",
+			Method:      "GET",
+			Description: "查看设备固件列表",
+			Group:       "设备模块",
+		},
+		{
+			Path:        "firmwares",
+			Method:      "GET",
+			Description: "查看固件列表",
+			Group:       "设备模块",
+		},
+		{
 			Path:        "firmwares",
 			Method:      "POST",
 			Description: "固件上传",
@@ -858,6 +870,12 @@ func initPermissions(db *gorm.DB) error {
 			Path:        "networks/:id/devices",
 			Method:      "DELETE",
 			Description: "移除设备",
+			Group:       "网络模块",
+		},
+		{
+			Path:        "networks/:id",
+			Method:      "DELETE",
+			Description: "删除网络",
 			Group:       "网络模块",
 		},
 		{
