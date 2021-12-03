@@ -57,7 +57,7 @@ const RuleTemplatesPage = () => {
                 <Space>
                     <HasPermission value={Permission.AlarmRuleTemplateEdit}>
                         <Button type="text" size="small"
-                                href={`#/alarm-management?locale=alarmRules/editRuleTemplate&templateId=${record.id}`}
+                                href={`#/alarm-management?locale=alarmRules/editAlarmRuleTemplate&templateId=${record.id}`}
                                 icon={<EditOutlined/>}/>
                     </HasPermission>
                     <HasPermission value={Permission.AlarmRuleTemplateDelete}>

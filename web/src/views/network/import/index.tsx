@@ -21,6 +21,8 @@ export interface NetworkRequestForm {
     asset_id: number
     communication_period: number
     communication_time_offset: number
+    group_size: number
+    group_interval: number
     routing_tables: [],
     devices: any
 }
@@ -81,6 +83,8 @@ const ImportNetworkPage = () => {
                     asset_id: values.asset,
                     communication_period: values.communication_period,
                     communication_time_offset: values.communication_time_offset,
+                    group_size: values.group_size,
+                    group_interval: values.group_interval,
                     routing_tables: edges.map((e: any) => [e.to, e.from]),
                     devices: nodes.map((n: any) => {
                         return {

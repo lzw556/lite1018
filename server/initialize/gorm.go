@@ -873,6 +873,12 @@ func initPermissions(db *gorm.DB) error {
 			Group:       "网络模块",
 		},
 		{
+			Path:        "networks/:id",
+			Method:      "DELETE",
+			Description: "删除网络",
+			Group:       "网络模块",
+		},
+		{
 			Path:        "roles",
 			Method:      "POST",
 			Description: "添加角色",

@@ -9,6 +9,7 @@ import ShadowCard from "../../../components/shadowCard";
 import MyBreadcrumb from "../../../components/myBreadcrumb";
 import HasPermission from "../../../permission";
 import {Permission} from "../../../permission/permission";
+import {GetParamValue} from "../../../utils/path";
 
 
 const tabList = [
@@ -29,7 +30,8 @@ const contents = new Map<string, any>([
 
 const AlarmRulePage = () => {
     const location = useLocation<any>()
-    const [currentKey, setCurrentKey] = useState<string>(location.state && location.state.tab ? location.state.tab : "rules")
+    const tab = GetParamValue(location.search, "tab")
+    const [currentKey, setCurrentKey] = useState<string>(tab ? tab : "rules")
 
     const renderAddButton = () => {
         if (currentKey === "rules") {

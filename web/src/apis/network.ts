@@ -37,3 +37,7 @@ export function UpdateNetworkRequest(id:number, params:any) {
 export function SyncNetworkRequest(id:number) {
     return request.put(`/networks/${id}/sync`, null).then(res => res.data)
 }
+
+export function DeleteNetworkRequest(id:number) {
+    return request.delete(`/networks/${id}`).then(DeleteResponse)
+}

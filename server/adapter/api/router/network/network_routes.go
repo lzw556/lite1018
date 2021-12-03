@@ -70,3 +70,8 @@ func (r networkRouter) updateByID(ctx *gin.Context) (interface{}, error) {
 	}
 	return r.service.UpdateNetwork(id, req)
 }
+
+func (r networkRouter) deleteByID(ctx *gin.Context) (interface{}, error) {
+	id := cast.ToUint(ctx.Param("id"))
+	return nil, r.service.RemoveNetwork(id)
+}

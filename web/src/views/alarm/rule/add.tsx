@@ -303,10 +303,7 @@ const AddRulePage = () => {
         <Footer style={{position: "fixed", bottom: 0, right: 0, background: "transparent"}}>
             <Space>
                 <Button onClick={() => {
-                    history.push({
-                        pathname: "/alarm-management/alarmRules",
-                        state: {tab: "rules"}
-                    })
+                    window.location.hash = "alarm-management?locale=alarmRules&tab=rules"
                 }}>取消</Button>
                 <Button type={"primary"} onClick={onSave}>创建</Button>
             </Space>

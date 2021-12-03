@@ -35,6 +35,7 @@ func (r *networkRouter) initRoutes() {
 
 		// DELETE
 		router.NewDeleteRoute("networks/:id/devices", r.removeDevices),
+		router.NewDeleteRoute("networks/:id", r.deleteByID),
 	}
 }
 
