@@ -5,7 +5,6 @@ import {GetPropertiesRequest} from "../../../../apis/property";
 import {Content} from "antd/lib/layout/layout";
 import DeviceTypeSelect from "../../../../components/deviceTypeSelect";
 import {AlarmRuleTemplate} from "../../../../types/alarm_rule_template";
-import {useHistory} from "react-router-dom";
 import {GetFieldName} from "../../../../constants/field";
 import MyBreadcrumb from "../../../../components/myBreadcrumb";
 
@@ -23,7 +22,6 @@ const RuleTemplate: FC<RuleTemplateProps> = ({defaultValue, onOk, okText}) => {
     const [rule, setRule] = useState(defaultValue?.rule)
     const [deviceType, setDeviceType] = useState<number>(defaultValue ? defaultValue.deviceType : 0)
     const [form] = Form.useForm()
-    const history = useHistory()
 
     useEffect(() => {
         if (deviceType) {
@@ -172,10 +170,7 @@ const RuleTemplate: FC<RuleTemplateProps> = ({defaultValue, onOk, okText}) => {
                                 <Col span={16} style={{textAlign: "right"}}>
                                     <Space>
                                         <Button onClick={() => {
-                                            history.push({
-                                                pathname: "/alarm-management/alarmRules",
-                                                state: {tab: "templates"}
-                                            })
+                                            window.location.hash = "alarm-management?locale=alarmRules&tab=templates"
                                         }}>取消</Button>
                                         <Button type="primary" onClick={onClick}>{okText}</Button>
                                     </Space>

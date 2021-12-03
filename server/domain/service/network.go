@@ -57,19 +57,19 @@ func (s Network) FindNetworks(assetID uint) ([]vo.Network, error) {
 }
 
 func (s Network) AccessDevices(networkID uint, req request.AccessDevices) error {
-	cmd, err := s.factory.NewNetworkAccessDevicesCmd(networkID, req)
+	cmd, err := s.factory.NewNetworkUpdateCmdByID(networkID)
 	if err != nil {
 		return err
 	}
-	return cmd.Run()
+	return cmd.AccessDevices(req.Parent, req.Children)
 }
 
 func (s Network) RemoveDevices(networkID uint, req request.RemoveDevices) error {
-	cmd, err := s.factory.NewNetworkRemoveDeviceCmd(networkID)
+	cmd, err := s.factory.NewNetworkUpdateCmdByID(networkID)
 	if err != nil {
 		return err
 	}
-	return cmd.Run(req)
+	return cmd.RemoveDevices(req)
 }
 
 func (s Network) UpdateSetting(gatewayID uint, req request.WSN) error {
@@ -90,6 +90,14 @@ func (s Network) UpdateNetwork(networkID uint, req request.Network) (*vo.Network
 		return nil, err
 	}
 	return cmd.Update(req)
+}
+
+func (s Network) RemoveNetwork(networkID uint) error {
+	cmd, err := s.factory.NewNetworkRemoveCmd(networkID)
+	if err != nil {
+		return err
+	}
+	return cmd.Run()
 }
 
 func (s Network) SyncNetwork(networkID uint) error {

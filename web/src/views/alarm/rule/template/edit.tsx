@@ -1,5 +1,5 @@
 import RuleTemplate from "./ruleTemplate";
-import {useHistory, useLocation} from "react-router-dom";
+import {useLocation} from "react-router-dom";
 import {useCallback, useEffect, useState} from "react";
 import {GetRuleTemplateRequest, UpdateRuleTemplateRequest} from "../../../../apis/alarm";
 import {AlarmRuleTemplate} from "../../../../types/alarm_rule_template";
@@ -9,7 +9,6 @@ import {GetParamValue} from "../../../../utils/path";
 const EditRuleTemplatePage = () => {
     const location = useLocation<any>()
     const [template, setTemplate] = useState<AlarmRuleTemplate>()
-    const history = useHistory()
 
     const fetchTemplate = useCallback(() => {
         const templateId = GetParamValue(location.search, "templateId")
@@ -17,11 +16,11 @@ const EditRuleTemplatePage = () => {
             GetRuleTemplateRequest(Number(templateId))
                 .then(data => setTemplate(data))
                 .catch(_ => {
-                    history.push({pathname: "/alarm-management/alarmRules", state: {tab: "templates"}})
+                    window.location.hash = "alarm-management?locale=alarmRules&tab=templates"
                 })
         }else {
             message.error("模板不存在").then()
-            history.push({pathname: "/alarm-management/alarmRules", state: {tab: "templates"}})
+            window.location.hash = "alarm-management?locale=alarmRules&tab=templates"
         }
     }, [])
 
@@ -32,7 +31,7 @@ const EditRuleTemplatePage = () => {
     const onSave = (value: any) => {
         UpdateRuleTemplateRequest(value.id, value)
             .then(_ => {
-                history.push({pathname: "/alarm-management/alarmRules", state: {tab: "templates"}})
+                window.location.hash = "alarm-management?locale=alarmRules&tab=templates"
             })
     }
 

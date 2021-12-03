@@ -23,6 +23,7 @@ export const Permission = {
     NetworkAccessDevices: {path: "networks/:id/devices", method: "PATCH"},
     NetworkExport: {path: "networks/:id/export", method: "GET"},
     NetworkEdit: {path: "networks/:id", method: "PUT"},
+    NetworkDelete: {path: "networks/:id", method: "DELETE"},
     AlarmRuleAdd: {path: "alarmRules", method: "POST"},
     AlarmRuleEdit: {path: "alarmRules/:id", method: "PUT"},
     AlarmRuleDelete: {path: "alarmRules/:id", method: "DELETE"},

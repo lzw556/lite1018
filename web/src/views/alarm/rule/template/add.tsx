@@ -1,16 +1,13 @@
 import {AddAlarmRuleTemplateRequest} from "../../../../apis/alarm";
 import RuleTemplate from "./ruleTemplate";
-import {useHistory} from "react-router-dom";
 
 
 const AddRuleTemplatePage = () => {
 
-    const history = useHistory()
-
     const onSave = (value: any) => {
         AddAlarmRuleTemplateRequest(value)
             .then(_ => {
-                history.push({pathname: "/alarm-management?locale=alarmRules", state: {tab: "templates"}})
+                window.location.hash = "alarm-management?locale=alarmRules&tab=templates"
             })
     }
 

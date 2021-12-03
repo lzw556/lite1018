@@ -62,11 +62,12 @@ const AddDevicePage = () => {
     }
 
     const onNext = () => {
-        form.validateFields().then(values => {
+        form.validateFields(["name", "mac", "asset"]).then(values => {
+            console.log(values)
             setRequestForm(Object.assign({}, requestForm, {name: values.name, mac_address: values.mac, asset_id: values.asset}))
             setCurrent(current + 1)
-        }).catch(_ => {
-
+        }).catch(e => {
+            console.log(e)
         })
     }
 

@@ -1,6 +1,6 @@
 import {AlarmRule} from "../../../../types/alarm_rule";
 import {Col, Form, Input, Modal, Row, Select} from "antd";
-import {FC, useState} from "react";
+import {FC, useEffect, useState} from "react";
 import {defaultValidateMessages} from "../../../../constants/validator";
 import {UpdateAlarmRuleRequest} from "../../../../apis/alarm";
 import {GetFieldName} from "../../../../constants/field";
@@ -18,6 +18,17 @@ const EditModal: FC<EditProps> = ({visible, rule, onCancel, onSuccess}) => {
     const [isLoading, setIsLoading] = useState<boolean>(false)
     const [form] = Form.useForm()
 
+    useEffect(() => {
+        if (visible) {
+            form.setFieldsValue({
+                property: rule ? `${rule.property.name}/${GetFieldName(rule.rule.field)}` : null,
+                operation: rule ? rule.rule.operation : ">",
+                threshold: rule?.rule.threshold,
+                level: rule?.level,
+            })
+        }
+    }, [visible])
+
     const onSave = () => {
         if (rule) {
             setIsLoading(true)
@@ -29,7 +40,7 @@ const EditModal: FC<EditProps> = ({visible, rule, onCancel, onSuccess}) => {
                         threshold: parseFloat(values.threshold),
                     },
                     level: values.level,
-                }).then(_ => onSuccess)
+                }).then(_ => onSuccess())
             }).catch(_ =>
                 setIsLoading(false)
             )
@@ -41,15 +52,14 @@ const EditModal: FC<EditProps> = ({visible, rule, onCancel, onSuccess}) => {
         <Form form={form} validateMessages={defaultValidateMessages}>
             <Row justify={"start"}>
                 <Col span={24}>
-                    <Form.Item label={"属性名称"} name="property"
-                               initialValue={rule ? `${rule.property.name}/${GetFieldName(rule.rule.field)}` : null}>
+                    <Form.Item label={"属性名称"} name="property">
                         <Input disabled/>
                     </Form.Item>
                 </Col>
             </Row>
             <Row justify={"start"}>
                 <Col span={12}>
-                    <Form.Item label={"阈值条件"} initialValue={rule ? rule.rule.operation : ">"} labelCol={{span: 0}}
+                    <Form.Item label={"阈值条件"} labelCol={{span: 0}}
                                name={"operation"} rules={[{required: true, message: "请选择阈值条件"}]}>
                         <Select size={"middle"} defaultActiveFirstOption={true}
                                 style={{width: "64px"}}>
@@ -61,7 +71,7 @@ const EditModal: FC<EditProps> = ({visible, rule, onCancel, onSuccess}) => {
                     </Form.Item>
                 </Col>
                 <Col span={12}>
-                    <Form.Item noStyle name={"threshold"} initialValue={rule?.rule.threshold} rules={[{
+                    <Form.Item noStyle name={"threshold"} rules={[{
                         required: true, type: "number", transform(value: any) {
                             if (value) {
                                 return Number(value)
@@ -74,7 +84,7 @@ const EditModal: FC<EditProps> = ({visible, rule, onCancel, onSuccess}) => {
             </Row>
             <Row justify={"start"}>
                 <Col span={24}>
-                    <Form.Item label={"报警级别"} name={"level"} initialValue={rule?.level} rules={[{required: true, message: "请选择报警级别"}]}>
+                    <Form.Item label={"报警级别"} name={"level"} rules={[{required: true, message: "请选择报警级别"}]}>
                         <Select defaultActiveFirstOption={true} size={"middle"}>
                             <Option key={1} value={1}>提示</Option>
                             <Option key={2} value={2}>重要</Option>
