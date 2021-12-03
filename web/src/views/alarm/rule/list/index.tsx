@@ -45,7 +45,7 @@ const RulesPage = () => {
         RemoveAlarmRuleRequest(id).then(_ => onRefresh())
     }
 
-    const columns = [
+    const columns:any = [
         {
             title: '规则名称',
             dataIndex: 'name',
@@ -82,7 +82,6 @@ const RulesPage = () => {
             title: '操作',
             key: 'action',
             width: 200,
-            shouldCellUpdate: () => false,
             render: (_: any, record: any) => {
                 return <>
                     <HasPermission value={Permission.AlarmRuleEdit}>
@@ -135,9 +134,14 @@ const RulesPage = () => {
         <br/>
         <Row justify={"start"}>
             <Col span={24}>
-                <TableLayout emptyText={"报警规则列表为空"} columns={columns} isLoading={table.isLoading}
+                <TableLayout emptyText={"报警规则列表为空"}
+                             columns={columns}
+                             permissions={[Permission.AlarmRuleEdit,Permission.AlarmRuleDelete]}
+                             isLoading={table.isLoading}
                              pagination={table.pagination}
-                             refreshKey={table.refreshKey} data={table.data} onChange={onChange}/>
+                             refreshKey={table.refreshKey}
+                             data={table.data}
+                             onChange={onChange}/>
             </Col>
         </Row>
         <EditModal rule={rule} visible={editVisible} onSuccess={() => {

@@ -5,6 +5,8 @@ import {GetMenusTreeRequest} from "../../../apis/menu";
 import {Menu} from "../../../types/menu";
 import {AllocMenusRequest} from "../../../apis/role";
 import "../../../assets/iconfont.css"
+import usePermission, {Permission} from "../../../permission/permission";
+import HasPermission from "../../../permission";
 
 export interface MenuDrawerProps extends DrawerProps {
     role?: Role
@@ -15,6 +17,7 @@ const MenuDrawer: FC<MenuDrawerProps> = (props) => {
     const {role, visible, onCancel} = props;
     const [menus, setMenus] = useState<Menu[]>();
     const [checkMenus, setCheckMenus] = useState<number[]>([])
+    const {hasPermission} = usePermission()
 
     useEffect(() => {
         if (role) {
@@ -38,7 +41,9 @@ const MenuDrawer: FC<MenuDrawerProps> = (props) => {
     const renderExtra = () => {
         return <Space>
             <Button onClick={onCancel}>取消</Button>
-            <Button type={"primary"} onClick={onSave}>保存</Button>
+            <HasPermission value={Permission.RoleAllocMenus}>
+                <Button type={"primary"} onClick={onSave}>保存</Button>
+            </HasPermission>
         </Space>
     }
 
@@ -53,7 +58,7 @@ const MenuDrawer: FC<MenuDrawerProps> = (props) => {
 
     const renderMenusTree = () => {
         if (menus && visible) {
-            return <Tree checkable defaultExpandAll={true} showIcon={true} selectable={false}
+            return <Tree checkable={hasPermission(Permission.RoleAllocMenus)} defaultExpandAll={true} showIcon={true} selectable={false}
                          defaultCheckedKeys={renderDefaultCheckedKeys()} treeData={convertTreeData(menus)}
                          onCheck={onCheck}/>
         }

@@ -85,16 +85,14 @@ const FirmwarePage = () => {
         {
             title: '操作',
             key: 'action',
-            render: (text: any, record: any) => (
-                <Space>
-                    <HasPermission value={Permission.FirmwareDelete}>
-                        <Popconfirm placement="left" title="确认要删除该用户吗?" onConfirm={() => onDelete(record.id)}
-                                    okText="删除" cancelText="取消">
-                            <Button type="text" size="small" icon={<DeleteOutlined/>} danger/>
-                        </Popconfirm>
-                    </HasPermission>
+            render: (text: any, record: any) => {
+                return <Space>
+                    <Popconfirm placement="left" title="确认要删除该用户吗?" onConfirm={() => onDelete(record.id)}
+                                okText="删除" cancelText="取消">
+                        <Button type="text" size="small" icon={<DeleteOutlined/>} danger/>
+                    </Popconfirm>
                 </Space>
-            ),
+            },
         }
     ]
 
@@ -124,6 +122,7 @@ const FirmwarePage = () => {
                     <TableLayout
                         emptyText={"固件列表为空"}
                         columns={columns}
+                        permissions={[Permission.FirmwareDelete]}
                         isLoading={table.isLoading}
                         refreshKey={table.refreshKey}
                         onChange={onChange}

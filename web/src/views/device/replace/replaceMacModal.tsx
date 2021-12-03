@@ -16,7 +16,7 @@ const ReplaceMacModal: FC<ReplaceMacProps> = ({visible, device, onCancel, onSucc
     const onSave = () => {
         form.validateFields().then(values => {
             if (device) {
-                ReplaceDeviceMacRequest(device.id, values.mac).then(_ => onSuccess)
+                ReplaceDeviceMacRequest(device.id, values.mac).then(_ => onSuccess())
             }
         })
     }

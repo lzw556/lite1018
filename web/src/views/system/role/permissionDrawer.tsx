@@ -3,6 +3,8 @@ import {Role} from "../../../types/role";
 import {FC, useEffect, useState} from "react";
 import {GetPermissionsWithGroupRequest} from "../../../apis/permission";
 import {AllocPermissionsRequest} from "../../../apis/role";
+import usePermission, {Permission} from "../../../permission/permission";
+import HasPermission from "../../../permission";
 
 export interface PermissionDrawerProps extends DrawerProps {
     role?: Role
@@ -13,6 +15,7 @@ const PermissionDrawer: FC<PermissionDrawerProps> = (props) => {
     const {role, visible, onCancel} = props;
     const [permissions, setPermissions] = useState<any>();
     const [checkPermissions, setCheckPermissions] = useState<number[]>([]);
+    const {hasPermission} = usePermission();
 
     useEffect(() => {
         if (role) {
@@ -54,7 +57,9 @@ const PermissionDrawer: FC<PermissionDrawerProps> = (props) => {
     const renderExtra = () => {
         return <Space>
             <Button onClick={onCancel}>取消</Button>
-            <Button type={"primary"} onClick={onSave}>保存</Button>
+            <HasPermission value={Permission.RoleAllocPermissions}>
+                <Button type={"primary"} onClick={onSave}>保存</Button>
+            </HasPermission>
         </Space>
     }
 
@@ -82,7 +87,7 @@ const PermissionDrawer: FC<PermissionDrawerProps> = (props) => {
 
     const convertPermissionTree = () => {
         if (permissions && visible) {
-            return <Tree checkable defaultExpandAll={true} showIcon={true} selectable={false}
+            return <Tree checkable={hasPermission(Permission.RoleAllocPermissions)} defaultExpandAll={true} showIcon={true} selectable={false}
                          defaultCheckedKeys={renderDefaultCheckedKeys()} treeData={convertTreeData()}
                          onCheck={onCheck}/>
         }

@@ -8,6 +8,8 @@ import {GetFieldName} from "../../../constants/field";
 import {OperationTranslate} from "../../../constants/rule";
 import moment from "moment";
 import {DeleteOutlined, EditOutlined} from "@ant-design/icons";
+import usePermission, {Permission} from "../../../permission/permission";
+import HasPermission from "../../../permission";
 
 export interface AlarmRecordTableProps {
     type: "active" | "history"
@@ -21,6 +23,7 @@ export interface AlarmRecordTableProps {
 
 const AlarmRecordTable: FC<AlarmRecordTableProps> = ({type, start, stop, device, asset, levels, statuses}) => {
     const [table, setTable] = useState<TableProps>({data: {}, isLoading: false, pagination: true, refreshKey: 0})
+    const {hasPermission} = usePermission()
 
     const onChange = useCallback((current: number, size: number) => {
         const filter = {
@@ -53,7 +56,7 @@ const AlarmRecordTable: FC<AlarmRecordTableProps> = ({type, start, stop, device,
         </Menu>
     }
 
-    const columns = [
+    const columns:any = [
         {
             title: '报警级别',
             dataIndex: 'level',
@@ -155,14 +158,16 @@ const AlarmRecordTable: FC<AlarmRecordTableProps> = ({type, start, stop, device,
             render: (_: any, record: any) => {
                 return <Space>
                     {
-                        type === 'active' && <Dropdown overlay={renderEditMenu(record)}>
+                        type === 'active' && hasPermission(Permission.AlarmRecordAcknowledge) && <Dropdown overlay={renderEditMenu(record)}>
                             <Button type={"text"} size={"small"} icon={<EditOutlined/>}/>
                         </Dropdown>
                     }
-                    <Popconfirm placement="left" title="确认要删除该规则吗?" onConfirm={() => onDelete(record.id)}
-                                okText="删除" cancelText="取消">
-                        <Button type="text" size="small" icon={<DeleteOutlined/>} danger/>
-                    </Popconfirm>
+                    <HasPermission value={Permission.AlarmRecordAcknowledge}>
+                        <Popconfirm placement="left" title="确认要删除该规则吗?" onConfirm={() => onDelete(record.id)}
+                                    okText="删除" cancelText="取消">
+                            <Button type="text" size="small" icon={<DeleteOutlined/>} danger/>
+                        </Popconfirm>
+                    </HasPermission>
                 </Space>
             }
         }
@@ -182,8 +187,14 @@ const AlarmRecordTable: FC<AlarmRecordTableProps> = ({type, start, stop, device,
         return columns
     }
 
-    return <TableLayout emptyText={"报警记录列表为空"} columns={renderColumns()} isLoading={table.isLoading} pagination={table.pagination}
-                        refreshKey={table.refreshKey} data={table.data} onChange={onChange}/>
+    return <TableLayout emptyText={"报警记录列表为空"}
+                        permissions={[Permission.AlarmRecordAcknowledge, Permission.AlarmRecordDelete]}
+                        columns={renderColumns()}
+                        isLoading={table.isLoading}
+                        pagination={table.pagination}
+                        refreshKey={table.refreshKey}
+                        data={table.data}
+                        onChange={onChange}/>
 }
 
 export default AlarmRecordTable

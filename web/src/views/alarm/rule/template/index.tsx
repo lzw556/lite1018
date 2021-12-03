@@ -7,7 +7,7 @@ import DeviceTypeSelect from "../../../../components/deviceTypeSelect";
 import {DeviceType, DeviceTypeString} from "../../../../types/device_type";
 import {DeleteOutlined, EditOutlined} from "@ant-design/icons";
 import HasPermission from "../../../../permission";
-import {Permission} from "../../../../permission/permission";
+import usePermission, {Permission, PermissionType} from "../../../../permission/permission";
 
 const {Option} = Select
 
@@ -52,7 +52,6 @@ const RuleTemplatesPage = () => {
         {
             title: '操作',
             key: 'action',
-            shouldCellUpdate: () => false,
             render: (text: any, record: any) => (
                 <Space>
                     <HasPermission value={Permission.AlarmRuleTemplateEdit}>
@@ -67,8 +66,8 @@ const RuleTemplatesPage = () => {
                         </Popconfirm>
                     </HasPermission>
                 </Space>
-            ),
-        },
+            )
+        }
     ]
 
     return <div>
@@ -90,6 +89,7 @@ const RuleTemplatesPage = () => {
             <Col span={24}>
                 <TableLayout isLoading={table.isLoading}
                              emptyText={"报警规则模板列表为空"}
+                             permissions={[Permission.AlarmRuleTemplateEdit, Permission.AlarmRuleTemplateDelete]}
                              pagination={table.pagination}
                              refreshKey={table.refreshKey}
                              columns={columns}
