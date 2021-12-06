@@ -158,7 +158,11 @@ const AddRulePage = () => {
                 reject("输入不能为空")
                 return
             }
-            CheckRuleNameRequest(value).then()
+            CheckRuleNameRequest(value).then(_ => {
+                resolve("")
+            }).catch(e => {
+                reject(e)
+            })
         })
     }
 
