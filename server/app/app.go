@@ -11,6 +11,7 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/asset"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/device"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/firmware"
+	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/measurement"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/menu"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/network"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/permission"
@@ -102,6 +103,7 @@ func runApiServer(dist embed.FS) {
 		role.NewRouter(service.NewRole()),
 		permission.NewRouter(service.NewPermission()),
 		asset.NewRouter(service.NewAsset()),
+		measurement.NewRouter(service.NewMeasurement()),
 		device.NewRouter(service.NewDevice()),
 		property.NewRouter(service.NewProperty()),
 		firmware.NewRouter(service.NewFirmware()),

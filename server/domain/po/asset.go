@@ -2,16 +2,11 @@ package po
 
 import "gorm.io/gorm"
 
-type AssetType uint
-
-const (
-	DefaultAssetType AssetType = iota
-)
-
 type Asset struct {
 	gorm.Model
-	Name string `gorm:"type:varchar(64)"`
-	Type AssetType
+	Name      string `gorm:"type:varchar(64)"`
+	ParentID  uint
+	ProjectID uint
 }
 
 func (Asset) TableName() string {

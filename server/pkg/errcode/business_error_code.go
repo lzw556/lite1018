@@ -58,6 +58,10 @@ const (
 	RoleNotFoundError
 )
 
+const (
+	UnknownMeasurementTypeError BusinessErrorCode = iota + 18001
+)
+
 var businessErrorMap = map[BusinessErrorCode]string{
 	UnknownBusinessError:                "未知错误",
 	SystemNotReadyError:                 "系统未初始化完成",
@@ -84,6 +88,7 @@ var businessErrorMap = map[BusinessErrorCode]string{
 	AlarmRecordAlreadyAcknowledgedError: "报警已被处理",
 	RoleExistsError:                     "角色已存在",
 	RoleNotFoundError:                   "角色不存在",
+	UnknownMeasurementTypeError:         "未知的监测点类型",
 }
 
 func GetErrMessage(code BusinessErrorCode) string {

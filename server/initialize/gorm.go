@@ -23,6 +23,8 @@ func InitTables(db *gorm.DB) error {
 		&po.AlarmRuleTemplate{},
 		&po.AlarmRecord{},
 		&po.AlarmRecordAcknowledge{},
+		&po.Measurement{},
+		&po.MeasurementProcess{},
 	}
 	for _, table := range tables {
 		if !db.Migrator().HasTable(table) {
@@ -399,6 +401,14 @@ func initMenus(db *gorm.DB) error {
 			Name:     "assets",
 			ParentID: 5,
 			View:     "Asset",
+			Path:     "/asset-management",
+		},
+		{
+			ID:       23,
+			Title:    "添加监测点",
+			Name:     "addMeasurement",
+			ParentID: 5,
+			View:     "AddMeasurement",
 			Path:     "/asset-management",
 		},
 		{

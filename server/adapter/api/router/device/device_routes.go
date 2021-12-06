@@ -6,8 +6,19 @@ import (
 	"github.com/spf13/cast"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/request"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/response"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/devicetype"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/errcode"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/json"
 )
+
+func (r deviceRouter) getDeviceTypeParameters(ctx *gin.Context) (interface{}, error) {
+	id := cast.ToUint(ctx.Param("id"))
+	result, err := devicetype.GetParameter(id)
+	if err != nil {
+		return nil, response.BusinessErr(err.(errcode.BusinessErrorCode), "")
+	}
+	return result, nil
+}
 
 func (r deviceRouter) create(ctx *gin.Context) (interface{}, error) {
 	var req request.Device

@@ -1,22 +1,16 @@
 package po
 
-import "gorm.io/gorm"
-
-type MeasurementType uint
-
-const (
-	BoltLooseningMeasurementType MeasurementType = iota + 1
-	BoltElongationMeasurementType
-	CorrosionThicknessMeasurementType
-	PressureMeasurementType
-	FlangeLooseningMeasurementType
-	FlangeElongationMeasurementType
+import (
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/measurement"
+	"gorm.io/gorm"
 )
 
 type Measurement struct {
 	gorm.Model
-	Name string `gorm:"type:varchar(64);"`
-	Type uint
+	Name     string `gorm:"type:varchar(64);"`
+	Type     measurement.Type
+	AssetID  uint
+	Settings MeasurementSettings `gorm:"type:json"`
 }
 
 func (Measurement) TableName() string {

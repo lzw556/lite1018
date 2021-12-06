@@ -33,6 +33,8 @@ func (r *deviceRouter) initRoutes() {
 		router.NewGetRoute("devices/:id/download/data", r.downloadDataByID),
 		router.NewGetRoute("check/devices/:mac", r.checkMacAddress),
 
+		router.NewGetRoute("deviceTypes/:id/parameters", r.getDeviceTypeParameters),
+
 		// PUT
 		router.NewPutRoute("devices/:id", r.updateByID),
 
