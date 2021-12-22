@@ -18,7 +18,8 @@ func NewRouter(s Service) router.Router {
 func (r *networkRouter) initRoutes() {
 	r.routes = []router.Route{
 		// POST
-		router.NewPostRoute("networks", r.importNetwork),
+		router.NewPostRoute("networks/import", r.importNetwork),
+		router.NewPostRoute("networks", r.create),
 
 		// GET
 		router.NewGetRoute("networks/:id", r.getByID),

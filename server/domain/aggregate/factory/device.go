@@ -22,6 +22,7 @@ type Device struct {
 	deviceRepo   dependency.DeviceRepository
 	networkRepo  dependency.NetworkRepository
 	propertyRepo dependency.PropertyRepository
+	bindingRepo  dependency.MeasurementDeviceBindingRepository
 }
 
 func NewDevice() Device {
@@ -29,6 +30,7 @@ func NewDevice() Device {
 		deviceRepo:   repository.Device{},
 		networkRepo:  repository.Network{},
 		propertyRepo: repository.Property{},
+		bindingRepo:  repository.MeasurementDeviceBinding{},
 	}
 }
 
@@ -40,7 +42,7 @@ func (factory Device) NewDeviceCreateCmd(req request.Device) (command.DeviceCrea
 	}
 	e.Name = req.Name
 	e.MacAddress = req.MacAddress
-	e.TypeID = req.TypeID
+	e.Type = req.TypeID
 	switch req.TypeID {
 	case devicetype.GatewayType:
 		return factory.newGatewayCreateCmd(e.Device, req)
@@ -58,7 +60,7 @@ func (factory Device) NewDeviceCreateCmd(req request.Device) (command.DeviceCrea
 }
 
 func (factory Device) newGatewayCreateCmd(e po.Device, req request.Device) (*command.GatewayCreateCmd, error) {
-	e.AssetID = req.AssetID
+	e.NetworkID = req.NetworkID
 	e.Category = po.GatewayCategory
 	e.IPN = req.IPN
 	cmd := command.NewGatewayCreateCmd()
@@ -75,7 +77,7 @@ func (factory Device) newGatewayCreateCmd(e po.Device, req request.Device) (*com
 }
 
 func (factory Device) newRouterCreateCmd(e po.Device, req request.Device) (*command.RouterCreateCmd, error) {
-	e.AssetID = req.AssetID
+	e.NetworkID = req.NetworkID
 	e.Category = po.RouterCategory
 	cmd := command.NewRouterCreateCmd()
 	cmd.Device = e
@@ -83,7 +85,7 @@ func (factory Device) newRouterCreateCmd(e po.Device, req request.Device) (*comm
 }
 
 func (factory Device) newSensorCreateCmd(e po.Device, req request.Device) (*command.SensorCreateCmd, error) {
-	e.AssetID = req.AssetID
+	e.NetworkID = req.NetworkID
 	e.Category = po.SensorCategory
 	e.Sensors = req.Sensors
 	cmd := command.NewSensorCreateCmd()
@@ -123,7 +125,7 @@ func (factory Device) NewDeviceQuery(id uint) (*query.DeviceQuery, error) {
 	}
 	q := query.NewDeviceQuery()
 	q.Device = e
-	if e.TypeID == devicetype.GatewayType {
+	if e.Type == devicetype.GatewayType {
 		q.Network, _ = factory.networkRepo.Get(ctx, e.NetworkID)
 	}
 	return &q, nil
@@ -140,18 +142,20 @@ func (factory Device) NewDeviceGroupByQuery(deviceType uint) (*query.DeviceGroup
 	return &q, nil
 }
 
-func (factory Device) NewDevicePagingQuery(assetID, page, size int, req request.DeviceSearch) (*query.DevicePagingQuery, error) {
+func (factory Device) NewDevicePagingQuery(page, size int, filters request.Filters) (*query.DevicePagingQuery, error) {
 	ctx := context.TODO()
-	specs := []spec.Specification{
-		spec.AssetEqSpec(assetID),
-	}
-	switch req.Target {
-	case "name":
-		specs = append(specs, spec.DeviceNameEqSpec(cast.ToString(req.Text)))
-	case "mac_address":
-		specs = append(specs, spec.DeviceMacEqSpec(cast.ToString(req.Text)))
-	case "network_id":
-		specs = append(specs, spec.NetworkEqSpec(cast.ToUint(req.Text)))
+	specs := make([]spec.Specification, 0)
+	for _, filter := range filters {
+		switch filter.Name {
+		case "asset_id":
+			specs = append(specs, spec.AssetEqSpec(cast.ToUint(filter.Value)))
+		case "name":
+			specs = append(specs, spec.DeviceNameEqSpec(cast.ToString(filter.Value)))
+		case "mac_address":
+			specs = append(specs, spec.DeviceMacEqSpec(cast.ToString(filter.Value)))
+		case "network_id":
+			specs = append(specs, spec.NetworkEqSpec(cast.ToUint(filter.Value)))
+		}
 	}
 	es, total, err := factory.deviceRepo.PagingBySpecs(ctx, page, size, specs...)
 	if err != nil {
@@ -161,8 +165,8 @@ func (factory Device) NewDevicePagingQuery(assetID, page, size int, req request.
 	cmd.Devices = es
 	cmd.PropertiesMap = map[uint][]po.Property{}
 	for _, e := range es {
-		if _, ok := cmd.PropertiesMap[e.TypeID]; !ok {
-			cmd.PropertiesMap[e.TypeID], _ = factory.propertyRepo.FindByDeviceTypeID(ctx, e.TypeID)
+		if _, ok := cmd.PropertiesMap[e.Type]; !ok {
+			cmd.PropertiesMap[e.Type], _ = factory.propertyRepo.FindByDeviceTypeID(ctx, e.Type)
 		}
 	}
 	return &cmd, nil
@@ -231,12 +235,47 @@ func (factory Device) NewDeviceUpgradeCmd(deviceID uint) (*command.DeviceUpgrade
 	return &cmd, nil
 }
 
-func (factory Device) NewDeviceStatisticQuery() (*query.DeviceStatisticQuery, error) {
-	es, err := factory.deviceRepo.Find(context.TODO())
+func (factory Device) NewDeviceStatisticsQuery(filters request.Filters) (*query.DeviceStatisticsQuery, error) {
+	specs := factory.buildFilterSpec(filters)
+	es, err := factory.deviceRepo.FindBySpecs(context.TODO(), specs...)
 	if err != nil {
 		return nil, err
 	}
-	q := query.NewDeviceStatisticQuery()
+	q := query.NewDeviceStatisticsQuery()
 	q.Devices = es
 	return &q, nil
+}
+
+func (factory Device) NewDeviceListQueryByFilter(filters request.Filters) (*query.DeviceListQuery, error) {
+	ctx := context.TODO()
+	specs := factory.buildFilterSpec(filters)
+	es, err := factory.deviceRepo.FindBySpecs(ctx, specs...)
+	if err != nil {
+		return nil, err
+	}
+	q := query.NewDeviceListQuery()
+	q.Devices = es
+	return &q, nil
+}
+
+func (factory Device) buildFilterSpec(filters request.Filters) []spec.Specification {
+	specs := make([]spec.Specification, 0)
+	for _, filter := range filters {
+		switch filter.Name {
+		case "asset_id":
+			specs = append(specs, spec.AssetEqSpec(cast.ToUint(filter.Value)))
+		case "network_id":
+			specs = append(specs, spec.NetworkEqSpec(cast.ToUint(filter.Value)))
+		case "measurement_id":
+			bindings, _ := factory.bindingRepo.FindBySpecs(context.TODO(), spec.MeasurementEqSpec(cast.ToUint(filter.Value)))
+			macSpecs := make(spec.DeviceMacInSpec, len(bindings))
+			for i, binding := range bindings {
+				macSpecs[i] = binding.MacAddress
+			}
+			specs = append(specs, macSpecs)
+		case "category":
+			specs = append(specs, spec.CategoryEqSpec(cast.ToUint(filter.Value)))
+		}
+	}
+	return specs
 }

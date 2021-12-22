@@ -1,9 +1,10 @@
 import request from "../utils/request";
 import {Firmware} from "../types/firmware";
 import {DeleteResponse, GetResponse} from "../utils/response";
+import {PageResult} from "../types/page";
 
 export function PagingFirmwaresRequest(page:number, size:number) {
-    return request.get<Firmware[]>("/firmwares", {page, size}).then(GetResponse)
+    return request.get<PageResult<Firmware[]>>("/firmwares", {page, size}).then(GetResponse)
 }
 
 export function RemoveFirmwareRequest(id:number) {

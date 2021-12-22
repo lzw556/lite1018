@@ -5,11 +5,11 @@ import {AssetStatistic} from "../types/asset_statistic";
 import {DeleteResponse, GetResponse, PostResponse, PutResponse} from "../utils/response";
 
 export function PagingAssetsRequest(page:number, size: number) {
-    return request.get<PageResult<Asset[]>>("/assets", {page, size}).then(GetResponse)
+    return request.get<PageResult<Asset[]>>("/assets?method=paging", {page, size}).then(GetResponse)
 }
 
-export function AddAssetRequest(name: string) {
-    return request.post<any>("/assets", {name}).then(PostResponse)
+export function AddAssetRequest(formData: any) {
+    return request.upload<any>("/assets", formData).then(PostResponse)
 }
 
 export function GetAssetRequest(id: number) {
@@ -30,4 +30,12 @@ export function GetAssetStatisticsRequest(id:number) {
 
 export function GetAllAssetStatisticsRequest() {
     return request.get<AssetStatistic[]>(`/assets/statistics`).then(GetResponse)
+}
+
+export function GetAssetsRequest() {
+    return request.get<Asset[]>(`/assets`).then(GetResponse)
+}
+
+export function GetAssetChildrenRequest(id:number) {
+    return request.get<Asset[]>(`/assets/${id}/children`).then(GetResponse)
 }

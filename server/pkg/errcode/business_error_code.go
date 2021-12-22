@@ -35,6 +35,7 @@ const (
 	DeviceCommandExecFailedError
 	DeviceCommandCancelledError
 	UnknownDeviceCommandTypeError
+	DeviceAlreadyBindingError
 )
 
 const (
@@ -59,7 +60,8 @@ const (
 )
 
 const (
-	UnknownMeasurementTypeError BusinessErrorCode = iota + 18001
+	MeasurementNotFoundError BusinessErrorCode = iota + 18001
+	UnknownMeasurementTypeError
 )
 
 var businessErrorMap = map[BusinessErrorCode]string{
@@ -78,6 +80,7 @@ var businessErrorMap = map[BusinessErrorCode]string{
 	DeviceCommandExecFailedError:        "命令执行失败",
 	DeviceCommandSendTimeoutError:       "命令发送超时",
 	DeviceCommandCancelledError:         "命令已取消",
+	DeviceAlreadyBindingError:           "设备已被绑定",
 	UnknownDeviceCommandTypeError:       "未知的设备命令",
 	NetworkNotFoundError:                "网络不存在",
 	FirmwareNotFoundError:               "固件不存在",
@@ -88,6 +91,7 @@ var businessErrorMap = map[BusinessErrorCode]string{
 	AlarmRecordAlreadyAcknowledgedError: "报警已被处理",
 	RoleExistsError:                     "角色已存在",
 	RoleNotFoundError:                   "角色不存在",
+	MeasurementNotFoundError:            "监测点不存在",
 	UnknownMeasurementTypeError:         "未知的监测点类型",
 }
 

@@ -1,22 +1,12 @@
 package po
 
-import (
-	"database/sql/driver"
-	"errors"
-	"fmt"
-	"github.com/thetasensors/theta-cloud-lite/server/pkg/json"
-)
-
-type MeasurementDeviceBinding map[uint]uint
-
-func (s MeasurementDeviceBinding) Value() (driver.Value, error) {
-	return json.Marshal(s)
+type MeasurementDeviceBinding struct {
+	ID            uint `gorm:"primaryKey;autoIncrement"`
+	MeasurementID uint
+	MacAddress    string `gorm:"type:varchar(12);unique_index"`
+	Index         uint
 }
 
-func (s *MeasurementDeviceBinding) Scan(v interface{}) error {
-	bytes, ok := v.([]byte)
-	if !ok {
-		return errors.New(fmt.Sprint("failed to unmarshal MeasurementDeviceBinding value:", v))
-	}
-	return json.Unmarshal(bytes, s)
+func (MeasurementDeviceBinding) TableName() string {
+	return "ts_measurement_device_binding"
 }

@@ -9,7 +9,7 @@ import usePermission, {Permission} from "../../../permission/permission";
 import HasPermission from "../../../permission";
 
 export interface MenuDrawerProps extends DrawerProps {
-    role?: Role
+    role: Role
     onCancel: () => void
 }
 
@@ -20,22 +20,18 @@ const MenuDrawer: FC<MenuDrawerProps> = (props) => {
     const {hasPermission} = usePermission()
 
     useEffect(() => {
-        if (role) {
+        if (visible) {
             GetMenusTreeRequest().then(data => {
                 setMenus(data)
                 setCheckMenus(role.menus)
             })
-        } else {
-            onCancel()
         }
-    }, [role])
+    }, [visible])
 
     const onSave = () => {
-        if (role) {
-            AllocMenusRequest(role.id, checkMenus).then(_ => {
-                onCancel()
-            })
-        }
+        AllocMenusRequest(role.id, checkMenus).then(_ => {
+            onCancel()
+        })
     }
 
     const renderExtra = () => {
@@ -58,7 +54,8 @@ const MenuDrawer: FC<MenuDrawerProps> = (props) => {
 
     const renderMenusTree = () => {
         if (menus && visible) {
-            return <Tree checkable={hasPermission(Permission.RoleAllocMenus)} defaultExpandAll={true} showIcon={true} selectable={false}
+            return <Tree checkable={hasPermission(Permission.RoleAllocMenus)} defaultExpandAll={true} showIcon={true}
+                         selectable={false}
                          defaultCheckedKeys={renderDefaultCheckedKeys()} treeData={convertTreeData(menus)}
                          onCheck={onCheck}/>
         }

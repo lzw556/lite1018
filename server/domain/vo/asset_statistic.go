@@ -17,12 +17,4 @@ func NewAssetStatistic(e po.Asset) AssetStatistic {
 }
 
 func (s *AssetStatistic) UpdateStatus() {
-	for _, device := range s.Devices {
-		if device.AlertState.Level > s.Status {
-			s.Status = device.AlertState.Level
-		}
-		if s.Status >= 3 {
-			break
-		}
-	}
 }

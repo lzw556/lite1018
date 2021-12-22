@@ -1,7 +1,10 @@
 package crontask
 
 import (
+	"context"
 	"github.com/robfig/cron/v3"
+	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/xlog"
 	"sync"
 )
 
@@ -13,27 +16,54 @@ type Adapter struct {
 }
 
 func NewAdapter() *Adapter {
-	return &Adapter{
-		cron:      cron.New(),
-		entityIDs: map[string]cron.EntryID{},
+	a := &Adapter{
+		cron:      cron.New(cron.WithSeconds()),
+		entityIDs: make(map[string]cron.EntryID),
 		mu:        sync.RWMutex{},
 	}
+	a.initMeasurementJobs()
+	return a
+
+}
+
+func (a *Adapter) initMeasurementJobs() {
+	repo := repository.Measurement{}
+	es, err := repo.Find(context.TODO())
+	if err != nil {
+		xlog.Error("init measurement jobs", err)
+		return
+	}
+	jobs := make([]Job, len(es))
+	for i, e := range es {
+		jobs[i] = NewMeasurementDataJob(e)
+	}
+	a.AddJobs(jobs...)
 }
 
 func (a *Adapter) AddJobs(jobs ...Job) {
-	for _, job := range jobs {
-		if _, ok := a.getEntity(job.ID()); !ok {
-			entityID, err := a.cron.AddJob(job.Spec(), job)
+	for _, j := range jobs {
+		if _, ok := a.getEntity(j.ID()); !ok {
+			entityID, err := a.cron.AddJob(j.Spec(), j)
 			if err != nil {
 				return
 			}
-			a.setEntity(job, entityID)
+			a.setEntity(j, entityID)
 		}
 	}
 }
 
 func (a *Adapter) RemoveJob(id string) {
+	a.mu.Lock()
+	defer a.mu.Unlock()
+	if entityID, ok := a.getEntity(id); ok {
+		a.cron.Remove(entityID)
+		delete(a.entityIDs, id)
+	}
+}
 
+func (a *Adapter) RefreshJob(job Job) {
+	a.RemoveJob(job.ID())
+	a.AddJobs(job)
 }
 
 func (a *Adapter) getEntity(id string) (cron.EntryID, bool) {
@@ -41,8 +71,9 @@ func (a *Adapter) getEntity(id string) (cron.EntryID, bool) {
 	return value, ok
 }
 
-func (a *Adapter) Run() {
+func (a *Adapter) Run() error {
 	a.cron.Run()
+	return nil
 }
 
 func (a *Adapter) Stop() {

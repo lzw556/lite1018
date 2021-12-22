@@ -7,7 +7,10 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/json"
 )
 
-type MeasurementSettings map[string]interface{}
+type MeasurementSettings struct {
+	Measurements Settings `json:"measurements"`
+	Sensors      Settings `json:"sensors"`
+}
 
 func (s MeasurementSettings) Value() (driver.Value, error) {
 	return json.Marshal(s)

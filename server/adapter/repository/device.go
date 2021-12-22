@@ -30,6 +30,10 @@ func (repo Device) Save(ctx context.Context, e *po.Device) error {
 	return repo.DB(ctx).Save(e).Error
 }
 
+func (repo Device) BatchSave(ctx context.Context, es []po.Device) error {
+	return repo.DB(ctx).Save(&es).Error
+}
+
 func (repo Device) UpdatesBySpecs(ctx context.Context, updates map[string]interface{}, specs ...specification.Specification) error {
 	return repo.DB(ctx).Model(&po.Device{}).Scopes(specification.Scopes(specs)...).Updates(updates).Error
 }

@@ -36,6 +36,12 @@ func (repo AlarmRecord) UpdateBySpecs(ctx context.Context, updates map[string]in
 	return repo.DB(ctx).Scopes(spec.Scopes(specs)...).Model(&po.AlarmRecord{}).Updates(updates).Error
 }
 
+func (repo AlarmRecord) CountBySpecs(ctx context.Context, specs ...spec.Specification) (int64, error) {
+	var count int64
+	err := repo.DB(ctx).Model(&po.AlarmRecord{}).Scopes(spec.Scopes(specs)...).Count(&count).Error
+	return count, err
+}
+
 func (repo AlarmRecord) Get(ctx context.Context, id uint) (entity.AlarmRecord, error) {
 	var e entity.AlarmRecord
 	err := repo.DB(ctx).First(&e, id).Error

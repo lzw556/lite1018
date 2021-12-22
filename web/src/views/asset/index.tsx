@@ -1,59 +1,49 @@
-import {FC, useCallback, useState} from "react";
+import {FC, useCallback, useEffect, useState} from "react";
 import {Button, Popconfirm, Space} from "antd";
 import {Content} from "antd/lib/layout/layout";
-import TableLayout, {TableProps} from "../layout/TableLayout";
+import TableLayout from "../layout/TableLayout";
 import {GetAssetRequest, PagingAssetsRequest, RemoveAssetRequest} from "../../apis/asset";
 import AddModal from "./addModal";
 import {InitializeAssetState} from "../../types/asset";
-import EditModal from "./editModal";
 import {DeleteOutlined, EditOutlined, PlusOutlined} from "@ant-design/icons";
 import ShadowCard from "../../components/shadowCard";
 import MyBreadcrumb from "../../components/myBreadcrumb";
 import HasPermission from "../../permission";
 import {Permission} from "../../permission/permission";
+import {PageResult} from "../../types/page";
 
 
 const AssetPage: FC = () => {
     const [addAssetVisible, setAddAssetVisible] = useState<boolean>(false)
     const [editAssetVisible, setEditAssetVisible] = useState<boolean>(false)
     const [asset, setAsset] = useState(InitializeAssetState)
-    const [table, setTable] = useState<TableProps>({
-        refreshKey: 0,
-        data: {},
-        isLoading: false,
-        pagination: true
-    })
+    const [dataSource, setDataSource] = useState<PageResult<any>>()
 
-    const onChange = useCallback((current: number, size: number) => {
-        onLoading(true)
-        PagingAssetsRequest(current, size).then(data => {
-            onLoading(false)
-            setTable(old => Object.assign({}, old, {data: data}))
-        }).catch((_) => {
-            onLoading(false)
-        })
+    const fetchAssets = useCallback((current: number, size: number) => {
+        PagingAssetsRequest(current, size).then(setDataSource)
     }, [])
 
+    useEffect(() => {
+        fetchAssets(1, 10)
+    }, [fetchAssets])
+
+    const onRefresh = () => {
+        if (dataSource) {
+            fetchAssets(dataSource.page, dataSource.size)
+        }
+    }
+
     const onAddAssetSuccess = () => {
-        onRefresh()
         setAddAssetVisible(false)
+        onRefresh()
     }
 
     const onEditAssetSuccess = () => {
-        onRefresh()
         setEditAssetVisible(false)
     }
 
-    const onRefresh = () => {
-        setTable(old => Object.assign({}, old, {refreshKey: old.refreshKey + 1}))
-    }
-
-    const onLoading = (isLoading: boolean) => {
-        setTable(old => Object.assign({}, old, {isLoading: isLoading}))
-    }
-
     const onDelete = async (id: number) => {
-        RemoveAssetRequest(id).then(_ => onRefresh())
+        RemoveAssetRequest(id).then()
     }
 
     const onEdit = async (id: number) => {
@@ -102,16 +92,13 @@ const AssetPage: FC = () => {
                 emptyText={"资产列表为空"}
                 permissions={[Permission.AssetDelete, Permission.AssetEdit]}
                 columns={columns}
-                isLoading={table.isLoading}
-                refreshKey={table.refreshKey}
-                onChange={onChange}
-                pagination={true}
-                data={table.data}/>
+                dataSource={dataSource}
+                onPageChange={fetchAssets}/>
         </ShadowCard>
         <AddModal visible={addAssetVisible} onCancel={() => setAddAssetVisible(false)}
                   onSuccess={onAddAssetSuccess}/>
-        <EditModal visible={editAssetVisible} asset={asset} onCancel={() => setEditAssetVisible(false)}
-                   onSuccess={onEditAssetSuccess}/>
+        {/*<EditModal visible={editAssetVisible} asset={asset} onCancel={() => setEditAssetVisible(false)}*/}
+        {/*           onSuccess={onEditAssetSuccess}/>*/}
     </Content>
 }
 

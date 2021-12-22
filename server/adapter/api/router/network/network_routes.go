@@ -7,12 +7,20 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/response"
 )
 
+func (r networkRouter) create(ctx *gin.Context) (interface{}, error) {
+	var req request.CreateNetwork
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		return nil, response.InvalidParameterError(err.Error())
+	}
+	return nil, r.service.CreateNetwork(req)
+}
+
 func (r networkRouter) importNetwork(ctx *gin.Context) (interface{}, error) {
 	var req request.ImportNetwork
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		return nil, response.InvalidParameterError(err.Error())
 	}
-	return nil, r.service.CreateNetwork(req)
+	return nil, r.service.ImportNetwork(req)
 }
 
 func (r networkRouter) exportNetwork(ctx *gin.Context) (interface{}, error) {
@@ -31,8 +39,19 @@ func (r networkRouter) sync(ctx *gin.Context) (interface{}, error) {
 }
 
 func (r networkRouter) find(ctx *gin.Context) (interface{}, error) {
-	assetID := cast.ToUint(ctx.Query("assetId"))
-	return r.service.FindNetworks(assetID)
+	filters := request.NewFilters(ctx.Request.URL.Query())
+	switch ctx.Query("method") {
+	case "paging":
+		page := cast.ToInt(ctx.Query("page"))
+		size := cast.ToInt(ctx.Query("size"))
+		result, total, err := r.service.FindNetworksByPaginate(filters, page, size)
+		if err != nil {
+			return nil, err
+		}
+		return response.NewPageResult(page, size, total, result), nil
+	default:
+		return nil, nil
+	}
 }
 
 func (r networkRouter) accessDevices(ctx *gin.Context) (interface{}, error) {

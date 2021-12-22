@@ -3,6 +3,8 @@ package factory
 import (
 	"context"
 	"errors"
+	"fmt"
+	"github.com/spf13/cast"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/request"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/response"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
@@ -41,33 +43,58 @@ func (factory Network) NewNetworkQuery(networkID uint) (*query.NetworkQuery, err
 	return &q, nil
 }
 
-func (factory Network) NewNetworksQuery(assetID uint) (*query.NetworksQuery, error) {
+func (factory Network) NewNetworkPagingQuery(filters request.Filters, page, size int) (*query.NetworkPagingQuery, error) {
 	ctx := context.TODO()
-	es, err := factory.deviceRepo.FindBySpecs(ctx, spec.AssetEqSpec(assetID), spec.TypeEqSpec(devicetype.GatewayType))
+	specs := make([]spec.Specification, 0)
+	for _, filter := range filters {
+		switch filter.Name {
+		case "asset_id":
+			specs = append(specs, spec.AssetEqSpec(cast.ToUint(filter.Value)))
+		}
+	}
+	es, total, err := factory.networkRepo.PagingBySpecs(ctx, page, size, specs...)
 	if err != nil {
 		return nil, err
 	}
-	ids := make([]uint, len(es))
-	for i, e := range es {
-		ids[i] = e.NetworkID
-	}
-	networks, err := factory.networkRepo.FindBySpecs(ctx, spec.PrimaryKeyInSpec(ids))
-	if err != nil {
-		return nil, err
-	}
-	q := query.NewNetworksQuery()
-	q.Networks = networks
+	q := query.NewNetworkPagingQuery(total)
+	q.Networks = es
 	return &q, nil
 }
 
-func (factory Network) NewNetworkCreateCmd(req request.ImportNetwork) (*command.NetworkCreateCmd, error) {
+func (factory Network) NewNetworkCreateCmd(req request.CreateNetwork) (*command.NetworkCreateCmd, error) {
+	ctx := context.TODO()
+	gateway, _ := factory.deviceRepo.GetBySpecs(ctx, spec.DeviceMacEqSpec(req.Gateway.MacAddress))
+	if gateway.ID != 0 {
+		return nil, response.BusinessErr(errcode.DeviceMacExistsError, "")
+	}
+	cmd := command.NewNetworkCreateCmd()
+	cmd.Network.Network = po.Network{
+		Name:                    req.Name,
+		AssetID:                 req.AssetID,
+		CommunicationPeriod:     req.WSN.CommunicationPeriod,
+		CommunicationTimeOffset: req.WSN.CommunicationTimeOffset,
+		GroupSize:               req.WSN.GroupSize,
+		GroupInterval:           req.WSN.GroupInterval,
+		RoutingTables:           make(po.RoutingTables, 0),
+	}
+	cmd.Network.Gateway.Device = po.Device{
+		MacAddress: req.Gateway.MacAddress,
+		Name:       fmt.Sprintf("%s-网关", req.Name),
+		Type:       devicetype.GatewayType,
+		IPN:        req.IPN,
+		AssetID:    req.AssetID,
+	}
+	return &cmd, nil
+}
+
+func (factory Network) NewNetworkImportCmd(req request.ImportNetwork) (*command.NetworkImportCmd, error) {
 	ctx := context.TODO()
 	asset, err := factory.assetRepo.Get(ctx, req.AssetID)
 	if err != nil {
 		return nil, response.BusinessErr(errcode.AssetNotFoundError, "")
 	}
 
-	cmd := command.NewNetworkCreateCmd()
+	cmd := command.NewNetworkImportCmd()
 	// 构建网络实体
 	cmd.Network = po.Network{
 		CommunicationPeriod:     req.CommunicationPeriod,
@@ -92,8 +119,8 @@ func (factory Network) NewNetworkCreateCmd(req request.ImportNetwork) (*command.
 		e.Name = device.Name
 		e.MacAddress = device.MacAddress
 		e.AssetID = asset.ID
-		e.TypeID = device.TypeID
-		switch e.TypeID {
+		e.Type = device.TypeID
+		switch e.Type {
 		case devicetype.GatewayType:
 			cmd.Network.Name = device.Name
 			e.Category = po.GatewayCategory

@@ -6,7 +6,7 @@ import (
 
 type DeviceData struct {
 	Time       time.Time `json:"time"`
-	DeviceID   uint      `json:"device_id"`
+	MacAddress string    `json:"mac_address"`
 	SensorType uint      `json:"sensor_type"`
 	Values     []float32 `json:"values"`
 }

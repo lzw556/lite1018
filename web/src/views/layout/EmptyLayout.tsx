@@ -8,6 +8,7 @@ export interface EmptyLayoutProps extends EmptyProps{
 const EmptyLayout = (props: EmptyLayoutProps) => {
     const {description, children} = props
     return <Empty
+        {...props}
         image={Empty.PRESENTED_IMAGE_SIMPLE}
         description={
             <p>

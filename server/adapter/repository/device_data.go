@@ -18,7 +18,7 @@ func (repo DeviceData) Create(e po.DeviceData) error {
 		if err != nil {
 			return err
 		}
-		dataBucket, err := bucket.CreateBucketIfNotExists(itob(e.DeviceID))
+		dataBucket, err := bucket.CreateBucketIfNotExists([]byte(e.MacAddress))
 		if err != nil {
 			return err
 		}
@@ -30,12 +30,12 @@ func (repo DeviceData) Create(e po.DeviceData) error {
 	})
 }
 
-func (repo DeviceData) Find(deviceID uint, from, to time.Time) ([]po.DeviceData, error) {
+func (repo DeviceData) Find(mac string, from, to time.Time) ([]po.DeviceData, error) {
 	var es []po.DeviceData
 	err := repo.BoltDB().View(func(tx *bbolt.Tx) error {
 		bucket := tx.Bucket([]byte(po.DeviceData{}.BucketName()))
 		if bucket != nil {
-			if dataBucket := bucket.Bucket(itob(deviceID)); dataBucket != nil {
+			if dataBucket := bucket.Bucket([]byte(mac)); dataBucket != nil {
 				c := dataBucket.Cursor()
 				min := []byte(from.Format("2006-01-02T15:04:05Z"))
 				max := []byte(to.Format("2006-01-02T15:04:05Z"))
@@ -53,12 +53,12 @@ func (repo DeviceData) Find(deviceID uint, from, to time.Time) ([]po.DeviceData,
 	return es, err
 }
 
-func (repo DeviceData) Get(deviceID uint, time time.Time) (po.DeviceData, error) {
+func (repo DeviceData) Get(mac string, time time.Time) (po.DeviceData, error) {
 	var e po.DeviceData
 	err := repo.BoltDB().View(func(tx *bbolt.Tx) error {
 		bucket := tx.Bucket([]byte(po.DeviceData{}.BucketName()))
 		if bucket != nil {
-			if dataBucket := bucket.Bucket(itob(deviceID)); dataBucket != nil {
+			if dataBucket := bucket.Bucket([]byte(mac)); dataBucket != nil {
 				c := dataBucket.Cursor()
 				current := []byte(time.Format("2006-01-02T15:04:05Z"))
 				var buf []byte
@@ -77,12 +77,12 @@ func (repo DeviceData) Get(deviceID uint, time time.Time) (po.DeviceData, error)
 	return e, err
 }
 
-func (repo DeviceData) Top(deviceID uint, limit int) ([]po.DeviceData, error) {
+func (repo DeviceData) Top(mac string, limit int) ([]po.DeviceData, error) {
 	var es []po.DeviceData
 	err := repo.BoltDB().View(func(tx *bbolt.Tx) error {
 		bucket := tx.Bucket([]byte(po.DeviceData{}.BucketName()))
 		if bucket != nil {
-			if dataBucket := bucket.Bucket(itob(deviceID)); dataBucket != nil {
+			if dataBucket := bucket.Bucket([]byte(mac)); dataBucket != nil {
 				c := dataBucket.Cursor()
 				for k, v := c.Last(); k != nil && len(es) < limit; k, v = c.Prev() {
 					var e po.DeviceData
@@ -98,12 +98,12 @@ func (repo DeviceData) Top(deviceID uint, limit int) ([]po.DeviceData, error) {
 	return es, err
 }
 
-func (repo DeviceData) Last(deviceID uint) (po.DeviceData, error) {
+func (repo DeviceData) Last(mac string) (po.DeviceData, error) {
 	var e po.DeviceData
 	err := repo.BoltDB().View(func(tx *bbolt.Tx) error {
 		bucket := tx.Bucket([]byte(e.BucketName()))
 		if bucket != nil {
-			if dataBucket := bucket.Bucket(itob(deviceID)); dataBucket != nil {
+			if dataBucket := bucket.Bucket([]byte(mac)); dataBucket != nil {
 				c := dataBucket.Cursor()
 				_, v := c.Last()
 				if len(v) > 0 {
@@ -118,11 +118,11 @@ func (repo DeviceData) Last(deviceID uint) (po.DeviceData, error) {
 	return e, err
 }
 
-func (repo DeviceData) Delete(deviceID uint, from, to time.Time) error {
+func (repo DeviceData) Delete(mac string, from, to time.Time) error {
 	err := repo.BoltDB().Update(func(tx *bbolt.Tx) error {
 		bucket := tx.Bucket([]byte(po.DeviceData{}.BucketName()))
 		if bucket != nil {
-			if dataBucket := bucket.Bucket(itob(deviceID)); dataBucket != nil {
+			if dataBucket := bucket.Bucket([]byte(mac)); dataBucket != nil {
 				c := dataBucket.Cursor()
 				min := []byte(from.Format("2006-01-02T15:04:05Z"))
 				max := []byte(to.Format("2006-01-02T15:04:05Z"))

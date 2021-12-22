@@ -9,12 +9,19 @@ type WSN struct {
 
 type Network struct {
 	Name string `json:"name"`
-	WSN
+	WSN  WSN    `json:"wsn"`
 }
 
 type AccessDevices struct {
-	Parent   uint   `json:"parent"`
-	Children []uint `json:"children"`
+	ParentID   uint                   `json:"parent_id"`
+	Devices    []uint                 `json:"devices"`
+	IsNew      bool                   `json:"is_new"`
+	DeviceType uint                   `json:"device_type"`
+	Name       string                 `json:"name"`
+	MacAddress string                 `json:"mac_address"`
+	Sensors    map[string]interface{} `json:"sensors"`
+	System     map[string]interface{} `json:"system"`
+	IPN        map[string]interface{} `json:"ipn"`
 }
 
 type RemoveDevices struct {
@@ -37,4 +44,14 @@ type ImportNetwork struct {
 		System     map[string]interface{} `json:"system,omitempty"`
 		Sensors    map[string]interface{} `json:"sensors,omitempty"`
 	} `json:"devices"`
+}
+
+type CreateNetwork struct {
+	AssetID uint   `json:"asset_id"`
+	Name    string `json:"name"`
+	WSN     WSN    `json:"wsn"`
+	Gateway struct {
+		MacAddress string `json:"mac_address"`
+	}
+	IPN map[string]interface{} `json:"ipn"`
 }

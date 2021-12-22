@@ -17,9 +17,28 @@ func NewRouter(s Service) router.Router {
 
 func (r *measurementRouter) initRoutes() {
 	r.routes = []router.Route{
+		// POST
+		router.NewPostRoute("measurements", r.create),
 
 		// GET
-		router.NewGetRoute("/measurementTypes/:id/parameters", r.getMeasurementTypeParameters),
+		router.NewGetRoute("measurements", r.find),
+		router.NewGetRoute("measurements/fields", r.getFields),
+		router.NewGetRoute("measurements/statistics", r.statistical),
+		router.NewGetRoute("measurements/:id", r.getByID),
+		router.NewGetRoute("measurements/:id/statistics", r.getStatistic),
+		router.NewGetRoute("measurements/:id/data", r.getData),
+
+		router.NewGetRoute("/check/deviceBinding/:mac", r.checkDeviceBinding),
+
+		// PUT
+		router.NewPutRoute("measurements/:id", r.updateByID),
+
+		// PATCH
+		router.NewPatchRoute("measurements/:id/settings", r.updateSettings),
+		router.NewPatchRoute("measurements/:id/devices", r.bindingDevices),
+
+		// DELETE
+		router.NewDeleteRoute("measurements/:id", r.deleteByID),
 	}
 }
 

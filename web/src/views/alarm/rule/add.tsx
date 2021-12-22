@@ -1,164 +1,123 @@
-import {
-    Button,
-    Card,
-    Cascader,
-    Col,
-    ConfigProvider,
-    Form,
-    Input,
-    message,
-    Radio,
-    Row,
-    Select,
-    Space,
-    Table,
-    Tree
-} from "antd";
+import {Button, Card, Col, Form, Input, message, Radio, Row, Select, Space, Tree} from "antd";
 import {Content} from "antd/lib/layout/layout";
-import {useEffect, useState} from "react";
-import DeviceTypeSelect from "../../../components/deviceTypeSelect";
-import {GetDeviceGroupByAsset} from "../../../apis/device";
-import {Property} from "../../../types/property";
-import {GetPropertiesRequest} from "../../../apis/property";
+import {useCallback, useEffect, useState} from "react";
 import {Footer} from "antd/es/layout/layout";
 import {useHistory} from "react-router-dom";
-import {AddAlarmRuleRequest, CheckRuleNameRequest, PagingRuleTemplateRequest} from "../../../apis/alarm";
-import {defaultValidateMessages, Normalizes, Rules} from "../../../constants/validator";
-import {EmptyLayout} from "../../layout";
-import {GetFieldName} from "../../../constants/field";
+import {AddAlarmRequest, CheckRuleNameRequest, PagingAlarmTemplateRequest} from "../../../apis/alarm";
+import {defaultValidateMessages, Rules} from "../../../constants/validator";
 import MyBreadcrumb from "../../../components/myBreadcrumb";
+import MeasurementTypeSelect from "../../../components/select/measurementTypeSelect";
+import {GetMeasurementFieldsRequest, GetMeasurementsRequest} from "../../../apis/measurement";
+import {Measurement} from "../../../types/measurement";
+import {MeasurementField} from "../../../types/measurement_data";
+import {MeasurementType} from "../../../types/measurement_type";
+import RuleFormItem from "../ruleFormItem";
+import TableLayout from "../../layout/TableLayout";
+import {PageResult} from "../../../types/page";
 
 const {Option} = Select
 
 const AddRulePage = () => {
-    const [groups, setGroups] = useState<any>([])
-    const [properties, setProperties] = useState<Property[]>([])
     const [selectedTemplates, setSelectedTemplates] = useState<number[]>([])
-    const [selectedDevices, setSelectedDevices] = useState<number[]>([])
-    const [property, setProperty] = useState<Property>()
-    const [templates, setTemplates] = useState<any>()
-    const [deviceType, setDeviceType] = useState(0)
+    const [selectedMeasurements, setSelectedMeasurements] = useState<number[]>([])
+    const [measurements, setMeasurements] = useState<Measurement[]>()
+    const [fields, setFields] = useState<MeasurementField[]>()
+    const [field, setField] = useState<MeasurementField>()
+    const [dataSource, setDataSource] = useState<PageResult<any>>()
+    const [type, setType] = useState<MeasurementType>()
     const [createType, setCreateType] = useState<number>(0)
     const [form] = Form.useForm()
     const history = useHistory()
 
+    const fetchAlarmTemplates = useCallback((current: number, size: number) => {
+        PagingAlarmTemplateRequest(current, size, {measurement_type: type}).then(setDataSource)
+    }, [type])
+
     useEffect(() => {
-        if (deviceType) {
-            GetDeviceGroupByAsset(deviceType).then(setGroups)
+        if (type) {
+            form.resetFields(["field"])
+            setField(undefined)
+            GetMeasurementsRequest({type}).then(setMeasurements)
             if (createType === 1) {
-                PagingRuleTemplateRequest(1, 100, deviceType)
-                    .then(setTemplates)
+                fetchAlarmTemplates(1, 10)
             } else {
-                GetPropertiesRequest(deviceType)
-                    .then(setProperties)
+                GetMeasurementFieldsRequest(type).then(setFields)
             }
         }
-    }, [createType, deviceType])
+    }, [createType, type, fetchAlarmTemplates])
 
-    const onDeviceTypeChanged = (value: any) => {
-        setDeviceType(value)
-    }
 
     const convertTreeData = () => {
-        return groups.map((group: any) => {
+        return measurements?.map(measurement => {
             return {
-                title: `资产: ${group.name}`,
-                key: group.id,
-                checkable: false,
-                children: group.devices.map((item: any) => {
-                    return {
-                        title: `设备: ${item.name}`,
-                        key: item.id,
-                    }
-                })
+                title: measurement.name,
+                key: measurement.id,
+                checkable: true,
             }
         })
-    }
-
-    const renderPropertyOptions = () => {
-        return properties.map(item => {
-            return {
-                value: item.id,
-                label: item.name,
-                children: item.fields.map(item => {
-                    return {
-                        value: item.name,
-                        label: GetFieldName(item.name),
-                    }
-                })
-            }
-        })
-    }
-
-    const onPropertyChanged = (values: any) => {
-        setProperty(properties.find(item => item.id === values[0]))
     }
 
     const onSave = () => {
-        form.validateFields(["name", "device_type"]).then(values => {
-            if (selectedDevices.length > 0) {
+        form.validateFields().then(values => {
+            if (selectedMeasurements.length > 0) {
                 const req = {
                     name: values.name,
-                    device_ids: selectedDevices,
-                    device_type: values.device_type,
-                    create_type: createType,
+                    measurement_ids: selectedMeasurements,
                     description: form.getFieldValue("description")
                 }
                 if (createType === 1) {
-                    onCreateFromTemplates(req)
+                    createByTemplates(req)
                 } else {
-                    onCreateByCustom(req)
+                    createByCustom(req)
                 }
             } else {
                 message.info("请先选择设备").then()
             }
-        }).catch(_ => {
-
+        }).catch(err => {
+            message.error(err)
         })
     }
 
-    const onCreateFromTemplates = (req: any) => {
+    const createByTemplates = (req: any) => {
         if (selectedTemplates.length > 0) {
-            const params = Object.assign({}, req, {
-                template_ids: selectedTemplates
-            })
+            const params = {...req, template_ids: selectedTemplates}
             createAlarmRule(params)
         } else {
             message.info("请先选择模板").then()
         }
     }
 
-    const onCreateByCustom = (req: any) => {
-        form.validateFields(["property", "threshold"]).then(values => {
-            const params = Object.assign({}, req, {
-                property_id: values.property[0],
+    const createByCustom = (req: any) => {
+        form.validateFields(["field", "threshold"]).then(values => {
+            const params = {
+                ...req,
                 rule: {
-                    field: values.property[1],
+                    field: values.field,
                     method: form.getFieldValue("method"),
                     operation: form.getFieldValue("operation"),
                     threshold: parseFloat(values.threshold),
                 },
                 level: form.getFieldValue("level")
-            })
+            }
             createAlarmRule(params)
         })
     }
 
     const createAlarmRule = (params: any) => {
-        AddAlarmRuleRequest(params).then(_ => history.goBack())
+        AddAlarmRequest(createType, params).then(_ => history.goBack())
     }
 
-    const onDevicesSelected = (keys: any) => {
-        setSelectedDevices(keys)
+    const onSelect = (keys: any) => {
+        setSelectedMeasurements(keys)
     }
 
     const onNameValidator = (rule: any, value: any) => {
-        return new Promise((resolve, reject) => {
+        return new Promise<void>((resolve, reject) => {
             if (!value) {
                 reject("输入不能为空")
                 return
             }
-            CheckRuleNameRequest(value).then()
+            CheckRuleNameRequest(value).then(_ => resolve()).catch(_ => reject("该名称已存在"))
         })
     }
 
@@ -179,49 +138,14 @@ const AddRulePage = () => {
 
     const renderFormItem = () => {
         if (createType) {
-            return <ConfigProvider renderEmpty={() => {
-                return <EmptyLayout description={"模板列表为空"}/>
-            }}>
-                <Table rowKey={(record: any) => record.id} rowSelection={rowSelection} columns={columns}
-                       dataSource={templates} pagination={false} size={"small"}/>
-            </ConfigProvider>
+            return <TableLayout emptyText={"报警规则模板为空"}
+                                columns={columns}
+                                dataSource={dataSource}
+                                rowSelection={rowSelection}
+                                onPageChange={fetchAlarmTemplates}/>
         } else {
             return <Card type={"inner"} size={"small"} title={"自定义规则"} bordered={false}>
-                <Row justify={"start"}>
-                    <Col span={12}>
-                        <Form.Item label={"设备属性"} name={"property"} rules={[{required: true, message: "请选择设备属性"}]}>
-                            <Cascader size={"middle"} placeholder={"请选择设备属性"} options={renderPropertyOptions()}
-                                      onChange={onPropertyChanged}/>
-                        </Form.Item>
-                    </Col>
-                    <Col span={10} offset={1}>
-                        <Form.Item label={"统计方式"} name={"method"} initialValue={"current"}>
-                            <Select size={"middle"} style={{width: "100px"}}>
-                                <Option key={"current"} value={"current"}>当前值</Option>
-                            </Select>
-                        </Form.Item>
-                    </Col>
-                </Row>
-                <Row justify={"start"}>
-                    <Col span={7}>
-                        <Form.Item required label={"阈值条件"} name={"operation"}
-                                   initialValue={">"}>
-                            <Select size={"middle"} defaultActiveFirstOption={true}
-                                    style={{width: "64px"}}>
-                                <Option key={">"} value={">"}>&gt;</Option>
-                                <Option key={">="} value={">="}>&gt;=</Option>
-                                <Option key={"<"} value={"<"}>&lt;</Option>
-                                <Option key={"<="} value={"<="}>&lt;=</Option>
-                            </Select>
-                        </Form.Item>
-                    </Col>
-                    <Col span={5}>
-                        <Form.Item name={"threshold"} normalize={Normalizes.float} rules={[Rules.number]}>
-                            <Input placeholder={"报警阈值"} size={"middle"}
-                                   suffix={property?.unit}/>
-                        </Form.Item>
-                    </Col>
-                </Row>
+                <RuleFormItem fields={fields}/>
                 <Row justify={"start"}>
                     <Col span={12}>
                         <Form.Item label={"报警级别"} name={"level"} initialValue={1} required>
@@ -270,25 +194,28 @@ const AddRulePage = () => {
                 </Row>
                 <Row justify={"space-between"}>
                     <Col span={16}>
-                        <Form.Item label={"设备类型"} name={"device_type"} labelCol={{span: 4}}
-                                   rules={[{required: true, message: "请先选择设备类型"}]}>
-                            <DeviceTypeSelect sensor={true} placeholder={"请选择设备类型"} style={{width: "200px"}}
-                                              onChange={onDeviceTypeChanged}/>
+                        <Form.Item label={"监测点类型"} name={"measurement_type"} labelCol={{span: 4}}
+                                   rules={[Rules.required]}>
+                            <MeasurementTypeSelect
+                                placeholder={"请选择监测点类型"}
+                                style={{"width": "200px"}}
+                                onChange={setType}
+                            />
                         </Form.Item>
                     </Col>
                 </Row>
                 <Row justify={"space-between"}>
                     <Col span={7} offset={1}>
-                        <Card type={"inner"} size={"small"} title={"选择设备"}
+                        <Card type={"inner"} size={"small"} title={"选择监测点"}
                               style={{height: "512px", backgroundColor: "#f4f5f6"}}>
                             <Tree
                                 selectable={false}
                                 checkable
                                 showIcon
-                                selectedKeys={selectedDevices}
+                                selectedKeys={selectedMeasurements}
                                 style={{height: "100%", backgroundColor: "#f4f5f6"}}
                                 treeData={convertTreeData()}
-                                onCheck={onDevicesSelected}
+                                onCheck={onSelect}
                             />
                         </Card>
                     </Col>

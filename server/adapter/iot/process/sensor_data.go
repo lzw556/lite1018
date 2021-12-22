@@ -1,17 +1,14 @@
 package process
 
 import (
-	"context"
 	"fmt"
 	"github.com/gogo/protobuf/proto"
-	"github.com/thetasensors/theta-cloud-lite/server/adapter"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/iot"
 	pd "github.com/thetasensors/theta-cloud-lite/server/adapter/iot/proto"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/po"
-	spec "github.com/thetasensors/theta-cloud-lite/server/domain/specification"
 	"sync"
 	"time"
 )
@@ -21,16 +18,12 @@ var mu sync.RWMutex
 type SensorData struct {
 	deviceRepo     dependency.DeviceRepository
 	deviceDataRepo dependency.DeviceDataRepository
-	alarmRuleRepo  dependency.AlarmRuleRepository
-	propertyRepo   dependency.PropertyRepository
 }
 
 func NewSensorData() Processor {
 	return newRoot(SensorData{
 		deviceRepo:     repository.Device{},
 		deviceDataRepo: repository.DeviceData{},
-		alarmRuleRepo:  repository.AlarmRule{},
-		propertyRepo:   repository.Property{},
 	})
 }
 
@@ -51,7 +44,7 @@ func (p SensorData) Process(ctx *iot.Context, msg iot.Message) error {
 		if device, ok := value.(entity.Device); ok {
 			e := po.DeviceData{
 				Time:       time.Unix(int64(m.Timestamp), int64(m.Usec*1000)),
-				DeviceID:   device.ID,
+				MacAddress: device.MacAddress,
 				SensorType: uint(m.SensorId),
 				Values:     m.GetValues(),
 			}
@@ -60,11 +53,6 @@ func (p SensorData) Process(ctx *iot.Context, msg iot.Message) error {
 			if err := p.deviceDataRepo.Create(e); err != nil {
 				return fmt.Errorf("save device %s data failed: %v", device.MacAddress, err)
 			}
-			rules, err := p.alarmRuleRepo.FindBySpecs(context.TODO(), spec.DeviceInSpec{device.ID})
-			if err != nil {
-				return fmt.Errorf("find device %s alarm rules faield: %v", device.MacAddress, err)
-			}
-			adapter.RuleEngine.ExecuteSelectedRules(device, rules)
 		}
 	}
 	return nil

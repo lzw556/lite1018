@@ -5,19 +5,19 @@ export type AlarmRuleTemplate = {
     name: string
     deviceType: number
     property: Property
-    rule: AlarmRuleContent
+    rule: AlarmRule
     level: number
     description: string
 }
 
-export type AlarmRuleContent = {
+export type AlarmRule = {
     field: string
     method: string
     operation: string
     threshold: number
 }
 
-export const InitializeRule: AlarmRuleContent = {
+export const InitializeRule: AlarmRule = {
     field: "",
     method: "current",
     operation: ">",

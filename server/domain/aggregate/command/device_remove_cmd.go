@@ -19,19 +19,19 @@ type DeviceRemoveCmd struct {
 	deviceDataRepo        dependency.DeviceDataRepository
 	deviceRepo            dependency.DeviceRepository
 	deviceStatusRepo      dependency.DeviceStatusRepository
-	deviceAlertStateRepo  dependency.DeviceAlertStateRepository
 	deviceInformationRepo dependency.DeviceInformationRepository
 	networkRepo           dependency.NetworkRepository
+	bindingRepo           dependency.MeasurementDeviceBindingRepository
 }
 
 func NewDeviceRemoveCmd() DeviceRemoveCmd {
 	return DeviceRemoveCmd{
 		deviceRepo:            repository.Device{},
 		deviceDataRepo:        repository.DeviceData{},
-		deviceAlertStateRepo:  repository.DeviceAlertState{},
 		deviceStatusRepo:      repository.DeviceStatus{},
 		deviceInformationRepo: repository.DeviceInformation{},
 		networkRepo:           repository.Network{},
+		bindingRepo:           repository.MeasurementDeviceBinding{},
 	}
 }
 
@@ -40,7 +40,7 @@ func (cmd DeviceRemoveCmd) Run() error {
 		if err := cmd.deviceRepo.Delete(txCtx, cmd.Device.ID); err != nil {
 			return err
 		}
-		switch cmd.Device.TypeID {
+		switch cmd.Device.Type {
 		case devicetype.GatewayType, devicetype.RouterType:
 		default:
 			if err := cmd.deviceInformationRepo.Delete(cmd.Device.ID); err != nil {
@@ -49,23 +49,26 @@ func (cmd DeviceRemoveCmd) Run() error {
 			if err := cmd.deviceStatusRepo.Delete(cmd.Device.ID); err != nil {
 				return err
 			}
-			if err := cmd.deviceAlertStateRepo.Delete(cmd.Device.ID); err != nil {
-				return err
-			}
 		}
-		cmd.Network.RemoveDevice(cmd.Device)
-		return cmd.networkRepo.Save(txCtx, &cmd.Network.Network)
+		if cmd.Device.NetworkID > 0 {
+			cmd.Network.RemoveDevice(cmd.Device)
+			return cmd.networkRepo.Save(txCtx, &cmd.Network.Network)
+		}
+		return cmd.bindingRepo.DeleteBySpecs(txCtx, spec.DeviceMacEqSpec(cmd.Device.MacAddress))
 	})
 	if err != nil {
 		return err
 	}
-	devices, err := cmd.deviceRepo.FindBySpecs(context.TODO(), spec.NetworkEqSpec(cmd.Network.ID))
-	if err != nil {
-		return err
+	if cmd.Device.NetworkID > 0 {
+		devices, err := cmd.deviceRepo.FindBySpecs(context.TODO(), spec.NetworkEqSpec(cmd.Network.ID))
+		if err != nil {
+			return err
+		}
+		return command.SyncNetwork(cmd.Network, devices, 3*time.Second)
 	}
-	return command.SyncNetwork(cmd.Network, devices, 3*time.Second)
+	return nil
 }
 
 func (cmd DeviceRemoveCmd) RemoveData(from, to time.Time) error {
-	return cmd.deviceDataRepo.Delete(cmd.Device.ID, from, to)
+	return cmd.deviceDataRepo.Delete(cmd.Device.MacAddress, from, to)
 }

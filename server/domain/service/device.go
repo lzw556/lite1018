@@ -60,8 +60,8 @@ func (s Device) GetDevice(deviceID uint) (*vo.Device, error) {
 	return query.Detail()
 }
 
-func (s Device) FindDevicesByPaginate(assetID, page, size int, req request.DeviceSearch) ([]vo.Device, int64, error) {
-	query, err := s.factory.NewDevicePagingQuery(assetID, page, size, req)
+func (s Device) FindDevicesByPaginate(page, size int, filters request.Filters) ([]vo.Device, int64, error) {
+	query, err := s.factory.NewDevicePagingQuery(page, size, filters)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -69,12 +69,12 @@ func (s Device) FindDevicesByPaginate(assetID, page, size int, req request.Devic
 	return result, total, nil
 }
 
-func (s Device) FindDevicesGroupByAsset(deviceType uint) ([]vo.Group, error) {
-	query, err := s.factory.NewDeviceGroupByQuery(deviceType)
+func (s Device) FindDevicesByFilter(filters request.Filters) ([]vo.Device, error) {
+	query, err := s.factory.NewDeviceListQueryByFilter(filters)
 	if err != nil {
 		return nil, err
 	}
-	return query.GroupBy("asset")
+	return query.Run(), nil
 }
 
 func (s Device) UpdateDeviceSetting(deviceID uint, req request.DeviceSetting) error {
@@ -180,10 +180,10 @@ func (s Device) GetChildren(deviceID uint) ([]vo.Device, error) {
 	return query.Query()
 }
 
-func (s Device) Statistic() ([]vo.DeviceStatistic, error) {
-	query, err := s.factory.NewDeviceStatisticQuery()
+func (s Device) GetDevicesStatistics(filters request.Filters) ([]vo.DeviceStatistic, error) {
+	query, err := s.factory.NewDeviceStatisticsQuery(filters)
 	if err != nil {
 		return nil, err
 	}
-	return query.Statistic()
+	return query.Run()
 }

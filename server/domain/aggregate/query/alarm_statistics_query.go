@@ -6,16 +6,16 @@ import (
 	"time"
 )
 
-type AlarmStatisticsQuery struct {
+type AlarmRecordStatisticsQuery struct {
 	entity.AlarmRecords
 	Times []time.Time
 }
 
-func NewAlarmStatisticsQuery() AlarmStatisticsQuery {
-	return AlarmStatisticsQuery{}
+func NewAlarmRecordStatisticsQuery() AlarmRecordStatisticsQuery {
+	return AlarmRecordStatisticsQuery{}
 }
 
-func (query AlarmStatisticsQuery) Query() vo.AlarmStatistics {
+func (query AlarmRecordStatisticsQuery) Query() vo.AlarmRecordStatistics {
 	temp := map[string][]entity.AlarmRecord{}
 	times := make([]string, 0)
 	for _, record := range query.AlarmRecords {
@@ -26,7 +26,7 @@ func (query AlarmStatisticsQuery) Query() vo.AlarmStatistics {
 		}
 		temp[timeStr] = append(temp[timeStr], record)
 	}
-	result := vo.NewAlarmStatistics()
+	result := vo.NewAlarmRecordStatistics()
 	for i, t := range query.Times {
 		result.AddTime(t)
 		if statistic, ok := temp[t.Format("2006-01-02")]; ok {

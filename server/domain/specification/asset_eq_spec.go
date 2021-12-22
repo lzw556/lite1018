@@ -10,9 +10,6 @@ func (s AssetEqSpec) IsSpecifiedBy(v interface{}) bool {
 
 func (s AssetEqSpec) Scope() func(db *gorm.DB) *gorm.DB {
 	return func(db *gorm.DB) *gorm.DB {
-		if s > 0 {
-			return db.Where("asset_id = ?", s)
-		}
-		return db
+		return db.Where("asset_id = ?", s)
 	}
 }

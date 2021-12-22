@@ -6,3 +6,8 @@ export type IpnSetting = {
     ntp_is_enabled: boolean
     ntp_addr?: string
 }
+
+export const DEFAULT_IPN_SETTING: IpnSetting = {
+    ip_mode: 0,
+    ntp_is_enabled: false
+}

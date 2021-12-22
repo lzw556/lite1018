@@ -13,8 +13,16 @@ export function AddDeviceRequest(device: any) {
     return request.post("/devices", device).then(PostResponse)
 }
 
-export function PagingDevicesRequest(assetId:number, page:number, size: number, search:any) {
-    return request.get<PageResult<Device[]>>("/devices", {assetId, page, size, search}).then(GetResponse)
+export function PagingDevicesRequest(page:number, size: number, filters:any) {
+    return request.get<PageResult<Device[]>>("/devices?method=paging", {page, size, ...filters}).then(GetResponse)
+}
+
+export function GetDevicesRequest(filters:any) {
+    return request.get<Device[]>("/devices", filters).then(GetResponse)
+}
+
+export function GetDevicesByFilterRequest(assetId:number, filter:string) {
+    return request.get<Device[]>(`/devices?method=filter`, {assetId, filter}).then(GetResponse)
 }
 
 export function UpdateDeviceSettingRequest(id:number, setting:any) {
@@ -62,7 +70,7 @@ export function DeviceCancelUpgradeRequest(id:number) {
 }
 
 export function GetDeviceGroupByAsset(deviceType: number) {
-    return request.get(`/devices/groupBy/asset`, {device_type: deviceType}).then(GetResponse)
+    return request.get(`/devices?method=groupByAsset`, {device_type: deviceType}).then(GetResponse)
 }
 
 export function GetChildrenRequest(id:number) {
@@ -73,6 +81,6 @@ export function GetDeviceSettingRequest(id:number) {
     return request.get<any>(`/devices/${id}/settings`).then(GetResponse)
 }
 
-export function GetDevicesStatisticsRequest() {
-    return request.get<DeviceStatistic[]>(`/devices/statistics`).then(GetResponse)
+export function GetDevicesStatisticsRequest(filter: any) {
+    return request.get<DeviceStatistic[]>(`/devices/statistics`, {...filter}).then(GetResponse)
 }

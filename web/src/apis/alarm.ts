@@ -1,20 +1,20 @@
 import request from "../utils/request";
 import {PageResult} from "../types/page";
 import {AlarmRuleTemplate} from "../types/alarm_rule_template";
-import {AlarmRule} from "../types/alarm_rule";
-import {AlarmStatistics} from "../types/alarm_statistics";
+import {Alarm} from "../types/alarm_rule";
+import {AlarmRecordStatistics} from "../types/alarm_statistics";
 import {DeleteResponse, GetResponse, PostResponse, PutResponse} from "../utils/response";
 
 
-export function AddAlarmRuleTemplateRequest(params: any) {
-    return request.post("/alarmRuleTemplates", params).then(res => res.data)
+export function AddAlarmTemplateRequest(params: any) {
+    return request.post("/alarmTemplates", params).then(res => res.data)
 }
 
-export function PagingRuleTemplateRequest(current: number, size: number, deviceType: number) {
-    return request.get<PageResult<AlarmRuleTemplate>>("/alarmRuleTemplates", {
+export function PagingAlarmTemplateRequest(current: number, size: number, filter:any) {
+    return request.get<PageResult<AlarmRuleTemplate>>("/alarmTemplates?method=paging", {
         page: current,
         size: size,
-        device_type: deviceType,
+        ...filter,
     }).then(GetResponse)
 }
 
@@ -31,23 +31,23 @@ export function RemoveRuleTemplateRequest(id: number) {
 }
 
 export function CheckRuleNameRequest(name: string) {
-    return request.get(`/check/alarmRules/${name}`).then(GetResponse)
+    return request.get(`/check/alarms/${name}`).then(GetResponse)
 }
 
-export function AddAlarmRuleRequest(params: any) {
-    return request.post("/alarmRules", params).then(PostResponse)
+export function AddAlarmRequest(createType: number, params: any) {
+    return request.post(`/alarms?create_type=${createType}`, params).then(PostResponse)
 }
 
-export function PagingAlarmRulesRequest(assetId: number, deviceId: number, page: number, size: number) {
-    return request.get<PageResult<AlarmRule[]>>("/alarmRules", {assetId, deviceId, page, size}).then(GetResponse)
+export function PagingAlarmsRequest(filter:any, page: number, size: number) {
+    return request.get<PageResult<Alarm[]>>("/alarms?method=paging", {...filter, page, size}).then(GetResponse)
 }
 
-export function GetAlarmRuleRequest(id: number) {
-    return request.get<AlarmRule>(`/alarmRules/${id}`).then(GetResponse)
+export function GetAlarmRequest(id: number) {
+    return request.get<Alarm>(`/alarms/${id}`).then(GetResponse)
 }
 
 export function UpdateAlarmRuleRequest(id: number, params: any) {
-    return request.put<AlarmRule>(`/alarmRules/${id}`, params).then(PutResponse)
+    return request.put<Alarm>(`/alarms/${id}`, params).then(PutResponse)
 }
 
 export function RemoveAlarmRuleRequest(id: number) {
@@ -55,11 +55,11 @@ export function RemoveAlarmRuleRequest(id: number) {
 }
 
 export function PagingAlarmRecordsRequest(page: number, size: number, from: number, to: number, filter: any) {
-    return request.get<PageResult<any>>("/alarmRecords", {page, size, from, to, filter}).then(GetResponse)
+    return request.get<PageResult<any>>("/alarmRecords?method=paging", {page, size, from, to, ...filter}).then(GetResponse)
 }
 
-export function GetAlarmStatisticsRequest(from: number, to: number, filter: any) {
-    return request.get<AlarmStatistics>(`/alarmStatistics`, {from, to, filter}).then(GetResponse)
+export function GetAlarmRecordStatisticsRequest(from: number, to: number, filter: any) {
+    return request.get<AlarmRecordStatistics>(`/alarmRecords/statistics`, {from, to, ...filter}).then(GetResponse)
 }
 
 export function GetAlarmRecordRequest(id: number) {
@@ -70,6 +70,10 @@ export function RemoveAlarmRecordRequest(id: number) {
     return request.delete(`/alarmRecords/${id}`).then(DeleteResponse)
 }
 
-export function AcknowledgeAlarmRecordRequest(id: number) {
-    return request.patch(`/alarmRecords/${id}/acknowledge`, null).then(PutResponse)
+export function AcknowledgeAlarmRecordRequest(id: number, params: any) {
+    return request.patch(`/alarmRecords/${id}/acknowledge`, params).then(PutResponse)
+}
+
+export function GetAcknowledgeRequest(id: number) {
+    return request.get<any>(`/alarmRecords/${id}/acknowledge`).then(GetResponse)
 }

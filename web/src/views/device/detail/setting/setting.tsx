@@ -54,9 +54,11 @@ const Setting: FC<SettingProps> = (props) => {
                     {
                         displayRender ? displayRender(setting[name]) : setting[name]
                     }
-                    <HasPermission value={Permission.DeviceSettingsEdit}>
-                        <a onClick={() => setEditSetting(true)}><EditOutlined/></a>
-                    </HasPermission>
+                    {
+                        <HasPermission value={Permission.DeviceSettingsEdit}>
+                            <a onClick={() => setEditSetting(true)}><EditOutlined/></a>
+                        </HasPermission>
+                    }
                 </Space>
             }
         } else {

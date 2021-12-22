@@ -13,18 +13,16 @@ type AssetStatisticQuery struct {
 	po.Asset
 	Devices entity.Devices
 
-	propertyRepo         dependency.PropertyRepository
-	deviceStatusRepo     dependency.DeviceStatusRepository
-	deviceAlertStateRepo dependency.DeviceAlertStateRepository
-	deviceDataRepo       dependency.DeviceDataRepository
+	propertyRepo     dependency.PropertyRepository
+	deviceStatusRepo dependency.DeviceStatusRepository
+	deviceDataRepo   dependency.DeviceDataRepository
 }
 
 func NewAssetStatisticQuery() AssetStatisticQuery {
 	return AssetStatisticQuery{
-		propertyRepo:         repository.Property{},
-		deviceDataRepo:       repository.DeviceData{},
-		deviceStatusRepo:     repository.DeviceStatus{},
-		deviceAlertStateRepo: repository.DeviceAlertState{},
+		propertyRepo:     repository.Property{},
+		deviceDataRepo:   repository.DeviceData{},
+		deviceStatusRepo: repository.DeviceStatus{},
 	}
 }
 
@@ -41,23 +39,20 @@ func (query AssetStatisticQuery) buildDevices(devices []entity.Device) ([]vo.Dev
 	propertyMap := map[uint][]po.Property{}
 	for i, device := range devices {
 		result[i] = vo.NewDevice(device)
-		if _, ok := propertyMap[device.TypeID]; !ok {
-			propertyMap[device.TypeID], _ = query.propertyRepo.FindByDeviceTypeID(context.TODO(), device.TypeID)
+		if _, ok := propertyMap[device.Type]; !ok {
+			propertyMap[device.Type], _ = query.propertyRepo.FindByDeviceTypeID(context.TODO(), device.Type)
 		}
 		if status, err := query.deviceStatusRepo.Get(device.ID); err == nil {
 			result[i].State.DeviceStatus = status
 		}
-		if alert, err := query.deviceAlertStateRepo.Get(device.ID); err == nil {
-			result[i].AlertState = vo.NewDeviceAlertState(alert)
-		}
-		result[i].SetProperties(propertyMap[device.TypeID])
+		result[i].SetProperties(propertyMap[device.Type])
 		query.setLastPropertiesData(&result[i])
 	}
 	return result, nil
 }
 
 func (query AssetStatisticQuery) setLastPropertiesData(device *vo.Device) {
-	data, err := query.deviceDataRepo.Last(device.ID)
+	data, err := query.deviceDataRepo.Last(device.MacAddress)
 	if err != nil {
 		return
 	}

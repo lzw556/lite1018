@@ -4,12 +4,10 @@ import {
     CodeOutlined,
     DeleteOutlined,
     EditOutlined,
-    LoadingOutlined,
-    PlusOutlined
+    LoadingOutlined
 } from "@ant-design/icons";
 import {Content} from "antd/lib/layout/layout";
-import {useHistory} from "react-router-dom";
-import TableLayout, {TableProps} from "../layout/TableLayout";
+import TableLayout from "../layout/TableLayout";
 import {useCallback, useEffect, useState} from "react";
 import {DeviceCommand} from "../../types/device_command";
 import {
@@ -19,86 +17,75 @@ import {
     PagingDevicesRequest,
     SendDeviceCommandRequest
 } from "../../apis/device";
-import {DeviceType, DeviceTypeString} from "../../types/device_type";
+import {DeviceType} from "../../types/device_type";
 import EditSettingModal from "./edit/editSettingModal";
 import {Device} from "../../types/device";
 import EditBaseInfoModel from "./edit/editBaseInfoModel";
 import {ColorHealth, ColorWarn} from "../../constants/color";
 import Label from "../../components/label";
 import ReplaceMacModal from "./replace/replaceMacModal";
-import EditWsnSettingModal from "./edit/editWsnSettingModal";
 import useSocket, {SocketTopic} from "../../socket";
 import ShadowCard from "../../components/shadowCard";
 import UpgradeModal from "./upgrade";
 import "../../string-extension";
 import DeviceUpgradeState from "./state/upgradeState";
 import {IsUpgrading} from "../../types/device_upgrade_status";
-import AssetSelect from "../../components/assetSelect";
 import "../../assets/iconfont.css";
 import AlertIcon from "../../components/alertIcon";
 import MyBreadcrumb from "../../components/myBreadcrumb";
 import _ from "lodash";
 import HasPermission from "../../permission";
 import usePermission, {Permission} from "../../permission/permission";
+import {PageResult} from "../../types/page";
+import AssetTreeSelect from "../../components/select/assetTreeSelect";
 
 const {Search} = Input
 const {Option} = Select
 const {Text} = Typography
 
 const DevicePage = () => {
-    const [table, setTable] = useState<TableProps>({
-        data: {result: []},
-        isLoading: false,
-        pagination: true,
-        refreshKey: 0
-    })
-    const history = useHistory()
     const [assetId, setAssetId] = useState<number>(0)
     const [searchTarget, setSearchTarget] = useState<number>(0)
     const [searchText, setSearchText] = useState<string>("")
     const [device, setDevice] = useState<Device>()
-    const [editWsnSettingVisible, setEditWsnSettingVisible] = useState<boolean>(false)
     const [editSettingVisible, setEditSettingVisible] = useState<boolean>(false)
     const [editBaseInfoVisible, setEditBaseInfoVisible] = useState<boolean>(false)
     const [upgradeVisible, setUpgradeVisible] = useState<boolean>(false)
     const [replaceVisible, setReplaceVisible] = useState<boolean>(false)
     const [executeDevice, setExecuteDevice] = useState<Device>()
     const {PubSub} = useSocket()
+    const [dataSource, setDataSource] = useState<PageResult<any>>()
     const {hasPermission, hasPermissions} = usePermission()
+    const [refreshKey, setRefreshKey] = useState<number>(0)
 
     useEffect(() => {
         PubSub.subscribe(SocketTopic.connectionState, (msg: string, state: any) => {
-            if (state && table.data.result) {
-                const data = _.cloneDeep(table.data)
-                data.result.forEach((item: Device) => {
+            if (state && dataSource) {
+                const newDataSource = _.cloneDeep(dataSource)
+                newDataSource.result.forEach((item: Device) => {
                     if (item.id === state.id) {
                         item.state.isOnline = state.isOnline
                     }
                 })
-                setTable({...table, data: data})
+                setDataSource(newDataSource)
             }
         })
         PubSub.subscribe(SocketTopic.upgradeState, (msg: string, state: any) => {
-            if (state && table.data.result) {
-                const data = _.cloneDeep(table.data)
-                data.result.forEach((item: Device) => {
+            if (state && dataSource) {
+                const newDataSource = _.cloneDeep(dataSource)
+                newDataSource.result.forEach((item: Device) => {
                     if (item.id === state.id) {
                         item.upgradeState = state
                     }
                 })
-                setTable({...table, data: data})
+                setDataSource(newDataSource)
             }
         })
-
         return () => {
             PubSub.unsubscribe(SocketTopic.connectionState)
             PubSub.unsubscribe(SocketTopic.upgradeState)
         }
-    }, [table])
-
-    const onAssetChange = (value: number) => {
-        setAssetId(value)
-    }
+    }, [dataSource])
 
     const onSearch = (value: string) => {
         setSearchText(value)
@@ -108,32 +95,30 @@ const DevicePage = () => {
         setSearchTarget(value)
     }
 
-    const onChange = useCallback((current: number, size: number) => {
-        onLoading(true)
-        const condition = {
-            target: searchTarget === 0 ? "name" : "mac_address",
-            text: searchText
+    const fetchDevices = useCallback((current: number, size: number) => {
+        const filter: any = {}
+        if (assetId) {
+            filter.asset_id = assetId
         }
-        PagingDevicesRequest(assetId, current, size, condition).then(data => {
-            onLoading(false)
-            setTable({...table, data: data})
-        })
-    }, [assetId, searchText])
+        if (searchTarget === 0) {
+            filter.name = searchText
+        } else if (searchTarget === 1) {
+            filter.mac_address = searchText
+        }
+        PagingDevicesRequest(current, size, filter).then(setDataSource)
+    }, [assetId, searchText, refreshKey])
 
-    const onLoading = (isLoading: boolean) => {
-        setTable({...table, isLoading: isLoading})
-    }
+    useEffect(() => {
+        fetchDevices(1, 10)
+    }, [fetchDevices])
 
-    const onAddDevice = () => {
-        history.push("/device-management?locale=addDevice")
+
+    const onRefresh = () => {
+        setRefreshKey(refreshKey + 1)
     }
 
     const onDelete = (id: number) => {
         DeleteDeviceRequest(id).then(_ => onRefresh())
-    }
-
-    const onRefresh = () => {
-        setTable({...table, refreshKey: table.refreshKey + 1})
     }
 
     const onCommand = (device: Device, key: any) => {
@@ -194,7 +179,6 @@ const DevicePage = () => {
             setReplaceVisible(key === "0")
             setEditBaseInfoVisible(key === "1")
             setEditSettingVisible(key === "2")
-            setEditWsnSettingVisible(key === "3")
         })
     }
 
@@ -212,10 +196,6 @@ const DevicePage = () => {
             {
                 hasPermission(Permission.DeviceSettingsEdit) && record.typeId !== DeviceType.Router &&
                 <Menu.Item key={2}>更新设备配置</Menu.Item>
-            }
-            {
-                hasPermission(Permission.NetworkSettingEdit) && record.typeId === DeviceType.Gateway &&
-                <Menu.Item key={3}>更新网络参数</Menu.Item>
             }
         </Menu>
     }
@@ -274,7 +254,7 @@ const DevicePage = () => {
             dataIndex: 'typeId',
             key: 'typeId',
             render: (text: DeviceType) => {
-                return DeviceTypeString(text)
+                return DeviceType.toString(text)
             }
         },
         {
@@ -319,26 +299,14 @@ const DevicePage = () => {
     ]
 
     return <Content>
-        <MyBreadcrumb>
-            <Space>
-                {
-                    hasPermission(Permission.DeviceAdd) &&
-                    <Button type="primary" onClick={onAddDevice}>添加设备 <PlusOutlined/></Button>
-
-                }
-            </Space>
-        </MyBreadcrumb>
+        <MyBreadcrumb/>
         <ShadowCard>
             <Row justify="center">
                 <Col span={24}>
                     <Space>
                         <Label name={"资产"}>
-                            <AssetSelect bordered={false} style={{width: "120px"}} defaultValue={assetId}
-                                         defaultActiveFirstOption={true}
-                                         placeholder={"请选择资产"}
-                                         onChange={onAssetChange} suffixIcon={<CaretDownOutlined/>}>
-                                <Option key={0} value={0}>所有资产</Option>
-                            </AssetSelect>
+                            <AssetTreeSelect bordered={false} allowClear={true} style={{width: "144px"}}
+                                             placeholder={"所有资产"} onChange={setAssetId}/>
                         </Label>
                         <Input.Group compact>
                             <Select defaultValue={searchTarget} style={{width: "80px"}}
@@ -363,11 +331,8 @@ const DevicePage = () => {
                         emptyText={"设备列表为空"}
                         columns={columns}
                         permissions={[Permission.DeviceEdit, Permission.DeviceReplace, Permission.DeviceCommand, Permission.DeviceUpgrade, Permission.DeviceFirmwares, Permission.DeviceDelete, Permission.DeviceSettingsEdit, Permission.NetworkSettingEdit]}
-                        isLoading={table.isLoading}
-                        pagination={table.pagination}
-                        refreshKey={table.refreshKey}
-                        data={table.data}
-                        onChange={onChange}
+                        dataSource={dataSource}
+                        onPageChange={fetchDevices}
                     />
                 </Col>
             </Row>
@@ -376,14 +341,14 @@ const DevicePage = () => {
             setDevice(undefined)
             setReplaceVisible(false)
         }} onSuccess={() => {
-            onRefresh()
             setDevice(undefined)
             setReplaceVisible(false)
+            onRefresh()
         }}/>
         <EditBaseInfoModel device={device} visible={editBaseInfoVisible} onSuccess={() => {
-            onRefresh()
             setDevice(undefined)
             setEditBaseInfoVisible(false)
+            onRefresh()
         }} onCancel={() => {
             setDevice(undefined)
             setEditBaseInfoVisible(false)
@@ -391,16 +356,10 @@ const DevicePage = () => {
         <EditSettingModal device={device} visible={editSettingVisible} onSuccess={() => {
             setDevice(undefined)
             setEditSettingVisible(false)
+            onRefresh()
         }} onCancel={() => {
             setDevice(undefined)
             setEditSettingVisible(false)
-        }}/>
-        <EditWsnSettingModal visible={editWsnSettingVisible} device={device} onSuccess={() => {
-            setDevice(undefined)
-            setEditWsnSettingVisible(false)
-        }} onCancel={() => {
-            setDevice(undefined)
-            setEditWsnSettingVisible(false)
         }}/>
         <UpgradeModal visible={upgradeVisible} device={device} onSuccess={() => {
             setDevice(undefined)

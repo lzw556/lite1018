@@ -1,7 +1,6 @@
 import {FC, useEffect, useState} from "react";
 import {Select, SelectProps} from "antd";
 import {Network} from "../types/network";
-import {GetNetworksRequest} from "../apis/network";
 import {CaretDownOutlined} from "@ant-design/icons";
 
 export interface NetworkSelectProps extends SelectProps<any> {
@@ -16,10 +15,10 @@ const NetworkSelect: FC<NetworkSelectProps> = (props) => {
     const {asset, onDefaultSelect} = props
 
     useEffect(() => {
-        GetNetworksRequest(asset).then(data => {
-            setNetworks(data)
-            onDefaultSelect(data[0]?.id)
-        })
+        // GetNetworksRequest(asset).then(data => {
+        //     setNetworks(data)
+        //     onDefaultSelect(data[0]?.id)
+        // })
     }, [asset])
 
     return <Select {...props} suffixIcon={<CaretDownOutlined/>}>

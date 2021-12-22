@@ -59,7 +59,7 @@ func (cmd updateDeviceListCmd) Payload() []byte {
 
 func toDeviceListItem(e entity.Device) *pd.DeviceListItem {
 	item := &pd.DeviceListItem{
-		Type: int32(e.TypeID),
+		Type: int32(e.Type),
 		Mac:  utils.StringToBytes(binary.LittleEndian, e.MacAddress),
 		Name: utils.StringToBytes(binary.BigEndian, fmt.Sprintf("%x", e.Name)),
 	}
