@@ -1,4 +1,4 @@
-package po
+package entity
 
 import "time"
 
@@ -10,4 +10,8 @@ type MeasurementData struct {
 
 func (MeasurementData) BucketName() string {
 	return "ts_measurement_data"
+}
+
+func (m MeasurementData) SetFields() {
+
 }

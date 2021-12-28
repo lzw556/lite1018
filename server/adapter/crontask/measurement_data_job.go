@@ -2,7 +2,7 @@ package crontask
 
 import (
 	"context"
-	"fmt"
+	"github.com/robfig/cron/v3"
 	"github.com/spf13/cast"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/ruleengine"
@@ -34,26 +34,27 @@ func (m MeasurementData) ID() string {
 	return cast.ToString(m.Measurement.ID)
 }
 
-func (m MeasurementData) Spec() string {
-	period := cast.ToDuration(cast.ToInt(m.SamplePeriod)) * time.Millisecond
-	offset := cast.ToDuration(cast.ToInt(m.SamplePeriodTimeOffset)) * time.Millisecond
-	switch {
-	case period.Seconds() < 60:
-		return fmt.Sprintf("*/%d * * * * *", int(period.Seconds()))
-	case period.Minutes() < 60:
-		return fmt.Sprintf("%d */%d * * * *", int(offset.Seconds()), int(period.Minutes()))
-	case period.Hours() < 24:
-		return fmt.Sprintf("%d 0 */%d * * *", int(offset.Seconds()), int(period.Hours()))
-	default:
-		return fmt.Sprintf("%d 0 0 */%d * *", int(offset.Seconds()), int(period.Hours()/24))
+func (m MeasurementData) Schedule() cron.Schedule {
+	period := cast.ToDuration(cast.ToInt(m.PollingPeriod)) * time.Millisecond
+	return &MeasurementSchedule{
+		Every: period,
 	}
 }
 
 func (m MeasurementData) Run() {
+	xlog.Infof("run measurement data job: %s", m.Name)
 	var strategy measurement.Strategy
 	switch m.Measurement.Type {
 	case measurementtype.BoltLoosening:
-		strategy = measurement.NewBoltLooseningStrategy(m.Measurement)
+		strategy = measurement.NewBoltLooseningStrategy()
+	case measurementtype.BoltElongation:
+		strategy = measurement.NewBoltElongationStrategy()
+	case measurementtype.AngleDip:
+		strategy = measurement.NewAngleDipStrategy()
+	case measurementtype.Vibration:
+		strategy = measurement.NewVibrationStrategy()
+	case measurementtype.NormalTemperatureCorrosion:
+		strategy = measurement.NewNormalTemperatureCorrosionStrategy()
 	default:
 		xlog.Errorf("unknown measurement type: %s", m.Measurement.Type)
 		return

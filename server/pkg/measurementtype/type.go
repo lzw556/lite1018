@@ -5,8 +5,9 @@ type Type uint
 const (
 	BoltLoosening Type = iota + 1
 	BoltElongation
-	CorrosionThickness
-	Pressure
+	NormalTemperatureCorrosion
+	HighTemperatureCorrosion
+	PressureTemperature
 	FlangeLoosening
 	FlangeElongation
 	Vibration

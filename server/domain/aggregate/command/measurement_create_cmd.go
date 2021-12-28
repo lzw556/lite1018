@@ -29,8 +29,8 @@ func NewMeasurementCreateCmd() MeasurementCreateCmd {
 	}
 }
 
-func (cmd MeasurementCreateCmd) Run() error {
-	return transaction.Execute(context.TODO(), func(txCtx context.Context) error {
+func (cmd MeasurementCreateCmd) Run() (uint, error) {
+	err := transaction.Execute(context.TODO(), func(txCtx context.Context) error {
 		if err := cmd.measurementRepo.Create(txCtx, &cmd.Measurement); err != nil {
 			return err
 		}
@@ -51,8 +51,11 @@ func (cmd MeasurementCreateCmd) Run() error {
 				}
 			}
 		}
-		job := crontask.NewMeasurementDataJob(cmd.Measurement)
-		adapter.CronTask.AddJobs(job)
+		if cmd.Measurement.Mode == po.PollingAcquisitionMode {
+			job := crontask.NewMeasurementDataJob(cmd.Measurement)
+			adapter.CronTask.AddJobs(job)
+		}
 		return nil
 	})
+	return cmd.Measurement.ID, err
 }

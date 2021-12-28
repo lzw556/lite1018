@@ -6,29 +6,30 @@ import AssetTreeSelect from "../../../components/select/assetTreeSelect";
 import LocationSelect from "../../../components/locationSelect";
 import {UpdateMeasurementRequest} from "../../../apis/measurement";
 import {GetAssetRequest} from "../../../apis/asset";
-import {COMMUNICATION_TIME_OFFSET, SAMPLE_PERIOD_1} from "../../../constants";
+import AcquisitionModeSelect from "../../../components/select/acquisitionModeSelect";
+import CommunicationPeriodSelect from "../../../components/communicationPeriodSelect";
 
 export interface EditMeasurementModalProps extends ModalProps {
     measurement: Measurement;
     onSuccess: () => void;
 }
 
-const {Option} = Select;
-
 const EditMeasurementModal:FC<EditMeasurementModalProps> = (props) => {
     const {measurement, visible, onSuccess} = props;
     const [form] = Form.useForm();
     const [location, setLocation] = useState(measurement.display?.location);
+    const [mode, setMode] = useState(0)
     const [asset, setAsset] = useState(measurement.asset);
 
     useEffect(() => {
         if (visible) {
+            setMode(measurement.mode)
             form.setFieldsValue({
                 name: measurement.name,
                 asset: measurement.asset?.id,
                 location: location,
-                sample_period: measurement.samplePeriod,
-                sample_period_time_offset: measurement.samplePeriodTimeOffset,
+                polling_period: measurement.pollingPeriod,
+                acquisition_mode: measurement.mode,
             })
         }
     }, [visible])
@@ -61,20 +62,14 @@ const EditMeasurementModal:FC<EditMeasurementModalProps> = (props) => {
                                     setLocation(point);
                                 }}/>
             </Form.Item>
-            <Form.Item label={"采集周期"} name={"sample_period"} rules={[Rules.required]}>
-                <Select placeholder={"请选择采集周期"}>
-                    {
-                        SAMPLE_PERIOD_1.map(item => (<Option key={item.value} value={item.value}>{item.text}</Option>))
-                    }
-                </Select>
+            <Form.Item label={"采集方式"} name={"acquisition_mode"} rules={[Rules.required]}>
+                <AcquisitionModeSelect type={measurement.type} onChange={setMode}/>
             </Form.Item>
-            <Form.Item label={"采集延时"} name={"sample_period_time_offset"} rules={[Rules.required]}>
-                <Select placeholder={"请选择采集延时"}>
-                    {
-                        COMMUNICATION_TIME_OFFSET.map(item => (<Option key={item.value} value={item.value}>{item.text}</Option>))
-                    }
-                </Select>
-            </Form.Item>
+            {
+                mode === 1 && <Form.Item label={"轮询周期"} name={"polling_period"} rules={[Rules.required]}>
+                    <CommunicationPeriodSelect placeholder={"请选择轮询周期"} />
+                </Form.Item>
+            }
         </Form>
     </Modal>
 }

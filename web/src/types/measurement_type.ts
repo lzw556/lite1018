@@ -3,8 +3,9 @@ import {DeviceType} from "./device_type";
 export enum MeasurementType {
     BoltLoosening = 1,
     BoltElongation,
-    CorrosionThickness,
-    Pressure,
+    NormalTemperatureCorrosion,
+    HighTemperatureCorrosion,
+    PressureTemperature,
     FlangeLoosening,
     FlangeElongation,
     Vibration,
@@ -20,10 +21,12 @@ export namespace MeasurementType {
                 return "螺栓松动";
             case MeasurementType.BoltElongation:
                 return "螺栓预紧力";
-            case MeasurementType.Pressure:
+            case MeasurementType.PressureTemperature:
                 return "压力温度";
-            case MeasurementType.CorrosionThickness:
-                return "腐蚀厚度";
+            case MeasurementType.NormalTemperatureCorrosion:
+                return "常温腐蚀";
+            case MeasurementType.HighTemperatureCorrosion:
+                return "高温腐蚀";
             case MeasurementType.Vibration:
                 return "振动";
             case MeasurementType.AngleDip:
@@ -40,6 +43,7 @@ export namespace MeasurementType {
                 return "未知类型";
         }
     }
+
     export function toDeviceType(type?: MeasurementType) {
         switch (type) {
             case MeasurementType.BoltLoosening:
@@ -52,8 +56,10 @@ export namespace MeasurementType {
             case MeasurementType.BoltElongation:
             case MeasurementType.FlangeElongation:
                 return [DeviceType.BoltElongation]
-            case MeasurementType.CorrosionThickness:
-                return [DeviceType.NormalTemperatureCorrosion, DeviceType.HighTemperatureCorrosion]
+            case MeasurementType.NormalTemperatureCorrosion:
+                return [DeviceType.NormalTemperatureCorrosion]
+            case MeasurementType.HighTemperatureCorrosion:
+                return [DeviceType.HighTemperatureCorrosion]
             case MeasurementType.Vibration:
                 return [DeviceType.VibrationTemperature3Axis]
             default:

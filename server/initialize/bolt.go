@@ -11,7 +11,8 @@ func InitBuckets(db *bbolt.DB) {
 	buckets := []core.Bucket{
 		po.System{},
 		po.DeviceStatus{},
-		po.DeviceData{},
+		entity.SensorData{},
+		entity.LargeSensorData{},
 		po.DeviceInformation{},
 		entity.MeasurementAlert{},
 	}

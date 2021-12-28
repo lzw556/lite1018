@@ -1,5 +1,9 @@
 package measurementtype
 
+import "fmt"
+
+var ErrVariableNotFound = fmt.Errorf("variable not found")
+
 type VariableType uint
 
 const (
@@ -8,79 +12,385 @@ const (
 )
 
 type Variable struct {
-	Index     int          `json:"index"`
+	DataIndex int          `json:"dataIndex"`
 	Name      string       `json:"name"`
 	Title     string       `json:"title"`
 	Unit      string       `json:"unit"`
 	Precision int          `json:"precision"`
 	Type      VariableType `json:"type"`
 	Primary   bool         `json:"primary"`
+	Sort      int          `json:"sort"`
 }
 
-var Variables = map[Type]map[string]Variable{
+var Variables = map[Type][]Variable{
 	BoltLoosening: {
-		"loosening_angel": {
-			Index:     0,
-			Name:      "loosening_angel",
+		{
+			DataIndex: 0,
+			Name:      "loosening_angle",
 			Title:     "松动角度",
 			Unit:      "°",
 			Precision: 3,
 			Type:      FloatVariableType,
 			Primary:   true,
+			Sort:      0,
 		},
-		"attitude": {
-			Index:     8,
+		{
+			DataIndex: 8,
 			Name:      "attitude",
 			Title:     "姿态指数",
 			Unit:      "",
 			Type:      FloatVariableType,
 			Precision: 3,
+			Sort:      1,
+			Primary:   true,
 		},
-		"motion": {
-			Index:     5,
+		{
+			DataIndex: 5,
 			Name:      "motion",
 			Title:     "移动指数",
 			Unit:      "",
 			Type:      FloatVariableType,
 			Precision: 3,
+			Sort:      2,
+			Primary:   true,
 		},
 	},
 	BoltElongation: {
-		"preload": {
+		{
 			Name:      "preload",
 			Title:     "预紧力",
+			DataIndex: 5,
 			Unit:      "kN",
 			Primary:   true,
 			Type:      FloatVariableType,
 			Precision: 3,
+			Sort:      0,
 		},
-		"temperature": {
+		{
 			Name:      "temperature",
 			Title:     "温度",
+			DataIndex: 1,
 			Unit:      "°C",
 			Type:      FloatVariableType,
 			Precision: 3,
+			Sort:      1,
+			Primary:   true,
 		},
-		"length": {
+		{
 			Name:      "length",
 			Title:     "长度",
+			DataIndex: 0,
 			Unit:      "mm",
 			Type:      FloatVariableType,
 			Precision: 3,
+			Sort:      2,
+			Primary:   true,
 		},
-		"defect": {
+		{
 			Name:      "defect",
 			Title:     "缺陷位置",
+			DataIndex: 3,
 			Unit:      "mm",
 			Type:      FloatVariableType,
 			Precision: 3,
+			Sort:      3,
+			Primary:   true,
 		},
-		"tof": {
+		{
 			Name:      "tof",
 			Title:     "飞行时间",
+			DataIndex: 2,
 			Unit:      "ns",
 			Type:      FloatVariableType,
 			Precision: 3,
+			Sort:      4,
 		},
 	},
+	AngleDip: {
+		{
+			Name:      "inclination",
+			Title:     "倾斜角",
+			Unit:      "°",
+			Type:      FloatVariableType,
+			Precision: 3,
+			DataIndex: 0,
+			Sort:      0,
+			Primary:   true,
+		},
+		{
+			Name:      "pitch",
+			Title:     "俯仰角",
+			Unit:      "°",
+			Type:      FloatVariableType,
+			Precision: 3,
+			DataIndex: 1,
+			Sort:      1,
+			Primary:   true,
+		},
+		{
+			Name:      "roll",
+			Title:     "翻滚角",
+			Unit:      "°",
+			Type:      FloatVariableType,
+			Precision: 3,
+			DataIndex: 2,
+			Sort:      2,
+			Primary:   true,
+		},
+	},
+	Vibration: {
+		{
+			Name:      "vibration_severity",
+			Title:     "振动烈度",
+			DataIndex: 1,
+			Unit:      "mm/s",
+			Type:      ArrayVariableType,
+			Precision: 3,
+			Primary:   true,
+			Sort:      0,
+		},
+		{
+			Name:      "enveloping_pk2pk",
+			Title:     "加速度包络",
+			DataIndex: 3,
+			Unit:      "gE",
+			Type:      ArrayVariableType,
+			Precision: 3,
+			Primary:   true,
+			Sort:      1,
+		},
+		{
+			Name:      "acceleration_peak",
+			Title:     "加速度峰值",
+			DataIndex: 5,
+			Unit:      "mm/s²",
+			Type:      ArrayVariableType,
+			Precision: 3,
+			Primary:   true,
+			Sort:      2,
+		},
+		{
+			Name:      "temperature",
+			Title:     "温度",
+			DataIndex: 73,
+			Unit:      "°C",
+			Type:      FloatVariableType,
+			Precision: 3,
+			Primary:   true,
+			Sort:      3,
+		},
+		{
+			Name:      "fft_frequency",
+			Title:     "频率",
+			DataIndex: 52,
+			Unit:      "Hz",
+			Type:      ArrayVariableType,
+			Precision: 3,
+			Primary:   true,
+			Sort:      4,
+		},
+		{
+			Name:      "displacement_peak_difference",
+			Title:     "位移峰峰值",
+			DataIndex: 7,
+			Unit:      "",
+			Type:      ArrayVariableType,
+			Precision: 3,
+			Sort:      5,
+		},
+		{
+			Name:      "acceleration_rms",
+			Title:     "加速度有效值",
+			DataIndex: 0,
+			Unit:      "mm/s²",
+			Type:      ArrayVariableType,
+			Precision: 3,
+			Sort:      6,
+		},
+		{
+			Name:      "crest_factor",
+			Title:     "波峰因子",
+			DataIndex: 5,
+			Unit:      "",
+			Type:      ArrayVariableType,
+			Precision: 3,
+			Sort:      7,
+		},
+		{
+			Name:      "pulse_factor",
+			Title:     "脉冲因子",
+			DataIndex: 12,
+			Unit:      "",
+			Type:      ArrayVariableType,
+			Precision: 3,
+			Sort:      8,
+		},
+		{
+			Name:      "margin_factor",
+			Title:     "裕度因子",
+			DataIndex: 11,
+			Unit:      "",
+			Type:      ArrayVariableType,
+			Precision: 3,
+			Sort:      9,
+		},
+		{
+			Name:      "kurtosis",
+			Title:     "峭度",
+			DataIndex: 7,
+			Unit:      "",
+			Type:      ArrayVariableType,
+			Precision: 3,
+			Sort:      10,
+		},
+		{
+			Name:      "kurtosis_norm",
+			Title:     "峭度指标",
+			DataIndex: 8,
+			Unit:      "",
+			Type:      ArrayVariableType,
+			Precision: 3,
+			Sort:      11,
+		},
+		{
+			Name:      "skewness",
+			Title:     "歪度",
+			DataIndex: 9,
+			Unit:      "",
+			Type:      ArrayVariableType,
+			Precision: 3,
+			Sort:      12,
+		},
+		{
+			Name:      "skewness_norm",
+			Title:     "歪度指标",
+			DataIndex: 10,
+			Unit:      "",
+			Type:      ArrayVariableType,
+			Precision: 3,
+			Sort:      13,
+		},
+		{
+			Name:      "fft_value_1",
+			Title:     "一倍频",
+			DataIndex: 51,
+			Unit:      "",
+			Type:      ArrayVariableType,
+			Precision: 3,
+			Sort:      14,
+		},
+		{
+			Name:      "fft_value_2",
+			Title:     "二倍频",
+			DataIndex: 53,
+			Unit:      "",
+			Type:      ArrayVariableType,
+			Precision: 3,
+			Sort:      14,
+		},
+		{
+			Name:      "fft_value_3",
+			Title:     "三倍频",
+			DataIndex: 55,
+			Unit:      "",
+			Type:      ArrayVariableType,
+			Precision: 3,
+			Sort:      15,
+		},
+		{
+			Name:      "fft_value_0",
+			Title:     "半倍频",
+			DataIndex: 49,
+			Unit:      "",
+			Type:      ArrayVariableType,
+			Precision: 3,
+			Sort:      16,
+		},
+		{
+			Name:      "spectrum_variance",
+			Title:     "谱方差",
+			DataIndex: 13,
+			Unit:      "",
+			Type:      ArrayVariableType,
+			Precision: 3,
+			Sort:      17,
+		},
+		{
+			Name:      "spectrum_mean",
+			Title:     "谱均值",
+			DataIndex: 14,
+			Unit:      "",
+			Type:      ArrayVariableType,
+			Precision: 3,
+			Sort:      18,
+		},
+		{
+			Name:      "spectrum_rms",
+			Title:     "谱有效值",
+			DataIndex: 15,
+			Unit:      "",
+			Type:      ArrayVariableType,
+			Precision: 3,
+			Sort:      19,
+		},
+		{
+			Name:      "inclination",
+			Title:     "倾角",
+			DataIndex: 48,
+			Unit:      "",
+			Type:      FloatVariableType,
+			Precision: 3,
+			Sort:      20,
+		},
+	},
+	NormalTemperatureCorrosion: {
+		{
+			Name:      "thickness",
+			Title:     "厚度",
+			DataIndex: 0,
+			Unit:      "mm",
+			Type:      FloatVariableType,
+			Precision: 3,
+			Primary:   true,
+			Sort:      0,
+		},
+		{
+			Name:      "corrosion_rate",
+			Title:     "腐蚀率",
+			DataIndex: 0,
+			Unit:      "mm/a",
+			Type:      FloatVariableType,
+			Precision: 3,
+			Primary:   true,
+			Sort:      1,
+		},
+		{
+			Name:      "temperature",
+			Title:     "温度",
+			DataIndex: 1,
+			Unit:      "°C",
+			Type:      FloatVariableType,
+			Precision: 3,
+			Primary:   true,
+			Sort:      2,
+		},
+		{
+			Name:      "tof",
+			Title:     "飞行时间",
+			DataIndex: 3,
+			Unit:      "ns",
+			Type:      FloatVariableType,
+			Precision: 3,
+			Sort:      3,
+		},
+	},
+}
+
+func GetVariable(t Type, name string) (Variable, error) {
+	for _, v := range Variables[t] {
+		if v.Name == name {
+			return v, nil
+		}
+	}
+	return Variable{}, ErrVariableNotFound
 }

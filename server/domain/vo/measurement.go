@@ -7,28 +7,28 @@ import (
 )
 
 type Measurement struct {
-	ID                     uint                 `json:"id"`
-	Name                   string               `json:"name"`
-	Type                   measurementtype.Type `json:"type"`
-	Display                *Display             `json:"display,omitempty"`
-	Data                   *MeasurementData     `json:"data,omitempty"`
-	Alert                  *MeasurementAlert    `json:"alert,omitempty"`
-	Settings               po.Settings          `json:"settings,omitempty"`
-	SensorSettings         po.SensorSetting     `json:"sensorSettings,omitempty"`
-	SamplePeriod           uint                 `json:"samplePeriod"`
-	SamplePeriodTimeOffset uint                 `json:"samplePeriodTimeOffset"`
-	Asset                  *Asset               `json:"asset,omitempty"`
+	ID             uint                 `json:"id"`
+	Name           string               `json:"name"`
+	Type           measurementtype.Type `json:"type"`
+	Display        *Display             `json:"display,omitempty"`
+	Data           *MeasurementData     `json:"data,omitempty"`
+	Alert          *MeasurementAlert    `json:"alert,omitempty"`
+	Settings       po.Settings          `json:"settings,omitempty"`
+	SensorSettings po.SensorSetting     `json:"sensorSettings,omitempty"`
+	Mode           po.AcquisitionMode   `json:"mode"`
+	PollingPeriod  uint                 `json:"polling_period"`
+	Asset          *Asset               `json:"asset,omitempty"`
 }
 
 func NewMeasurement(e po.Measurement) Measurement {
 	m := Measurement{
-		ID:                     e.ID,
-		Name:                   e.Name,
-		Type:                   e.Type,
-		Settings:               e.Settings,
-		SensorSettings:         e.SensorSettings,
-		SamplePeriod:           e.SamplePeriod,
-		SamplePeriodTimeOffset: e.SamplePeriodTimeOffset,
+		ID:             e.ID,
+		Name:           e.Name,
+		Type:           e.Type,
+		Settings:       e.Settings,
+		SensorSettings: e.SensorSettings,
+		Mode:           e.Mode,
+		PollingPeriod:  e.PollingPeriod,
 	}
 	if e.Display != (po.Display{}) {
 		display := NewDisplay(e.Display)
@@ -37,18 +37,13 @@ func NewMeasurement(e po.Measurement) Measurement {
 	return m
 }
 
-func (m *Measurement) SetData(e po.MeasurementData) {
+func (m *Measurement) SetData(e entity.MeasurementData) {
 	data := NewMeasurementData(e)
 	for k, v := range e.Fields {
-		if field, ok := measurementtype.Variables[m.Type][k]; ok {
+		if variable, err := measurementtype.GetVariable(m.Type, k); err == nil {
 			data.Fields = append(data.Fields, MeasurementField{
-				Name:      k,
-				Title:     field.Title,
-				Value:     v,
-				Unit:      field.Unit,
-				Precision: field.Precision,
-				Type:      uint(field.Type),
-				Primary:   field.Primary,
+				Variable: variable,
+				Value:    v,
 			})
 		}
 	}

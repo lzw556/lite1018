@@ -6,7 +6,7 @@ import (
 )
 
 type Service interface {
-	CreateMeasurement(req request.CreateMeasurement) error
+	CreateMeasurement(req request.CreateMeasurement) (uint, error)
 
 	CheckDeviceBinding(macAddress string) error
 
@@ -19,8 +19,10 @@ type Service interface {
 
 	GetMeasurement(id uint) (*vo.Measurement, error)
 	GetMeasurementData(id uint, from, to int64) ([]vo.MeasurementData, error)
+	GetMeasurementRawData(id uint, from, to int64) ([]vo.MeasurementRawData, error)
 	UpdateMeasurementSettings(id uint, req request.MeasurementSettings) error
 	UpdateMeasurementByID(id uint, req request.CreateMeasurement) error
 	UpdateMeasurementDeviceBindings(id uint, req request.UpdateMeasurementDeviceBindings) error
 	RemoveMeasurementByID(id uint) error
+	RemoveMeasurementDataByID(id uint, from, to int64) error
 }

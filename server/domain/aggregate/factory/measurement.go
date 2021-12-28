@@ -44,8 +44,8 @@ func (factory Measurement) NewMeasurementCreateCmd(req request.CreateMeasurement
 	cmd.Measurement.Settings = req.Settings
 	cmd.SensorSettings = req.Sensors
 	cmd.Measurement.Type = measurementtype.Type(req.Type)
-	cmd.Measurement.SamplePeriod = req.SamplePeriod
-	cmd.Measurement.SamplePeriodTimeOffset = req.SamplePeriodTimeOffset
+	cmd.PollingPeriod = req.PollingPeriod
+	cmd.Mode = po.AcquisitionMode(req.Mode)
 	cmd.Bindings = make([]po.MeasurementDeviceBinding, len(req.BindingDevices))
 	for i, binding := range req.BindingDevices {
 		device, err := factory.deviceRepo.GetBySpecs(ctx, spec.DeviceMacEqSpec(binding.Value))
@@ -58,13 +58,8 @@ func (factory Measurement) NewMeasurementCreateCmd(req request.CreateMeasurement
 				MacAddress: binding.Value,
 				Type:       req.DeviceType,
 				AssetID:    asset.ID,
+				Sensors:    req.Sensors,
 				Category:   po.SensorCategory,
-			}
-			device.Sensors = po.SensorSetting{
-				"schedule0_sample_period": req.SamplePeriod,
-			}
-			for k, v := range req.Sensors {
-				device.Sensors[k] = v
 			}
 		}
 		cmd.Devices = append(cmd.Devices, device)

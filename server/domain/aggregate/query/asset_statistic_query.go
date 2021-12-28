@@ -15,13 +15,13 @@ type AssetStatisticQuery struct {
 
 	propertyRepo     dependency.PropertyRepository
 	deviceStatusRepo dependency.DeviceStatusRepository
-	deviceDataRepo   dependency.DeviceDataRepository
+	deviceDataRepo   dependency.SensorDataRepository
 }
 
 func NewAssetStatisticQuery() AssetStatisticQuery {
 	return AssetStatisticQuery{
 		propertyRepo:     repository.Property{},
-		deviceDataRepo:   repository.DeviceData{},
+		deviceDataRepo:   repository.SensorData{},
 		deviceStatusRepo: repository.DeviceStatus{},
 	}
 }

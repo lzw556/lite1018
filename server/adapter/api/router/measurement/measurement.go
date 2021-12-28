@@ -27,6 +27,7 @@ func (r *measurementRouter) initRoutes() {
 		router.NewGetRoute("measurements/:id", r.getByID),
 		router.NewGetRoute("measurements/:id/statistics", r.getStatistic),
 		router.NewGetRoute("measurements/:id/data", r.getData),
+		router.NewGetRoute("measurements/:id/rawData", r.getRawData),
 
 		router.NewGetRoute("/check/deviceBinding/:mac", r.checkDeviceBinding),
 
@@ -38,7 +39,8 @@ func (r *measurementRouter) initRoutes() {
 		router.NewPatchRoute("measurements/:id/devices", r.bindingDevices),
 
 		// DELETE
-		router.NewDeleteRoute("measurements/:id", r.deleteByID),
+		router.NewDeleteRoute("measurements/:id", r.removeByID),
+		router.NewDeleteRoute("measurements/:id/data", r.removeDataByID),
 	}
 }
 

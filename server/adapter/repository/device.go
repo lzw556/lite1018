@@ -69,7 +69,7 @@ func (repo Device) PagingBySpecs(ctx context.Context, page, size int, specs ...s
 	return es, total, err
 }
 
-func (repo Device) FindBySpecs(ctx context.Context, specs ...specification.Specification) ([]entity.Device, error) {
+func (repo Device) FindBySpecs(ctx context.Context, specs ...specification.Specification) (entity.Devices, error) {
 	var es []entity.Device
 	err := repo.DB(ctx).Scopes(specification.Scopes(specs)...).Find(&es).Error
 	return es, err

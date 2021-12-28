@@ -19,7 +19,7 @@ type DeviceQuery struct {
 
 	deviceRepo            dependency.DeviceRepository
 	deviceStatusRepo      dependency.DeviceStatusRepository
-	deviceDataRepo        dependency.DeviceDataRepository
+	deviceDataRepo        dependency.SensorDataRepository
 	deviceInformationRepo dependency.DeviceInformationRepository
 	networkRepo           dependency.NetworkRepository
 	propertyRepo          dependency.PropertyRepository
@@ -31,7 +31,7 @@ func NewDeviceQuery() DeviceQuery {
 	return DeviceQuery{
 		deviceRepo:            repository.Device{},
 		deviceStatusRepo:      repository.DeviceStatus{},
-		deviceDataRepo:        repository.DeviceData{},
+		deviceDataRepo:        repository.SensorData{},
 		deviceInformationRepo: repository.DeviceInformation{},
 		networkRepo:           repository.Network{},
 		propertyRepo:          repository.Property{},
@@ -86,7 +86,7 @@ func (query DeviceQuery) PropertyDataByRange(pid uint, from, to time.Time) (vo.P
 	return query.getPropertyData(property, data), nil
 }
 
-func (query DeviceQuery) getPropertyData(property po.Property, data []po.DeviceData) vo.PropertyData {
+func (query DeviceQuery) getPropertyData(property po.Property, data []entity.SensorData) vo.PropertyData {
 	result := vo.NewPropertyData(property)
 	for k := range property.Fields {
 		result.Fields[k] = make([]float32, len(data))
@@ -106,7 +106,7 @@ func (query DeviceQuery) getPropertyData(property po.Property, data []po.DeviceD
 	return result
 }
 
-func (query DeviceQuery) calculateCorrosionRate(current po.DeviceData, idx uint, t time.Time) float32 {
+func (query DeviceQuery) calculateCorrosionRate(current entity.SensorData, idx uint, t time.Time) float32 {
 	monthAgo, err := query.deviceDataRepo.Get(query.Device.MacAddress, t.AddDate(0, -1, 0))
 	if err != nil {
 		return 0

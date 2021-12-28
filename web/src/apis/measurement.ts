@@ -39,6 +39,10 @@ export function GetMeasurementDataRequest(id: number, from: number, to: number) 
     return request.get(`/measurements/${id}/data`, {from, to}).then(GetResponse);
 }
 
+export function GetMeasurementRawDataRequest(id: number, from: number, to: number) {
+    return request.get<any>(`/measurements/${id}/rawData`, {from, to}).then(GetResponse);
+}
+
 export function UpdateMeasurementRequest(id: number, params: any) {
     return request.put(`/measurements/${id}`, params).then(PutResponse);
 }
@@ -49,4 +53,8 @@ export function UpdateMeasurementDevicesBindingRequest(id: number, params: any) 
 
 export function RemoveMeasurementRequest(id:number) {
     return request.delete(`/measurements/${id}`).then(DeleteResponse);
+}
+
+export function RemoveMeasurementDataRequest(id:number, from:number, to:number) {
+    return request.delete(`/measurements/${id}/data?from=${from}&to=${to}`).then(DeleteResponse);
 }

@@ -94,6 +94,8 @@ const SensorTable:FC<SensorTableProps> = ({measurement}) => {
                 ]
             case MeasurementType.FlangeLoosening:
                 return columns
+            default:
+                return columns
         }
     }
 

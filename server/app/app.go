@@ -83,6 +83,7 @@ func runIoTServer() {
 	adapter.IoT.RegisterDispatchers(
 		dispatcher.NewDeviceStatus(),
 		dispatcher.NewSensorData(),
+		dispatcher.NewLargeSensorData(),
 		dispatcher.NewLinkStatus(),
 		dispatcher.NewRestartStatus(),
 		dispatcher.NewDeviceInformation(),

@@ -20,7 +20,7 @@ import AlertStatistic from "./alertStatistic";
 import SensorTable from "./sensorTable";
 import MeasurementSettings from "./settings";
 import HistoryData from "./history";
-import {MeasurementField} from "../../../../types/measurement_data";
+import {MeasurementField, MeasurementFieldType} from "../../../../types/measurement_data";
 
 const tabList = [
     {
@@ -64,21 +64,22 @@ const MeasurementDetail = () => {
     }, [measurement])
 
     const renderActions = () => {
-        switch (measurement?.type) {
-            case MeasurementType.BoltLoosening:
-                return fields.sort((a, b) => Number(b.primary) - Number(a.primary)).map(field => {
-                    if (measurement?.data?.fields) {
-                        const data = measurement.data?.fields.find(f => f.name === field.name)
-                        if (data) {
-                            return <Statistic title={data.title} valueStyle={{fontSize: "14pt"}}
-                                              value={data.value.toFixed(data.precision)} suffix={data.unit}/>
-                        }
+        return fields.filter(item => item.primary).sort((a, b) => a.sort - b.sort).map(field => {
+            if (measurement?.data?.fields) {
+                const data = measurement.data?.fields.find(f => f.name === field.name)
+                if (data) {
+                    if (field.type === MeasurementFieldType.Float) {
+                        return <Statistic title={`${data.title}(单位: ${data.unit})`} valueStyle={{fontSize: "14pt"}}
+                                          value={data.value.toFixed(data.precision)}/>
+                    } else {
+                        return <Statistic title={`${data.title}(单位: ${data.unit})`} valueStyle={{fontSize: "14pt"}}
+                                          value={data.value[1].toFixed(data.precision)}/>
                     }
-                    return <Statistic title={field.title} valueStyle={{fontSize: "14pt"}}
-                                      value={"暂无数据"}/>
-                })
-        }
-        return []
+                }
+            }
+            return <Statistic title={field.title} valueStyle={{fontSize: "14pt"}}
+                              value={"暂无数据"}/>
+        })
     }
 
     const renderStatus = () => {
@@ -97,62 +98,66 @@ const MeasurementDetail = () => {
     return <Content>
         <MyBreadcrumb/>
         {
-            measurement && <Row justify={"space-between"}>
-                <Col span={12} style={{height: "100%"}}>
-                    <ShadowCard style={{height: "100%"}} size={"small"} actions={renderActions()}>
+            measurement &&
+            <ShadowCard actions={renderActions()}>
+                <Row justify={"space-between"}>
+                    <Col span={12} style={{height: "100%"}}>
                         <Typography.Title level={4}>{measurement.name}</Typography.Title>
-                        <Form.Item label={"状态"} style={{marginBottom: "4px"}} labelCol={{span: 5}} labelAlign={"left"}
+                        <Form.Item label={"状态"} labelCol={{span: 5}}
+                                   labelAlign={"left"}
                                    colon={false}>
                             {
                                 renderStatus()
                             }
                         </Form.Item>
-                        <Form.Item label={"类型"} style={{marginBottom: "4px"}} labelCol={{span: 5}} labelAlign={"left"}
+                        <Form.Item label={"类型"} labelCol={{span: 5}}
+                                   labelAlign={"left"}
                                    colon={false}>
                             {
                                 MeasurementType.toString(measurement.type)
                             }
                         </Form.Item>
-                        <Form.Item label={"上报时间"} style={{marginBottom: "2px"}} labelCol={{span: 5}} labelAlign={"left"}
+                        <Form.Item label={"上报时间"} labelCol={{span: 5}}
+                                   labelAlign={"left"}
                                    colon={false}>
                             {
-                                measurement.data ? moment.unix(measurement.data?.timestamp).local().format("YYYY-MM-DD HH:mm:ss") : "-"
+                                measurement.data && measurement.data.timestamp > 0 ? moment.unix(measurement.data.timestamp).local().format("YYYY-MM-DD HH:mm:ss") : "-"
                             }
                         </Form.Item>
-                    </ShadowCard>
-                </Col>
-                <Col span={12}>
-                    <Row justify={"start"}>
-                        <Col span={12} style={{paddingLeft: "8px"}}>
-                            <ShadowCard>
-                                <Statistic title={"总数据条数"} value={statistic?.data.total}/>
-                            </ShadowCard>
-                        </Col>
-                        <Col span={12} style={{paddingLeft: "8px"}}>
-                            <ShadowCard>
-                                <Statistic title={"今日数据条数"} value={statistic?.data.today}/>
-                            </ShadowCard>
-                        </Col>
-                    </Row>
-                    <Row justify={"start"} style={{paddingTop: "8px"}}>
-                        <Col span={8} style={{paddingLeft: "8px"}}>
-                            <ShadowCard>
-                                <Statistic title={"总报警"} value={statistic?.alert.total}/>
-                            </ShadowCard>
-                        </Col>
-                        <Col span={8} style={{paddingLeft: "8px"}}>
-                            <ShadowCard>
-                                <Statistic title={"今日报警"} value={statistic?.alert.today}/>
-                            </ShadowCard>
-                        </Col>
-                        <Col span={8} style={{paddingLeft: "8px"}}>
-                            <ShadowCard>
-                                <Statistic title={"未处理报警"} value={statistic?.alert.untreated}/>
-                            </ShadowCard>
-                        </Col>
-                    </Row>
-                </Col>
-            </Row>
+                    </Col>
+                    <Col span={12}>
+                        <Row justify={"start"}>
+                            <Col span={12} style={{paddingLeft: "8px"}}>
+                                <ShadowCard>
+                                    <Statistic title={"总数据条数"} value={statistic?.data.total}/>
+                                </ShadowCard>
+                            </Col>
+                            <Col span={12} style={{paddingLeft: "8px"}}>
+                                <ShadowCard>
+                                    <Statistic title={"今日数据条数"} value={statistic?.data.today}/>
+                                </ShadowCard>
+                            </Col>
+                        </Row>
+                        <Row justify={"start"} style={{paddingTop: "8px"}}>
+                            <Col span={8} style={{paddingLeft: "8px"}}>
+                                <ShadowCard>
+                                    <Statistic title={"总报警"} value={statistic?.alert.total}/>
+                                </ShadowCard>
+                            </Col>
+                            <Col span={8} style={{paddingLeft: "8px"}}>
+                                <ShadowCard>
+                                    <Statistic title={"今日报警"} value={statistic?.alert.today}/>
+                                </ShadowCard>
+                            </Col>
+                            <Col span={8} style={{paddingLeft: "8px"}}>
+                                <ShadowCard>
+                                    <Statistic title={"未处理报警"} value={statistic?.alert.untreated}/>
+                                </ShadowCard>
+                            </Col>
+                        </Row>
+                    </Col>
+                </Row>
+            </ShadowCard>
         }
         <Row justify={"start"} style={{paddingTop: "8px", paddingBottom: "8px"}}>
             <Col span={10}>

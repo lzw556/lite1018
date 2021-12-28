@@ -103,6 +103,8 @@ const AssetMonitor = () => {
                 <Label name={"资产"}>
                     <AssetTreeSelect bordered={false} style={{width: "150px"}}
                                      placeholder={"请选择资产"}
+                                     defaultActiveFirstOption={true}
+                                     value={asset?.id}
                                      onChange={fetchAsset}/>
                 </Label>
             </Space>

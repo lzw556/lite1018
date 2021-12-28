@@ -1,13 +1,15 @@
 package vo
 
-import "github.com/thetasensors/theta-cloud-lite/server/domain/po"
+import (
+	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
+)
 
 type MeasurementData struct {
 	Timestamp int64              `json:"timestamp"`
 	Fields    []MeasurementField `json:"fields"`
 }
 
-func NewMeasurementData(e po.MeasurementData) MeasurementData {
+func NewMeasurementData(e entity.MeasurementData) MeasurementData {
 	return MeasurementData{
 		Timestamp: e.Time.Unix(),
 	}

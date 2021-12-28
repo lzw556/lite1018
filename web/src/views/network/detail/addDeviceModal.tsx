@@ -54,7 +54,7 @@ const AddDeviceModal:FC<AddDeviceModalProps> = (props) => {
         form.validateFields().then(values => {
             AccessDevicesRequest(network.id, values).then(_ => {
                 onSuccess();
-            })
+            }) 
         }).catch(e => {})
     }
 

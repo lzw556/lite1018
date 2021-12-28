@@ -3,7 +3,6 @@ package ruleengine
 import (
 	"bytes"
 	"context"
-	"fmt"
 	"github.com/bilibili/gengine/engine"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/po"
@@ -42,7 +41,6 @@ func initRules() {
 func UpdateRules(alarms ...po.Alarm) error {
 	buf := bytes.Buffer{}
 	for _, a := range alarms {
-		fmt.Println(a.RuleSpec())
 		buf.WriteString(a.RuleSpec())
 	}
 	return pool.UpdatePooledRulesIncremental(buf.String())

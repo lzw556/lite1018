@@ -15,7 +15,7 @@ func (r measurementRouter) create(ctx *gin.Context) (interface{}, error) {
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		return nil, response.InvalidParameterError(err.Error())
 	}
-	return nil, r.service.CreateMeasurement(req)
+	return r.service.CreateMeasurement(req)
 }
 
 func (r measurementRouter) checkDeviceBinding(ctx *gin.Context) (interface{}, error) {
@@ -59,15 +59,11 @@ func (r measurementRouter) getStatistic(ctx *gin.Context) (interface{}, error) {
 
 func (r measurementRouter) getFields(ctx *gin.Context) (interface{}, error) {
 	typeID := cast.ToUint(ctx.Query("type"))
-	fields := measurementtype.Variables[measurementtype.Type(typeID)]
+	variables := measurementtype.Variables[measurementtype.Type(typeID)]
 	result := make([]vo.MeasurementField, 0)
-	for _, v := range fields {
+	for _, v := range variables {
 		result = append(result, vo.MeasurementField{
-			Name:    v.Name,
-			Title:   v.Title,
-			Unit:    v.Unit,
-			Type:    uint(v.Type),
-			Primary: v.Primary,
+			Variable: v,
 		})
 	}
 	return result, nil
@@ -99,7 +95,21 @@ func (r measurementRouter) getData(ctx *gin.Context) (interface{}, error) {
 	return r.service.GetMeasurementData(id, from, to)
 }
 
-func (r measurementRouter) deleteByID(ctx *gin.Context) (interface{}, error) {
+func (r measurementRouter) getRawData(ctx *gin.Context) (interface{}, error) {
+	id := cast.ToUint(ctx.Param("id"))
+	from := cast.ToInt64(ctx.Query("from"))
+	to := cast.ToInt64(ctx.Query("to"))
+	return r.service.GetMeasurementRawData(id, from, to)
+}
+
+func (r measurementRouter) removeByID(ctx *gin.Context) (interface{}, error) {
 	id := cast.ToUint(ctx.Param("id"))
 	return nil, r.service.RemoveMeasurementByID(id)
+}
+
+func (r measurementRouter) removeDataByID(ctx *gin.Context) (interface{}, error) {
+	id := cast.ToUint(ctx.Param("id"))
+	from := cast.ToInt64(ctx.Query("from"))
+	to := cast.ToInt64(ctx.Query("to"))
+	return nil, r.service.RemoveMeasurementDataByID(id, from, to)
 }

@@ -5,16 +5,22 @@ import {GetAssetsRequest} from "../../apis/asset";
 import {CaretDownOutlined} from "@ant-design/icons";
 
 export interface AssetTreeSelectProps extends TreeSelectProps<any> {
-
+    onChange?: (value: number) => void;
 }
 
 const {TreeNode} = TreeSelect;
 
-const AssetTreeSelect:FC<AssetTreeSelectProps> = (props) => {
+const AssetTreeSelect: FC<AssetTreeSelectProps> = (props) => {
+    const {onChange, defaultActiveFirstOption} = props;
     const [dataSource, setDataSource] = useState<Asset[]>()
 
     useEffect(() => {
-        GetAssetsRequest().then(setDataSource)
+        GetAssetsRequest().then(data => {
+            if (data.length && defaultActiveFirstOption) {
+                onChange && onChange(data[0].id);
+            }
+            setDataSource(data)
+        })
     }, [])
 
     const convertAssetTreeNode: any = (parentId: number) => {
@@ -27,7 +33,7 @@ const AssetTreeSelect:FC<AssetTreeSelectProps> = (props) => {
         })
     }
 
-    return <TreeSelect {...props} treeDefaultExpandAll={true} suffixIcon={<CaretDownOutlined/>}>
+    return <TreeSelect {...props} treeDefaultExpandAll={true} suffixIcon={<CaretDownOutlined/>} onChange={onChange}>
         {
             convertAssetTreeNode(0)
         }

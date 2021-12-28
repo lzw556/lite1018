@@ -10,12 +10,12 @@ import (
 type DeviceListQuery struct {
 	entity.Devices
 
-	deviceDataRepo dependency.DeviceDataRepository
+	deviceDataRepo dependency.SensorDataRepository
 }
 
 func NewDeviceListQuery() DeviceListQuery {
 	return DeviceListQuery{
-		deviceDataRepo: repository.DeviceData{},
+		deviceDataRepo: repository.SensorData{},
 	}
 }
 

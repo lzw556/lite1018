@@ -6,7 +6,7 @@ import "./index.css"
 import MyBreadcrumb from "../../components/myBreadcrumb";
 import TableLayout from "../layout/TableLayout";
 import AddNetworkModal from "./modal/addNetworkModal";
-import {Button, Col, Dropdown, Menu, Popconfirm, Row, Select, Space} from "antd";
+import {Button, Col, Dropdown, Menu, message, Popconfirm, Row, Select, Space} from "antd";
 import {CodeOutlined, DeleteOutlined, EditOutlined, PlusOutlined} from "@ant-design/icons";
 import Label from "../../components/label";
 import {Network} from "../../types/network";
@@ -14,8 +14,9 @@ import EditNetworkModal from "./modal/editNetworkModal";
 import moment from "moment";
 import {PageResult} from "../../types/page";
 import AssetTreeSelect from "../../components/select/assetTreeSelect";
-
-const {Option} = Select;
+import {SendDeviceCommandRequest} from "../../apis/device";
+import {DeviceCommand} from "../../types/device_command";
+import {Device} from "../../types/device";
 
 const NetworkPage = () => {
     const [assetId, setAssetId] = useState<number>(0)
@@ -47,16 +48,25 @@ const NetworkPage = () => {
         })
     }
 
-    const onCommand = (device: Network, key: any) => {
-
+    const onCommand = (device: Device, key: any) => {
+        switch (key) {
+            case "1":
+                SendDeviceCommandRequest(device.id, DeviceCommand.Provision).then(res => {
+                    if (res.code === 200) {
+                        message.success("发送成功")
+                    }else {
+                        message.error(`发送失败: ${res.msg}`)
+                    }
+                })
+        }
     }
 
     const renderCommandMenus = (record: Network) => {
         return <Menu onClick={(e) => {
-            onCommand(record, e.key)
+            onCommand(record.gateway, e.key)
         }}>
-            <Menu.Item>同步网络</Menu.Item>
-            <Menu.Item>继续组网</Menu.Item>
+            <Menu.Item key={0}>同步网络</Menu.Item>
+            <Menu.Item key={1}>继续组网</Menu.Item>
         </Menu>
     }
 
@@ -152,7 +162,11 @@ const NetworkPage = () => {
                 <Col span={12}>
                     <Space>
                         <Label name={"资产"}>
-                            <AssetTreeSelect bordered={false} allowClear={true} style={{width: "144px"}} placeholder={"所有资产"} onChange={setAssetId}/>
+                            <AssetTreeSelect bordered={false}
+                                             allowClear={true}
+                                             style={{width: "144px"}}
+                                             placeholder={"所有资产"}
+                                             onChange={setAssetId}/>
                         </Label>
                     </Space>
                 </Col>

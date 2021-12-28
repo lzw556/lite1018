@@ -1,13 +1,14 @@
 package dependency
 
 import (
-	"github.com/thetasensors/theta-cloud-lite/server/domain/po"
+	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	"time"
 )
 
 type MeasurementDataRepository interface {
-	Create(e po.MeasurementData) error
-	Last(id uint) (po.MeasurementData, error)
-	FindAll(id uint) ([]po.MeasurementData, error)
-	Find(id uint, from, to time.Time) ([]po.MeasurementData, error)
+	Create(e entity.MeasurementData) error
+	Last(id uint) (entity.MeasurementData, error)
+	FindAll(id uint) ([]entity.MeasurementData, error)
+	Find(id uint, from, to time.Time) ([]entity.MeasurementData, error)
+	Delete(id uint, from, to time.Time) error
 }

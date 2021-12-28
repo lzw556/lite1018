@@ -25,8 +25,7 @@ type AccessDevices struct {
 }
 
 type RemoveDevices struct {
-	DeviceIDs     []uint      `json:"device_ids"`
-	RoutingTables [][2]string `json:"routing_tables"`
+	DeviceIDs []uint `json:"device_ids"`
 }
 
 type ImportNetwork struct {

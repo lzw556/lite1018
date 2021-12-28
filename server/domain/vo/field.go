@@ -1,6 +1,8 @@
 package vo
 
-import "github.com/thetasensors/theta-cloud-lite/server/domain/po"
+import (
+	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
+)
 
 type Field struct {
 	Index  uint      `json:"index"`
@@ -11,7 +13,7 @@ type Field struct {
 
 type Fields []Field
 
-func (fs Fields) SetData(e po.DeviceData) {
+func (fs Fields) SetData(e entity.SensorData) {
 	for _, f := range fs {
 		f.Values = append(f.Values, e.Values[f.Index])
 	}

@@ -120,17 +120,24 @@ func (cmd NetworkUpdateCmd) AccessNewDevice(req request.AccessDevices) error {
 
 func (cmd NetworkUpdateCmd) RemoveDevices(req request.RemoveDevices) error {
 	ctx := context.TODO()
-	err := transaction.Execute(ctx, func(txCtx context.Context) error {
-		cmd.Network.UpdateRoutingTables(req.RoutingTables)
+	devices, err := cmd.deviceRepo.FindBySpecs(ctx, spec.PrimaryKeyInSpec(req.DeviceIDs))
+	if err != nil {
+		return err
+	}
+	for i, device := range devices {
+		cmd.Network.RemoveDevice(device)
+		devices[i].NetworkID = 0
+	}
+	err = transaction.Execute(ctx, func(txCtx context.Context) error {
 		if err := cmd.networkRepo.Save(txCtx, &cmd.Network.Network); err != nil {
 			return err
 		}
-		return cmd.deviceRepo.UpdatesBySpecs(txCtx, map[string]interface{}{"network_id": 0}, spec.PrimaryKeyInSpec(req.DeviceIDs))
+		return cmd.deviceRepo.BatchSave(txCtx, devices.PersistentObject())
 	})
 	if err != nil {
 		return err
 	}
-	devices, err := cmd.deviceRepo.FindBySpecs(ctx, spec.NetworkEqSpec(cmd.Network.ID))
+	devices, err = cmd.deviceRepo.FindBySpecs(ctx, spec.NetworkEqSpec(cmd.Network.ID))
 	if err != nil {
 		return err
 	}

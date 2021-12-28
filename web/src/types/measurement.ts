@@ -13,8 +13,8 @@ export type Measurement = {
     asset?: Asset;
     settings?: any;
     sensorSettings?:any;
-    samplePeriod:number;
-    samplePeriodTimeOffset:number;
+    pollingPeriod:number;
+    mode: number;
 }
 
 export namespace Measurement {
@@ -22,6 +22,8 @@ export namespace Measurement {
         if (m.data) {
             switch (m.type) {
                 case MeasurementType.BoltLoosening:
+                    return m.data.fields?.filter(item => item.primary)
+                case MeasurementType.BoltElongation:
                     return m.data.fields?.filter(item => item.primary)
                 case MeasurementType.FlangeLoosening:
                     return m.data.fields?.filter(item => item.primary)

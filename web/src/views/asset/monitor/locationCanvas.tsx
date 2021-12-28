@@ -24,7 +24,7 @@ const LocationCanvas: FC<LocationCanvasProps> = ({x, y, value}) => {
                 return <>
                     <p>{`类型: ${MeasurementType.toString(measurement.type)}`}</p>
                     {
-                        Measurement.getPrimaryFields(measurement)?.map(field => {
+                        Measurement.getPrimaryFields(measurement)?.sort((a:any, b:any) => a.sort - b.sort).map(field => {
                             return <>
                                 <p>{`${field.title}: ${field.value}${field.unit}`}</p>
                             </>

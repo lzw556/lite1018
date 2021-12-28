@@ -2,7 +2,7 @@ package repository
 
 import (
 	"bytes"
-	"github.com/thetasensors/theta-cloud-lite/server/domain/po"
+	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/json"
 	"go.etcd.io/bbolt"
 	"time"
@@ -12,7 +12,7 @@ type MeasurementData struct {
 	repository
 }
 
-func (repo MeasurementData) Create(e po.MeasurementData) error {
+func (repo MeasurementData) Create(e entity.MeasurementData) error {
 	return repo.BoltDB().Update(func(tx *bbolt.Tx) error {
 		bucket, err := tx.CreateBucketIfNotExists([]byte(e.BucketName()))
 		if err != nil {
@@ -30,8 +30,8 @@ func (repo MeasurementData) Create(e po.MeasurementData) error {
 	})
 }
 
-func (repo MeasurementData) Last(id uint) (po.MeasurementData, error) {
-	var e po.MeasurementData
+func (repo MeasurementData) Last(id uint) (entity.MeasurementData, error) {
+	var e entity.MeasurementData
 	err := repo.BoltDB().View(func(tx *bbolt.Tx) error {
 		bucket := tx.Bucket([]byte(e.BucketName()))
 		if bucket != nil {
@@ -50,15 +50,15 @@ func (repo MeasurementData) Last(id uint) (po.MeasurementData, error) {
 	return e, err
 }
 
-func (repo MeasurementData) FindAll(id uint) ([]po.MeasurementData, error) {
-	var es []po.MeasurementData
+func (repo MeasurementData) FindAll(id uint) ([]entity.MeasurementData, error) {
+	var es []entity.MeasurementData
 	err := repo.BoltDB().View(func(tx *bbolt.Tx) error {
-		bucket := tx.Bucket([]byte(po.MeasurementData{}.BucketName()))
+		bucket := tx.Bucket([]byte(entity.MeasurementData{}.BucketName()))
 		if bucket != nil {
 			if dataBucket := bucket.Bucket(itob(id)); dataBucket != nil {
 				c := dataBucket.Cursor()
 				for k, v := c.First(); k != nil; k, v = c.Next() {
-					var e po.MeasurementData
+					var e entity.MeasurementData
 					if err := json.Unmarshal(v, &e); err != nil {
 						return err
 					}
@@ -71,17 +71,17 @@ func (repo MeasurementData) FindAll(id uint) ([]po.MeasurementData, error) {
 	return es, err
 }
 
-func (repo MeasurementData) Find(id uint, from, to time.Time) ([]po.MeasurementData, error) {
-	var es []po.MeasurementData
+func (repo MeasurementData) Find(id uint, from, to time.Time) ([]entity.MeasurementData, error) {
+	var es []entity.MeasurementData
 	err := repo.BoltDB().View(func(tx *bbolt.Tx) error {
-		bucket := tx.Bucket([]byte(po.MeasurementData{}.BucketName()))
+		bucket := tx.Bucket([]byte(entity.MeasurementData{}.BucketName()))
 		if bucket != nil {
-			min := []byte(from.Format("2006-01-02T15:04:05Z"))
-			max := []byte(to.Format("2006-01-02T15:04:05Z"))
+			min := []byte(from.UTC().Format("2006-01-02T15:04:05Z"))
+			max := []byte(to.UTC().Format("2006-01-02T15:04:05Z"))
 			if dataBucket := bucket.Bucket(itob(id)); dataBucket != nil {
 				c := dataBucket.Cursor()
 				for k, v := c.Seek(min); k != nil && bytes.Compare(k, max) <= 0; k, v = c.Next() {
-					var e po.MeasurementData
+					var e entity.MeasurementData
 					if err := json.Unmarshal(v, &e); err != nil {
 						return err
 					}
@@ -92,4 +92,24 @@ func (repo MeasurementData) Find(id uint, from, to time.Time) ([]po.MeasurementD
 		return nil
 	})
 	return es, err
+}
+
+func (repo MeasurementData) Delete(id uint, from, to time.Time) error {
+	err := repo.BoltDB().Update(func(tx *bbolt.Tx) error {
+		bucket := tx.Bucket([]byte(entity.MeasurementData{}.BucketName()))
+		if bucket != nil {
+			if dataBucket := bucket.Bucket(itob(id)); dataBucket != nil {
+				c := dataBucket.Cursor()
+				min := []byte(from.UTC().Format("2006-01-02T15:04:05Z"))
+				max := []byte(to.UTC().Format("2006-01-02T15:04:05Z"))
+				for k, _ := c.Seek(min); k != nil && bytes.Compare(k, max) <= 0; k, _ = c.Next() {
+					if err := dataBucket.Delete(k); err != nil {
+						return err
+					}
+				}
+			}
+		}
+		return nil
+	})
+	return err
 }

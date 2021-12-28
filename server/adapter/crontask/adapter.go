@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/robfig/cron/v3"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
+	spec "github.com/thetasensors/theta-cloud-lite/server/domain/specification"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/xlog"
 	"sync"
 )
@@ -28,7 +29,7 @@ func NewAdapter() *Adapter {
 
 func (a *Adapter) initMeasurementJobs() {
 	repo := repository.Measurement{}
-	es, err := repo.Find(context.TODO())
+	es, err := repo.FindBySpecs(context.TODO(), spec.SampleMethodEqSpec(1))
 	if err != nil {
 		xlog.Error("init measurement jobs", err)
 		return
@@ -42,11 +43,9 @@ func (a *Adapter) initMeasurementJobs() {
 
 func (a *Adapter) AddJobs(jobs ...Job) {
 	for _, j := range jobs {
+		xlog.Infof("add job [%s] to cron task", j.ID())
 		if _, ok := a.getEntity(j.ID()); !ok {
-			entityID, err := a.cron.AddJob(j.Spec(), j)
-			if err != nil {
-				return
-			}
+			entityID := a.cron.Schedule(j.Schedule(), j)
 			a.setEntity(j, entityID)
 		}
 	}

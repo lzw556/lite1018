@@ -31,17 +31,17 @@ func NewMeasurementAlert(m po.Measurement, a po.Alarm) *MeasurementAlert {
 }
 
 func (alert MeasurementAlert) Max() float32 {
-	if field, ok := measurementtype.Variables[alert.Measurement.Type][alert.Alarm.Rule.Field]; ok {
+	if variable, err := measurementtype.GetVariable(alert.Measurement.Type, alert.Alarm.Rule.Field); err == nil {
 		data, err := alert.measurementDataRepo.Last(alert.Measurement.ID)
 		if err != nil {
 			return 0
 		}
-		switch field.Type {
+		switch variable.Type {
 		case measurementtype.FloatVariableType:
-			return cast.ToFloat32(data.Fields[field.Name])
+			return cast.ToFloat32(data.Fields[variable.Name])
 		case measurementtype.ArrayVariableType:
 			max := float32(0)
-			values := data.Fields[field.Name].([]float32)
+			values := data.Fields[variable.Name].([]float32)
 			for _, value := range values {
 				if max < value {
 					max = value
@@ -49,22 +49,23 @@ func (alert MeasurementAlert) Max() float32 {
 			}
 			return max
 		}
+		return 0
 	}
 	return 0
 }
 
 func (alert MeasurementAlert) Min() float32 {
-	if field, ok := measurementtype.Variables[alert.Measurement.Type][alert.Alarm.Rule.Field]; ok {
+	if variable, err := measurementtype.GetVariable(alert.Measurement.Type, alert.Alarm.Rule.Field); err == nil {
 		data, err := alert.measurementDataRepo.Last(alert.Measurement.ID)
 		if err != nil {
 			return 0
 		}
-		switch field.Type {
+		switch variable.Type {
 		case measurementtype.FloatVariableType:
-			return cast.ToFloat32(data.Fields[field.Name])
+			return cast.ToFloat32(data.Fields[variable.Name])
 		case measurementtype.ArrayVariableType:
 			min := float32(0)
-			values := data.Fields[field.Name].([]float32)
+			values := data.Fields[variable.Name].([]float32)
 			for _, value := range values {
 				if min > value {
 					min = value
@@ -77,17 +78,17 @@ func (alert MeasurementAlert) Min() float32 {
 }
 
 func (alert MeasurementAlert) Mean() float32 {
-	if field, ok := measurementtype.Variables[alert.Measurement.Type][alert.Alarm.Rule.Field]; ok {
+	if variable, err := measurementtype.GetVariable(alert.Measurement.Type, alert.Alarm.Rule.Field); err == nil {
 		data, err := alert.measurementDataRepo.Last(alert.Measurement.ID)
 		if err != nil {
 			return 0
 		}
-		switch field.Type {
+		switch variable.Type {
 		case measurementtype.FloatVariableType:
-			return cast.ToFloat32(data.Fields[field.Name])
+			return cast.ToFloat32(data.Fields[variable.Name])
 		case measurementtype.ArrayVariableType:
 			sum := float32(0)
-			values := data.Fields[field.Name].([]float32)
+			values := data.Fields[variable.Name].([]float32)
 			for _, value := range values {
 				sum += value
 			}
@@ -98,16 +99,16 @@ func (alert MeasurementAlert) Mean() float32 {
 }
 
 func (alert MeasurementAlert) Current() float32 {
-	if field, ok := measurementtype.Variables[alert.Measurement.Type][alert.Alarm.Rule.Field]; ok {
+	if variable, err := measurementtype.GetVariable(alert.Measurement.Type, alert.Alarm.Rule.Field); err == nil {
 		data, err := alert.measurementDataRepo.Last(alert.Measurement.ID)
 		if err != nil {
 			return 0
 		}
-		switch field.Type {
+		switch variable.Type {
 		case measurementtype.FloatVariableType:
-			return cast.ToFloat32(data.Fields[field.Name])
+			return cast.ToFloat32(data.Fields[variable.Name])
 		case measurementtype.ArrayVariableType:
-			return data.Fields[field.Name].([]float32)[0]
+			return data.Fields[variable.Name].([]float32)[0]
 		}
 	}
 	return 0

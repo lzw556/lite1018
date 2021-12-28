@@ -37,21 +37,15 @@ func NewMeasurementUpdateCmd() MeasurementUpdateCmd {
 }
 
 func (cmd MeasurementUpdateCmd) Update(req request.CreateMeasurement) error {
-	periodIsChanged := cmd.Measurement.SamplePeriodTimeOffset != req.SamplePeriodTimeOffset || cmd.SamplePeriod != req.SamplePeriod
 	cmd.Measurement.Display.Location = req.Location
 	cmd.Measurement.Name = req.Name
 	cmd.Measurement.AssetID = req.Asset
-	cmd.Measurement.SamplePeriodTimeOffset = req.SamplePeriodTimeOffset
-	cmd.Measurement.SamplePeriod = req.SamplePeriod
+	cmd.Measurement.PollingPeriod = req.PollingPeriod
 	err := transaction.Execute(context.TODO(), func(txCtx context.Context) error {
 		if err := cmd.measurementRepo.Save(context.TODO(), &cmd.Measurement); err != nil {
 			return err
 		}
-		if periodIsChanged {
-			err := cmd.updateSensorSettings(txCtx, cmd.SensorSettings, req.SamplePeriod)
-			if err != nil {
-				return err
-			}
+		if cmd.Measurement.Mode == po.PollingAcquisitionMode {
 			job := crontask.NewMeasurementDataJob(cmd.Measurement)
 			adapter.CronTask.RefreshJob(job)
 		}
@@ -72,7 +66,7 @@ func (cmd MeasurementUpdateCmd) UpdateDeviceBindings(req request.UpdateMeasureme
 	err := transaction.Execute(context.TODO(), func(txCtx context.Context) error {
 		for i, binding := range bindings {
 			if device, err := cmd.deviceRepo.GetBySpecs(txCtx, spec.DeviceMacEqSpec(binding.MacAddress)); err != nil && errors.Is(err, gorm.ErrRecordNotFound) {
-				device.SetSensors(po.SensorSetting{"schedule0_sample_period": cmd.Measurement.SamplePeriod})
+				device.Sensors = cmd.SensorSettings
 				device.MacAddress = binding.MacAddress
 				device.AssetID = cmd.Measurement.AssetID
 				device.Type = req.DeviceType
@@ -89,7 +83,41 @@ func (cmd MeasurementUpdateCmd) UpdateDeviceBindings(req request.UpdateMeasureme
 }
 
 func (cmd MeasurementUpdateCmd) UpdateSettings(req request.MeasurementSettings) error {
-	return nil
+	if cmd.SensorSettings == nil {
+		cmd.SensorSettings = make(map[string]interface{})
+	}
+	for k, v := range req.Sensors {
+		cmd.SensorSettings[k] = v
+	}
+	cmd.Measurement.Settings = req.Settings
+	return transaction.Execute(context.TODO(), func(txCtx context.Context) error {
+		if err := cmd.measurementRepo.Save(txCtx, &cmd.Measurement); err != nil {
+			return err
+		}
+		bindings, err := cmd.bindingRepo.FindBySpecs(txCtx, spec.MeasurementEqSpec(cmd.Measurement.ID))
+		if err != nil {
+			return err
+		}
+		if len(bindings) > 0 {
+			macSpec := make(spec.DeviceMacInSpec, len(bindings))
+			for i, binding := range bindings {
+				macSpec[i] = binding.MacAddress
+			}
+			updates := map[string]interface{}{
+				"sensors": cmd.SensorSettings,
+			}
+			if err := cmd.deviceRepo.UpdatesBySpecs(txCtx, updates, macSpec); err != nil {
+				return err
+			}
+			// sync device settings
+			devices, err := cmd.deviceRepo.FindBySpecs(txCtx, macSpec)
+			if err != nil {
+				return err
+			}
+			go cmd.syncDeviceSettings(devices)
+		}
+		return nil
+	})
 }
 
 func (cmd MeasurementUpdateCmd) updateSensorSettings(ctx context.Context, e po.SensorSetting, period uint) error {
@@ -97,29 +125,10 @@ func (cmd MeasurementUpdateCmd) updateSensorSettings(ctx context.Context, e po.S
 		e = po.SensorSetting{
 			"schedule0_sample_period": period,
 		}
+	} else {
+		e["schedule0_sample_period"] = period
 	}
-	bindings, err := cmd.bindingRepo.FindBySpecs(ctx, spec.MeasurementEqSpec(cmd.Measurement.ID))
-	if err != nil {
-		return err
-	}
-	if len(bindings) > 0 {
-		macSpec := make(spec.DeviceMacInSpec, len(bindings))
-		for i, binding := range bindings {
-			macSpec[i] = binding.MacAddress
-		}
-		updates := map[string]interface{}{
-			"sensors": e,
-		}
-		if err := cmd.deviceRepo.UpdatesBySpecs(ctx, updates, macSpec); err != nil {
-			return err
-		}
-		// sync device settings
-		devices, err := cmd.deviceRepo.FindBySpecs(ctx, macSpec)
-		if err != nil {
-			return err
-		}
-		go cmd.syncDeviceSettings(devices)
-	}
+
 	return nil
 }
 

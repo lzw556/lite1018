@@ -20,6 +20,7 @@ func (query NetworkPagingQuery) Paging() ([]vo.Network, int64) {
 	result := make([]vo.Network, len(query.Networks))
 	for i, network := range query.Networks {
 		result[i] = vo.NewNetwork(network)
+		result[i].Gateway.ID = network.GatewayID
 	}
 	return result, query.total
 }

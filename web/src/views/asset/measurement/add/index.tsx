@@ -11,7 +11,9 @@ import {AddMeasurementRequest} from "../../../../apis/measurement";
 import DeviceTypeSelect from "../../../../components/select/deviceTypeSelect";
 import {MeasurementType} from "../../../../types/measurement_type";
 import DeviceMacAddressSelect from "../../../../components/select/deviceMacAddressSelect";
-import {COMMUNICATION_TIME_OFFSET, SAMPLE_PERIOD_1} from "../../../../constants";
+import {SAMPLE_PERIOD_1} from "../../../../constants";
+import AcquisitionModeSelect from "../../../../components/select/acquisitionModeSelect";
+import CommunicationPeriodSelect from "../../../../components/communicationPeriodSelect";
 
 const {Step} = Steps;
 const {Option} = Select;
@@ -19,6 +21,7 @@ const {Option} = Select;
 const AddMeasurement = () => {
     const [current, setCurrent] = useState<number>(0)
     const [type, setType] = useState<MeasurementType>()
+    const [mode, setMode] = useState<any>(0)
     const [params, setParams] = useState<any>({})
     const [success, setSuccess] = useState<boolean>(false)
     const [form] = Form.useForm()
@@ -81,17 +84,21 @@ const AddMeasurement = () => {
             <Row justify={"center"}>
                 <Col span={24}>
                     <Divider orientation={"left"} plain>参数配置</Divider>
-                    <Form.Item label={"采集周期"} name={"sample_period"} rules={[Rules.required]}>
+                    {
+                        type &&
+                        <Form.Item label={"采集方式"} name={"acquisition_mode"} rules={[Rules.required]}>
+                            <AcquisitionModeSelect type={type} onChange={setMode}/>
+                        </Form.Item>
+                    }
+                    {
+                        mode === 1 && <Form.Item label={"轮询周期"} name={"polling_period"} rules={[Rules.required]}>
+                            <CommunicationPeriodSelect placeholder={"请选择轮询周期"}/>
+                        </Form.Item>
+                    }
+                    <Form.Item label={"采集周期"} name={["sensors", "schedule0_sample_period"]} rules={[Rules.required]}>
                         <Select placeholder={"请选择采集周期"}>
                             {
                                 SAMPLE_PERIOD_1.map(item => (<Option key={item.value} value={item.value}>{item.text}</Option>))
-                            }
-                        </Select>
-                    </Form.Item>
-                    <Form.Item label={"采集延时"} name={"sample_period_time_offset"} rules={[Rules.required]}>
-                        <Select placeholder={"请选择采集延时"}>
-                            {
-                                COMMUNICATION_TIME_OFFSET.map(item => (<Option key={item.value} value={item.value}>{item.text}</Option>))
                             }
                         </Select>
                     </Form.Item>

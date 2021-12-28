@@ -16,7 +16,7 @@ type DeviceRemoveCmd struct {
 	entity.Device
 	Network entity.Network
 
-	deviceDataRepo        dependency.DeviceDataRepository
+	deviceDataRepo        dependency.SensorDataRepository
 	deviceRepo            dependency.DeviceRepository
 	deviceStatusRepo      dependency.DeviceStatusRepository
 	deviceInformationRepo dependency.DeviceInformationRepository
@@ -27,7 +27,7 @@ type DeviceRemoveCmd struct {
 func NewDeviceRemoveCmd() DeviceRemoveCmd {
 	return DeviceRemoveCmd{
 		deviceRepo:            repository.Device{},
-		deviceDataRepo:        repository.DeviceData{},
+		deviceDataRepo:        repository.SensorData{},
 		deviceStatusRepo:      repository.DeviceStatus{},
 		deviceInformationRepo: repository.DeviceInformation{},
 		networkRepo:           repository.Network{},

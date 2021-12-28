@@ -11,6 +11,7 @@ export type MeasurementField = {
     type: MeasurementFieldType;
     precision: number;
     primary: boolean;
+    sort: number;
 }
 
 export enum MeasurementFieldType {

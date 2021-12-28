@@ -29,10 +29,10 @@ func NewMeasurement() measurement.Service {
 	}
 }
 
-func (s Measurement) CreateMeasurement(req request.CreateMeasurement) error {
+func (s Measurement) CreateMeasurement(req request.CreateMeasurement) (uint, error) {
 	cmd, err := s.factory.NewMeasurementCreateCmd(req)
 	if err != nil {
-		return err
+		return 0, err
 	}
 	return cmd.Run()
 }
@@ -109,6 +109,14 @@ func (s Measurement) GetMeasurementData(id uint, from, to int64) ([]vo.Measureme
 	return query.GetData(from, to)
 }
 
+func (s Measurement) GetMeasurementRawData(id uint, from, to int64) ([]vo.MeasurementRawData, error) {
+	query, err := s.factory.NewMeasurementQuery(id)
+	if err != nil {
+		return nil, err
+	}
+	return query.GetRawData(from, to)
+}
+
 func (s Measurement) UpdateMeasurementByID(id uint, req request.CreateMeasurement) error {
 	cmd, err := s.factory.NewMeasurementUpdateCmd(id)
 	if err != nil {
@@ -123,4 +131,12 @@ func (s Measurement) RemoveMeasurementByID(id uint) error {
 		return err
 	}
 	return cmd.Remove()
+}
+
+func (s Measurement) RemoveMeasurementDataByID(id uint, from, to int64) error {
+	cmd, err := s.factory.NewMeasurementRemoveCmd(id)
+	if err != nil {
+		return err
+	}
+	return cmd.RemoveData(from, to)
 }

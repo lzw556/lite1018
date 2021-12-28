@@ -17,16 +17,20 @@ type MeasurementQuery struct {
 
 	measurementDataRepo  dependency.MeasurementDataRepository
 	measurementAlertRepo dependency.MeasurementAlertRepository
+	largeSensorDataRepo  dependency.LargeSensorDataRepository
 	alarmRecordRepo      dependency.AlarmRecordRepository
 	assetRepo            dependency.AssetRepository
+	bindingRepo          dependency.MeasurementDeviceBindingRepository
 }
 
 func NewMeasurementQuery() MeasurementQuery {
 	return MeasurementQuery{
 		measurementDataRepo:  repository.MeasurementData{},
 		measurementAlertRepo: repository.MeasurementAlert{},
+		largeSensorDataRepo:  repository.LargeSensorData{},
 		alarmRecordRepo:      repository.AlarmRecord{},
 		assetRepo:            repository.Asset{},
+		bindingRepo:          repository.MeasurementDeviceBinding{},
 	}
 }
 
@@ -54,12 +58,12 @@ func (query MeasurementQuery) Statistical() (*vo.MeasurementStatistic, error) {
 	date := time.Now().Format("2006-01-02")
 	begin, _ := time.Parse("2006-01-02 15:04:05", fmt.Sprintf("%s 00:00:00", date))
 	end, _ := time.Parse("2006-01-02 15:04:05", fmt.Sprintf("%s 23:59:59", date))
-	today, err := query.measurementDataRepo.Find(query.Measurement.ID, begin, end)
-	if err != nil {
-		return nil, err
-	}
 	result.Data.Total = len(total)
-	result.Data.Today = len(today)
+	for _, data := range total {
+		if data.Time.Format("2006-01-02") == date {
+			result.Data.Today = result.Data.Today + 1
+		}
+	}
 	if total, err := query.alarmRecordRepo.CountBySpecs(ctx, spec.MeasurementEqSpec(query.Measurement.ID)); err == nil {
 		result.Alert.Total = int(total)
 	}
@@ -83,18 +87,30 @@ func (query MeasurementQuery) GetData(from, to int64) ([]vo.MeasurementData, err
 	for i, d := range data {
 		result[i] = vo.NewMeasurementData(d)
 		for k, v := range d.Fields {
-			if field, ok := measurementtype.Variables[query.Measurement.Type][k]; ok {
+			if variable, err := measurementtype.GetVariable(query.Measurement.Type, k); err == nil {
 				result[i].Fields = append(result[i].Fields, vo.MeasurementField{
-					Name:      k,
-					Title:     field.Title,
-					Value:     v,
-					Unit:      field.Unit,
-					Precision: field.Precision,
-					Type:      uint(field.Type),
-					Primary:   field.Primary,
+					Variable: variable,
+					Value:    v,
 				})
 			}
 		}
+	}
+	return result, nil
+}
+
+func (query MeasurementQuery) GetRawData(from, to int64) ([]vo.MeasurementRawData, error) {
+	ctx := context.TODO()
+	binding, err := query.bindingRepo.GetBySpecs(ctx, spec.MeasurementEqSpec(query.Measurement.ID))
+	if err != nil {
+		return nil, err
+	}
+	data, err := query.largeSensorDataRepo.Find(binding.MacAddress, time.Unix(from, 0), time.Unix(to, 0))
+	if err != nil {
+		return nil, err
+	}
+	result := make([]vo.MeasurementRawData, len(data))
+	for i, d := range data {
+		result[i] = vo.NewMeasurementRawData(d)
 	}
 	return result, nil
 }

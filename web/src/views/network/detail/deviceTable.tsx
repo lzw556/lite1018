@@ -3,7 +3,6 @@ import {ColorHealth, ColorWarn} from "../../../constants/color";
 import {Device} from "../../../types/device";
 import {FC, useCallback, useEffect, useState} from "react";
 import {
-    DeleteDeviceRequest,
     DeviceUpgradeRequest, GetDeviceRequest,
     PagingDevicesRequest,
     SendDeviceCommandRequest
@@ -26,6 +25,7 @@ import UpgradeModal from "../../../views/device/upgrade";
 import _ from "lodash";
 import {PageResult} from "../../../types/page";
 import {DeviceType} from "../../../types/device_type";
+import {RemoveDevicesRequest} from "../../../apis/network";
 
 export interface DeviceTableProps {
     network: Network
@@ -86,7 +86,7 @@ const DeviceTable:FC<DeviceTableProps> = ({network}) => {
     }, [fetchDevices])
 
     const onDelete = (id: number) => {
-        DeleteDeviceRequest(id).then(_ => onRefresh())
+        RemoveDevicesRequest(network.id, {device_ids: [id]}).then()
     }
 
     const onRefresh = () => {
@@ -262,7 +262,7 @@ const DeviceTable:FC<DeviceTableProps> = ({network}) => {
                     <HasPermission value={Permission.DeviceDelete}>
                         {
                             record.id !== network.gateway.id &&
-                            <Popconfirm placement="left" title="确认要删除该设备吗?" onConfirm={() => onDelete(record.id)}
+                            <Popconfirm placement="left" title="确认要将该设备移除网络吗?" onConfirm={() => onDelete(record.id)}
                                         okText="删除" cancelText="取消">
                                 <Button type="text" size="small" icon={<DeleteOutlined/>} danger disabled={isUpgrading}/>
                             </Popconfirm>

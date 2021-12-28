@@ -18,7 +18,7 @@ const MeasurementFieldSelect:FC<MeasurementFieldSelectProps> = (props) => {
 
     useEffect(() => {
         GetMeasurementFieldsRequest(measurement.type).then(data => {
-            setFields(data)
+            setFields(data.sort((a, b) => a.sort - b.sort))
         })
     },[measurement])
 

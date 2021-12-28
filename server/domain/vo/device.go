@@ -76,6 +76,6 @@ func (d *Device) SetBinding(e po.MeasurementDeviceBinding) {
 	d.Binding = e.MeasurementID
 }
 
-func (d *Device) SetData(e po.DeviceData) {
+func (d *Device) SetData(e entity.SensorData) {
 	d.Data = NewDeviceData(e)
 }

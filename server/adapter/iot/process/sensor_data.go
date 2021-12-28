@@ -8,7 +8,6 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
-	"github.com/thetasensors/theta-cloud-lite/server/domain/po"
 	"sync"
 	"time"
 )
@@ -17,13 +16,15 @@ var mu sync.RWMutex
 
 type SensorData struct {
 	deviceRepo     dependency.DeviceRepository
-	deviceDataRepo dependency.DeviceDataRepository
+	sensorDataRepo dependency.SensorDataRepository
+	processor      Processor
 }
 
 func NewSensorData() Processor {
 	return newRoot(SensorData{
 		deviceRepo:     repository.Device{},
-		deviceDataRepo: repository.DeviceData{},
+		sensorDataRepo: repository.SensorData{},
+		processor:      NewMeasurementData(),
 	})
 }
 
@@ -32,7 +33,7 @@ func (p SensorData) Name() string {
 }
 
 func (p SensorData) Next() Processor {
-	return nil
+	return p.processor
 }
 
 func (p SensorData) Process(ctx *iot.Context, msg iot.Message) error {
@@ -42,7 +43,7 @@ func (p SensorData) Process(ctx *iot.Context, msg iot.Message) error {
 	}
 	if value, ok := ctx.Get(msg.Body.Device); ok {
 		if device, ok := value.(entity.Device); ok {
-			e := po.DeviceData{
+			e := entity.SensorData{
 				Time:       time.Unix(int64(m.Timestamp), int64(m.Usec*1000)),
 				MacAddress: device.MacAddress,
 				SensorType: uint(m.SensorId),
@@ -50,7 +51,7 @@ func (p SensorData) Process(ctx *iot.Context, msg iot.Message) error {
 			}
 			mu.Lock()
 			defer mu.Unlock()
-			if err := p.deviceDataRepo.Create(e); err != nil {
+			if err := p.sensorDataRepo.Create(e); err != nil {
 				return fmt.Errorf("save device %s data failed: %v", device.MacAddress, err)
 			}
 		}

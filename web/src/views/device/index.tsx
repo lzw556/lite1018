@@ -188,9 +188,6 @@ const DevicePage = () => {
             onEdit(record.id, e.key)
         }} disabled={isUpgrading}>
             {
-                hasPermission(Permission.DeviceReplace) && <Menu.Item key={0}>替换设备</Menu.Item>
-            }
-            {
                 hasPermission(Permission.DeviceEdit) && <Menu.Item key={1}>编辑设备信息</Menu.Item>
             }
             {

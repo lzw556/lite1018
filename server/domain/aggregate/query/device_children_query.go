@@ -13,13 +13,13 @@ type DeviceChildrenQuery struct {
 	entity.Devices
 
 	propertyRepo   dependency.PropertyRepository
-	deviceDataRepo dependency.DeviceDataRepository
+	deviceDataRepo dependency.SensorDataRepository
 }
 
 func NewDeviceChildrenQuery() DeviceChildrenQuery {
 	return DeviceChildrenQuery{
 		propertyRepo:   repository.Property{},
-		deviceDataRepo: repository.DeviceData{},
+		deviceDataRepo: repository.SensorData{},
 	}
 }
 

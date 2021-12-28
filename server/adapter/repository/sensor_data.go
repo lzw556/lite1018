@@ -2,17 +2,17 @@ package repository
 
 import (
 	"bytes"
-	"github.com/thetasensors/theta-cloud-lite/server/domain/po"
+	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/json"
 	"go.etcd.io/bbolt"
 	"time"
 )
 
-type DeviceData struct {
+type SensorData struct {
 	repository
 }
 
-func (repo DeviceData) Create(e po.DeviceData) error {
+func (repo SensorData) Create(e entity.SensorData) error {
 	return repo.BoltDB().Update(func(tx *bbolt.Tx) error {
 		bucket, err := tx.CreateBucketIfNotExists([]byte(e.BucketName()))
 		if err != nil {
@@ -30,17 +30,17 @@ func (repo DeviceData) Create(e po.DeviceData) error {
 	})
 }
 
-func (repo DeviceData) Find(mac string, from, to time.Time) ([]po.DeviceData, error) {
-	var es []po.DeviceData
+func (repo SensorData) Find(mac string, from, to time.Time) ([]entity.SensorData, error) {
+	var es []entity.SensorData
 	err := repo.BoltDB().View(func(tx *bbolt.Tx) error {
-		bucket := tx.Bucket([]byte(po.DeviceData{}.BucketName()))
+		bucket := tx.Bucket([]byte(entity.SensorData{}.BucketName()))
 		if bucket != nil {
 			if dataBucket := bucket.Bucket([]byte(mac)); dataBucket != nil {
 				c := dataBucket.Cursor()
 				min := []byte(from.Format("2006-01-02T15:04:05Z"))
 				max := []byte(to.Format("2006-01-02T15:04:05Z"))
 				for k, v := c.Seek(min); k != nil && bytes.Compare(k, max) <= 0; k, v = c.Next() {
-					var e po.DeviceData
+					var e entity.SensorData
 					if err := json.Unmarshal(v, &e); err != nil {
 						return err
 					}
@@ -53,10 +53,10 @@ func (repo DeviceData) Find(mac string, from, to time.Time) ([]po.DeviceData, er
 	return es, err
 }
 
-func (repo DeviceData) Get(mac string, time time.Time) (po.DeviceData, error) {
-	var e po.DeviceData
+func (repo SensorData) Get(mac string, time time.Time) (entity.SensorData, error) {
+	var e entity.SensorData
 	err := repo.BoltDB().View(func(tx *bbolt.Tx) error {
-		bucket := tx.Bucket([]byte(po.DeviceData{}.BucketName()))
+		bucket := tx.Bucket([]byte(entity.SensorData{}.BucketName()))
 		if bucket != nil {
 			if dataBucket := bucket.Bucket([]byte(mac)); dataBucket != nil {
 				c := dataBucket.Cursor()
@@ -77,15 +77,15 @@ func (repo DeviceData) Get(mac string, time time.Time) (po.DeviceData, error) {
 	return e, err
 }
 
-func (repo DeviceData) Top(mac string, limit int) ([]po.DeviceData, error) {
-	var es []po.DeviceData
+func (repo SensorData) Top(mac string, limit int) ([]entity.SensorData, error) {
+	var es []entity.SensorData
 	err := repo.BoltDB().View(func(tx *bbolt.Tx) error {
-		bucket := tx.Bucket([]byte(po.DeviceData{}.BucketName()))
+		bucket := tx.Bucket([]byte(entity.SensorData{}.BucketName()))
 		if bucket != nil {
 			if dataBucket := bucket.Bucket([]byte(mac)); dataBucket != nil {
 				c := dataBucket.Cursor()
 				for k, v := c.Last(); k != nil && len(es) < limit; k, v = c.Prev() {
-					var e po.DeviceData
+					var e entity.SensorData
 					if err := json.Unmarshal(v, &e); err != nil {
 						return err
 					}
@@ -98,8 +98,8 @@ func (repo DeviceData) Top(mac string, limit int) ([]po.DeviceData, error) {
 	return es, err
 }
 
-func (repo DeviceData) Last(mac string) (po.DeviceData, error) {
-	var e po.DeviceData
+func (repo SensorData) Last(mac string) (entity.SensorData, error) {
+	var e entity.SensorData
 	err := repo.BoltDB().View(func(tx *bbolt.Tx) error {
 		bucket := tx.Bucket([]byte(e.BucketName()))
 		if bucket != nil {
@@ -118,9 +118,9 @@ func (repo DeviceData) Last(mac string) (po.DeviceData, error) {
 	return e, err
 }
 
-func (repo DeviceData) Delete(mac string, from, to time.Time) error {
+func (repo SensorData) Delete(mac string, from, to time.Time) error {
 	err := repo.BoltDB().Update(func(tx *bbolt.Tx) error {
-		bucket := tx.Bucket([]byte(po.DeviceData{}.BucketName()))
+		bucket := tx.Bucket([]byte(entity.SensorData{}.BucketName()))
 		if bucket != nil {
 			if dataBucket := bucket.Bucket([]byte(mac)); dataBucket != nil {
 				c := dataBucket.Cursor()
