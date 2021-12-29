@@ -58,7 +58,7 @@ func (n *NetworkExportFile) AddDevices(es []entity.Device) {
 			ID:      uint(i),
 			Name:    e.Name,
 			Address: e.MacAddress,
-			Type:    e.TypeID,
+			Type:    e.Type,
 		}
 		bytes, err := json.Marshal(DeviceSetting{
 			IPN:     e.IPN,

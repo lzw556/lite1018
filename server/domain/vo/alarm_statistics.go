@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-type AlarmStatistics struct {
+type AlarmRecordStatistics struct {
 	Time      []int64 `json:"time"`
 	Info      []uint  `json:"info"`
 	Warn      []uint  `json:"warn"`
@@ -16,8 +16,8 @@ type AlarmStatistics struct {
 	Recovered []uint  `json:"recovered"`
 }
 
-func NewAlarmStatistics() AlarmStatistics {
-	return AlarmStatistics{
+func NewAlarmRecordStatistics() AlarmRecordStatistics {
+	return AlarmRecordStatistics{
 		Time:      make([]int64, 0),
 		Info:      make([]uint, 0),
 		Warn:      make([]uint, 0),
@@ -28,7 +28,7 @@ func NewAlarmStatistics() AlarmStatistics {
 	}
 }
 
-func (a *AlarmStatistics) AddTime(t time.Time) {
+func (a *AlarmRecordStatistics) AddTime(t time.Time) {
 	a.Time = append(a.Time, t.Unix())
 	a.Info = append(a.Info, 0)
 	a.Warn = append(a.Warn, 0)
@@ -38,7 +38,7 @@ func (a *AlarmStatistics) AddTime(t time.Time) {
 	a.Recovered = append(a.Recovered, 0)
 }
 
-func (a *AlarmStatistics) Statistical(index int, records []entity.AlarmRecord) {
+func (a *AlarmRecordStatistics) Statistical(index int, records []entity.AlarmRecord) {
 	for _, record := range records {
 		switch record.Level {
 		case 1:

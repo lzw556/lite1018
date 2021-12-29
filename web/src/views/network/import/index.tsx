@@ -2,7 +2,6 @@ import {Button, Card, Col, Divider, Form, message, Result, Row, Space, Upload} f
 import {Content} from "antd/lib/layout/layout";
 import {useEffect, useState} from "react";
 import {Canvas, Edge, Node, NodeProps, Remove} from "reaflow";
-import "../graph/graph.css"
 import {ImportOutlined, InboxOutlined} from "@ant-design/icons";
 import {DeviceType} from "../../../types/device_type";
 import {ImportNetworkRequest} from "../../../apis/network";

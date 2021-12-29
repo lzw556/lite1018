@@ -23,15 +23,16 @@ func (r *deviceRouter) initRoutes() {
 		router.NewPostRoute("devices/:id/upgrade", r.upgrade),
 
 		// GET
-		router.NewGetRoute("devices/statistics", r.statistic),
-		router.NewGetRoute("devices/groupBy/asset", r.findGroupByAsset),
-		router.NewGetRoute("devices", r.paging),
+		router.NewGetRoute("devices/statistics", r.statistical),
+		router.NewGetRoute("devices", r.find),
 		router.NewGetRoute("devices/:id", r.getByID),
 		router.NewGetRoute("devices/:id/children", r.getChildren),
 		router.NewGetRoute("devices/:id/settings", r.getSettingByID),
 		router.NewGetRoute("devices/:id/data", r.findDataByID),
 		router.NewGetRoute("devices/:id/download/data", r.downloadDataByID),
 		router.NewGetRoute("check/devices/:mac", r.checkMacAddress),
+
+		router.NewGetRoute("deviceTypes/:id/parameters", r.getDeviceTypeParameters),
 
 		// PUT
 		router.NewPutRoute("devices/:id", r.updateByID),

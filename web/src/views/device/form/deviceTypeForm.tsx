@@ -5,7 +5,7 @@ import {DEFAULT_DEVICE_SETTING_IPN, DEFAULT_WSN_SETTING} from "../../../types/de
 import IpnFormItem from "./item/ipnFormItem";
 import WsnFormItem from "./item/wsnFormItem";
 import {useEffect} from "react";
-import DeviceTypeSelect from "../../../components/deviceTypeSelect";
+import DeviceTypeSelect from "../../../components/select/deviceTypeSelect";
 import {defaultValidateMessages, Rules} from "../../../constants/validator";
 
 const DeviceTypeForm = (props: any) => {
@@ -43,7 +43,7 @@ const DeviceTypeForm = (props: any) => {
 
     return <Form form={form} labelCol={{span: 8}} validateMessages={defaultValidateMessages}>
         <Form.Item label={"设备类型"} name="typeId" rules={[Rules.required]}>
-            <DeviceTypeSelect sensor={false} placeholder={"请选择设备类型"} onChange={(value:DeviceType) => {
+            <DeviceTypeSelect placeholder={"请选择设备类型"} onChange={(value:DeviceType) => {
                 onChange(value)
             }}/>
         </Form.Item>

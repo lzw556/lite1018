@@ -18,31 +18,32 @@ func NewRouter(s Service) router.Router {
 func (r *alarmRouter) initRoutes() {
 	r.routes = []router.Route{
 		// POST
-		router.NewPostRoute("alarmRuleTemplates", r.createAlarmRuleTemplate),
-		router.NewPostRoute("alarmRules", r.createAlarmRule),
+		router.NewPostRoute("alarmTemplates", r.createTemplate),
+		router.NewPostRoute("alarms", r.create),
 
 		// GET
-		router.NewGetRoute("alarmRuleTemplates", r.pagingAlarmRuleTemplates),
-		router.NewGetRoute("alarmRuleTemplates/:id", r.getAlarmRuleTemplate),
-		router.NewGetRoute("alarmRules", r.pagingAlarmRules),
-		router.NewGetRoute("alarmRules/:id", r.getAlarmRules),
-		router.NewGetRoute("alarmRecords", r.pagingAlarmRecords),
-		router.NewGetRoute("alarmRecords/:id", r.getAlarmRecord),
-		router.NewGetRoute("alarmStatistics", r.alarmStatistics),
+		router.NewGetRoute("alarmTemplates", r.pagingTemplates),
+		router.NewGetRoute("alarmTemplates/:id", r.getTemplate),
+		router.NewGetRoute("alarms", r.find),
+		router.NewGetRoute("alarms/:id", r.get),
+		router.NewGetRoute("alarmRecords", r.pagingRecords),
+		router.NewGetRoute("alarmRecords/:id", r.getRecord),
+		router.NewGetRoute("alarmRecords/:id/acknowledge", r.getRecordAcknowledge),
+		router.NewGetRoute("alarmRecords/statistics", r.alarmRecordStatistical),
 
-		router.NewGetRoute("check/alarmRules/:name", r.checkAlarmRule),
+		router.NewGetRoute("check/alarms/:name", r.checkAlarm),
 
 		// PUT
-		router.NewPutRoute("alarmRuleTemplates/:id", r.updateAlarmRuleTemplate),
-		router.NewPutRoute("alarmRules/:id", r.updateAlarmRule),
+		router.NewPutRoute("alarmTemplates/:id", r.updateTemplate),
+		router.NewPutRoute("alarms/:id", r.update),
 
 		// PATCH
-		router.NewPatchRoute("alarmRecords/:id/acknowledge", r.acknowledgeAlarmRecord),
+		router.NewPatchRoute("alarmRecords/:id/acknowledge", r.acknowledgeRecord),
 
 		// DELETE
-		router.NewDeleteRoute("alarmRuleTemplates/:id", r.removeAlarmRuleTemplate),
-		router.NewDeleteRoute("alarmRules/:id", r.removeAlarmRule),
-		router.NewDeleteRoute("alarmRecords/:id", r.removeAlarmRecord),
+		router.NewDeleteRoute("alarmTemplates/:id", r.removeTemplate),
+		router.NewDeleteRoute("alarms/:id", r.remove),
+		router.NewDeleteRoute("alarmRecords/:id", r.removeRecord),
 	}
 }
 

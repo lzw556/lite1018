@@ -1,13 +1,13 @@
 import {Device} from "../../../../types/device";
 import {FC, useEffect, useState} from "react";
 import {Button, Card, Col, DatePicker, Empty, Row, Select, Space} from "antd";
-import {DeviceType, GetSensors} from "../../../../types/device_type";
+import {DeviceType} from "../../../../types/device_type";
 import {GetChildrenRequest, GetDeviceDataRequest} from "../../../../apis/device";
 import moment from "moment";
 import {DefaultMonitorDataOption, LineChartStyles} from "../../../../constants/chart";
 import ReactECharts from "echarts-for-react";
 import {ColorDanger} from "../../../../constants/color";
-import {AlarmRule} from "../../../../types/alarm_rule";
+import {Alarm} from "../../../../types/alarm_rule";
 import Label from "../../../../components/label";
 import {ReloadOutlined} from "@ant-design/icons";
 import {GetFieldName} from "../../../../constants/field";
@@ -30,7 +30,7 @@ const MonitorPage: FC<MonitorPageProps> = ({device}) => {
         if (device) {
             if (device.typeId === DeviceType.Gateway || device.typeId === DeviceType.Router) {
                 GetChildrenRequest(device.id).then(data => {
-                    const result = data.filter(item => GetSensors().includes(item.typeId))
+                    const result = data.filter(item => DeviceType.Sensors().includes(item.typeId))
                     setDevices(result)
                     if (result.length > 0) {
                         fetchDeviceData(result[0].id)
@@ -42,7 +42,7 @@ const MonitorPage: FC<MonitorPageProps> = ({device}) => {
         }
     }, [device, startDate, endDate])
 
-    const convertMarkLine = (alarms: AlarmRule[], unit: string) => {
+    const convertMarkLine = (alarms: Alarm[], unit: string) => {
         if (alarms) {
             const data = alarms.filter(item => item.level === 3).map(item => {
                 return {

@@ -13,13 +13,13 @@ type DeviceChildrenQuery struct {
 	entity.Devices
 
 	propertyRepo   dependency.PropertyRepository
-	deviceDataRepo dependency.DeviceDataRepository
+	deviceDataRepo dependency.SensorDataRepository
 }
 
 func NewDeviceChildrenQuery() DeviceChildrenQuery {
 	return DeviceChildrenQuery{
 		propertyRepo:   repository.Property{},
-		deviceDataRepo: repository.DeviceData{},
+		deviceDataRepo: repository.SensorData{},
 	}
 }
 
@@ -29,14 +29,14 @@ func (query DeviceChildrenQuery) Query() ([]vo.Device, error) {
 	propertiesMap := map[uint][]po.Property{}
 	for i, device := range query.Devices {
 		result[i] = vo.NewDevice(device)
-		if _, ok := propertiesMap[device.TypeID]; !ok {
-			properties, err := query.propertyRepo.FindByDeviceTypeID(ctx, device.TypeID)
+		if _, ok := propertiesMap[device.Type]; !ok {
+			properties, err := query.propertyRepo.FindByDeviceTypeID(ctx, device.Type)
 			if err != nil {
 				return nil, err
 			}
-			propertiesMap[device.TypeID] = properties
+			propertiesMap[device.Type] = properties
 		}
-		result[i].SetProperties(propertiesMap[device.TypeID])
+		result[i].SetProperties(propertiesMap[device.Type])
 	}
 	return result, nil
 }

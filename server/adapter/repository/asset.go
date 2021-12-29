@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/po"
+	spec "github.com/thetasensors/theta-cloud-lite/server/domain/specification"
 )
 
 type Asset struct {
@@ -44,4 +45,10 @@ func (repo Asset) Save(ctx context.Context, e *po.Asset) error {
 
 func (repo Asset) Delete(ctx context.Context, id uint) error {
 	return repo.DB(ctx).Delete(&po.Asset{}, id).Error
+}
+
+func (repo Asset) FindBySpecs(ctx context.Context, specs ...spec.Specification) ([]po.Asset, error) {
+	var es []po.Asset
+	err := repo.DB(ctx).Scopes(spec.Scopes(specs)...).Find(&es).Error
+	return es, err
 }

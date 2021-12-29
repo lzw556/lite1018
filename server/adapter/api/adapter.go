@@ -45,6 +45,7 @@ func (a *Adapter) Run() error {
 	a.engine.Use(cors.New(cors.Config{
 		AllowAllOrigins: true,
 	}))
+	a.engine.Static("/res", "/resources")
 	group := a.engine.Group("api")
 	for _, m := range a.middlewares {
 		group.Use(m.WrapHandler())
@@ -76,7 +77,7 @@ func (a *Adapter) errorWrapper(handler middleware.ErrorWrapperHandler) gin.Handl
 				return
 			}
 			switch data := data.(type) {
-			case *vo.NetworkExportFile, *vo.PropertyDataFile:
+			case *vo.NetworkExportFile, *vo.PropertyDataFile, *vo.ImageFile:
 				if writer, ok := data.(response.FileWriter); ok {
 					response.WriteFile(ctx, writer)
 					return

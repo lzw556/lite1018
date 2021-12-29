@@ -61,3 +61,11 @@ func (d Device) GetUpgradeState() DeviceUpgradeState {
 }
 
 type Devices []Device
+
+func (ds Devices) PersistentObject() []po.Device {
+	pos := make([]po.Device, len(ds))
+	for i, device := range ds {
+		pos[i] = device.Device
+	}
+	return pos
+}

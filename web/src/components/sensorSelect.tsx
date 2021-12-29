@@ -2,7 +2,7 @@ import {Select, SelectProps} from "antd";
 import {FC, useState} from "react";
 import {CaretDownOutlined} from "@ant-design/icons";
 import {Device} from "../types/device";
-import {PagingDevicesRequest} from "../apis/device";
+import {GetDevicesRequest} from "../apis/device";
 
 export interface SensorSelectProps extends SelectProps<any> {
     assetId: number
@@ -17,8 +17,8 @@ const SensorSelect: FC<SensorSelectProps> = (props) => {
 
     const onLoadDevices = (open: any) => {
         if (open) {
-            PagingDevicesRequest(assetId, 1, 100, {}).then(data => {
-                setDevices(data.result.filter(item => item.category === 3))
+            GetDevicesRequest({asset_id: assetId}).then(data => {
+                setDevices(data.filter(item => item.category === 3))
             })
         }
     }

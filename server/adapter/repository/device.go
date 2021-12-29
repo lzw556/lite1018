@@ -30,6 +30,10 @@ func (repo Device) Save(ctx context.Context, e *po.Device) error {
 	return repo.DB(ctx).Save(e).Error
 }
 
+func (repo Device) BatchSave(ctx context.Context, es []po.Device) error {
+	return repo.DB(ctx).Save(&es).Error
+}
+
 func (repo Device) UpdatesBySpecs(ctx context.Context, updates map[string]interface{}, specs ...specification.Specification) error {
 	return repo.DB(ctx).Model(&po.Device{}).Scopes(specification.Scopes(specs)...).Updates(updates).Error
 }
@@ -65,7 +69,7 @@ func (repo Device) PagingBySpecs(ctx context.Context, page, size int, specs ...s
 	return es, total, err
 }
 
-func (repo Device) FindBySpecs(ctx context.Context, specs ...specification.Specification) ([]entity.Device, error) {
+func (repo Device) FindBySpecs(ctx context.Context, specs ...specification.Specification) (entity.Devices, error) {
 	var es []entity.Device
 	err := repo.DB(ctx).Scopes(specification.Scopes(specs)...).Find(&es).Error
 	return es, err

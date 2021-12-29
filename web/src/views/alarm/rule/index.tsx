@@ -1,72 +1,146 @@
-import {Button, Col, Row, Space} from "antd";
-import {PlusOutlined} from "@ant-design/icons";
-import {Content} from "antd/lib/layout/layout";
-import {useState} from "react";
-import {useLocation} from "react-router-dom";
-import RulesPage from "./list";
-import RuleTemplatesPage from "./template";
-import ShadowCard from "../../../components/shadowCard";
-import MyBreadcrumb from "../../../components/myBreadcrumb";
+import TableLayout from "../../layout/TableLayout";
+import {useCallback, useEffect, useState} from "react";
+import {GetAlarmRequest, PagingAlarmsRequest, RemoveAlarmRuleRequest} from "../../../apis/alarm";
+import {Button, Col, Divider, Popconfirm, Row, Select, Space} from "antd";
+import Label from "../../../components/label";
+import EditModal from "./modal/editModal";
+import {Alarm} from "../../../types/alarm_rule";
+import AssetSelect from "../../../components/assetSelect";
 import HasPermission from "../../../permission";
 import {Permission} from "../../../permission/permission";
-import {GetParamValue} from "../../../utils/path";
+import {PageResult} from "../../../types/page";
+import {Measurement} from "../../../types/measurement";
+import {MeasurementType} from "../../../types/measurement_type";
 
 
-const tabList = [
-    {
-        key: "rules",
-        tab: "规则列表",
-    },
-    {
-        key: "templates",
-        tab: "规则模板",
-    }
-]
+const {Option} = Select
 
-const contents = new Map<string, any>([
-    ["rules", <RulesPage/>],
-    ["templates", <RuleTemplatesPage/>]
-])
+const AlarmRule = () => {
+    const [asset, setAsset] = useState<number>(0)
+    const [measurement, setMeasurement] = useState<number>(0)
+    const [alarm, setAlarm] = useState<Alarm>()
+    const [editVisible, setEditVisible] = useState<boolean>(false)
+    const [dataSource, setDataSource] = useState<PageResult<any[]>>()
 
-const AlarmRulePage = () => {
-    const location = useLocation<any>()
-    const tab = GetParamValue(location.search, "tab")
-    const [currentKey, setCurrentKey] = useState<string>(tab ? tab : "rules")
-
-    const renderAddButton = () => {
-        if (currentKey === "rules") {
-            return <HasPermission value={Permission.AlarmRuleAdd}>
-                <Button href="#/alarm-management?locale=alarmRules/addAlarmRule" type="primary">
-                    创建规则 <PlusOutlined/>
-                </Button>
-            </HasPermission>
-        } else if (currentKey === "templates") {
-            return <HasPermission value={Permission.AlarmRuleTemplateAdd}>
-                <Button href="#/alarm-management?locale=alarmRules/addAlarmRuleTemplate" type="primary">
-                    创建规则模板 <PlusOutlined/>
-                </Button>
-            </HasPermission>
-        }
+    const onAssetChanged = (value: any) => {
+        setAsset(value)
     }
 
-    return <Content>
-        <MyBreadcrumb>
-            <Space>
-                {
-                    renderAddButton()
+    const onEdit = (id: number) => {
+        GetAlarmRequest(id).then(data => {
+            setAlarm(data)
+            setEditVisible(true)
+        })
+    }
+
+    const onDelete = (id: number) => {
+        RemoveAlarmRuleRequest(id).then()
+    }
+
+    const columns:any = [
+        {
+            title: '规则名称',
+            dataIndex: 'name',
+            key: 'name'
+        },
+        {
+            title: '监测点名称',
+            dataIndex: 'measurement',
+            key: 'measurement',
+            render: (measurement:Measurement) => {
+                return measurement.name
+            }
+        },
+        {
+            title: '监测点类型',
+            dataIndex: 'measurement',
+            key: 'measurement',
+            render: (measurement:Measurement) => {
+                return MeasurementType.toString(measurement.type)
+            }
+        },
+        {
+            title: '启停状态',
+            dataIndex: 'enabled',
+            key: 'enabled',
+            render: (text: any, record: any) => {
+                if (record.enabled) {
+                    return "启用"
                 }
-            </Space>
-        </MyBreadcrumb>
-        <Row justify="center">
-            <Col span={24}>
-                <ShadowCard tabList={tabList} activeTabKey={currentKey} size={"small"} onTabChange={key => {
-                    setCurrentKey(key)
-                }}>
-                    {contents.get(currentKey)}
-                </ShadowCard>
+                return "停用"
+            }
+        },
+        {
+            title: '操作',
+            key: 'action',
+            width: 200,
+            render: (_: any, record: any) => {
+                return <>
+                    <HasPermission value={Permission.AlarmRuleEdit}>
+                        <Button type={"link"} size={"small"} onClick={() => {
+                            onEdit(record.id)
+                        }}>修改阈值</Button>
+                    </HasPermission>
+                    <HasPermission value={Permission.AlarmRuleDelete}>
+                        <Divider type={"vertical"}/>
+                        <Popconfirm placement="left" title="确认要删除该规则吗?" onConfirm={() => onDelete(record.id)}
+                                    okText="删除" cancelText="取消">
+                            <Button type="text" size="small" danger>删除</Button>
+                        </Popconfirm>
+                    </HasPermission>
+                </>
+            }
+        }
+    ]
+
+    useEffect(() => {
+        fetchAlarms(1, 10)
+    }, [])
+
+    const fetchAlarms = useCallback((current: number, size: number) => {
+        const filter:any = {}
+        if (asset) {
+            filter.asset_id = asset
+        }
+        if (measurement) {
+            filter.measurement_id = measurement
+        }
+        PagingAlarmsRequest(filter, current, size).then(setDataSource)
+    }, [asset, measurement])
+
+    return <div>
+        <Row justify={"start"}>
+            <Col span={12}>
+                <Space>
+                    <Label name={"资产"}>
+                        <AssetSelect bordered={false} style={{width: "150px"}} defaultValue={asset}
+                                     defaultActiveFirstOption={true}
+                                     placeholder={"请选择资产"}
+                                     onChange={onAssetChanged}>
+                            <Option key={0} value={0}>所有资产</Option>
+                        </AssetSelect>
+                    </Label>
+                </Space>
             </Col>
         </Row>
-    </Content>
+        <br/>
+        <Row justify={"start"}>
+            <Col span={24}>
+                <TableLayout emptyText={"报警规则列表为空"}
+                             columns={columns}
+                             permissions={[Permission.AlarmRuleEdit,Permission.AlarmRuleDelete]}
+                             dataSource={dataSource}
+                             onPageChange={fetchAlarms}/>
+            </Col>
+        </Row>
+        {
+            alarm && <EditModal alarm={alarm} visible={editVisible} onSuccess={() => {
+                setEditVisible(false)
+            }} onCancel={() => {
+                setEditVisible(false)
+            }}/>
+        }
+    </div>
 }
 
-export default AlarmRulePage
+export default AlarmRule

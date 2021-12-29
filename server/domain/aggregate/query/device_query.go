@@ -19,33 +19,33 @@ type DeviceQuery struct {
 
 	deviceRepo            dependency.DeviceRepository
 	deviceStatusRepo      dependency.DeviceStatusRepository
-	deviceDataRepo        dependency.DeviceDataRepository
+	deviceDataRepo        dependency.SensorDataRepository
 	deviceInformationRepo dependency.DeviceInformationRepository
-	assetRepo             dependency.AssetRepository
+	networkRepo           dependency.NetworkRepository
 	propertyRepo          dependency.PropertyRepository
-	alarmRuleRepo         dependency.AlarmRuleRepository
+	alarmRuleRepo         dependency.AlarmRepository
+	bindingRepo           dependency.MeasurementDeviceBindingRepository
 }
 
 func NewDeviceQuery() DeviceQuery {
 	return DeviceQuery{
 		deviceRepo:            repository.Device{},
 		deviceStatusRepo:      repository.DeviceStatus{},
-		deviceDataRepo:        repository.DeviceData{},
+		deviceDataRepo:        repository.SensorData{},
 		deviceInformationRepo: repository.DeviceInformation{},
-		assetRepo:             repository.Asset{},
+		networkRepo:           repository.Network{},
 		propertyRepo:          repository.Property{},
-		alarmRuleRepo:         repository.AlarmRule{},
+		bindingRepo:           repository.MeasurementDeviceBinding{},
 	}
 }
 
 func (query DeviceQuery) Detail() (*vo.Device, error) {
 	ctx := context.TODO()
-	asset, err := query.assetRepo.Get(ctx, query.Device.AssetID)
-	if err != nil {
-		return nil, err
-	}
 	result := vo.NewDevice(query.Device)
-	result.SetAsset(asset)
+	if network, err := query.networkRepo.Get(ctx, query.Network.ID); err == nil {
+		result.SetNetwork(network)
+	}
+	var err error
 	result.State.DeviceStatus, err = query.deviceStatusRepo.Get(query.Device.ID)
 	if err != nil {
 		xlog.Errorf("get device [%s] status failed:%v", query.Device.MacAddress, err)
@@ -57,8 +57,11 @@ func (query DeviceQuery) Detail() (*vo.Device, error) {
 	if query.Network.ID != 0 {
 		result.SetWSN(query.Network)
 	}
-	if properties, err := query.propertyRepo.FindByDeviceTypeID(ctx, query.Device.TypeID); err == nil {
+	if properties, err := query.propertyRepo.FindByDeviceTypeID(ctx, query.Device.Type); err == nil {
 		result.SetProperties(properties)
+	}
+	if binding, err := query.bindingRepo.GetBySpecs(ctx, spec.DeviceMacEqSpec(query.Device.MacAddress)); err == nil {
+		result.SetBinding(binding)
 	}
 	return &result, nil
 }
@@ -76,14 +79,14 @@ func (query DeviceQuery) PropertyDataByRange(pid uint, from, to time.Time) (vo.P
 	if err != nil {
 		return vo.PropertyData{}, err
 	}
-	data, err := query.deviceDataRepo.Find(query.Device.ID, from, to)
+	data, err := query.deviceDataRepo.Find(query.Device.MacAddress, from, to)
 	if err != nil {
 		return vo.PropertyData{}, err
 	}
 	return query.getPropertyData(property, data), nil
 }
 
-func (query DeviceQuery) getPropertyData(property po.Property, data []po.DeviceData) vo.PropertyData {
+func (query DeviceQuery) getPropertyData(property po.Property, data []entity.SensorData) vo.PropertyData {
 	result := vo.NewPropertyData(property)
 	for k := range property.Fields {
 		result.Fields[k] = make([]float32, len(data))
@@ -103,8 +106,8 @@ func (query DeviceQuery) getPropertyData(property po.Property, data []po.DeviceD
 	return result
 }
 
-func (query DeviceQuery) calculateCorrosionRate(current po.DeviceData, idx uint, t time.Time) float32 {
-	monthAgo, err := query.deviceDataRepo.Get(query.Device.ID, t.AddDate(0, -1, 0))
+func (query DeviceQuery) calculateCorrosionRate(current entity.SensorData, idx uint, t time.Time) float32 {
+	monthAgo, err := query.deviceDataRepo.Get(query.Device.MacAddress, t.AddDate(0, -1, 0))
 	if err != nil {
 		return 0
 	}
@@ -116,22 +119,17 @@ func (query DeviceQuery) calculateCorrosionRate(current po.DeviceData, idx uint,
 
 func (query DeviceQuery) DataByRange(from, to time.Time) ([]vo.PropertyData, error) {
 	ctx := context.TODO()
-	properties, err := query.propertyRepo.FindByDeviceTypeID(ctx, query.Device.TypeID)
+	properties, err := query.propertyRepo.FindByDeviceTypeID(ctx, query.Device.Type)
 	if err != nil {
 		return nil, err
 	}
-	data, err := query.deviceDataRepo.Find(query.Device.ID, from, to)
+	data, err := query.deviceDataRepo.Find(query.Device.MacAddress, from, to)
 	if err != nil {
 		return nil, err
 	}
 	result := make([]vo.PropertyData, len(properties))
 	for i, property := range properties {
 		result[i] = query.getPropertyData(property, data)
-		alarmRules, err := query.alarmRuleRepo.FindBySpecs(ctx, spec.PropertyEqSpec(property.ID))
-		if err != nil {
-			return nil, err
-		}
-		result[i].AddAlarms(alarmRules...)
 	}
 	return result, nil
 }

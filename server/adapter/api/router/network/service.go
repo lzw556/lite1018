@@ -7,8 +7,9 @@ import (
 
 type Service interface {
 	GetNetwork(networkID uint) (*vo.Network, error)
-	FindNetworks(assetID uint) ([]vo.Network, error)
-	CreateNetwork(req request.ImportNetwork) error
+	FindNetworksByPaginate(filters request.Filters, page, size int) ([]vo.Network, int64, error)
+	ImportNetwork(req request.ImportNetwork) error
+	CreateNetwork(req request.CreateNetwork) error
 
 	UpdateNetwork(networkID uint, req request.Network) (*vo.Network, error)
 	RemoveNetwork(networkID uint) error

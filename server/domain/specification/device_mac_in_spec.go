@@ -12,9 +12,6 @@ func (s DeviceMacInSpec) IsSpecifiedBy(v interface{}) bool {
 
 func (s DeviceMacInSpec) Scope() func(db *gorm.DB) *gorm.DB {
 	return func(db *gorm.DB) *gorm.DB {
-		if len(s) > 0 {
-			return db.Where("mac_address IN ?", s)
-		}
-		return db
+		return db.Where("mac_address IN ?", s)
 	}
 }

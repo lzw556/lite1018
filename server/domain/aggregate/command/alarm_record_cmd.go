@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/request"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/response"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
@@ -14,20 +15,18 @@ import (
 type AlarmRecordCmd struct {
 	entity.AlarmRecord
 
-	repository           dependency.AlarmRecordRepository
-	acknowledgeRepo      dependency.AlarmRecordAcknowledgeRepository
-	deviceAlertStateRepo dependency.DeviceAlertStateRepository
+	repository      dependency.AlarmRecordRepository
+	acknowledgeRepo dependency.AlarmRecordAcknowledgeRepository
 }
 
 func NewAlarmRecordCmd() AlarmRecordCmd {
 	return AlarmRecordCmd{
-		repository:           repository.AlarmRecord{},
-		acknowledgeRepo:      repository.AlarmRecordAcknowledge{},
-		deviceAlertStateRepo: repository.DeviceAlertState{},
+		repository:      repository.AlarmRecord{},
+		acknowledgeRepo: repository.AlarmRecordAcknowledge{},
 	}
 }
 
-func (cmd AlarmRecordCmd) AcknowledgeBy(userID uint) error {
+func (cmd AlarmRecordCmd) AcknowledgeBy(req request.AcknowledgeAlarmRecord) error {
 	if !cmd.AlarmRecord.Acknowledged {
 		cmd.AlarmRecord.Acknowledge()
 		return transaction.Execute(context.TODO(), func(txCtx context.Context) error {
@@ -36,17 +35,13 @@ func (cmd AlarmRecordCmd) AcknowledgeBy(userID uint) error {
 			}
 			e := po.AlarmRecordAcknowledge{
 				AlarmRecordID: cmd.AlarmRecord.ID,
-				UserID:        userID,
+				UserID:        req.UserID,
+				Note:          req.Note,
 			}
 			if err := cmd.acknowledgeRepo.Create(txCtx, &e); err != nil {
 				return err
 			}
-			alertState, err := cmd.deviceAlertStateRepo.Get(cmd.AlarmRecord.DeviceID)
-			if err != nil {
-				return err
-			}
-			alertState.Acknowledged(cmd.AlarmRecord.ID)
-			return cmd.deviceAlertStateRepo.Save(cmd.AlarmRecord.DeviceID, &alertState)
+			return nil
 		})
 	}
 	return response.BusinessErr(errcode.AlarmRecordAlreadyAcknowledgedError, "")

@@ -1,4 +1,4 @@
-export type AlarmStatistics = {
+export type AlarmRecordStatistics = {
     time: number[]
     info: number[]
     warn: number[]

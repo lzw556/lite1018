@@ -16,7 +16,7 @@ type Device struct {
 	gorm.Model
 	Name       string `gorm:"type:varchar(64)"`
 	MacAddress string `gorm:"type:varchar(12)"`
-	TypeID     uint
+	Type       uint
 	NetworkID  uint
 	AssetID    uint
 	Category   DeviceCategory
@@ -44,7 +44,7 @@ func (d *Device) SetSystem(system SystemSetting) {
 
 func (d *Device) SetSensors(sensor SensorSetting) {
 	d.Sensors = SensorSetting{}
-	for _, key := range SensorSettingKeys[d.TypeID] {
+	for _, key := range SensorSettingKeys[d.Type] {
 		if value, ok := sensor[key]; ok {
 			d.Sensors[key] = value
 		}

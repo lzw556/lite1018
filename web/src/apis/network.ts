@@ -1,17 +1,22 @@
 import request from "../utils/request";
 import {Network} from "../types/network";
 import {DeleteResponse, GetResponse, PostResponse, PutResponse} from "../utils/response";
+import {PageResult} from "../types/page";
 
 export function GetNetworkRequest(id: number) {
     return request.get<Network>(`/networks/${id}`).then(GetResponse)
 }
 
-export function GetNetworksRequest(assetId:number) {
-    return request.get<Network[]>(`/networks`, {assetId}).then(GetResponse)
+export function PagingNetworksRequest(filter:any, page:number, size:number) {
+    return request.get<PageResult<Network[]>>(`/networks?method=paging`, {...filter, page, size}).then(GetResponse)
 }
 
-export function AccessDevicesRequest(networkId:number, parent:number, children:[]) {
-    return request.patch(`/networks/${networkId}/devices`, {parent, children}).then(PutResponse)
+export function AccessDevicesRequest(networkId:number, params:any) {
+    return request.patch(`/networks/${networkId}/devices`, params).then(PutResponse)
+}
+
+export function AddDeviceRequest(id:number, param:any) {
+    return request.post(`/networks/${id}/devices`, param).then(PostResponse)
 }
 
 export function RemoveDevicesRequest(networkId:number, params:any) {
@@ -19,6 +24,10 @@ export function RemoveDevicesRequest(networkId:number, params:any) {
 }
 
 export function ImportNetworkRequest(params:any) {
+    return request.post("/networks/import", params).then(PostResponse)
+}
+
+export function CreateNetworkRequest(params:any) {
     return request.post("/networks", params).then(PostResponse)
 }
 

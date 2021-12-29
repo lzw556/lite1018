@@ -15,7 +15,6 @@ type AssetRemoveCmd struct {
 	assetRepo             dependency.AssetRepository
 	deviceRepo            dependency.DeviceRepository
 	deviceStatus          dependency.DeviceStatusRepository
-	deviceAlertStateRepo  dependency.DeviceAlertStateRepository
 	deviceInformationRepo dependency.DeviceInformationRepository
 	networkRepo           dependency.NetworkRepository
 }
@@ -25,7 +24,6 @@ func NewAssetRemoveCmd() AssetRemoveCmd {
 		assetRepo:             repository.Asset{},
 		deviceRepo:            repository.Device{},
 		deviceStatus:          repository.DeviceStatus{},
-		deviceAlertStateRepo:  repository.DeviceAlertState{},
 		deviceInformationRepo: repository.DeviceInformation{},
 		networkRepo:           repository.Network{},
 	}
@@ -50,9 +48,6 @@ func (cmd AssetRemoveCmd) Run() error {
 		}
 		for _, device := range devices {
 			if err := cmd.deviceStatus.Delete(device.ID); err != nil {
-				return err
-			}
-			if err := cmd.deviceAlertStateRepo.Delete(device.ID); err != nil {
 				return err
 			}
 			if err := cmd.deviceInformationRepo.Delete(device.ID); err != nil {

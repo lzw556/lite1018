@@ -56,7 +56,7 @@ func (cmd DeviceUpdateCmd) UpdateBaseInfo(req request.Device) error {
 }
 
 func (cmd DeviceUpdateCmd) UpdateSetting(req request.DeviceSetting) error {
-	switch cmd.Device.TypeID {
+	switch cmd.Device.Type {
 	case devicetype.GatewayType:
 		for _, key := range po.IPNSettingKeys {
 			if value, ok := req[key]; ok {
@@ -65,7 +65,7 @@ func (cmd DeviceUpdateCmd) UpdateSetting(req request.DeviceSetting) error {
 		}
 	case devicetype.RouterType:
 	default:
-		for _, key := range po.SensorSettingKeys[cmd.Device.TypeID] {
+		for _, key := range po.SensorSettingKeys[cmd.Device.Type] {
 			if value, ok := req[key]; ok {
 				cmd.Device.Sensors[key] = value
 			}

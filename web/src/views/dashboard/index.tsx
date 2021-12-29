@@ -8,12 +8,10 @@ import {useEffect, useState} from "react";
 import {AssetStatistic} from "../../types/asset_statistic";
 import {ColorDanger, ColorHealth, ColorInfo, ColorWarn} from "../../constants/color";
 import {DeviceStatistic} from "../../types/device_statistic";
-import {GetDevicesStatisticsRequest} from "../../apis/device";
-import {GetAlarmStatisticsRequest} from "../../apis/alarm";
-import {AlarmStatistics} from "../../types/alarm_statistics";
+import {GetAlarmRecordStatisticsRequest} from "../../apis/alarm";
+import {AlarmRecordStatistics} from "../../types/alarm_statistics";
 import moment from "moment";
 import AssetDashboardCard from "./assetDashboardCard";
-import AlarmRecordCard from "./alarmRecordCard";
 import AlertChartCard from "./alertChartCard";
 import {GetAllAssetStatisticsRequest} from "../../apis/asset";
 
@@ -22,7 +20,7 @@ const {Title} = Typography;
 const DashboardPage = () => {
     const [assetStatistics, setAssetStatistics] = useState<AssetStatistic[]>([]);
     const [deviceStatistics, setDeviceStatistics] = useState<DeviceStatistic[]>([]);
-    const [alarmStatistics, setAlarmStatistics] = useState<AlarmStatistics>();
+    const [alarmStatistics, setAlarmStatistics] = useState<AlarmRecordStatistics>();
 
     const fetchAssetStatistics = () => {
         GetAllAssetStatisticsRequest().then(setAssetStatistics)
@@ -78,7 +76,7 @@ const DashboardPage = () => {
     }
 
     const fetchDeviceStatistics = () => {
-        GetDevicesStatisticsRequest().then(setDeviceStatistics);
+        // GetDevicesStatisticsRequest().then(setDeviceStatistics);
     }
 
     const renderDeviceStatistics = () => {
@@ -150,7 +148,7 @@ const DashboardPage = () => {
     }
 
     const fetchAlarmStatistics = () => {
-        GetAlarmStatisticsRequest(moment().local().startOf("day").unix(), moment().local().endOf("day").unix(), {})
+        GetAlarmRecordStatisticsRequest(moment().local().startOf("day").unix(), moment().local().endOf("day").unix(), {})
             .then(setAlarmStatistics)
     }
 
@@ -230,7 +228,7 @@ const DashboardPage = () => {
                 </Row>
                 <Row justify={"start"}>
                     <Col span={24}>
-                        <AlarmRecordCard/>
+                        {/*<AlarmRecordCard/>*/}
                     </Col>
                 </Row>
             </Col>

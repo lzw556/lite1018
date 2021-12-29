@@ -8,7 +8,6 @@ import {Content} from "antd/lib/layout/layout";
 import InformationCard from "./information";
 import ShadowCard from "../../../components/shadowCard";
 import MonitorPage from "./monitor";
-import AlertPage from "./alert";
 import {DownOutlined} from "@ant-design/icons";
 import {DeviceCommand} from "../../../types/device_command";
 import SettingPage from "./setting";
@@ -27,10 +26,6 @@ const tabList = [
         key: "settings",
         tab: "配置信息",
     },
-    {
-        key: "alert",
-        tab: "报警记录"
-    },
 ]
 
 const DeviceDetailPage = () => {
@@ -43,7 +38,6 @@ const DeviceDetailPage = () => {
 
     const contents = new Map<string, any>([
         ["monitor", <MonitorPage device={device}/>],
-        ["alert", <AlertPage device={device}/>],
         ["settings", <SettingPage device={device}/>],
         ["historyData", <HistoryDataPage device={device}/>]
     ])

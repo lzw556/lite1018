@@ -4,6 +4,7 @@ import "github.com/thetasensors/theta-cloud-lite/server/domain/po"
 
 type Network struct {
 	po.Network
+	Gateway Device
 }
 
 func (n *Network) UpdateRoutingTables(tables [][2]string) {
@@ -33,7 +34,7 @@ func (n *Network) RemoveDevice(e Device) {
 	n.RoutingTables = append(n.RoutingTables[0:rmIdx], n.RoutingTables[rmIdx+1:]...)
 }
 
-func (n *Network) AccessDevices(parent Device, children []Device) {
+func (n *Network) AccessDevices(parent Device, children ...Device) {
 	tables := make(po.RoutingTables, len(children))
 	for i, child := range children {
 		tables[i] = po.RoutingTable{

@@ -1,7 +1,7 @@
 import ShadowCard from "../../components/shadowCard";
 import {Typography} from "antd";
 import {useEffect, useState} from "react";
-import {GetAlarmStatisticsRequest} from "../../apis/alarm";
+import {GetAlarmRecordStatisticsRequest} from "../../apis/alarm";
 import {AlarmLevelCritical, AlarmLevelInfo, AlarmLevelWarn} from "../../constants/rule";
 import {ColorDanger, ColorInfo, ColorWarn} from "../../constants/color";
 import {DefaultMultiBarOption} from "../../constants/chart";
@@ -16,7 +16,7 @@ const AlertChartCard = () => {
     const [endTime] = useState(moment().local().endOf("day"))
 
     useEffect(() => {
-        GetAlarmStatisticsRequest(beginTime.unix(), endTime.unix(), {}).then(data => {
+        GetAlarmRecordStatisticsRequest(beginTime.unix(), endTime.unix(), {}).then(data => {
             const {info, warn, critical, time} = data
             const series = [
                 {name: AlarmLevelInfo, type: "bar", data: info, color: ColorInfo},

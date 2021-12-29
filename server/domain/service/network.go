@@ -24,7 +24,15 @@ func NewNetwork() network.Service {
 	}
 }
 
-func (s Network) CreateNetwork(req request.ImportNetwork) error {
+func (s Network) ImportNetwork(req request.ImportNetwork) error {
+	cmd, err := s.factory.NewNetworkImportCmd(req)
+	if err != nil {
+		return err
+	}
+	return cmd.Run()
+}
+
+func (s Network) CreateNetwork(req request.CreateNetwork) error {
 	cmd, err := s.factory.NewNetworkCreateCmd(req)
 	if err != nil {
 		return err
@@ -48,12 +56,13 @@ func (s Network) GetNetwork(networkID uint) (*vo.Network, error) {
 	return query.Detail()
 }
 
-func (s Network) FindNetworks(assetID uint) ([]vo.Network, error) {
-	query, err := s.factory.NewNetworksQuery(assetID)
+func (s Network) FindNetworksByPaginate(filters request.Filters, page, size int) ([]vo.Network, int64, error) {
+	query, err := s.factory.NewNetworkPagingQuery(filters, page, size)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
-	return query.List(), nil
+	result, total := query.Paging()
+	return result, total, nil
 }
 
 func (s Network) AccessDevices(networkID uint, req request.AccessDevices) error {
@@ -61,7 +70,10 @@ func (s Network) AccessDevices(networkID uint, req request.AccessDevices) error 
 	if err != nil {
 		return err
 	}
-	return cmd.AccessDevices(req.Parent, req.Children)
+	if req.IsNew {
+		return cmd.AccessNewDevice(req)
+	}
+	return cmd.AccessDevices(req.ParentID, req.Devices)
 }
 
 func (s Network) RemoveDevices(networkID uint, req request.RemoveDevices) error {

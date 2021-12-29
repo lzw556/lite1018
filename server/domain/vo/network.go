@@ -9,6 +9,7 @@ type Network struct {
 	ID                      uint             `json:"id"`
 	Name                    string           `json:"name"`
 	Gateway                 Device           `json:"gateway,omitempty"`
+	Asset                   Asset            `json:"asset,omitempty"`
 	Nodes                   []Device         `json:"nodes"`
 	RoutingTables           po.RoutingTables `json:"routingTables"`
 	CommunicationPeriod     uint             `json:"communicationPeriod"`
@@ -35,4 +36,8 @@ func (n *Network) AddGateway(e entity.Device) {
 
 func (n *Network) SetNodes(nodes []Device) {
 	n.Nodes = nodes
+}
+
+func (n *Network) AddAsset(e po.Asset) {
+	n.Asset = NewAsset(e)
 }

@@ -7,7 +7,7 @@ import usePermission, {Permission} from "../../../permission/permission";
 import HasPermission from "../../../permission";
 
 export interface PermissionDrawerProps extends DrawerProps {
-    role?: Role
+    role: Role
     onCancel: () => void
 }
 
@@ -18,40 +18,33 @@ const PermissionDrawer: FC<PermissionDrawerProps> = (props) => {
     const {hasPermission} = usePermission();
 
     useEffect(() => {
-        if (role) {
+        if (visible) {
             GetPermissionsWithGroupRequest().then(res => {
                 if (res.code === 200) {
                     setPermissions(res.data)
                     console.log(res.data)
                 }
             })
-        } else {
-            onCancel()
         }
-    }, [role])
+    }, [visible])
 
     const onSave = () => {
-        if (role) {
-            AllocPermissionsRequest(role.id, checkPermissions).then(_ => {
-                onCancel()
-            })
-        }
+        AllocPermissionsRequest(role.id, checkPermissions).then(_ => {
+            onCancel()
+        })
     }
 
     const renderDefaultCheckedKeys = () => {
-        if (role) {
-            const ps = role.permissions.map((item: any) => `${item[0]}::${item[1]}`)
-            const checked: any[] = []
-            Object.keys(permissions).forEach(key => {
-                permissions[key].filter((item: any) => {
-                    return ps.includes(`${item.path}::${item.method}`)
-                }).forEach((item: any) => {
-                    checked.push(item.id)
-                })
+        const ps = role.permissions.map((item: any) => `${item[0]}::${item[1]}`)
+        const checked: any[] = []
+        Object.keys(permissions).forEach(key => {
+            permissions[key].filter((item: any) => {
+                return ps.includes(`${item.path}::${item.method}`)
+            }).forEach((item: any) => {
+                checked.push(item.id)
             })
-            return checked
-        }
-        return []
+        })
+        return checked
     }
 
     const renderExtra = () => {
@@ -87,7 +80,8 @@ const PermissionDrawer: FC<PermissionDrawerProps> = (props) => {
 
     const convertPermissionTree = () => {
         if (permissions && visible) {
-            return <Tree checkable={hasPermission(Permission.RoleAllocPermissions)} defaultExpandAll={true} showIcon={true} selectable={false}
+            return <Tree checkable={hasPermission(Permission.RoleAllocPermissions)} defaultExpandAll={true}
+                         showIcon={true} selectable={false}
                          defaultCheckedKeys={renderDefaultCheckedKeys()} treeData={convertTreeData()}
                          onCheck={onCheck}/>
         }

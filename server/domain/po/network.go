@@ -11,6 +11,7 @@ import (
 type Network struct {
 	gorm.Model
 	Name                    string `gorm:"type:varchar(64)"`
+	AssetID                 uint
 	GatewayID               uint
 	CommunicationPeriod     uint `gorm:"default:0;not null;"`
 	CommunicationTimeOffset uint `gorm:"default:0;not null;"`

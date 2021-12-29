@@ -1,16 +1,12 @@
 import useSocket, {SocketTopic} from "../socket";
-import {Button, message, notification, Space} from "antd";
+import {Button, notification, Space} from "antd";
 import {useEffect} from "react";
-import {AcknowledgeAlarmRecordRequest} from "../apis/alarm";
 
 const AlertNotification = () => {
     const {PubSub} = useSocket()
 
     const onAcknowledge = (id: number) => {
-        AcknowledgeAlarmRecordRequest(id).then(_ => {
-            notification.close(String(id))
-            message.success("确认报警成功").then()
-        })
+
     }
 
     useEffect(() => {

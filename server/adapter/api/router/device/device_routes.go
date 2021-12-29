@@ -6,8 +6,19 @@ import (
 	"github.com/spf13/cast"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/request"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/response"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/devicetype"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/errcode"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/json"
 )
+
+func (r deviceRouter) getDeviceTypeParameters(ctx *gin.Context) (interface{}, error) {
+	id := cast.ToUint(ctx.Param("id"))
+	result, err := devicetype.GetParameter(id)
+	if err != nil {
+		return nil, response.BusinessErr(err.(errcode.BusinessErrorCode), "")
+	}
+	return result, nil
+}
 
 func (r deviceRouter) create(ctx *gin.Context) (interface{}, error) {
 	var req request.Device
@@ -22,23 +33,26 @@ func (r deviceRouter) getByID(ctx *gin.Context) (interface{}, error) {
 	return r.service.GetDevice(id)
 }
 
-func (r deviceRouter) paging(ctx *gin.Context) (interface{}, error) {
-	assetID := cast.ToInt(ctx.Query("assetId"))
-	page := cast.ToInt(ctx.Query("page"))
-	size := cast.ToInt(ctx.Query("size"))
-	var req request.DeviceSearch
-	if err := json.Unmarshal([]byte(ctx.Query("search")), &req); err != nil {
-		return nil, response.InvalidParameterError(err.Error())
+func (r deviceRouter) find(ctx *gin.Context) (interface{}, error) {
+	method := ctx.Query("method")
+	filters := request.NewFilters(ctx.Request.URL.Query())
+	switch method {
+	case "paging":
+		page := cast.ToInt(ctx.Query("page"))
+		size := cast.ToInt(ctx.Query("size"))
+		result, total, err := r.service.FindDevicesByPaginate(page, size, filters)
+		if err != nil {
+			return nil, err
+		}
+		return response.NewPageResult(page, size, total, result), nil
+	default:
+		return r.service.FindDevicesByFilter(filters)
 	}
-	result, total, err := r.service.FindDevicesByPaginate(assetID, page, size, req)
-	if err != nil {
-		return nil, err
-	}
-	return response.NewPageResult(page, size, total, result), nil
 }
 
-func (r deviceRouter) statistic(_ *gin.Context) (interface{}, error) {
-	return r.service.Statistic()
+func (r deviceRouter) statistical(ctx *gin.Context) (interface{}, error) {
+	filters := request.NewFilters(ctx.Request.URL.Query())
+	return r.service.GetDevicesStatistics(filters)
 }
 
 func (r deviceRouter) updateByID(ctx *gin.Context) (interface{}, error) {
@@ -118,11 +132,6 @@ func (r deviceRouter) removeDataByID(ctx *gin.Context) (interface{}, error) {
 	from := cast.ToInt64(ctx.Query("from"))
 	to := cast.ToInt64(ctx.Query("to"))
 	return nil, r.service.RemoveDataByID(id, from, to)
-}
-
-func (r deviceRouter) findGroupByAsset(ctx *gin.Context) (interface{}, error) {
-	deviceType := cast.ToUint(ctx.Query("device_type"))
-	return r.service.FindDevicesGroupByAsset(deviceType)
 }
 
 func (r deviceRouter) getChildren(ctx *gin.Context) (interface{}, error) {

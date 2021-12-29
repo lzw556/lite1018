@@ -7,46 +7,43 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/po"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/vo"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/measurementtype"
 )
 
 type AlarmRecordPagingQuery struct {
 	entity.AlarmRecords
 
-	total         int64
-	deviceRepo    dependency.DeviceRepository
-	propertyRepo  dependency.PropertyRepository
-	alarmRuleRepo dependency.AlarmRuleRepository
+	total           int64
+	measurementRepo dependency.MeasurementRepository
+	alarmRepo       dependency.AlarmRepository
 }
 
 func NewAlarmRecordPagingQuery(total int64) AlarmRecordPagingQuery {
 	return AlarmRecordPagingQuery{
-		total:         total,
-		deviceRepo:    repository.Device{},
-		propertyRepo:  repository.Property{},
-		alarmRuleRepo: repository.AlarmRule{},
+		total:           total,
+		measurementRepo: repository.Measurement{},
+		alarmRepo:       repository.Alarm{},
 	}
 }
 
 func (query AlarmRecordPagingQuery) Paging() ([]vo.AlarmRecord, int64) {
 	ctx := context.TODO()
 	result := make([]vo.AlarmRecord, len(query.AlarmRecords))
-	deviceMap := map[uint]entity.Device{}
-	propertyMap := map[uint]po.Property{}
-	alarmRuleMap := map[uint]po.AlarmRule{}
+	measurementMap := map[uint]po.Measurement{}
+	alarmMap := map[uint]po.Alarm{}
 	for i, e := range query.AlarmRecords {
-		if _, ok := deviceMap[e.DeviceID]; !ok {
-			deviceMap[e.DeviceID], _ = query.deviceRepo.Get(ctx, e.DeviceID)
-		}
-		if _, ok := propertyMap[e.PropertyID]; !ok {
-			propertyMap[e.PropertyID], _ = query.propertyRepo.Get(ctx, e.PropertyID)
-		}
-		if _, ok := alarmRuleMap[e.AlarmID]; !ok {
-			alarmRuleMap[e.AlarmID], _ = query.alarmRuleRepo.Get(ctx, e.AlarmID)
-		}
 		result[i] = vo.NewAlarmRecord(e)
-		result[i].SetDevice(deviceMap[e.DeviceID])
-		result[i].SetProperty(propertyMap[e.PropertyID])
-		result[i].Name = alarmRuleMap[e.AlarmID].Name
+		if _, ok := measurementMap[e.MeasurementID]; !ok {
+			measurementMap[e.MeasurementID], _ = query.measurementRepo.Get(ctx, e.MeasurementID)
+		}
+		result[i].SetMeasurement(measurementMap[e.MeasurementID])
+		if variable, err := measurementtype.GetVariable(measurementMap[e.MeasurementID].Type, e.Rule.Field); err == nil {
+			result[i].SetField(variable)
+		}
+		if _, ok := alarmMap[e.AlarmID]; !ok {
+			alarmMap[e.AlarmID], _ = query.alarmRepo.Get(ctx, e.AlarmID)
+		}
+		result[i].Name = alarmMap[e.AlarmID].Name
 	}
 	return result, query.total
 }
