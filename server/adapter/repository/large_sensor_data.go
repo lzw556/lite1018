@@ -52,3 +52,27 @@ func (repo LargeSensorData) Find(mac string, from, to time.Time) ([]entity.Large
 	})
 	return es, err
 }
+
+func (repo LargeSensorData) Get(mac string, time time.Time) (entity.LargeSensorData, error) {
+	var e entity.LargeSensorData
+	err := repo.BoltDB().Update(func(tx *bbolt.Tx) error {
+		bucket := tx.Bucket([]byte(e.BucketName()))
+		if bucket != nil {
+			if dataBucket := bucket.Bucket([]byte(mac)); dataBucket != nil {
+				c := dataBucket.Cursor()
+				current := []byte(time.UTC().Format("2006-01-02T15:04:05Z"))
+				var buf []byte
+				if k, v := c.Seek(current); k != nil {
+					buf = v
+				} else if bytes.Compare(k, current) <= 0 {
+					_, buf = c.Next()
+				}
+				if err := json.Unmarshal(buf, &e); err != nil {
+					return err
+				}
+			}
+		}
+		return nil
+	})
+	return e, err
+}

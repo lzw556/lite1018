@@ -102,6 +102,12 @@ func (r measurementRouter) getRawData(ctx *gin.Context) (interface{}, error) {
 	return r.service.GetMeasurementRawData(id, from, to)
 }
 
+func (r measurementRouter) getRawDataByTimestamp(ctx *gin.Context) (interface{}, error) {
+	id := cast.ToUint(ctx.Param("id"))
+	timestamp := cast.ToInt64(ctx.Param("timestamp"))
+	return r.service.GetMeasurementRawDataByTimestamp(id, timestamp)
+}
+
 func (r measurementRouter) removeByID(ctx *gin.Context) (interface{}, error) {
 	id := cast.ToUint(ctx.Param("id"))
 	return nil, r.service.RemoveMeasurementByID(id)

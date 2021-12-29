@@ -2,17 +2,15 @@ package vo
 
 import (
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
-	"time"
 )
 
 type MeasurementRawData struct {
-	Time   time.Time `json:"time"`
-	Values []float32 `json:"values"`
+	Timestamp int64     `json:"timestamp"`
+	Values    []float32 `json:"values,omitempty"`
 }
 
 func NewMeasurementRawData(e entity.LargeSensorData) MeasurementRawData {
 	return MeasurementRawData{
-		Time:   e.Time,
-		Values: e.Values,
+		Timestamp: e.Time.Unix(),
 	}
 }

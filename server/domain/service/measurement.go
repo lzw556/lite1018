@@ -114,7 +114,15 @@ func (s Measurement) GetMeasurementRawData(id uint, from, to int64) ([]vo.Measur
 	if err != nil {
 		return nil, err
 	}
-	return query.GetRawData(from, to)
+	return query.GateRawDataByRange(from, to)
+}
+
+func (s Measurement) GetMeasurementRawDataByTimestamp(id uint, timestamp int64) (*vo.MeasurementRawData, error) {
+	query, err := s.factory.NewMeasurementQuery(id)
+	if err != nil {
+		return nil, err
+	}
+	return query.GateRawData(timestamp)
 }
 
 func (s Measurement) UpdateMeasurementByID(id uint, req request.CreateMeasurement) error {

@@ -9,7 +9,7 @@ import {GetParamValue} from "../../../utils/path";
 import {GetNetworkRequest} from "../../../apis/network";
 import "../../../string-extension";
 import moment from "moment";
-import DeviceTable from "./deviceTable";
+import DeviceList from "./deviceList";
 import TopologyView from "./topologyView";
 import {PlusOutlined} from "@ant-design/icons";
 import AddDeviceModal from "./addDeviceModal";
@@ -32,8 +32,14 @@ const NetworkDetail = () => {
     const [network, setNetwork] = useState<Network>()
     const [addDeviceVisible, setAddDeviceVisible] = useState(false)
     const [currentKey, setCurrentKey] = useState<string>("devices");
+    const [refreshKey, setRefreshKey] = useState(0)
+
+    const onRefresh = () => {
+        setRefreshKey(refreshKey + 1)
+    }
+
     const contents = new Map<string, any>([
-        ["devices", network && <DeviceTable network={network}/>],
+        ["devices", network && <DeviceList network={network} onRefresh={() => refreshKey}/>],
         ["graph", network && <TopologyView network={network}/>],
     ])
 
@@ -242,7 +248,10 @@ const NetworkDetail = () => {
                 network={network}
                 visible={addDeviceVisible}
                 onCancel={() => setAddDeviceVisible(false)}
-                onSuccess={() => setAddDeviceVisible(false)}
+                onSuccess={() => {
+                    onRefresh()
+                    setAddDeviceVisible(false)
+                }}
             />
         }
     </Content>

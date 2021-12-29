@@ -17,7 +17,7 @@ import "../../index.css";
 import moment from "moment";
 import SensorStatistic from "../../monitor/sensorStatistic";
 import AlertStatistic from "./alertStatistic";
-import SensorTable from "./sensorTable";
+import SensorList from "./sensorList";
 import MeasurementSettings from "./settings";
 import HistoryData from "./history";
 import {MeasurementField, MeasurementFieldType} from "../../../../types/measurement_data";
@@ -44,7 +44,7 @@ const MeasurementDetail = () => {
     const [currentKey, setCurrentKey] = useState("sensors")
     const [fields, setFields] = useState<MeasurementField[]>([])
     const contents = new Map<string, any>([
-        ["sensors", measurement && <SensorTable measurement={measurement}/>],
+        ["sensors", measurement && <SensorList measurement={measurement}/>],
         ["history", measurement && <HistoryData measurement={measurement}/>],
         ["settings", measurement && <MeasurementSettings measurement={measurement}/>]
     ]);

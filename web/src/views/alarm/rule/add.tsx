@@ -88,22 +88,13 @@ const AddRulePage = () => {
     }
 
     const createByCustom = (req: any) => {
-        form.validateFields(["field", "threshold"]).then(values => {
-            const params = {
-                ...req,
-                rule: {
-                    field: values.field,
-                    method: form.getFieldValue("method"),
-                    operation: form.getFieldValue("operation"),
-                    threshold: parseFloat(values.threshold),
-                },
-                level: form.getFieldValue("level")
-            }
-            createAlarmRule(params)
+        form.validateFields().then(values => {
+            createAlarmRule({...req, ...values})
         })
     }
 
     const createAlarmRule = (params: any) => {
+        console.log(params)
         AddAlarmRequest(createType, params).then(_ => history.goBack())
     }
 

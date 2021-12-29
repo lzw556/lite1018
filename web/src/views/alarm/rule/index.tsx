@@ -21,6 +21,7 @@ const AlarmRule = () => {
     const [alarm, setAlarm] = useState<Alarm>()
     const [editVisible, setEditVisible] = useState<boolean>(false)
     const [dataSource, setDataSource] = useState<PageResult<any[]>>()
+    const [refreshKey, setRefreshKey] = useState<number>(0)
 
     const onAssetChanged = (value: any) => {
         setAsset(value)
@@ -34,7 +35,11 @@ const AlarmRule = () => {
     }
 
     const onDelete = (id: number) => {
-        RemoveAlarmRuleRequest(id).then()
+        RemoveAlarmRuleRequest(id).then(_ => onRefresh())
+    }
+
+    const onRefresh = () => {
+        setRefreshKey(refreshKey + 1)
     }
 
     const columns:any = [
@@ -93,10 +98,6 @@ const AlarmRule = () => {
         }
     ]
 
-    useEffect(() => {
-        fetchAlarms(1, 10)
-    }, [])
-
     const fetchAlarms = useCallback((current: number, size: number) => {
         const filter:any = {}
         if (asset) {
@@ -106,7 +107,11 @@ const AlarmRule = () => {
             filter.measurement_id = measurement
         }
         PagingAlarmsRequest(filter, current, size).then(setDataSource)
-    }, [asset, measurement])
+    }, [asset, measurement, refreshKey])
+
+    useEffect(() => {
+        fetchAlarms(1, 10)
+    }, [fetchAlarms])
 
     return <div>
         <Row justify={"start"}>

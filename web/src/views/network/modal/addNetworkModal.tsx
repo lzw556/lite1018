@@ -4,9 +4,9 @@ import IpnFormItem from "../../../components/formItems/ipnFormItem";
 import WsnFormItem from "../../../components/formItems/wsnFormItem";
 import {DEFAULT_WSN_SETTING} from "../../../types/wsn_setting";
 import {DEFAULT_IPN_SETTING} from "../../../types/ipn_setting";
-import AssetSelect from "../../../components/assetSelect";
 import {defaultValidateMessages, Rules} from "../../../constants/validator";
 import {CreateNetworkRequest} from "../../../apis/network";
+import AssetTreeSelect from "../../../components/select/assetTreeSelect";
 
 export interface AddNetworkModalProps extends ModalProps{
     onSuccess:() => void;
@@ -47,7 +47,7 @@ const AddNetworkModal:FC<AddNetworkModalProps> = (props) => {
                 <Input placeholder={"请输入网络名称"}/>
             </Form.Item>
             <Form.Item label={"所属资产"} name={"asset_id"} rules={[Rules.required]}>
-                <AssetSelect placeholder={"请选择网关所属资产"}/>
+                <AssetTreeSelect placeholder={"请选择网络所属资产"}/>
             </Form.Item>
             <WsnFormItem/>
             <Divider orientation={"left"} plain>网关信息</Divider>

@@ -43,6 +43,10 @@ export function GetMeasurementRawDataRequest(id: number, from: number, to: numbe
     return request.get<any>(`/measurements/${id}/rawData`, {from, to}).then(GetResponse);
 }
 
+export function GetMeasurementRawDataByTimeRequest(id: number, timestamp:number) {
+    return request.get<any>(`/measurements/${id}/rawData/${timestamp}`).then(GetResponse);
+}
+
 export function UpdateMeasurementRequest(id: number, params: any) {
     return request.put(`/measurements/${id}`, params).then(PutResponse);
 }
