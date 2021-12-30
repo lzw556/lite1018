@@ -37,16 +37,33 @@ const MeasurementRawData: React.FC<{ measurement: Measurement }> = ({ measuremen
     echarts.showLoading();
     GetMeasurementRawDataRequest(id, timestamp).then((res) => {
       const legends = ['X轴', 'Y轴', 'Z轴'];
+      const index = [];
+      for (let i = 0; i < res.values.length / 3; i++) {
+        index.push(i);
+      }
       echarts.setOption({
         legend: { data: legends },
-        xAxis: { type: 'category', data: [] },
+        xAxis: { type: 'category', data: index },
         yAxis: { type: 'value' },
         series: legends.map((legend, i) => ({
           name: legend,
           type: 'line',
           data: res.values.filter((val: number, j: number) => (j - i) % legends.length === 0),
-          ...LineChartStyles[i]
-        }))
+          ...LineChartStyles.map((style) => style.itemStyle)[i]
+        })),
+        animation: false,
+        smooth: true,
+        dataZoom: [
+          {
+            type: 'slider',
+            show: true,
+            startValue: 0,
+            endValue: 5000,
+            height: '15',
+            bottom: '3%',
+            zoomLock: true
+          }
+        ]
       });
       echarts.hideLoading();
     });
