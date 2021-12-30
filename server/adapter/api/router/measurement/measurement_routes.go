@@ -1,7 +1,6 @@
 package measurement
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/cast"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/request"
@@ -84,7 +83,6 @@ func (r measurementRouter) bindingDevices(ctx *gin.Context) (interface{}, error)
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		return nil, response.InvalidParameterError(err.Error())
 	}
-	fmt.Println(req)
 	return nil, r.service.UpdateMeasurementDeviceBindings(id, req)
 }
 
@@ -100,6 +98,16 @@ func (r measurementRouter) getRawData(ctx *gin.Context) (interface{}, error) {
 	from := cast.ToInt64(ctx.Query("from"))
 	to := cast.ToInt64(ctx.Query("to"))
 	return r.service.GetMeasurementRawData(id, from, to)
+}
+
+func (r measurementRouter) downloadRawData(ctx *gin.Context) (interface{}, error) {
+	id := cast.ToUint(ctx.Param("id"))
+	timestamp := cast.ToInt64(ctx.Param("timestamp"))
+	result, err := r.service.GetMeasurementRawDataByTimestamp(id, timestamp)
+	if err != nil {
+		return nil, err
+	}
+	return result.ToCsvFile()
 }
 
 func (r measurementRouter) getRawDataByTimestamp(ctx *gin.Context) (interface{}, error) {

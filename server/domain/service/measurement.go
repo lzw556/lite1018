@@ -109,7 +109,7 @@ func (s Measurement) GetMeasurementData(id uint, from, to int64) ([]vo.Measureme
 	return query.GetData(from, to)
 }
 
-func (s Measurement) GetMeasurementRawData(id uint, from, to int64) ([]vo.MeasurementRawData, error) {
+func (s Measurement) GetMeasurementRawData(id uint, from, to int64) (vo.MeasurementsRawData, error) {
 	query, err := s.factory.NewMeasurementQuery(id)
 	if err != nil {
 		return nil, err

@@ -1,7 +1,6 @@
 package device
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/cast"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/request"
@@ -119,7 +118,6 @@ func (r deviceRouter) downloadDataByID(ctx *gin.Context) (interface{}, error) {
 	if err := json.Unmarshal([]byte(ctx.Query("pids")), &pids); err != nil {
 		return nil, err
 	}
-	fmt.Println(pids)
 	result, err := r.service.GetPropertyDataByIDs(id, pids, from, to)
 	if err != nil {
 		return nil, err

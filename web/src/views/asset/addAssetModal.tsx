@@ -4,19 +4,18 @@ import {AddAssetRequest, GetAssetRequest} from "../../apis/asset";
 import {Form, Input, Modal, ModalProps, Upload} from "antd";
 import {PlusOutlined} from "@ant-design/icons";
 import AssetSelect from "../../components/assetSelect";
-import {Asset} from "../../types/asset";
 import LocationSelect from "../../components/locationSelect";
+import {defaultValidateMessages} from "../../constants/validator";
 
 export interface AddAssetModelProps extends ModalProps{
-    asset?: Asset;
     onSuccess: () => void
 }
 
-const AddModal:FC<AddAssetModelProps> = (props) => {
-    const {visible, onCancel, onSuccess, asset} = props
+const AddAssetModal:FC<AddAssetModelProps> = (props) => {
+    const {visible, onSuccess} = props
     const [isLoading, setIsLoading] = useState<boolean>(false)
-    const [parent, setParent] = useState<Asset>()
     const [file, setFile] = useState<any>()
+    const [parent, setParent] = useState<any>()
     const [location, setLocation] = useState<any>()
     const [form] = useForm()
 
@@ -24,14 +23,6 @@ const AddModal:FC<AddAssetModelProps> = (props) => {
         if (visible) {
             form.resetFields()
             setFile(undefined)
-            if (asset) {
-                form.setFieldsValue({
-                    name: asset.name,
-                    parent_id: asset.parent?.id,
-                })
-                setParent(asset.parent)
-                setLocation(asset.display?.location)
-            }
         }
     }, [visible])
 
@@ -91,8 +82,8 @@ const AddModal:FC<AddAssetModelProps> = (props) => {
         GetAssetRequest(id).then(setParent)
     }
 
-    return <Modal title={"资产添加"} width={420} onOk={onAdd} {...props} confirmLoading={isLoading}>
-        <Form form={form} labelCol={{span: 6}}>
+    return <Modal title={"资产添加"} width={420} onOk={onAdd} {...props} okText={"确定"} cancelText={"取消"} confirmLoading={isLoading}>
+        <Form form={form} labelCol={{span: 6}} validateMessages={defaultValidateMessages}>
             <Form.Item name="name" label={"资产名称"} rules={[{required: true, message: "请输入资产名称"}]}>
                 <Input placeholder="资产名称"/>
             </Form.Item>
@@ -135,4 +126,4 @@ const AddModal:FC<AddAssetModelProps> = (props) => {
     </Modal>
 }
 
-export default AddModal
+export default AddAssetModal

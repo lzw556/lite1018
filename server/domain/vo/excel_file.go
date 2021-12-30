@@ -5,15 +5,15 @@ import (
 	"github.com/xuri/excelize/v2"
 )
 
-type PropertyDataFile struct {
+type ExcelFile struct {
 	Name string         `json:"name"`
 	File *excelize.File `json:"file"`
 }
 
-func (f *PropertyDataFile) FileName() string {
+func (f *ExcelFile) FileName() string {
 	return f.Name
 }
 
-func (f *PropertyDataFile) Write(writer gin.ResponseWriter) error {
+func (f *ExcelFile) Write(writer gin.ResponseWriter) error {
 	return f.File.Write(writer)
 }

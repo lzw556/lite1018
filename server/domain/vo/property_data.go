@@ -30,7 +30,7 @@ func (d *PropertyData) AddAlarms(es ...po.AlarmRule) {
 	}
 }
 
-func (d PropertyData) ToExcelFile() (*PropertyDataFile, error) {
+func (d PropertyData) ToExcelFile() (*ExcelFile, error) {
 	excel := excelize.NewFile()
 	excel.NewSheet(d.Name)
 	if err := excel.SetCellValue(d.Name, "A1", "时间"); err != nil {
@@ -59,7 +59,7 @@ func (d PropertyData) ToExcelFile() (*PropertyDataFile, error) {
 	}
 	// delete default excel sheet
 	excel.DeleteSheet("Sheet1")
-	return &PropertyDataFile{
+	return &ExcelFile{
 		Name: d.Name,
 		File: excel,
 	}, nil
@@ -67,7 +67,7 @@ func (d PropertyData) ToExcelFile() (*PropertyDataFile, error) {
 
 type PropertiesData []PropertyData
 
-func (ps PropertiesData) ToExcelFile() (*PropertyDataFile, error) {
+func (ps PropertiesData) ToExcelFile() (*ExcelFile, error) {
 	excel := excelize.NewFile()
 	for _, d := range ps {
 		excel.NewSheet(d.Name)
@@ -98,7 +98,7 @@ func (ps PropertiesData) ToExcelFile() (*PropertyDataFile, error) {
 	}
 	// delete default excel sheet
 	excel.DeleteSheet("Sheet1")
-	return &PropertyDataFile{
+	return &ExcelFile{
 		Name: "properties",
 		File: excel,
 	}, nil

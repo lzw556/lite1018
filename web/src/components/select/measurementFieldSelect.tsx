@@ -13,11 +13,14 @@ export interface MeasurementFieldSelectProps extends SelectProps<any>{
 const {Option} = Select;
 
 const MeasurementFieldSelect:FC<MeasurementFieldSelectProps> = (props) => {
-    const {measurement, onChange} = props
+    const {measurement, onChange, defaultActiveFirstOption} = props
     const [fields, setFields] = useState<MeasurementField[]>([])
 
     useEffect(() => {
         GetMeasurementFieldsRequest(measurement.type).then(data => {
+            if (defaultActiveFirstOption && onChange) {
+                onChange(data[0])
+            }
             setFields(data.sort((a, b) => a.sort - b.sort))
         })
     },[measurement])

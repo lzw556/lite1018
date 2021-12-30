@@ -8,10 +8,11 @@ import ShadowCard from "../../components/shadowCard";
 import MyBreadcrumb from "../../components/myBreadcrumb";
 import InfiniteScroll from "react-infinite-scroll-component";
 import AssetEditModal from "./assetEditModal";
+import AddAssetModal from "./addAssetModal";
 
 
 const AssetPage: FC = () => {
-    const [editVisible, setEditVisible] = useState(false);
+    const [addVisible, setAddVisible] = useState(false);
     const [asset, setAsset] = useState<Asset>()
     const [refreshKey, setRefreshKey] = useState<number>(0)
     const [records, setRecords] = useState<Asset[]>([])
@@ -40,10 +41,7 @@ const AssetPage: FC = () => {
     }
 
     const onEdit = async (id: number) => {
-        GetAssetRequest(id).then(data => {
-            setAsset(data)
-            setEditVisible(true)
-        })
+        GetAssetRequest(id).then(setAsset)
     }
 
     const renderActions = (id: number) => {
@@ -59,7 +57,7 @@ const AssetPage: FC = () => {
     return <Content>
         <MyBreadcrumb>
             <Button type="primary" onClick={() => {
-                setEditVisible(true)
+                setAddVisible(true)
             }}>
                 添加资产 <PlusOutlined/>
             </Button>
@@ -78,7 +76,7 @@ const AssetPage: FC = () => {
                                     fetchAssets(current + 1, 10)
                                 }}>
                     <List size={"small"} dataSource={records}
-                          grid={{column: 4}}
+                          grid={{sm: 1, md: 2, lg: 3, xl: 4, xxl: 6}}
                           renderItem={asset => {
                               return <List.Item key={asset.id}>
                                   <ShadowCard
@@ -103,6 +101,13 @@ const AssetPage: FC = () => {
                                      }}
             />
         }
+        <AddAssetModal
+            visible={addVisible}
+            onCancel={() => setAddVisible(false)}
+            onSuccess={() => {
+                setAddVisible(false)
+                onRefresh()
+            }}/>
     </Content>
 }
 
