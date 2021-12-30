@@ -29,7 +29,7 @@ func NewAsset() asset.Service {
 	}
 }
 
-func (s Asset) CreateAsset(req request.Asset) error {
+func (s Asset) CreateAsset(req request.CreateAsset) error {
 	e := po.Asset{
 		Name:     req.Name,
 		Image:    uuid.NewV1().String(),
@@ -54,18 +54,17 @@ func (s Asset) CreateAsset(req request.Asset) error {
 	})
 }
 
-func (s Asset) UpdateAsset(assetID uint, req request.Asset) (*vo.Asset, error) {
+func (s Asset) UpdateAsset(assetID uint, req request.UpdateAsset) error {
 	ctx := context.TODO()
 	e, err := s.repository.Get(ctx, assetID)
 	if err != nil {
-		return nil, response.BusinessErr(errcode.AssetNotFoundError, "")
+		return response.BusinessErr(errcode.AssetNotFoundError, "")
 	}
 	e.Name = req.Name
-	if err := s.repository.Save(ctx, &e); err != nil {
-		return nil, err
-	}
-	result := vo.NewAsset(e)
-	return &result, nil
+	e.ParentID = req.ParentID
+	e.Display.Location.X = req.Location.X
+	e.Display.Location.Y = req.Location.Y
+	return s.repository.Save(ctx, &e)
 }
 
 func (s Asset) RemoveAsset(assetID uint) error {
@@ -95,6 +94,9 @@ func (s Asset) GetAsset(assetID uint) (*vo.Asset, error) {
 		return nil, response.BusinessErr(errcode.AssetNotFoundError, "")
 	}
 	result := vo.NewAsset(e)
+	if parent, err := s.repository.Get(ctx, e.ParentID); err == nil {
+		result.SetParent(parent)
+	}
 	return &result, nil
 }
 

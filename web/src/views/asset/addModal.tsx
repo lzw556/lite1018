@@ -1,22 +1,20 @@
-import {useEffect, useState} from "react";
+import {FC, useEffect, useState} from "react";
 import {useForm} from "antd/es/form/Form";
 import {AddAssetRequest, GetAssetRequest} from "../../apis/asset";
-import {Form, Input, Modal, Upload} from "antd";
+import {Form, Input, Modal, ModalProps, Upload} from "antd";
 import {PlusOutlined} from "@ant-design/icons";
 import AssetSelect from "../../components/assetSelect";
 import {Asset} from "../../types/asset";
 import LocationSelect from "../../components/locationSelect";
 
-export interface AddAssetProps {
-    visible: boolean
-    onCancel?: () => void
+export interface AddAssetModelProps extends ModalProps{
+    asset?: Asset;
     onSuccess: () => void
 }
 
-const AddModal = (props: AddAssetProps) => {
-    const {visible, onCancel, onSuccess} = props
+const AddModal:FC<AddAssetModelProps> = (props) => {
+    const {visible, onCancel, onSuccess, asset} = props
     const [isLoading, setIsLoading] = useState<boolean>(false)
-    const [imageUrl, setImageUrl] = useState<any>('')
     const [parent, setParent] = useState<Asset>()
     const [file, setFile] = useState<any>()
     const [location, setLocation] = useState<any>()
@@ -26,7 +24,14 @@ const AddModal = (props: AddAssetProps) => {
         if (visible) {
             form.resetFields()
             setFile(undefined)
-            setImageUrl(undefined)
+            if (asset) {
+                form.setFieldsValue({
+                    name: asset.name,
+                    parent_id: asset.parent?.id,
+                })
+                setParent(asset.parent)
+                setLocation(asset.display?.location)
+            }
         }
     }, [visible])
 
@@ -58,9 +63,6 @@ const AddModal = (props: AddAssetProps) => {
 
     const onBeforeUpload = (file: any) => {
         setFile(file)
-        getBase64(file).then(imageUrl => {
-            setImageUrl(imageUrl)
-        })
         return false
     }
 
@@ -83,23 +85,13 @@ const AddModal = (props: AddAssetProps) => {
 
     const onRemove = (file: any) => {
         setFile(undefined)
-        setImageUrl(undefined)
     }
 
-    const getBase64 = (file: any) => {
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = () => resolve(reader.result);
-            reader.onerror = error => reject(error);
-        });
-    }
-
-    const fetchAsset = (id:number) => {
+    const fetchAsset = (id: number) => {
         GetAssetRequest(id).then(setParent)
     }
 
-    return <Modal title={"资产添加"} width={420} onOk={onAdd} {...props}>
+    return <Modal title={"资产添加"} width={420} onOk={onAdd} {...props} confirmLoading={isLoading}>
         <Form form={form} labelCol={{span: 6}}>
             <Form.Item name="name" label={"资产名称"} rules={[{required: true, message: "请输入资产名称"}]}>
                 <Input placeholder="资产名称"/>

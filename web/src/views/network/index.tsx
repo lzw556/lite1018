@@ -6,7 +6,7 @@ import "./index.css"
 import MyBreadcrumb from "../../components/myBreadcrumb";
 import TableLayout from "../layout/TableLayout";
 import AddNetworkModal from "./modal/addNetworkModal";
-import {Button, Col, Dropdown, Menu, message, Popconfirm, Row, Select, Space} from "antd";
+import {Button, Col, Dropdown, Menu, message, Popconfirm, Row, Space} from "antd";
 import {CodeOutlined, DeleteOutlined, EditOutlined, PlusOutlined} from "@ant-design/icons";
 import Label from "../../components/label";
 import {Network} from "../../types/network";
@@ -26,15 +26,15 @@ const NetworkPage = () => {
     const [dataSource, setDataSource] = useState<PageResult<any>>()
     const [refreshKey, setRefreshKey] = useState<number>(0)
 
-    const fetchNetworks =  useCallback((current: number, size: number) => {
-        const filter:any = {}
+    const fetchNetworks = useCallback((current: number, size: number) => {
+        const filter: any = {}
         if (assetId) {
             filter.asset_id = assetId
         }
         PagingNetworksRequest(filter, current, size).then(setDataSource)
     }, [assetId, refreshKey])
 
-    useEffect(() =>{
+    useEffect(() => {
         fetchNetworks(1, 10)
     }, [fetchNetworks])
 
@@ -54,7 +54,7 @@ const NetworkPage = () => {
                 SendDeviceCommandRequest(device.id, DeviceCommand.Provision).then(res => {
                     if (res.code === 200) {
                         message.success("发送成功")
-                    }else {
+                    } else {
                         message.error(`发送失败: ${res.msg}`)
                     }
                 })
@@ -70,21 +70,11 @@ const NetworkPage = () => {
         </Menu>
     }
 
-    const onEdit = (id: number, key: any) => {
+    const onEdit = (id: number) => {
         GetNetworkRequest(id).then(data => {
             setNetwork(data)
             setEditVisible(true)
         })
-    }
-
-    const renderEditMenus = (record: Network) => {
-        return <Menu onClick={(e) => {
-            onEdit(record.id, e.key)
-        }}>
-            {
-                <Menu.Item key={1}>编辑网络信息</Menu.Item>
-            }
-        </Menu>
     }
 
     const columns = [
@@ -136,9 +126,7 @@ const NetworkPage = () => {
             key: 'action',
             render: (text: any, record: any) => (
                 <Space size={"middle"}>
-                    <Dropdown overlay={renderEditMenus(record)}>
-                        <Button type="text" size="small" icon={<EditOutlined/>}/>
-                    </Dropdown>
+                    <Button type="text" size="small" icon={<EditOutlined/>} onClick={() => onEdit(record.id)}/>
                     <Dropdown overlay={renderCommandMenus(record)}>
                         <Button type="text" icon={<CodeOutlined/>}/>
                     </Dropdown>

@@ -16,8 +16,8 @@ export function GetAssetRequest(id: number) {
     return request.get<Asset>(`/assets/${id}`).then(GetResponse)
 }
 
-export function UpdateAssetRequest(id:number, name:string) {
-    return request.put<Asset>(`/assets/${id}`, {name}).then(PutResponse)
+export function UpdateAssetRequest(id:number, params:any) {
+    return request.put<Asset>(`/assets/${id}`, params).then(PutResponse)
 }
 
 export function RemoveAssetRequest(id: number) {

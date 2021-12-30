@@ -7,6 +7,7 @@ export type Asset = {
     image: string
     display?: Display
     status: number
+    parent?: Asset
 }
 
 export const InitializeAssetState = {

@@ -47,7 +47,7 @@ func (factory Asset) NewAssetRemoveCmd(assetID uint) (*command.AssetRemoveCmd, e
 	return &cmd, nil
 }
 
-func (factory Asset) NewAssetCreateCmd(req request.Asset) (*command.AssetCreateCmd, error) {
+func (factory Asset) NewAssetCreateCmd(req request.CreateAsset) (*command.AssetCreateCmd, error) {
 	cmd := command.NewAssetCreateCmd()
 	cmd.Asset = po.Asset{
 		Name:     req.Name,

@@ -18,14 +18,18 @@ import {ColorDanger, ColorHealth, ColorInfo, ColorWarn} from "../../../constants
 import AlarmRecordStatistic from "./alarmRecordStatistic";
 import {DeleteOutlined, EditOutlined} from "@ant-design/icons";
 import EditMeasurementModal from "./editMeasurementModal";
+import {useLocation} from "react-router-dom";
+import {GetParamValue} from "../../../utils/path";
 
 const AssetMonitor = () => {
+    const location = useLocation();
     const [asset, setAsset] = useState<Asset>();
     const [dataSource, setDataSource] = useState<Measurement[]>([]);
     const [measurement, setMeasurement] = useState<Measurement>();
     const [height] = useState(window.innerHeight - 200)
     const selector = document.querySelector("#container")
     const [refreshKey, setRefreshKey] = useState(1)
+    const id = GetParamValue(location.search, "id")
 
     useEffect(() => {
         if (asset) {
@@ -45,7 +49,7 @@ const AssetMonitor = () => {
         GetMeasurementRequest(id).then(setMeasurement)
     }
 
-    const onDelete = (id:number) => {
+    const onDelete = (id: number) => {
         RemoveMeasurementRequest(id).then(_ => onRefresh())
     }
 
@@ -104,6 +108,7 @@ const AssetMonitor = () => {
                     <AssetTreeSelect bordered={false} style={{width: "150px"}}
                                      placeholder={"请选择资产"}
                                      defaultActiveFirstOption={true}
+                                     defaultValue={Number(id)}
                                      value={asset?.id}
                                      onChange={fetchAsset}/>
                 </Label>
@@ -118,7 +123,7 @@ const AssetMonitor = () => {
                 <ShadowCard style={{height: "32%", marginTop: "2%"}}>
                     <Typography.Title level={5}>传感器统计</Typography.Title>
                     {
-                       asset && <SensorStatistic filter={{asset_id: asset.id}} style={{height: "144px"}}/>
+                        asset && <SensorStatistic filter={{asset_id: asset.id}} style={{height: "144px"}}/>
                     }
                 </ShadowCard>
                 <ShadowCard style={{height: "32%", marginTop: "2%"}}>
