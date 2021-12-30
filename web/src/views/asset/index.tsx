@@ -1,45 +1,39 @@
 import {FC, useCallback, useEffect, useState} from "react";
-import {Button, Popconfirm, Space} from "antd";
+import {Button, Card, List, Skeleton} from "antd";
 import {Content} from "antd/lib/layout/layout";
-import TableLayout from "../layout/TableLayout";
 import {GetAssetRequest, PagingAssetsRequest, RemoveAssetRequest} from "../../apis/asset";
-import AddModal from "./addModal";
-import {InitializeAssetState} from "../../types/asset";
-import {DeleteOutlined, EditOutlined, PlusOutlined} from "@ant-design/icons";
+import {Asset} from "../../types/asset";
+import {DeleteOutlined, EditOutlined, MonitorOutlined, PlusOutlined} from "@ant-design/icons";
 import ShadowCard from "../../components/shadowCard";
 import MyBreadcrumb from "../../components/myBreadcrumb";
-import HasPermission from "../../permission";
-import {Permission} from "../../permission/permission";
-import {PageResult} from "../../types/page";
+import InfiniteScroll from "react-infinite-scroll-component";
+import AssetEditModal from "./assetEditModal";
+import AddAssetModal from "./addAssetModal";
 
 
 const AssetPage: FC = () => {
-    const [addAssetVisible, setAddAssetVisible] = useState<boolean>(false)
-    const [editAssetVisible, setEditAssetVisible] = useState<boolean>(false)
-    const [asset, setAsset] = useState(InitializeAssetState)
-    const [dataSource, setDataSource] = useState<PageResult<any>>()
+    const [addVisible, setAddVisible] = useState(false);
+    const [asset, setAsset] = useState<Asset>()
+    const [refreshKey, setRefreshKey] = useState<number>(0)
+    const [records, setRecords] = useState<Asset[]>([])
+    const [total, setTotal] = useState<number>(0)
+    const [current, setCurrent] = useState<number>(1)
 
     const fetchAssets = useCallback((current: number, size: number) => {
-        PagingAssetsRequest(current, size).then(setDataSource)
-    }, [])
+        PagingAssetsRequest(current, size).then(data => {
+            const ids = records.map(item => item.id)
+            setRecords([...records, ...data.result.filter(item => !ids.includes(item.id))])
+            setTotal(data.total)
+            setCurrent(data.page)
+        })
+    }, [refreshKey])
 
     useEffect(() => {
         fetchAssets(1, 10)
     }, [fetchAssets])
 
     const onRefresh = () => {
-        if (dataSource) {
-            fetchAssets(dataSource.page, dataSource.size)
-        }
-    }
-
-    const onAddAssetSuccess = () => {
-        setAddAssetVisible(false)
-        onRefresh()
-    }
-
-    const onEditAssetSuccess = () => {
-        setEditAssetVisible(false)
+        setRefreshKey(refreshKey + 1)
     }
 
     const onDelete = async (id: number) => {
@@ -47,58 +41,73 @@ const AssetPage: FC = () => {
     }
 
     const onEdit = async (id: number) => {
-        GetAssetRequest(id).then(data => {
-            setAsset(data)
-            setEditAssetVisible(true)
-        })
+        GetAssetRequest(id).then(setAsset)
     }
 
-    const columns = [
-        {
-            title: '名称',
-            dataIndex: 'name',
-            key: 'name',
-        },
-        {
-            title: '操作',
-            key: 'action',
-            render: (text: any, record: any) => {
-                return <Space>
-                    <HasPermission value={Permission.AssetEdit}>
-                        <Button type="text" size="small" icon={<EditOutlined/>}
-                                onClick={() => onEdit(record.id)}/>
-                    </HasPermission>
-                    <HasPermission value={Permission.AssetDelete}>
-                        <Popconfirm placement="left" title="确认要删除该资产吗?" onConfirm={() => onDelete(record.id)}
-                                    okText="删除" cancelText="取消">
-                            <Button type="text" size="small" icon={<DeleteOutlined/>} danger/>
-                        </Popconfirm>
-                    </HasPermission>
-                </Space>
-            }
-        }
-    ]
+    const renderActions = (id: number) => {
+        return [
+            <Button type={"text"} icon={<MonitorOutlined/>} onClick={() => {
+                window.location.hash = "asset-management?locale=assetMonitor&id=" + id
+            }}/>,
+            <Button type={"text"} icon={<EditOutlined/>} onClick={() => onEdit(id)}/>,
+            <Button type={"text"} icon={<DeleteOutlined/>} danger/>
+        ]
+    }
 
     return <Content>
         <MyBreadcrumb>
             <Button type="primary" onClick={() => {
-                setAddAssetVisible(true)
+                setAddVisible(true)
             }}>
                 添加资产 <PlusOutlined/>
             </Button>
         </MyBreadcrumb>
         <ShadowCard>
-            <TableLayout
-                emptyText={"资产列表为空"}
-                permissions={[Permission.AssetDelete, Permission.AssetEdit]}
-                columns={columns}
-                dataSource={dataSource}
-                onPageChange={fetchAssets}/>
+            <div id="scrollableDiv"
+                 style={{
+                     height: "400px",
+                     overflow: 'auto',
+                     border: '0px solid rgba(140, 140, 140, 0.35)',
+                 }}>
+                <InfiniteScroll dataLength={records.length}
+                                hasMore={records.length < total}
+                                loader={<Skeleton paragraph={{rows: 1}} active={true}/>}
+                                next={() => {
+                                    fetchAssets(current + 1, 10)
+                                }}>
+                    <List size={"small"} dataSource={records}
+                          grid={{sm: 1, md: 2, lg: 3, xl: 4, xxl: 6}}
+                          renderItem={asset => {
+                              return <List.Item key={asset.id}>
+                                  <ShadowCard
+                                      cover={<img alt={asset.name} height={144} style={{objectFit: "cover"}}
+                                                  src={`/api/resources/assets/${asset.image}`}/>}
+                                      actions={renderActions(asset.id)}
+                                  >
+                                      <Card.Meta title={asset.name}/>
+                                  </ShadowCard>
+                              </List.Item>
+                          }}
+                    />
+                </InfiniteScroll>
+            </div>
         </ShadowCard>
-        <AddModal visible={addAssetVisible} onCancel={() => setAddAssetVisible(false)}
-                  onSuccess={onAddAssetSuccess}/>
-        {/*<EditModal visible={editAssetVisible} asset={asset} onCancel={() => setEditAssetVisible(false)}*/}
-        {/*           onSuccess={onEditAssetSuccess}/>*/}
+        {
+            asset && <AssetEditModal asset={asset} visible={!!asset}
+                                     onCancel={() => setAsset(undefined)}
+                                     onSuccess={() => {
+                                         setAsset(undefined)
+                                         onRefresh()
+                                     }}
+            />
+        }
+        <AddAssetModal
+            visible={addVisible}
+            onCancel={() => setAddVisible(false)}
+            onSuccess={() => {
+                setAddVisible(false)
+                onRefresh()
+            }}/>
     </Content>
 }
 

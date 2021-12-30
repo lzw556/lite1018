@@ -37,8 +37,8 @@ func (repo SensorData) Find(mac string, from, to time.Time) ([]entity.SensorData
 		if bucket != nil {
 			if dataBucket := bucket.Bucket([]byte(mac)); dataBucket != nil {
 				c := dataBucket.Cursor()
-				min := []byte(from.Format("2006-01-02T15:04:05Z"))
-				max := []byte(to.Format("2006-01-02T15:04:05Z"))
+				min := []byte(from.UTC().Format("2006-01-02T15:04:05Z"))
+				max := []byte(to.UTC().Format("2006-01-02T15:04:05Z"))
 				for k, v := c.Seek(min); k != nil && bytes.Compare(k, max) <= 0; k, v = c.Next() {
 					var e entity.SensorData
 					if err := json.Unmarshal(v, &e); err != nil {
@@ -60,7 +60,7 @@ func (repo SensorData) Get(mac string, time time.Time) (entity.SensorData, error
 		if bucket != nil {
 			if dataBucket := bucket.Bucket([]byte(mac)); dataBucket != nil {
 				c := dataBucket.Cursor()
-				current := []byte(time.Format("2006-01-02T15:04:05Z"))
+				current := []byte(time.UTC().Format("2006-01-02T15:04:05Z"))
 				var buf []byte
 				if k, v := c.Seek(current); k != nil {
 					buf = v
@@ -124,8 +124,8 @@ func (repo SensorData) Delete(mac string, from, to time.Time) error {
 		if bucket != nil {
 			if dataBucket := bucket.Bucket([]byte(mac)); dataBucket != nil {
 				c := dataBucket.Cursor()
-				min := []byte(from.Format("2006-01-02T15:04:05Z"))
-				max := []byte(to.Format("2006-01-02T15:04:05Z"))
+				min := []byte(from.UTC().Format("2006-01-02T15:04:05Z"))
+				max := []byte(to.UTC().Format("2006-01-02T15:04:05Z"))
 				for k, _ := c.Seek(min); k != nil && bytes.Compare(k, max) <= 0; k, _ = c.Next() {
 					if err := dataBucket.Delete(k); err != nil {
 						return err

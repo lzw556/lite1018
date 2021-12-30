@@ -18,9 +18,13 @@ const FirmwarePage = () => {
     const [dataSource, setDataSource] = useState<PageResult<Firmware[]>>()
     const [refreshKey, setRefreshKey] = useState<number>(0)
 
+    const fetchFirmwares = useCallback((current: number, size: number) => {
+        PagingFirmwaresRequest(current, size).then(setDataSource);
+    }, [refreshKey])
+
     useEffect(() => {
         fetchFirmwares(1, 10)
-    }, [])
+    }, [fetchFirmwares])
 
     const onFileChange = (info: any) => {
         if (info.file.status === 'uploading') {
@@ -41,10 +45,6 @@ const FirmwarePage = () => {
             }
         })
     }
-
-    const fetchFirmwares = useCallback((current: number, size: number) => {
-        PagingFirmwaresRequest(current, size).then(setDataSource);
-    }, [refreshKey])
 
     const onRefresh = () => {
         setRefreshKey(refreshKey + 1)

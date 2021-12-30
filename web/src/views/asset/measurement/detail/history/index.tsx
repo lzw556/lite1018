@@ -2,8 +2,6 @@ import {Measurement} from "../../../../../types/measurement";
 import {FC, useEffect, useState} from "react";
 import {
     GetMeasurementDataRequest,
-    GetMeasurementRawDataRequest,
-    GetMeasurementRawDataTimestampRequest,
     RemoveMeasurementDataRequest
 } from "../../../../../apis/measurement";
 import moment from "moment";
@@ -25,7 +23,7 @@ const {RangePicker} = DatePicker;
 const HistoryData: FC<HistoryDataProps> = ({measurement}) => {
     const [beginDate, setBeginDate] = useState(moment().subtract(7, 'days').startOf("day"));
     const [endDate, setEndDate] = useState(moment().endOf("day"));
-    const [dataSource, setDataSource] = useState<any>({})
+    const [dataSource, setDataSource] = useState<any>()
     const [field, setField] = useState<MeasurementField>()
 
     useEffect(() => {
@@ -65,6 +63,8 @@ const HistoryData: FC<HistoryDataProps> = ({measurement}) => {
                         <MeasurementFieldSelect placeholder={"请选择属性"}
                                                 style={{"width": "120px"}}
                                                 bordered={false}
+                                                defaultActiveFirstOption={true}
+                                                value={field?.name}
                                                 measurement={measurement}
                                                 onChange={setField}/>
                     </Label>

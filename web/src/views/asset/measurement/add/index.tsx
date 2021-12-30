@@ -24,6 +24,7 @@ const AddMeasurement = () => {
     const [mode, setMode] = useState<any>(0)
     const [params, setParams] = useState<any>({})
     const [success, setSuccess] = useState<boolean>(false)
+    const [id, setId] = useState<any>()
     const [form] = Form.useForm()
 
     const steps = [
@@ -51,7 +52,8 @@ const AddMeasurement = () => {
             Object.keys(values).forEach(key => {
                 params[key] = values[key]
             })
-            AddMeasurementRequest(params).then(_ => {
+            AddMeasurementRequest(params).then(data => {
+                setId(data)
                 setSuccess(true)
             })
         })
@@ -87,7 +89,7 @@ const AddMeasurement = () => {
                     {
                         type &&
                         <Form.Item label={"采集方式"} name={"acquisition_mode"} rules={[Rules.required]}>
-                            <AcquisitionModeSelect type={type} onChange={setMode}/>
+                            <AcquisitionModeSelect placeholder={"请选择监测点采集方式"} type={type} onChange={setMode}/>
                         </Form.Item>
                     }
                     {
@@ -115,18 +117,16 @@ const AddMeasurement = () => {
                 success && (<Result
                     status="success"
                     title="监测点创建成功!"
-                    subTitle="您可以返回监测点列表查看监测点信息或者继续创建监测点"
+                    subTitle="您可以查看监测点信息或者继续创建监测点"
                     extra={[
-                        <Button type="primary" key="devices" onClick={() => {
-                            window.location.hash = "device-management/devices"
-                        }}>
-                            返回
-                        </Button>,
                         <Button key="add" onClick={() => {
                             form.resetFields()
                             setCurrent(0)
                             setSuccess(false)
-                        }}>继续创建监测点</Button>,
+                        }}>继续创建</Button>,
+                        <Button key="detail" type={"primary"} onClick={() => {
+                            window.location.hash = `asset-management?locale=assetMonitor/measurementDetail&id=${id}`
+                        }}>查看监测点</Button>
                     ]}
                 />)
             }

@@ -8,7 +8,7 @@ import (
 )
 
 func (r assetRouter) create(ctx *gin.Context) (interface{}, error) {
-	var req request.Asset
+	var req request.CreateAsset
 	if err := ctx.ShouldBind(&req); err != nil {
 		return nil, response.InvalidParameterError(err.Error())
 	}
@@ -17,11 +17,11 @@ func (r assetRouter) create(ctx *gin.Context) (interface{}, error) {
 
 func (r assetRouter) updateByID(ctx *gin.Context) (interface{}, error) {
 	id := cast.ToUint(ctx.Param("id"))
-	var req request.Asset
+	var req request.UpdateAsset
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		return nil, response.InvalidParameterError(err.Error())
 	}
-	return r.service.UpdateAsset(id, req)
+	return nil, r.service.UpdateAsset(id, req)
 }
 
 func (r assetRouter) getByID(ctx *gin.Context) (interface{}, error) {

@@ -4,6 +4,7 @@ import {FC, useEffect, useState} from "react";
 import {Rules} from "../../../constants/validator";
 import WsnFormItem from "../../../components/formItems/wsnFormItem";
 import {UpdateNetworkRequest} from "../../../apis/network";
+import AssetTreeSelect from "../../../components/select/assetTreeSelect";
 
 export interface EditNetworkModalProps extends ModalProps{
   network: Network;
@@ -19,6 +20,7 @@ const EditNetworkModal:FC<EditNetworkModalProps> = (props) => {
         if (visible) {
             form.setFieldsValue({
                 name: network.name,
+                asset: network.asset.id,
                 wsn: {
                     communication_period: network.communicationPeriod,
                     communication_time_offset: network.communicationTimeOffset,
@@ -47,6 +49,9 @@ const EditNetworkModal:FC<EditNetworkModalProps> = (props) => {
         <Form form={form} labelCol={{span: 7}}>
             <Form.Item label={"名称"} name={"name"} rules={[Rules.required]}>
                 <Input placeholder={"请输入网络名称"}/>
+            </Form.Item>
+            <Form.Item label={"所属资产"} name={"asset_id"} rules={[Rules.required]}>
+                <AssetTreeSelect placeholder={"请选择网络所属资产"}/>
             </Form.Item>
             <WsnFormItem/>
         </Form>

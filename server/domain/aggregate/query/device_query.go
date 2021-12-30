@@ -2,6 +2,7 @@ package query
 
 import (
 	"context"
+	"fmt"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
@@ -15,7 +16,6 @@ import (
 
 type DeviceQuery struct {
 	entity.Device
-	Network entity.Network
 
 	deviceRepo            dependency.DeviceRepository
 	deviceStatusRepo      dependency.DeviceStatusRepository
@@ -42,7 +42,8 @@ func NewDeviceQuery() DeviceQuery {
 func (query DeviceQuery) Detail() (*vo.Device, error) {
 	ctx := context.TODO()
 	result := vo.NewDevice(query.Device)
-	if network, err := query.networkRepo.Get(ctx, query.Network.ID); err == nil {
+	fmt.Println(query.Device)
+	if network, err := query.networkRepo.Get(ctx, query.Device.NetworkID); err == nil {
 		result.SetNetwork(network)
 	}
 	var err error
@@ -53,9 +54,6 @@ func (query DeviceQuery) Detail() (*vo.Device, error) {
 	result.Information.DeviceInformation, err = query.deviceInformationRepo.Get(query.Device.ID)
 	if err != nil {
 		xlog.Errorf("get device information failed:%v", query.Device.MacAddress, err)
-	}
-	if query.Network.ID != 0 {
-		result.SetWSN(query.Network)
 	}
 	if properties, err := query.propertyRepo.FindByDeviceTypeID(ctx, query.Device.Type); err == nil {
 		result.SetProperties(properties)
@@ -68,9 +66,6 @@ func (query DeviceQuery) Detail() (*vo.Device, error) {
 
 func (query DeviceQuery) Setting() *vo.DeviceSetting {
 	result := vo.NewDeviceSetting(query.Device)
-	if query.Network.ID != 0 {
-		result.SetNetwork(query.Network)
-	}
 	return &result
 }
 

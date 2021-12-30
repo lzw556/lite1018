@@ -51,7 +51,7 @@ export function UpdateAlarmRuleRequest(id: number, params: any) {
 }
 
 export function RemoveAlarmRuleRequest(id: number) {
-    return request.delete(`/alarmRules/${id}`).then(DeleteResponse)
+    return request.delete(`/alarms/${id}`).then(DeleteResponse)
 }
 
 export function PagingAlarmRecordsRequest(page: number, size: number, from: number, to: number, filter: any) {

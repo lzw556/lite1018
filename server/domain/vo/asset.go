@@ -8,6 +8,7 @@ type Asset struct {
 	ParentID uint     `json:"parentId"`
 	Image    string   `json:"image"`
 	Display  *Display `json:"display,omitempty"`
+	Parent   *Asset   `json:"parent,omitempty"`
 }
 
 func NewAsset(e po.Asset) Asset {
@@ -22,4 +23,9 @@ func NewAsset(e po.Asset) Asset {
 		a.Display = &d
 	}
 	return a
+}
+
+func (a *Asset) SetParent(e po.Asset) {
+	parent := NewAsset(e)
+	a.Parent = &parent
 }

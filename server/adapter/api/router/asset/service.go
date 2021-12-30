@@ -6,8 +6,8 @@ import (
 )
 
 type Service interface {
-	CreateAsset(req request.Asset) error
-	UpdateAsset(assetID uint, req request.Asset) (*vo.Asset, error)
+	CreateAsset(req request.CreateAsset) error
+	UpdateAsset(assetID uint, req request.UpdateAsset) error
 	RemoveAsset(assetID uint) error
 	FindAssetsByPaginate(page, size int) ([]vo.Asset, int64, error)
 	FindAssets() ([]vo.Asset, error)

@@ -2,19 +2,19 @@ import {Measurement} from "../../../../types/measurement";
 import {FC, useEffect, useState} from "react";
 import {GetDevicesRequest} from "../../../../apis/device";
 import {Device} from "../../../../types/device";
-import TableLayout from "../../../layout/TableLayout";
 import {Space, Tag, Typography} from "antd";
 import {ColorHealth, ColorWarn} from "../../../../constants/color";
 import "../../../../string-extension"
 import {MeasurementType} from "../../../../types/measurement_type";
 import moment from "moment";
 import AddDeviceModal from "./addDeviceModal";
+import DeviceTable from "../../../../components/table/deviceTable";
 
-export interface SensorTableProps {
+export interface SensorListProps {
     measurement: Measurement;
 }
 
-const SensorTable:FC<SensorTableProps> = ({measurement}) => {
+const SensorList:FC<SensorListProps> = ({measurement}) => {
     const [dataSource, setDataSource] = useState<Device[]>([]);
     const [visible, setVisible] = useState<boolean>(false);
 
@@ -100,7 +100,7 @@ const SensorTable:FC<SensorTableProps> = ({measurement}) => {
     }
 
     return <>
-        <TableLayout emptyText={<span>传感器列表为空 <a onClick={() => setVisible(true)}>去绑定</a></span>} columns={renderColumns()} dataSource={dataSource}/>
+        <DeviceTable emptyText={<span>传感器列表为空 <a onClick={() => setVisible(true)}>去绑定</a></span>} columns={renderColumns()} dataSource={dataSource}/>
         {
             measurement && <AddDeviceModal measurement={measurement}
                                            visible={visible}
@@ -110,4 +110,4 @@ const SensorTable:FC<SensorTableProps> = ({measurement}) => {
     </>
 }
 
-export default SensorTable
+export default SensorList

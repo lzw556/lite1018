@@ -7,9 +7,11 @@ import {MeasurementFieldType} from "../../../../../../types/measurement_data";
 
 const LineChart:FC<MeasurementChartProps> = ({dataSource, field, style}) => {
     const [option, setOption] = useState<any>({})
+    const [isLoading, setIsLoading] = useState<boolean>(false)
 
     const convertOption = useCallback(() => {
         if (dataSource) {
+            setIsLoading(true)
             const times = dataSource.map((item:any) => moment.unix(item.timestamp).local());
             let legend: any[] = []
             let series = {}
@@ -60,13 +62,14 @@ const LineChart:FC<MeasurementChartProps> = ({dataSource, field, style}) => {
         }else {
             setOption({})
         }
+        setIsLoading(false)
     }, [field])
 
     useEffect(() => {
         convertOption()
     }, [convertOption])
 
-    return <EChartsReact option={option} style={style} notMerge={true}/>
+    return <EChartsReact loadingOption={{ text: '正在加载数据, 请稍等...' }} showLoading={isLoading} option={option} style={style} notMerge={true}/>
 }
 
 export default LineChart;

@@ -19,7 +19,8 @@ type Service interface {
 
 	GetMeasurement(id uint) (*vo.Measurement, error)
 	GetMeasurementData(id uint, from, to int64) ([]vo.MeasurementData, error)
-	GetMeasurementRawData(id uint, from, to int64) ([]vo.MeasurementRawData, error)
+	GetMeasurementRawData(id uint, from, to int64) (vo.MeasurementsRawData, error)
+	GetMeasurementRawDataByTimestamp(id uint, timestamp int64) (*vo.MeasurementRawData, error)
 	UpdateMeasurementSettings(id uint, req request.MeasurementSettings) error
 	UpdateMeasurementByID(id uint, req request.CreateMeasurement) error
 	UpdateMeasurementDeviceBindings(id uint, req request.UpdateMeasurementDeviceBindings) error

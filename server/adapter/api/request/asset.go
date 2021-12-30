@@ -5,7 +5,7 @@ import (
 	"mime/multipart"
 )
 
-type Asset struct {
+type CreateAsset struct {
 	Name     string                `form:"name"`
 	Image    *multipart.FileHeader `form:"file"`
 	ParentID uint                  `form:"parent_id"`
@@ -15,7 +15,7 @@ type Asset struct {
 	} `form:"location"`
 }
 
-func (a *Asset) UploadBytes() ([]byte, error) {
+func (a *CreateAsset) UploadBytes() ([]byte, error) {
 	if a.Image == nil {
 		return nil, nil
 	}
@@ -29,4 +29,13 @@ func (a *Asset) UploadBytes() ([]byte, error) {
 		return nil, err
 	}
 	return payload, nil
+}
+
+type UpdateAsset struct {
+	Name     string `json:"name"`
+	ParentID uint   `json:"parent_id"`
+	Location *struct {
+		X float32 `json:"x"`
+		Y float32 `json:"y"`
+	} `json:"location"`
 }

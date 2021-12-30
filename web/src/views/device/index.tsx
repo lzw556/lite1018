@@ -7,7 +7,6 @@ import {
     LoadingOutlined
 } from "@ant-design/icons";
 import {Content} from "antd/lib/layout/layout";
-import TableLayout from "../layout/TableLayout";
 import {useCallback, useEffect, useState} from "react";
 import {DeviceCommand} from "../../types/device_command";
 import {
@@ -24,7 +23,6 @@ import EditBaseInfoModel from "./edit/editBaseInfoModel";
 import {ColorHealth, ColorWarn} from "../../constants/color";
 import Label from "../../components/label";
 import ReplaceMacModal from "./replace/replaceMacModal";
-import useSocket, {SocketTopic} from "../../socket";
 import ShadowCard from "../../components/shadowCard";
 import UpgradeModal from "./upgrade";
 import "../../string-extension";
@@ -33,11 +31,11 @@ import {IsUpgrading} from "../../types/device_upgrade_status";
 import "../../assets/iconfont.css";
 import AlertIcon from "../../components/alertIcon";
 import MyBreadcrumb from "../../components/myBreadcrumb";
-import _ from "lodash";
 import HasPermission from "../../permission";
 import usePermission, {Permission} from "../../permission/permission";
 import {PageResult} from "../../types/page";
 import AssetTreeSelect from "../../components/select/assetTreeSelect";
+import DeviceTable from "../../components/table/deviceTable";
 
 const {Search} = Input
 const {Option} = Select
@@ -53,39 +51,9 @@ const DevicePage = () => {
     const [upgradeVisible, setUpgradeVisible] = useState<boolean>(false)
     const [replaceVisible, setReplaceVisible] = useState<boolean>(false)
     const [executeDevice, setExecuteDevice] = useState<Device>()
-    const {PubSub} = useSocket()
     const [dataSource, setDataSource] = useState<PageResult<any>>()
     const {hasPermission, hasPermissions} = usePermission()
     const [refreshKey, setRefreshKey] = useState<number>(0)
-
-    useEffect(() => {
-        PubSub.subscribe(SocketTopic.connectionState, (msg: string, state: any) => {
-            if (state && dataSource) {
-                const newDataSource = _.cloneDeep(dataSource)
-                newDataSource.result.forEach((item: Device) => {
-                    if (item.id === state.id) {
-                        item.state.isOnline = state.isOnline
-                    }
-                })
-                setDataSource(newDataSource)
-            }
-        })
-        PubSub.subscribe(SocketTopic.upgradeState, (msg: string, state: any) => {
-            if (state && dataSource) {
-                const newDataSource = _.cloneDeep(dataSource)
-                newDataSource.result.forEach((item: Device) => {
-                    if (item.id === state.id) {
-                        item.upgradeState = state
-                    }
-                })
-                setDataSource(newDataSource)
-            }
-        })
-        return () => {
-            PubSub.unsubscribe(SocketTopic.connectionState)
-            PubSub.unsubscribe(SocketTopic.upgradeState)
-        }
-    }, [dataSource])
 
     const onSearch = (value: string) => {
         setSearchText(value)
@@ -324,13 +292,7 @@ const DevicePage = () => {
             <br/>
             <Row justify="center">
                 <Col span={24}>
-                    <TableLayout
-                        emptyText={"设备列表为空"}
-                        columns={columns}
-                        permissions={[Permission.DeviceEdit, Permission.DeviceReplace, Permission.DeviceCommand, Permission.DeviceUpgrade, Permission.DeviceFirmwares, Permission.DeviceDelete, Permission.DeviceSettingsEdit, Permission.NetworkSettingEdit]}
-                        dataSource={dataSource}
-                        onPageChange={fetchDevices}
-                    />
+                    <DeviceTable columns={columns} dataSource={dataSource} onChange={fetchDevices}/>
                 </Col>
             </Row>
         </ShadowCard>

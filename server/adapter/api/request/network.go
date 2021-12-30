@@ -8,8 +8,9 @@ type WSN struct {
 }
 
 type Network struct {
-	Name string `json:"name"`
-	WSN  WSN    `json:"wsn"`
+	Name    string `json:"name"`
+	AssetID uint   `json:"asset_id"`
+	WSN     WSN    `json:"wsn"`
 }
 
 type AccessDevices struct {

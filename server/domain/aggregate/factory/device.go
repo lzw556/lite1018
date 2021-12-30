@@ -125,9 +125,6 @@ func (factory Device) NewDeviceQuery(id uint) (*query.DeviceQuery, error) {
 	}
 	q := query.NewDeviceQuery()
 	q.Device = e
-	if e.Type == devicetype.GatewayType {
-		q.Network, _ = factory.networkRepo.Get(ctx, e.NetworkID)
-	}
 	return &q, nil
 }
 

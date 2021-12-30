@@ -9,6 +9,7 @@ import (
 	spec "github.com/thetasensors/theta-cloud-lite/server/domain/specification"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/vo"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/measurementtype"
+	"sort"
 	"time"
 )
 
@@ -98,7 +99,7 @@ func (query MeasurementQuery) GetData(from, to int64) ([]vo.MeasurementData, err
 	return result, nil
 }
 
-func (query MeasurementQuery) GetRawData(from, to int64) ([]vo.MeasurementRawData, error) {
+func (query MeasurementQuery) GateRawDataByRange(from, to int64) (vo.MeasurementsRawData, error) {
 	ctx := context.TODO()
 	binding, err := query.bindingRepo.GetBySpecs(ctx, spec.MeasurementEqSpec(query.Measurement.ID))
 	if err != nil {
@@ -108,9 +109,25 @@ func (query MeasurementQuery) GetRawData(from, to int64) ([]vo.MeasurementRawDat
 	if err != nil {
 		return nil, err
 	}
-	result := make([]vo.MeasurementRawData, len(data))
+	result := make(vo.MeasurementsRawData, len(data))
 	for i, d := range data {
 		result[i] = vo.NewMeasurementRawData(d)
 	}
+	sort.Sort(result)
 	return result, nil
+}
+
+func (query MeasurementQuery) GateRawData(timestamp int64) (*vo.MeasurementRawData, error) {
+	ctx := context.TODO()
+	binding, err := query.bindingRepo.GetBySpecs(ctx, spec.MeasurementEqSpec(query.Measurement.ID))
+	if err != nil {
+		return nil, err
+	}
+	data, err := query.largeSensorDataRepo.Get(binding.MacAddress, time.Unix(timestamp, 0))
+	if err != nil {
+		return nil, err
+	}
+	result := vo.NewMeasurementRawData(data)
+	result.Values = data.Values
+	return &result, nil
 }

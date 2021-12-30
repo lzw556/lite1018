@@ -11,17 +11,24 @@ export interface AssetTreeSelectProps extends TreeSelectProps<any> {
 const {TreeNode} = TreeSelect;
 
 const AssetTreeSelect: FC<AssetTreeSelectProps> = (props) => {
-    const {onChange, defaultActiveFirstOption} = props;
+    const {onChange, defaultActiveFirstOption, defaultValue} = props;
     const [dataSource, setDataSource] = useState<Asset[]>()
 
     useEffect(() => {
         GetAssetsRequest().then(data => {
             if (data.length && defaultActiveFirstOption) {
-                onChange && onChange(data[0].id);
+                if (onChange) {
+                    const asset = data.find(item => item.id === defaultValue);
+                    if (asset) {
+                        onChange(asset.id)
+                    }else {
+                        onChange(data[0].id)
+                    }
+                }
             }
             setDataSource(data)
         })
-    }, [])
+    }, [defaultValue])
 
     const convertAssetTreeNode: any = (parentId: number) => {
         return dataSource?.filter(item => item.parentId == parentId).map(item => {

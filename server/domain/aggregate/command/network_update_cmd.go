@@ -32,12 +32,25 @@ func NewNetworkUpdateCmd() NetworkUpdateCmd {
 }
 
 func (cmd NetworkUpdateCmd) Update(req request.Network) (*vo.Network, error) {
+	isAssetChanged := cmd.Network.AssetID != req.AssetID
 	cmd.Network.CommunicationPeriod = req.WSN.CommunicationPeriod
 	cmd.Network.CommunicationTimeOffset = req.WSN.CommunicationTimeOffset
 	cmd.Network.GroupInterval = req.WSN.GroupInterval
 	cmd.Network.GroupSize = req.WSN.GroupSize
 	cmd.Network.Name = req.Name
-	err := cmd.networkRepo.Save(context.TODO(), &cmd.Network.Network)
+	cmd.Network.AssetID = req.AssetID
+	err := transaction.Execute(context.TODO(), func(txCtx context.Context) error {
+		if err := cmd.networkRepo.Save(txCtx, &cmd.Network.Network); err != nil {
+			return err
+		}
+		if isAssetChanged {
+			updates := map[string]interface{}{
+				"asset_id": cmd.Network.AssetID,
+			}
+			return cmd.deviceRepo.UpdatesBySpecs(txCtx, updates, spec.NetworkEqSpec(cmd.Network.ID))
+		}
+		return nil
+	})
 	if err != nil {
 		return nil, err
 	}

@@ -93,7 +93,7 @@ const InformationCard: FC<GatewayInformationProps> = ({device, isLoading}) => {
                 </Col>
                 <Col span={6}>
                     {
-                        device.network ? device.network.name : "未入网"
+                        device.network ? device.network.name : "无"
                     }
                 </Col>
             </Row>

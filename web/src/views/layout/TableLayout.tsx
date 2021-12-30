@@ -62,6 +62,7 @@ const TableLayout: FC<TableLayoutProps> = (props) => {
                     dataSource && !Array.isArray(dataSource) &&
                     <Pagination {...pagination}
                                 current={dataSource.page}
+                                total={dataSource.total}
                                 pageSize={dataSource.size}/>
                 }
             </Col>
