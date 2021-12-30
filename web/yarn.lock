@@ -10346,10 +10346,18 @@ react-konva-utils@^0.2.0:
     react-konva "^17.0.2-4"
     use-image "^1.0.7"
 
-react-konva@^17.0.2-4, react-konva@^17.0.2-5:
+react-konva@^17.0.2-4:
   version "17.0.2-5"
   resolved "https://registry.nlark.com/react-konva/download/react-konva-17.0.2-5.tgz?cache=0&sync_timestamp=1626236120327&other_urls=https%3A%2F%2Fregistry.nlark.com%2Freact-konva%2Fdownload%2Freact-konva-17.0.2-5.tgz#e70b0acf323402de0a540f27b300fbe7ed151849"
   integrity sha1-5wsKzzI0At4KVA8nswD75+0VGEk=
+  dependencies:
+    react-reconciler "~0.26.2"
+    scheduler "^0.20.2"
+
+react-konva@^17.0.2-5:
+  version "17.0.2-5"
+  resolved "https://registry.npmjs.org/react-konva/-/react-konva-17.0.2-5.tgz#e70b0acf323402de0a540f27b300fbe7ed151849"
+  integrity sha512-IyzdfqRDK8r1ulp/jbLPX18AuO+n5yNtL0+4T0QEUsgArRqIl/VRCG1imA5mYJBk0cBNC5+fWDHN+HWEW62ZEQ==
   dependencies:
     react-reconciler "~0.26.2"
     scheduler "^0.20.2"
