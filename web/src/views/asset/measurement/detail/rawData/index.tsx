@@ -1,4 +1,4 @@
-import { Col, DatePicker, Menu, Row } from 'antd';
+import { Col, DatePicker, Menu, Row, Space, Typography } from 'antd';
 import EChartsReact from 'echarts-for-react';
 import moment from 'moment';
 import * as React from 'react';
@@ -15,10 +15,9 @@ const MeasurementRawData: React.FC<{ measurement: Measurement }> = ({ measuremen
   const [endDate, setEndDate] = React.useState(moment().endOf('day'));
   const [timestamps, setTimestamps] = React.useState<number[]>([]);
   const [isLoaded, setIsLoaded] = React.useState(false);
+  const [loading, setLoading] = React.useState(false);
+  const [chartOptions, setChartOptions] = React.useState<any>();
   const [timestamp, setTimestamp] = React.useState(0);
-  React.useEffect(() => {
-    setTimestamp(timestamps.length > 0 ? timestamps[0] : 0);
-  }, [timestamps]);
   React.useEffect(() => {
     setIsLoaded(false);
     GetMeasurementRawDataTimestampRequest(
@@ -30,69 +29,93 @@ const MeasurementRawData: React.FC<{ measurement: Measurement }> = ({ measuremen
       setTimestamps(res.map((val: any) => val.timestamp));
     });
   }, [beginDate, endDate, measurement.id]);
-
-  const chartInstance = React.useRef();
-  const handleChartReady = (echarts: any, id: number, timestamp: number) => {
-    if (!chartInstance.current) chartInstance.current = echarts;
-    echarts.showLoading();
-    GetMeasurementRawDataRequest(id, timestamp).then((res) => {
-      const legends = ['X轴', 'Y轴', 'Z轴'];
-      const index = [];
-      for (let i = 0; i < res.values.length / 3; i++) {
-        index.push(i);
+  React.useEffect(() => {
+    setTimestamp(timestamps.length > 0 ? timestamps[0] : 0);
+  }, [timestamps]);
+  React.useEffect(() => {
+    setLoading(true);
+    GetMeasurementRawDataRequest(measurement.id, timestamp).then(
+      ({ values }: { timestamp: number; values: number[] }) => {
+        const legends = ['X轴', 'Y轴', 'Z轴'];
+        setChartOptions({
+          legend: { data: legends },
+          xAxis: {
+            type: 'category',
+            data: Object.keys(values.filter((val, i) => i % 3 === 0)).map((val) => Number(val))
+          },
+          yAxis: { type: 'value' },
+          series: legends.map((legend, i) => ({
+            name: legend,
+            type: 'line',
+            data: values.filter((val, j) => (j - i) % legends.length === 0),
+            itemStyle: LineChartStyles[i].itemStyle
+          })),
+          animation: false,
+          smooth: true,
+          dataZoom: [
+            {
+              type: 'slider',
+              show: true,
+              startValue: 0,
+              endValue: 5000,
+              height: '15',
+              bottom: '3%',
+              zoomLock: true
+            }
+          ]
+        });
+        setLoading(false);
       }
-      echarts.setOption({
-        legend: { data: legends },
-        xAxis: { type: 'category', data: index },
-        yAxis: { type: 'value' },
-        series: legends.map((legend, i) => ({
-          name: legend,
-          type: 'line',
-          data: res.values.filter((val: number, j: number) => (j - i) % legends.length === 0),
-          ...LineChartStyles.map((style) => style.itemStyle)[i]
-        })),
-        animation: false,
-        smooth: true,
-        dataZoom: [
-          {
-            type: 'slider',
-            show: true,
-            startValue: 0,
-            endValue: 5000,
-            height: '15',
-            bottom: '3%',
-            zoomLock: true
-          }
-        ]
-      });
-      echarts.hideLoading();
-    });
-  };
+    );
+  }, [timestamp, measurement.id]);
   const renderContent = () => {
     if (timestamps.length > 0 && timestamp > 0) {
       return (
         <Row>
           <Col span={4} style={{ maxHeight: 500, overflow: 'auto' }}>
-            <Menu defaultSelectedKeys={[timestamp.toString()]}>
+            <Menu selectedKeys={[timestamp.toString()]}>
               {timestamps.map((time) => (
                 <Menu.Item
                   key={time}
+                  title={moment.unix(time).local().format('YYYY-MM-DD HH:mm:ss')}
                   onClick={() => {
-                    handleChartReady(chartInstance.current, measurement.id, time);
+                    setTimestamp(time);
                   }}
                 >
-                  {moment.unix(time).local().format('YYYY-MM-DD HH:mm:ss')}
+                  <Space size={24}>
+                    <Typography.Link>下载</Typography.Link>
+                    {moment.unix(time).local().format('YYYY-MM-DD HH:mm:ss')}
+                  </Space>
                 </Menu.Item>
               ))}
             </Menu>
           </Col>
           <Col span={20}>
-            <EChartsReact
-              loadingOption={{ text: '正在处理数据, 请稍等...' }}
-              showLoading={true}
-              onChartReady={(echarts) => handleChartReady(echarts, measurement.id, timestamp)}
-              option={{}}
-            />
+            {loading && (
+              <div
+                className='mask'
+                style={{
+                  position: 'absolute',
+                  width: '100%',
+                  height: '100%',
+                  backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                  zIndex: 10
+                }}
+              >
+                <div
+                  className='spin'
+                  style={{
+                    position: 'absolute',
+                    left: '50%',
+                    top: '50%',
+                    transform: 'translate(-50%,-50%)'
+                  }}
+                >
+                  正在处理数据, 请稍等...
+                </div>
+              </div>
+            )}
+            <EChartsReact style={{ height: 500 }} option={chartOptions} />
           </Col>
         </Row>
       );
