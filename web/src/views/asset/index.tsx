@@ -18,6 +18,7 @@ const AssetPage: FC = () => {
     const [records, setRecords] = useState<Asset[]>([])
     const [total, setTotal] = useState<number>(0)
     const [current, setCurrent] = useState<number>(1)
+    const [height] = useState(window.innerHeight - 180)
 
     const fetchAssets = useCallback((current: number, size: number) => {
         PagingAssetsRequest(current, size).then(data => {
@@ -65,7 +66,7 @@ const AssetPage: FC = () => {
         <ShadowCard>
             <div id="scrollableDiv"
                  style={{
-                     height: "400px",
+                     height: `${height}px`,
                      overflow: 'auto',
                      border: '0px solid rgba(140, 140, 140, 0.35)',
                  }}>

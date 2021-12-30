@@ -1,4 +1,4 @@
-import { Col, DatePicker, Menu, Row } from 'antd';
+import {Col, DatePicker, Menu, Row} from 'antd';
 import EChartsReact from 'echarts-for-react';
 import moment from 'moment';
 import * as React from 'react';
@@ -59,14 +59,24 @@ const MeasurementRawData: React.FC<{ measurement: Measurement }> = ({ measuremen
             show: true,
             startValue: 0,
             endValue: 5000,
-            height: '30',
-            zoomLock: true
+            height: '32',
+            zoomLock: false,
           }
         ]
       });
       echarts.hideLoading();
     });
   };
+
+  const columns = [
+    {
+      title: '时间',
+      dataIndex: 'timestamp',
+      key: 'timestamp',
+      render: (timestamp: number) => moment.unix(timestamp).local().format('YYYY-MM-DD HH:mm:ss')
+    }
+  ]
+
   const renderContent = () => {
     if (timestamps.length > 0 && timestamp > 0) {
       return (
