@@ -59,8 +59,7 @@ const MeasurementRawData: React.FC<{ measurement: Measurement }> = ({ measuremen
             show: true,
             startValue: 0,
             endValue: 5000,
-            height: '15',
-            bottom: '3%',
+            height: '30',
             zoomLock: true
           }
         ]
