@@ -29,6 +29,7 @@ func (r *measurementRouter) initRoutes() {
 		router.NewGetRoute("measurements/:id/data", r.getData),
 		router.NewGetRoute("measurements/:id/rawData", r.getRawData),
 		router.NewGetRoute("measurements/:id/rawData/:timestamp", r.getRawDataByTimestamp),
+		router.NewGetRoute("measurements/:id/rawData/:timestamp/download", r.downloadRawData),
 
 		router.NewGetRoute("/check/deviceBinding/:mac", r.checkDeviceBinding),
 

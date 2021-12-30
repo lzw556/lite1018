@@ -3,3 +3,7 @@
     margin: 6px 0;
     cursor: default;
 }
+
+.ts-row-selected {
+    color: #1890ff;
+}
