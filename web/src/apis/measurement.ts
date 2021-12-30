@@ -39,8 +39,12 @@ export function GetMeasurementDataRequest(id: number, from: number, to: number) 
     return request.get(`/measurements/${id}/data`, {from, to}).then(GetResponse);
 }
 
-export function GetMeasurementRawDataRequest(id: number, from: number, to: number) {
+export function GetMeasurementRawDataTimestampRequest(id: number, from: number, to: number) {
     return request.get<any>(`/measurements/${id}/rawData`, {from, to}).then(GetResponse);
+}
+
+export function GetMeasurementRawDataRequest(id: number, timestamp: number) {
+    return request.get<any>(`/measurements/${id}/rawData/${timestamp}`).then(GetResponse);
 }
 
 export function UpdateMeasurementRequest(id: number, params: any) {

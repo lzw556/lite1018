@@ -21,6 +21,7 @@ import SensorTable from "./sensorTable";
 import MeasurementSettings from "./settings";
 import HistoryData from "./history";
 import {MeasurementField, MeasurementFieldType} from "../../../../types/measurement_data";
+import MeasurementRawData from "./rawData";
 
 const tabList = [
     {
@@ -30,6 +31,10 @@ const tabList = [
     {
         key: "history",
         tab: "历史数据"
+    },
+    {
+        key: "rawData",
+        tab: "波形记录"
     },
     {
         key: "settings",
@@ -46,6 +51,7 @@ const MeasurementDetail = () => {
     const contents = new Map<string, any>([
         ["sensors", measurement && <SensorTable measurement={measurement}/>],
         ["history", measurement && <HistoryData measurement={measurement}/>],
+        ["rawData", measurement && <MeasurementRawData measurement={measurement}/>],
         ["settings", measurement && <MeasurementSettings measurement={measurement}/>]
     ]);
 
@@ -179,7 +185,13 @@ const MeasurementDetail = () => {
         </Row>
         <Row justify={"start"} style={{paddingBottom: "8px"}}>
             <Col span={24}>
-                <ShadowCard tabList={tabList} onTabChange={key => setCurrentKey(key)}>
+                <ShadowCard tabList={tabList.map((tab) => {
+              if (tab.key === 'rawData') {
+                return { ...tab, disabled: measurement?.type !== MeasurementType.Vibration };
+              } else {
+                return tab;
+              }
+            })} onTabChange={key => setCurrentKey(key)}>
                     {contents.get(currentKey)}
                 </ShadowCard>
             </Col>
