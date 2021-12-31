@@ -1,4 +1,4 @@
-import {Col, DatePicker, Row, Space, Table} from 'antd';
+import {Col, DatePicker, Row, Space, Spin, Table} from 'antd';
 import EChartsReact from 'echarts-for-react';
 import moment from 'moment';
 import * as React from 'react';
@@ -9,28 +9,27 @@ import {
 } from '../../../../../apis/measurement';
 import {LineChartStyles} from '../../../../../constants/chart';
 import {Measurement} from '../../../../../types/measurement';
-import {EmptyLayout} from '../../../../layout';
 import "../../../index.css";
 
 const MeasurementRawData: React.FC<{ measurement: Measurement }> = ({measurement}) => {
     const [beginDate, setBeginDate] = React.useState(moment().subtract(7, 'days').startOf('day'));
     const [endDate, setEndDate] = React.useState(moment().endOf('day'));
-    const [dataSource, setDataSource] = React.useState<any>([]);
+    const [dataSource, setDataSource] = React.useState<any>();
     const [loading, setLoading] = React.useState(false);
     const [chartOptions, setChartOptions] = React.useState<any>({});
-    const [timestamp, setTimestamp] = React.useState(0);
+    const [timestamp, setTimestamp] = React.useState<number>();
+
     React.useEffect(() => {
         GetMeasurementRawDataTimestampRequest(
             measurement.id,
             beginDate.utc().unix(),
             endDate.utc().unix()
-        ).then(setDataSource);
+        ).then(data => {
+            setDataSource(data)
+            setTimestamp(data.length && data[0].timestamp)
+        });
     }, [beginDate, endDate, measurement.id]);
-    React.useEffect(() => {
-        if (dataSource.length) {
-            setTimestamp(dataSource[0].timestamp);
-        }
-    }, [dataSource]);
+
     React.useEffect(() => {
         if (timestamp) {
             setLoading(true);
@@ -43,11 +42,18 @@ const MeasurementRawData: React.FC<{ measurement: Measurement }> = ({measurement
                             type: 'category',
                             data: Object.keys(values.filter((val, i) => i % 3 === 0)).map((val) => Number(val))
                         },
+                        grid: {
+                            left: '2%',
+                            right: '8%',
+                            bottom: '12%',
+                            containLabel: true,
+                            borderWidth: '0',
+                        },
                         yAxis: {type: 'value'},
                         series: legends.map((legend, i) => ({
                             name: legend,
                             type: 'line',
-                            data: values.filter((val, j) => (j - i) % legends.length === 0),
+                            data: values.filter((val, j) => j % legends.length === i),
                             itemStyle: LineChartStyles[i].itemStyle
                         })),
                         animation: false,
@@ -100,67 +106,55 @@ const MeasurementRawData: React.FC<{ measurement: Measurement }> = ({measurement
         });
     }
 
-    const renderContent = () => {
-        if (dataSource.length > 0 && timestamp > 0) {
-            return (
-                <Row>
-                    <Col xl={6} xxl={4} style={{maxHeight: 500, overflow: 'auto'}}>
-                        <Table size={"middle"}
-                               showHeader={false}
-                               columns={columns}
-                               dataSource={dataSource}
-                               pagination={false}
-                               rowClassName={(record) => record.timestamp === timestamp ? 'ts-row-selected' : ''}
-                               onRow={(record) => ({
-                                   onClick: () => setTimestamp(record.timestamp),
-                                   onMouseLeave: () => window.document.body.style.cursor = 'default',
-                                   onMouseEnter: () => window.document.body.style.cursor = 'pointer'
-                               })}
-                        />
-                        {/*<Menu selectedKeys={[timestamp.toString()]}>*/}
-                        {/*    {timestamps.map((time) => (*/}
-                        {/*        <Menu.Item*/}
-                        {/*            key={time}*/}
-                        {/*            title={moment.unix(time).local().format('YYYY-MM-DD HH:mm:ss')}*/}
-                        {/*            onClick={() => {*/}
-                        {/*                setTimestamp(time);*/}
-                        {/*            }}*/}
-                        {/*        >*/}
-                        {/*            <Space size={24}>*/}
-                        {/*                <Typography.Link>下载</Typography.Link>*/}
-                        {/*                {moment.unix(time).local().format('YYYY-MM-DD HH:mm:ss')}*/}
-                        {/*            </Space>*/}
-                        {/*        </Menu.Item>*/}
-                        {/*    ))}*/}
-                        {/*</Menu>*/}
-                    </Col>
-                    <Col xl={18} xxl={20}>
-                        <EChartsReact loadingOption={{ text: '正在加载数据, 请稍等...' }}  showLoading={loading} style={{height: 500}} option={chartOptions}/>
-                    </Col>
-                </Row>
-            );
-        } else {
-            return <EmptyLayout description={'暂时没有数据'}/>;
-        }
-    };
+    const renderChart = () => {
+        return (
+            <Spin spinning={timestamp === undefined}>
+                <EChartsReact loadingOption={{ text: '正在加载数据, 请稍等...' }}  showLoading={loading} style={{height: 500}} option={chartOptions}/>
+            </Spin>
+        )
+    }
 
-    return (
-        <>
-            <Row justify='end'>
-                <DatePicker.RangePicker
-                    allowClear={false}
-                    value={[beginDate, endDate]}
-                    onChange={(date, dateString) => {
-                        if (dateString) {
-                            setBeginDate(moment(dateString[0]).startOf('day'));
-                            setEndDate(moment(dateString[1]).endOf('day'));
-                        }
-                    }}
-                />
+    return  <Row>
+        <Col xl={6} xxl={4} style={{maxHeight: 500}}>
+            <Row justify={"center"} style={{width: "100%"}}>
+                <Col span={24}>
+                    <DatePicker.RangePicker
+                        allowClear={false}
+                        value={[beginDate, endDate]}
+                        onChange={(date, dateString) => {
+                            if (dateString) {
+                                setBeginDate(moment(dateString[0]).startOf('day'));
+                                setEndDate(moment(dateString[1]).endOf('day'));
+                            }
+                        }}
+                    />
+                </Col>
             </Row>
-            {renderContent()}
-        </>
-    );
+            <Row justify={"space-between"} style={{maxHeight: "464px", overflow: "auto", paddingTop: "4px"}}>
+                <Col span={24}>
+                    <Table size={"middle"}
+                           style={{width: "100%"}}
+                           showHeader={false}
+                           columns={columns}
+                           dataSource={dataSource}
+                           loading={dataSource === undefined}
+                           pagination={false}
+                           rowClassName={(record) => record.timestamp === timestamp ? 'ant-table-row-selected' : ''}
+                           onRow={(record) => ({
+                               onClick: () => setTimestamp(record.timestamp),
+                               onMouseLeave: () => window.document.body.style.cursor = 'default',
+                               onMouseEnter: () => window.document.body.style.cursor = 'pointer'
+                           })}
+                    />
+                </Col>
+            </Row>
+        </Col>
+        <Col xl={18} xxl={20}>
+            {
+                renderChart()
+            }
+        </Col>
+    </Row>
 };
 
 export default MeasurementRawData;
