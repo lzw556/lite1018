@@ -9,25 +9,26 @@ import {Col, Row, Skeleton, Spin} from "antd";
 
 export interface AssetCanvasProps {
     width: number;
-    height?: number;
+    height: number;
     center?: number | undefined
     middle?: number | undefined
     measurements: Measurement[];
     asset: Asset;
 }
 
-const AssetCanvas: FC<AssetCanvasProps> = ({width, asset, measurements}) => {
+const AssetCanvas: FC<AssetCanvasProps> = ({width, height, asset, measurements}) => {
     const [image, status] = useImage(`/api/resources/assets/${asset.image}`);
     const [children, setChildren] = useState<Asset[]>([])
 
     useEffect(() => {
+        console.log(height)
         GetAssetChildrenRequest(asset.id).then(setChildren)
     }, [asset])
 
     const render = () => {
         switch (status) {
             case "loading":
-                return <Row justify={"center"} align={"middle"} style={{height: "200px"}}>
+                return <Row justify={"center"} align={"middle"} style={{height: `${height}px`}}>
                     <Col>
                         <Spin spinning tip={"图片加载中..."}/>
                     </Col>
@@ -37,10 +38,11 @@ const AssetCanvas: FC<AssetCanvasProps> = ({width, asset, measurements}) => {
                     const scale = width / image.width;
                     const scaleWidth = image.width * scale;
                     const scaleHeight = image.height * scale;
-                    const x = (width - scaleWidth) / 2;
-                    return <Stage key={`${asset.id}-stage`} width={width} height={scaleHeight} draggable={true}>
+                    const x = (width - scaleWidth) / 2
+                    const y = (height - scaleHeight) / 2
+                    return <Stage key={`${asset.id}-stage`} width={width} height={height} draggable={true}>
                         <Layer>
-                            <Group key={`${asset.id}-group`} x={x} y={0} width={scaleWidth} height={scaleHeight}>
+                            <Group key={`${asset.id}-group`} x={x} y={y} width={scaleWidth} height={scaleHeight}>
                                 <Image key={`${asset.id}-image`} width={scaleWidth} height={scaleHeight} image={image}/>
                                 {
                                     renderMeasurements(scaleWidth, scaleHeight)
@@ -56,7 +58,7 @@ const AssetCanvas: FC<AssetCanvasProps> = ({width, asset, measurements}) => {
                     没有图片
                 </div>
             case "failed":
-                return <Row justify={"center"} align={"middle"} style={{height: "200px"}}>
+                return <Row justify={"center"} align={"middle"} style={{height: height}}>
                     <Col>
                         <Skeleton.Image/>
                     </Col>

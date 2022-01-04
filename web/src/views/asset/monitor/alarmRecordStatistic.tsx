@@ -7,9 +7,10 @@ import {AlarmRecordStatistics} from "../../../types/alarm_statistics";
 
 export interface AlarmRecordStatisticProps {
     asset?: Asset
+    style?: any
 }
 
-const AlarmRecordStatistic:FC<AlarmRecordStatisticProps> = ({asset}) => {
+const AlarmRecordStatistic:FC<AlarmRecordStatisticProps> = ({asset, style}) => {
     const [statistics, setStatistics] = useState<AlarmRecordStatistics>();
 
     useEffect(() => {
@@ -20,7 +21,7 @@ const AlarmRecordStatistic:FC<AlarmRecordStatisticProps> = ({asset}) => {
         }
     }, [asset])
 
-    return <Row justify={"space-between"}>
+    return <Row justify={"space-between"} style={style} align={"middle"}>
         <Col span={6}>
             <Statistic title={"未处理"} value={statistics?.untreated.reduce((acc, curr) => acc + curr, 0)}/>
         </Col>

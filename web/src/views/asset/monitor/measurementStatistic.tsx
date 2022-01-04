@@ -1,5 +1,5 @@
 import {Asset} from "../../../types/asset";
-import {FC, useEffect, useState} from "react";
+import React, {FC, useEffect, useState} from "react";
 import {GetMeasurementStatisticsRequest} from "../../../apis/measurement";
 import EChartsReact from "echarts-for-react";
 import {DefaultPieOption} from "../../../constants/chart";
@@ -7,9 +7,10 @@ import {ColorDanger, ColorHealth, ColorInfo, ColorWarn} from "../../../constants
 
 export interface MeasurementStatisticProps {
     asset?: Asset;
+    style?: React.CSSProperties;
 }
 
-const MeasurementStatistic: FC<MeasurementStatisticProps> = ({asset}) => {
+const MeasurementStatistic: FC<MeasurementStatisticProps> = ({asset, style}) => {
     const [option, setOption] = useState<any>({});
 
     useEffect(() => {
@@ -34,7 +35,7 @@ const MeasurementStatistic: FC<MeasurementStatisticProps> = ({asset}) => {
             legend: {
                 show: true,
                 orient: 'vertical',
-                top: '10%',
+                top: 0,
                 left: 0,
                 formatter: function (name: string) {
                     return `${name}(${legend.get(name)})`;
@@ -82,7 +83,7 @@ const MeasurementStatistic: FC<MeasurementStatisticProps> = ({asset}) => {
         })
     }
 
-    return <EChartsReact option={option} style={{height: "144px"}}/>
+    return <EChartsReact option={option} style={style}/>
 }
 
 export default MeasurementStatistic

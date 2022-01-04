@@ -3,6 +3,7 @@ package request
 import (
 	"io/ioutil"
 	"mime/multipart"
+	"path"
 )
 
 type CreateAsset struct {
@@ -29,6 +30,10 @@ func (a *CreateAsset) UploadBytes() ([]byte, error) {
 		return nil, err
 	}
 	return payload, nil
+}
+
+func (a *CreateAsset) GetFileExt() string {
+	return path.Ext(a.Image.Filename)
 }
 
 type UpdateAsset struct {

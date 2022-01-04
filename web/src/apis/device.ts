@@ -21,10 +21,6 @@ export function GetDevicesRequest(filters:any) {
     return request.get<Device[]>("/devices", filters).then(GetResponse)
 }
 
-export function GetDevicesByFilterRequest(assetId:number, filter:string) {
-    return request.get<Device[]>(`/devices?method=filter`, {assetId, filter}).then(GetResponse)
-}
-
 export function UpdateDeviceSettingRequest(id:number, setting:any) {
     return request.patch(`/devices/${id}/settings`, setting).then(PutResponse)
 }

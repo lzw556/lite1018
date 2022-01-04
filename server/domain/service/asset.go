@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"fmt"
 	uuid "github.com/satori/go.uuid"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/request"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/response"
@@ -32,7 +33,7 @@ func NewAsset() asset.Service {
 func (s Asset) CreateAsset(req request.CreateAsset) error {
 	e := po.Asset{
 		Name:     req.Name,
-		Image:    uuid.NewV1().String(),
+		Image:    fmt.Sprintf("%s%s", uuid.NewV1().String(), req.GetFileExt()),
 		ParentID: req.ParentID,
 	}
 	if req.Location != nil {

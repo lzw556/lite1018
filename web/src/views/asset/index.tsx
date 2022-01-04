@@ -1,5 +1,5 @@
 import {FC, useCallback, useEffect, useState} from "react";
-import {Button, Card, List, Skeleton} from "antd";
+import {Button, Card, List, Popconfirm, Skeleton} from "antd";
 import {Content} from "antd/lib/layout/layout";
 import {GetAssetRequest, PagingAssetsRequest, RemoveAssetRequest} from "../../apis/asset";
 import {Asset} from "../../types/asset";
@@ -22,15 +22,14 @@ const AssetPage: FC = () => {
 
     const fetchAssets = useCallback((current: number, size: number) => {
         PagingAssetsRequest(current, size).then(data => {
-            const ids = records.map(item => item.id)
-            setRecords([...records, ...data.result.filter(item => !ids.includes(item.id))])
+            setRecords(data.result)
             setTotal(data.total)
             setCurrent(data.page)
         })
     }, [refreshKey])
 
     useEffect(() => {
-        fetchAssets(1, 10)
+        fetchAssets(1, 100)
     }, [fetchAssets])
 
     const onRefresh = () => {
@@ -38,7 +37,7 @@ const AssetPage: FC = () => {
     }
 
     const onDelete = async (id: number) => {
-        RemoveAssetRequest(id).then()
+        RemoveAssetRequest(id).then(_ => onRefresh())
     }
 
     const onEdit = async (id: number) => {
@@ -51,7 +50,9 @@ const AssetPage: FC = () => {
                 window.location.hash = "asset-management?locale=assetMonitor&id=" + id
             }}/>,
             <Button type={"text"} icon={<EditOutlined/>} onClick={() => onEdit(id)}/>,
-            <Button type={"text"} icon={<DeleteOutlined/>} danger/>
+            <Popconfirm title={"确定要删除吗"} okText={"删除"} cancelText={"取消"} onConfirm={() => onDelete(id)}>
+                <Button type={"text"} icon={<DeleteOutlined/>} danger/>
+            </Popconfirm>
         ]
     }
 

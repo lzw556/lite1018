@@ -30,8 +30,8 @@ func NewMeasurementQuery() MeasurementQuery {
 		measurementAlertRepo: repository.MeasurementAlert{},
 		largeSensorDataRepo:  repository.LargeSensorData{},
 		alarmRecordRepo:      repository.AlarmRecord{},
-		assetRepo:            repository.Asset{},
 		bindingRepo:          repository.MeasurementDeviceBinding{},
+		assetRepo:            repository.Asset{},
 	}
 }
 

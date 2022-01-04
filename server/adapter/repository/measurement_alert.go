@@ -38,3 +38,13 @@ func (repo MeasurementAlert) Get(id uint) (entity.MeasurementAlert, error) {
 	})
 	return e, err
 }
+
+func (repo MeasurementAlert) Delete(id uint) error {
+	return repo.BoltDB().Update(func(tx *bbolt.Tx) error {
+		bucket := tx.Bucket([]byte(entity.MeasurementAlert{}.BucketName()))
+		if bucket != nil {
+			return bucket.Delete(itob(id))
+		}
+		return nil
+	})
+}

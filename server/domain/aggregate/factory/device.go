@@ -19,18 +19,20 @@ import (
 )
 
 type Device struct {
-	deviceRepo   dependency.DeviceRepository
-	networkRepo  dependency.NetworkRepository
-	propertyRepo dependency.PropertyRepository
-	bindingRepo  dependency.MeasurementDeviceBindingRepository
+	deviceRepo      dependency.DeviceRepository
+	networkRepo     dependency.NetworkRepository
+	propertyRepo    dependency.PropertyRepository
+	measurementRepo dependency.MeasurementRepository
+	bindingRepo     dependency.MeasurementDeviceBindingRepository
 }
 
 func NewDevice() Device {
 	return Device{
-		deviceRepo:   repository.Device{},
-		networkRepo:  repository.Network{},
-		propertyRepo: repository.Property{},
-		bindingRepo:  repository.MeasurementDeviceBinding{},
+		deviceRepo:      repository.Device{},
+		networkRepo:     repository.Network{},
+		propertyRepo:    repository.Property{},
+		measurementRepo: repository.Measurement{},
+		bindingRepo:     repository.MeasurementDeviceBinding{},
 	}
 }
 

@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"fmt"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/request"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/response"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/iot/command"
@@ -83,6 +84,7 @@ func (cmd NetworkUpdateCmd) AccessDevices(parentID uint, childrenID []uint) erro
 		return err
 	}
 	cmd.Network.AccessDevices(parent, children...)
+	fmt.Println(children)
 	err = transaction.Execute(context.TODO(), func(txCtx context.Context) error {
 		if err := cmd.networkRepo.Save(txCtx, &cmd.Network.Network); err != nil {
 			return err

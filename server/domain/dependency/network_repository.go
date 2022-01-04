@@ -19,4 +19,5 @@ type NetworkRepository interface {
 
 	UpdateByGatewayID(ctx context.Context, gatewayID, period, timeOffset uint) error
 	Save(ctx context.Context, e *po.Network) error
+	DeleteBySpecs(ctx context.Context, specs ...specification.Specification) error
 }

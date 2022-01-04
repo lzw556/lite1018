@@ -2,7 +2,7 @@ import {Form, Input, Modal, ModalProps, Radio, Select} from "antd";
 import {FC, useEffect, useState} from "react";
 import {Network} from "../../../types/network";
 import DeviceTypeSelect from "../../../components/select/deviceTypeSelect";
-import DeviceSelect from "../../../components/deviceSelect";
+import DeviceSelect from "../../../components/select/deviceSelect";
 import {AccessDevicesRequest} from "../../../apis/network";
 import {Rules} from "../../../constants/validator";
 import {DeviceType} from "../../../types/device_type";
@@ -22,9 +22,8 @@ const AddDeviceModal:FC<AddDeviceModalProps> = (props) => {
 
     useEffect(() => {
         if (visible) {
-            form.setFieldsValue({
-                is_new: false
-            })
+            form.resetFields();
+            form.setFieldsValue({is_new: false})
         }
     }, [visible])
 
@@ -46,7 +45,7 @@ const AddDeviceModal:FC<AddDeviceModalProps> = (props) => {
             </>
         }
         return <Form.Item label={"设备选择"} name={"devices"} rules={[Rules.required]}>
-            <DeviceSelect filter={"notInNetwork"} asset={network.asset.id} mode={"multiple"} placeholder={"请选择需要接入的设备"} />
+            <DeviceSelect filters={{asset_id: network.asset.id, network_id: 0, category: 3}} mode={"multiple"} maxTagCount={"responsive"} placeholder={"请选择需要接入的设备"} />
         </Form.Item>
     }
 
@@ -54,7 +53,7 @@ const AddDeviceModal:FC<AddDeviceModalProps> = (props) => {
         form.validateFields().then(values => {
             AccessDevicesRequest(network.id, values).then(_ => {
                 onSuccess();
-            }) 
+            })
         }).catch(e => {})
     }
 

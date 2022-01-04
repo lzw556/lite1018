@@ -18,6 +18,7 @@ type Measurement struct {
 	Mode           po.AcquisitionMode   `json:"mode"`
 	PollingPeriod  uint                 `json:"polling_period"`
 	Asset          *Asset               `json:"asset,omitempty"`
+	Devices        []Device             `json:"devices"`
 }
 
 func NewMeasurement(e po.Measurement) Measurement {
@@ -29,6 +30,7 @@ func NewMeasurement(e po.Measurement) Measurement {
 		SensorSettings: e.SensorSettings,
 		Mode:           e.Mode,
 		PollingPeriod:  e.PollingPeriod,
+		Devices:        make([]Device, 0),
 	}
 	if e.Display != (po.Display{}) {
 		display := NewDisplay(e.Display)
@@ -64,4 +66,11 @@ func (m *Measurement) SetAlert(e entity.MeasurementAlert) {
 func (m *Measurement) SetAsset(e po.Asset) {
 	asset := NewAsset(e)
 	m.Asset = &asset
+}
+
+func (m *Measurement) SetDevices(es entity.Devices) {
+	m.Devices = make([]Device, len(es))
+	for i, e := range es {
+		m.Devices[i] = NewDevice(e)
+	}
 }

@@ -29,7 +29,7 @@ const SensorStatistic: FC<DeviceStatisticProps> = ({filter,style}) => {
             legend: {
                 show: true,
                 orient: 'vertical',
-                top: '10%',
+                top: 0,
                 left: 0,
                 formatter: function (name: string) {
                     return `${name}(${legend.get(name)})`;

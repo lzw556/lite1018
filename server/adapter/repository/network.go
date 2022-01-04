@@ -56,6 +56,10 @@ func (repo Network) PagingBySpecs(ctx context.Context, page, size int, specs ...
 	return es, count, err
 }
 
+func (repo Network) DeleteBySpecs(ctx context.Context, specs ...spec.Specification) error {
+	return repo.DB(ctx).Scopes(spec.Scopes(specs)...).Delete(&po.Network{}).Error
+}
+
 func (repo Network) UpdateByGatewayID(ctx context.Context, gatewayID, period, timeOffset uint) error {
 	return repo.DB(ctx).Model(&po.Network{}).Where("gateway_id = ?", gatewayID).Updates(map[string]interface{}{"communication_period": period, "communication_time_offset": timeOffset}).Error
 }

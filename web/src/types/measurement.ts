@@ -2,6 +2,7 @@ import { Asset } from "./asset";
 import {Display} from "./display";
 import {MeasurementData} from "./measurement_data";
 import {MeasurementType} from "./measurement_type";
+import {Device} from "./device";
 
 export type Measurement = {
     id: number;
@@ -15,6 +16,7 @@ export type Measurement = {
     sensorSettings?:any;
     pollingPeriod:number;
     mode: number;
+    devices: Device[]
 }
 
 export namespace Measurement {

@@ -6,7 +6,9 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/po"
 	spec "github.com/thetasensors/theta-cloud-lite/server/domain/specification"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/global"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/transaction"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/xlog"
 )
 
 type AssetRemoveCmd struct {
@@ -17,6 +19,9 @@ type AssetRemoveCmd struct {
 	deviceStatus          dependency.DeviceStatusRepository
 	deviceInformationRepo dependency.DeviceInformationRepository
 	networkRepo           dependency.NetworkRepository
+	measurementRepo       dependency.MeasurementRepository
+	measurementAlertRepo  dependency.MeasurementAlertRepository
+	bindingRepo           dependency.MeasurementDeviceBindingRepository
 }
 
 func NewAssetRemoveCmd() AssetRemoveCmd {
@@ -26,35 +31,72 @@ func NewAssetRemoveCmd() AssetRemoveCmd {
 		deviceStatus:          repository.DeviceStatus{},
 		deviceInformationRepo: repository.DeviceInformation{},
 		networkRepo:           repository.Network{},
+		measurementRepo:       repository.Measurement{},
+		measurementAlertRepo:  repository.MeasurementAlert{},
+		bindingRepo:           repository.MeasurementDeviceBinding{},
 	}
 }
 
 func (cmd AssetRemoveCmd) Run() error {
 	ctx := context.TODO()
-	devices, err := cmd.deviceRepo.FindBySpecs(ctx, spec.AssetEqSpec(cmd.Asset.ID))
+	err := transaction.Execute(ctx, func(txCtx context.Context) error {
+		return cmd.remove(txCtx, cmd.Asset)
+	})
 	if err != nil {
 		return err
 	}
-	var network = uint(0)
-	if len(devices) > 0 {
-		network = devices[0].NetworkID
+	if err := global.DeleteFile("resources/assets", cmd.Asset.Image); err != nil {
+		xlog.Warnf("remove asset [%d] image [%s] failed: %v", cmd.Asset.ID, cmd.Asset.Image, err)
 	}
-	err = transaction.Execute(ctx, func(txCtx context.Context) error {
-		if err := cmd.assetRepo.Delete(txCtx, cmd.Asset.ID); err != nil {
+	return nil
+}
+
+func (cmd AssetRemoveCmd) remove(ctx context.Context, assets ...po.Asset) error {
+	for _, asset := range assets {
+		// Remove asset
+		if err := cmd.assetRepo.Delete(ctx, asset.ID); err != nil {
 			return err
 		}
-		if err := cmd.deviceRepo.DeleteBySpecs(txCtx, spec.AssetEqSpec(cmd.Asset.ID)); err != nil {
+		// Remove measurements
+		if measurements, err := cmd.measurementRepo.FindBySpecs(ctx, spec.AssetEqSpec(asset.ID)); err == nil {
+			for _, measurement := range measurements {
+				if err := cmd.measurementAlertRepo.Delete(measurement.ID); err != nil {
+					return err
+				}
+				if err := cmd.measurementRepo.Delete(ctx, measurement.ID); err != nil {
+					return err
+				}
+				if err := cmd.bindingRepo.DeleteBySpecs(ctx, spec.MeasurementEqSpec(measurement.ID)); err != nil {
+					return err
+				}
+			}
+		}
+		// Remove devices
+		if devices, err := cmd.deviceRepo.FindBySpecs(ctx, spec.AssetEqSpec(asset.ID)); err == nil {
+			for _, device := range devices {
+				if err := cmd.deviceStatus.Delete(device.ID); err != nil {
+					return err
+				}
+				if err := cmd.deviceInformationRepo.Delete(device.ID); err != nil {
+					return err
+				}
+			}
+		}
+		if err := cmd.deviceRepo.DeleteBySpecs(ctx, spec.AssetEqSpec(asset.ID)); err != nil {
 			return err
 		}
-		for _, device := range devices {
-			if err := cmd.deviceStatus.Delete(device.ID); err != nil {
-				return err
-			}
-			if err := cmd.deviceInformationRepo.Delete(device.ID); err != nil {
+
+		// Remove networks
+		if err := cmd.networkRepo.DeleteBySpecs(ctx, spec.AssetEqSpec(asset.ID)); err != nil {
+			return err
+		}
+
+		// Remove children
+		if children, err := cmd.assetRepo.FindBySpecs(ctx, spec.ParentIDEqSpec(asset.ID)); err == nil {
+			if err := cmd.remove(ctx, children...); err != nil {
 				return err
 			}
 		}
-		return cmd.networkRepo.Delete(txCtx, network)
-	})
-	return err
+	}
+	return nil
 }

@@ -1,22 +1,21 @@
 import {Select, SelectProps} from "antd";
 import {FC, useEffect, useState} from "react";
-import {GetDevicesByFilterRequest} from "../apis/device";
-import {Device} from "../types/device";
+import {Device} from "../../types/device";
+import {GetDevicesRequest} from "../../apis/device";
 
 export interface DeviceSelectProps extends SelectProps<any> {
-    filter: "notInNetwork" | "sensors" | "gateway" | "router" | "all"
-    asset: number
+    filters?: any;
 }
 
 const {Option} = Select;
 
-const DeviceSelect:FC<DeviceSelectProps> = (props) => {
-    const {asset, filter} = props
+const DeviceSelect: FC<DeviceSelectProps> = (props) => {
+    const {filters} = props
     const [devices, setDevices] = useState<Device[]>([])
 
     useEffect(() => {
-        GetDevicesByFilterRequest(asset, filter).then(setDevices)
-    }, [asset, filter])
+        GetDevicesRequest(filters).then(setDevices)
+    }, [filters])
 
     return <Select {...props}>
         {
