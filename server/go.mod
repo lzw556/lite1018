@@ -15,6 +15,7 @@ require (
 	github.com/eclipse/paho.mqtt.golang v1.3.5
 	github.com/fvbock/endless v0.0.0-20170109170031-447134032cb6
 	github.com/gin-contrib/cors v1.3.1
+	github.com/gin-contrib/gzip v0.0.5 // indirect
 	github.com/gin-contrib/static v0.0.1
 	github.com/gin-gonic/gin v1.7.4
 	github.com/gogo/protobuf v1.3.2

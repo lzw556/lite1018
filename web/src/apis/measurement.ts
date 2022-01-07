@@ -36,8 +36,8 @@ export function UpdateMeasurementSettingRequest(id: number, setting:any) {
     return request.patch(`/measurements/${id}/settings`, setting).then(PutResponse);
 }
 
-export function DownloadMeasurementRawDataRequest(id:number, timestamp:number) {
-    return request.download<any>(`/measurements/${id}/rawData/${timestamp}/download`);
+export function DownloadMeasurementRawDataRequest(id:number, timestamp:number, params:any) {
+    return request.download<any>(`/measurements/${id}/waveData/${timestamp}/download`, params);
 }
 
 export function GetMeasurementDataRequest(id: number, from: number, to: number) {

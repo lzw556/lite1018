@@ -3,8 +3,8 @@ package api
 import (
 	"embed"
 	"github.com/fvbock/endless"
-
 	"github.com/gin-contrib/cors"
+	"github.com/gin-contrib/gzip"
 	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/middleware"
@@ -50,6 +50,7 @@ func (a *Adapter) Run() error {
 	for _, m := range a.middlewares {
 		group.Use(m.WrapHandler())
 	}
+	group.Use(gzip.Gzip(gzip.DefaultCompression))
 	for _, r := range a.routers {
 		for _, route := range r.Routes() {
 			group.Handle(route.Method(), route.Path(), a.errorWrapper(route.Handler()))

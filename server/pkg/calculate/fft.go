@@ -105,7 +105,7 @@ type FFTOutput struct {
 
 func fftFrequencyGet(n int, frequency int) (output []float64) {
 	output = make([]float64, n)
-	for i := 0; i < n; i++ {
+	for i := 1; i < n; i++ {
 		output[i] = float64(i) * float64(frequency) / float64(n)
 	}
 	return
@@ -174,7 +174,7 @@ func fftOutputConvert(output []FFTOutput, outputNum int, n int, scale int, range
 	return
 }
 
-func defualtFFTOutputGet(pr []float64, pi []float64, n int, frequency int) (output []FFTOutput) {
+func defaultFFTOutputGet(pr []float64, pi []float64, n int, frequency int) (output []FFTOutput) {
 	frequencyArr := fftFrequencyGet(n, frequency)
 	sz := len(frequencyArr)
 	output = make([]FFTOutput, sz)
@@ -601,7 +601,7 @@ func FFTFrequencyCalc(mPr []float64, sampleNum int, paramFrequency int) (output 
 		mPr[j] = math.Sqrt(mFr[j]*mFr[j] + mFi[j]*mFi[j])
 	}
 
-	output = defualtFFTOutputGet(mPr, mPi, sampleNum, paramFrequency)
+	output = defaultFFTOutputGet(mPr, mPi, sampleNum, paramFrequency)
 
 	return
 }

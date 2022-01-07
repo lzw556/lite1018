@@ -34,9 +34,13 @@ func (m *WaveData) SetValues(values []float64) {
 
 func (d WaveData) ToCsvFile() (*CsvFile, error) {
 	filename := fmt.Sprintf("%s.csv", time.Unix(d.Timestamp, 0).Format("2006-01-02_15-04-05"))
-	data := make([][]string, len(d.Values)/3)
+	data := make([][]string, len(d.Values[0]))
 	for i := 0; i < len(data); i++ {
-		data[i] = []string{fmt.Sprintf("%f", d.Values[i]), fmt.Sprintf("%f", d.Values[i+1]), fmt.Sprintf("%f", d.Values[i+2])}
+		axis := make([]string, len(d.Values))
+		for j, value := range d.Values {
+			axis[j] = fmt.Sprintf("%f", value[i])
+		}
+		data[i] = axis
 	}
 	return &CsvFile{
 		Name:  filename,

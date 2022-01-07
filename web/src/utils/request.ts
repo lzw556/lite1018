@@ -2,7 +2,7 @@ import axios, {AxiosRequestConfig, AxiosResponse, Method} from "axios";
 import {ResponseResult} from "../types/response";
 import {getToken, isLogin} from "./session";
 
-axios.defaults.timeout = 10000
+axios.defaults.timeout =  30 * 1000
 axios.defaults.baseURL = "/api"
 
 axios.interceptors.request.use((config:AxiosRequestConfig) => {

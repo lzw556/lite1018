@@ -127,12 +127,12 @@ const WaveData: React.FC<{ measurement: Measurement }> = ({measurement}) => {
     ]
 
     const onDownload = (timestamp: number) => {
-        DownloadMeasurementRawDataRequest(measurement.id, timestamp).then(res => {
+        DownloadMeasurementRawDataRequest(measurement.id, timestamp, {calculate}).then(res => {
             if (res.status === 200) {
                 const url = window.URL.createObjectURL(new Blob([res.data]))
                 const link = document.createElement('a')
                 link.href = url
-                link.setAttribute('download', `${moment.unix(timestamp).local().format("YYYY-MM-DD_hh-mm-ss")}.csv`)
+                link.setAttribute('download', `${moment.unix(timestamp).local().format("YYYY-MM-DD_hh-mm-ss")}${getChartTitle()}.csv`)
                 document.body.appendChild(link)
                 link.click()
             }
