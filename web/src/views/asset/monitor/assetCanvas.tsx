@@ -21,7 +21,6 @@ const AssetCanvas: FC<AssetCanvasProps> = ({width, height, asset, measurements})
     const [children, setChildren] = useState<Asset[]>([])
 
     useEffect(() => {
-        console.log(height)
         GetAssetChildrenRequest(asset.id).then(setChildren)
     }, [asset])
 

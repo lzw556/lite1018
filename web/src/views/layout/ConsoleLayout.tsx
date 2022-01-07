@@ -4,11 +4,11 @@ import "./layout.css"
 import {NavLink} from "react-router-dom";
 import RouterGuard from "../../routers/routerGuard";
 import {HeaderLayout} from "./index";
-import AlertNotification from "../../components/alertNotification";
 import "../../assets/iconfont.css"
 import React from "react";
 import {GetParamValue} from "../../utils/path";
 import {SecondaryRoutes} from "../../routers/routes";
+import AlertMessageNotification from "../../components/notification/alert";
 
 const {SubMenu} = Menu
 const {Sider} = Layout
@@ -80,7 +80,7 @@ const ConsoleLayout = (props: any) => {
                 }
             </Layout>
         </Layout>
-        <AlertNotification/>
+        <AlertMessageNotification/>
     </Layout>
 }
 

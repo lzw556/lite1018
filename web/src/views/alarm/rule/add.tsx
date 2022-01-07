@@ -3,7 +3,7 @@ import {Content} from "antd/lib/layout/layout";
 import {useCallback, useEffect, useState} from "react";
 import {Footer} from "antd/es/layout/layout";
 import {useHistory} from "react-router-dom";
-import {AddAlarmRequest, CheckRuleNameRequest, PagingAlarmTemplateRequest} from "../../../apis/alarm";
+import {AddAlarmRequest, CheckAlarmNameRequest, PagingAlarmTemplateRequest} from "../../../apis/alarm";
 import {defaultValidateMessages, Rules} from "../../../constants/validator";
 import MyBreadcrumb from "../../../components/myBreadcrumb";
 import MeasurementTypeSelect from "../../../components/select/measurementTypeSelect";
@@ -94,7 +94,6 @@ const AddRulePage = () => {
     }
 
     const createAlarmRule = (params: any) => {
-        console.log(params)
         AddAlarmRequest(createType, params).then(_ => history.goBack())
     }
 
@@ -108,7 +107,7 @@ const AddRulePage = () => {
                 reject("输入不能为空")
                 return
             }
-            CheckRuleNameRequest(value).then(_ => resolve()).catch(_ => reject("该名称已存在"))
+            CheckAlarmNameRequest(value).then(_ => resolve()).catch(_ => reject("该名称已存在"))
         })
     }
 

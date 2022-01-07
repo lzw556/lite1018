@@ -18,19 +18,19 @@ export function PagingAlarmTemplateRequest(current: number, size: number, filter
     }).then(GetResponse)
 }
 
-export function GetRuleTemplateRequest(id: number) {
-    return request.get<AlarmRuleTemplate>(`/alarmRuleTemplates/${id}`).then(GetResponse)
+export function GetAlarmTemplateRequest(id: number) {
+    return request.get<AlarmRuleTemplate>(`/alarmTemplates/${id}`).then(GetResponse)
 }
 
-export function UpdateRuleTemplateRequest(id: number, params: any) {
-    return request.put(`/alarmRuleTemplates/${id}`, params).then(PutResponse)
+export function UpdateAlarmTemplateRequest(id: number, params: any) {
+    return request.put(`/alarmTemplates/${id}`, params).then(PutResponse)
 }
 
-export function RemoveRuleTemplateRequest(id: number) {
-    return request.delete(`/alarmRuleTemplates/${id}`).then(DeleteResponse)
+export function RemoveAlarmTemplateRequest(id: number) {
+    return request.delete(`/alarmTemplates/${id}`).then(DeleteResponse)
 }
 
-export function CheckRuleNameRequest(name: string) {
+export function CheckAlarmNameRequest(name: string) {
     return request.get(`/check/alarms/${name}`).then(GetResponse)
 }
 
@@ -46,11 +46,11 @@ export function GetAlarmRequest(id: number) {
     return request.get<Alarm>(`/alarms/${id}`).then(GetResponse)
 }
 
-export function UpdateAlarmRuleRequest(id: number, params: any) {
+export function UpdateAlarmRequest(id: number, params: any) {
     return request.put<Alarm>(`/alarms/${id}`, params).then(PutResponse)
 }
 
-export function RemoveAlarmRuleRequest(id: number) {
+export function RemoveAlarmRequest(id: number) {
     return request.delete(`/alarms/${id}`).then(DeleteResponse)
 }
 

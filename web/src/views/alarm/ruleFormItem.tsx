@@ -1,16 +1,26 @@
 import {Col, Form, Input, Row, Select} from "antd";
 import {Normalizes, Rules} from "../../constants/validator";
-import {FC, useState} from "react";
+import {FC, useEffect, useState} from "react";
 import {MeasurementField, MeasurementFieldType} from "../../types/measurement_data";
+import {AlarmRule} from "../../types/alarm_rule_template";
 
 const {Option} = Select;
 
 export interface RuleFormItemProps {
     fields?: MeasurementField[]
+    defaultValue?: AlarmRule
 }
 
-const RuleFormItem: FC<RuleFormItemProps> = ({fields}) => {
+const RuleFormItem: FC<RuleFormItemProps> = ({fields, defaultValue}) => {
     const [field, setField] = useState<MeasurementField>();
+    const [options, setOptions] = useState<any>()
+
+    useEffect(() => {
+        if (defaultValue) {
+            setField(fields?.find(f => f.name === defaultValue?.field));
+        }
+    }, [fields]);
+
 
     const onFieldChange = (value: any) => {
         setField(fields?.find(f => f.name === value));
@@ -20,6 +30,12 @@ const RuleFormItem: FC<RuleFormItemProps> = ({fields}) => {
         switch (field?.type) {
             case MeasurementFieldType.Float:
                 return <Option key={"Current"} value={"Current"}>当前值</Option>
+            case MeasurementFieldType.Axis:
+                return <>
+                    <Option key={"X"} value={"X"}>X轴</Option>
+                    <Option key={"Y"} value={"Y"}>Y轴</Option>
+                    <Option key={"Z"} value={"Z"}>Z轴</Option>
+                </>
             case MeasurementFieldType.Array:
                 return <>
                     <Option key={"Max"} value={"Max"}>最大值</Option>
@@ -33,20 +49,16 @@ const RuleFormItem: FC<RuleFormItemProps> = ({fields}) => {
         <Row justify={"start"}>
             <Col span={12}>
                 <Form.Item label={"报警属性"} name={["rule", "field"]} rules={[Rules.required]}>
-                    <Select placeholder={"请选择监测点属性"} onChange={onFieldChange} allowClear={true}>
-                        {
-                            fields?.filter(item => item.primary).map((item: any) => {
-                                return <Option key={item.name} value={item.name}>{item.title}</Option>
-                            })
-                        }
+                    <Select placeholder={"请选择监测点属性"} onChange={onFieldChange}>
+                        {fields?.map(f => <Option key={f.name} value={f.name}>{f.title}</Option>)}
                     </Select>
                 </Form.Item>
             </Col>
             <Col span={10} offset={1}>
                 {
                     field &&
-                    <Form.Item label={"统计方式"} name={["rule", "method"]} initialValue={"Current"}>
-                        <Select size={"middle"} style={{width: "100px"}}>
+                    <Form.Item label={"统计方式"} name={["rule", "method"]}>
+                        <Select size={"middle"} placeholder={"请选择统计方式"} style={{width: "130px"}}>
                             {
                                 renderMethodOption()
                             }

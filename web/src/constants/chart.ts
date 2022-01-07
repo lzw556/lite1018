@@ -156,10 +156,10 @@ export const DefaultMultiBarOption = {
         data: ["提示", "重要", "紧急"]
     },
     grid: {
-        left: '3%',
-        top: '15%',
+        left: '8%',
+        top: '20%',
         right: '3%',
-        bottom: '10%',
+        bottom: '16%',
     },
     xAxis: [{
         type: 'category',

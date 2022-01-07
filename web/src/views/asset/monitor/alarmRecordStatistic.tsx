@@ -7,7 +7,7 @@ import {AlarmRecordStatistics} from "../../../types/alarm_statistics";
 
 export interface AlarmRecordStatisticProps {
     asset?: Asset
-    style?: any
+    style?: React.CSSProperties
 }
 
 const AlarmRecordStatistic:FC<AlarmRecordStatisticProps> = ({asset, style}) => {

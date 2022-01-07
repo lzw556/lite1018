@@ -13,12 +13,11 @@ export interface AlertStatisticProps {
 
 const AlertStatistic:FC<AlertStatisticProps> = ({filter,style}) => {
     const [option, setOption] = useState<any>({})
-    const [beginDate, setBeginDate] = useState(moment().subtract(7, "days").startOf("d"))
-    const [endDate, setEndDate] = useState(moment().endOf("d"))
+    const [beginDate] = useState(moment().subtract(7, "days").startOf("d"))
+    const [endDate] = useState(moment().endOf("d"))
 
     useEffect(() => {
         if (filter) {
-            console.log(filter)
             GetAlarmRecordStatisticsRequest(beginDate.utc().unix(), endDate.utc().unix(), filter).then(convertChartOption)
         }
     }, [filter])
@@ -35,6 +34,9 @@ const AlertStatistic:FC<AlertStatisticProps> = ({filter,style}) => {
             xAxis: {
                 ...DefaultMultiBarOption.xAxis,
                 data: time.map((item:any) => moment.unix(item).local().format("MM/DD"))
+            },
+            yAxis: {
+              minInterval: 1,
             },
             series: series
         })

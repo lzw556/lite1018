@@ -2,6 +2,7 @@ import request from "../utils/request";
 import {DeleteResponse, GetResponse, PostResponse, PutResponse} from "../utils/response";
 import {Measurement} from "../types/measurement";
 import {MeasurementField} from "../types/measurement_data";
+import {WaveData} from "../types/waveData";
 
 export function AddMeasurementRequest(params: any) {
     return request.post(`/measurements`, params).then(PostResponse);
@@ -43,12 +44,12 @@ export function GetMeasurementDataRequest(id: number, from: number, to: number) 
     return request.get(`/measurements/${id}/data`, {from, to}).then(GetResponse);
 }
 
-export function GetMeasurementRawDataTimestampRequest(id: number, from: number, to: number) {
-    return request.get<any>(`/measurements/${id}/rawData`, {from, to}).then(GetResponse);
+export function GetMeasurementWaveDataTimestampRequest(id: number, from: number, to: number) {
+    return request.get<any>(`/measurements/${id}/waveData`, {from, to}).then(GetResponse);
 }
 
-export function GetMeasurementRawDataRequest(id: number, timestamp: number) {
-    return request.get<any>(`/measurements/${id}/rawData/${timestamp}`).then(GetResponse);
+export function GetMeasurementWaveDataRequest(id: number, timestamp: number, params: any) {
+    return request.get<WaveData>(`/measurements/${id}/waveData/${timestamp}`, params).then(GetResponse);
 }
 
 export function UpdateMeasurementRequest(id: number, params: any) {

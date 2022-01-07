@@ -7,3 +7,7 @@
 .ts-row-selected {
     color: #1890ff;
 }
+
+.ant-empty-normal {
+    margin: 140px 0 !important;
+}

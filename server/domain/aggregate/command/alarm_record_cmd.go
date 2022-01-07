@@ -15,14 +15,16 @@ import (
 type AlarmRecordCmd struct {
 	entity.AlarmRecord
 
-	repository      dependency.AlarmRecordRepository
-	acknowledgeRepo dependency.AlarmRecordAcknowledgeRepository
+	repository           dependency.AlarmRecordRepository
+	acknowledgeRepo      dependency.AlarmRecordAcknowledgeRepository
+	measurementAlertRepo dependency.MeasurementAlertRepository
 }
 
 func NewAlarmRecordCmd() AlarmRecordCmd {
 	return AlarmRecordCmd{
-		repository:      repository.AlarmRecord{},
-		acknowledgeRepo: repository.AlarmRecordAcknowledge{},
+		repository:           repository.AlarmRecord{},
+		acknowledgeRepo:      repository.AlarmRecordAcknowledge{},
+		measurementAlertRepo: repository.MeasurementAlert{},
 	}
 }
 
@@ -41,7 +43,12 @@ func (cmd AlarmRecordCmd) AcknowledgeBy(req request.AcknowledgeAlarmRecord) erro
 			if err := cmd.acknowledgeRepo.Create(txCtx, &e); err != nil {
 				return err
 			}
-			return nil
+			alert, err := cmd.measurementAlertRepo.Get(cmd.AlarmRecord.MeasurementID)
+			if err != nil {
+				return err
+			}
+			alert.RemoveAlarmRecord(cmd.AlarmRecord.AlarmID)
+			return cmd.measurementAlertRepo.Create(&alert)
 		})
 	}
 	return response.BusinessErr(errcode.AlarmRecordAlreadyAcknowledgedError, "")

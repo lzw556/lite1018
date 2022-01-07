@@ -5,21 +5,28 @@ import (
 	"github.com/spf13/cast"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/request"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/response"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/errcode"
 )
 
 func (r assetRouter) create(ctx *gin.Context) (interface{}, error) {
-	var req request.CreateAsset
+	var req request.Asset
 	if err := ctx.ShouldBind(&req); err != nil {
 		return nil, response.InvalidParameterError(err.Error())
+	}
+	if req.CheckFileSize() {
+		return nil, response.BusinessErr(errcode.AssetImageSizeTooLargeError, "")
 	}
 	return nil, r.service.CreateAsset(req)
 }
 
 func (r assetRouter) updateByID(ctx *gin.Context) (interface{}, error) {
 	id := cast.ToUint(ctx.Param("id"))
-	var req request.UpdateAsset
-	if err := ctx.ShouldBindJSON(&req); err != nil {
+	var req request.Asset
+	if err := ctx.ShouldBind(&req); err != nil {
 		return nil, response.InvalidParameterError(err.Error())
+	}
+	if req.CheckFileSize() {
+		return nil, response.BusinessErr(errcode.AssetImageSizeTooLargeError, "")
 	}
 	return nil, r.service.UpdateAsset(id, req)
 }

@@ -1,12 +1,13 @@
 package request
 
 import (
+	"fmt"
 	"io/ioutil"
 	"mime/multipart"
 	"path"
 )
 
-type CreateAsset struct {
+type Asset struct {
 	Name     string                `form:"name"`
 	Image    *multipart.FileHeader `form:"file"`
 	ParentID uint                  `form:"parent_id"`
@@ -16,7 +17,7 @@ type CreateAsset struct {
 	} `form:"location"`
 }
 
-func (a *CreateAsset) UploadBytes() ([]byte, error) {
+func (a *Asset) UploadBytes() ([]byte, error) {
 	if a.Image == nil {
 		return nil, nil
 	}
@@ -32,7 +33,15 @@ func (a *CreateAsset) UploadBytes() ([]byte, error) {
 	return payload, nil
 }
 
-func (a *CreateAsset) GetFileExt() string {
+func (a *Asset) CheckFileSize() bool {
+	if a.Image != nil {
+		fmt.Println(a.Image.Size)
+		return a.Image.Size > 1024*1024*2 // 2MB
+	}
+	return false
+}
+
+func (a *Asset) GetFileExt() string {
 	return path.Ext(a.Image.Filename)
 }
 

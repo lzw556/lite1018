@@ -12,6 +12,7 @@ import {Measurement} from "../../../types/measurement";
 import {MeasurementField} from "../../../types/measurement_data";
 import AcknowledgeModal from "./acknowledgeModal";
 import AcknowledgeViewModal from "./acknowledgeViewModal";
+import {getRuleMethodString} from "../../../types/alarm_rule_template";
 
 export interface AlarmRecordTableProps {
     type: "active" | "history"
@@ -27,6 +28,7 @@ const AlarmRecordTable: FC<AlarmRecordTableProps> = ({type, start, stop, asset, 
     const [record, setRecord] = useState<any>()
     const [acknowledge, setAcknowledge] = useState<any>()
     const [dataSource, setDataSource] = useState<PageResult<any[]>>()
+    const [refreshKey, setRefreshKey] = useState<number>(0)
 
     const fetchAlarmRecords = useCallback((current: number, size: number) => {
         const filter: any = {
@@ -37,7 +39,7 @@ const AlarmRecordTable: FC<AlarmRecordTableProps> = ({type, start, stop, asset, 
             filter.asset_id = asset
         }
         PagingAlarmRecordsRequest(current, size, start, stop, filter).then(setDataSource)
-    }, [asset, start, stop, levels, type, statuses])
+    }, [asset, start, stop, levels, type, statuses, refreshKey])
 
     useEffect(() => {
         fetchAlarmRecords(1, 10)
@@ -48,7 +50,7 @@ const AlarmRecordTable: FC<AlarmRecordTableProps> = ({type, start, stop, asset, 
     }
 
     const onRefresh = () => {
-        // setTable(Object.assign({}, table, {refreshKey: table.refreshKey + 1}))
+        setRefreshKey(refreshKey + 1)
     }
 
     const onAcknowledge = (record:any) => {
@@ -92,6 +94,14 @@ const AlarmRecordTable: FC<AlarmRecordTableProps> = ({type, start, stop, asset, 
             }
         },
         {
+            title: "统计方式",
+            dataIndex: "rule",
+            key: "method",
+            render: (rule: any) => {
+                return getRuleMethodString(rule.method)
+            }
+        },
+        {
             title: "报警值",
             dataIndex: "value",
             key: "value",
@@ -104,7 +114,7 @@ const AlarmRecordTable: FC<AlarmRecordTableProps> = ({type, start, stop, asset, 
             dataIndex: 'rule',
             key: 'rule',
             render: (rule: any, record: any) => {
-                return `${rule.operation}${rule.threshold}${record.field.unit}`
+                return `${rule.operation} ${rule.threshold}${record.field.unit}`
             }
         },
         {
@@ -169,7 +179,7 @@ const AlarmRecordTable: FC<AlarmRecordTableProps> = ({type, start, stop, asset, 
                     {
                         record.status === 0 ?
                             <Button type="link" ghost size={"small"} onClick={() => onAcknowledge(record)}>标记为已处理</Button> :
-                            <Button type="link" ghost size={"small"} onClick={() => onViewAcknowledge(record.id)}>查看处理详情</Button>
+                            <Button disabled={record.status === 2} type="link" ghost size={"small"} onClick={() => onViewAcknowledge(record.id)}>查看处理详情</Button>
                     }
                     <HasPermission value={Permission.AlarmRecordAcknowledge}>
                         <Popconfirm placement="left" title="确认要删除该规则吗?" onConfirm={() => onDelete(record.id)}
@@ -203,7 +213,10 @@ const AlarmRecordTable: FC<AlarmRecordTableProps> = ({type, start, stop, asset, 
                      dataSource={dataSource}
                      onPageChange={fetchAlarmRecords}/>
         {
-            record && <AcknowledgeModal visible={record} record={record} onCancel={() => setRecord(undefined)} onSuccess={() => setRecord(undefined)}/>
+            record && <AcknowledgeModal visible={record} record={record} onCancel={() => setRecord(undefined)} onSuccess={() => {
+                setRecord(undefined)
+                onRefresh()
+            }}/>
         }
         {
             acknowledge && <AcknowledgeViewModal visible={acknowledge} acknowledge={acknowledge} onCancel={() => setAcknowledge(undefined)}/>

@@ -93,27 +93,27 @@ func (r measurementRouter) getData(ctx *gin.Context) (interface{}, error) {
 	return r.service.GetMeasurementData(id, from, to)
 }
 
-func (r measurementRouter) getRawData(ctx *gin.Context) (interface{}, error) {
+func (r measurementRouter) getWaveDataTimestamp(ctx *gin.Context) (interface{}, error) {
 	id := cast.ToUint(ctx.Param("id"))
 	from := cast.ToInt64(ctx.Query("from"))
 	to := cast.ToInt64(ctx.Query("to"))
 	return r.service.GetMeasurementRawData(id, from, to)
 }
 
-func (r measurementRouter) downloadRawData(ctx *gin.Context) (interface{}, error) {
+func (r measurementRouter) downloadWaveData(ctx *gin.Context) (interface{}, error) {
 	id := cast.ToUint(ctx.Param("id"))
 	timestamp := cast.ToInt64(ctx.Param("timestamp"))
-	result, err := r.service.GetMeasurementRawDataByTimestamp(id, timestamp)
+	result, err := r.service.GetMeasurementWaveDataByTimestamp(id, timestamp, ctx.Query("calculate"))
 	if err != nil {
 		return nil, err
 	}
 	return result.ToCsvFile()
 }
 
-func (r measurementRouter) getRawDataByTimestamp(ctx *gin.Context) (interface{}, error) {
+func (r measurementRouter) getWaveDataByTimestamp(ctx *gin.Context) (interface{}, error) {
 	id := cast.ToUint(ctx.Param("id"))
 	timestamp := cast.ToInt64(ctx.Param("timestamp"))
-	return r.service.GetMeasurementRawDataByTimestamp(id, timestamp)
+	return r.service.GetMeasurementWaveDataByTimestamp(id, timestamp, ctx.Query("calculate"))
 }
 
 func (r measurementRouter) removeByID(ctx *gin.Context) (interface{}, error) {

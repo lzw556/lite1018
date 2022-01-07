@@ -14,6 +14,7 @@ type ExportDevice struct {
 	Address  string `json:"address"`
 	Type     uint   `json:"type"`
 	Settings string `json:"settings"`
+	Modbus   int    `json:"modbus"`
 }
 
 type ExportDevices []ExportDevice
@@ -58,6 +59,7 @@ func (n *NetworkExportFile) AddDevices(es []entity.Device) {
 			ID:      uint(i),
 			Name:    e.Name,
 			Address: e.MacAddress,
+			Modbus:  0,
 			Type:    e.Type,
 		}
 		bytes, err := json.Marshal(DeviceSetting{

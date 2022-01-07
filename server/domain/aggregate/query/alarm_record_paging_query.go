@@ -8,6 +8,7 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/domain/po"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/vo"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/measurementtype"
+	"strings"
 )
 
 type AlarmRecordPagingQuery struct {
@@ -37,7 +38,8 @@ func (query AlarmRecordPagingQuery) Paging() ([]vo.AlarmRecord, int64) {
 			measurementMap[e.MeasurementID], _ = query.measurementRepo.Get(ctx, e.MeasurementID)
 		}
 		result[i].SetMeasurement(measurementMap[e.MeasurementID])
-		if variable, err := measurementtype.GetVariable(measurementMap[e.MeasurementID].Type, e.Rule.Field); err == nil {
+		parts := strings.Split(e.Rule.Field, "::")
+		if variable, err := measurementtype.GetVariable(measurementMap[e.MeasurementID].Type, parts[0]); err == nil {
 			result[i].SetField(variable)
 		}
 		if _, ok := alarmMap[e.AlarmID]; !ok {

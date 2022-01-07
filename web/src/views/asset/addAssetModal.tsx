@@ -1,17 +1,17 @@
 import {FC, useEffect, useState} from "react";
 import {useForm} from "antd/es/form/Form";
 import {AddAssetRequest, GetAssetRequest} from "../../apis/asset";
-import {Form, Input, Modal, ModalProps, Upload} from "antd";
-import {PlusOutlined} from "@ant-design/icons";
+import {Button, Form, Input, message, Modal, ModalProps, Space, Typography, Upload} from "antd";
+import {UploadOutlined} from "@ant-design/icons";
 import AssetSelect from "../../components/assetSelect";
 import LocationSelect from "../../components/locationSelect";
 import {defaultValidateMessages} from "../../constants/validator";
 
-export interface AddAssetModelProps extends ModalProps{
+export interface AddAssetModelProps extends ModalProps {
     onSuccess: () => void
 }
 
-const AddAssetModal:FC<AddAssetModelProps> = (props) => {
+const AddAssetModal: FC<AddAssetModelProps> = (props) => {
     const {visible, onSuccess} = props
     const [isLoading, setIsLoading] = useState<boolean>(false)
     const [file, setFile] = useState<any>()
@@ -53,7 +53,12 @@ const AddAssetModal:FC<AddAssetModelProps> = (props) => {
     }
 
     const onBeforeUpload = (file: any) => {
-        setFile(file)
+        const isLt2M = file.size / 1024 / 1024 < 2;
+        if (isLt2M) {
+            setFile(file)
+        }else {
+            message.error("上传图片大小不能超过2M");
+        }
         return false
     }
 
@@ -82,7 +87,8 @@ const AddAssetModal:FC<AddAssetModelProps> = (props) => {
         GetAssetRequest(id).then(setParent)
     }
 
-    return <Modal title={"资产添加"} width={420} onOk={onAdd} {...props} okText={"确定"} cancelText={"取消"} confirmLoading={isLoading}>
+    return <Modal title={"资产添加"} width={420} onOk={onAdd} {...props} okText={"确定"} cancelText={"取消"}
+                  confirmLoading={isLoading}>
         <Form form={form} labelCol={{span: 6}} validateMessages={defaultValidateMessages}>
             <Form.Item name="name" label={"资产名称"} rules={[{required: true, message: "请输入资产名称"}]}>
                 <Input placeholder="资产名称"/>
@@ -90,18 +96,20 @@ const AddAssetModal:FC<AddAssetModelProps> = (props) => {
             <Form.Item label={"资产图片"} name={"file"}>
                 <Upload
                     name="file"
-                    listType="picture-card"
-                    className="avatar-uploader"
+                    listType="picture"
+                    className="upload-list-inline"
+                    maxCount={1}
+                    showUploadList={true}
                     beforeUpload={onBeforeUpload}
                     onRemove={onRemove}
                     onPreview={onPreview}
                 >
-                    {
-                        !file && <div>
-                            <PlusOutlined/>
-                            <div style={{marginTop: 8}}>Upload</div>
-                        </div>
-                    }
+                    <Space>
+                        <Button icon={<UploadOutlined/>}>上传</Button>
+                        <Typography.Text type="secondary">
+                            图片大小不超过2M
+                        </Typography.Text>
+                    </Space>
                 </Upload>
             </Form.Item>
             <Form.Item name={"parent_id"} label={"父节点资产"}>

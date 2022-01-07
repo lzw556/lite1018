@@ -8,6 +8,7 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/domain/po"
 	spec "github.com/thetasensors/theta-cloud-lite/server/domain/specification"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/vo"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/calculate"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/measurementtype"
 	"sort"
 	"time"
@@ -111,13 +112,13 @@ func (query MeasurementQuery) GateRawDataByRange(from, to int64) (vo.Measurement
 	}
 	result := make(vo.MeasurementsRawData, len(data))
 	for i, d := range data {
-		result[i] = vo.NewMeasurementRawData(d)
+		result[i] = vo.NewWaveData(d)
 	}
 	sort.Sort(result)
 	return result, nil
 }
 
-func (query MeasurementQuery) GateRawData(timestamp int64) (*vo.MeasurementRawData, error) {
+func (query MeasurementQuery) GateWaveData(timestamp int64, calc string) (*vo.WaveData, error) {
 	ctx := context.TODO()
 	binding, err := query.bindingRepo.GetBySpecs(ctx, spec.MeasurementEqSpec(query.Measurement.ID))
 	if err != nil {
@@ -127,7 +128,34 @@ func (query MeasurementQuery) GateRawData(timestamp int64) (*vo.MeasurementRawDa
 	if err != nil {
 		return nil, err
 	}
-	result := vo.NewMeasurementRawData(data)
-	result.Values = data.Values
+	result := vo.NewWaveData(data)
+	result.SetValues(data.Values)
+	switch calc {
+	case "accelerationFrequencyDomain":
+		for i := range result.Values {
+			fft := calculate.FFTFrequencyCalc(result.Values[i], len(result.Values[i]), int(result.Frequency))
+			fftFrequencies := make([]float64, len(fft))
+			for j, output := range fft {
+				result.Values[i][j] = output.FFTValue
+				fftFrequencies[j] = output.Frequency
+			}
+			result.Frequencies = append(result.Frequencies, fftFrequencies)
+		}
+	case "velocityTimeDomain":
+		for i := range result.Values {
+			result.Values[i] = calculate.VelocityCalc(result.Values[i], len(result.Values[i]), float64(result.Frequency))
+		}
+	case "velocityFrequencyDomain":
+		for i := range result.Values {
+			values := calculate.VelocityCalc(result.Values[i], len(result.Values[i]), float64(result.Frequency))
+			fft := calculate.FFTFrequencyCalc(values, len(values), int(result.Frequency))
+			fftFrequencies := make([]float64, len(fft))
+			for j, output := range fft {
+				result.Values[i][j] = output.FFTValue
+				fftFrequencies[j] = output.Frequency
+			}
+			result.Frequencies = append(result.Frequencies, fftFrequencies)
+		}
+	}
 	return &result, nil
 }

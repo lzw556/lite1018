@@ -22,7 +22,7 @@ const AssetTreeSelect: FC<AssetTreeSelectProps> = (props) => {
                     if (asset) {
                         onChange(asset.id)
                     }else {
-                        onChange(data[0].id)
+                        onChange(data.sort((a, b) => a.id - b.id)[0].id)
                     }
                 }
             }

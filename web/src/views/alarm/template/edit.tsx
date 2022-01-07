@@ -3,27 +3,48 @@ import {Button, Card, Col, Form, Input, Row, Select, Space} from "antd";
 import MeasurementTypeSelect from "../../../components/select/measurementTypeSelect";
 import RuleFormItem from "../ruleFormItem";
 import {Content} from "antd/lib/layout/layout";
-import {useState} from "react";
-import {MeasurementField} from "../../../types/measurement_data";
+import {useLocation} from "react-router-dom";
+import {GetParamValue} from "../../../utils/path";
+import {useEffect, useState} from "react";
+import {GetAlarmTemplateRequest, UpdateAlarmTemplateRequest} from "../../../apis/alarm";
 import {GetMeasurementFieldsRequest} from "../../../apis/measurement";
-import {AddAlarmTemplateRequest} from "../../../apis/alarm";
-import {useHistory} from "react-router-dom";
 
 const {Option} = Select;
 
-const AddAlarmRuleTemplate = () => {
-    const history = useHistory();
+const EditAlarmRuleTemplate = () => {
     const [form] = Form.useForm();
-    const [fields, setFields] = useState<MeasurementField[]>([]);
+    const location = useLocation();
+    const [fields, setFields] = useState<any>();
+    const [rule, setRule] = useState<any>()
+    const id = GetParamValue(location.search, "id");
 
-    const onMeasurementTypeChange = (value:number) => {
-        GetMeasurementFieldsRequest(value).then(setFields)
+    useEffect(() => {
+        if (id && Number(id) > 0) {
+            GetAlarmTemplateRequest(Number(id)).then(data => {
+                setRule(data.rule)
+                fetchMeasurementFields(data.measurementType);
+                form.setFieldsValue({
+                    name: data.name,
+                    measurement_type: data.measurementType,
+                    rule: {
+                        ...data.rule,
+                        field: data.rule.field,
+                    },
+                    description: data.description,
+                    level: data.level,
+                })
+            })
+        }
+    }, [id])
+
+    const fetchMeasurementFields = (measurementType: number) => {
+        GetMeasurementFieldsRequest(measurementType).then(setFields)
     }
 
-    const onAdd = () => {
+    const onSave = () => {
         form.validateFields().then(values => {
-            AddAlarmTemplateRequest(values).then(_ => {
-                history.goBack();
+            UpdateAlarmTemplateRequest(Number(id), values).then(_ => {
+                window.location.hash = `/alarm-management?locale=alarmRules&tab=templates`
             })
         })
     }
@@ -48,13 +69,13 @@ const AddAlarmRuleTemplate = () => {
                                 <Form.Item labelCol={{span: 4}} label={"监测点类型"} name="measurement_type"
                                            rules={[{required: true, message: "请选择设备类型"}]}>
                                     <MeasurementTypeSelect placeholder={"请选择监测点类型"}
-                                                           style={{width: "225px"}}
-                                                           onChange={onMeasurementTypeChange}/>
+                                                           disabled={true}
+                                                           style={{width: "225px"}}/>
                                 </Form.Item>
                                 <Form.Item label={"  "} labelCol={{span: 4}} colon={false}>
                                     <Card type={"inner"} bordered={false} size={"small"}
                                           style={{padding: "4px", background: "#eef0f5"}}>
-                                        <RuleFormItem fields={fields}/>
+                                        <RuleFormItem fields={fields} defaultValue={rule}/>
                                     </Card>
                                 </Form.Item>
                             </Col>
@@ -91,7 +112,7 @@ const AddAlarmRuleTemplate = () => {
                                     <Button onClick={() => {
                                         window.location.hash = "alarm-management?locale=alarmRules&tab=templates"
                                     }}>取消</Button>
-                                    <Button type="primary" onClick={onAdd}>创建</Button>
+                                    <Button type="primary" onClick={onSave}>更新</Button>
                                 </Space>
                             </Col>
                         </Row>
@@ -102,4 +123,4 @@ const AddAlarmRuleTemplate = () => {
     </Content>
 }
 
-export default AddAlarmRuleTemplate
+export default EditAlarmRuleTemplate;

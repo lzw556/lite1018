@@ -2,9 +2,10 @@ import {Alarm} from "../../../../types/alarm_rule";
 import {Col, Form, Input, Modal, Row, Select} from "antd";
 import {FC, useEffect, useState} from "react";
 import {defaultValidateMessages} from "../../../../constants/validator";
-import {UpdateAlarmRuleRequest} from "../../../../apis/alarm";
+import {UpdateAlarmRequest} from "../../../../apis/alarm";
 import {GetMeasurementFieldsRequest} from "../../../../apis/measurement";
 import {MeasurementField} from "../../../../types/measurement_data";
+import {getRuleMethodString} from "../../../../types/alarm_rule_template";
 
 export interface EditProps {
     alarm: Alarm
@@ -23,11 +24,13 @@ const EditModal: FC<EditProps> = ({visible, alarm, onCancel, onSuccess}) => {
     useEffect(() => {
         if (visible) {
             GetMeasurementFieldsRequest(alarm.measurement.type).then(data => {
-                setField(data.find(item => item.name === alarm.rule.field))
+                const f = data.find(item => item.name === alarm.rule.field)
+                setField(f)
                 form.setFieldsValue({
-                    field: data.find(item => item.name === alarm.rule.field)?.title,
+                    field: f?.title,
                     operation: alarm.rule.operation,
                     threshold: alarm.rule.threshold,
+                    method: getRuleMethodString(alarm.rule.method),
                     level: alarm.level,
                 })
             })
@@ -38,7 +41,7 @@ const EditModal: FC<EditProps> = ({visible, alarm, onCancel, onSuccess}) => {
         setIsLoading(true)
         form.validateFields().then(values => {
             setIsLoading(false)
-            UpdateAlarmRuleRequest(alarm.id, {
+            UpdateAlarmRequest(alarm.id, {
                 rule: {
                     operation: values.operation,
                     threshold: parseFloat(values.threshold),
@@ -54,11 +57,18 @@ const EditModal: FC<EditProps> = ({visible, alarm, onCancel, onSuccess}) => {
                   onCancel={onCancel} confirmLoading={isLoading}>
         <Form form={form} validateMessages={defaultValidateMessages}>
             <Row justify={"start"}>
-                <Col span={24}>
-                    <Form.Item label={"属性名称"} name="field">
-                        <Input disabled/>
-                    </Form.Item>
-                </Col>
+                <Input.Group compact>
+                    <Col span={16}>
+                        <Form.Item label={"属性名称"} name="field" required>
+                            <Input disabled/>
+                        </Form.Item>
+                    </Col>
+                    <Col span={8}>
+                        <Form.Item name={"method"}>
+                            <Input disabled/>
+                        </Form.Item>
+                    </Col>
+                </Input.Group>
             </Row>
             <Row justify={"start"}>
                 <Col span={12}>

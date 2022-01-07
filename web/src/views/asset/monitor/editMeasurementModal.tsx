@@ -1,4 +1,4 @@
-import {Form, Input, Modal, ModalProps, Select} from "antd";
+import {Form, Input, Modal, ModalProps} from "antd";
 import {Measurement} from "../../../types/measurement";
 import {FC, useEffect, useState} from "react";
 import {Rules} from "../../../constants/validator";
@@ -45,7 +45,7 @@ const EditMeasurementModal:FC<EditMeasurementModalProps> = (props) => {
         setLocation(undefined)
     }
 
-    return <Modal {...props} title={"监测点编辑"} width={420} onOk={onSave}>
+    return <Modal {...props} title={"监测点编辑"} okText={"更新"} cancelText={"取消"} width={420} onOk={onSave}>
         <Form form={form} labelCol={{span:6}}>
             <Form.Item name={"name"} label={"监测点名称"} rules={[Rules.required]}>
                 <Input />

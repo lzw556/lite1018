@@ -5,6 +5,7 @@ import (
 	"encoding/binary"
 	"fmt"
 	"github.com/gogo/protobuf/proto"
+	"github.com/spf13/cast"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/iot"
 	pd "github.com/thetasensors/theta-cloud-lite/server/adapter/iot/proto"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
@@ -69,15 +70,20 @@ func (p LargeSensorData) Process(ctx *iot.Context, msg iot.Message) error {
 			Data:  m.Data,
 		})
 		if receiver.isComplete() {
-			data, err := receiver.sensorData()
-			if err != nil {
-				return err
+			if value, ok := ctx.Get(msg.Body.Device); ok {
+				if device, ok := value.(entity.Device); ok {
+					data, err := receiver.sensorData()
+					if err != nil {
+						return err
+					}
+					data.MacAddress = msg.Body.Device
+					data.Parameters["kx122_continuous_odr"] = getKx122ContinuousOdr(cast.ToInt(device.Sensors["kx122_continuous_odr"]))
+					if err := p.repository.Create(&data); err != nil {
+						return err
+					}
+					_ = cache.Delete(msg.Body.Device)
+				}
 			}
-			data.MacAddress = msg.Body.Device
-			if err := p.repository.Create(&data); err != nil {
-				return err
-			}
-			_ = cache.Delete(msg.Body.Device)
 		} else {
 			if err := cache.SetStruct(msg.Body.Device, &receiver); err != nil {
 				return err
@@ -134,7 +140,8 @@ func (t SensorDataReceiver) sensorData() (entity.LargeSensorData, error) {
 	data := entity.LargeSensorData{
 		SensorType: t.SensorType,
 		Time:       time.Unix(int64(t.Timestamp), 0),
-		Values:     make([]float32, 0),
+		Values:     make([]float64, 0),
+		Parameters: map[string]interface{}{},
 	}
 	byteData := t.ReducePackets()
 	for i := 0; i < len(byteData); i += 2 {
@@ -142,7 +149,21 @@ func (t SensorDataReceiver) sensorData() (entity.LargeSensorData, error) {
 		if err := binary.Read(bytes.NewBuffer(byteData[i:i+2]), binary.LittleEndian, &value); err != nil {
 			return entity.LargeSensorData{}, err
 		}
-		data.Values = append(data.Values, float32(value))
+		data.Values = append(data.Values, float64(value))
 	}
 	return data, nil
+}
+
+func getKx122ContinuousOdr(value int) float32 {
+	switch value {
+	case 12:
+		return 3200
+	case 13:
+		return 6400
+	case 14:
+		return 12800
+	case 15:
+		return 25600
+	}
+	return 25600
 }

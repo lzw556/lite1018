@@ -1,7 +1,7 @@
-import {Button, Col, Popconfirm, Row, Select, Space} from "antd";
+import {Button, Col, Popconfirm, Row, Space} from "antd";
 import TableLayout from "../../layout/TableLayout";
 import {useCallback, useEffect, useState} from "react";
-import {PagingAlarmTemplateRequest, RemoveRuleTemplateRequest} from "../../../apis/alarm";
+import {PagingAlarmTemplateRequest, RemoveAlarmTemplateRequest} from "../../../apis/alarm";
 import Label from "../../../components/label";
 import {DeleteOutlined, EditOutlined} from "@ant-design/icons";
 import HasPermission from "../../../permission";
@@ -10,11 +10,10 @@ import {PageResult} from "../../../types/page";
 import MeasurementTypeSelect from "../../../components/select/measurementTypeSelect";
 import {MeasurementType} from "../../../types/measurement_type";
 
-const {Option} = Select
-
 const AlarmRuleTemplate = () => {
     const [measurementType, setMeasurementType] = useState<MeasurementType>()
     const [dataSource, setDataSource] = useState<PageResult<any>>()
+    const [refreshKey, setRefreshKey] = useState(0)
 
     const fetchAlarmTemplates = useCallback((current: number, size: number) => {
         const filter:any = {}
@@ -22,17 +21,18 @@ const AlarmRuleTemplate = () => {
             filter.measurement_type = measurementType
         }
         PagingAlarmTemplateRequest(current, size, filter).then(setDataSource)
-    }, [measurementType])
+    }, [measurementType, refreshKey])
 
     useEffect(() => {
         fetchAlarmTemplates(1, 10)
     }, [fetchAlarmTemplates])
 
     const onRefresh = () => {
+        setRefreshKey(refreshKey + 1)
     }
 
     const onDelete = (id: number) => {
-        RemoveRuleTemplateRequest(id).then(_ => onRefresh())
+        RemoveAlarmTemplateRequest(id).then(_ => onRefresh())
     }
 
     const columns = [
@@ -56,7 +56,7 @@ const AlarmRuleTemplate = () => {
                 <Space>
                     <HasPermission value={Permission.AlarmRuleTemplateEdit}>
                         <Button type="text" size="small"
-                                href={`#/alarm-management?locale=alarmRules/editAlarmRuleTemplate&templateId=${record.id}`}
+                                href={`#/alarm-management?locale=alarmRules/editAlarmRuleTemplate&id=${record.id}`}
                                 icon={<EditOutlined/>}/>
                     </HasPermission>
                     <HasPermission value={Permission.AlarmRuleTemplateDelete}>

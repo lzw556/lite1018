@@ -102,6 +102,7 @@ func (factory Network) NewNetworkImportCmd(req request.ImportNetwork) (*command.
 		GroupSize:               req.GroupSize,
 		GroupInterval:           req.GroupInterval,
 		RoutingTables:           make(po.RoutingTables, len(req.RoutingTables)),
+		AssetID:                 req.AssetID,
 	}
 	for i, table := range req.RoutingTables {
 		cmd.RoutingTables[i] = po.RoutingTable{

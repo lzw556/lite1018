@@ -55,3 +55,7 @@ func (repo AlarmRecord) Delete(ctx context.Context, id uint) error {
 func (repo AlarmRecord) Save(ctx context.Context, e *po.AlarmRecord) error {
 	return repo.DB(ctx).Save(e).Error
 }
+
+func (repo AlarmRecord) Updates(ctx context.Context, id uint, updates map[string]interface{}) error {
+	return repo.DB(ctx).Model(&po.AlarmRecord{}).Where("id = ?", id).Updates(updates).Error
+}

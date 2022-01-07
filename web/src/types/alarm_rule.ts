@@ -9,4 +9,5 @@ export type Alarm = {
     level: number
     description: string
     enabled: boolean
+    createdAt: number
 }

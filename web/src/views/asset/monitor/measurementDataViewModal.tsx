@@ -20,12 +20,12 @@ const MeasurementDataViewModal:FC<MeasurementDataViewModalProps> = (props) => {
 
     const columns = [
         {
-            title: "属性名称",
+            title: "名称",
             dataIndex: "title",
             key: "title",
         },
         {
-            title: "属性值",
+            title: "值",
             dataIndex: "value",
             key: "value",
             render: (value: any, record:MeasurementField) => {
@@ -39,7 +39,7 @@ const MeasurementDataViewModal:FC<MeasurementDataViewModalProps> = (props) => {
 
     return <Modal {...props} width={620} title={measurement.name} footer={null}>
         {
-            measurement.data && <Typography.Title level={4}>{`数据采集时间: ${moment.unix(measurement.data.timestamp).local().format("YYYY-MM-DD hh:mm:ss")}`}</Typography.Title>
+            measurement.data && <Typography.Title level={4}>{`特征值采集时间: ${moment.unix(measurement.data.timestamp).local().format("YYYY-MM-DD hh:mm:ss")}`}</Typography.Title>
         }
         <Table columns={columns} size={"small"} scroll={{ y: 300 }} pagination={false} dataSource={dataSource}/>
     </Modal>

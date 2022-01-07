@@ -1,5 +1,5 @@
 import {Form, Input, Radio, Select} from "antd";
-import {FC, useState} from "react";
+import {FC, useEffect, useState} from "react";
 import SamplePeriodSelect from "../select/samplePeriodSelect";
 import {Rules} from "../../constants/validator";
 
@@ -10,17 +10,21 @@ export interface WaveDataFormItemProps {
 }
 
 const WaveDataFormItem:FC<WaveDataFormItemProps> = ({defaultValue}) => {
-    const [isEnabled, setIsEnabled] = useState<any>(defaultValue === 32);
+    const [isEnabled, setIsEnabled] = useState<boolean>(false);
+
+    useEffect(() => {
+        setIsEnabled(defaultValue === 32);
+    }, [defaultValue])
 
     return <>
         <Form.Item label={"原始数据采集"} name={["sensors", "schedule1_sensor_flags"]}>
-            <Radio.Group buttonStyle={"solid"} defaultValue={defaultValue} onChange={e => setIsEnabled(e.target.value)}>
+            <Radio.Group buttonStyle={"solid"} defaultValue={defaultValue} onChange={e => setIsEnabled(e.target.value === 32)}>
                 <Radio.Button key={32} value={32}>启用</Radio.Button>
                 <Radio.Button key={0} value={0}>禁用</Radio.Button>
             </Radio.Group>
         </Form.Item>
         {
-            isEnabled !== 0 && <>
+            isEnabled && <>
                 <Form.Item label={"原始数据采集周期"} name={["sensors", "schedule1_sample_period"]}>
                     <SamplePeriodSelect placeholder={"请选择原始数据采集周期"}/>
                 </Form.Item>

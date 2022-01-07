@@ -9,7 +9,7 @@ import {
     GetMeasurementStatisticRequest,
 } from "../../../../apis/measurement";
 import {Measurement} from "../../../../types/measurement";
-import {Col, Form, Row, Statistic, Tag, Typography} from "antd";
+import {Col, Form, Popover, Row, Statistic, Tag, Typography} from "antd";
 import ShadowCard from "../../../../components/shadowCard";
 import {ColorDanger, ColorHealth, ColorInfo, ColorWarn} from "../../../../constants/color";
 import {MeasurementType} from "../../../../types/measurement_type";
@@ -21,7 +21,7 @@ import SensorList from "./sensorList";
 import MeasurementSettings from "./settings";
 import HistoryData from "./history";
 import {MeasurementField, MeasurementFieldType} from "../../../../types/measurement_data";
-import MeasurementRawData from "./rawData";
+import WaveData from "./waveData";
 
 const tabList = [
     {
@@ -29,17 +29,13 @@ const tabList = [
         tab: "传感器列表"
     },
     {
+        key: "settings",
+        tab: "参数配置"
+    },
+    {
         key: "history",
         tab: "历史数据"
     },
-    {
-        key: "rawData",
-        tab: "波形记录"
-    },
-    {
-        key: "settings",
-        tab: "参数配置"
-    }
 ]
 
 const MeasurementDetail = () => {
@@ -51,7 +47,7 @@ const MeasurementDetail = () => {
     const contents = new Map<string, any>([
         ["sensors", measurement && <SensorList measurement={measurement}/>],
         ["history", measurement && <HistoryData measurement={measurement}/>],
-        ["rawData", measurement && <MeasurementRawData measurement={measurement}/>],
+        ["waveData", measurement && <WaveData measurement={measurement}/>],
         ["settings", measurement && <MeasurementSettings measurement={measurement}/>]
     ]);
 
@@ -69,17 +65,31 @@ const MeasurementDetail = () => {
         }
     }, [measurement])
 
+    const renderContent = (field: MeasurementField) => {
+        switch (measurement?.type) {
+            case MeasurementType.Vibration:
+                return <>
+                    <p>{`X轴: ${field.value[0].toFixed(field.precision)}${field.unit}`}</p>
+                    <p>{`Y轴: ${field.value[1].toFixed(field.precision)}${field.unit}`}</p>
+                    <p>{`Z轴: ${field.value[2].toFixed(field.precision)}${field.unit}`}</p>
+                </>
+        }
+        return <div/>
+    }
+
     const renderActions = () => {
         return fields.filter(item => item.primary).sort((a, b) => a.sort - b.sort).map(field => {
             if (measurement?.data?.fields) {
                 const data = measurement.data?.fields.find(f => f.name === field.name)
                 if (data) {
                     if (field.type === MeasurementFieldType.Float) {
-                        return <Statistic title={`${data.title}(单位: ${data.unit})`} valueStyle={{fontSize: "14pt"}}
-                                          value={data.value.toFixed(data.precision)}/>
+                        return <Statistic title={data.title} valueStyle={{fontSize: "14pt"}}
+                                          value={data.value.toFixed(data.precision)} suffix={data.unit}/>
                     } else {
-                        return <Statistic title={`${data.title}(单位: ${data.unit})`} valueStyle={{fontSize: "14pt"}}
-                                          value={data.value[1].toFixed(data.precision)}/>
+                        return <Popover title={data.title} content={renderContent(data)}>
+                            <Statistic title={data.title} valueStyle={{fontSize: "14pt"}}
+                                       value={data.value[0].toFixed(data.precision)} suffix={data.unit}/>
+                        </Popover>
                     }
                 }
             }
@@ -101,6 +111,21 @@ const MeasurementDetail = () => {
         }
     }
 
+    const renderTabList = () => {
+        switch (measurement?.type) {
+            case MeasurementType.Vibration:
+                return [
+                    ...tabList,
+                    {
+                        key: "waveData",
+                        tab: "波形数据"
+                    },
+                ]
+            default:
+                return tabList
+        }
+    }
+
     return <Content>
         <MyBreadcrumb/>
         {
@@ -111,6 +136,7 @@ const MeasurementDetail = () => {
                         <Typography.Title level={4}>{measurement.name}</Typography.Title>
                         <Form.Item label={"状态"} labelCol={{span: 5}}
                                    labelAlign={"left"}
+                                   style={{marginBottom: "6px"}}
                                    colon={false}>
                             {
                                 renderStatus()
@@ -118,13 +144,23 @@ const MeasurementDetail = () => {
                         </Form.Item>
                         <Form.Item label={"类型"} labelCol={{span: 5}}
                                    labelAlign={"left"}
+                                   style={{marginBottom: "6px"}}
                                    colon={false}>
                             {
                                 MeasurementType.toString(measurement.type)
                             }
                         </Form.Item>
-                        <Form.Item label={"上报时间"} labelCol={{span: 5}}
+                        <Form.Item label={"所属资产"} labelCol={{span: 5}}
                                    labelAlign={"left"}
+                                   style={{marginBottom: "6px"}}
+                                   colon={false}>
+                            {
+                                measurement.asset?.name
+                            }
+                        </Form.Item>
+                        <Form.Item label={"采集时间"} labelCol={{span: 5}}
+                                   labelAlign={"left"}
+                                   style={{marginBottom: "6px"}}
                                    colon={false}>
                             {
                                 measurement.data && measurement.data.timestamp > 0 ? moment.unix(measurement.data.timestamp).local().format("YYYY-MM-DD HH:mm:ss") : "-"
@@ -166,16 +202,16 @@ const MeasurementDetail = () => {
             </ShadowCard>
         }
         <Row justify={"start"} style={{paddingTop: "8px", paddingBottom: "8px"}}>
-            <Col span={10}>
-                <ShadowCard title={"传感器统计"}>
+            <Col xl={10} xxl={6}>
+                <ShadowCard title={<Typography.Title level={5}>传感器统计</Typography.Title>}>
                     {
                         measurement &&
                         <SensorStatistic filter={{measurement_id: measurement.id}} style={{height: "200px"}}/>
                     }
                 </ShadowCard>
             </Col>
-            <Col span={14}>
-                <ShadowCard title={"一周报警统计"} style={{marginLeft: "8px"}}>
+            <Col xl={14} xxl={18}>
+                <ShadowCard title={<Typography.Title level={5}>一周报警统计</Typography.Title>} style={{marginLeft: "8px"}}>
                     {
                         measurement &&
                         <AlertStatistic filter={{measurement_id: measurement.id}} style={{height: "200px"}}/>
@@ -185,13 +221,7 @@ const MeasurementDetail = () => {
         </Row>
         <Row justify={"start"} style={{paddingBottom: "8px"}}>
             <Col span={24}>
-                <ShadowCard tabList={tabList.map((tab) => {
-              if (tab.key === 'rawData') {
-                return { ...tab, disabled: measurement?.type !== MeasurementType.Vibration };
-              } else {
-                return tab;
-              }
-            })} onTabChange={key => setCurrentKey(key)}>
+                <ShadowCard tabList={renderTabList()} onTabChange={key => setCurrentKey(key)}>
                     {contents.get(currentKey)}
                 </ShadowCard>
             </Col>

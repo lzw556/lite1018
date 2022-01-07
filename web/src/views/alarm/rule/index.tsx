@@ -1,23 +1,21 @@
 import TableLayout from "../../layout/TableLayout";
 import {useCallback, useEffect, useState} from "react";
-import {GetAlarmRequest, PagingAlarmsRequest, RemoveAlarmRuleRequest} from "../../../apis/alarm";
-import {Button, Col, Divider, Popconfirm, Row, Select, Space} from "antd";
+import {GetAlarmRequest, PagingAlarmsRequest, RemoveAlarmRequest} from "../../../apis/alarm";
+import {Button, Col, Divider, Popconfirm, Row, Space} from "antd";
 import Label from "../../../components/label";
 import EditModal from "./modal/editModal";
 import {Alarm} from "../../../types/alarm_rule";
-import AssetSelect from "../../../components/assetSelect";
 import HasPermission from "../../../permission";
 import {Permission} from "../../../permission/permission";
 import {PageResult} from "../../../types/page";
 import {Measurement} from "../../../types/measurement";
 import {MeasurementType} from "../../../types/measurement_type";
-
-
-const {Option} = Select
+import moment from "moment";
+import AssetTreeSelect from "../../../components/select/assetTreeSelect";
 
 const AlarmRule = () => {
     const [asset, setAsset] = useState<number>(0)
-    const [measurement, setMeasurement] = useState<number>(0)
+    const [measurement] = useState<number>(0)
     const [alarm, setAlarm] = useState<Alarm>()
     const [editVisible, setEditVisible] = useState<boolean>(false)
     const [dataSource, setDataSource] = useState<PageResult<any[]>>()
@@ -35,14 +33,14 @@ const AlarmRule = () => {
     }
 
     const onDelete = (id: number) => {
-        RemoveAlarmRuleRequest(id).then(_ => onRefresh())
+        RemoveAlarmRequest(id).then(_ => onRefresh())
     }
 
     const onRefresh = () => {
         setRefreshKey(refreshKey + 1)
     }
 
-    const columns:any = [
+    const columns: any = [
         {
             title: '规则名称',
             dataIndex: 'name',
@@ -52,7 +50,7 @@ const AlarmRule = () => {
             title: '监测点名称',
             dataIndex: 'measurement',
             key: 'measurement',
-            render: (measurement:Measurement) => {
+            render: (measurement: Measurement) => {
                 return measurement.name
             }
         },
@@ -60,7 +58,7 @@ const AlarmRule = () => {
             title: '监测点类型',
             dataIndex: 'measurement',
             key: 'measurement',
-            render: (measurement:Measurement) => {
+            render: (measurement: Measurement) => {
                 return MeasurementType.toString(measurement.type)
             }
         },
@@ -74,6 +72,12 @@ const AlarmRule = () => {
                 }
                 return "停用"
             }
+        },
+        {
+            title: '创建时间',
+            dataIndex: 'createdAt',
+            key: 'createdAt',
+            render: (timestamp: number) => moment.unix(timestamp).local().format("YYYY-MM-DD HH:mm:ss")
         },
         {
             title: '操作',
@@ -99,7 +103,7 @@ const AlarmRule = () => {
     ]
 
     const fetchAlarms = useCallback((current: number, size: number) => {
-        const filter:any = {}
+        const filter: any = {}
         if (asset) {
             filter.asset_id = asset
         }
@@ -118,12 +122,11 @@ const AlarmRule = () => {
             <Col span={12}>
                 <Space>
                     <Label name={"资产"}>
-                        <AssetSelect bordered={false} style={{width: "150px"}} defaultValue={asset}
-                                     defaultActiveFirstOption={true}
-                                     placeholder={"请选择资产"}
-                                     onChange={onAssetChanged}>
-                            <Option key={0} value={0}>所有资产</Option>
-                        </AssetSelect>
+                        <AssetTreeSelect bordered={false}
+                                         allowClear={true}
+                                         style={{minWidth: "120px"}}
+                                         placeholder={"所有资产"}
+                                         onChange={onAssetChanged}/>
                     </Label>
                 </Space>
             </Col>
@@ -133,7 +136,7 @@ const AlarmRule = () => {
             <Col span={24}>
                 <TableLayout emptyText={"报警规则列表为空"}
                              columns={columns}
-                             permissions={[Permission.AlarmRuleEdit,Permission.AlarmRuleDelete]}
+                             permissions={[Permission.AlarmRuleEdit, Permission.AlarmRuleDelete]}
                              dataSource={dataSource}
                              onPageChange={fetchAlarms}/>
             </Col>

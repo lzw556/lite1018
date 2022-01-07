@@ -3,6 +3,7 @@ package command
 import (
 	"context"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
+	"github.com/thetasensors/theta-cloud-lite/server/adapter/ruleengine"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/po"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/transaction"
@@ -25,6 +26,6 @@ func (cmd AlarmCreateCmd) Run() error {
 		if err := cmd.alarmRepo.BatchCreate(context.TODO(), cmd.Alarms); err != nil {
 			return err
 		}
-		return nil
+		return ruleengine.UpdateRules(cmd.Alarms...)
 	})
 }

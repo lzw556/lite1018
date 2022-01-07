@@ -117,12 +117,12 @@ func (s Measurement) GetMeasurementRawData(id uint, from, to int64) (vo.Measurem
 	return query.GateRawDataByRange(from, to)
 }
 
-func (s Measurement) GetMeasurementRawDataByTimestamp(id uint, timestamp int64) (*vo.MeasurementRawData, error) {
+func (s Measurement) GetMeasurementWaveDataByTimestamp(id uint, timestamp int64, calc string) (*vo.WaveData, error) {
 	query, err := s.factory.NewMeasurementQuery(id)
 	if err != nil {
 		return nil, err
 	}
-	return query.GateRawData(timestamp)
+	return query.GateWaveData(timestamp, calc)
 }
 
 func (s Measurement) UpdateMeasurementByID(id uint, req request.CreateMeasurement) error {

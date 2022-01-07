@@ -16,6 +16,7 @@ func _() {
 	_ = x[UserExistsError-11004]
 	_ = x[InvalidTokenError-11005]
 	_ = x[AssetNotFoundError-12001]
+	_ = x[AssetImageSizeTooLargeError-12002]
 	_ = x[DeviceNotFoundError-13001]
 	_ = x[DeviceMacExistsError-13002]
 	_ = x[UnknownDeviceTypeError-13003]
@@ -41,7 +42,7 @@ func _() {
 const (
 	_BusinessErrorCode_name_0 = "UnknownBusinessErrorSystemNotReadyError"
 	_BusinessErrorCode_name_1 = "UserNotFoundErrorInvalidUsernameOrPasswordErrorInvalidOldPasswordErrorUserExistsErrorInvalidTokenError"
-	_BusinessErrorCode_name_2 = "AssetNotFoundError"
+	_BusinessErrorCode_name_2 = "AssetNotFoundErrorAssetImageSizeTooLargeError"
 	_BusinessErrorCode_name_3 = "DeviceNotFoundErrorDeviceMacExistsErrorUnknownDeviceTypeErrorDeviceCommandSendFailedErrorDeviceCommandSendTimeoutErrorDeviceCommandExecFailedErrorDeviceCommandCancelledErrorUnknownDeviceCommandTypeErrorDeviceAlreadyBindingError"
 	_BusinessErrorCode_name_4 = "FirmwareNotFoundErrorFirmwareFormatErrorFirmwareExistsError"
 	_BusinessErrorCode_name_5 = "NetworkNotFoundError"
@@ -53,6 +54,7 @@ const (
 var (
 	_BusinessErrorCode_index_0 = [...]uint8{0, 20, 39}
 	_BusinessErrorCode_index_1 = [...]uint8{0, 17, 47, 70, 85, 102}
+	_BusinessErrorCode_index_2 = [...]uint8{0, 18, 45}
 	_BusinessErrorCode_index_3 = [...]uint8{0, 19, 39, 61, 89, 118, 146, 173, 202, 227}
 	_BusinessErrorCode_index_4 = [...]uint8{0, 21, 40, 59}
 	_BusinessErrorCode_index_6 = [...]uint8{0, 19, 41, 76}
@@ -68,8 +70,9 @@ func (i BusinessErrorCode) String() string {
 	case 11001 <= i && i <= 11005:
 		i -= 11001
 		return _BusinessErrorCode_name_1[_BusinessErrorCode_index_1[i]:_BusinessErrorCode_index_1[i+1]]
-	case i == 12001:
-		return _BusinessErrorCode_name_2
+	case 12001 <= i && i <= 12002:
+		i -= 12001
+		return _BusinessErrorCode_name_2[_BusinessErrorCode_index_2[i]:_BusinessErrorCode_index_2[i+1]]
 	case 13001 <= i && i <= 13009:
 		i -= 13001
 		return _BusinessErrorCode_name_3[_BusinessErrorCode_index_3[i]:_BusinessErrorCode_index_3[i+1]]

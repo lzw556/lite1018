@@ -1,6 +1,6 @@
 import {Content} from "antd/lib/layout/layout";
 import {useCallback, useEffect, useState} from "react";
-import {DeleteNetworkRequest, GetNetworkRequest, PagingNetworksRequest} from "../../apis/network";
+import {DeleteNetworkRequest, ExportNetworkRequest, GetNetworkRequest, PagingNetworksRequest} from "../../apis/network";
 import ShadowCard from "../../components/shadowCard";
 import "./index.css"
 import MyBreadcrumb from "../../components/myBreadcrumb";
@@ -16,7 +16,6 @@ import {PageResult} from "../../types/page";
 import AssetTreeSelect from "../../components/select/assetTreeSelect";
 import {SendDeviceCommandRequest} from "../../apis/device";
 import {DeviceCommand} from "../../types/device_command";
-import {Device} from "../../types/device";
 
 const NetworkPage = () => {
     const [assetId, setAssetId] = useState<number>(0)
@@ -48,25 +47,41 @@ const NetworkPage = () => {
         })
     }
 
-    const onCommand = (device: Device, key: any) => {
+    const onCommand = (record: Network, key: any) => {
         switch (key) {
             case "1":
-                SendDeviceCommandRequest(device.id, DeviceCommand.Provision).then(res => {
+                SendDeviceCommandRequest(record.gateway.id, DeviceCommand.Provision).then(res => {
                     if (res.code === 200) {
                         message.success("发送成功")
                     } else {
                         message.error(`发送失败: ${res.msg}`)
                     }
                 })
+                break
+            case "2":
+                exportNetwork(record)
+                break
         }
+    }
+
+    const exportNetwork = (n: Network) => {
+        ExportNetworkRequest(n.id).then(res => {
+            const url = window.URL.createObjectURL(new Blob([res.data]))
+            const link = document.createElement('a')
+            link.href = url
+            link.setAttribute('download', `${n.name}.json`)
+            document.body.appendChild(link)
+            link.click()
+        });
     }
 
     const renderCommandMenus = (record: Network) => {
         return <Menu onClick={(e) => {
-            onCommand(record.gateway, e.key)
+            onCommand(record, e.key)
         }}>
             <Menu.Item key={0}>同步网络</Menu.Item>
             <Menu.Item key={1}>继续组网</Menu.Item>
+            <Menu.Item key={2}>导出网络</Menu.Item>
         </Menu>
     }
 

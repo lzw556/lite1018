@@ -17,4 +17,5 @@ export type MeasurementField = {
 export enum MeasurementFieldType {
     Float = 1,
     Array,
+    Axis
 }

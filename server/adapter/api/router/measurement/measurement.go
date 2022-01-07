@@ -27,9 +27,9 @@ func (r *measurementRouter) initRoutes() {
 		router.NewGetRoute("measurements/:id", r.getByID),
 		router.NewGetRoute("measurements/:id/statistics", r.getStatistic),
 		router.NewGetRoute("measurements/:id/data", r.getData),
-		router.NewGetRoute("measurements/:id/rawData", r.getRawData),
-		router.NewGetRoute("measurements/:id/rawData/:timestamp", r.getRawDataByTimestamp),
-		router.NewGetRoute("measurements/:id/rawData/:timestamp/download", r.downloadRawData),
+		router.NewGetRoute("measurements/:id/waveData", r.getWaveDataTimestamp),
+		router.NewGetRoute("measurements/:id/waveData/:timestamp", r.getWaveDataByTimestamp),
+		router.NewGetRoute("measurements/:id/waveData/:timestamp/download", r.downloadWaveData),
 
 		router.NewGetRoute("/check/deviceBinding/:mac", r.checkDeviceBinding),
 

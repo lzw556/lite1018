@@ -27,16 +27,20 @@ const HistoryData: FC<HistoryDataProps> = ({measurement}) => {
     const [field, setField] = useState<MeasurementField>()
 
     useEffect(() => {
-        GetMeasurementDataRequest(measurement.id, beginDate.utc().unix(), endDate.utc().unix()).then(setDataSource);
+        GetMeasurementDataRequest(measurement.id, beginDate.utc().unix(), endDate.utc().unix()).then(data => {
+            console.log(data)
+            setDataSource(data)
+        });
     }, [beginDate, endDate])
 
     const renderChart = () => {
-        if (field && dataSource) {
+        if (field) {
             switch (measurement.type) {
                 case MeasurementType.BoltLoosening:
                 case MeasurementType.BoltElongation:
                 case MeasurementType.AngleDip:
                 case MeasurementType.Vibration:
+                case MeasurementType.NormalTemperatureCorrosion:
                     return <LineChart dataSource={dataSource} field={field} style={{height: "400px"}}/>
             }
         }

@@ -9,7 +9,7 @@ export interface AcknowledgeViewModalProps extends ModalProps {
 const AcknowledgeViewModal: FC<AcknowledgeViewModalProps> = (props) => {
     const {acknowledge} = props;
 
-    return <Modal {...props} width={420} title={"报警处理详情"}>
+    return <Modal {...props} width={420} title={"报警处理详情"} footer={null}>
         <Form.Item label={"处理人"} labelCol={{span: 5}}>
             <Input disabled value={acknowledge.user}/>
         </Form.Item>

@@ -274,6 +274,8 @@ func (factory Device) buildFilterSpec(filters request.Filters) []spec.Specificat
 			specs = append(specs, macSpecs)
 		case "category":
 			specs = append(specs, spec.CategoryEqSpec(cast.ToUint(filter.Value)))
+		case "type":
+			specs = append(specs, spec.TypeEqSpec(cast.ToUint(filter.Value)))
 		}
 	}
 	return specs

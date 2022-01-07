@@ -25,12 +25,17 @@ const LocationCanvas: FC<LocationCanvasProps> = ({x, y, value}) => {
                     <p>{`类型: ${MeasurementType.toString(measurement.type)}`}</p>
                     {
                         Measurement.getPrimaryFields(measurement)?.sort((a:any, b:any) => a.sort - b.sort).map(field => {
+                            if (Array.isArray(field.value)) {
+                                return <>
+                                    <p>{`${field.title}: ${field.value.map(v => v.toFixed(field.precision))}${field.unit}`}</p>
+                                </>
+                            }
                             return <>
-                                <p>{`${field.title}: ${field.value}${field.unit}`}</p>
+                                <p>{`${field.title}: ${field.value.toFixed(field.precision)}${field.unit}`}</p>
                             </>
                         })
                     }
-                    <p>{`上报时间: ${moment.unix(measurement.data.timestamp).format("YYYY-MM-DD HH:mm:ss")}`}</p>
+                    <p>{`上报时间: ${measurement.data.timestamp > 0 ? moment.unix(measurement.data.timestamp).format("YYYY-MM-DD HH:mm:ss") : "-"}`}</p>
                 </>
             }
         }
@@ -61,9 +66,9 @@ const LocationCanvas: FC<LocationCanvasProps> = ({x, y, value}) => {
     }
 
     return <Group x={x} y={y}>
-        <Circle radius={10}
+        <Circle radius={15}
                 fillRadialGradientStartRadius={0}
-                fillRadialGradientEndRadius={10}
+                fillRadialGradientEndRadius={15}
                 fillRadialGradientColorStops={[0, getColor(), 1, "transparent"]}
                 onMouseOver={() => {
                     setShow(true)

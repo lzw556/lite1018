@@ -99,7 +99,15 @@ func (factory Alarm) NewAlarmPagingQuery(filters request.Filters, page, size int
 	for _, filter := range filters {
 		switch filter.Name {
 		case "asset_id":
-			specs = append(specs, spec.AssetEqSpec(cast.ToUint(filter.Value)))
+			measurement, err := factory.measurementRepo.FindBySpecs(ctx, spec.AssetEqSpec(cast.ToUint(filter.Value)))
+			if err != nil {
+				return nil, err
+			}
+			measurementInSpec := make(spec.MeasurementInSpec, len(measurement))
+			for i, m := range measurement {
+				measurementInSpec[i] = m.ID
+			}
+			specs = append(specs, measurementInSpec)
 		case "measurement_id":
 			specs = append(specs, spec.MeasurementEqSpec(cast.ToUint(filter.Value)))
 		}

@@ -1,6 +1,6 @@
 import {Content} from "antd/es/layout/layout";
 import MyBreadcrumb from "../../../components/myBreadcrumb";
-import {Button, Col, List, Popconfirm, Row, Space, Statistic, Tag, Typography} from "antd";
+import {Button, Col, ConfigProvider, List, Popconfirm, Row, Space, Statistic, Tag, Typography} from "antd";
 import AssetTreeSelect from "../../../components/select/assetTreeSelect";
 import Label from "../../../components/label";
 import ShadowCard from "../../../components/shadowCard";
@@ -13,24 +13,24 @@ import {GetMeasurementRequest, GetMeasurementsRequest, RemoveMeasurementRequest}
 import MeasurementStatistic from "./measurementStatistic";
 import SensorStatistic from "./sensorStatistic";
 import {ColorDanger, ColorHealth, ColorInfo, ColorWarn} from "../../../constants/color";
-import AlarmRecordStatistic from "./alarmRecordStatistic";
 import {DeleteOutlined, EditOutlined, MonitorOutlined} from "@ant-design/icons";
 import EditMeasurementModal from "./editMeasurementModal";
 import {useLocation} from "react-router-dom";
-import {GetParamValue} from "../../../utils/path";
 import moment from "moment";
 import MeasurementDataViewModal from "./measurementDataViewModal";
+import {EmptyLayout} from "../../layout";
+import AlertStatistic from "../measurement/detail/alertStatistic";
 
 const AssetMonitor = () => {
-    const location = useLocation();
+    const location = useLocation<any>();
     const [asset, setAsset] = useState<Asset>();
     const [dataSource, setDataSource] = useState<Measurement[]>([]);
     const [measurement, setMeasurement] = useState<Measurement>();
     const selector = document.querySelector("#container")
     const [height] = useState<number>(window.innerHeight - 200)
     const [refreshKey, setRefreshKey] = useState(1)
-    const id = GetParamValue(location.search, "id")
     const [isShowDataViewModal, setIsShowDataViewModal] = useState(false)
+    const id = location.state?.id ? Number(location.state.id) : undefined
 
     useEffect(() => {
         if (asset) {
@@ -39,6 +39,7 @@ const AssetMonitor = () => {
     }, [asset, refreshKey])
 
     const fetchAsset = (id: number) => {
+        console.log(id)
         GetAssetRequest(id).then(setAsset)
     }
 
@@ -60,13 +61,14 @@ const AssetMonitor = () => {
                 const data = m.data.fields.filter(f => f.primary).sort((a, b) => a.sort - b.sort)[0]
                 if (Array.isArray(data.value)) {
                     return <>
-                        <Statistic title={`${data.title}(X轴)`} value={data.value[0]} suffix={data.unit} precision={data.precision}/>
-                        <Typography.Text>{moment.unix(m.data.timestamp).local().format("YYYY-MM-DD hh:mm:ss")}</Typography.Text>
+                        <Statistic title={`${data.title}(X轴)`} value={data.value[0]} suffix={data.unit}
+                                   precision={data.precision}/>
+                        <Typography.Text>{moment.unix(m.data.timestamp).local().format("YYYY-MM-DD HH:mm:ss")}</Typography.Text>
                     </>
                 }
                 return <>
                     <Statistic title={data.title} value={data.value} suffix={data.unit} precision={data.precision}/>
-                    <Typography.Text>{moment.unix(m.data.timestamp).local().format("YYYY-MM-DD hh:mm:ss")}</Typography.Text>
+                    <Typography.Text>{moment.unix(m.data.timestamp).local().format("YYYY-MM-DD HH:mm:ss")}</Typography.Text>
                 </>
             }
         }
@@ -112,7 +114,7 @@ const AssetMonitor = () => {
                     <AssetTreeSelect bordered={false} style={{width: "150px"}}
                                      placeholder={"请选择资产"}
                                      defaultActiveFirstOption={true}
-                                     defaultValue={Number(id)}
+                                     defaultValue={id}
                                      value={asset?.id}
                                      onChange={fetchAsset}/>
                 </Label>
@@ -120,59 +122,71 @@ const AssetMonitor = () => {
         </MyBreadcrumb>
         <Row justify={"start"}>
             <Col xl={8} xxl={6}>
-                <ShadowCard title={"监测点状态统计"} size={"small"} style={{height: "33%"}}>
-                    <MeasurementStatistic asset={asset} style={{height: `${height / 3 - 20}px`}}/>
+                <ShadowCard bodyStyle={{height: `${height / 3}px`, position: "relative"}}
+                            title={<Typography.Title level={5}>监测点状态统计</Typography.Title>} size={"small"}>
+                    <MeasurementStatistic asset={asset} style={{height: `${height / 4}px`}}/>
                 </ShadowCard>
-                <ShadowCard title={"传感器状态统计"} size={"small"} style={{height: "33%"}}>
+                <ShadowCard bodyStyle={{height: `${height / 3}px`, position: "relative", marginTop: "2px"}}
+                            title={<Typography.Title level={5}>传感器状态统计</Typography.Title>} size={"small"}>
                     {
-                        asset && <SensorStatistic filter={{asset_id: asset.id}} style={{height: `${height / 3 - 20}px`}}/>
+                        asset && selector &&
+                        <SensorStatistic filter={{asset_id: asset.id}} style={{height: `${height / 4}px`}}/>
                     }
                 </ShadowCard>
-                <ShadowCard title={"今日报警统计"} size={"small"} style={{height: "33%"}}>
-                    <AlarmRecordStatistic asset={asset}  />
+                <ShadowCard bodyStyle={{height: `${height / 3}px`, position: "relative", marginTop: "2px"}}
+                            size={"small"}
+                            title={<Typography.Title level={5}>一周报警统计</Typography.Title>}>
+                    {
+                        asset &&
+                        <AlertStatistic filter={{asset_id: asset.id}} style={{height: `${height / 4}px`}}/>
+                    }
                 </ShadowCard>
             </Col>
-            <Col xl={16} xxl={18} style={{paddingLeft: "8px"}}>
-                <ShadowCard style={{height: "99%"}}>
-                    <Typography.Title level={5}>资产示意图</Typography.Title>
-                    <Row justify={"start"} style={{width: "100%"}} align={"middle"}>
-                        <Col span={24}>
-                            <div id={"container"} style={{width: "100%", height: `${height}px`}}>
-                                {
-                                    asset && selector &&
-                                    <AssetCanvas width={selector.clientWidth}
-                                                 height={selector.clientHeight}
-                                                 asset={asset}
-                                                 measurements={dataSource}/>
-                                }
-                            </div>
+            <Col xl={16} xxl={18}>
+                <ShadowCard style={{height: "100%", position: "relative"}} bodyStyle={{height: "100%"}}
+                            title={<Typography.Title level={5}>资产示意图</Typography.Title>} size={"small"}>
+                    <Row justify={"start"} style={{height: "100%", position: "relative"}}>
+                        <Col id={"container"} span={24} style={{height: "90%", position: "relative"}}>
+                            {
+                                asset && selector &&
+                                <AssetCanvas width={selector.clientWidth}
+                                             height={selector.clientHeight}
+                                             asset={asset}
+                                             measurements={dataSource}/>
+                            }
                         </Col>
                     </Row>
                 </ShadowCard>
             </Col>
         </Row>
-        <ShadowCard>
-            <Typography.Title level={5}>监测点列表</Typography.Title>
-            <Row justify={"start"} style={{overflow: "auto"}}>
-                <Col span={24}>
-                    <List size={"small"} dataSource={dataSource}
-                          grid={{sm: 1, md: 2, lg: 3, xl: 4, xxl: 6}}
-                          renderItem={measurement => {
-                              return <List.Item key={measurement.id}>
-                                  <ShadowCard size={"small"}
-                                              title={<a href={`#/asset-management?locale=assetMonitor/measurementDetail&id=${measurement.id}`}>{measurement.name}</a>}
-                                              extra={renderMeasurementStatus(measurement)}
-                                              actions={renderMeasurementActions(measurement)}>
-                                      {
-                                          renderMeasurementData(measurement)
-                                      }
-                                  </ShadowCard>
-                              </List.Item>
-                          }}
-                    />
-                </Col>
-            </Row>
-        </ShadowCard>
+        <Row justify={"start"}>
+            <Col span={24}>
+                <ShadowCard size={"small"} title={<Typography.Title level={5}>监测点列表</Typography.Title>}>
+                    <Row justify={"start"} style={{overflow: "auto"}}>
+                        <Col span={24}>
+                            <ConfigProvider renderEmpty={() => <EmptyLayout description={"监测点列表为空"}/>}>
+                                <List size={"small"} dataSource={dataSource}
+                                      grid={{sm: 1, md: 2, lg: 3, xl: 4, xxl: 6}}
+                                      renderItem={measurement => {
+                                          return <List.Item key={measurement.id}>
+                                              <ShadowCard size={"small"}
+                                                          title={<a
+                                                              href={`#/asset-management?locale=assetMonitor/measurementDetail&id=${measurement.id}`}>{measurement.name}</a>}
+                                                          extra={renderMeasurementStatus(measurement)}
+                                                          actions={renderMeasurementActions(measurement)}>
+                                                  {
+                                                      renderMeasurementData(measurement)
+                                                  }
+                                              </ShadowCard>
+                                          </List.Item>
+                                      }}
+                                />
+                            </ConfigProvider>
+                        </Col>
+                    </Row>
+                </ShadowCard>
+            </Col>
+        </Row>
         {
             measurement && !isShowDataViewModal && <EditMeasurementModal
                 visible={!!measurement}
@@ -185,11 +199,12 @@ const AssetMonitor = () => {
             />
         }
         {
-            measurement && isShowDataViewModal && <MeasurementDataViewModal measurement={measurement} visible={isShowDataViewModal}
-                                                     onCancel={() => {
-                                                         setMeasurement(undefined);
-                                                         setIsShowDataViewModal(false);
-                                                     }}/>
+            measurement && isShowDataViewModal &&
+            <MeasurementDataViewModal measurement={measurement} visible={isShowDataViewModal}
+                                      onCancel={() => {
+                                          setMeasurement(undefined);
+                                          setIsShowDataViewModal(false);
+                                      }}/>
         }
     </Content>
 }

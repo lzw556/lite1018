@@ -4,13 +4,14 @@ import moment from "moment";
 import {DefaultHistoryDataOption, LineChartStyles} from "../../../../../../constants/chart";
 import {MeasurementChartProps} from "./measurement_chart";
 import {MeasurementFieldType} from "../../../../../../types/measurement_data";
+import {EmptyLayout} from "../../../../../layout";
 
 const LineChart:FC<MeasurementChartProps> = ({dataSource, field, style}) => {
     const [option, setOption] = useState<any>({})
     const [isLoading, setIsLoading] = useState<boolean>(false)
 
     const convertOption = useCallback(() => {
-        if (dataSource) {
+        if (dataSource && dataSource.length > 0) {
             setIsLoading(true)
             const times = dataSource.map((item:any) => moment.unix(item.timestamp).local());
             let legend: any[] = []
@@ -63,13 +64,19 @@ const LineChart:FC<MeasurementChartProps> = ({dataSource, field, style}) => {
             setOption({})
         }
         setIsLoading(false)
-    }, [field])
+    }, [field, dataSource])
 
     useEffect(() => {
         convertOption()
     }, [convertOption])
 
-    return <EChartsReact loadingOption={{ text: '正在加载数据, 请稍等...' }} showLoading={isLoading} option={option} style={style} notMerge={true}/>
+    return <>
+        {
+            dataSource && dataSource.length ?
+                <EChartsReact loadingOption={{ text: '正在加载数据, 请稍等...' }} showLoading={isLoading} option={option} style={style} notMerge={true}/> :
+                <EmptyLayout description={"暂时没有数据"}/>
+        }
+    </>
 }
 
 export default LineChart;

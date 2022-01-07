@@ -24,6 +24,7 @@ const (
 
 const (
 	AssetNotFoundError BusinessErrorCode = iota + 12001
+	AssetImageSizeTooLargeError
 )
 
 const (
@@ -93,6 +94,7 @@ var businessErrorMap = map[BusinessErrorCode]string{
 	RoleNotFoundError:                   "角色不存在",
 	MeasurementNotFoundError:            "监测点不存在",
 	UnknownMeasurementTypeError:         "未知的监测点类型",
+	AssetImageSizeTooLargeError:         "资产图片大小超过限制(2MB)",
 }
 
 func GetErrMessage(code BusinessErrorCode) string {

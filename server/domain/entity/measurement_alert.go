@@ -18,6 +18,10 @@ func (m MeasurementAlert) Level(id uint) uint {
 	return m.Records[id].Level
 }
 
+func (m *MeasurementAlert) RemoveAlarmRecord(id uint) {
+	delete(m.Records, id)
+}
+
 func (m MeasurementAlert) MeasurementStatus() uint {
 	status := uint(0)
 	for _, record := range m.Records {

@@ -60,6 +60,8 @@ func (p MeasurementData) Process(ctx *iot.Context, msg iot.Message) error {
 			strategy = measurement.NewNormalTemperatureCorrosionStrategy()
 		case measurementtype.Vibration:
 			strategy = measurement.NewVibrationStrategy()
+		case measurementtype.AngleDip:
+			strategy = measurement.NewAngleDipStrategy()
 		default:
 			return errcode.UnknownMeasurementTypeError
 		}

@@ -30,7 +30,7 @@ func NewAsset() asset.Service {
 	}
 }
 
-func (s Asset) CreateAsset(req request.CreateAsset) error {
+func (s Asset) CreateAsset(req request.Asset) error {
 	e := po.Asset{
 		Name:     req.Name,
 		Image:    fmt.Sprintf("%s%s", uuid.NewV1().String(), req.GetFileExt()),
@@ -55,7 +55,7 @@ func (s Asset) CreateAsset(req request.CreateAsset) error {
 	})
 }
 
-func (s Asset) UpdateAsset(assetID uint, req request.UpdateAsset) error {
+func (s Asset) UpdateAsset(assetID uint, req request.Asset) error {
 	ctx := context.TODO()
 	e, err := s.repository.Get(ctx, assetID)
 	if err != nil {
@@ -63,9 +63,26 @@ func (s Asset) UpdateAsset(assetID uint, req request.UpdateAsset) error {
 	}
 	e.Name = req.Name
 	e.ParentID = req.ParentID
-	e.Display.Location.X = req.Location.X
-	e.Display.Location.Y = req.Location.Y
-	return s.repository.Save(ctx, &e)
+	if req.Location != nil {
+		e.Display.Location.X = req.Location.X
+		e.Display.Location.Y = req.Location.Y
+	}
+	return transaction.Execute(ctx, func(txCtx context.Context) error {
+		if err := s.repository.Save(txCtx, &e); err != nil {
+			return err
+		}
+		if req.Image != nil {
+			if err := global.DeleteFile("resources/assets", e.Image); err != nil {
+				return err
+			}
+			payload, err := req.UploadBytes()
+			if err != nil {
+				return err
+			}
+			return global.SaveFile(e.Image, "resources/assets", payload)
+		}
+		return nil
+	})
 }
 
 func (s Asset) RemoveAsset(assetID uint) error {
