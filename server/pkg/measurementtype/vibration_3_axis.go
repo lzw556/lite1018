@@ -72,7 +72,7 @@ func (Vibration3Axis) Variables() Variables {
 			Name:      "acceleration_rms",
 			Title:     "加速度有效值",
 			DataIndex: 0,
-			Unit:      "mm/s²",
+			Unit:      "m/s²",
 			Type:      AxisVariableType,
 			Precision: 3,
 			Sort:      6,
