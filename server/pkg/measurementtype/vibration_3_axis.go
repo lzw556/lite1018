@@ -33,7 +33,7 @@ func (Vibration3Axis) Variables() Variables {
 			Name:      "acceleration_peak",
 			Title:     "加速度峰值",
 			DataIndex: 5,
-			Unit:      "mm/s²",
+			Unit:      "m/s²",
 			Type:      AxisVariableType,
 			Precision: 3,
 			Primary:   true,
