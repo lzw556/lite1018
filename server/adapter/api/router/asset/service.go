@@ -7,12 +7,12 @@ import (
 
 type Service interface {
 	CreateAsset(req request.Asset) error
-	UpdateAsset(assetID uint, req request.Asset) error
-	RemoveAsset(assetID uint) error
+	UpdateAssetByID(id uint, req request.Asset) error
+	DeleteAssetByID(id uint) error
 	FindAssetsByPaginate(page, size int) ([]vo.Asset, int64, error)
 	FindAssets() ([]vo.Asset, error)
-	GetAssetChildren(id uint) ([]vo.Asset, error)
-	GetAsset(assetID uint) (*vo.Asset, error)
-	Statistic(assetID uint) (*vo.AssetStatistic, error)
-	StatisticAll() ([]vo.AssetStatistic, error)
+	GetAssetChildrenByID(id uint) ([]vo.Asset, error)
+	GetAssetByID(id uint) (*vo.Asset, error)
+	StatisticalAssetByID(id uint) (*vo.AssetStatistic, error)
+	StatisticalAssets() ([]vo.AssetStatistic, error)
 }

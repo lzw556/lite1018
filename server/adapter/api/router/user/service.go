@@ -8,12 +8,12 @@ import (
 type Service interface {
 	Login(req request.Login) (*vo.AccessToken, error)
 	CreateUser(req request.User) error
-	UpdateUser(userID uint, req request.User) (*vo.User, error)
-	UpdateProfile(userID uint, req request.Profile) (*vo.User, error)
-	UpdatePass(userID uint, req request.UserPass) error
+	UpdateUserByID(id uint, req request.User) (*vo.User, error)
+	UpdateProfileByUserID(userID uint, req request.Profile) (*vo.User, error)
+	UpdatePassByUserID(userID uint, req request.UserPass) error
 
-	GetUser(userID uint) (*vo.User, error)
+	GetUserByID(id uint) (*vo.User, error)
 	FindUsersByPaginate(page, size int) ([]vo.User, int64, error)
 
-	RemoveUser(userID uint) error
+	DeleteUserByID(id uint) error
 }

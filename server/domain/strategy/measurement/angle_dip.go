@@ -19,7 +19,7 @@ func NewAngleDipStrategy() Strategy {
 }
 
 func (s AngleDipStrategy) Do(m po.Measurement) (entity.MeasurementData, error) {
-	data, err := s.getLastDeviceData(m)
+	data, err := s.getLastSensorData(m)
 	if err != nil {
 		return entity.MeasurementData{}, err
 	}

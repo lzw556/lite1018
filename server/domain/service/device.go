@@ -36,7 +36,7 @@ func (s Device) CreateDevice(req request.Device) error {
 	return cmd.Run()
 }
 
-func (s Device) RemoveDevice(deviceID uint) error {
+func (s Device) DeleteDeviceByID(deviceID uint) error {
 	cmd, err := s.factory.NewDeviceRemoveCmd(deviceID)
 	if err != nil {
 		return err
@@ -44,7 +44,7 @@ func (s Device) RemoveDevice(deviceID uint) error {
 	return cmd.Run()
 }
 
-func (s Device) UpdateDevice(deviceID uint, req request.Device) error {
+func (s Device) UpdateDeviceByID(deviceID uint, req request.Device) error {
 	cmd, err := s.factory.NewDeviceUpdateCmd(deviceID)
 	if err != nil {
 		return err
@@ -52,7 +52,7 @@ func (s Device) UpdateDevice(deviceID uint, req request.Device) error {
 	return cmd.UpdateBaseInfo(req)
 }
 
-func (s Device) GetDevice(deviceID uint) (*vo.Device, error) {
+func (s Device) GetDeviceByID(deviceID uint) (*vo.Device, error) {
 	query, err := s.factory.NewDeviceQuery(deviceID)
 	if err != nil {
 		return nil, err
@@ -69,7 +69,7 @@ func (s Device) FindDevicesByPaginate(page, size int, filters request.Filters) (
 	return result, total, nil
 }
 
-func (s Device) FindDevicesByFilter(filters request.Filters) ([]vo.Device, error) {
+func (s Device) FilterDevices(filters request.Filters) ([]vo.Device, error) {
 	query, err := s.factory.NewDeviceListQueryByFilter(filters)
 	if err != nil {
 		return nil, err
@@ -77,7 +77,7 @@ func (s Device) FindDevicesByFilter(filters request.Filters) ([]vo.Device, error
 	return query.Run(), nil
 }
 
-func (s Device) UpdateDeviceSetting(deviceID uint, req request.DeviceSetting) error {
+func (s Device) UpdateDeviceSettingByID(deviceID uint, req request.DeviceSetting) error {
 	cmd, err := s.factory.NewDeviceUpdateCmd(deviceID)
 	if err != nil {
 		return err
@@ -85,7 +85,7 @@ func (s Device) UpdateDeviceSetting(deviceID uint, req request.DeviceSetting) er
 	return cmd.UpdateSetting(req)
 }
 
-func (s Device) GetDeviceSetting(deviceID uint) (*vo.DeviceSetting, error) {
+func (s Device) GetDeviceSettingByID(deviceID uint) (*vo.DeviceSetting, error) {
 	query, err := s.factory.NewDeviceQuery(deviceID)
 	if err != nil {
 		return nil, err
@@ -101,7 +101,7 @@ func (s Device) CheckDeviceMacAddress(mac string) error {
 	return response.BusinessErr(errcode.DeviceMacExistsError, mac)
 }
 
-func (s Device) ReplaceDevice(deviceID uint, mac string) error {
+func (s Device) ReplaceDeviceByID(deviceID uint, mac string) error {
 	cmd, err := s.factory.NewDeviceUpdateCmd(deviceID)
 	if err != nil {
 		return err
@@ -148,7 +148,7 @@ func (s Device) RemoveDataByID(deviceID uint, from, to int64) error {
 	return cmd.RemoveData(time.Unix(from, 0), time.Unix(to, 0))
 }
 
-func (s Device) ExecuteCommand(deviceID uint, cmdType uint) error {
+func (s Device) ExecuteCommandByID(deviceID uint, cmdType uint) error {
 	cmd, err := s.factory.NewDeviceExecuteCommandCmd(deviceID)
 	if err != nil {
 		return err
@@ -156,7 +156,7 @@ func (s Device) ExecuteCommand(deviceID uint, cmdType uint) error {
 	return cmd.Run(cmdType)
 }
 
-func (s Device) ExecuteDeviceUpgrade(deviceID uint, req request.DeviceUpgrade) error {
+func (s Device) ExecuteDeviceUpgradeByID(deviceID uint, req request.DeviceUpgrade) error {
 	cmd, err := s.factory.NewDeviceUpgradeCmd(deviceID)
 	if err != nil {
 		return err
@@ -164,7 +164,7 @@ func (s Device) ExecuteDeviceUpgrade(deviceID uint, req request.DeviceUpgrade) e
 	return cmd.Upgrade(req)
 }
 
-func (s Device) ExecuteDeviceCancelUpgrade(deviceID uint) error {
+func (s Device) ExecuteDeviceCancelUpgradeByID(deviceID uint) error {
 	cmd, err := s.factory.NewDeviceUpgradeCmd(deviceID)
 	if err != nil {
 		return err

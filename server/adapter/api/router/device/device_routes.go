@@ -27,9 +27,9 @@ func (r deviceRouter) create(ctx *gin.Context) (interface{}, error) {
 	return nil, r.service.CreateDevice(req)
 }
 
-func (r deviceRouter) getByID(ctx *gin.Context) (interface{}, error) {
+func (r deviceRouter) get(ctx *gin.Context) (interface{}, error) {
 	id := cast.ToUint(ctx.Param("id"))
-	return r.service.GetDevice(id)
+	return r.service.GetDeviceByID(id)
 }
 
 func (r deviceRouter) find(ctx *gin.Context) (interface{}, error) {
@@ -45,33 +45,33 @@ func (r deviceRouter) find(ctx *gin.Context) (interface{}, error) {
 		}
 		return response.NewPageResult(page, size, total, result), nil
 	default:
-		return r.service.FindDevicesByFilter(filters)
+		return r.service.FilterDevices(filters)
 	}
 }
 
-func (r deviceRouter) statistical(ctx *gin.Context) (interface{}, error) {
+func (r deviceRouter) statisticalDevices(ctx *gin.Context) (interface{}, error) {
 	filters := request.NewFilters(ctx.Request.URL.Query())
 	return r.service.GetDevicesStatistics(filters)
 }
 
-func (r deviceRouter) updateByID(ctx *gin.Context) (interface{}, error) {
+func (r deviceRouter) update(ctx *gin.Context) (interface{}, error) {
 	id := cast.ToUint(ctx.Param("id"))
 	var req request.Device
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		return nil, response.InvalidParameterError(err.Error())
 	}
-	return nil, r.service.UpdateDevice(id, req)
+	return nil, r.service.UpdateDeviceByID(id, req)
 }
 
 func (r deviceRouter) executeCommand(ctx *gin.Context) (interface{}, error) {
 	id := cast.ToUint(ctx.Param("id"))
 	cmd := cast.ToUint(ctx.Param("cmd"))
-	return nil, r.service.ExecuteCommand(id, cmd)
+	return nil, r.service.ExecuteCommandByID(id, cmd)
 }
 
 func (r deviceRouter) getSettingByID(ctx *gin.Context) (interface{}, error) {
 	id := cast.ToUint(ctx.Param("id"))
-	return r.service.GetDeviceSetting(id)
+	return r.service.GetDeviceSettingByID(id)
 }
 
 func (r deviceRouter) updateSettingByID(ctx *gin.Context) (interface{}, error) {
@@ -80,7 +80,7 @@ func (r deviceRouter) updateSettingByID(ctx *gin.Context) (interface{}, error) {
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		return nil, response.InvalidParameterError(err.Error())
 	}
-	return nil, r.service.UpdateDeviceSetting(id, req)
+	return nil, r.service.UpdateDeviceSettingByID(id, req)
 }
 
 func (r deviceRouter) checkMacAddress(ctx *gin.Context) (interface{}, error) {
@@ -91,12 +91,12 @@ func (r deviceRouter) checkMacAddress(ctx *gin.Context) (interface{}, error) {
 func (r deviceRouter) replaceByID(ctx *gin.Context) (interface{}, error) {
 	id := cast.ToUint(ctx.Param("id"))
 	mac := ctx.Param("mac")
-	return nil, r.service.ReplaceDevice(id, mac)
+	return nil, r.service.ReplaceDeviceByID(id, mac)
 }
 
-func (r deviceRouter) removeByID(ctx *gin.Context) (interface{}, error) {
+func (r deviceRouter) delete(ctx *gin.Context) (interface{}, error) {
 	id := cast.ToUint(ctx.Param("id"))
-	return nil, r.service.RemoveDevice(id)
+	return nil, r.service.DeleteDeviceByID(id)
 }
 
 func (r deviceRouter) findDataByID(ctx *gin.Context) (interface{}, error) {
@@ -144,7 +144,7 @@ func (r deviceRouter) upgrade(ctx *gin.Context) (interface{}, error) {
 		return nil, response.InvalidParameterError(err.Error())
 	}
 	if req.Type == 1 {
-		return nil, r.service.ExecuteDeviceUpgrade(id, req)
+		return nil, r.service.ExecuteDeviceUpgradeByID(id, req)
 	}
-	return nil, r.service.ExecuteDeviceCancelUpgrade(id)
+	return nil, r.service.ExecuteDeviceCancelUpgradeByID(id)
 }

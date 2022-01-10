@@ -19,7 +19,7 @@ func (r assetRouter) create(ctx *gin.Context) (interface{}, error) {
 	return nil, r.service.CreateAsset(req)
 }
 
-func (r assetRouter) updateByID(ctx *gin.Context) (interface{}, error) {
+func (r assetRouter) update(ctx *gin.Context) (interface{}, error) {
 	id := cast.ToUint(ctx.Param("id"))
 	var req request.Asset
 	if err := ctx.ShouldBind(&req); err != nil {
@@ -28,12 +28,12 @@ func (r assetRouter) updateByID(ctx *gin.Context) (interface{}, error) {
 	if req.CheckFileSize() {
 		return nil, response.BusinessErr(errcode.AssetImageSizeTooLargeError, "")
 	}
-	return nil, r.service.UpdateAsset(id, req)
+	return nil, r.service.UpdateAssetByID(id, req)
 }
 
-func (r assetRouter) getByID(ctx *gin.Context) (interface{}, error) {
+func (r assetRouter) get(ctx *gin.Context) (interface{}, error) {
 	id := cast.ToUint(ctx.Param("id"))
-	return r.service.GetAsset(id)
+	return r.service.GetAssetByID(id)
 }
 
 func (r assetRouter) find(ctx *gin.Context) (interface{}, error) {
@@ -51,23 +51,23 @@ func (r assetRouter) find(ctx *gin.Context) (interface{}, error) {
 	}
 }
 
-func (r assetRouter) statistic(ctx *gin.Context) (interface{}, error) {
+func (r assetRouter) statisticalAsset(ctx *gin.Context) (interface{}, error) {
 	id := cast.ToUint(ctx.Param("id"))
-	return r.service.Statistic(id)
+	return r.service.StatisticalAssetByID(id)
 }
 
-func (r assetRouter) statisticAll(_ *gin.Context) (interface{}, error) {
-	return r.service.StatisticAll()
+func (r assetRouter) statisticalAssets(_ *gin.Context) (interface{}, error) {
+	return r.service.StatisticalAssets()
 }
 
-func (r assetRouter) removeByID(ctx *gin.Context) (interface{}, error) {
+func (r assetRouter) delete(ctx *gin.Context) (interface{}, error) {
 	id := cast.ToUint(ctx.Param("id"))
-	return nil, r.service.RemoveAsset(id)
+	return nil, r.service.DeleteAssetByID(id)
 }
 
 func (r assetRouter) getChildren(ctx *gin.Context) (interface{}, error) {
 	id := cast.ToUint(ctx.Param("id"))
-	return r.service.GetAssetChildren(id)
+	return r.service.GetAssetChildrenByID(id)
 }
 
 func (r assetRouter) measurementStatistics(ctx *gin.Context) (interface{}, error) {

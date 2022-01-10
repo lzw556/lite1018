@@ -23,25 +23,25 @@ func (r *measurementRouter) initRoutes() {
 		// GET
 		router.NewGetRoute("measurements", r.find),
 		router.NewGetRoute("measurements/fields", r.getFields),
-		router.NewGetRoute("measurements/statistics", r.statistical),
-		router.NewGetRoute("measurements/:id", r.getByID),
-		router.NewGetRoute("measurements/:id/statistics", r.getStatistic),
-		router.NewGetRoute("measurements/:id/data", r.getData),
-		router.NewGetRoute("measurements/:id/waveData", r.getWaveDataTimestamp),
-		router.NewGetRoute("measurements/:id/waveData/:timestamp", r.getWaveDataByTimestamp),
+		router.NewGetRoute("measurements/statistics", r.statisticalMeasurements),
+		router.NewGetRoute("measurements/:id", r.get),
+		router.NewGetRoute("measurements/:id/statistics", r.statisticalMeasurement),
+		router.NewGetRoute("measurements/:id/data", r.findDataByID),
+		router.NewGetRoute("measurements/:id/waveData", r.findWaveDataTimestamp),
+		router.NewGetRoute("measurements/:id/waveData/:timestamp", r.findWaveDataByTimestamp),
 		router.NewGetRoute("measurements/:id/waveData/:timestamp/download", r.downloadWaveData),
 
 		router.NewGetRoute("/check/deviceBinding/:mac", r.checkDeviceBinding),
 
 		// PUT
-		router.NewPutRoute("measurements/:id", r.updateByID),
+		router.NewPutRoute("measurements/:id", r.update),
 
 		// PATCH
 		router.NewPatchRoute("measurements/:id/settings", r.updateSettings),
 		router.NewPatchRoute("measurements/:id/devices", r.bindingDevices),
 
 		// DELETE
-		router.NewDeleteRoute("measurements/:id", r.removeByID),
+		router.NewDeleteRoute("measurements/:id", r.delete),
 		router.NewDeleteRoute("measurements/:id/data", r.removeDataByID),
 	}
 }

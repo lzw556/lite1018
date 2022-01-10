@@ -53,7 +53,7 @@ func (s Measurement) FindMeasurementsByAssetID(assetID uint) ([]vo.Measurement, 
 	return query.Run(), nil
 }
 
-func (s Measurement) GetMeasurementStatistics(assetID uint) ([]vo.MeasurementStatistic, error) {
+func (s Measurement) StatisticalMeasurementsByAssetID(assetID uint) ([]vo.MeasurementStatistic, error) {
 	query, err := s.factory.NewMeasurementStatisticsQueryByAssetID(assetID)
 	if err != nil {
 		return nil, err
@@ -61,7 +61,7 @@ func (s Measurement) GetMeasurementStatistics(assetID uint) ([]vo.MeasurementSta
 	return query.Run()
 }
 
-func (s Measurement) GetMeasurementStatistic(id uint) (*vo.MeasurementStatistic, error) {
+func (s Measurement) StatisticalMeasurementByID(id uint) (*vo.MeasurementStatistic, error) {
 	query, err := s.factory.NewMeasurementQuery(id)
 	if err != nil {
 		return nil, err
@@ -85,7 +85,7 @@ func (s Measurement) GetMeasurement(id uint) (*vo.Measurement, error) {
 	return query.Run(), nil
 }
 
-func (s Measurement) UpdateMeasurementSettings(id uint, req request.MeasurementSettings) error {
+func (s Measurement) UpdateMeasurementSettingsByID(id uint, req request.MeasurementSettings) error {
 	cmd, err := s.factory.NewMeasurementUpdateCmd(id)
 	if err != nil {
 		return err
@@ -93,7 +93,7 @@ func (s Measurement) UpdateMeasurementSettings(id uint, req request.MeasurementS
 	return cmd.UpdateSettings(req)
 }
 
-func (s Measurement) UpdateMeasurementDeviceBindings(id uint, req request.UpdateMeasurementDeviceBindings) error {
+func (s Measurement) UpdateMeasurementDeviceBindingsByID(id uint, req request.UpdateMeasurementDeviceBindings) error {
 	cmd, err := s.factory.NewMeasurementUpdateCmd(id)
 	if err != nil {
 		return err
@@ -133,7 +133,7 @@ func (s Measurement) UpdateMeasurementByID(id uint, req request.CreateMeasuremen
 	return cmd.Update(req)
 }
 
-func (s Measurement) RemoveMeasurementByID(id uint) error {
+func (s Measurement) DeleteMeasurementByID(id uint) error {
 	cmd, err := s.factory.NewMeasurementRemoveCmd(id)
 	if err != nil {
 		return err

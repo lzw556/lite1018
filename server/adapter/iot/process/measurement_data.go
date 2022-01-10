@@ -62,6 +62,8 @@ func (p MeasurementData) Process(ctx *iot.Context, msg iot.Message) error {
 			strategy = measurement.NewVibrationStrategy()
 		case measurementtype.AngleDip:
 			strategy = measurement.NewAngleDipStrategy()
+		case measurementtype.FlangeElongation:
+			strategy = measurement.NewFlangeElongationStrategy()
 		default:
 			return errcode.UnknownMeasurementTypeError
 		}

@@ -11,5 +11,5 @@ type Service interface {
 	FindFirmwaresByPaginate(page, size int) (vo.Firmwares, int64, error)
 	FindFirmwaresByDeviceID(deviceID uint) (vo.Firmwares, error)
 
-	RemoveFirmware(firmwareID uint) error
+	DeleteFirmwareByID(id uint) error
 }

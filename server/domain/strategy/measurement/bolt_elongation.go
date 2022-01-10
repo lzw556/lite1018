@@ -19,7 +19,7 @@ func NewBoltElongationStrategy() Strategy {
 }
 
 func (s BoltElongationStrategy) Do(m po.Measurement) (entity.MeasurementData, error) {
-	data, err := s.strategy.getLastDeviceData(m)
+	data, err := s.strategy.getLastSensorData(m)
 	if err != nil {
 		return entity.MeasurementData{}, err
 	}

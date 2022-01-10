@@ -32,12 +32,12 @@ func (r measurementRouter) find(ctx *gin.Context) (interface{}, error) {
 	}
 }
 
-func (r measurementRouter) getByID(ctx *gin.Context) (interface{}, error) {
+func (r measurementRouter) get(ctx *gin.Context) (interface{}, error) {
 	id := cast.ToUint(ctx.Param("id"))
 	return r.service.GetMeasurement(id)
 }
 
-func (r measurementRouter) updateByID(ctx *gin.Context) (interface{}, error) {
+func (r measurementRouter) update(ctx *gin.Context) (interface{}, error) {
 	id := cast.ToUint(ctx.Param("id"))
 	var req request.CreateMeasurement
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -46,14 +46,14 @@ func (r measurementRouter) updateByID(ctx *gin.Context) (interface{}, error) {
 	return nil, r.service.UpdateMeasurementByID(id, req)
 }
 
-func (r measurementRouter) statistical(ctx *gin.Context) (interface{}, error) {
+func (r measurementRouter) statisticalMeasurements(ctx *gin.Context) (interface{}, error) {
 	assetID := cast.ToUint(ctx.Query("assetId"))
-	return r.service.GetMeasurementStatistics(assetID)
+	return r.service.StatisticalMeasurementsByAssetID(assetID)
 }
 
-func (r measurementRouter) getStatistic(ctx *gin.Context) (interface{}, error) {
+func (r measurementRouter) statisticalMeasurement(ctx *gin.Context) (interface{}, error) {
 	id := cast.ToUint(ctx.Param("id"))
-	return r.service.GetMeasurementStatistic(id)
+	return r.service.StatisticalMeasurementByID(id)
 }
 
 func (r measurementRouter) getFields(ctx *gin.Context) (interface{}, error) {
@@ -74,7 +74,7 @@ func (r measurementRouter) updateSettings(ctx *gin.Context) (interface{}, error)
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		return nil, response.InvalidParameterError(err.Error())
 	}
-	return nil, r.service.UpdateMeasurementSettings(id, req)
+	return nil, r.service.UpdateMeasurementSettingsByID(id, req)
 }
 
 func (r measurementRouter) bindingDevices(ctx *gin.Context) (interface{}, error) {
@@ -83,17 +83,17 @@ func (r measurementRouter) bindingDevices(ctx *gin.Context) (interface{}, error)
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		return nil, response.InvalidParameterError(err.Error())
 	}
-	return nil, r.service.UpdateMeasurementDeviceBindings(id, req)
+	return nil, r.service.UpdateMeasurementDeviceBindingsByID(id, req)
 }
 
-func (r measurementRouter) getData(ctx *gin.Context) (interface{}, error) {
+func (r measurementRouter) findDataByID(ctx *gin.Context) (interface{}, error) {
 	id := cast.ToUint(ctx.Param("id"))
 	from := cast.ToInt64(ctx.Query("from"))
 	to := cast.ToInt64(ctx.Query("to"))
 	return r.service.GetMeasurementData(id, from, to)
 }
 
-func (r measurementRouter) getWaveDataTimestamp(ctx *gin.Context) (interface{}, error) {
+func (r measurementRouter) findWaveDataTimestamp(ctx *gin.Context) (interface{}, error) {
 	id := cast.ToUint(ctx.Param("id"))
 	from := cast.ToInt64(ctx.Query("from"))
 	to := cast.ToInt64(ctx.Query("to"))
@@ -110,15 +110,15 @@ func (r measurementRouter) downloadWaveData(ctx *gin.Context) (interface{}, erro
 	return result.ToCsvFile()
 }
 
-func (r measurementRouter) getWaveDataByTimestamp(ctx *gin.Context) (interface{}, error) {
+func (r measurementRouter) findWaveDataByTimestamp(ctx *gin.Context) (interface{}, error) {
 	id := cast.ToUint(ctx.Param("id"))
 	timestamp := cast.ToInt64(ctx.Param("timestamp"))
 	return r.service.GetMeasurementWaveDataByTimestamp(id, timestamp, ctx.Query("calculate"))
 }
 
-func (r measurementRouter) removeByID(ctx *gin.Context) (interface{}, error) {
+func (r measurementRouter) delete(ctx *gin.Context) (interface{}, error) {
 	id := cast.ToUint(ctx.Param("id"))
-	return nil, r.service.RemoveMeasurementByID(id)
+	return nil, r.service.DeleteMeasurementByID(id)
 }
 
 func (r measurementRouter) removeDataByID(ctx *gin.Context) (interface{}, error) {

@@ -40,7 +40,7 @@ func (s Network) CreateNetwork(req request.CreateNetwork) error {
 	return cmd.Run()
 }
 
-func (s Network) ExportNetwork(networkID uint) (*vo.NetworkExportFile, error) {
+func (s Network) ExportNetworkByID(networkID uint) (*vo.NetworkExportFile, error) {
 	cmd, err := s.factory.NewNetworkExportCmd(networkID)
 	if err != nil {
 		return nil, err
@@ -48,7 +48,7 @@ func (s Network) ExportNetwork(networkID uint) (*vo.NetworkExportFile, error) {
 	return cmd.Run(), nil
 }
 
-func (s Network) GetNetwork(networkID uint) (*vo.Network, error) {
+func (s Network) GetNetworkByID(networkID uint) (*vo.Network, error) {
 	query, err := s.factory.NewNetworkQuery(networkID)
 	if err != nil {
 		return nil, err
@@ -65,7 +65,7 @@ func (s Network) FindNetworksByPaginate(filters request.Filters, page, size int)
 	return result, total, nil
 }
 
-func (s Network) AccessDevices(networkID uint, req request.AccessDevices) error {
+func (s Network) AddDevicesByID(networkID uint, req request.AddDevices) error {
 	cmd, err := s.factory.NewNetworkUpdateCmdByID(networkID)
 	if err != nil {
 		return err
@@ -76,7 +76,7 @@ func (s Network) AccessDevices(networkID uint, req request.AccessDevices) error 
 	return cmd.AccessDevices(req.ParentID, req.Devices)
 }
 
-func (s Network) RemoveDevices(networkID uint, req request.RemoveDevices) error {
+func (s Network) RemoveDevicesByID(networkID uint, req request.RemoveDevices) error {
 	cmd, err := s.factory.NewNetworkUpdateCmdByID(networkID)
 	if err != nil {
 		return err
@@ -84,7 +84,7 @@ func (s Network) RemoveDevices(networkID uint, req request.RemoveDevices) error 
 	return cmd.RemoveDevices(req)
 }
 
-func (s Network) UpdateSetting(gatewayID uint, req request.WSN) error {
+func (s Network) UpdateSettingByGatewayID(gatewayID uint, req request.WSN) error {
 	cmd, err := s.factory.NewNetworkUpdateCmd(gatewayID)
 	if err != nil {
 		return err
@@ -92,7 +92,7 @@ func (s Network) UpdateSetting(gatewayID uint, req request.WSN) error {
 	return cmd.UpdateSetting(req)
 }
 
-func (s Network) UpdateNetwork(networkID uint, req request.Network) (*vo.Network, error) {
+func (s Network) UpdateNetworkByID(networkID uint, req request.Network) (*vo.Network, error) {
 	e, err := s.repository.Get(context.TODO(), networkID)
 	if err != nil {
 		return nil, response.BusinessErr(errcode.NetworkNotFoundError, "")
@@ -104,7 +104,7 @@ func (s Network) UpdateNetwork(networkID uint, req request.Network) (*vo.Network
 	return cmd.Update(req)
 }
 
-func (s Network) RemoveNetwork(networkID uint) error {
+func (s Network) DeleteNetworkByID(networkID uint) error {
 	cmd, err := s.factory.NewNetworkRemoveCmd(networkID)
 	if err != nil {
 		return err
@@ -112,7 +112,7 @@ func (s Network) RemoveNetwork(networkID uint) error {
 	return cmd.Run()
 }
 
-func (s Network) SyncNetwork(networkID uint) error {
+func (s Network) SyncNetworkByID(networkID uint) error {
 	cmd, err := s.factory.NewNetworkSyncCmd(networkID)
 	if err != nil {
 		return err

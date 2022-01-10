@@ -14,16 +14,16 @@ type Service interface {
 
 	FilterMeasurements(req request.Filters) ([]vo.Measurement, error)
 
-	GetMeasurementStatistics(assetID uint) ([]vo.MeasurementStatistic, error)
-	GetMeasurementStatistic(id uint) (*vo.MeasurementStatistic, error)
+	StatisticalMeasurementsByAssetID(assetID uint) ([]vo.MeasurementStatistic, error)
+	StatisticalMeasurementByID(id uint) (*vo.MeasurementStatistic, error)
 
 	GetMeasurement(id uint) (*vo.Measurement, error)
 	GetMeasurementData(id uint, from, to int64) ([]vo.MeasurementData, error)
 	GetMeasurementRawData(id uint, from, to int64) (vo.MeasurementsRawData, error)
 	GetMeasurementWaveDataByTimestamp(id uint, timestamp int64, calc string) (*vo.WaveData, error)
-	UpdateMeasurementSettings(id uint, req request.MeasurementSettings) error
+	UpdateMeasurementSettingsByID(id uint, req request.MeasurementSettings) error
 	UpdateMeasurementByID(id uint, req request.CreateMeasurement) error
-	UpdateMeasurementDeviceBindings(id uint, req request.UpdateMeasurementDeviceBindings) error
-	RemoveMeasurementByID(id uint) error
+	UpdateMeasurementDeviceBindingsByID(id uint, req request.UpdateMeasurementDeviceBindings) error
+	DeleteMeasurementByID(id uint) error
 	RemoveMeasurementDataByID(id uint, from, to int64) error
 }

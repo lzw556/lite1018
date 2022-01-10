@@ -104,7 +104,7 @@ func (cmd NetworkUpdateCmd) AccessDevices(parentID uint, childrenID []uint) erro
 	return nil
 }
 
-func (cmd NetworkUpdateCmd) AccessNewDevice(req request.AccessDevices) error {
+func (cmd NetworkUpdateCmd) AccessNewDevice(req request.AddDevices) error {
 	ctx := context.TODO()
 	device, err := cmd.deviceRepo.GetBySpecs(ctx, spec.DeviceMacEqSpec(req.MacAddress))
 	if device.ID != 0 {

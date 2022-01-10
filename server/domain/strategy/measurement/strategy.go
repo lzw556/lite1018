@@ -22,24 +22,24 @@ func inPeriod(last time.Time, period time.Duration) bool {
 type strategy struct {
 	binding    dependency.MeasurementDeviceBindingRepository
 	device     dependency.DeviceRepository
-	deviceData dependency.SensorDataRepository
+	sensorData dependency.SensorDataRepository
 }
 
 func newStrategy() strategy {
 	return strategy{
 		binding:    repository.MeasurementDeviceBinding{},
 		device:     repository.Device{},
-		deviceData: repository.SensorData{},
+		sensorData: repository.SensorData{},
 	}
 }
 
-func (s strategy) getLastDeviceData(m po.Measurement) (entity.SensorData, error) {
+func (s strategy) getLastSensorData(m po.Measurement) (entity.SensorData, error) {
 	ctx := context.TODO()
 	binding, err := s.binding.GetBySpecs(ctx, spec.MeasurementEqSpec(m.ID))
 	if err != nil {
 		return entity.SensorData{}, err
 	}
-	data, err := s.deviceData.Last(binding.MacAddress)
+	data, err := s.sensorData.Last(binding.MacAddress)
 	if err != nil {
 		return entity.SensorData{}, err
 	}
@@ -49,13 +49,13 @@ func (s strategy) getLastDeviceData(m po.Measurement) (entity.SensorData, error)
 	return data, nil
 }
 
-func (s strategy) getDeviceData(m po.Measurement, time time.Time) (entity.SensorData, error) {
+func (s strategy) getSensorData(m po.Measurement, time time.Time) (entity.SensorData, error) {
 	ctx := context.TODO()
 	binding, err := s.binding.GetBySpecs(ctx, spec.MeasurementEqSpec(m.ID))
 	if err != nil {
 		return entity.SensorData{}, err
 	}
-	data, err := s.deviceData.Get(binding.MacAddress, time)
+	data, err := s.sensorData.Get(binding.MacAddress, time)
 	if err != nil {
 		return entity.SensorData{}, err
 	}

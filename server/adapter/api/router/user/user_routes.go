@@ -17,7 +17,7 @@ func (r userRouter) login(ctx *gin.Context) (interface{}, error) {
 
 func (r userRouter) getByID(ctx *gin.Context) (interface{}, error) {
 	id := cast.ToUint(ctx.Param("id"))
-	return r.service.GetUser(id)
+	return r.service.GetUserByID(id)
 }
 
 func (r userRouter) paging(ctx *gin.Context) (interface{}, error) {
@@ -44,17 +44,17 @@ func (r userRouter) updateByID(ctx *gin.Context) (interface{}, error) {
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		return nil, response.InvalidParameterError(err.Error())
 	}
-	return r.service.UpdateUser(id, req)
+	return r.service.UpdateUserByID(id, req)
 }
 
 func (r userRouter) removeByID(ctx *gin.Context) (interface{}, error) {
 	id := cast.ToUint(ctx.Param("id"))
-	return nil, r.service.RemoveUser(id)
+	return nil, r.service.DeleteUserByID(id)
 }
 
 func (r userRouter) profile(ctx *gin.Context) (interface{}, error) {
 	id := cast.ToUint(ctx.MustGet("user_id"))
-	return r.service.GetUser(id)
+	return r.service.GetUserByID(id)
 }
 
 func (r userRouter) updateProfile(ctx *gin.Context) (interface{}, error) {
@@ -63,7 +63,7 @@ func (r userRouter) updateProfile(ctx *gin.Context) (interface{}, error) {
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		return nil, response.InvalidParameterError(err.Error())
 	}
-	return r.service.UpdateProfile(id, req)
+	return r.service.UpdateProfileByUserID(id, req)
 }
 
 func (r userRouter) updatePass(ctx *gin.Context) (interface{}, error) {
@@ -72,5 +72,5 @@ func (r userRouter) updatePass(ctx *gin.Context) (interface{}, error) {
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		return nil, response.InvalidParameterError(err.Error())
 	}
-	return nil, r.service.UpdatePass(id, req)
+	return nil, r.service.UpdatePassByUserID(id, req)
 }

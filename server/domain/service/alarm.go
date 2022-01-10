@@ -138,7 +138,7 @@ func (s Alarm) FindAlarmsByPaginate(filters request.Filters, page, size int) ([]
 	return result, total, nil
 }
 
-func (s Alarm) GetAlarm(id uint) (*vo.Alarm, error) {
+func (s Alarm) GetAlarmByID(id uint) (*vo.Alarm, error) {
 	query, err := s.factory.NewAlarmQuery(id)
 	if err != nil {
 		return nil, err
@@ -146,7 +146,7 @@ func (s Alarm) GetAlarm(id uint) (*vo.Alarm, error) {
 	return query.Detail(), nil
 }
 
-func (s Alarm) UpdateAlarm(id uint, req request.UpdateAlarm) error {
+func (s Alarm) UpdateAlarmByID(id uint, req request.UpdateAlarm) error {
 	ctx := context.TODO()
 	e, err := s.repository.Get(ctx, id)
 	if err != nil {
@@ -163,7 +163,7 @@ func (s Alarm) UpdateAlarm(id uint, req request.UpdateAlarm) error {
 	})
 }
 
-func (s Alarm) RemoveAlarm(id uint) error {
+func (s Alarm) DeleteAlarmByID(id uint) error {
 	e, err := s.repository.Get(context.TODO(), id)
 	if err != nil {
 		return response.BusinessErr(errcode.AlarmRuleNotFoundError, "")
@@ -188,7 +188,7 @@ func (s Alarm) FindAlarmRecordsByPaginate(filters request.Filters, from, to int6
 	return result, total, nil
 }
 
-func (s Alarm) GetAlarmRecord(recordID uint) (*vo.AlarmRecord, error) {
+func (s Alarm) GetAlarmRecordByID(recordID uint) (*vo.AlarmRecord, error) {
 	query, err := s.factory.NewAlarmRecordQuery(recordID)
 	if err != nil {
 		return nil, err
@@ -196,7 +196,7 @@ func (s Alarm) GetAlarmRecord(recordID uint) (*vo.AlarmRecord, error) {
 	return query.Detail()
 }
 
-func (s Alarm) AcknowledgeAlarmRecord(recordID uint, req request.AcknowledgeAlarmRecord) error {
+func (s Alarm) AcknowledgeAlarmRecordByID(recordID uint, req request.AcknowledgeAlarmRecord) error {
 	cmd, err := s.factory.NewAlarmRecordCmd(recordID)
 	if err != nil {
 		return err
@@ -204,7 +204,7 @@ func (s Alarm) AcknowledgeAlarmRecord(recordID uint, req request.AcknowledgeAlar
 	return cmd.AcknowledgeBy(req)
 }
 
-func (s Alarm) GetAlarmRecordAcknowledge(recordID uint) (*vo.AlarmRecordAcknowledge, error) {
+func (s Alarm) GetAlarmRecordAcknowledgeByID(recordID uint) (*vo.AlarmRecordAcknowledge, error) {
 	query, err := s.factory.NewAlarmRecordQuery(recordID)
 	if err != nil {
 		return nil, err
@@ -212,7 +212,7 @@ func (s Alarm) GetAlarmRecordAcknowledge(recordID uint) (*vo.AlarmRecordAcknowle
 	return query.GetAcknowledge()
 }
 
-func (s Alarm) RemoveAlarmRecord(recordID uint) error {
+func (s Alarm) DeleteAlarmRecordByID(recordID uint) error {
 	return s.record.Delete(context.TODO(), recordID)
 }
 

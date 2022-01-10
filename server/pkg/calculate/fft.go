@@ -175,7 +175,7 @@ func fftOutputConvert(output []FFTOutput, outputNum int, n int, scale int, range
 }
 
 func defaultFFTOutputGet(pr []float64, pi []float64, n int, frequency int) (output []FFTOutput) {
-	frequencyArr := fftFrequencyGet(n, frequency)
+	frequencyArr := fftFrequencyGet(n>>1, frequency)
 	sz := len(frequencyArr)
 	output = make([]FFTOutput, sz)
 	for i := 0; i < sz; i++ {

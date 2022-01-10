@@ -58,7 +58,7 @@ func (s User) CreateUser(req request.User) error {
 	return s.repository.Create(ctx, &e)
 }
 
-func (s User) UpdateUser(userID uint, req request.User) (*vo.User, error) {
+func (s User) UpdateUserByID(userID uint, req request.User) (*vo.User, error) {
 	ctx := context.TODO()
 	e, err := s.repository.Get(ctx, userID)
 	if err != nil {
@@ -74,7 +74,7 @@ func (s User) UpdateUser(userID uint, req request.User) (*vo.User, error) {
 	return &result, nil
 }
 
-func (s User) GetUser(userID uint) (*vo.User, error) {
+func (s User) GetUserByID(userID uint) (*vo.User, error) {
 	e, err := s.repository.Get(context.TODO(), userID)
 	if err != nil {
 		return nil, response.BusinessErr(errcode.UserNotFoundError, "")
@@ -95,7 +95,7 @@ func (s User) FindUsersByPaginate(page, size int) ([]vo.User, int64, error) {
 	return result, total, nil
 }
 
-func (s User) RemoveUser(userID uint) error {
+func (s User) DeleteUserByID(userID uint) error {
 	ctx := context.TODO()
 	e, err := s.repository.Get(ctx, userID)
 	if err != nil {
@@ -104,7 +104,7 @@ func (s User) RemoveUser(userID uint) error {
 	return s.repository.Delete(ctx, e.ID)
 }
 
-func (s User) UpdateProfile(userID uint, req request.Profile) (*vo.User, error) {
+func (s User) UpdateProfileByUserID(userID uint, req request.Profile) (*vo.User, error) {
 	ctx := context.TODO()
 	e, err := s.repository.Get(ctx, userID)
 	if err != nil {
@@ -121,7 +121,7 @@ func (s User) UpdateProfile(userID uint, req request.Profile) (*vo.User, error) 
 	return &result, nil
 }
 
-func (s User) UpdatePass(userID uint, req request.UserPass) error {
+func (s User) UpdatePassByUserID(userID uint, req request.UserPass) error {
 	ctx := context.TODO()
 	e, err := s.repository.Get(ctx, userID)
 	if err != nil {

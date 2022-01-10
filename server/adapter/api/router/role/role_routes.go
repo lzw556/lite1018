@@ -21,10 +21,10 @@ func (r roleRouter) update(ctx *gin.Context) (interface{}, error) {
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		return nil, response.InvalidParameterError(err.Error())
 	}
-	return nil, r.service.UpdateRole(id, req)
+	return nil, r.service.UpdateRoleByID(id, req)
 }
 
-func (r roleRouter) paging(ctx *gin.Context) (interface{}, error) {
+func (r roleRouter) find(ctx *gin.Context) (interface{}, error) {
 	page := cast.ToInt(ctx.Query("page"))
 	size := cast.ToInt(ctx.Query("size"))
 	result, total, err := r.service.GetRolesByPaginate(page, size)
@@ -40,7 +40,7 @@ func (r roleRouter) allocMenus(ctx *gin.Context) (interface{}, error) {
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		return nil, response.InvalidParameterError(err.Error())
 	}
-	return nil, r.service.AllocMenus(id, req)
+	return nil, r.service.AllocMenusByRoleID(id, req)
 }
 
 func (r roleRouter) allocPermissions(ctx *gin.Context) (interface{}, error) {
@@ -49,12 +49,12 @@ func (r roleRouter) allocPermissions(ctx *gin.Context) (interface{}, error) {
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		return nil, response.InvalidParameterError(err.Error())
 	}
-	return nil, r.service.AllocPermissions(id, req)
+	return nil, r.service.AllocPermissionsByRoleID(id, req)
 }
 
 func (r roleRouter) get(ctx *gin.Context) (interface{}, error) {
 	id := cast.ToUint(ctx.Param("id"))
-	return r.service.GetRole(id)
+	return r.service.GetRoleByID(id)
 }
 
 func (r roleRouter) casbin(ctx *gin.Context) (interface{}, error) {
@@ -62,7 +62,7 @@ func (r roleRouter) casbin(ctx *gin.Context) (interface{}, error) {
 	return r.service.GetCasbinByUserID(userID)
 }
 
-func (r roleRouter) removeByID(ctx *gin.Context) (interface{}, error) {
+func (r roleRouter) delete(ctx *gin.Context) (interface{}, error) {
 	id := cast.ToUint(ctx.Param("id"))
-	return nil, r.service.RemoveRoleByID(id)
+	return nil, r.service.DeleteRoleByID(id)
 }

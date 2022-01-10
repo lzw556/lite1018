@@ -20,12 +20,12 @@ func NewNormalTemperatureCorrosionStrategy() Strategy {
 }
 
 func (s NormalTemperatureCorrosionStrategy) Do(m po.Measurement) (entity.MeasurementData, error) {
-	data, err := s.strategy.getLastDeviceData(m)
+	data, err := s.strategy.getLastSensorData(m)
 	if err != nil {
 		return entity.MeasurementData{}, err
 	}
 	monthAgo := data.Time.AddDate(0, -1, 0)
-	monthAgoData, err := s.strategy.getDeviceData(m, monthAgo)
+	monthAgoData, err := s.strategy.getSensorData(m, monthAgo)
 	if err != nil {
 		return entity.MeasurementData{}, err
 	}

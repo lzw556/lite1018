@@ -17,15 +17,15 @@ type Service interface {
 	CreateAlarmFromTemplate(req request.CreateAlarmFromTemplate) error
 
 	FindAlarmsByPaginate(filters request.Filters, page, size int) ([]vo.Alarm, int64, error)
-	GetAlarm(id uint) (*vo.Alarm, error)
-	UpdateAlarm(id uint, req request.UpdateAlarm) error
-	RemoveAlarm(id uint) error
+	GetAlarmByID(id uint) (*vo.Alarm, error)
+	UpdateAlarmByID(id uint, req request.UpdateAlarm) error
+	DeleteAlarmByID(id uint) error
 
-	GetAlarmRecord(recordID uint) (*vo.AlarmRecord, error)
-	GetAlarmRecordAcknowledge(recordID uint) (*vo.AlarmRecordAcknowledge, error)
-	AcknowledgeAlarmRecord(recordID uint, req request.AcknowledgeAlarmRecord) error
+	GetAlarmRecordByID(id uint) (*vo.AlarmRecord, error)
+	GetAlarmRecordAcknowledgeByID(id uint) (*vo.AlarmRecordAcknowledge, error)
+	AcknowledgeAlarmRecordByID(id uint, req request.AcknowledgeAlarmRecord) error
 	FindAlarmRecordsByPaginate(filters request.Filters, from, to int64, page, size int) ([]vo.AlarmRecord, int64, error)
-	RemoveAlarmRecord(recordID uint) error
+	DeleteAlarmRecordByID(recordID uint) error
 
 	GetAlarmRecordStatistics(from, to int64, filters request.Filters) (vo.AlarmRecordStatistics, error)
 }

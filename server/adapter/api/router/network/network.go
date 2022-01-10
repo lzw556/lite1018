@@ -22,21 +22,21 @@ func (r *networkRouter) initRoutes() {
 		router.NewPostRoute("networks", r.create),
 
 		// GET
-		router.NewGetRoute("networks/:id", r.getByID),
+		router.NewGetRoute("networks/:id", r.get),
 		router.NewGetRoute("networks", r.find),
 		router.NewGetRoute("networks/:id/export", r.exportNetwork),
 
 		// PUT
 		router.NewPutRoute("networks/setting", r.updateSettingByGatewayID),
-		router.NewPutRoute("networks/:id", r.updateByID),
+		router.NewPutRoute("networks/:id", r.update),
 		router.NewPutRoute("networks/:id/sync", r.sync),
 
 		// PATCH
-		router.NewPatchRoute("networks/:id/devices", r.accessDevices),
+		router.NewPatchRoute("networks/:id/devices", r.addDevices),
 
 		// DELETE
 		router.NewDeleteRoute("networks/:id/devices", r.removeDevices),
-		router.NewDeleteRoute("networks/:id", r.deleteByID),
+		router.NewDeleteRoute("networks/:id", r.delete),
 	}
 }
 

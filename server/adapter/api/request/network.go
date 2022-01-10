@@ -13,7 +13,7 @@ type Network struct {
 	WSN     WSN    `json:"wsn"`
 }
 
-type AccessDevices struct {
+type AddDevices struct {
 	ParentID   uint                   `json:"parent_id"`
 	Devices    []uint                 `json:"devices"`
 	IsNew      bool                   `json:"is_new"`

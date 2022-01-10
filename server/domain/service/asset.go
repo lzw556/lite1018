@@ -55,7 +55,7 @@ func (s Asset) CreateAsset(req request.Asset) error {
 	})
 }
 
-func (s Asset) UpdateAsset(assetID uint, req request.Asset) error {
+func (s Asset) UpdateAssetByID(assetID uint, req request.Asset) error {
 	ctx := context.TODO()
 	e, err := s.repository.Get(ctx, assetID)
 	if err != nil {
@@ -85,7 +85,7 @@ func (s Asset) UpdateAsset(assetID uint, req request.Asset) error {
 	})
 }
 
-func (s Asset) RemoveAsset(assetID uint) error {
+func (s Asset) DeleteAssetByID(assetID uint) error {
 	cmd, err := s.factory.NewAssetRemoveCmd(assetID)
 	if err != nil {
 		return err
@@ -105,7 +105,7 @@ func (s Asset) FindAssetsByPaginate(page, size int) ([]vo.Asset, int64, error) {
 	return result, total, nil
 }
 
-func (s Asset) GetAsset(assetID uint) (*vo.Asset, error) {
+func (s Asset) GetAssetByID(assetID uint) (*vo.Asset, error) {
 	ctx := context.TODO()
 	e, err := s.repository.Get(ctx, assetID)
 	if err != nil {
@@ -118,7 +118,7 @@ func (s Asset) GetAsset(assetID uint) (*vo.Asset, error) {
 	return &result, nil
 }
 
-func (s Asset) Statistic(assetID uint) (*vo.AssetStatistic, error) {
+func (s Asset) StatisticalAssetByID(assetID uint) (*vo.AssetStatistic, error) {
 	cmd, err := s.factory.NewAssetStatisticQuery(assetID)
 	if err != nil {
 		return nil, err
@@ -126,7 +126,7 @@ func (s Asset) Statistic(assetID uint) (*vo.AssetStatistic, error) {
 	return cmd.Statistic()
 }
 
-func (s Asset) StatisticAll() ([]vo.AssetStatistic, error) {
+func (s Asset) StatisticalAssets() ([]vo.AssetStatistic, error) {
 	assets, err := s.repository.Find(context.TODO())
 	if err != nil {
 		return nil, err
@@ -158,7 +158,7 @@ func (s Asset) FindAssets() ([]vo.Asset, error) {
 	return result, nil
 }
 
-func (s Asset) GetAssetChildren(id uint) ([]vo.Asset, error) {
+func (s Asset) GetAssetChildrenByID(id uint) ([]vo.Asset, error) {
 	es, err := s.repository.FindBySpecs(context.TODO(), spec.ParentIDEqSpec(id))
 	if err != nil {
 		return nil, err
