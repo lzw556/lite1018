@@ -7,18 +7,18 @@ import (
 )
 
 type Measurement struct {
-	ID             uint                 `json:"id"`
-	Name           string               `json:"name"`
-	Type           measurementtype.Type `json:"type"`
-	Display        *Display             `json:"display,omitempty"`
-	Data           *MeasurementData     `json:"data,omitempty"`
-	Alert          *MeasurementAlert    `json:"alert,omitempty"`
-	Settings       po.Settings          `json:"settings,omitempty"`
-	SensorSettings po.SensorSetting     `json:"sensorSettings,omitempty"`
-	Mode           po.AcquisitionMode   `json:"mode"`
-	PollingPeriod  uint                 `json:"polling_period"`
-	Asset          *Asset               `json:"asset,omitempty"`
-	Devices        []Device             `json:"devices"`
+	ID             uint               `json:"id"`
+	Name           string             `json:"name"`
+	Type           uint               `json:"type"`
+	Display        *Display           `json:"display,omitempty"`
+	Data           *MeasurementData   `json:"data,omitempty"`
+	Alert          *MeasurementAlert  `json:"alert,omitempty"`
+	Settings       po.Settings        `json:"settings,omitempty"`
+	SensorSettings po.SensorSetting   `json:"sensorSettings,omitempty"`
+	Mode           po.AcquisitionMode `json:"mode"`
+	PollingPeriod  uint               `json:"polling_period"`
+	Asset          *Asset             `json:"asset,omitempty"`
+	Devices        []Device           `json:"devices"`
 }
 
 func NewMeasurement(e po.Measurement) Measurement {
@@ -41,12 +41,14 @@ func NewMeasurement(e po.Measurement) Measurement {
 
 func (m *Measurement) SetData(e entity.MeasurementData) {
 	data := NewMeasurementData(e)
-	for k, v := range e.Fields {
-		if variable, err := measurementtype.GetVariable(m.Type, k); err == nil {
-			data.Fields = append(data.Fields, MeasurementField{
-				Variable: variable,
-				Value:    v,
-			})
+	if t := measurementtype.Get(m.Type); t != nil {
+		for k, v := range e.Fields {
+			if variable, err := t.Variables().GetByName(k); err == nil {
+				data.Fields = append(data.Fields, MeasurementField{
+					Variable: variable,
+					Value:    v,
+				})
+			}
 		}
 	}
 	m.Data = &data

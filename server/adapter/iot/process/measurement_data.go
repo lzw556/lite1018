@@ -52,17 +52,17 @@ func (p MeasurementData) Process(ctx *iot.Context, msg iot.Message) error {
 		}
 		var strategy measurement.Strategy
 		switch m.Type {
-		case measurementtype.BoltLoosening:
+		case measurementtype.BoltLooseningType:
 			strategy = measurement.NewBoltLooseningStrategy()
-		case measurementtype.BoltElongation:
+		case measurementtype.BoltElongationType:
 			strategy = measurement.NewBoltElongationStrategy()
-		case measurementtype.NormalTemperatureCorrosion:
+		case measurementtype.NormalTemperatureCorrosionType:
 			strategy = measurement.NewNormalTemperatureCorrosionStrategy()
-		case measurementtype.Vibration:
+		case measurementtype.Vibration3AxisType:
 			strategy = measurement.NewVibrationStrategy()
-		case measurementtype.AngleDip:
+		case measurementtype.AngleDipType:
 			strategy = measurement.NewAngleDipStrategy()
-		case measurementtype.FlangeElongation:
+		case measurementtype.FlangeElongationType:
 			strategy = measurement.NewFlangeElongationStrategy()
 		default:
 			return errcode.UnknownMeasurementTypeError

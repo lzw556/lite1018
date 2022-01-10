@@ -8,19 +8,19 @@ import (
 	"strings"
 )
 
-type VibrationStrategy struct {
+type Vibration3AxisStrategy struct {
 	strategy
-	variables []measurementtype.Variable
+	Type measurementtype.Vibration3Axis
 }
 
 func NewVibrationStrategy() Strategy {
-	return &VibrationStrategy{
-		strategy:  newStrategy(),
-		variables: measurementtype.Variables[measurementtype.Vibration],
+	return &Vibration3AxisStrategy{
+		strategy: newStrategy(),
+		Type:     measurementtype.Vibration3Axis{},
 	}
 }
 
-func (s VibrationStrategy) Do(m po.Measurement) (entity.MeasurementData, error) {
+func (s Vibration3AxisStrategy) Do(m po.Measurement) (entity.MeasurementData, error) {
 	data, err := s.strategy.getLastSensorData(m)
 	if err != nil {
 		return entity.MeasurementData{}, err
@@ -33,7 +33,7 @@ func (s VibrationStrategy) Do(m po.Measurement) (entity.MeasurementData, error) 
 		Time:          data.Time,
 		Fields:        map[string]interface{}{},
 	}
-	for _, variable := range s.variables {
+	for _, variable := range s.Type.Variables() {
 		switch variable.Type {
 		case measurementtype.FloatVariableType:
 			result.Fields[variable.Name] = data.Values[variable.DataIndex]

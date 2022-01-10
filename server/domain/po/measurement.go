@@ -1,7 +1,6 @@
 package po
 
 import (
-	"github.com/thetasensors/theta-cloud-lite/server/pkg/measurementtype"
 	"gorm.io/gorm"
 )
 
@@ -15,7 +14,7 @@ const (
 type Measurement struct {
 	gorm.Model
 	Name           string `gorm:"type:varchar(64);"`
-	Type           measurementtype.Type
+	Type           uint
 	AssetID        uint
 	Settings       Settings        `gorm:"type:json"`
 	SensorSettings SensorSetting   `gorm:"type:json"`

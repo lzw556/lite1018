@@ -20,20 +20,25 @@ type MeasurementAlert struct {
 	measurementDataRepo dependency.MeasurementDataRepository
 	repository          dependency.MeasurementAlertRepository
 	alarmRecordRepo     dependency.AlarmRecordRepository
+	Variables           measurementtype.Variables
 }
 
 func NewMeasurementAlert(m po.Measurement, a po.Alarm) *MeasurementAlert {
-	return &MeasurementAlert{
+	alert := &MeasurementAlert{
 		Measurement:         m,
 		Alarm:               a,
 		measurementDataRepo: repository.MeasurementData{},
 		repository:          repository.MeasurementAlert{},
 		alarmRecordRepo:     repository.AlarmRecord{},
 	}
+	if t := measurementtype.Get(m.Type); t != nil {
+		alert.Variables = t.Variables()
+	}
+	return alert
 }
 
 func (alert MeasurementAlert) Max() float32 {
-	if variable, err := measurementtype.GetVariable(alert.Measurement.Type, alert.Alarm.Rule.Field); err == nil {
+	if variable, err := alert.Variables.GetByName(alert.Alarm.Rule.Field); err == nil {
 		data, err := alert.measurementDataRepo.Last(alert.Measurement.ID)
 		if err != nil {
 			return 0
@@ -57,7 +62,7 @@ func (alert MeasurementAlert) Max() float32 {
 }
 
 func (alert MeasurementAlert) Min() float32 {
-	if variable, err := measurementtype.GetVariable(alert.Measurement.Type, alert.Alarm.Rule.Field); err == nil {
+	if variable, err := alert.Variables.GetByName(alert.Alarm.Rule.Field); err == nil {
 		data, err := alert.measurementDataRepo.Last(alert.Measurement.ID)
 		if err != nil {
 			return 0
@@ -80,7 +85,7 @@ func (alert MeasurementAlert) Min() float32 {
 }
 
 func (alert MeasurementAlert) Mean() float32 {
-	if variable, err := measurementtype.GetVariable(alert.Measurement.Type, alert.Alarm.Rule.Field); err == nil {
+	if variable, err := alert.Variables.GetByName(alert.Alarm.Rule.Field); err == nil {
 		data, err := alert.measurementDataRepo.Last(alert.Measurement.ID)
 		if err != nil {
 			return 0
@@ -101,7 +106,7 @@ func (alert MeasurementAlert) Mean() float32 {
 }
 
 func (alert MeasurementAlert) Current() float32 {
-	if variable, err := measurementtype.GetVariable(alert.Measurement.Type, alert.Alarm.Rule.Field); err == nil {
+	if variable, err := alert.Variables.GetByName(alert.Alarm.Rule.Field); err == nil {
 		data, err := alert.measurementDataRepo.Last(alert.Measurement.ID)
 		if err != nil {
 			return 0
@@ -117,7 +122,7 @@ func (alert MeasurementAlert) Current() float32 {
 }
 
 func (alert MeasurementAlert) X() float32 {
-	if variable, err := measurementtype.GetVariable(alert.Measurement.Type, alert.Alarm.Rule.Field); err == nil {
+	if variable, err := alert.Variables.GetByName(alert.Alarm.Rule.Field); err == nil {
 		data, err := alert.measurementDataRepo.Last(alert.Measurement.ID)
 		if err != nil {
 			return 0
@@ -131,28 +136,32 @@ func (alert MeasurementAlert) X() float32 {
 }
 
 func (alert MeasurementAlert) Y() float32 {
-	if variable, err := measurementtype.GetVariable(alert.Measurement.Type, alert.Alarm.Rule.Field); err == nil {
-		data, err := alert.measurementDataRepo.Last(alert.Measurement.ID)
-		if err != nil {
-			return 0
-		}
-		if variable.Type == measurementtype.AxisVariableType {
-			current := data.Fields[variable.Name].([]interface{})[1]
-			return cast.ToFloat32(current)
+	if t := measurementtype.Get(alert.Measurement.Type); t != nil {
+		if variable, err := t.Variables().GetByName(alert.Alarm.Rule.Field); err == nil {
+			data, err := alert.measurementDataRepo.Last(alert.Measurement.ID)
+			if err != nil {
+				return 0
+			}
+			if variable.Type == measurementtype.AxisVariableType {
+				current := data.Fields[variable.Name].([]interface{})[1]
+				return cast.ToFloat32(current)
+			}
 		}
 	}
 	return 0
 }
 
 func (alert MeasurementAlert) Z() float32 {
-	if variable, err := measurementtype.GetVariable(alert.Measurement.Type, alert.Alarm.Rule.Field); err == nil {
-		data, err := alert.measurementDataRepo.Last(alert.Measurement.ID)
-		if err != nil {
-			return 0
-		}
-		if variable.Type == measurementtype.AxisVariableType {
-			current := data.Fields[variable.Name].([]interface{})[2]
-			return cast.ToFloat32(current)
+	if t := measurementtype.Get(alert.Measurement.Type); t != nil {
+		if variable, err := t.Variables().GetByName(alert.Alarm.Rule.Field); err == nil {
+			data, err := alert.measurementDataRepo.Last(alert.Measurement.ID)
+			if err != nil {
+				return 0
+			}
+			if variable.Type == measurementtype.AxisVariableType {
+				current := data.Fields[variable.Name].([]interface{})[2]
+				return cast.ToFloat32(current)
+			}
 		}
 	}
 	return 0
@@ -194,7 +203,7 @@ func (alert MeasurementAlert) Alert(value float32) {
 		}
 		message := vo.AlertNotificationMessage{}
 		message.AlarmRecord = vo.NewAlarmRecord(entity.AlarmRecord{AlarmRecord: record})
-		if variable, err := measurementtype.GetVariable(alert.Measurement.Type, alert.Alarm.Rule.Field); err == nil {
+		if variable, err := alert.Variables.GetByName(alert.Alarm.Rule.Field); err == nil {
 			message.AlarmRecord.SetField(variable)
 		}
 		message.AlarmRecord.SetMeasurement(alert.Measurement)

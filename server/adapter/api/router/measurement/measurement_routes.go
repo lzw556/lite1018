@@ -58,7 +58,7 @@ func (r measurementRouter) statisticalMeasurement(ctx *gin.Context) (interface{}
 
 func (r measurementRouter) getFields(ctx *gin.Context) (interface{}, error) {
 	typeID := cast.ToUint(ctx.Query("type"))
-	variables := measurementtype.Variables[measurementtype.Type(typeID)]
+	variables := measurementtype.Get(typeID).Variables()
 	result := make([]vo.MeasurementField, 0)
 	for _, v := range variables {
 		result = append(result, vo.MeasurementField{

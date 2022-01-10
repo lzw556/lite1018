@@ -14,13 +14,13 @@ import (
 
 type FlangeElongationStrategy struct {
 	strategy
-	variables []measurementtype.Variable
+	Type measurementtype.FlangeElongation
 }
 
 func NewFlangeElongationStrategy() Strategy {
 	return &FlangeElongationStrategy{
-		strategy:  newStrategy(),
-		variables: measurementtype.Variables[measurementtype.FlangeElongation],
+		strategy: newStrategy(),
+		Type:     measurementtype.FlangeElongation{},
 	}
 }
 

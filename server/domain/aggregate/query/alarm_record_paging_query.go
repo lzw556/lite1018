@@ -39,7 +39,8 @@ func (query AlarmRecordPagingQuery) Paging() ([]vo.AlarmRecord, int64) {
 		}
 		result[i].SetMeasurement(measurementMap[e.MeasurementID])
 		parts := strings.Split(e.Rule.Field, "::")
-		if variable, err := measurementtype.GetVariable(measurementMap[e.MeasurementID].Type, parts[0]); err == nil {
+		variables := measurementtype.Get(measurementMap[e.MeasurementID].Type).Variables()
+		if variable, err := variables.GetByName(parts[0]); err == nil {
 			result[i].SetField(variable)
 		}
 		if _, ok := alarmMap[e.AlarmID]; !ok {

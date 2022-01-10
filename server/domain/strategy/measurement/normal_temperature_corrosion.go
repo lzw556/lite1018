@@ -9,13 +9,13 @@ import (
 
 type NormalTemperatureCorrosionStrategy struct {
 	strategy
-	variables []measurementtype.Variable
+	Type measurementtype.NormalTemperatureCorrosion
 }
 
 func NewNormalTemperatureCorrosionStrategy() Strategy {
 	return &NormalTemperatureCorrosionStrategy{
-		strategy:  newStrategy(),
-		variables: measurementtype.Variables[measurementtype.NormalTemperatureCorrosion],
+		strategy: newStrategy(),
+		Type:     measurementtype.NormalTemperatureCorrosion{},
 	}
 }
 
@@ -34,7 +34,7 @@ func (s NormalTemperatureCorrosionStrategy) Do(m po.Measurement) (entity.Measure
 		MeasurementID: m.ID,
 		Fields:        map[string]interface{}{},
 	}
-	for _, v := range s.variables {
+	for _, v := range s.Type.Variables() {
 		if v.Name == "corrosion_rate" {
 			result.Fields[v.Name] = calculate.CorrosionRate(data.Values[v.DataIndex], monthAgoData.Values[v.DataIndex], data.Time.Sub(monthAgo).Seconds())
 		} else {

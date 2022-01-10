@@ -45,15 +45,15 @@ func (m MeasurementData) Run() {
 	xlog.Infof("run measurement data job: %s", m.Name)
 	var strategy measurement.Strategy
 	switch m.Measurement.Type {
-	case measurementtype.BoltLoosening:
+	case measurementtype.BoltLooseningType:
 		strategy = measurement.NewBoltLooseningStrategy()
-	case measurementtype.BoltElongation:
+	case measurementtype.BoltElongationType:
 		strategy = measurement.NewBoltElongationStrategy()
-	case measurementtype.AngleDip:
+	case measurementtype.AngleDipType:
 		strategy = measurement.NewAngleDipStrategy()
-	case measurementtype.Vibration:
+	case measurementtype.Vibration3AxisType:
 		strategy = measurement.NewVibrationStrategy()
-	case measurementtype.NormalTemperatureCorrosion:
+	case measurementtype.NormalTemperatureCorrosionType:
 		strategy = measurement.NewNormalTemperatureCorrosionStrategy()
 	default:
 		xlog.Errorf("unknown measurement type: %s", m.Measurement.Type)

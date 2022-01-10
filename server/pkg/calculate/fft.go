@@ -2,10 +2,9 @@ package calculate
 
 import (
 	"fmt"
+	gofft "github.com/mjibson/go-dsp/fft"
 	"math"
 	"os"
-
-	gofft "github.com/mjibson/go-dsp/fft"
 )
 
 func powerExponentGet(num int) int {
@@ -111,7 +110,7 @@ func fftFrequencyGet(n int, frequency int) (output []float64) {
 	return
 }
 
-func defualtFFTFind(pr []float64, frequency []float64, outputNum int, n int, baseFrequency float64) (output []FFTOutput) {
+func defaultFFTFind(pr []float64, frequency []float64, outputNum int, n int, baseFrequency float64) (output []FFTOutput) {
 	output = make([]FFTOutput, outputNum)
 	if baseFrequency < 1 {
 		var maxPr float64 = 0
@@ -174,17 +173,15 @@ func fftOutputConvert(output []FFTOutput, outputNum int, n int, scale int, range
 	return
 }
 
-func defaultFFTOutputGet(pr []float64, pi []float64, n int, frequency int) (output []FFTOutput) {
-	frequencyArr := fftFrequencyGet(n>>1, frequency)
-	sz := len(frequencyArr)
+func defaultFFTOutputGet(pr []float64, n int, frequency int) (output []FFTOutput) {
+	frequencyArr := fftFrequencyGet(n, frequency)
+	sz := len(frequencyArr) / 2
 	output = make([]FFTOutput, sz)
 	for i := 0; i < sz; i++ {
 		output[i].FFTValue = pr[i]
 		output[i].Frequency = frequencyArr[i]
 	}
 
-	// output = defualtFFTFind(pr, frequencyArr, outputNum, n>>1, baseFrequency)
-	// output = fftOutputConvert(output, outputNum, n>>1, scale, rangeVal)
 	return
 }
 
@@ -581,13 +578,11 @@ func mean(data []float64) float64 {
 }
 
 func FFTFrequencyCalc(mPr []float64, sampleNum int, paramFrequency int) (output []FFTOutput) {
-	mPi := make([]float64, 0)
 	var prSum float64 = 0
 	var prAverage float64 = 0
-	var i, j int
+	var i int
 	for i = 0; i < sampleNum; i++ {
 		prSum += mPr[i]
-		mPi = append(mPi, 0)
 	}
 
 	prAverage = prSum / float64(sampleNum)
@@ -595,13 +590,12 @@ func FFTFrequencyCalc(mPr []float64, sampleNum int, paramFrequency int) (output 
 		mPr[i] -= prAverage
 	}
 
-	mFr, mFi := fft(mPr, mPi, sampleNum)
-
-	for j = 0; j < sampleNum-1; j++ {
-		mPr[j] = math.Sqrt(mFr[j]*mFr[j] + mFi[j]*mFi[j])
+	fftResult := gofft.FFTReal(mPr)
+	for i := 0; i < len(fftResult); i++ {
+		mPr[i] = math.Sqrt(real(fftResult[i])*real(fftResult[i]) + imag(fftResult[i])*imag(fftResult[i]))
 	}
 
-	output = defaultFFTOutputGet(mPr, mPi, sampleNum, paramFrequency)
+	output = defaultFFTOutputGet(mPr, sampleNum, paramFrequency)
 
 	return
 }
@@ -620,7 +614,7 @@ func VelocityCalc(accXX []float64, sigLen int, fs float64) (velX1 []float64) {
 	return
 }
 
-func displacementCalc(velX1 []float64, sigLen int, fs float64) (disX1 []float64) {
+func DisplacementCalc(velX1 []float64, sigLen int, fs float64) (disX1 []float64) {
 	disX := make([]float64, sigLen)
 	disX[0] = velX1[0] / 2
 	for i := 1; i < sigLen; i++ {
@@ -667,7 +661,7 @@ func hilbert(data []float64) (output []complex128) {
 	return
 }
 
-func envelopCalc(data []float64) (highEnvelop []float64, lowEnvelop []float64) {
+func EnvelopCalc(data []float64) (highEnvelop []float64, lowEnvelop []float64) {
 	output := hilbert(data)
 	highEnvelop = make([]float64, len(output))
 	for i := range output {
@@ -694,7 +688,7 @@ func envelopCalc(data []float64) (highEnvelop []float64, lowEnvelop []float64) {
 //func main() {
 //	fdataArr := make([]float64, 0)
 //
-//	f, err := os.OpenFile("vib.csv", os.O_RDONLY, 0600)
+//	f, err := os.OpenFile("rawData.csv", os.O_RDONLY, 0600)
 //	if err != nil {
 //		panic(err)
 //	} else {
@@ -715,29 +709,44 @@ func envelopCalc(data []float64) (highEnvelop []float64, lowEnvelop []float64) {
 //		}
 //	}
 //
-//	fdataArr = fdataArr[:8192]
+//	fdataArr = fdataArr[:1024]
 //
-//	fullScale := 65536.0 / 2.0
-//	measuringRangeUnitG := 2.0
-//	gravityScale := fullScale / measuringRangeUnitG
+//	// fdataArr = fdataArr[:8192]
 //
-//	meanAccX1 := mean(fdataArr)
-//	accXX := make([]float64, len(fdataArr))
-//	for i := range fdataArr {
-//		accXX[i] = fdataArr[i] - meanAccX1
-//		accXX[i] = accXX[i] * 9.8 / gravityScale
+//	// fullScale := 65536.0 / 2.0
+//	// measuringRangeUnitG := 2.0
+//	// gravityScale := fullScale / measuringRangeUnitG
+//
+//	// meanAccX1 := mean(fdataArr)
+//	// accXX := make([]float64, len(fdataArr))
+//	// for i := range fdataArr {
+//	// 	accXX[i] = fdataArr[i] - meanAccX1
+//	// 	accXX[i] = accXX[i] * 9.8 / gravityScale
+//	// }
+//
+//	// velX1 := VelocityCalc(accXX, len(accXX), 12800)
+//	// disX1 := DisplacementCalc(velX1, len(velX1), 12800)
+//
+//	// h, l := EnvelopCalc(disX1)
+//
+//	// output := FFTFrequencyCalc(disX1, len(disX1), 12800)
+//	output := FFTFrequencyCalc(fdataArr, len(fdataArr), 12800)
+//
+//	// for i := 0; i < 10; i++ {
+//	// 	fmt.Printf("%f\n", output[i].FFTValue)
+//	// }
+//	var maxIndex int = 0
+//	var maxVal float64 = 0
+//	for i := 0; i < len(output); i++ {
+//		if output[i].FFTValue > maxVal {
+//			maxVal = output[i].FFTValue
+//			maxIndex = i
+//		}
 //	}
 //
-//	velX1 := velocityCalc(accXX, len(accXX), 12800)
-//	disX1 := displacementCalc(velX1, len(velX1), 12800)
-//
-//	// h, l := envelopCalc(disX1)
-//
-//	output := fftFrequencyCalc(disX1, len(disX1), 12800)
-//
+//	fmt.Printf("Max [len=%d] v %f, i %d, f %f", len(output), maxVal, maxIndex, output[maxIndex].Frequency)
 //	// for i := range output {
 //	// 	fmt.Printf("i=%d\n", i)
-//	// 	writeFile("fftv.txt", fmt.Sprintf("%f,", output[i].FFTValue))
-//	// 	writeFile("fftf.txt", fmt.Sprintf("%f,", output[i].Frequency))
+//	// 	writeFile("fftr.txt", fmt.Sprintf("%f,", output[i].FFTValue))
 //	// }
 //}

@@ -8,13 +8,13 @@ import (
 
 type BoltLooseningStrategy struct {
 	strategy
-	variables []measurementtype.Variable
+	Type measurementtype.BoltLoosening
 }
 
 func NewBoltLooseningStrategy() Strategy {
 	return &BoltLooseningStrategy{
-		strategy:  newStrategy(),
-		variables: measurementtype.Variables[measurementtype.BoltLoosening],
+		strategy: newStrategy(),
+		Type:     measurementtype.BoltLoosening{},
 	}
 }
 
@@ -28,7 +28,7 @@ func (s BoltLooseningStrategy) Do(m po.Measurement) (entity.MeasurementData, err
 		Time:          data.Time,
 		Fields:        map[string]interface{}{},
 	}
-	for _, variable := range s.variables {
+	for _, variable := range s.Type.Variables() {
 		result.Fields[variable.Name] = data.Values[variable.DataIndex]
 	}
 	return result, nil

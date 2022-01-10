@@ -14,7 +14,6 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/domain/po"
 	spec "github.com/thetasensors/theta-cloud-lite/server/domain/specification"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/errcode"
-	"github.com/thetasensors/theta-cloud-lite/server/pkg/measurementtype"
 	"gorm.io/gorm"
 )
 
@@ -43,7 +42,7 @@ func (factory Measurement) NewMeasurementCreateCmd(req request.CreateMeasurement
 	cmd.Measurement.AssetID = asset.ID
 	cmd.Measurement.Settings = req.Settings
 	cmd.SensorSettings = req.Sensors
-	cmd.Measurement.Type = measurementtype.Type(req.Type)
+	cmd.Measurement.Type = req.Type
 	cmd.PollingPeriod = req.PollingPeriod
 	cmd.Mode = po.AcquisitionMode(req.Mode)
 	cmd.Bindings = make([]po.MeasurementDeviceBinding, len(req.BindingDevices))

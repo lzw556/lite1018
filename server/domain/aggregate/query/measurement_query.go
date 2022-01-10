@@ -86,10 +86,11 @@ func (query MeasurementQuery) GetData(from, to int64) ([]vo.MeasurementData, err
 		return nil, err
 	}
 	result := make([]vo.MeasurementData, len(data))
+	variables := measurementtype.Get(query.Measurement.Type).Variables()
 	for i, d := range data {
 		result[i] = vo.NewMeasurementData(d)
 		for k, v := range d.Fields {
-			if variable, err := measurementtype.GetVariable(query.Measurement.Type, k); err == nil {
+			if variable, err := variables.GetByName(k); err == nil {
 				result[i].Fields = append(result[i].Fields, vo.MeasurementField{
 					Variable: variable,
 					Value:    v,

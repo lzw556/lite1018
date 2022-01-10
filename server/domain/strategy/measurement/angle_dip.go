@@ -8,13 +8,13 @@ import (
 
 type AngleDipStrategy struct {
 	strategy
-	variables []measurementtype.Variable
+	Type measurementtype.AngleDip
 }
 
 func NewAngleDipStrategy() Strategy {
 	return &AngleDipStrategy{
-		strategy:  newStrategy(),
-		variables: measurementtype.Variables[measurementtype.AngleDip],
+		strategy: newStrategy(),
+		Type:     measurementtype.AngleDip{},
 	}
 }
 
@@ -28,7 +28,7 @@ func (s AngleDipStrategy) Do(m po.Measurement) (entity.MeasurementData, error) {
 		Time:          data.Time,
 		Fields:        map[string]interface{}{},
 	}
-	for _, variable := range s.variables {
+	for _, variable := range s.Type.Variables() {
 		switch variable.Type {
 		case measurementtype.ArrayVariableType:
 			result.Fields[variable.Name] = data.Values[variable.DataIndex:3]
