@@ -2,10 +2,13 @@ package calculate
 
 import (
 	"fmt"
-	gofft "github.com/mjibson/go-dsp/fft"
 	"math"
 	"os"
+
+	gofft "github.com/mjibson/go-dsp/fft"
 )
+
+var PI float64 = 3.1415926
 
 func powerExponentGet(num int) int {
 	var i int = 0
@@ -18,83 +21,6 @@ func powerExponentGet(num int) int {
 	}
 
 	return i
-}
-
-func fft(pr []float64, pi []float64, n int) (fr []float64, fi []float64) {
-	var it, m, is, i, j, nv, l0 int
-	var vr, vi, p, q, s, poddr, poddi float64
-	fr = make([]float64, n)
-	fi = make([]float64, n)
-
-	k := int(math.Log(float64(n)) / math.Log(2))
-	//将pr[0]和pi[0]循环赋值给fr[]和fi[]
-	for it = 0; it <= n-1; it++ {
-		m = it
-		is = 0
-		for i = 0; i <= k-1; i++ {
-			j = m / 2
-			is = 2*is + (m - 2*j)
-			m = j
-		}
-		fr[it] = pr[is]
-		fi[it] = pi[is]
-	}
-	pr[0] = 1.0
-	pi[0] = 0.0
-	p = 6.283185306 / (1.0 * float64(n))
-	//将w=e^-j2pi/n用欧拉公式表示
-	pr[1] = math.Cos(p)
-	pi[1] = -math.Sin(p)
-
-	//计算pr[]
-	for i = 2; i <= n-1; i++ {
-		p = pr[i-1] * pr[1]
-		q = pi[i-1] * pi[1]
-		s = (pr[i-1] + pi[i-1]) * (pr[1] + pi[1])
-		pr[i] = p - q
-		pi[i] = s - p - q
-	}
-	for it = 0; it <= n-2; it = it + 2 {
-		vr = fr[it]
-		vi = fi[it]
-		fr[it] = vr + fr[it+1]
-		fi[it] = vi + fi[it+1]
-		fr[it+1] = vr - fr[it+1]
-		fi[it+1] = vi - fi[it+1]
-	}
-	m = n / 2
-	nv = 2
-	//蝴蝶操作
-	for l0 = k - 2; l0 >= 0; l0-- {
-		m = m / 2
-		nv = 2 * nv
-		for it = 0; it <= (m-1)*nv; it = it + nv {
-			for j = 0; j <= (nv/2)-1; j++ {
-				p = pr[m*j] * fr[it+j+nv/2]
-				q = pi[m*j] * fi[it+j+nv/2]
-				s = pr[m*j] + pi[m*j]
-				s = s * (fr[it+j+nv/2] + fi[it+j+nv/2])
-				poddr = p - q
-				poddi = s - p - q
-				fr[it+j+nv/2] = fr[it+j] - poddr
-				fi[it+j+nv/2] = fi[it+j] - poddi
-				fr[it+j] = fr[it+j] + poddr
-				fi[it+j] = fi[it+j] + poddi
-			}
-		}
-	}
-
-	////幅值计算
-	//for (i = 0; i <= n - 1; i++) {
-	//	pr[i] = sqrt(fr[i] * fr[i] + fi[i] * fi[i]);
-	//}
-
-	for i = 0; i <= n-1; i++ {
-		pr[i] = fr[i]
-		pi[i] = fi[i]
-	}
-
-	return
 }
 
 type FFTOutput struct {
@@ -110,75 +36,12 @@ func fftFrequencyGet(n int, frequency int) (output []float64) {
 	return
 }
 
-func defaultFFTFind(pr []float64, frequency []float64, outputNum int, n int, baseFrequency float64) (output []FFTOutput) {
-	output = make([]FFTOutput, outputNum)
-	if baseFrequency < 1 {
-		var maxPr float64 = 0
-		var index int = 1
-		for i := 0; i < n; i++ {
-			if math.Abs(pr[i]) > maxPr {
-				maxPr = math.Abs(pr[i])
-				index = i
-			}
-		}
-
-		baseFrequency = frequency[index]
-	}
-
-	for i := 0; i < outputNum; i++ {
-		var param float64
-		if i < 1 {
-			param = 0.5
-		} else {
-			param = float64(i)
-		}
-
-		var frequencyBack float64 = baseFrequency * param
-		var differenceFrequencyValue float64
-		if frequencyBack < 15 {
-			differenceFrequencyValue = baseFrequency / 2
-		} else {
-			differenceFrequencyValue = 10
-		}
-
-		var maxPr float64
-		var index int = -1
-		for j := 0; j < n; j++ {
-			if frequency[j] > frequencyBack-differenceFrequencyValue && frequency[j] < frequencyBack+differenceFrequencyValue {
-				if math.Abs(pr[j]) > maxPr {
-					maxPr = math.Abs(pr[j])
-					index = j
-				}
-			}
-
-			if frequency[j] >= frequencyBack+differenceFrequencyValue {
-				break
-			}
-		}
-		if index >= 0 {
-			output[i].FFTValue = pr[index]
-			output[i].Frequency = frequency[index]
-		}
-	}
-
-	return
-}
-
-func fftOutputConvert(output []FFTOutput, outputNum int, n int, scale int, rangeVal int) (outputResult []FFTOutput) {
-	outputResult = make([]FFTOutput, outputNum)
-	for i := 0; i < outputNum; i++ {
-		outputResult[i].FFTValue = output[i].FFTValue * 9.8 / float64(scale) * float64(rangeVal) / float64(n)
-		outputResult[i].Frequency = output[i].Frequency
-	}
-	return
-}
-
-func defaultFFTOutputGet(pr []float64, n int, frequency int) (output []FFTOutput) {
+func defualtFFTOutputGet(pr []float64, n int, frequency int) (output []FFTOutput) {
 	frequencyArr := fftFrequencyGet(n, frequency)
 	sz := len(frequencyArr) / 2
 	output = make([]FFTOutput, sz)
 	for i := 0; i < sz; i++ {
-		output[i].FFTValue = pr[i]
+		output[i].FFTValue = pr[i] / float64(sz)
 		output[i].Frequency = frequencyArr[i]
 	}
 
@@ -203,7 +66,7 @@ func writeFile(filename string, content string) {
 	return
 }
 
-func filterEnveloping(sigInput []float64, sigLen int, fs float64) (y []float64) {
+func FilterEnveloping(sigInput []float64, sigLen int, fs int) (y []float64) {
 	y = make([]float64, sigLen)
 	y1 := make([]float64, sigLen)
 	var Gain1, Gain2, Gain3, Gain4 float64
@@ -390,7 +253,7 @@ func filterEnveloping(sigInput []float64, sigLen int, fs float64) (y []float64) 
 	return
 }
 
-func filterRMS(sigInput []float64, sigLen int, fs float64) (y []float64) {
+func FilterRMS(sigInput []float64, sigLen int, fs int) (y []float64) {
 	y = make([]float64, sigLen)
 	y1 := make([]float64, sigLen)
 	var Gain1, Gain2, Gain3, Gain4 float64
@@ -577,54 +440,231 @@ func mean(data []float64) float64 {
 	return ret / float64(len(data))
 }
 
-func FFTFrequencyCalc(mPr []float64, sampleNum int, paramFrequency int) (output []FFTOutput) {
-	var prSum float64 = 0
-	var prAverage float64 = 0
-	var i int
-	for i = 0; i < sampleNum; i++ {
-		prSum += mPr[i]
+func sampleNumGet(sampleNum int) (n int) {
+	n = 2
+	for n*2 <= sampleNum {
+		n = n * 2
+	}
+	return n
+}
+func round(x float64) int {
+	return int(math.Floor(x + 0.5))
+}
+
+func FFTFrequencyCalc(data []float64, sampleNum int, paramFrequency int) (output []FFTOutput) {
+	sampleNum = sampleNumGet(sampleNum)
+	data = data[:sampleNum]
+	fdataArr := removeMean(data)
+
+	res := gofft.FFTReal(fdataArr)
+	fftr := make([]float64, len(fdataArr))
+	for i := 0; i < len(res); i++ {
+		fftr[i] = math.Sqrt(real(res[i])*real(res[i]) + imag(res[i])*imag(res[i]))
 	}
 
-	prAverage = prSum / float64(sampleNum)
-	for i = 0; i < sampleNum; i++ {
-		mPr[i] -= prAverage
-	}
-
-	fftResult := gofft.FFTReal(mPr)
-	for i := 0; i < len(fftResult); i++ {
-		mPr[i] = math.Sqrt(real(fftResult[i])*real(fftResult[i]) + imag(fftResult[i])*imag(fftResult[i]))
-	}
-
-	output = defaultFFTOutputGet(mPr, sampleNum, paramFrequency)
+	output = defualtFFTOutputGet(fftr, sampleNum, paramFrequency)
 
 	return
 }
 
-func VelocityCalc(accXX []float64, sigLen int, fs float64) (velX1 []float64) {
-	accX1 := filterRMS(accXX, sigLen, fs)
-	velX := make([]float64, sigLen)
-	velX[0] = accX1[0] / 2.0
-	for i := 1; i < sigLen; i++ {
-		velX[i] = velX[i-1] + accX1[i]
-	}
-	for i := range velX {
-		velX[i] = velX[i] * 1000 / fs
-	}
-	velX1 = filterRMS(velX, sigLen, fs)
-	return
+func AccelerationCalc(raw []float64, sigLen int, fs int, rangeVal int) []float64 {
+	raw = raw[:sigLen]
+	return DataConvert(removeMean(raw), fs, rangeVal)
 }
 
-func DisplacementCalc(velX1 []float64, sigLen int, fs float64) (disX1 []float64) {
-	disX := make([]float64, sigLen)
-	disX[0] = velX1[0] / 2
-	for i := 1; i < sigLen; i++ {
-		disX[i] = disX[i-1] + velX1[i]
+func AccelerationFrequencyCalc(raw []float64, sigLen int, fs int, rangeVal int) []FFTOutput {
+	raw = raw[:sigLen]
+	data := DataConvert(removeMean(raw), fs, rangeVal)
+	accFreq := FFTFrequencyCalc(data, len(data), fs)
+	return accFreq
+}
+
+func VelocityCalc(raw []float64, sigLen int, fs int, rangeVal int) []float64 {
+	raw = raw[:sigLen]
+	data := DataConvert(raw, fs, rangeVal)
+	velX1 := velocityCalc(data, sigLen, fs)
+	for i := range velX1 {
+		velX1[i] = velX1[i] * 1000.0
 	}
-	for i := range disX {
-		disX[i] = disX[i] * 1000 / fs
+	return velX1
+}
+
+func VelocityFrequencyCalc(raw []float64, sigLen int, fs int, rangeVal int) []FFTOutput {
+	velX1 := VelocityCalc(raw, sigLen, fs, rangeVal)
+	velFreq := FFTFrequencyCalc(velX1, len(velX1), fs)
+	return velFreq
+}
+
+func DisplacementCalc(raw []float64, sigLen int, fs int, rangeVal int) []float64 {
+	raw = raw[:sigLen]
+	data := DataConvert(raw, fs, rangeVal)
+	disX1 := displacementCalc(data, sigLen, fs)
+	for i := range disX1 {
+		disX1[i] = disX1[i] * 1000.0 * 1000.0
 	}
-	disX1 = filterRMS(disX, sigLen, fs)
-	return
+	return disX1
+}
+
+func DisplacementFrequencyCalc(raw []float64, sigLen int, fs int, rangeVal int) []FFTOutput {
+	disX1 := DisplacementCalc(raw, sigLen, fs, rangeVal)
+	disFreq := FFTFrequencyCalc(disX1, len(disX1), fs)
+	return disFreq
+}
+
+func vibrationDataProcess(data []complex128, s1 int, e1 int, s2 int, e2 int) []complex128 {
+	pr := make([]float64, len(data))
+	pi := make([]float64, len(data))
+	sigLen := len(data)
+	for i := range data {
+		pr[i] = real(data[i])
+		pi[i] = imag(data[i])
+	}
+
+	if s1 <= s2 && e1 >= e2 {
+		for i := 0; i < s1; i++ {
+			pr[i] = 0
+			pi[i] = 0
+		}
+		for i := e1; i < sigLen; i++ {
+			pr[i] = 0
+			pi[i] = 0
+		}
+	} else if s1 >= s2 && e1 >= e2 && s1 <= e2 {
+		for i := 0; i < s2; i++ {
+			pr[i] = 0
+			pi[i] = 0
+		}
+		for i := e1; i < sigLen; i++ {
+			pr[i] = 0
+			pi[i] = 0
+		}
+	} else if s1 <= s2 && e1 <= e2 && s2 <= e1 {
+		for i := 0; i < s1; i++ {
+			pr[i] = 0
+			pi[i] = 0
+		}
+		for i := e2; i < sigLen; i++ {
+			pr[i] = 0
+			pi[i] = 0
+		}
+	} else if s1 <= s2 && e1 <= e2 && e1 <= s2 {
+		for i := 0; i < s1; i++ {
+			pr[i] = 0
+			pi[i] = 0
+		}
+		for i := e1; i < s2; i++ {
+			pr[i] = 0
+			pi[i] = 0
+		}
+		for i := e2; i < sigLen; i++ {
+			pr[i] = 0
+			pi[i] = 0
+		}
+	} else if s1 >= s2 && e1 >= e2 && e2 <= s1 {
+		for i := 0; i < s2; i++ {
+			pr[i] = 0
+			pi[i] = 0
+		}
+		for i := e2; i < s1; i++ {
+			pr[i] = 0
+			pi[i] = 0
+		}
+		for i := e1; i < sigLen; i++ {
+			pr[i] = 0
+			pi[i] = 0
+		}
+	} else if s1 >= s2 && e1 <= e2 {
+		for i := 0; i < s2; i++ {
+			pr[i] = 0
+			pi[i] = 0
+		}
+		for i := e2; i < sigLen; i++ {
+			pr[i] = 0
+			pi[i] = 0
+		}
+	}
+
+	for i := range data {
+		data[i] = complex(pr[i], pi[i])
+	}
+
+	return data
+}
+
+func displacementCalc(data []float64, sigLen int, fs int) []float64 {
+	sigLen = sampleNumGet(sigLen)
+	data = data[:sigLen]
+	data = removeMean(data)
+
+	res := gofft.FFTReal(data)
+	tmp := make([]float64, sigLen)
+
+	var fmin float64 = 1.0 * float64(fs) / 340
+	var fmax float64 = 2000.0
+	var df float64 = 1.0 * float64(fs) / float64(sigLen)
+	var dw float64 = 2 * PI * df
+
+	for i := 0; i < sigLen/2; i++ {
+		tmp[i] = float64(i) * dw
+	}
+
+	for i := 0; i < sigLen/2; i++ {
+		tmp[i+int(sigLen/2)] = -1.0 * dw * (0.5*float64(sigLen) - 1.0 - float64(i))
+	}
+
+	re := make([]float64, sigLen)
+	im := make([]float64, sigLen)
+	for i := 2; i < sigLen; i++ {
+		re[i] = -real(res[i]) / tmp[i] / tmp[i]
+		im[i] = -imag(res[i]) / tmp[i] / tmp[i]
+	}
+
+	for i := 0; i < sigLen; i++ {
+		res[i] = complex(re[i], im[i])
+	}
+
+	// for i := 0; i < 10; i++ {
+	// 	fmt.Printf("%d=%f\n", i, real(res[i]))
+	// }
+
+	// for i := 0; i < 10; i++ {
+	// 	fmt.Printf("imag %d=%f\n", i, imag(res[i]))
+	// }
+
+	HPStop := round(fmin/df + 0.5)
+	LPStop := round(fmax/df+0.5) - 1
+	// st1 := HPStop - 1
+	// en1 := LPStop
+	// st2 := sigLen - LPStop
+	// en2 := sigLen - HPStop + 1
+
+	// res = vibrationDataProcess(res, st1, en1, st2, en2)
+	tmpre := make([]float64, sigLen)
+	tmpim := make([]float64, sigLen)
+
+	for i := HPStop; i < LPStop; i++ {
+		tmpre[i] = real(res[i])
+		tmpim[i] = imag(res[i])
+	}
+
+	for i := sigLen - LPStop + 1; i < sigLen-HPStop+1; i++ {
+		tmpre[i] = real(res[i])
+		tmpim[i] = imag(res[i])
+	}
+
+	for i := 0; i < sigLen; i++ {
+		res[i] = complex(tmpre[i], tmpim[i])
+	}
+
+	res2 := gofft.IFFT(res)
+
+	disp := make([]float64, sigLen)
+	for i := range res2 {
+		disp[i] = real(res2[i])
+	}
+
+	disp = removeMean(disp)
+	return disp
 }
 
 func hilbert(data []float64) (output []complex128) {
@@ -652,12 +692,12 @@ func hilbert(data []float64) (output []complex128) {
 		}
 	}
 
-	fftResult := gofft.FFTReal(data)
+	res := gofft.FFTReal(data)
 	for i := 0; i < sampleNum; i++ {
-		fftResult[i] = complex(real(fftResult[i])*h[i], imag(fftResult[i])*h[i])
+		res[i] = complex(real(res[i])*h[i], imag(res[i])*h[i])
 	}
 
-	output = gofft.IFFT(fftResult)
+	output = gofft.IFFT(res)
 	return
 }
 
@@ -685,6 +725,134 @@ func EnvelopCalc(data []float64) (highEnvelop []float64, lowEnvelop []float64) {
 	return
 }
 
+func DataConvert(fdataArr []float64, fs int, rangeVal int) (output []float64) {
+	var fullScale float64
+	if fs == 3200 || fs == 6400 || fs == 12800 || fs == 25600 {
+		fullScale = 65536 / 2
+		// rangeVal = 4
+	}
+	if fs == 4000 || fs == 8000 || fs == 16000 || fs == 32000 || fs == 64000 {
+		fullScale = 262144 / 2
+		// rangeVal = 50
+	}
+	gravityScale := fullScale / float64(rangeVal)
+
+	output = make([]float64, len(fdataArr))
+	for i := range fdataArr {
+		output[i] = fdataArr[i] * 9.8 / gravityScale
+	}
+	return output
+}
+
+func removeMean(fdataArr []float64) (output []float64) {
+	meanData := mean(fdataArr)
+	output = make([]float64, len(fdataArr))
+	for i := range fdataArr {
+		output[i] = fdataArr[i] - meanData
+	}
+	return output
+}
+
+func printCurve(filename string, data []float64) {
+	for i := range data {
+		fmt.Printf("%s: %d\n", filename, i)
+		writeFile(filename, fmt.Sprintf("%f,", data[i]))
+	}
+}
+
+func velocityCalc(data []float64, sigLen int, fs int) []float64 {
+	sigLen = sampleNumGet(sigLen)
+	data = data[:sigLen]
+	data = removeMean(data)
+
+	// var gravity float64 = 9.8 / ((65536 / 2) / 4)
+	for i := range data {
+		data[i] = data[i]
+	}
+
+	res := gofft.FFTReal(data)
+	tmp := make([]float64, sigLen)
+
+	var fmin float64 = 1.0 * float64(fs) / 340
+	var fmax float64 = 2000.0
+	var df float64 = 1.0 * float64(fs) / float64(sigLen)
+	var dw float64 = 2 * PI * df
+	for i := 0; i < sigLen/2; i++ {
+		tmp[i] = float64(i) * dw
+	}
+
+	for i := 0; i < sigLen/2; i++ {
+		tmp[i+sigLen/2] = -1.0 * dw * (0.5*float64(sigLen) - 1.0 - float64(i))
+	}
+
+	// for i := 2; i < sigLen; i++ {
+	// 	res[i] = complex(imag(res[i])/tmp[i], -(real(res[i]) / tmp[i]))
+	// }
+	re := make([]float64, sigLen)
+	im := make([]float64, sigLen)
+	for i := 2; i < sigLen; i++ {
+		re[i] = real(res[i]) / tmp[i]
+		im[i] = imag(res[i]) / tmp[i]
+	}
+
+	for i := 0; i < sigLen; i++ {
+		t := re[i]
+		re[i] = im[i]
+		im[i] = -t
+	}
+
+	for i := 0; i < sigLen; i++ {
+		res[i] = complex(re[i], im[i])
+	}
+
+	HPStop := round(fmin/df + 0.5)
+	LPStop := round(fmax/df+0.5) - 1
+	// st1 := HPStop - 1
+	// en1 := LPStop
+	// st2 := sigLen - LPStop
+	// en2 := sigLen - HPStop + 1
+
+	// res = vibrationDataProcess(res, st1, en1, st2, en2)
+	tmpre := make([]float64, sigLen)
+	tmpim := make([]float64, sigLen)
+
+	for i := HPStop; i < LPStop; i++ {
+		tmpre[i] = real(res[i])
+		tmpim[i] = imag(res[i])
+	}
+
+	for i := sigLen - LPStop + 1; i < sigLen-HPStop+1; i++ {
+		tmpre[i] = real(res[i])
+		tmpim[i] = imag(res[i])
+	}
+
+	for i := 0; i < sigLen; i++ {
+		res[i] = complex(tmpre[i], tmpim[i])
+	}
+
+	res2 := gofft.IFFT(res)
+
+	vel := make([]float64, sigLen)
+	for i := range res2 {
+		vel[i] = real(res2[i])
+	}
+
+	vel = removeMean(vel)
+	return vel
+
+	// accX1 := FilterRMS(data, sigLen, fs)
+	// velX := make([]float64, sigLen)
+	// velX[0] = accX1[0] / 2.0
+	// for i := 1; i < sigLen; i++ {
+	// 	velX[i] = velX[i-1] + accX1[i]
+	// }
+	// for i := range velX {
+	// 	velX[i] = velX[i] * 1000 / float64(fs)
+	// }
+	// velX1 = FilterRMS(velX, sigLen, fs)
+}
+
+//
 //func main() {
 //	fdataArr := make([]float64, 0)
 //
@@ -711,42 +879,31 @@ func EnvelopCalc(data []float64) (highEnvelop []float64, lowEnvelop []float64) {
 //
 //	fdataArr = fdataArr[:1024]
 //
-//	// fdataArr = fdataArr[:8192]
-//
-//	// fullScale := 65536.0 / 2.0
-//	// measuringRangeUnitG := 2.0
-//	// gravityScale := fullScale / measuringRangeUnitG
-//
-//	// meanAccX1 := mean(fdataArr)
-//	// accXX := make([]float64, len(fdataArr))
-//	// for i := range fdataArr {
-//	// 	accXX[i] = fdataArr[i] - meanAccX1
-//	// 	accXX[i] = accXX[i] * 9.8 / gravityScale
-//	// }
-//
-//	// velX1 := VelocityCalc(accXX, len(accXX), 12800)
-//	// disX1 := DisplacementCalc(velX1, len(velX1), 12800)
-//
 //	// h, l := EnvelopCalc(disX1)
 //
-//	// output := FFTFrequencyCalc(disX1, len(disX1), 12800)
-//	output := FFTFrequencyCalc(fdataArr, len(fdataArr), 12800)
-//
-//	// for i := 0; i < 10; i++ {
-//	// 	fmt.Printf("%f\n", output[i].FFTValue)
+//	// var maxIndex int = 0
+//	// var maxVal float64 = 0
+//	// for i := 0; i < len(output); i++ {
+//	// 	if output[i].FFTValue > maxVal {
+//	// 		maxVal = output[i].FFTValue
+//	// 		maxIndex = i
+//	// 	}
 //	// }
-//	var maxIndex int = 0
-//	var maxVal float64 = 0
-//	for i := 0; i < len(output); i++ {
-//		if output[i].FFTValue > maxVal {
-//			maxVal = output[i].FFTValue
-//			maxIndex = i
-//		}
-//	}
 //
-//	fmt.Printf("Max [len=%d] v %f, i %d, f %f", len(output), maxVal, maxIndex, output[maxIndex].Frequency)
-//	// for i := range output {
-//	// 	fmt.Printf("i=%d\n", i)
-//	// 	writeFile("fftr.txt", fmt.Sprintf("%f,", output[i].FFTValue))
-//	// }
+//	// fmt.Printf("Max [len=%d] v %f, i %d, f %f", len(output), maxVal, maxIndex, output[maxIndex].Frequency)
+//
+//	fs := 12800
+//	rangeVal := 4
+//
+//	// rawData := AccelerationCalc(fdataArr, len(fdataArr), fs, 4)
+//	// accFreq := AccelerationFrequencyCalc(fdataArr, len(fdataArr), fs, 4)
+//
+//	velData := VelocityCalc(fdataArr, len(fdataArr), fs, rangeVal)
+//	dispData := DisplacementCalc(fdataArr, len(fdataArr), fs, rangeVal)
+//
+//	fmt.Printf("%f\n", dispData[0])
+//
+//	// printCurve("raw.csv", rawData)
+//	printCurve("vel.csv", velData)
+//	printCurve("disp.csv", dispData)
 //}
