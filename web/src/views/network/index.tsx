@@ -29,8 +29,8 @@ const NetworkPage = () => {
         const filter: any = {}
         if (assetId) {
             filter.asset_id = assetId
+            PagingNetworksRequest(filter, current, size).then(setDataSource)
         }
-        PagingNetworksRequest(filter, current, size).then(setDataSource)
     }, [assetId, refreshKey])
 
     useEffect(() => {
@@ -166,9 +166,10 @@ const NetworkPage = () => {
                     <Space>
                         <Label name={"资产"}>
                             <AssetTreeSelect bordered={false}
-                                             allowClear={true}
+                                             defaultActiveFirstOption={true}
                                              style={{width: "144px"}}
                                              placeholder={"所有资产"}
+                                             value={assetId}
                                              onChange={setAssetId}/>
                         </Label>
                     </Space>

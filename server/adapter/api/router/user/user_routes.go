@@ -21,13 +21,20 @@ func (r userRouter) getByID(ctx *gin.Context) (interface{}, error) {
 }
 
 func (r userRouter) paging(ctx *gin.Context) (interface{}, error) {
-	page := cast.ToInt(ctx.Query("page"))
-	size := cast.ToInt(ctx.Query("size"))
-	result, total, err := r.service.FindUsersByPaginate(page, size)
-	if err != nil {
-		return nil, err
+	method := ctx.Query("method")
+	filters := request.NewFilters(ctx.Request.URL.Query())
+	switch method {
+	case "paging":
+		page := cast.ToInt(ctx.Query("page"))
+		size := cast.ToInt(ctx.Query("size"))
+		result, total, err := r.service.FindUsersByPaginate(page, size)
+		if err != nil {
+			return nil, err
+		}
+		return response.NewPageResult(page, size, total, result), nil
+	default:
+		return r.service.FilterUsers(filters)
 	}
-	return response.NewPageResult(page, size, total, result), nil
 }
 
 func (r userRouter) create(ctx *gin.Context) (interface{}, error) {

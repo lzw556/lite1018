@@ -52,7 +52,7 @@ func (m MeasurementData) Run() {
 	case measurementtype.AngleDipType:
 		strategy = measurement.NewAngleDipStrategy()
 	case measurementtype.Vibration3AxisType:
-		strategy = measurement.NewVibrationStrategy()
+		strategy = measurement.NewVibration3AxisStrategy()
 	case measurementtype.NormalTemperatureCorrosionType:
 		strategy = measurement.NewNormalTemperatureCorrosionStrategy()
 	default:

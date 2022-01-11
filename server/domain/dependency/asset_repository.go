@@ -9,7 +9,7 @@ import (
 type AssetRepository interface {
 	Get(ctx context.Context, id uint) (po.Asset, error)
 	Find(ctx context.Context) ([]po.Asset, error)
-	FindByPaginate(ctx context.Context, page int, size int) ([]po.Asset, int64, error)
+	PagingBySpecs(ctx context.Context, page int, size int, specs ...spec.Specification) ([]po.Asset, int64, error)
 	Create(ctx context.Context, e *po.Asset) error
 	Save(ctx context.Context, e *po.Asset) error
 	Delete(ctx context.Context, id uint) error

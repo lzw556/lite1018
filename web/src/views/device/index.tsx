@@ -65,15 +65,15 @@ const DevicePage = () => {
 
     const fetchDevices = useCallback((current: number, size: number) => {
         const filter: any = {}
-        if (assetId) {
-            filter.asset_id = assetId
-        }
         if (searchTarget === 0) {
             filter.name = searchText
         } else if (searchTarget === 1) {
             filter.mac_address = searchText
         }
-        PagingDevicesRequest(current, size, filter).then(setDataSource)
+        if (assetId) {
+            filter.asset_id = assetId
+            PagingDevicesRequest(current, size, filter).then(setDataSource)
+        }
     }, [assetId, searchText, refreshKey])
 
     useEffect(() => {
@@ -270,7 +270,10 @@ const DevicePage = () => {
                 <Col span={24}>
                     <Space>
                         <Label name={"资产"}>
-                            <AssetTreeSelect bordered={false} allowClear={true} style={{width: "144px"}}
+                            <AssetTreeSelect bordered={false}
+                                             style={{width: "144px"}}
+                                             defaultActiveFirstOption={true}
+                                             value={assetId}
                                              placeholder={"所有资产"} onChange={setAssetId}/>
                         </Label>
                         <Input.Group compact>

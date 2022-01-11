@@ -25,6 +25,7 @@ export const Role = lazy(() => import('./system/role'))
 export const Menu = lazy(() => import('./system/menu'))
 export const Permission = lazy(() => import('./system/permission'))
 export const System = lazy(() => import('./system'))
+export const Project = lazy(() => import('./project'))
 
 export const Unauthorized = lazy(() => import('./403'))
 export const NotFound = lazy(() => import('./404'))

@@ -6,6 +6,8 @@ type AlarmTemplate struct {
 	Description     string    `json:"description"`
 	Rule            AlarmRule `json:"rule"`
 	Level           uint      `json:"level"`
+
+	ProjectID uint `json:"-"`
 }
 
 type AlarmRule struct {

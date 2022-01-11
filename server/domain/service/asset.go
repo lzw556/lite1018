@@ -32,9 +32,10 @@ func NewAsset() asset.Service {
 
 func (s Asset) CreateAsset(req request.Asset) error {
 	e := po.Asset{
-		Name:     req.Name,
-		Image:    fmt.Sprintf("%s%s", uuid.NewV1().String(), req.GetFileExt()),
-		ParentID: req.ParentID,
+		Name:      req.Name,
+		Image:     fmt.Sprintf("%s%s", uuid.NewV1().String(), req.GetFileExt()),
+		ParentID:  req.ParentID,
+		ProjectID: req.ProjectID,
 	}
 	if req.Location != nil {
 		e.Display.Location.X = req.Location.X
@@ -63,6 +64,7 @@ func (s Asset) UpdateAssetByID(assetID uint, req request.Asset) error {
 	}
 	e.Name = req.Name
 	e.ParentID = req.ParentID
+	e.ProjectID = req.ProjectID
 	if req.Location != nil {
 		e.Display.Location.X = req.Location.X
 		e.Display.Location.Y = req.Location.Y
@@ -93,15 +95,12 @@ func (s Asset) DeleteAssetByID(assetID uint) error {
 	return cmd.Run()
 }
 
-func (s Asset) FindAssetsByPaginate(page, size int) ([]vo.Asset, int64, error) {
-	es, total, err := s.repository.FindByPaginate(context.TODO(), page, size)
+func (s Asset) FindAssetsByPaginate(page, size int, filters request.Filters) ([]vo.Asset, int64, error) {
+	query, err := s.factory.NewAssetPagingQuery(page, size, filters)
 	if err != nil {
 		return nil, 0, err
 	}
-	result := make([]vo.Asset, len(es))
-	for i, e := range es {
-		result[i] = vo.NewAsset(e)
-	}
+	result, total := query.Run()
 	return result, total, nil
 }
 
@@ -146,16 +145,12 @@ func (s Asset) StatisticalAssets() ([]vo.AssetStatistic, error) {
 	return result, nil
 }
 
-func (s Asset) FindAssets() ([]vo.Asset, error) {
-	es, err := s.repository.Find(context.TODO())
+func (s Asset) FilterAssets(filters request.Filters) ([]vo.Asset, error) {
+	query, err := s.factory.NewAssetFilterQuery(filters)
 	if err != nil {
 		return nil, err
 	}
-	result := make([]vo.Asset, len(es))
-	for i, e := range es {
-		result[i] = vo.NewAsset(e)
-	}
-	return result, nil
+	return query.Run(), nil
 }
 
 func (s Asset) GetAssetChildrenByID(id uint) ([]vo.Asset, error) {

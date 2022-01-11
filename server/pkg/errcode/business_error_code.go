@@ -65,6 +65,12 @@ const (
 	UnknownMeasurementTypeError
 )
 
+const (
+	ProjectNotFoundError BusinessErrorCode = iota + 19001
+	ProjectExistsError
+	ProjectNotSelectedError
+)
+
 var businessErrorMap = map[BusinessErrorCode]string{
 	UnknownBusinessError:                "未知错误",
 	SystemNotReadyError:                 "系统未初始化完成",
@@ -95,6 +101,9 @@ var businessErrorMap = map[BusinessErrorCode]string{
 	MeasurementNotFoundError:            "监测点不存在",
 	UnknownMeasurementTypeError:         "未知的监测点类型",
 	AssetImageSizeTooLargeError:         "资产图片大小超过限制(2MB)",
+	ProjectNotFoundError:                "项目不存在",
+	ProjectExistsError:                  "项目已存在",
+	ProjectNotSelectedError:             "请先选择项目",
 }
 
 func GetErrMessage(code BusinessErrorCode) string {

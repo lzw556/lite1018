@@ -137,3 +137,7 @@ func (s User) UpdatePassByUserID(userID uint, req request.UserPass) error {
 	e.Password = string(newPwd)
 	return s.repository.Save(ctx, &e)
 }
+
+func (s User) FilterUsers(filters request.Filters) ([]vo.User, error) {
+	return nil, nil
+}

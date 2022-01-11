@@ -21,10 +21,6 @@ const AlarmRule = () => {
     const [dataSource, setDataSource] = useState<PageResult<any[]>>()
     const [refreshKey, setRefreshKey] = useState<number>(0)
 
-    const onAssetChanged = (value: any) => {
-        setAsset(value)
-    }
-
     const onEdit = (id: number) => {
         GetAlarmRequest(id).then(data => {
             setAlarm(data)
@@ -104,13 +100,13 @@ const AlarmRule = () => {
 
     const fetchAlarms = useCallback((current: number, size: number) => {
         const filter: any = {}
-        if (asset) {
-            filter.asset_id = asset
-        }
         if (measurement) {
             filter.measurement_id = measurement
         }
-        PagingAlarmsRequest(filter, current, size).then(setDataSource)
+        if (asset) {
+            filter.asset_id = asset
+            PagingAlarmsRequest(filter, current, size).then(setDataSource)
+        }
     }, [asset, measurement, refreshKey])
 
     useEffect(() => {
@@ -123,10 +119,11 @@ const AlarmRule = () => {
                 <Space>
                     <Label name={"资产"}>
                         <AssetTreeSelect bordered={false}
-                                         allowClear={true}
-                                         style={{minWidth: "120px"}}
+                                         style={{minWidth: "144px"}}
                                          placeholder={"所有资产"}
-                                         onChange={onAssetChanged}/>
+                                         defaultActiveFirstOption={true}
+                                         value={asset}
+                                         onChange={setAsset}/>
                     </Label>
                 </Space>
             </Col>

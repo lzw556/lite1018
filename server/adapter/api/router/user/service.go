@@ -14,6 +14,7 @@ type Service interface {
 
 	GetUserByID(id uint) (*vo.User, error)
 	FindUsersByPaginate(page, size int) ([]vo.User, int64, error)
+	FilterUsers(filters request.Filters) ([]vo.User, error)
 
 	DeleteUserByID(id uint) error
 }

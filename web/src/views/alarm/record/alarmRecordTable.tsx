@@ -37,8 +37,8 @@ const AlarmRecordTable: FC<AlarmRecordTableProps> = ({type, start, stop, asset, 
         }
         if (asset) {
             filter.asset_id = asset
+            PagingAlarmRecordsRequest(current, size, start, stop, filter).then(setDataSource)
         }
-        PagingAlarmRecordsRequest(current, size, start, stop, filter).then(setDataSource)
     }, [asset, start, stop, levels, type, statuses, refreshKey])
 
     useEffect(() => {

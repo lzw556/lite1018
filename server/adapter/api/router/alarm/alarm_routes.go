@@ -12,11 +12,16 @@ func (r alarmRouter) createTemplate(ctx *gin.Context) (interface{}, error) {
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		return nil, response.InvalidParameterError(err.Error())
 	}
+	req.ProjectID = cast.ToUint(ctx.MustGet("project_id"))
 	return nil, r.service.CreateAlarmTemplate(req)
 }
 
 func (r alarmRouter) findTemplates(ctx *gin.Context) (interface{}, error) {
 	filters := request.NewFilters(ctx.Request.URL.Query())
+	filters = append(filters, request.Filter{
+		Name:  "project_id",
+		Value: ctx.MustGet("project_id"),
+	})
 	switch ctx.Query("method") {
 	case "paging":
 		page := cast.ToInt(ctx.Query("page"))

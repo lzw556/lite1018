@@ -11,3 +11,5 @@ type Project struct {
 func (Project) TableName() string {
 	return "ts_project"
 }
+
+type Projects []Project

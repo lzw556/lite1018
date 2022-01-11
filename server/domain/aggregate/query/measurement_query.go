@@ -3,6 +3,7 @@ package query
 import (
 	"context"
 	"fmt"
+	"github.com/spf13/cast"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/po"
@@ -11,6 +12,7 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/calculate"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/measurementtype"
 	"sort"
+	"sync"
 	"time"
 )
 
@@ -131,32 +133,44 @@ func (query MeasurementQuery) GateWaveData(timestamp int64, calc string) (*vo.Wa
 	}
 	result := vo.NewWaveData(data)
 	result.SetValues(data.Values)
-	switch calc {
-	case "accelerationFrequencyDomain":
-		for i := range result.Values {
-			fft := calculate.FFTFrequencyCalc(result.Values[i], len(result.Values[i]), int(result.Frequency))
-			fftFrequencies := make([]float64, len(fft))
-			for j, output := range fft {
-				result.Values[i][j] = output.FFTValue
-				fftFrequencies[j] = output.Frequency
-			}
-			result.Frequencies = append(result.Frequencies, fftFrequencies)
-		}
-	case "velocityTimeDomain":
-		for i := range result.Values {
-			result.Values[i] = calculate.VelocityCalc(result.Values[i], len(result.Values[i]), float64(result.Frequency))
-		}
-	case "velocityFrequencyDomain":
-		for i := range result.Values {
-			values := calculate.VelocityCalc(result.Values[i], len(result.Values[i]), float64(result.Frequency))
-			fft := calculate.FFTFrequencyCalc(values, len(values), int(result.Frequency))
-			fftFrequencies := make([]float64, len(fft))
-			for j, output := range fft {
-				result.Values[i][j] = output.FFTValue
-				fftFrequencies[j] = output.Frequency
-			}
-			result.Frequencies = append(result.Frequencies, fftFrequencies)
-		}
+	frequency := cast.ToInt(data.Parameters["kx122_continuous_odr"])
+	if frequency == 0 {
+		frequency = 12.8 * 1000
 	}
+	unitG := cast.ToInt(data.Parameters["kx122_continuous_range"])
+	if unitG == 0 {
+		unitG = 8
+	}
+	var wg sync.WaitGroup
+	for i, values := range result.Values {
+		wg.Add(1)
+		go func(i int, values []float64) {
+			defer wg.Done()
+			switch calc {
+			case "accelerationFrequencyDomain":
+				accelerationFFT := calculate.AccelerationFrequencyCalc(values, len(values), frequency, unitG)
+				frequencies := make([]float64, len(accelerationFFT))
+				for j, output := range accelerationFFT {
+					result.Values[i][j] = output.FFTValue
+					frequencies[j] = output.Frequency
+				}
+				result.Frequencies = append(result.Frequencies, frequencies)
+			case "velocityTimeDomain":
+				result.Values[i] = calculate.VelocityCalc(values, len(values), frequency, unitG)
+			case "velocityFrequencyDomain":
+				velocityFFT := calculate.VelocityFrequencyCalc(values, len(values), frequency, unitG)
+				frequencies := make([]float64, len(velocityFFT))
+				for j, output := range velocityFFT {
+					result.Values[i][j] = output.FFTValue
+					frequencies[j] = output.Frequency
+				}
+				result.Frequencies = append(result.Frequencies, frequencies)
+			default:
+				result.Values[i] = calculate.AccelerationCalc(values, len(values), frequency, unitG)
+			}
+
+		}(i, values)
+	}
+	wg.Wait()
 	return &result, nil
 }

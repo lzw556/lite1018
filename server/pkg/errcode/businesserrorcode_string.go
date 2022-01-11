@@ -37,6 +37,9 @@ func _() {
 	_ = x[RoleNotFoundError-17002]
 	_ = x[MeasurementNotFoundError-18001]
 	_ = x[UnknownMeasurementTypeError-18002]
+	_ = x[ProjectNotFoundError-19001]
+	_ = x[ProjectExistsError-19002]
+	_ = x[ProjectNotSelectedError-19003]
 }
 
 const (
@@ -49,6 +52,7 @@ const (
 	_BusinessErrorCode_name_6 = "AlarmRuleNameExistsAlarmRuleNotFoundErrorAlarmRecordAlreadyAcknowledgedError"
 	_BusinessErrorCode_name_7 = "RoleExistsErrorRoleNotFoundError"
 	_BusinessErrorCode_name_8 = "MeasurementNotFoundErrorUnknownMeasurementTypeError"
+	_BusinessErrorCode_name_9 = "ProjectNotFoundErrorProjectExistsErrorProjectNotSelectedError"
 )
 
 var (
@@ -60,6 +64,7 @@ var (
 	_BusinessErrorCode_index_6 = [...]uint8{0, 19, 41, 76}
 	_BusinessErrorCode_index_7 = [...]uint8{0, 15, 32}
 	_BusinessErrorCode_index_8 = [...]uint8{0, 24, 51}
+	_BusinessErrorCode_index_9 = [...]uint8{0, 20, 38, 61}
 )
 
 func (i BusinessErrorCode) String() string {
@@ -90,6 +95,9 @@ func (i BusinessErrorCode) String() string {
 	case 18001 <= i && i <= 18002:
 		i -= 18001
 		return _BusinessErrorCode_name_8[_BusinessErrorCode_index_8[i]:_BusinessErrorCode_index_8[i+1]]
+	case 19001 <= i && i <= 19003:
+		i -= 19001
+		return _BusinessErrorCode_name_9[_BusinessErrorCode_index_9[i]:_BusinessErrorCode_index_9[i+1]]
 	default:
 		return "BusinessErrorCode(" + strconv.FormatInt(int64(i), 10) + ")"
 	}

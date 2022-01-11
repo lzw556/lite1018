@@ -8,10 +8,11 @@ import (
 )
 
 type Asset struct {
-	Name     string                `form:"name"`
-	Image    *multipart.FileHeader `form:"file"`
-	ParentID uint                  `form:"parent_id"`
-	Location *struct {
+	Name      string                `form:"name"`
+	Image     *multipart.FileHeader `form:"file"`
+	ParentID  uint                  `form:"parent_id"`
+	ProjectID uint                  `json:"project_id"`
+	Location  *struct {
 		X float32 `form:"x"`
 		Y float32 `form:"y"`
 	} `form:"location"`
@@ -43,13 +44,4 @@ func (a *Asset) CheckFileSize() bool {
 
 func (a *Asset) GetFileExt() string {
 	return path.Ext(a.Image.Filename)
-}
-
-type UpdateAsset struct {
-	Name     string `json:"name"`
-	ParentID uint   `json:"parent_id"`
-	Location *struct {
-		X float32 `json:"x"`
-		Y float32 `json:"y"`
-	} `json:"location"`
 }

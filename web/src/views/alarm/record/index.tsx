@@ -18,10 +18,6 @@ const AlarmRecordPage = () => {
     const [currentKey, setCurrentKey] = useState<string>("active")
     const [statuses] = useState<number[]>([0, 1, 2])
 
-    const onAssetChange = (value: any) => {
-        setAssetId(value)
-    }
-
     const tabList = [
         {
             key: "active",
@@ -62,10 +58,11 @@ const AlarmRecordPage = () => {
                             <Space>
                                 <Label name={"资产"}>
                                     <AssetTreeSelect bordered={false}
-                                                     allowClear
-                                                     style={{width: "128px"}}
+                                                     style={{width: "144px"}}
                                                      placeholder={"所有资产"}
-                                                     onChange={onAssetChange}/>
+                                                     defaultActiveFirstOption={true}
+                                                     value={assetId}
+                                                     onChange={setAssetId}/>
                                 </Label>
                                 <Label name={"报警级别"}>
                                     <Select bordered={false} mode={"multiple"} value={alarmLevels}

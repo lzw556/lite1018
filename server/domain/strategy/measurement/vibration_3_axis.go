@@ -13,7 +13,7 @@ type Vibration3AxisStrategy struct {
 	Type measurementtype.Vibration3Axis
 }
 
-func NewVibrationStrategy() Strategy {
+func NewVibration3AxisStrategy() Strategy {
 	return &Vibration3AxisStrategy{
 		strategy: newStrategy(),
 		Type:     measurementtype.Vibration3Axis{},

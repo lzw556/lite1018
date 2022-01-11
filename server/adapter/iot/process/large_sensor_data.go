@@ -12,6 +12,7 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/cache"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/devicetype"
 	"sort"
 	"time"
 )
@@ -77,7 +78,10 @@ func (p LargeSensorData) Process(ctx *iot.Context, msg iot.Message) error {
 						return err
 					}
 					data.MacAddress = msg.Body.Device
-					data.Parameters["kx122_continuous_odr"] = getKx122ContinuousOdr(cast.ToInt(device.Sensors["kx122_continuous_odr"]))
+					if device.Type == devicetype.VibrationTemperature3AxisType {
+						data.Parameters["kx122_continuous_odr"] = getKx122ContinuousOdr(cast.ToInt(device.Sensors["kx122_continuous_odr"]))
+						data.Parameters["kx122_continuous_range"] = getKx122ContinuousRange(cast.ToInt(device.Sensors["kx122_continuous_range"]))
+					}
 					if err := p.repository.Create(&data); err != nil {
 						return err
 					}
@@ -166,4 +170,16 @@ func getKx122ContinuousOdr(value int) float32 {
 		return 25600
 	}
 	return 25600
+}
+
+func getKx122ContinuousRange(value int) int {
+	switch value {
+	case 0:
+		return 2
+	case 1:
+		return 4
+	case 2:
+		return 8
+	}
+	return 8
 }

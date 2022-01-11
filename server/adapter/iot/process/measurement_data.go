@@ -59,7 +59,7 @@ func (p MeasurementData) Process(ctx *iot.Context, msg iot.Message) error {
 		case measurementtype.NormalTemperatureCorrosionType:
 			strategy = measurement.NewNormalTemperatureCorrosionStrategy()
 		case measurementtype.Vibration3AxisType:
-			strategy = measurement.NewVibrationStrategy()
+			strategy = measurement.NewVibration3AxisStrategy()
 		case measurementtype.AngleDipType:
 			strategy = measurement.NewAngleDipStrategy()
 		case measurementtype.FlangeElongationType:

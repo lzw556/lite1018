@@ -10,9 +10,11 @@ import (
 func InitTables(db *gorm.DB) error {
 	tables := []interface{}{
 		&po.User{},
+		&po.Project{},
 		&po.Role{},
 		&po.Menu{},
 		&po.RoleMenuRelation{},
+		&po.UserProjectRelation{},
 		&po.Permission{},
 		&po.Asset{},
 		&po.Device{},
@@ -59,6 +61,9 @@ func InitTables(db *gorm.DB) error {
 		return err
 	}
 	if err := initPermissions(db); err != nil {
+		return err
+	}
+	if err := initProject(db); err != nil {
 		return err
 	}
 	return nil
@@ -500,6 +505,18 @@ func initMenus(db *gorm.DB) error {
 			Hidden:   false,
 		},
 		{
+			ID:       8000,
+			Title:    "项目管理",
+			Name:     "projects",
+			ParentID: 0,
+			Icon:     "icon-project-management",
+			Path:     "/project-management",
+			View:     "Project",
+			IsAuth:   true,
+			Hidden:   false,
+			Sort:     5,
+		},
+		{
 			ID:       6000,
 			Title:    "用户管理",
 			Name:     "users",
@@ -509,7 +526,7 @@ func initMenus(db *gorm.DB) error {
 			View:     "User",
 			IsAuth:   true,
 			Hidden:   false,
-			Sort:     5,
+			Sort:     6,
 		},
 		{
 			ID:       7000,
@@ -521,7 +538,7 @@ func initMenus(db *gorm.DB) error {
 			View:     "Me",
 			IsAuth:   true,
 			Hidden:   false,
-			Sort:     6,
+			Sort:     7,
 		},
 	}
 	for _, menu := range menus {
@@ -930,6 +947,46 @@ func initPermissions(db *gorm.DB) error {
 		err := db.FirstOrCreate(&permission, map[string]interface{}{"path": permission.Path, "method": permission.Method}).Error
 		if err != nil {
 			return err
+		}
+	}
+	return nil
+}
+
+func initProject(db *gorm.DB) error {
+	project := po.Project{
+		Name:        "默认项目",
+		Description: "默认项目",
+	}
+	err := db.FirstOrCreate(&project, map[string]interface{}{"name": "默认项目"}).Error
+	if err != nil {
+		return err
+	}
+	if project.ID > 0 {
+		var assets []po.Asset
+		err = db.Find(&assets, "project_id = 0 OR project_id IS NULL").Error
+		if err != nil {
+			return err
+		}
+		for i := range assets {
+			assets[i].ProjectID = project.ID
+		}
+		if len(assets) > 0 {
+			if err := db.Save(&assets).Error; err != nil {
+				return err
+			}
+		}
+		var alarmTemplates []po.AlarmTemplate
+		err = db.Find(&alarmTemplates, "project_id = 0 OR project_id IS NULL").Error
+		if err != nil {
+			return err
+		}
+		for i := range alarmTemplates {
+			alarmTemplates[i].ProjectID = project.ID
+		}
+		if len(alarmTemplates) > 0 {
+			if err := db.Save(&alarmTemplates).Error; err != nil {
+				return err
+			}
 		}
 	}
 	return nil

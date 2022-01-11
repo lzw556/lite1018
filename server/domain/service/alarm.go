@@ -39,6 +39,7 @@ func (s Alarm) CreateAlarmTemplate(req request.AlarmTemplate) error {
 		MeasurementType: req.MeasurementType,
 		Description:     req.Description,
 		Level:           req.Level,
+		ProjectID:       req.ProjectID,
 	}
 	e.Rule = po.AlarmRule{
 		Field:     req.Rule.Field,
@@ -55,6 +56,8 @@ func (s Alarm) FindAlarmTemplatesByPaginate(filters request.Filters, page, size 
 		switch filter.Name {
 		case "measurement_type":
 			specs = append(specs, spec.MeasurementTypeEqSpec(cast.ToUint(filter.Value)))
+		case "project_id":
+			specs = append(specs, spec.ProjectEqSpec(cast.ToUint(filter.Value)))
 		}
 	}
 	es, total, err := s.template.PagingBySpecs(context.TODO(), page, size, specs...)
@@ -84,6 +87,7 @@ func (s Alarm) UpdateAlarmTemplate(id uint, req request.AlarmTemplate) (*vo.Alar
 	}
 	e.Name = req.Name
 	e.Description = req.Description
+	e.ProjectID = req.ProjectID
 	e.Level = req.Level
 	e.Rule = po.AlarmRule{
 		Field:     req.Rule.Field,

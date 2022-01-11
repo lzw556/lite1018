@@ -96,9 +96,9 @@ const WaveData: React.FC<{ measurement: Measurement }> = ({measurement}) => {
     const getChartTitle = () => {
         switch (calculate) {
             case "accelerationTimeDomain":
-                return "加速度时域(mm/s²)";
+                return "加速度时域(m/s²)";
             case "accelerationFrequencyDomain":
-                return "加速度频域(mm/s²)";
+                return "加速度频域(m/s²)";
             case "velocityTimeDomain":
                 return "速度时域(mm/s)";
             case "velocityFrequencyDomain":

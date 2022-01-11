@@ -4,7 +4,7 @@ type BoltLoosening struct {
 }
 
 func (b BoltLoosening) ID() uint {
-	return BoltElongationType
+	return BoltLooseningType
 }
 
 func (b BoltLoosening) Variables() Variables {

@@ -16,6 +16,7 @@ func (r assetRouter) create(ctx *gin.Context) (interface{}, error) {
 	if req.CheckFileSize() {
 		return nil, response.BusinessErr(errcode.AssetImageSizeTooLargeError, "")
 	}
+	req.ProjectID = cast.ToUint(ctx.MustGet("project_id"))
 	return nil, r.service.CreateAsset(req)
 }
 
@@ -28,6 +29,7 @@ func (r assetRouter) update(ctx *gin.Context) (interface{}, error) {
 	if req.CheckFileSize() {
 		return nil, response.BusinessErr(errcode.AssetImageSizeTooLargeError, "")
 	}
+	req.ProjectID = cast.ToUint(ctx.MustGet("project_id"))
 	return nil, r.service.UpdateAssetByID(id, req)
 }
 
@@ -37,17 +39,23 @@ func (r assetRouter) get(ctx *gin.Context) (interface{}, error) {
 }
 
 func (r assetRouter) find(ctx *gin.Context) (interface{}, error) {
+	filters := request.Filters{
+		{
+			Name:  "project_id",
+			Value: ctx.MustGet("project_id"),
+		},
+	}
 	switch ctx.Query("method") {
 	case "paging":
 		page := cast.ToInt(ctx.Query("page"))
 		size := cast.ToInt(ctx.Query("size"))
-		result, total, err := r.service.FindAssetsByPaginate(page, size)
+		result, total, err := r.service.FindAssetsByPaginate(page, size, filters)
 		if err != nil {
 			return nil, err
 		}
 		return response.NewPageResult(page, size, total, result), nil
 	default:
-		return r.service.FindAssets()
+		return r.service.FilterAssets(filters)
 	}
 }
 
