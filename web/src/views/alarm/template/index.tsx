@@ -54,12 +54,12 @@ const AlarmRuleTemplate = () => {
             key: 'action',
             render: (text: any, record: any) => (
                 <Space>
-                    <HasPermission value={Permission.AlarmRuleTemplateEdit}>
+                    <HasPermission value={Permission.AlarmTemplateEdit}>
                         <Button type="text" size="small"
                                 href={`#/alarm-management?locale=alarmRules/editAlarmRuleTemplate&id=${record.id}`}
                                 icon={<EditOutlined/>}/>
                     </HasPermission>
-                    <HasPermission value={Permission.AlarmRuleTemplateDelete}>
+                    <HasPermission value={Permission.AlarmTemplateDelete}>
                         <Popconfirm placement="left" title="确认要删除该模板吗?" onConfirm={() => onDelete(record.id)}
                                     okText="删除" cancelText="取消">
                             <Button type="text" size="small" icon={<DeleteOutlined/>} danger/>
@@ -90,7 +90,7 @@ const AlarmRuleTemplate = () => {
         <Row justify={"space-between"}>
             <Col span={24}>
                 <TableLayout emptyText={"报警规则模板列表为空"}
-                             permissions={[Permission.AlarmRuleTemplateEdit, Permission.AlarmRuleTemplateDelete]}
+                             permissions={[Permission.AlarmTemplateEdit, Permission.AlarmTemplateDelete]}
                              columns={columns}
                              dataSource={dataSource}/>
             </Col>

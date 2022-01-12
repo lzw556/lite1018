@@ -35,13 +35,13 @@ const AlarmPage = () => {
 
     const renderAddButton = () => {
         if (currentKey === "rules") {
-            return <HasPermission value={Permission.AlarmRuleAdd}>
+            return <HasPermission value={Permission.AlarmAdd}>
                 <Button href="#/alarm-management?locale=alarmRules/addAlarmRule" type="primary">
                     创建规则 <PlusOutlined/>
                 </Button>
             </HasPermission>
         } else if (currentKey === "templates") {
-            return <HasPermission value={Permission.AlarmRuleTemplateAdd}>
+            return <HasPermission value={Permission.AlarmTemplateAdd}>
                 <Button href="#/alarm-management?locale=alarmRules/addAlarmRuleTemplate" type="primary">
                     创建规则模板 <PlusOutlined/>
                 </Button>

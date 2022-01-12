@@ -81,12 +81,12 @@ const AlarmRule = () => {
             width: 200,
             render: (_: any, record: any) => {
                 return <>
-                    <HasPermission value={Permission.AlarmRuleEdit}>
+                    <HasPermission value={Permission.AlarmEdit}>
                         <Button type={"link"} size={"small"} onClick={() => {
                             onEdit(record.id)
                         }}>修改阈值</Button>
                     </HasPermission>
-                    <HasPermission value={Permission.AlarmRuleDelete}>
+                    <HasPermission value={Permission.AlarmDelete}>
                         <Divider type={"vertical"}/>
                         <Popconfirm placement="left" title="确认要删除该规则吗?" onConfirm={() => onDelete(record.id)}
                                     okText="删除" cancelText="取消">
@@ -133,7 +133,7 @@ const AlarmRule = () => {
             <Col span={24}>
                 <TableLayout emptyText={"报警规则列表为空"}
                              columns={columns}
-                             permissions={[Permission.AlarmRuleEdit, Permission.AlarmRuleDelete]}
+                             permissions={[Permission.AlarmEdit, Permission.AlarmDelete]}
                              dataSource={dataSource}
                              onPageChange={fetchAlarms}/>
             </Col>
