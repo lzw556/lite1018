@@ -11,7 +11,8 @@ type WaveData struct {
 	Frequency   float32     `json:"frequency"`
 	Timestamp   int64       `json:"timestamp"`
 	Values      [][]float64 `json:"values,omitempty"`
-	Frequencies [][]float64 `json:"frequencies,omitempty"`
+	Frequencies [][]int     `json:"frequencies,omitempty"`
+	Times       [][]int     `json:"times,omitempty"`
 }
 
 func NewWaveData(e entity.LargeSensorData) WaveData {
