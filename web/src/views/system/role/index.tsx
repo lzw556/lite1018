@@ -22,17 +22,19 @@ const RolePage = () => {
     const [permissionVisible, setPermissionVisible] = useState(false);
     const [role, setRole] = useState<Role>()
     const [dataSource, setDataSource] = useState<PageResult<any>>()
+    const [refreshKey, setRefreshKey] = useState(0)
     const {hasPermission} = usePermission()
 
     const fetchRoles = useCallback((current, size) => {
         PagingRolesRequest(current, size).then(setDataSource)
-    }, [])
+    }, [refreshKey])
 
     useEffect(() => {
         fetchRoles(1, 10)
     }, [fetchRoles])
 
     const onRefresh = () => {
+        setRefreshKey(refreshKey + 1)
     }
 
     const onAllocMenus = (id: number) => {

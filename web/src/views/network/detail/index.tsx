@@ -14,6 +14,8 @@ import TopologyView from "./topologyView";
 import {PlusOutlined} from "@ant-design/icons";
 import AddDeviceModal from "./addDeviceModal";
 import "../index.css";
+import usePermission, {Permission} from "../../../permission/permission";
+import HasPermission from "../../../permission";
 
 const tabList = [
     {
@@ -229,9 +231,11 @@ const NetworkDetail = () => {
 
     return <Content>
         <MyBreadcrumb>
-            <Space>
-                <Button type={"primary"} onClick={() => setAddDeviceVisible(true)}>接入设备 <PlusOutlined/></Button>
-            </Space>
+            <HasPermission value={Permission.NetworkAddDevices}>
+                <Space>
+                    <Button type={"primary"} onClick={() => setAddDeviceVisible(true)}>接入设备 <PlusOutlined/></Button>
+                </Space>
+            </HasPermission>
         </MyBreadcrumb>
         {
             renderInformation()

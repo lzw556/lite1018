@@ -27,7 +27,7 @@ func InitTables(db *gorm.DB) error {
 		&po.Measurement{},
 		&po.MeasurementDeviceBinding{},
 	}
-	//db.Migrator().DropTable(&po.Menu{}, &po.RoleMenuRelation{})
+	db.Migrator().DropTable(&po.Menu{}, &po.Permission{})
 	for _, table := range tables {
 		if !db.Migrator().HasTable(table) {
 			if err := db.Migrator().CreateTable(table); err != nil {

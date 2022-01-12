@@ -11,9 +11,12 @@ import EditAssetModal from "./editAssetModal";
 import AddAssetModal from "./addAssetModal";
 import {EmptyLayout} from "../layout";
 import {useHistory} from "react-router-dom";
+import usePermission, {Permission} from "../../permission/permission";
+import HasPermission from "../../permission";
 
 
 const AssetPage: FC = () => {
+    const {hasPermission} = usePermission();
     const [addVisible, setAddVisible] = useState(false);
     const [asset, setAsset] = useState<Asset>();
     const [refreshKey, setRefreshKey] = useState<number>(0);
@@ -55,20 +58,22 @@ const AssetPage: FC = () => {
             <Button type={"text"} icon={<MonitorOutlined/>} onClick={() => {
                 history.push({pathname: "/asset-management", search: "?locale=assetMonitor", state: {id: id}})
             }}/>,
-            <Button type={"text"} icon={<EditOutlined/>} onClick={() => onEdit(id)}/>,
-            <Popconfirm title={"确定要删除吗"} okText={"删除"} cancelText={"取消"} onConfirm={() => onDelete(id)}>
-                <Button type={"text"} icon={<DeleteOutlined/>} danger/>
+            <Button disabled={!hasPermission(Permission.AssetEdit)} type={"text"} icon={<EditOutlined/>} onClick={() => onEdit(id)}/>,
+            <Popconfirm disabled={!hasPermission(Permission.AssetDelete)} title={"确定要删除吗"} okText={"删除"} cancelText={"取消"} onConfirm={() => onDelete(id)}>
+                <Button disabled={!hasPermission(Permission.AssetDelete)} type={"text"} icon={<DeleteOutlined/>} danger/>
             </Popconfirm>
         ]
     }
 
     return <Content>
         <MyBreadcrumb>
-            <Button type="primary" onClick={() => {
-                setAddVisible(true)
-            }}>
-                添加资产 <PlusOutlined/>
-            </Button>
+            <HasPermission value={Permission.AssetAdd}>
+                <Button type="primary" onClick={() => {
+                    setAddVisible(true)
+                }}>
+                    添加资产 <PlusOutlined/>
+                </Button>
+            </HasPermission>
         </MyBreadcrumb>
         <ShadowCard>
             <div id="scrollableDiv"

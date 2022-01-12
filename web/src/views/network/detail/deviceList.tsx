@@ -11,6 +11,7 @@ import {PageResult} from "../../../types/page";
 import {DeviceType} from "../../../types/device_type";
 import {RemoveDevicesRequest} from "../../../apis/network";
 import DeviceTable from "../../../components/table/deviceTable";
+import usePermission, {Permission} from "../../../permission/permission";
 
 export interface DeviceTableProps {
     network: Network
@@ -18,6 +19,7 @@ export interface DeviceTableProps {
 }
 
 const DeviceList: FC<DeviceTableProps> = ({network, onRefresh}) => {
+    const {hasPermission} = usePermission();
     const [dataSource, setDataSource] = useState<PageResult<any>>()
     const [refreshKey, setRefreshKey] = useState(0)
 
@@ -112,7 +114,7 @@ const DeviceList: FC<DeviceTableProps> = ({network, onRefresh}) => {
                 const isUpgrading = record.upgradeState && record.upgradeState.status >= 1 && record.upgradeState.status <= 3
                 return <Space>
                     {
-                        record.id !== network.gateway.id &&
+                        hasPermission(Permission.NetworkRemoveDevices) && record.id !== network.gateway.id &&
                         <Popconfirm placement="left" title="确认要将该设备移除网络吗?" onConfirm={() => onDelete(record.id)}
                                     okText="移除" cancelText="取消">
                             <Button type="text" size="small" icon={<DeleteOutlined/>} danger disabled={isUpgrading}/>
@@ -124,7 +126,7 @@ const DeviceList: FC<DeviceTableProps> = ({network, onRefresh}) => {
     ]
 
     return <>
-        <DeviceTable columns={columns} dataSource={dataSource} onChange={fetchDevices}/>
+        <DeviceTable columns={columns} permissions={[Permission.NetworkRemoveDevices]} dataSource={dataSource} onChange={fetchDevices}/>
     </>
 }
 

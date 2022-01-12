@@ -246,7 +246,7 @@ const DevicePage = () => {
                 return <Space>
                     <Dropdown overlay={renderEditMenus(record)}>
                         <Button type="text" size="small" icon={<EditOutlined/>}
-                                hidden={!(hasPermission(Permission.DeviceEdit) || hasPermission(Permission.DeviceSettingsEdit) || hasPermission(Permission.DeviceReplace) || hasPermission(Permission.NetworkSettingEdit))}/>
+                                hidden={!(hasPermission(Permission.DeviceEdit) || hasPermission(Permission.DeviceSettingsEdit))}/>
                     </Dropdown>
                     <Dropdown overlay={renderCommandMenus(record)}>
                         <Button type="text" icon={<CodeOutlined/>}
@@ -295,7 +295,10 @@ const DevicePage = () => {
             <br/>
             <Row justify="center">
                 <Col span={24}>
-                    <DeviceTable columns={columns} dataSource={dataSource} onChange={fetchDevices}/>
+                    <DeviceTable columns={columns}
+                                 permissions={[Permission.DeviceEdit, Permission.DeviceSettingsEdit, Permission.DeviceCommand, Permission.DeviceDelete]}
+                                 dataSource={dataSource}
+                                 onChange={fetchDevices}/>
                 </Col>
             </Row>
         </ShadowCard>

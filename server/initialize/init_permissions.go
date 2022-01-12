@@ -38,18 +38,6 @@ func initPermissions(db *gorm.DB) error {
 			Group:       "项目模块",
 		},
 		{
-			Path:        "assets/:id/statistics",
-			Method:      "GET",
-			Description: "单个资产统计信息",
-			Group:       "资产模块",
-		},
-		{
-			Path:        "assets/statistics",
-			Method:      "GET",
-			Description: "所有资产统计信息",
-			Group:       "资产模块",
-		},
-		{
 			Path:        "assets/:id",
 			Method:      "GET",
 			Description: "查看单个资产",
@@ -99,6 +87,12 @@ func initPermissions(db *gorm.DB) error {
 		},
 		{
 			Path:        "measurements/:id",
+			Method:      "GET",
+			Description: "查看单个监测点",
+			Group:       "监测点模块",
+		},
+		{
+			Path:        "measurements/:id/*",
 			Method:      "GET",
 			Description: "查看监测点详情",
 			Group:       "监测点模块",
@@ -161,12 +155,6 @@ func initPermissions(db *gorm.DB) error {
 			Path:        "devices",
 			Method:      "GET",
 			Description: "查看设备列表",
-			Group:       "设备模块",
-		},
-		{
-			Path:        "devices/statistics",
-			Method:      "GET",
-			Description: "设备统计信息",
 			Group:       "设备模块",
 		},
 		{
@@ -246,12 +234,6 @@ func initPermissions(db *gorm.DB) error {
 			Method:      "DELETE",
 			Description: "删除设备数据",
 			Group:       "数据模块",
-		},
-		{
-			Path:        "alarmStatistics",
-			Method:      "GET",
-			Description: "报警统计信息",
-			Group:       "报警模块",
 		},
 		{
 			Path:        "alarmRecords",

@@ -16,8 +16,11 @@ import {PageResult} from "../../types/page";
 import AssetTreeSelect from "../../components/select/assetTreeSelect";
 import {SendDeviceCommandRequest} from "../../apis/device";
 import {DeviceCommand} from "../../types/device_command";
+import usePermission, {Permission} from "../../permission/permission";
+import HasPermission from "../../permission";
 
 const NetworkPage = () => {
+    const {hasPermission, hasPermissions} = usePermission();
     const [assetId, setAssetId] = useState<number>(0)
     const [addVisible, setAddVisible] = useState<boolean>(false)
     const [editVisible, setEditVisible] = useState<boolean>(false)
@@ -141,14 +144,23 @@ const NetworkPage = () => {
             key: 'action',
             render: (text: any, record: any) => (
                 <Space size={"middle"}>
-                    <Button type="text" size="small" icon={<EditOutlined/>} onClick={() => onEdit(record.id)}/>
-                    <Dropdown overlay={renderCommandMenus(record)}>
-                        <Button type="text" icon={<CodeOutlined/>}/>
-                    </Dropdown>
-                    <Popconfirm placement="left" title="确认要删除该设备吗?" onConfirm={() => onDelete(record.id)}
-                                okText="删除" cancelText="取消">
-                        <Button type="text" size="small" icon={<DeleteOutlined/>} danger/>
-                    </Popconfirm>
+                    {
+                        hasPermission(Permission.NetworkEdit) &&
+                        <Button type="text" size="small" icon={<EditOutlined/>} onClick={() => onEdit(record.id)}/>
+                    }
+                    {
+                        hasPermission(Permission.NetworkExport) &&
+                        <Dropdown overlay={renderCommandMenus(record)}>
+                            <Button type="text" icon={<CodeOutlined/>}/>
+                        </Dropdown>
+                    }
+                    {
+                        hasPermission(Permission.NetworkDelete) &&
+                        <Popconfirm placement="left" title="确认要删除该设备吗?" onConfirm={() => onDelete(record.id)}
+                                    okText="删除" cancelText="取消">
+                            <Button type="text" size="small" icon={<DeleteOutlined/>} danger/>
+                        </Popconfirm>
+                    }
                 </Space>
             ),
         }
@@ -156,9 +168,11 @@ const NetworkPage = () => {
 
     return <Content>
         <MyBreadcrumb>
-            <Space>
-                <Button type={"primary"} onClick={() => setAddVisible(true)}>添加网络<PlusOutlined/></Button>
-            </Space>
+            <HasPermission value={Permission.NetworkAdd}>
+                <Space>
+                    <Button type={"primary"} onClick={() => setAddVisible(true)}>添加网络<PlusOutlined/></Button>
+                </Space>
+            </HasPermission>
         </MyBreadcrumb>
         <ShadowCard>
             <Row justify={"start"}>
@@ -179,6 +193,7 @@ const NetworkPage = () => {
             <Row justify={"start"}>
                 <Col span={24}>
                     <TableLayout emptyText={"网络列表为空"}
+                                 permissions={[Permission.NetworkEdit, Permission.NetworkExport, Permission.NetworkDelete]}
                                  columns={columns}
                                  dataSource={dataSource}
                                  onPageChange={fetchNetworks}/>
