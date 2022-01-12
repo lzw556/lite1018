@@ -53,22 +53,6 @@ func (s Measurement) FindMeasurementsByAssetID(assetID uint) ([]vo.Measurement, 
 	return query.Run(), nil
 }
 
-func (s Measurement) StatisticalMeasurementsByAssetID(assetID uint) ([]vo.MeasurementStatistic, error) {
-	query, err := s.factory.NewMeasurementStatisticsQueryByAssetID(assetID)
-	if err != nil {
-		return nil, err
-	}
-	return query.Run()
-}
-
-func (s Measurement) StatisticalMeasurementByID(id uint) (*vo.MeasurementStatistic, error) {
-	query, err := s.factory.NewMeasurementQuery(id)
-	if err != nil {
-		return nil, err
-	}
-	return query.Statistical()
-}
-
 func (s Measurement) FilterMeasurements(req request.Filters) ([]vo.Measurement, error) {
 	query, err := s.factory.NewMeasurementFilterQuery(req)
 	if err != nil {

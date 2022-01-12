@@ -234,17 +234,6 @@ func (factory Device) NewDeviceUpgradeCmd(deviceID uint) (*command.DeviceUpgrade
 	return &cmd, nil
 }
 
-func (factory Device) NewDeviceStatisticsQuery(filters request.Filters) (*query.DeviceStatisticsQuery, error) {
-	specs := factory.buildFilterSpec(filters)
-	es, err := factory.deviceRepo.FindBySpecs(context.TODO(), specs...)
-	if err != nil {
-		return nil, err
-	}
-	q := query.NewDeviceStatisticsQuery()
-	q.Devices = es
-	return &q, nil
-}
-
 func (factory Device) NewDeviceListQueryByFilter(filters request.Filters) (*query.DeviceListQuery, error) {
 	ctx := context.TODO()
 	specs := factory.buildFilterSpec(filters)

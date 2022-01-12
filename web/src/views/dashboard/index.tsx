@@ -14,7 +14,6 @@ import moment from "moment";
 import AssetDashboardCard from "./assetDashboardCard";
 import AlertChartCard from "./alertChartCard";
 import {GetAllAssetStatisticsRequest} from "../../apis/asset";
-import {GetMyProjectsRequest} from "../../apis/project";
 
 const {Title} = Typography;
 

@@ -20,8 +20,10 @@ import moment from "moment";
 import MeasurementDataViewModal from "./measurementDataViewModal";
 import {EmptyLayout} from "../../layout";
 import AlertStatistic from "../measurement/detail/alertStatistic";
+import usePermission, {Permission} from "../../../permission/permission";
 
 const AssetMonitor = () => {
+    const {hasPermission} = usePermission();
     const location = useLocation<any>();
     const [asset, setAsset] = useState<Asset>();
     const [dataSource, setDataSource] = useState<Measurement[]>([]);
@@ -34,12 +36,11 @@ const AssetMonitor = () => {
 
     useEffect(() => {
         if (asset) {
-            GetMeasurementsRequest({asset_id: asset.id}).then(setDataSource)
+            hasPermission(Permission.MeasurementList) && GetMeasurementsRequest({asset_id: asset.id}).then(setDataSource)
         }
     }, [asset, refreshKey])
 
     const fetchAsset = (id: number) => {
-        console.log(id)
         GetAssetRequest(id).then(setAsset)
     }
 
@@ -99,12 +100,20 @@ const AssetMonitor = () => {
     const renderMeasurementActions = (m: Measurement) => {
         return [
             <Button type={"text"} size={"small"} disabled={!m.data?.fields} onClick={() => onView(m)}><MonitorOutlined/></Button>,
-            <Button type={"text"} size={"small"} onClick={() => onEdit(m.id)}><EditOutlined/></Button>,
-            <Popconfirm placement="left" title="确认要删除该监测点吗?" onConfirm={() => onDelete(m.id)}
+            <Button disabled={!hasPermission(Permission.MeasurementEdit)} type={"text"} size={"small"} onClick={() => onEdit(m.id)}><EditOutlined/></Button>,
+            <Popconfirm disabled={!hasPermission(Permission.MeasurementDelete)} placement="left" title="确认要删除该监测点吗?" onConfirm={() => onDelete(m.id)}
                         okText="删除" cancelText="取消">
-                <Button type={"text"} size={"small"} danger><DeleteOutlined/></Button>
+                <Button disabled={!hasPermission(Permission.MeasurementDelete)} type={"text"} size={"small"} danger><DeleteOutlined/></Button>
             </Popconfirm>
         ]
+    }
+
+    const renderMeasurementTitle = (m: Measurement) => {
+        if (hasPermission(Permission.MeasurementDetail)) {
+            return <a
+                href={`#/asset-management?locale=assetMonitor/measurementDetail&id=${m.id}`}>{m.name}</a>
+        }
+        return m.name
     }
 
     return <Content>
@@ -170,8 +179,7 @@ const AssetMonitor = () => {
                                       renderItem={measurement => {
                                           return <List.Item key={measurement.id}>
                                               <ShadowCard size={"small"}
-                                                          title={<a
-                                                              href={`#/asset-management?locale=assetMonitor/measurementDetail&id=${measurement.id}`}>{measurement.name}</a>}
+                                                          title={renderMeasurementTitle(measurement)}
                                                           extra={renderMeasurementStatus(measurement)}
                                                           actions={renderMeasurementActions(measurement)}>
                                                   {

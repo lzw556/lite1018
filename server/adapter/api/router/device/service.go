@@ -11,7 +11,6 @@ type Service interface {
 	UpdateDeviceByID(id uint, req request.Device) error
 
 	GetDeviceByID(id uint) (*vo.Device, error)
-	GetDevicesStatistics(filters request.Filters) ([]vo.DeviceStatistic, error)
 	FindDevicesByPaginate(page, size int, filters request.Filters) ([]vo.Device, int64, error)
 	FilterDevices(filters request.Filters) ([]vo.Device, error)
 	CheckDeviceMacAddress(mac string) error

@@ -87,17 +87,6 @@ func (factory Measurement) NewMeasurementListQueryByAssetID(id uint) (*query.Mea
 	return &q, nil
 }
 
-func (factory Measurement) NewMeasurementStatisticsQueryByAssetID(assetID uint) (*query.MeasurementStatisticsQuery, error) {
-	ctx := context.TODO()
-	es, err := factory.measurementRepo.FindBySpecs(ctx, spec.AssetEqSpec(assetID))
-	if err != nil {
-		return nil, err
-	}
-	q := query.NewMeasurementStatisticsQuery()
-	q.Measurements = es
-	return &q, nil
-}
-
 func (factory Measurement) NewMeasurementFilterQuery(filters request.Filters) (*query.MeasurementFilterQuery, error) {
 	ctx := context.TODO()
 	specs := make([]spec.Specification, 0)

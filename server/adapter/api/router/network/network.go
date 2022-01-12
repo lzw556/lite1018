@@ -27,7 +27,6 @@ func (r *networkRouter) initRoutes() {
 		router.NewGetRoute("networks/:id/export", r.exportNetwork),
 
 		// PUT
-		router.NewPutRoute("networks/setting", r.updateSettingByGatewayID),
 		router.NewPutRoute("networks/:id", r.update),
 		router.NewPutRoute("networks/:id/sync", r.sync),
 

@@ -155,10 +155,3 @@ func (r alarmRouter) acknowledgeRecord(ctx *gin.Context) (interface{}, error) {
 	req.UserID = ctx.GetUint("user_id")
 	return nil, r.service.AcknowledgeAlarmRecordByID(id, req)
 }
-
-func (r alarmRouter) statisticalRecords(ctx *gin.Context) (interface{}, error) {
-	from := cast.ToInt64(ctx.Query("from"))
-	to := cast.ToInt64(ctx.Query("to"))
-	filters := request.NewFilters(ctx.Request.URL.Query())
-	return r.service.GetAlarmRecordStatistics(from, to, filters)
-}

@@ -6,6 +6,7 @@ import {Measurement} from "../../../types/measurement";
 import {GetAssetChildrenRequest} from "../../../apis/asset";
 import LocationCanvas from "./locationCanvas";
 import {Col, Row, Skeleton, Spin} from "antd";
+import usePermission, {Permission} from "../../../permission/permission";
 
 export interface AssetCanvasProps {
     width: number;
@@ -18,10 +19,11 @@ export interface AssetCanvasProps {
 
 const AssetCanvas: FC<AssetCanvasProps> = ({width, height, asset, measurements}) => {
     const [image, status] = useImage(`/api/resources/assets/${asset.image}`);
+    const {hasPermission} = usePermission();
     const [children, setChildren] = useState<Asset[]>([])
 
     useEffect(() => {
-        GetAssetChildrenRequest(asset.id).then(setChildren)
+        hasPermission(Permission.AssetChildren) && GetAssetChildrenRequest(asset.id).then(setChildren)
     }, [asset])
 
     const render = () => {

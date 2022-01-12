@@ -80,7 +80,8 @@ const PermissionDrawer: FC<PermissionDrawerProps> = (props) => {
 
     const convertPermissionTree = () => {
         if (permissions && visible) {
-            return <Tree checkable={hasPermission(Permission.RoleAllocPermissions)} defaultExpandAll={true}
+            return <Tree defaultExpandAll={true}
+                         checkable={true}
                          showIcon={true} selectable={false}
                          defaultCheckedKeys={renderDefaultCheckedKeys()} treeData={convertTreeData()}
                          onCheck={onCheck}/>

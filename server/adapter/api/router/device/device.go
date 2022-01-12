@@ -23,7 +23,6 @@ func (r *deviceRouter) initRoutes() {
 		router.NewPostRoute("devices/:id/upgrade", r.upgrade),
 
 		// GET
-		router.NewGetRoute("devices/statistics", r.statisticalDevices),
 		router.NewGetRoute("devices", r.find),
 		router.NewGetRoute("devices/:id", r.get),
 		router.NewGetRoute("devices/:id/children", r.getChildren),

@@ -2,7 +2,6 @@ package query
 
 import (
 	"context"
-	"fmt"
 	"github.com/spf13/cast"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
@@ -50,34 +49,6 @@ func (query MeasurementQuery) Run() *vo.Measurement {
 		result.SetAsset(asset)
 	}
 	return &result
-}
-
-func (query MeasurementQuery) Statistical() (*vo.MeasurementStatistic, error) {
-	result := vo.NewMeasurementStatistic(query.Measurement)
-	total, err := query.measurementDataRepo.FindAll(query.Measurement.ID)
-	ctx := context.TODO()
-	if err != nil {
-		return nil, err
-	}
-	date := time.Now().Format("2006-01-02")
-	begin, _ := time.Parse("2006-01-02 15:04:05", fmt.Sprintf("%s 00:00:00", date))
-	end, _ := time.Parse("2006-01-02 15:04:05", fmt.Sprintf("%s 23:59:59", date))
-	result.Data.Total = len(total)
-	for _, data := range total {
-		if data.Time.Format("2006-01-02") == date {
-			result.Data.Today = result.Data.Today + 1
-		}
-	}
-	if total, err := query.alarmRecordRepo.CountBySpecs(ctx, spec.MeasurementEqSpec(query.Measurement.ID)); err == nil {
-		result.Alert.Total = int(total)
-	}
-	if untreated, err := query.alarmRecordRepo.CountBySpecs(ctx, spec.MeasurementEqSpec(query.Measurement.ID), spec.StatusInSpec{uint(po.AlarmRecordStatusUntreated)}); err == nil {
-		result.Alert.Untreated = int(untreated)
-	}
-	if today, err := query.alarmRecordRepo.CountBySpecs(ctx, spec.MeasurementEqSpec(query.Measurement.ID), spec.StatusInSpec{uint(po.AlarmRecordStatusUntreated)}, spec.CreatedAtRangeSpec{begin, end}); err == nil {
-		result.Alert.Today = int(today)
-	}
-	return &result, nil
 }
 
 func (query MeasurementQuery) GetData(from, to int64) ([]vo.MeasurementData, error) {

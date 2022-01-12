@@ -219,11 +219,3 @@ func (s Alarm) GetAlarmRecordAcknowledgeByID(recordID uint) (*vo.AlarmRecordAckn
 func (s Alarm) DeleteAlarmRecordByID(recordID uint) error {
 	return s.record.Delete(context.TODO(), recordID)
 }
-
-func (s Alarm) GetAlarmRecordStatistics(from, to int64, filters request.Filters) (vo.AlarmRecordStatistics, error) {
-	query, err := s.factory.NewAlarmRecordStatisticsQuery(from, to, filters)
-	if err != nil {
-		return vo.AlarmRecordStatistics{}, err
-	}
-	return query.Query(), nil
-}

@@ -146,26 +146,6 @@ func (factory Alarm) NewAlarmRecordPagingQuery(filters request.Filters, from, to
 	return &q, nil
 }
 
-func (factory Alarm) NewAlarmRecordStatisticsQuery(from, to int64, filters request.Filters) (*query.AlarmRecordStatisticsQuery, error) {
-	ctx := context.TODO()
-	specs := factory.buildFilterSpecs(filters)
-	begin := time.Unix(from, 0)
-	end := time.Unix(to, 0)
-	specs = append(specs, spec.CreatedAtRangeSpec{begin, end})
-	es, err := factory.alarmRecordRepo.FindBySpecs(ctx, specs...)
-	if err != nil {
-		return nil, err
-	}
-	q := query.NewAlarmRecordStatisticsQuery()
-	q.AlarmRecords = es
-	days := int(time.Unix(to, 0).Sub(time.Unix(from, 0)).Hours()) / 24
-	q.Times = []time.Time{begin}
-	for i := 0; i < days; i++ {
-		q.Times = append(q.Times, q.Times[i].Add(24*time.Hour))
-	}
-	return &q, nil
-}
-
 func (factory Alarm) buildFilterSpecs(filters request.Filters) []spec.Specification {
 	specs := make([]spec.Specification, 0)
 	for _, filter := range filters {

@@ -37,6 +37,12 @@ export const Permission = {
     AssetAdd: {path: "assets", method: "POST"},
     AssetEdit: {path: "assets/:id", method: "PUT"},
     AssetDelete: {path: "assets/:id", method: "DELETE"},
+    AssetChildren: {path: "assets/:id/children", method: "GET"},
+    MeasurementList: {path: "measurements", method: "GET"},
+    MeasurementStatistics: {path: "measurements/statistics", method: "GET"},
+    MeasurementDetail: {path: "measurements/:id", method: "GET"},
+    MeasurementEdit: {path: "measurements/:id", method: "PUT"},
+    MeasurementDelete: {path: "measurements/:id", method: "DELETE"},
     UserAdd: {path: "users", method: "POST"},
     UserEdit: {path: "users/:id", method: "PUT"},
     UserDelete: {path: "users/:id", method: "DELETE"},
@@ -68,10 +74,7 @@ GetCasbinRequest().then(data => {
 const usePermission = () => {
     return {
         hasPermission: (value: PermissionType) => {
-            if (enforcer) {
-                return enforcer?.enforceSync(subject, value.path, value.method)
-            }
-            return false
+            return !!(enforcer && enforcer.enforceSync(subject, value.path, value.method));
         },
         hasPermissions: (first: PermissionType, ...seconds: PermissionType[]) => {
             if (enforcer) {

@@ -14,9 +14,6 @@ type Service interface {
 
 	FilterMeasurements(req request.Filters) ([]vo.Measurement, error)
 
-	StatisticalMeasurementsByAssetID(assetID uint) ([]vo.MeasurementStatistic, error)
-	StatisticalMeasurementByID(id uint) (*vo.MeasurementStatistic, error)
-
 	GetMeasurement(id uint) (*vo.Measurement, error)
 	GetMeasurementData(id uint, from, to int64) ([]vo.MeasurementData, error)
 	GetMeasurementRawData(id uint, from, to int64) (vo.MeasurementsRawData, error)

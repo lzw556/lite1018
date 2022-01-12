@@ -17,7 +17,7 @@ export function GetMeasurementsRequest(filter:any) {
 }
 
 export function GetMeasurementStatisticsRequest(assetId: number) {
-    return request.get<any>(`/measurements/statistics`, {assetId}).then(GetResponse);
+    return request.get<any>(`/statistics/measurements`, {asset_id: assetId}).then(GetResponse);
 }
 
 export function GetMeasurementFieldsRequest(type:number) {
@@ -28,8 +28,12 @@ export function GetMeasurementRequest(id: number) {
     return request.get<Measurement>(`/measurements/${id}`).then(GetResponse);
 }
 
-export function GetMeasurementStatisticRequest(id: number) {
-    return request.get(`/measurements/${id}/statistics`).then(GetResponse);
+export function GetMeasurementDataStatisticRequest(id: number) {
+    return request.get<any>(`/statistics/measurements/${id}/data`).then(GetResponse);
+}
+
+export function GetMeasurementAlertStatisticRequest(id: number) {
+    return request.get<any>(`/statistics/measurements/${id}/alert`).then(GetResponse);
 }
 
 export function UpdateMeasurementSettingRequest(id: number, setting:any) {

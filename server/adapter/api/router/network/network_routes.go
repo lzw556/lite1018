@@ -72,15 +72,6 @@ func (r networkRouter) removeDevices(ctx *gin.Context) (interface{}, error) {
 	return nil, r.service.RemoveDevicesByID(id, req)
 }
 
-func (r networkRouter) updateSettingByGatewayID(ctx *gin.Context) (interface{}, error) {
-	gatewayID := cast.ToUint(ctx.Query("gatewayId"))
-	var req request.WSN
-	if err := ctx.ShouldBindJSON(&req); err != nil {
-		return nil, response.InvalidParameterError(err.Error())
-	}
-	return nil, r.service.UpdateSettingByGatewayID(gatewayID, req)
-}
-
 func (r networkRouter) update(ctx *gin.Context) (interface{}, error) {
 	id := cast.ToUint(ctx.Param("id"))
 	var req request.Network

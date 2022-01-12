@@ -179,11 +179,3 @@ func (s Device) GetChildren(deviceID uint) ([]vo.Device, error) {
 	}
 	return query.Query()
 }
-
-func (s Device) GetDevicesStatistics(filters request.Filters) ([]vo.DeviceStatistic, error) {
-	query, err := s.factory.NewDeviceStatisticsQuery(filters)
-	if err != nil {
-		return nil, err
-	}
-	return query.Run()
-}

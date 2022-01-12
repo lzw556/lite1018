@@ -4,6 +4,7 @@ import {GetMeasurementStatisticsRequest} from "../../../apis/measurement";
 import EChartsReact from "echarts-for-react";
 import {DefaultPieOption} from "../../../constants/chart";
 import {ColorDanger, ColorHealth, ColorInfo, ColorWarn} from "../../../constants/color";
+import usePermission, {Permission} from "../../../permission/permission";
 
 export interface MeasurementStatisticProps {
     asset?: Asset;
@@ -11,11 +12,12 @@ export interface MeasurementStatisticProps {
 }
 
 const MeasurementStatistic: FC<MeasurementStatisticProps> = ({asset, style}) => {
+    const {hasPermission} = usePermission();
     const [option, setOption] = useState<any>({});
 
     useEffect(() => {
         if (asset) {
-            GetMeasurementStatisticsRequest(asset.id).then(convertChartOption);
+            hasPermission(Permission.MeasurementStatistics) && GetMeasurementStatisticsRequest(asset.id).then(convertChartOption);
         }
     }, [asset])
 

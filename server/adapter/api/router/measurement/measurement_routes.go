@@ -46,16 +46,6 @@ func (r measurementRouter) update(ctx *gin.Context) (interface{}, error) {
 	return nil, r.service.UpdateMeasurementByID(id, req)
 }
 
-func (r measurementRouter) statisticalMeasurements(ctx *gin.Context) (interface{}, error) {
-	assetID := cast.ToUint(ctx.Query("assetId"))
-	return r.service.StatisticalMeasurementsByAssetID(assetID)
-}
-
-func (r measurementRouter) statisticalMeasurement(ctx *gin.Context) (interface{}, error) {
-	id := cast.ToUint(ctx.Param("id"))
-	return r.service.StatisticalMeasurementByID(id)
-}
-
 func (r measurementRouter) getFields(ctx *gin.Context) (interface{}, error) {
 	typeID := cast.ToUint(ctx.Query("type"))
 	variables := measurementtype.Get(typeID).Variables()

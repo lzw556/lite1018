@@ -4,9 +4,10 @@ import {useEffect, useState} from "react";
 import {GetParamValue} from "../../../../utils/path";
 import {useLocation} from "react-router-dom";
 import {
+    GetMeasurementAlertStatisticRequest,
+    GetMeasurementDataStatisticRequest,
     GetMeasurementFieldsRequest,
     GetMeasurementRequest,
-    GetMeasurementStatisticRequest,
 } from "../../../../apis/measurement";
 import {Measurement} from "../../../../types/measurement";
 import {Col, Form, Popover, Row, Statistic, Tag, Typography} from "antd";
@@ -41,7 +42,8 @@ const tabList = [
 const MeasurementDetail = () => {
     const location = useLocation();
     const [measurement, setMeasurement] = useState<Measurement>();
-    const [statistic, setStatistic] = useState<any>()
+    const [dataStatistic, setDataStatistic] = useState<any>()
+    const [alertStatistic, setAlertStatistic] = useState<any>()
     const [currentKey, setCurrentKey] = useState("sensors")
     const [fields, setFields] = useState<MeasurementField[]>([])
     const contents = new Map<string, any>([
@@ -55,7 +57,8 @@ const MeasurementDetail = () => {
         const id = GetParamValue(location.search, "id")
         if (id && Number(id)) {
             GetMeasurementRequest(Number(id)).then(setMeasurement)
-            GetMeasurementStatisticRequest(Number(id)).then(setStatistic)
+            GetMeasurementDataStatisticRequest(Number(id)).then(setDataStatistic)
+            GetMeasurementAlertStatisticRequest(Number(id)).then(setAlertStatistic)
         }
     }, [])
 
@@ -171,29 +174,29 @@ const MeasurementDetail = () => {
                         <Row justify={"start"}>
                             <Col span={12} style={{paddingLeft: "8px"}}>
                                 <ShadowCard>
-                                    <Statistic title={"总数据条数"} value={statistic?.data.total}/>
+                                    <Statistic title={"总数据条数"} value={dataStatistic?.total}/>
                                 </ShadowCard>
                             </Col>
                             <Col span={12} style={{paddingLeft: "8px"}}>
                                 <ShadowCard>
-                                    <Statistic title={"今日数据条数"} value={statistic?.data.today}/>
+                                    <Statistic title={"今日数据条数"} value={dataStatistic?.today}/>
                                 </ShadowCard>
                             </Col>
                         </Row>
                         <Row justify={"start"} style={{paddingTop: "8px"}}>
                             <Col span={8} style={{paddingLeft: "8px"}}>
                                 <ShadowCard>
-                                    <Statistic title={"总报警"} value={statistic?.alert.total}/>
+                                    <Statistic title={"总报警"} value={alertStatistic?.total}/>
                                 </ShadowCard>
                             </Col>
                             <Col span={8} style={{paddingLeft: "8px"}}>
                                 <ShadowCard>
-                                    <Statistic title={"今日报警"} value={statistic?.alert.today}/>
+                                    <Statistic title={"今日报警"} value={alertStatistic?.today}/>
                                 </ShadowCard>
                             </Col>
                             <Col span={8} style={{paddingLeft: "8px"}}>
                                 <ShadowCard>
-                                    <Statistic title={"未处理报警"} value={statistic?.alert.untreated}/>
+                                    <Statistic title={"未处理报警"} value={alertStatistic?.untreated}/>
                                 </ShadowCard>
                             </Col>
                         </Row>

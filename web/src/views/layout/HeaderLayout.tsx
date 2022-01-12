@@ -78,7 +78,7 @@ const HeaderLayout = (props: any) => {
                     </Col>
                     <Col span={2} hidden={hideConsole}>
                         <Space>
-                            <NavLink to="/device-management?locale=devices"
+                            <NavLink to="/asset-management?locale=assetMonitor"
                                      className="ts-menu"><CreditCardOutlined/> 控制台</NavLink>
                         </Space>
                     </Col>

@@ -78,5 +78,5 @@ export function GetDeviceSettingRequest(id:number) {
 }
 
 export function GetDevicesStatisticsRequest(filter: any) {
-    return request.get<DeviceStatistic[]>(`/devices/statistics`, {...filter}).then(GetResponse)
+    return request.get<DeviceStatistic[]>(`/statistics/devices`, {...filter}).then(GetResponse)
 }

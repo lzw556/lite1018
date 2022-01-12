@@ -19,6 +19,7 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/property"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/resource"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/role"
+	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/statistic"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/system"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/user"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/crontask"
@@ -101,7 +102,7 @@ func runApiServer(dist embed.FS) {
 	adapter.Api.StaticFS(dist)
 	adapter.Api.UseMiddleware(
 		middleware.NewJWT("/login", "/resources/*"),
-		middleware.NewCasbinRbac("/login", "/my/*", "/check/*", "/menus/*", "/permissions/*", "/resources/*"),
+		middleware.NewCasbinRbac("/login", "/my/*", "/check/*", "/menus/*", "/permissions/*", "/resources/*", "/statistics/*"),
 		middleware.NewProjectChecker("/login", "/resources/*"),
 	)
 	adapter.Api.RegisterRouters(
@@ -119,6 +120,7 @@ func runApiServer(dist embed.FS) {
 		network.NewRouter(service.NewNetwork()),
 		alarm.NewRouter(service.NewAlarm()),
 		system.NewRouter(service.NewSystem()),
+		statistic.NewRouter(service.NewStatistic()),
 	)
 	go func() {
 		if err := adapter.Api.Run(); err != nil && err != http.ErrServerClosed {

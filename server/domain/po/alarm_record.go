@@ -25,3 +25,5 @@ type AlarmRecord struct {
 func (AlarmRecord) TableName() string {
 	return "ts_alarm_record"
 }
+
+type AlarmRecords []AlarmRecord

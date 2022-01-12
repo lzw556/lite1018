@@ -23,9 +23,7 @@ func (r *measurementRouter) initRoutes() {
 		// GET
 		router.NewGetRoute("measurements", r.find),
 		router.NewGetRoute("measurements/fields", r.getFields),
-		router.NewGetRoute("measurements/statistics", r.statisticalMeasurements),
 		router.NewGetRoute("measurements/:id", r.get),
-		router.NewGetRoute("measurements/:id/statistics", r.statisticalMeasurement),
 		router.NewGetRoute("measurements/:id/data", r.findDataByID),
 		router.NewGetRoute("measurements/:id/waveData", r.findWaveDataTimestamp),
 		router.NewGetRoute("measurements/:id/waveData/:timestamp", r.findWaveDataByTimestamp),

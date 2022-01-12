@@ -49,11 +49,6 @@ func (r deviceRouter) find(ctx *gin.Context) (interface{}, error) {
 	}
 }
 
-func (r deviceRouter) statisticalDevices(ctx *gin.Context) (interface{}, error) {
-	filters := request.NewFilters(ctx.Request.URL.Query())
-	return r.service.GetDevicesStatistics(filters)
-}
-
 func (r deviceRouter) update(ctx *gin.Context) (interface{}, error) {
 	id := cast.ToUint(ctx.Param("id"))
 	var req request.Device

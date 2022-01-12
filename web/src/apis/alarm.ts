@@ -59,7 +59,7 @@ export function PagingAlarmRecordsRequest(page: number, size: number, from: numb
 }
 
 export function GetAlarmRecordStatisticsRequest(from: number, to: number, filter: any) {
-    return request.get<AlarmRecordStatistics>(`/alarmRecords/statistics`, {from, to, ...filter}).then(GetResponse)
+    return request.get<AlarmRecordStatistics>(`/statistics/alarmRecords`, {from, to, ...filter}).then(GetResponse)
 }
 
 export function GetAlarmRecordRequest(id: number) {

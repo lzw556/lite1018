@@ -54,8 +54,9 @@ const MenuDrawer: FC<MenuDrawerProps> = (props) => {
 
     const renderMenusTree = () => {
         if (menus && visible) {
-            return <Tree checkable={hasPermission(Permission.RoleAllocMenus)} defaultExpandAll={true} showIcon={true}
+            return <Tree defaultExpandAll={true} showIcon={true}
                          selectable={false}
+                         checkable={true}
                          defaultCheckedKeys={renderDefaultCheckedKeys()} treeData={convertTreeData(menus)}
                          onCheck={onCheck}/>
         }
