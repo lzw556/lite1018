@@ -55,9 +55,31 @@ const WaveData: React.FC<{ measurement: Measurement }> = ({measurement}) => {
                                 break;
                         }
                     }
+                    if (data.times) {
+                        switch (calculate) {
+                            case "accelerationTimeDomain":
+                            case "velocityTimeDomain":
+                                xAxis = {
+                                    type: 'category',
+                                    data: data.times[0]
+                                }
+                                break;
+                        }
+                    }
                     setChartOptions({
                         legend: {data: legends},
                         title: {text: `${getChartTitle()} ${data.frequency / 1000}k Hz`, top: 0},
+                        tooltip: {
+                            trigger: 'axis',
+                            formatter: function (params: any) {
+                                let relVal = params[0].name;
+                                for (let i = 0; i < params.length; i++) {
+                                    let value = Number(params[i].value).toFixed(3)
+                                    relVal += `<br/> ${params[i].marker} ${params[i].seriesName}: ${value}`
+                                }
+                                return relVal;
+                            }
+                        },
                         xAxis: xAxis,
                         grid: {
                             left: '2%',

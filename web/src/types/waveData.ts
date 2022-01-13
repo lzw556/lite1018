@@ -4,4 +4,5 @@ export type WaveData = {
     frequency: number;
     values: number[][];
     frequencies?: number[][];
+    times?: number[][];
 }
