@@ -37,7 +37,7 @@ func (a *Asset) UploadBytes() ([]byte, error) {
 func (a *Asset) CheckFileSize() bool {
 	if a.Image != nil {
 		fmt.Println(a.Image.Size)
-		return a.Image.Size > 1024*1024*2 // 2MB
+		return a.Image.Size > 2<<20 // 2MB
 	}
 	return false
 }

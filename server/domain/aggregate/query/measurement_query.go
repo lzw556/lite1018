@@ -128,9 +128,9 @@ func (query MeasurementQuery) GateWaveData(timestamp int64, calc string) (*vo.Wa
 				result.Frequencies = append(result.Frequencies, frequencies)
 			case "velocityTimeDomain":
 				result.Values[i] = calculate.VelocityCalc(values, len(values), frequency, unitG)
-				times := make([]int, len(values))
+				times := make([]int, len(result.Values[i]))
 				for j := range times {
-					times[j] = j / frequency * 1000
+					times[j] = int((float32(j+1) / float32(frequency)) * 1000)
 				}
 				result.Times = append(result.Times, times)
 			case "velocityFrequencyDomain":
@@ -141,11 +141,26 @@ func (query MeasurementQuery) GateWaveData(timestamp int64, calc string) (*vo.Wa
 					frequencies[j] = int(output.Frequency)
 				}
 				result.Frequencies = append(result.Frequencies, frequencies)
+			case "displacementTimeDomain":
+				result.Values[i] = calculate.DisplacementCalc(values, len(values), frequency, unitG)
+				times := make([]int, len(result.Values[i]))
+				for j := range times {
+					times[j] = int((float32(j+1) / float32(frequency)) * 1000)
+				}
+				result.Times = append(result.Times, times)
+			case "displacementFrequencyDomain":
+				displacementFFT := calculate.DisplacementFrequencyCalc(values, len(values), frequency, unitG)
+				frequencies := make([]int, len(displacementFFT))
+				for j, output := range displacementFFT {
+					result.Values[i][j] = output.FFTValue
+					frequencies[j] = int(output.Frequency)
+				}
+				result.Frequencies = append(result.Frequencies, frequencies)
 			default:
 				result.Values[i] = calculate.AccelerationCalc(values, len(values), frequency, unitG)
-				times := make([]int, len(values))
+				times := make([]int, len(result.Values[i]))
 				for j := range times {
-					times[j] = j / frequency * 1000
+					times[j] = int((float32(j+1) / float32(frequency)) * 1000)
 				}
 				result.Times = append(result.Times, times)
 			}

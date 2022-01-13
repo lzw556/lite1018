@@ -39,7 +39,6 @@ const WaveData: React.FC<{ measurement: Measurement }> = ({measurement}) => {
             setLoading(true);
             GetMeasurementWaveDataRequest(measurement.id, timestamp, {calculate}).then(data => {
                     const legends = ["X轴", "Y轴", "Z轴"];
-                    console.log(data)
                     const xAxisName = calculate.indexOf('TimeDomain') > -1 ? 'ms' : 'Hz';
                     let xAxis = {
                         type: 'category',
@@ -50,10 +49,11 @@ const WaveData: React.FC<{ measurement: Measurement }> = ({measurement}) => {
                         switch (calculate) {
                             case "accelerationFrequencyDomain":
                             case "velocityFrequencyDomain":
+                            case "displacementFrequencyDomain":
                                 xAxis = {
                                     type: 'category',
                                     data: data.frequencies[0],
-                                    name:xAxisName
+                                    name: xAxisName
                                 }
                                 break;
                         }
@@ -62,10 +62,11 @@ const WaveData: React.FC<{ measurement: Measurement }> = ({measurement}) => {
                         switch (calculate) {
                             case "accelerationTimeDomain":
                             case "velocityTimeDomain":
+                            case "displacementTimeDomain":
                                 xAxis = {
                                     type: 'category',
                                     data: data.times[0],
-                                    name:xAxisName
+                                    name: xAxisName
                                 }
                                 break;
                         }
@@ -129,6 +130,10 @@ const WaveData: React.FC<{ measurement: Measurement }> = ({measurement}) => {
                 return "速度时域(mm/s)";
             case "velocityFrequencyDomain":
                 return "速度频域(mm/s)";
+            case "displacementTimeDomain":
+                return "位移时域(μm)";
+            case "displacementFrequencyDomain":
+                return "位移频域(μm)";
         }
         return ""
     }
@@ -224,6 +229,8 @@ const WaveData: React.FC<{ measurement: Measurement }> = ({measurement}) => {
                                     value={"accelerationFrequencyDomain"}>加速度频域</Option>
                             <Option key={'velocityTimeDomain'} value={'velocityTimeDomain'}>速度时域</Option>
                             <Option key={'velocityFrequencyDomain'} value={'velocityFrequencyDomain'}>速度频域</Option>
+                            <Option key={'displacementTimeDomain'} value={'displacementTimeDomain'}>位移时域</Option>
+                            <Option key={'displacementFrequencyDomain'} value={'displacementFrequencyDomain'}>位移频域</Option>
                         </Select>
                     </Row>
                 </Col>
