@@ -40,9 +40,11 @@ const WaveData: React.FC<{ measurement: Measurement }> = ({measurement}) => {
             GetMeasurementWaveDataRequest(measurement.id, timestamp, {calculate}).then(data => {
                     const legends = ["X轴", "Y轴", "Z轴"];
                     console.log(data)
+                    const xAxisName = calculate.indexOf('TimeDomain') > -1 ? 'ms' : 'Hz';
                     let xAxis = {
                         type: 'category',
-                        data: data.values[0].map((_: any, index: number) => index + 1)
+                        data: data.values[0].map((_: any, index: number) => index + 1),
+                        name: xAxisName
                     }
                     if (data.frequencies) {
                         switch (calculate) {
@@ -50,7 +52,8 @@ const WaveData: React.FC<{ measurement: Measurement }> = ({measurement}) => {
                             case "velocityFrequencyDomain":
                                 xAxis = {
                                     type: 'category',
-                                    data: data.frequencies[0]
+                                    data: data.frequencies[0],
+                                    name:xAxisName
                                 }
                                 break;
                         }
@@ -61,7 +64,8 @@ const WaveData: React.FC<{ measurement: Measurement }> = ({measurement}) => {
                             case "velocityTimeDomain":
                                 xAxis = {
                                     type: 'category',
-                                    data: data.times[0]
+                                    data: data.times[0],
+                                    name:xAxisName
                                 }
                                 break;
                         }
@@ -72,7 +76,7 @@ const WaveData: React.FC<{ measurement: Measurement }> = ({measurement}) => {
                         tooltip: {
                             trigger: 'axis',
                             formatter: function (params: any) {
-                                let relVal = params[0].name;
+                                let relVal = `<strong>${params[0].name}</strong>&nbsp;${xAxisName}`;
                                 for (let i = 0; i < params.length; i++) {
                                     let value = Number(params[i].value).toFixed(3)
                                     relVal += `<br/> ${params[i].marker} ${params[i].seriesName}: ${value}`
