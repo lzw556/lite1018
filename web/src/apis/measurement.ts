@@ -2,7 +2,7 @@ import request from "../utils/request";
 import {DeleteResponse, GetResponse, PostResponse, PutResponse} from "../utils/response";
 import {Measurement} from "../types/measurement";
 import {MeasurementField} from "../types/measurement_data";
-import {WaveData} from "../types/waveData";
+import {WaveData} from "../types/wave_data";
 
 export function AddMeasurementRequest(params: any) {
     return request.post(`/measurements`, params).then(PostResponse);
