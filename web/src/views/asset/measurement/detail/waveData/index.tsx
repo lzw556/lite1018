@@ -14,6 +14,33 @@ import {EmptyLayout} from "../../../../layout";
 
 const {Option} = Select;
 
+const defaultChartOption = {
+    title: {top: 0},
+    tooltip: {},
+    xAxis: {},
+    grid: {
+        left: '2%',
+        right: '8%',
+        bottom: '12%',
+        containLabel: true,
+        borderWidth: '0',
+    },
+    yAxis: {type: 'value'},
+    series: [],
+    animation: false,
+    smooth: true,
+    dataZoom: [
+        {
+            type: 'slider',
+            show: true,
+            startValue: 0,
+            endValue: 3000,
+            height: '32',
+            zoomLock: false
+        }
+    ]
+}
+
 const WaveData: React.FC<{ measurement: Measurement }> = ({measurement}) => {
     const [beginDate, setBeginDate] = React.useState(moment().subtract(3, 'days').startOf('day'));
     const [endDate, setEndDate] = React.useState(moment().endOf('day'));
@@ -22,6 +49,7 @@ const WaveData: React.FC<{ measurement: Measurement }> = ({measurement}) => {
     const [chartOptions, setChartOptions] = React.useState<any>({});
     const [timestamp, setTimestamp] = React.useState<number>();
     const [calculate, setCalculate] = React.useState<string>("accelerationTimeDomain");
+    const [envelope, setEnvelope] = React.useState<number>(0);
 
     React.useEffect(() => {
         GetMeasurementWaveDataTimestampRequest(
@@ -38,87 +66,154 @@ const WaveData: React.FC<{ measurement: Measurement }> = ({measurement}) => {
         if (timestamp) {
             setLoading(true);
             GetMeasurementWaveDataRequest(measurement.id, timestamp, {calculate}).then(data => {
-                    const legends = ["X轴", "Y轴", "Z轴"];
-                    const xAxisName = calculate.indexOf('TimeDomain') > -1 ? 'ms' : 'Hz';
-                    let xAxis = {
-                        type: 'category',
-                        data: data.values[0].map((_: any, index: number) => index + 1),
-                        name: xAxisName
+                    if (calculate.indexOf("TimeDomain") !== -1) {
+                        renderTimeDomainChart(data);
+                    } else if (calculate.indexOf("FrequencyDomain") !== -1) {
+                        renderFrequencyDomainChart(data);
+                    } else if (calculate.indexOf("Envelope") !== -1) {
+                        renderEnvelopeChart(data);
                     }
-                    if (data.frequencies) {
-                        switch (calculate) {
-                            case "accelerationFrequencyDomain":
-                            case "velocityFrequencyDomain":
-                            case "displacementFrequencyDomain":
-                                xAxis = {
-                                    type: 'category',
-                                    data: data.frequencies[0],
-                                    name: xAxisName
-                                }
-                                break;
-                        }
-                    }
-                    if (data.times) {
-                        switch (calculate) {
-                            case "accelerationTimeDomain":
-                            case "velocityTimeDomain":
-                            case "displacementTimeDomain":
-                                xAxis = {
-                                    type: 'category',
-                                    data: data.times[0],
-                                    name: xAxisName
-                                }
-                                break;
-                        }
-                    }
-                    setChartOptions({
-                        legend: {data: legends},
-                        title: {text: `${getChartTitle()} ${data.frequency / 1000}k Hz`, top: 0},
-                        tooltip: {
-                            trigger: 'axis',
-                            formatter: function (params: any) {
-                                let relVal = `<strong>${params[0].name}</strong>&nbsp;${xAxisName}`;
-                                for (let i = 0; i < params.length; i++) {
-                                    let value = Number(params[i].value).toFixed(3)
-                                    relVal += `<br/> ${params[i].marker} ${params[i].seriesName}: ${value}`
-                                }
-                                return relVal;
-                            }
-                        },
-                        xAxis: xAxis,
-                        grid: {
-                            left: '2%',
-                            right: '8%',
-                            bottom: '12%',
-                            containLabel: true,
-                            borderWidth: '0',
-                        },
-                        yAxis: {type: 'value'},
-                        series: legends.map((legend, i) => ({
-                            name: legend,
-                            type: 'line',
-                            data: data.values[i],
-                            itemStyle: LineChartStyles[i].itemStyle,
-                            showSymbol: false,
-                        })),
-                        animation: false,
-                        smooth: true,
-                        dataZoom: [
-                            {
-                                type: 'slider',
-                                show: true,
-                                startValue: 0,
-                                endValue: 3000,
-                                height: '32',
-                                zoomLock: false
-                            }
-                        ]
-                    });
                     setLoading(false);
                 }
             );
         }
-    }, [timestamp, calculate]);
+    }, [timestamp, calculate, envelope]);
+
+    const renderEnvelopeChart = (data: any) => {
+        const legends = ["X轴", "Y轴", "Z轴"];
+        setChartOptions({
+            ...defaultChartOption,
+            legend: {
+                data: [legends[envelope]],
+                itemStyle: {
+                    color:  LineChartStyles[envelope].itemStyle.normal.color
+                }
+            },
+            title: {text: `${getChartTitle()} ${data.frequency / 1000}KHz`, top: 0},
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: {
+                    type: 'cross',
+                    crossStyle: {
+                        color: '#999'
+                    }
+                },
+                formatter: function (params: any) {
+                    let relVal = `<strong>${params[0].name}</strong>&nbsp;Hz`;
+                    let value = Number(params[2].value).toFixed(3)
+                    relVal += `<br/> ${params[2].marker} ${params[2].seriesName}: ${value}`
+                    return relVal;
+                }
+            },
+            xAxis: {
+                type: 'category',
+                data: data.times![0].map((_: any, index: number) => index + 1),
+                name: "ms"
+            },
+            series: [
+                {
+                    name: legends[envelope],
+                    type: 'line',
+                    data: data.highEnvelopes![envelope],
+                    lineStyle: {
+                        opacity: 0
+                    },
+                    areaStyle: {
+                        color: '#ccc'
+                    },
+                    stack: 'confidence-band',
+                    symbol: 'none'
+                },
+                {
+                    name: legends[envelope],
+                    type: 'line',
+                    data: data.lowEnvelopes![envelope],
+                    lineStyle: {
+                        opacity: 0
+                    },
+                    areaStyle: {
+                        color: '#ccc'
+                    },
+                    stack: 'confidence-band',
+                    symbol: 'none'
+                },
+                {
+                    name: legends[envelope],
+                    type: 'line',
+                    data: data.values[envelope],
+                    itemStyle: LineChartStyles[envelope].itemStyle,
+                    showSymbol: false,
+                }
+            ]
+        })
+    }
+
+    const renderFrequencyDomainChart = (data: any) => {
+        const legends = ["X轴", "Y轴", "Z轴"];
+        setChartOptions({
+            ...defaultChartOption,
+            legend: {data: legends},
+            title: {text: `${getChartTitle()} ${data.frequency / 1000}KHz`, top: 0},
+            tooltip: {
+                trigger: 'axis',
+                formatter: function (params: any) {
+                    let relVal = `<strong>${params[0].name}</strong>&nbsp;Hz`;
+                    for (let i = 0; i < params.length; i++) {
+                        let value = Number(params[i].value).toFixed(3)
+                        relVal += `<br/> ${params[i].marker} ${params[i].seriesName}: ${value}`
+                    }
+                    return relVal;
+                }
+            },
+            xAxis: {
+                type: 'category',
+                xAxis: {
+                    type: 'category',
+                    data: data.frequencies![0].map((_: any, index: number) => index + 1),
+                    name: "Hz"
+                },
+            },
+            series: legends.map((legend, i) => ({
+                name: legend,
+                type: 'line',
+                data: data.values[i],
+                itemStyle: LineChartStyles[i].itemStyle,
+                showSymbol: false,
+            })),
+        })
+    }
+
+    const renderTimeDomainChart = (data: any) => {
+        const legends = ["X轴", "Y轴", "Z轴"];
+        setChartOptions({
+            ...defaultChartOption,
+            legend: {data: legends},
+            title: {text: `${getChartTitle()} ${data.frequency / 1000}KHz`, top: 0},
+            tooltip: {
+                trigger: 'axis',
+                formatter: function (params: any) {
+                    let relVal = `<strong>${params[0].name}</strong>&nbsp;ms`;
+                    for (let i = 0; i < params.length; i++) {
+                        let value = Number(params[i].value).toFixed(3)
+                        relVal += `<br/> ${params[i].marker} ${params[i].seriesName}: ${value}`
+                    }
+                    return relVal;
+                }
+            },
+            xAxis: {
+                type: 'category',
+                data: data.times![0].map((_: any, index: number) => index + 1),
+                name: "ms"
+            },
+            series: legends.map((legend, i) => ({
+                name: legend,
+                type: 'line',
+                data: data.values[i],
+                itemStyle: LineChartStyles[i].itemStyle,
+                showSymbol: false,
+            })),
+        });
+    }
 
     const getChartTitle = () => {
         switch (calculate) {
@@ -126,14 +221,20 @@ const WaveData: React.FC<{ measurement: Measurement }> = ({measurement}) => {
                 return "加速度时域(m/s²)";
             case "accelerationFrequencyDomain":
                 return "加速度频域(m/s²)";
+            case "accelerationEnvelope":
+                return "加速度包络(m/s²)";
             case "velocityTimeDomain":
                 return "速度时域(mm/s)";
             case "velocityFrequencyDomain":
                 return "速度频域(mm/s)";
+            case "velocityEnvelope":
+                return "速度包络(mm/s)";
             case "displacementTimeDomain":
                 return "位移时域(μm)";
             case "displacementFrequencyDomain":
                 return "位移频域(μm)";
+            case "displacementEnvelope":
+                return "位移包络(μm)";
         }
         return ""
     }
@@ -177,7 +278,7 @@ const WaveData: React.FC<{ measurement: Measurement }> = ({measurement}) => {
         return (
             <Spin spinning={timestamp === undefined}>
                 <EChartsReact loadingOption={{text: '正在加载数据, 请稍等...'}} showLoading={loading} style={{height: 500}}
-                              option={chartOptions}/>
+                              option={chartOptions} notMerge={true}/>
             </Spin>
         )
     }
@@ -223,15 +324,34 @@ const WaveData: React.FC<{ measurement: Measurement }> = ({measurement}) => {
             <Row justify={"start"}>
                 <Col span={24}>
                     <Row justify={"end"}>
-                        <Select defaultValue={calculate} style={{width: "120px"}} onChange={setCalculate}>
-                            <Option key={"accelerationTimeDomain"} value={"accelerationTimeDomain"}>加速度时域</Option>
-                            <Option key={"accelerationFrequencyDomain"}
-                                    value={"accelerationFrequencyDomain"}>加速度频域</Option>
-                            <Option key={'velocityTimeDomain'} value={'velocityTimeDomain'}>速度时域</Option>
-                            <Option key={'velocityFrequencyDomain'} value={'velocityFrequencyDomain'}>速度频域</Option>
-                            <Option key={'displacementTimeDomain'} value={'displacementTimeDomain'}>位移时域</Option>
-                            <Option key={'displacementFrequencyDomain'} value={'displacementFrequencyDomain'}>位移频域</Option>
-                        </Select>
+                        <Col>
+                            <Space>
+                                <Select defaultValue={calculate} style={{width: "120px"}} onChange={setCalculate}>
+                                    <Option key={"accelerationTimeDomain"}
+                                            value={"accelerationTimeDomain"}>加速度时域</Option>
+                                    <Option key={"accelerationFrequencyDomain"}
+                                            value={"accelerationFrequencyDomain"}>加速度频域</Option>
+                                    <Option key={"accelerationEnvelope"} value={"accelerationEnvelope"}>加速度包络</Option>
+                                    <Option key={'velocityTimeDomain'} value={'velocityTimeDomain'}>速度时域</Option>
+                                    <Option key={'velocityFrequencyDomain'}
+                                            value={'velocityFrequencyDomain'}>速度频域</Option>
+                                    <Option key={"velocityEnvelope"} value={"velocityEnvelope"}>速度包络</Option>
+                                    <Option key={'displacementTimeDomain'}
+                                            value={'displacementTimeDomain'}>位移时域</Option>
+                                    <Option key={'displacementFrequencyDomain'}
+                                            value={'displacementFrequencyDomain'}>位移频域</Option>
+                                    <Option key={"displacementEnvelope"} value={"displacementEnvelope"}>位移包络</Option>
+                                </Select>
+                                {
+                                    calculate.indexOf('Envelope') !== -1 &&
+                                    <Select style={{width: "120px"}} defaultValue={envelope} onChange={setEnvelope}>
+                                        <Option key={0} value={0}>X轴包络</Option>
+                                        <Option key={1} value={1}>Y轴包络</Option>
+                                        <Option key={2} value={2}>Z轴包络</Option>
+                                    </Select>
+                                }
+                            </Space>
+                        </Col>
                     </Row>
                 </Col>
                 <Col span={24}>

@@ -123,7 +123,7 @@ func (query MeasurementQuery) GateRawDataByRange(from, to int64) (vo.Measurement
 	return result, nil
 }
 
-func (query MeasurementQuery) GateWaveData(timestamp int64, calc string) (*vo.WaveData, error) {
+func (query MeasurementQuery) GetWaveData(timestamp int64, calc string) (*vo.WaveData, error) {
 	ctx := context.TODO()
 	binding, err := query.bindingRepo.GetBySpecs(ctx, spec.MeasurementEqSpec(query.Measurement.ID))
 	if err != nil {
@@ -149,29 +149,46 @@ func (query MeasurementQuery) GateWaveData(timestamp int64, calc string) (*vo.Wa
 	result.Values = make([][]float64, len(values))
 	result.Frequencies = make([][]int, len(values))
 	result.Times = make([][]int, len(values))
+	result.HighEnvelopes = make([][]float64, len(values))
+	result.LowEnvelopes = make([][]float64, len(values))
 	for i := range values {
 		wg.Add(1)
 		go func(m int) {
 			defer wg.Done()
 			switch calc {
+			case "accelerationTimeDomain":
+				accelerationValues := calculate.AccelerationCalc(values[m], len(values[m]), int(result.Frequency), unitG)
+				result.SetTimeDomainValues(m, accelerationValues)
 			case "accelerationFrequencyDomain":
-				accelerationFFT := calculate.AccelerationFrequencyCalc(values[m], len(values[m]), int(result.Frequency), unitG)
-				result.SetFrequencyDomainValues(m, accelerationFFT)
+				fftValues, fftFrequencies := calculate.AccelerationFrequencyCalc(values[m], len(values[m]), int(result.Frequency), unitG)
+				result.SetFrequencyDomainValues(m, fftValues, fftFrequencies)
+			case "accelerationEnvelope":
+				accelerationValues := calculate.AccelerationCalc(values[m], len(values[m]), int(result.Frequency), unitG)
+				highEnvelope, lowEnvelope := calculate.EnvelopCalc(accelerationValues)
+				result.SetTimeDomainValues(m, accelerationValues)
+				result.SetEnvelopeValues(m, highEnvelope, lowEnvelope)
 			case "velocityTimeDomain":
 				velocityValues := calculate.VelocityCalc(values[m], len(values[m]), int(result.Frequency), unitG)
 				result.SetTimeDomainValues(m, velocityValues)
 			case "velocityFrequencyDomain":
-				velocityFFT := calculate.VelocityFrequencyCalc(values[m], len(values[m]), int(result.Frequency), unitG)
-				result.SetFrequencyDomainValues(m, velocityFFT)
+				fftValues, fftFrequencies := calculate.VelocityFrequencyCalc(values[m], len(values[m]), int(result.Frequency), unitG)
+				result.SetFrequencyDomainValues(m, fftValues, fftFrequencies)
+			case "velocityEnvelope":
+				velocityValues := calculate.VelocityCalc(values[m], len(values[m]), int(result.Frequency), unitG)
+				highEnvelope, lowEnvelope := calculate.EnvelopCalc(velocityValues)
+				result.SetTimeDomainValues(m, velocityValues)
+				result.SetEnvelopeValues(m, highEnvelope, lowEnvelope)
 			case "displacementTimeDomain":
 				displacementValues := calculate.DisplacementCalc(values[m], len(values[m]), int(result.Frequency), unitG)
 				result.SetTimeDomainValues(m, displacementValues)
 			case "displacementFrequencyDomain":
-				displacementFFT := calculate.DisplacementFrequencyCalc(values[m], len(values[m]), int(result.Frequency), unitG)
-				result.SetFrequencyDomainValues(m, displacementFFT)
-			default:
-				accelerationValues := calculate.AccelerationCalc(values[m], len(values[m]), int(result.Frequency), unitG)
-				result.SetTimeDomainValues(m, accelerationValues)
+				fftValues, fftFrequencies := calculate.DisplacementFrequencyCalc(values[m], len(values[m]), int(result.Frequency), unitG)
+				result.SetFrequencyDomainValues(m, fftValues, fftFrequencies)
+			case "displacementEnvelope":
+				displacementValues := calculate.DisplacementCalc(values[m], len(values[m]), int(result.Frequency), unitG)
+				highEnvelope, lowEnvelope := calculate.EnvelopCalc(displacementValues)
+				result.SetTimeDomainValues(m, displacementValues)
+				result.SetEnvelopeValues(m, highEnvelope, lowEnvelope)
 			}
 		}(i)
 	}

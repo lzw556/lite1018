@@ -114,7 +114,7 @@ func (s Measurement) GetMeasurementWaveDataByTimestamp(id uint, timestamp int64,
 	if err != nil {
 		return nil, err
 	}
-	return query.GateWaveData(timestamp, calc)
+	return query.GetWaveData(timestamp, calc)
 }
 
 func (s Measurement) UpdateMeasurementByID(id uint, req request.CreateMeasurement) error {

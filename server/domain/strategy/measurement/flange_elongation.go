@@ -49,11 +49,13 @@ func (s FlangeElongationStrategy) Do(m po.Measurement) (entity.MeasurementData, 
 				// 法兰预紧力算法
 				dataSlice := make([]float64, 0)
 				for _, binding := range bindings {
-					if data, err := s.strategy.sensorData.Last(binding.MacAddress); err == nil {
+					if data, err := s.strategy.sensorData.Last(binding.MacAddress); err == nil && len(data.Values) > 0 {
 						dataSlice = append(dataSlice, cast.ToFloat64(data.Values[variable.DataIndex]))
 					}
 				}
-				return calculate.FlangeBoltPreloads(cast.ToInt(numOfBolts), len(bindings), 0, dataSlice)
+				if len(dataSlice) > 0 {
+					return calculate.FlangeBoltPreloads(cast.ToInt(numOfBolts), len(bindings), 0, dataSlice)
+				}
 			}
 			return nil
 		})

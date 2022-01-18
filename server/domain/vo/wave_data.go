@@ -4,17 +4,18 @@ import (
 	"fmt"
 	"github.com/spf13/cast"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
-	"github.com/thetasensors/theta-cloud-lite/server/pkg/calculate"
 	"strconv"
 	"time"
 )
 
 type WaveData struct {
-	Frequency   float32     `json:"frequency"`
-	Timestamp   int64       `json:"timestamp"`
-	Values      [][]float64 `json:"values,omitempty"`
-	Frequencies [][]int     `json:"frequencies,omitempty"`
-	Times       [][]int     `json:"times,omitempty"`
+	Frequency     float32     `json:"frequency"`
+	Timestamp     int64       `json:"timestamp"`
+	Values        [][]float64 `json:"values,omitempty"`
+	Frequencies   [][]int     `json:"frequencies,omitempty"`
+	Times         [][]int     `json:"times,omitempty"`
+	HighEnvelopes [][]float64 `json:"highEnvelopes,omitempty"`
+	LowEnvelopes  [][]float64 `json:"lowEnvelopes,omitempty"`
 }
 
 func NewWaveData(e entity.LargeSensorData) WaveData {
@@ -37,12 +38,23 @@ func (d *WaveData) SetTimeDomainValues(index int, values []float64) {
 	}
 }
 
-func (d *WaveData) SetFrequencyDomainValues(index int, fftValues []calculate.FFTOutput) {
-	d.Times[index] = make([]int, len(fftValues))
+func (d *WaveData) SetFrequencyDomainValues(index int, fftValues []float64, fftFrequencies []float64) {
+	d.Frequencies[index] = make([]int, len(fftValues))
 	d.Values[index] = make([]float64, len(fftValues))
-	for i, output := range fftValues {
-		d.Values[index][i], _ = strconv.ParseFloat(fmt.Sprintf("%.3f", output.FFTValue), 64)
-		d.Frequencies[index][i] = int(output.Frequency)
+	for i := range fftValues {
+		d.Values[index][i], _ = strconv.ParseFloat(fmt.Sprintf("%.3f", fftValues[i]), 64)
+		d.Frequencies[index][i] = int(fftFrequencies[i])
+	}
+}
+
+func (d *WaveData) SetEnvelopeValues(index int, high []float64, low []float64) {
+	d.HighEnvelopes[index] = make([]float64, len(high))
+	d.LowEnvelopes[index] = make([]float64, len(low))
+	for i, f := range high {
+		d.HighEnvelopes[index][i], _ = strconv.ParseFloat(fmt.Sprintf("%.3f", f), 64)
+	}
+	for i, f := range low {
+		d.LowEnvelopes[index][i], _ = strconv.ParseFloat(fmt.Sprintf("%.3f", f), 64)
 	}
 }
 

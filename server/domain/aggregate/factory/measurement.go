@@ -43,6 +43,7 @@ func (factory Measurement) NewMeasurementCreateCmd(req request.CreateMeasurement
 	cmd.Measurement.AssetID = asset.ID
 	cmd.Measurement.Type = req.Type
 	cmd.PollingPeriod = req.PollingPeriod
+	cmd.Settings = req.Settings
 	cmd.Mode = po.AcquisitionMode(req.Mode)
 	cmd.Bindings = make([]po.MeasurementDeviceBinding, len(req.BindingDevices))
 	t := devicetype.Get(req.DeviceType)
