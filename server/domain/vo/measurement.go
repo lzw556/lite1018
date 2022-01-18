@@ -29,6 +29,7 @@ func NewMeasurement(e po.Measurement) Measurement {
 		Type:          e.Type,
 		Mode:          e.Mode,
 		PollingPeriod: e.PollingPeriod,
+		Settings:      e.Settings,
 		Devices:       make([]Device, 0),
 	}
 	if e.Display != (po.Display{}) {

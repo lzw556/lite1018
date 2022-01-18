@@ -40,7 +40,7 @@ func NewMeasurementQuery() MeasurementQuery {
 	}
 }
 
-func (query MeasurementQuery) Run() *vo.Measurement {
+func (query MeasurementQuery) GetDetail() *vo.Measurement {
 	result := vo.NewMeasurement(query.Measurement)
 	if alert, err := query.measurementAlertRepo.Get(query.Measurement.ID); err == nil {
 		result.SetAlert(alert)

@@ -66,7 +66,7 @@ func (s Measurement) GetMeasurement(id uint) (*vo.Measurement, error) {
 	if err != nil {
 		return nil, err
 	}
-	return query.Run(), nil
+	return query.GetDetail(), nil
 }
 
 func (s Measurement) GetMeasurementSettingsByID(id uint) (*vo.MeasurementSettings, error) {

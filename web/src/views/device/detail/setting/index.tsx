@@ -63,7 +63,9 @@ const SettingPage: FC<SettingPageProps> = ({device}) => {
         </Row>
         <Row justify={"start"}>
             <Col span={12} offset={6}>
-                <Button type={"primary"} onClick={onSave}>保存</Button>
+                {
+                    !device?.binding && <Button type={"primary"} onClick={onSave}>保存</Button>
+                }
             </Col>
         </Row>
     </Skeleton>
