@@ -13,11 +13,11 @@ func FlangeBoltPreloads(numOfBolts, numOfSensors, boltOffset int, sensorPreloads
 		}
 	}
 
-	dt := 1 / float64(numOfBolts)
-	ds := 1 / float64(numOfSensors)
+	dt := 1.0 / float64(numOfBolts)
+	ds := 1.0 / float64(numOfSensors)
 	for i := 0; i < len(calculateBoltPreloads); i++ {
 		for j := 0; j < len(seedSensorPreloads); j++ {
-			calculateBoltPreloads[i] += seedSensorPreloads[j] * math.Sin((float64(i)*dt-float64(j)*ds)/ds)
+			calculateBoltPreloads[i] += seedSensorPreloads[j] * sinc((float64(i)*dt-float64(j)*ds)/ds)
 		}
 	}
 
@@ -25,6 +25,12 @@ func FlangeBoltPreloads(numOfBolts, numOfSensors, boltOffset int, sensorPreloads
 	for i := 0; i < len(boltPreloads); i++ {
 		boltPreloads[(i+boltOffset)%numOfBolts] = calculateBoltPreloads[i+numOfBolts]
 	}
-
 	return boltPreloads
+}
+
+func sinc(value float64) float64 {
+	if value == 0 {
+		return 1
+	}
+	return math.Sin(3.1415926*value) / (3.1415926 * value)
 }

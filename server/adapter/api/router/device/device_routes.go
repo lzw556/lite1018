@@ -5,6 +5,7 @@ import (
 	"github.com/spf13/cast"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/request"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/response"
+	"github.com/thetasensors/theta-cloud-lite/server/domain/vo"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/devicetype"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/errcode"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/json"
@@ -66,7 +67,16 @@ func (r deviceRouter) executeCommand(ctx *gin.Context) (interface{}, error) {
 
 func (r deviceRouter) getSettingByID(ctx *gin.Context) (interface{}, error) {
 	id := cast.ToUint(ctx.Param("id"))
-	return r.service.GetDeviceSettingByID(id)
+	return r.service.GetDeviceSettingsByID(id)
+}
+
+func (r deviceRouter) defaultSettings(ctx *gin.Context) (interface{}, error) {
+	typeID := cast.ToUint(ctx.Query("type"))
+	if t := devicetype.Get(typeID); t != nil {
+		result := vo.NewDeviceSettings(t.Settings())
+		return result, nil
+	}
+	return nil, response.BusinessErr(errcode.UnknownDeviceTypeError, "")
 }
 
 func (r deviceRouter) updateSettingByID(ctx *gin.Context) (interface{}, error) {

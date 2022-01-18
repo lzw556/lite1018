@@ -21,7 +21,7 @@ const LoginPage: FC = () => {
             if (res.code === 200) {
                 message.success("登录成功").then()
                 dispatch(userLoginSuccess(res.data))
-                window.location.hash = "/dashboard"
+                window.location.hash = "/"
             }else {
                 message.error(res.msg).then()
             }

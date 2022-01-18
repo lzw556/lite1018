@@ -119,9 +119,6 @@ func (cmd NetworkUpdateCmd) AccessNewDevice(req request.AddDevices) error {
 		MacAddress: req.MacAddress,
 		NetworkID:  cmd.Network.ID,
 		Type:       req.DeviceType,
-		Sensors:    req.Sensors,
-		System:     req.System,
-		IPN:        req.IPN,
 		AssetID:    cmd.Network.AssetID,
 	}
 	return transaction.Execute(ctx, func(txCtx context.Context) error {

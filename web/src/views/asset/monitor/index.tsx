@@ -21,6 +21,7 @@ import MeasurementDataViewModal from "./measurementDataViewModal";
 import {EmptyLayout} from "../../layout";
 import AlertStatistic from "../measurement/detail/alertStatistic";
 import usePermission, {Permission} from "../../../permission/permission";
+import {MeasurementFieldType} from "../../../types/measurement_data";
 
 const AssetMonitor = () => {
     const {hasPermission} = usePermission();
@@ -60,9 +61,15 @@ const AssetMonitor = () => {
         if (m.data) {
             if (m.data.fields) {
                 const data = m.data.fields.filter(f => f.primary).sort((a, b) => a.sort - b.sort)[0]
-                if (Array.isArray(data.value)) {
+                if (data.type === MeasurementFieldType.Axis) {
                     return <>
                         <Statistic title={`${data.title}(X轴)`} value={data.value[0]} suffix={data.unit}
+                                   precision={data.precision}/>
+                        <Typography.Text>{moment.unix(m.data.timestamp).local().format("YYYY-MM-DD HH:mm:ss")}</Typography.Text>
+                    </>
+                }else if (data.type === MeasurementFieldType.Array) {
+                    return <>
+                        <Statistic title={`${data.title}(最小值)`} value={Math.min.apply(null, data.value)} suffix={data.unit}
                                    precision={data.precision}/>
                         <Typography.Text>{moment.unix(m.data.timestamp).local().format("YYYY-MM-DD HH:mm:ss")}</Typography.Text>
                     </>

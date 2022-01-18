@@ -53,12 +53,12 @@ const HeaderLayout = (props: any) => {
             </Col>
             <Col span={18}>
                 <Row justify={"end"}>
-                    <Col offset={1} span={4}>
+                    <Col offset={1} xl={4} xxl={3}>
                         <Space>
                             <Text style={{color: "white"}} strong>{now}</Text>
                         </Space>
                     </Col>
-                    <Col span={3}>
+                    <Col xl={3} xxl={2}>
                         {
                             currentUser && <ProjectSelect bordered={false}
                                                           defaultValue={getProject()}
@@ -68,7 +68,7 @@ const HeaderLayout = (props: any) => {
                                                           size={"small"} onChange={onProjectChange}/>
                         }
                     </Col>
-                    <Col span={3}>
+                    <Col xl={3} xxl={2}>
                         <Dropdown overlay={menu}>
                             <Space>
                                 <Button type={"text"} style={{color: "#fff"}}><UserOutlined/>{currentUser?.username}
@@ -76,13 +76,13 @@ const HeaderLayout = (props: any) => {
                             </Space>
                         </Dropdown>
                     </Col>
-                    <Col span={2} hidden={hideConsole}>
+                    <Col span={2} hidden={true}>
                         <Space>
                             <NavLink to="/asset-management?locale=assetMonitor"
                                      className="ts-menu"><CreditCardOutlined/> 控制台</NavLink>
                         </Space>
                     </Col>
-                    <Col span={3} hidden={!hideConsole}>
+                    <Col span={3} hidden={true}>
                         <Space>
                             <NavLink to="/dashboard" className="ts-menu"><DashboardOutlined/> 监控大屏</NavLink>
                         </Space>

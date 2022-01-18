@@ -9,6 +9,7 @@ import (
 	spec "github.com/thetasensors/theta-cloud-lite/server/domain/specification"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/vo"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/calculate"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/devicetype"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/measurementtype"
 	"sort"
 	"sync"
@@ -24,6 +25,7 @@ type MeasurementQuery struct {
 	alarmRecordRepo      dependency.AlarmRecordRepository
 	assetRepo            dependency.AssetRepository
 	bindingRepo          dependency.MeasurementDeviceBindingRepository
+	deviceRepo           dependency.DeviceRepository
 }
 
 func NewMeasurementQuery() MeasurementQuery {
@@ -34,6 +36,7 @@ func NewMeasurementQuery() MeasurementQuery {
 		alarmRecordRepo:      repository.AlarmRecord{},
 		bindingRepo:          repository.MeasurementDeviceBinding{},
 		assetRepo:            repository.Asset{},
+		deviceRepo:           repository.Device{},
 	}
 }
 
@@ -49,6 +52,34 @@ func (query MeasurementQuery) Run() *vo.Measurement {
 		result.SetAsset(asset)
 	}
 	return &result
+}
+
+func (query MeasurementQuery) GetSettings() (*vo.MeasurementSettings, error) {
+	ctx := context.TODO()
+	binding, err := query.bindingRepo.GetBySpecs(ctx, spec.MeasurementEqSpec(query.Measurement.ID))
+	if err != nil {
+		return nil, err
+	}
+	device, err := query.deviceRepo.GetBySpecs(ctx, spec.DeviceMacEqSpec(binding.MacAddress))
+	if err != nil {
+		return nil, err
+	}
+	t := devicetype.Get(device.Type)
+	if t == nil {
+		return nil, nil
+	}
+	result := vo.MeasurementSettings{}
+	result.Settings = query.Settings
+	settings := t.Settings()
+	for i, setting := range t.Settings() {
+		if s, ok := query.SensorSettings.Get(setting.Key); ok {
+			settings[i].Value = setting.Convert(s.Value)
+		} else {
+			settings[i].Value = setting.Convert(setting.Value)
+		}
+	}
+	result.SensorSettings = vo.NewDeviceSettings(settings)
+	return &result, nil
 }
 
 func (query MeasurementQuery) GetData(from, to int64) ([]vo.MeasurementData, error) {
@@ -103,68 +134,46 @@ func (query MeasurementQuery) GateWaveData(timestamp int64, calc string) (*vo.Wa
 		return nil, err
 	}
 	result := vo.NewWaveData(data)
-	result.SetValues(data.Values)
-	frequency := cast.ToInt(data.Parameters["kx122_continuous_odr"])
-	if frequency == 0 {
-		frequency = 12.8 * 1000
+	values := make([][]float64, 3)
+	for i := 0; i < len(data.Values); i++ {
+		values[i%len(values)] = append(values[i%len(values)], data.Values[i])
+	}
+	if result.Frequency == 0 {
+		result.Frequency = 12.8 * 1000
 	}
 	unitG := cast.ToInt(data.Parameters["kx122_continuous_range"])
 	if unitG == 0 {
 		unitG = 8
 	}
 	var wg sync.WaitGroup
-	for i, values := range result.Values {
+	result.Values = make([][]float64, len(values))
+	result.Frequencies = make([][]int, len(values))
+	result.Times = make([][]int, len(values))
+	for i := range values {
 		wg.Add(1)
-		go func(i int, values []float64) {
+		go func(m int) {
 			defer wg.Done()
 			switch calc {
 			case "accelerationFrequencyDomain":
-				accelerationFFT := calculate.AccelerationFrequencyCalc(values, len(values), frequency, unitG)
-				frequencies := make([]int, len(accelerationFFT))
-				for j, output := range accelerationFFT {
-					result.Values[i][j] = output.FFTValue
-					frequencies[j] = int(output.Frequency)
-				}
-				result.Frequencies = append(result.Frequencies, frequencies)
+				accelerationFFT := calculate.AccelerationFrequencyCalc(values[m], len(values[m]), int(result.Frequency), unitG)
+				result.SetFrequencyDomainValues(m, accelerationFFT)
 			case "velocityTimeDomain":
-				result.Values[i] = calculate.VelocityCalc(values, len(values), frequency, unitG)
-				times := make([]int, len(result.Values[i]))
-				for j := range times {
-					times[j] = int((float32(j+1) / float32(frequency)) * 1000)
-				}
-				result.Times = append(result.Times, times)
+				velocityValues := calculate.VelocityCalc(values[m], len(values[m]), int(result.Frequency), unitG)
+				result.SetTimeDomainValues(m, velocityValues)
 			case "velocityFrequencyDomain":
-				velocityFFT := calculate.VelocityFrequencyCalc(values, len(values), frequency, unitG)
-				frequencies := make([]int, len(velocityFFT))
-				for j, output := range velocityFFT {
-					result.Values[i][j] = output.FFTValue
-					frequencies[j] = int(output.Frequency)
-				}
-				result.Frequencies = append(result.Frequencies, frequencies)
+				velocityFFT := calculate.VelocityFrequencyCalc(values[m], len(values[m]), int(result.Frequency), unitG)
+				result.SetFrequencyDomainValues(m, velocityFFT)
 			case "displacementTimeDomain":
-				result.Values[i] = calculate.DisplacementCalc(values, len(values), frequency, unitG)
-				times := make([]int, len(result.Values[i]))
-				for j := range times {
-					times[j] = int((float32(j+1) / float32(frequency)) * 1000)
-				}
-				result.Times = append(result.Times, times)
+				displacementValues := calculate.DisplacementCalc(values[m], len(values[m]), int(result.Frequency), unitG)
+				result.SetTimeDomainValues(m, displacementValues)
 			case "displacementFrequencyDomain":
-				displacementFFT := calculate.DisplacementFrequencyCalc(values, len(values), frequency, unitG)
-				frequencies := make([]int, len(displacementFFT))
-				for j, output := range displacementFFT {
-					result.Values[i][j] = output.FFTValue
-					frequencies[j] = int(output.Frequency)
-				}
-				result.Frequencies = append(result.Frequencies, frequencies)
+				displacementFFT := calculate.DisplacementFrequencyCalc(values[m], len(values[m]), int(result.Frequency), unitG)
+				result.SetFrequencyDomainValues(m, displacementFFT)
 			default:
-				result.Values[i] = calculate.AccelerationCalc(values, len(values), frequency, unitG)
-				times := make([]int, len(result.Values[i]))
-				for j := range times {
-					times[j] = int((float32(j+1) / float32(frequency)) * 1000)
-				}
-				result.Times = append(result.Times, times)
+				accelerationValues := calculate.AccelerationCalc(values[m], len(values[m]), int(result.Frequency), unitG)
+				result.SetTimeDomainValues(m, accelerationValues)
 			}
-		}(i, values)
+		}(i)
 	}
 	wg.Wait()
 	return &result, nil

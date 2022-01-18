@@ -37,7 +37,7 @@ func Execute(gateway, device entity.Device, t Type) error {
 
 func SyncDeviceSettings(gateway, device entity.Device) {
 	xlog.Infof("starting sync device settings => [%s]", device.MacAddress)
-	cmd := newUpdateDeviceSettingsCmd(device.IPN, device.System, device.Sensors)
+	cmd := newUpdateDeviceSettingsCmd(device.Settings)
 	if _, err := cmd.Execute(context.TODO(), gateway.MacAddress, device.MacAddress, 3*time.Second); err != nil {
 		xlog.Errorf("execute device [%s] command %s failed: %v", device.MacAddress, cmd.Name(), err)
 	}

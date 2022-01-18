@@ -3,34 +3,33 @@ package vo
 import (
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/po"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/devicetype"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/measurementtype"
 )
 
 type Measurement struct {
-	ID             uint               `json:"id"`
-	Name           string             `json:"name"`
-	Type           uint               `json:"type"`
-	Display        *Display           `json:"display,omitempty"`
-	Data           *MeasurementData   `json:"data,omitempty"`
-	Alert          *MeasurementAlert  `json:"alert,omitempty"`
-	Settings       po.Settings        `json:"settings,omitempty"`
-	SensorSettings po.SensorSetting   `json:"sensorSettings,omitempty"`
-	Mode           po.AcquisitionMode `json:"mode"`
-	PollingPeriod  uint               `json:"polling_period"`
-	Asset          *Asset             `json:"asset,omitempty"`
-	Devices        []Device           `json:"devices"`
+	ID             uint                `json:"id"`
+	Name           string              `json:"name"`
+	Type           uint                `json:"type"`
+	Display        *Display            `json:"display,omitempty"`
+	Data           *MeasurementData    `json:"data,omitempty"`
+	Alert          *MeasurementAlert   `json:"alert,omitempty"`
+	Settings       po.Settings         `json:"settings,omitempty"`
+	SensorSettings devicetype.Settings `json:"sensorSettings,omitempty"`
+	Mode           po.AcquisitionMode  `json:"mode"`
+	PollingPeriod  uint                `json:"polling_period"`
+	Asset          *Asset              `json:"asset,omitempty"`
+	Devices        []Device            `json:"devices"`
 }
 
 func NewMeasurement(e po.Measurement) Measurement {
 	m := Measurement{
-		ID:             e.ID,
-		Name:           e.Name,
-		Type:           e.Type,
-		Settings:       e.Settings,
-		SensorSettings: e.SensorSettings,
-		Mode:           e.Mode,
-		PollingPeriod:  e.PollingPeriod,
-		Devices:        make([]Device, 0),
+		ID:            e.ID,
+		Name:          e.Name,
+		Type:          e.Type,
+		Mode:          e.Mode,
+		PollingPeriod: e.PollingPeriod,
+		Devices:       make([]Device, 0),
 	}
 	if e.Display != (po.Display{}) {
 		display := NewDisplay(e.Display)

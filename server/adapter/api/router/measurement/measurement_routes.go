@@ -58,7 +58,12 @@ func (r measurementRouter) getFields(ctx *gin.Context) (interface{}, error) {
 	return result, nil
 }
 
-func (r measurementRouter) updateSettings(ctx *gin.Context) (interface{}, error) {
+func (r measurementRouter) getSettingsByID(ctx *gin.Context) (interface{}, error) {
+	id := cast.ToUint(ctx.Param("id"))
+	return r.service.GetMeasurementSettingsByID(id)
+}
+
+func (r measurementRouter) updateSettingsByID(ctx *gin.Context) (interface{}, error) {
 	id := cast.ToUint(ctx.Param("id"))
 	var req request.MeasurementSettings
 	if err := ctx.ShouldBindJSON(&req); err != nil {

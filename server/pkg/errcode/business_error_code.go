@@ -63,6 +63,7 @@ const (
 const (
 	MeasurementNotFoundError BusinessErrorCode = iota + 18001
 	UnknownMeasurementTypeError
+	MeasurementUnboundDeviceError
 )
 
 const (
@@ -100,6 +101,7 @@ var businessErrorMap = map[BusinessErrorCode]string{
 	RoleNotFoundError:                   "角色不存在",
 	MeasurementNotFoundError:            "监测点不存在",
 	UnknownMeasurementTypeError:         "未知的监测点类型",
+	MeasurementUnboundDeviceError:       "监测点未绑定设备",
 	AssetImageSizeTooLargeError:         "资产图片大小超过限制(2MB)",
 	ProjectNotFoundError:                "项目不存在",
 	ProjectExistsError:                  "项目已存在",

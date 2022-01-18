@@ -5,6 +5,7 @@ import (
 	"github.com/gogo/protobuf/proto"
 	pd "github.com/thetasensors/theta-cloud-lite/server/adapter/iot/proto"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/po"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/devicetype"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/json"
 	"time"
 )
@@ -20,13 +21,23 @@ type updateDeviceSettingsCmd struct {
 	settings deviceSettings
 }
 
-func newUpdateDeviceSettingsCmd(ipn po.IPNSetting, system po.SystemSetting, sensors po.SensorSetting) updateDeviceSettingsCmd {
+func newUpdateDeviceSettingsCmd(settings po.DeviceSettings) updateDeviceSettingsCmd {
 	cmd := updateDeviceSettingsCmd{
 		settings: deviceSettings{
-			IPN:     ipn,
-			System:  system,
-			Sensors: sensors,
+			IPN:     map[string]interface{}{},
+			System:  map[string]interface{}{},
+			Sensors: map[string]interface{}{},
 		},
+	}
+	for _, setting := range settings {
+		switch devicetype.SettingCategory(setting.Category) {
+		case devicetype.IpnSettingCategory:
+			cmd.settings.IPN[setting.Key] = setting.Value
+		case devicetype.SensorsSettingCategory:
+			cmd.settings.Sensors[setting.Key] = setting.Value
+		case devicetype.SystemSettingCategory:
+			cmd.settings.System[setting.Key] = setting.Value
+		}
 	}
 	cmd.request = newRequest()
 	return cmd

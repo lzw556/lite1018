@@ -81,7 +81,6 @@ func (factory Network) NewNetworkCreateCmd(req request.CreateNetwork) (*command.
 		MacAddress: req.Gateway.MacAddress,
 		Name:       fmt.Sprintf("%s-网关", req.Name),
 		Type:       devicetype.GatewayType,
-		IPN:        req.IPN,
 		AssetID:    req.AssetID,
 	}
 	return &cmd, nil
@@ -125,12 +124,10 @@ func (factory Network) NewNetworkImportCmd(req request.ImportNetwork) (*command.
 		case devicetype.GatewayType:
 			cmd.Network.Name = device.Name
 			e.Category = po.GatewayCategory
-			e.SetIPN(device.IPN)
 		case devicetype.RouterType:
 			e.Category = po.SensorCategory
 		default:
 			e.Category = po.SensorCategory
-			e.SetSensors(device.Sensors)
 		}
 		cmd.Devices[i] = e.Device
 	}

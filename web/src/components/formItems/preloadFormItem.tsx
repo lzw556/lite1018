@@ -36,8 +36,8 @@ const PreloadFormItem:FC<PreloadFormItemProps> = ({enabled}) => {
     return <>
         <Form.Item label={"是否启用预警力"} name={["sensors", "pretightening_is_enabled"]} initialValue={isEnabled}>
             <Radio.Group buttonStyle={"solid"} onChange={e => setIsEnabled(e.target.value)}>
-                <Radio.Button value={true}>启用</Radio.Button>
-                <Radio.Button value={false}>禁用</Radio.Button>
+                <Radio.Button value={1}>启用</Radio.Button>
+                <Radio.Button value={0}>禁用</Radio.Button>
             </Radio.Group>
         </Form.Item>
         {

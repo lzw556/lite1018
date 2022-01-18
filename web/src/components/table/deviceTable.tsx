@@ -22,7 +22,7 @@ const DeviceTable:FC<DeviceTableProps> = ({columns, emptyText, dataSource, permi
 
     useEffect(() => {
         PubSub.subscribe(SocketTopic.connectionState, (msg: string, state: any) => {
-            if (state && data) {
+            if (state && data && data.result) {
                 const newData = _.cloneDeep(data)
                 newData.result.forEach((item: Device) => {
                     if (item.id === state.id) {

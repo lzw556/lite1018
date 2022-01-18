@@ -28,13 +28,11 @@ func (s AngleDipStrategy) Do(m po.Measurement) (entity.MeasurementData, error) {
 		Time:          data.Time,
 		Fields:        map[string]interface{}{},
 	}
-	for _, variable := range s.Type.Variables() {
-		switch variable.Type {
-		case measurementtype.ArrayVariableType:
-			result.Fields[variable.Name] = data.Values[variable.DataIndex:3]
-		default:
-			result.Fields[variable.Name] = data.Values[variable.DataIndex]
+	result.Fields = s.Type.Variables().Convert(func(variable measurementtype.Variable) interface{} {
+		if variable.Type == measurementtype.FloatVariableType {
+			return data.Values[variable.DataIndex]
 		}
-	}
+		return nil
+	})
 	return result, nil
 }

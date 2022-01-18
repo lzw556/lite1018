@@ -75,4 +75,11 @@ func (n Network) GetChildren(mac string) []string {
 	return macs
 }
 
+func (n Network) GetGatewayMacAddress() string {
+	if len(n.Network.RoutingTables) > 0 {
+		return n.Network.RoutingTables[0][1]
+	}
+	return ""
+}
+
 type Networks []Network

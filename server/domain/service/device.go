@@ -57,7 +57,7 @@ func (s Device) GetDeviceByID(deviceID uint) (*vo.Device, error) {
 	if err != nil {
 		return nil, err
 	}
-	return query.Detail()
+	return query.GetDetail()
 }
 
 func (s Device) FindDevicesByPaginate(page, size int, filters request.Filters) ([]vo.Device, int64, error) {
@@ -82,15 +82,15 @@ func (s Device) UpdateDeviceSettingByID(deviceID uint, req request.DeviceSetting
 	if err != nil {
 		return err
 	}
-	return cmd.UpdateSetting(req)
+	return cmd.UpdateSettings(req)
 }
 
-func (s Device) GetDeviceSettingByID(deviceID uint) (*vo.DeviceSetting, error) {
+func (s Device) GetDeviceSettingsByID(deviceID uint) (vo.DeviceSettings, error) {
 	query, err := s.factory.NewDeviceQuery(deviceID)
 	if err != nil {
 		return nil, err
 	}
-	return query.Setting(), nil
+	return query.GetSettings()
 }
 
 func (s Device) CheckDeviceMacAddress(mac string) error {
@@ -102,11 +102,7 @@ func (s Device) CheckDeviceMacAddress(mac string) error {
 }
 
 func (s Device) ReplaceDeviceByID(deviceID uint, mac string) error {
-	cmd, err := s.factory.NewDeviceUpdateCmd(deviceID)
-	if err != nil {
-		return err
-	}
-	return cmd.Replace(mac)
+	return nil
 }
 
 func (s Device) GetPropertyDataByID(deviceID uint, pID uint, from, to int64) (vo.PropertyData, error) {

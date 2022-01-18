@@ -1,4 +1,4 @@
-import {Layout, Menu, Result} from "antd";
+import {Layout, Menu, Result, Spin} from "antd";
 import "../../App.css";
 import "./layout.css"
 import {NavLink} from "react-router-dom";
@@ -12,6 +12,7 @@ import AlertMessageNotification from "../../components/notification/alert";
 import {getProject} from "../../utils/session";
 
 const {SubMenu} = Menu
+
 const {Sider} = Layout
 
 const ConsoleLayout = (props: any) => {
@@ -42,7 +43,8 @@ const ConsoleLayout = (props: any) => {
     }
 
     const renderChildren = () => {
-        if (getProject()) {
+        const project = getProject()
+        if (project) {
             return <>
                 <Layout>
                     <Sider width={200} style={{
@@ -84,12 +86,16 @@ const ConsoleLayout = (props: any) => {
                 </Layout>
                 <AlertMessageNotification/>
             </>
+        }else if (project === undefined) {
+            return <Result
+                status="404"
+                title="未找到项目"
+                subTitle="为了更好的体验，请先联系管理员创建项目"
+            />
         }
-        return <Result
-            status="404"
-            title="未找到项目"
-            subTitle="为了更好的体验，请先联系管理员创建项目"
-        />
+        return <div style={{position: "absolute", width: "100%", height: "80%", textAlign: "center"}}>
+            <Spin size={"large"} tip={"加载中..."} spinning={true} style={{position: "absolute", paddingTop: "25%"}}/>
+        </div>
     }
 
     return <Layout className="ts-console">

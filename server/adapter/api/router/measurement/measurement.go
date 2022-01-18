@@ -24,6 +24,7 @@ func (r *measurementRouter) initRoutes() {
 		router.NewGetRoute("measurements", r.find),
 		router.NewGetRoute("measurements/fields", r.getFields),
 		router.NewGetRoute("measurements/:id", r.get),
+		router.NewGetRoute("measurements/:id/settings", r.getSettingsByID),
 		router.NewGetRoute("measurements/:id/data", r.findDataByID),
 		router.NewGetRoute("measurements/:id/waveData", r.findWaveDataTimestamp),
 		router.NewGetRoute("measurements/:id/waveData/:timestamp", r.findWaveDataByTimestamp),
@@ -35,7 +36,7 @@ func (r *measurementRouter) initRoutes() {
 		router.NewPutRoute("measurements/:id", r.update),
 
 		// PATCH
-		router.NewPatchRoute("measurements/:id/settings", r.updateSettings),
+		router.NewPatchRoute("measurements/:id/settings", r.updateSettingsByID),
 		router.NewPatchRoute("measurements/:id/devices", r.bindingDevices),
 
 		// DELETE

@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/crontask"
+	"github.com/thetasensors/theta-cloud-lite/server/adapter/iot/command"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
@@ -19,6 +20,7 @@ type MeasurementCreateCmd struct {
 	deviceRepo                   dependency.DeviceRepository
 	measurementRepo              dependency.MeasurementRepository
 	measurementDeviceBindingRepo dependency.MeasurementDeviceBindingRepository
+	networkRepo                  dependency.NetworkRepository
 }
 
 func NewMeasurementCreateCmd() MeasurementCreateCmd {
@@ -26,6 +28,7 @@ func NewMeasurementCreateCmd() MeasurementCreateCmd {
 		deviceRepo:                   repository.Device{},
 		measurementRepo:              repository.Measurement{},
 		measurementDeviceBindingRepo: repository.MeasurementDeviceBinding{},
+		networkRepo:                  repository.Network{},
 	}
 }
 
@@ -57,5 +60,23 @@ func (cmd MeasurementCreateCmd) Run() (uint, error) {
 		}
 		return nil
 	})
-	return cmd.Measurement.ID, err
+	if err != nil {
+		return 0, err
+	}
+	ctx := context.TODO()
+	networkMap := make(map[uint]entity.Network)
+	for i := range cmd.Devices {
+		go func(device entity.Device) {
+			if device.NetworkID != 0 {
+				if _, ok := networkMap[device.NetworkID]; !ok {
+					networkMap[device.NetworkID], _ = cmd.networkRepo.Get(ctx, device.NetworkID)
+				}
+				network := networkMap[device.NetworkID]
+				if gateway, err := cmd.deviceRepo.Get(ctx, network.GatewayID); err == nil {
+					command.SyncDeviceSettings(gateway, device)
+				}
+			}
+		}(cmd.Devices[i])
+	}
+	return cmd.Measurement.ID, nil
 }

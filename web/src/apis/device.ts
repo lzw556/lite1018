@@ -80,3 +80,7 @@ export function GetDeviceSettingRequest(id:number) {
 export function GetDevicesStatisticsRequest(filter: any) {
     return request.get<DeviceStatistic[]>(`/statistics/devices`, {...filter}).then(GetResponse)
 }
+
+export function GetDefaultDeviceSettingsRequest(type: number) {
+    return request.get<any>(`/devices/defaultSettings`, {type}).then(GetResponse)
+}

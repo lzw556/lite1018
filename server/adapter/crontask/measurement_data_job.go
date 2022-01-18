@@ -55,6 +55,8 @@ func (m MeasurementData) Run() {
 		strategy = measurement.NewVibration3AxisStrategy()
 	case measurementtype.NormalTemperatureCorrosionType:
 		strategy = measurement.NewNormalTemperatureCorrosionStrategy()
+	case measurementtype.FlangeElongationType:
+		strategy = measurement.NewFlangeElongationStrategy()
 	default:
 		xlog.Errorf("unknown measurement type: %s", m.Measurement.Type)
 		return

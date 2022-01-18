@@ -17,7 +17,7 @@ type Measurement struct {
 	Type           uint
 	AssetID        uint
 	Settings       Settings        `gorm:"type:json"`
-	SensorSettings SensorSetting   `gorm:"type:json"`
+	SensorSettings DeviceSettings  `gorm:"type:json"`
 	Mode           AcquisitionMode `gorm:"not null;default:0"`
 	PollingPeriod  uint            `gorm:"not null;default:1200000"`
 	Display        Display         `gorm:"type:json"`

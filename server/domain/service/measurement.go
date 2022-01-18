@@ -69,6 +69,14 @@ func (s Measurement) GetMeasurement(id uint) (*vo.Measurement, error) {
 	return query.Run(), nil
 }
 
+func (s Measurement) GetMeasurementSettingsByID(id uint) (*vo.MeasurementSettings, error) {
+	query, err := s.factory.NewMeasurementQuery(id)
+	if err != nil {
+		return nil, err
+	}
+	return query.GetSettings()
+}
+
 func (s Measurement) UpdateMeasurementSettingsByID(id uint, req request.MeasurementSettings) error {
 	cmd, err := s.factory.NewMeasurementUpdateCmd(id)
 	if err != nil {

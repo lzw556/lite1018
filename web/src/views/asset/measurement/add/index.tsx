@@ -1,22 +1,21 @@
 import {Content} from "antd/es/layout/layout";
 import MyBreadcrumb from "../../../../components/myBreadcrumb";
 import ShadowCard from "../../../../components/shadowCard";
-import {Button, Col, Divider, Form, Result, Row, Select, Space, Steps} from "antd";
+import {Button, Col, Divider, Form, Result, Row, Space, Steps} from "antd";
 import {useState} from "react";
 import BaseInfoFormItem from "./baseInfoFormItem";
-import SpeedObjectFormItem from "../../../../components/formItems/speedObjectFormItem";
-import PreloadFormItem from "../../../../components/formItems/preloadFormItem";
 import {defaultValidateMessages, Rules} from "../../../../constants/validator";
 import {AddMeasurementRequest} from "../../../../apis/measurement";
 import DeviceTypeSelect from "../../../../components/select/deviceTypeSelect";
 import {MeasurementType} from "../../../../types/measurement_type";
 import DeviceMacAddressSelect from "../../../../components/select/deviceMacAddressSelect";
-import {SAMPLE_PERIOD_1} from "../../../../constants";
 import AcquisitionModeSelect from "../../../../components/select/acquisitionModeSelect";
 import CommunicationPeriodSelect from "../../../../components/communicationPeriodSelect";
+import {GetDefaultDeviceSettingsRequest} from "../../../../apis/device";
+import {DeviceSetting} from "../../../../types/device_setting";
+import DeviceSettingFormItem from "../../../../components/formItems/deviceSettingFormItem";
 
 const {Step} = Steps;
-const {Option} = Select;
 
 const AddMeasurement = () => {
     const [current, setCurrent] = useState<number>(0)
@@ -24,6 +23,7 @@ const AddMeasurement = () => {
     const [mode, setMode] = useState<any>(0)
     const [params, setParams] = useState<any>({})
     const [success, setSuccess] = useState<boolean>(false)
+    const [settings, setSettings] = useState<DeviceSetting[]>([])
     const [id, setId] = useState<any>()
     const [form] = Form.useForm()
 
@@ -60,25 +60,23 @@ const AddMeasurement = () => {
     }
 
     const renderDeviceSettingItems = () => {
-        switch (type) {
-            case MeasurementType.FlangeElongation:
-            case MeasurementType.BoltElongation:
-                return <>
-                    <SpeedObjectFormItem/>
-                    <PreloadFormItem enabled={true}/>
-                </>
-        }
+        return settings.map(setting => {
+            return <DeviceSettingFormItem value={setting}/>
+        })
+    }
+
+    const onDeviceTypeChange = (value: any) => {
+        GetDefaultDeviceSettingsRequest(value).then(data => {
+            setSettings(data)
+        })
     }
 
     const renderDeviceBindingItem = () => {
         const sensors = MeasurementType.toDeviceType(type)
-        form.setFieldsValue({
-            device_type: sensors && sensors[0]
-        })
         return <>
             <Divider orientation={"left"} plain>设备绑定</Divider>
             <Form.Item label={"设备类型"} name={"device_type"} rules={[Rules.required]}>
-                <DeviceTypeSelect sensors={sensors}/>
+                <DeviceTypeSelect sensors={sensors} onChange={onDeviceTypeChange}/>
             </Form.Item>
             <Form.Item label={"MAC地址"} name={"binding_devices"} rules={[Rules.required]}>
                 <DeviceMacAddressSelect type={type} settings={params.settings}/>
@@ -97,14 +95,6 @@ const AddMeasurement = () => {
                             <CommunicationPeriodSelect placeholder={"请选择轮询周期"}/>
                         </Form.Item>
                     }
-                    <Form.Item label={"采集周期"} name={["sensors", "schedule0_sample_period"]} rules={[Rules.required]}>
-                        <Select placeholder={"请选择采集周期"}>
-                            {
-                                SAMPLE_PERIOD_1.map(item => (<Option key={item.value} value={item.value}>{item.text}</Option>))
-                            }
-                        </Select>
-                    </Form.Item>
-                    {renderDeviceSettingItems()}
                 </Col>
             </Row>
         </>
@@ -148,13 +138,20 @@ const AddMeasurement = () => {
                         </Row>
                         <Row justify={"start"}>
                             <Col span={12}>
-                                <Form form={form} labelCol={{span: 6}} validateMessages={defaultValidateMessages}>
+                                <Form form={form} labelCol={{xl: 8, xxl:6}} wrapperCol={{xl: 14, xxl: 12}} validateMessages={defaultValidateMessages}>
                                     {
                                         current === 0 &&
                                         <BaseInfoFormItem form={form} type={type} onTypeChange={setType}/>
                                     }
                                     {
-                                        current === 1 && renderDeviceBindingItem()
+                                        current === 1 && <>
+                                            {
+                                                renderDeviceBindingItem()
+                                            }
+                                            {
+                                                renderDeviceSettingItems()
+                                            }
+                                        </>
                                     }
                                 </Form>
                                 <Row justify={"start"}>

@@ -15,6 +15,7 @@ type Service interface {
 	FilterMeasurements(req request.Filters) ([]vo.Measurement, error)
 
 	GetMeasurement(id uint) (*vo.Measurement, error)
+	GetMeasurementSettingsByID(id uint) (*vo.MeasurementSettings, error)
 	GetMeasurementData(id uint, from, to int64) ([]vo.MeasurementData, error)
 	GetMeasurementRawData(id uint, from, to int64) (vo.MeasurementsRawData, error)
 	GetMeasurementWaveDataByTimestamp(id uint, timestamp int64, calc string) (*vo.WaveData, error)

@@ -33,3 +33,11 @@ func (vs Variables) GetByName(name string) (Variable, error) {
 	}
 	return Variable{}, ErrVariableNotFound
 }
+
+func (vs Variables) Convert(f func(variable Variable) interface{}) map[string]interface{} {
+	fields := make(map[string]interface{})
+	for _, v := range vs {
+		fields[v.Name] = f(v)
+	}
+	return fields
+}

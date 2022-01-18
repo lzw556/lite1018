@@ -24,22 +24,23 @@ func (s NormalTemperatureCorrosionStrategy) Do(m po.Measurement) (entity.Measure
 	if err != nil {
 		return entity.MeasurementData{}, err
 	}
-	monthAgo := data.Time.AddDate(0, -1, 0)
-	monthAgoData, err := s.strategy.getSensorData(m, monthAgo)
-	if err != nil {
-		return entity.MeasurementData{}, err
-	}
 	result := entity.MeasurementData{
 		Time:          data.Time,
 		MeasurementID: m.ID,
 		Fields:        map[string]interface{}{},
 	}
-	for _, v := range s.Type.Variables() {
-		if v.Name == "corrosion_rate" {
-			result.Fields[v.Name] = calculate.CorrosionRate(data.Values[v.DataIndex], monthAgoData.Values[v.DataIndex], data.Time.Sub(monthAgo).Seconds())
-		} else {
-			result.Fields[v.Name] = data.Values[v.DataIndex]
+	result.Fields = s.Type.Variables().Convert(func(variable measurementtype.Variable) interface{} {
+		if variable.Type == measurementtype.FloatVariableType {
+			if variable.Name == "corrosion_rate" {
+				monthAgo := data.Time.AddDate(0, -1, 0)
+				if monthAgoData, err := s.strategy.getSensorData(m, monthAgo); err == nil {
+					return calculate.CorrosionRate(data.Values[variable.DataIndex], monthAgoData.Values[variable.DataIndex], data.Time.Sub(monthAgo).Seconds())
+				}
+			} else {
+				return data.Values[variable.DataIndex]
+			}
 		}
-	}
+		return nil
+	})
 	return result, nil
 }

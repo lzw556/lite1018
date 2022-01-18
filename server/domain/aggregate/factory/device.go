@@ -36,7 +36,7 @@ func NewDevice() Device {
 	}
 }
 
-func (factory Device) NewDeviceCreateCmd(req request.Device) (command.DeviceCreateCmd, error) {
+func (factory Device) NewDeviceCreateCmd(req request.Device) (*command.DeviceCreateCmd, error) {
 	ctx := context.TODO()
 	e, err := factory.deviceRepo.GetBySpecs(ctx, spec.DeviceMacEqSpec(req.MacAddress))
 	if !errors.Is(err, gorm.ErrRecordNotFound) {
@@ -45,54 +45,32 @@ func (factory Device) NewDeviceCreateCmd(req request.Device) (command.DeviceCrea
 	e.Name = req.Name
 	e.MacAddress = req.MacAddress
 	e.Type = req.TypeID
-	switch req.TypeID {
-	case devicetype.GatewayType:
-		return factory.newGatewayCreateCmd(e.Device, req)
-	case devicetype.RouterType:
-		return factory.newRouterCreateCmd(e.Device, req)
-	case devicetype.BoltLooseningType,
-		devicetype.BoltElongationType,
-		devicetype.VibrationTemperature3AxisType,
-		devicetype.AngleDipType,
-		devicetype.NormalTemperatureCorrosionType,
-		devicetype.HighTemperatureCorrosionType:
-		return factory.newSensorCreateCmd(e.Device, req)
+	if t := devicetype.Get(req.TypeID); t != nil {
+		e.Settings = make(po.DeviceSettings, len(t.Settings()))
+		for i, setting := range t.Settings() {
+			s := po.DeviceSetting{
+				Key:      setting.Key,
+				Category: string(setting.Category),
+			}
+			var settings map[string]interface{}
+			switch setting.Category {
+			case devicetype.SensorsSettingCategory:
+				settings = req.Sensors
+			case devicetype.IpnSettingCategory:
+				settings = req.IPN
+			}
+			if value, ok := settings[setting.Key]; ok {
+				s.Value = setting.Convert(value)
+			} else {
+				s.Value = setting.Convert(setting.Value)
+			}
+			e.Settings[i] = s
+		}
+		cmd := command.NewDeviceCreateCmd()
+		cmd.Device = e.Device
+		return &cmd, nil
 	}
 	return nil, response.BusinessErr(errcode.UnknownDeviceTypeError, "")
-}
-
-func (factory Device) newGatewayCreateCmd(e po.Device, req request.Device) (*command.GatewayCreateCmd, error) {
-	e.NetworkID = req.NetworkID
-	e.Category = po.GatewayCategory
-	e.IPN = req.IPN
-	cmd := command.NewGatewayCreateCmd()
-	cmd.Device = e
-	cmd.Network = po.Network{
-		Name:                    req.Name,
-		CommunicationPeriod:     req.WSN.CommunicationPeriod,
-		CommunicationTimeOffset: req.WSN.CommunicationTimeOffset,
-		GroupSize:               req.WSN.GroupSize,
-		GroupInterval:           req.WSN.GroupInterval,
-		RoutingTables:           make(po.RoutingTables, 0),
-	}
-	return &cmd, nil
-}
-
-func (factory Device) newRouterCreateCmd(e po.Device, req request.Device) (*command.RouterCreateCmd, error) {
-	e.NetworkID = req.NetworkID
-	e.Category = po.RouterCategory
-	cmd := command.NewRouterCreateCmd()
-	cmd.Device = e
-	return &cmd, nil
-}
-
-func (factory Device) newSensorCreateCmd(e po.Device, req request.Device) (*command.SensorCreateCmd, error) {
-	e.NetworkID = req.NetworkID
-	e.Category = po.SensorCategory
-	e.Sensors = req.Sensors
-	cmd := command.NewSensorCreateCmd()
-	cmd.Device = e
-	return &cmd, nil
 }
 
 func (factory Device) NewDeviceRemoveCmd(deviceID uint) (*command.DeviceRemoveCmd, error) {

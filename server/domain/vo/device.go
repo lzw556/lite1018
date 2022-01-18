@@ -32,9 +32,6 @@ func NewDevice(e entity.Device) Device {
 		MacAddress: e.MacAddress,
 		TypeID:     e.Type,
 		Category:   uint(e.Category),
-		IPN:        e.IPN,
-		System:     e.System,
-		Sensors:    e.Sensors,
 		State:      DeviceState{},
 	}
 	d.State.DeviceConnectionState = e.GetConnectionState()

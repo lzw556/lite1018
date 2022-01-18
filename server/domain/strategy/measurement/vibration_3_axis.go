@@ -33,25 +33,26 @@ func (s Vibration3AxisStrategy) Do(m po.Measurement) (entity.MeasurementData, er
 		Time:          data.Time,
 		Fields:        map[string]interface{}{},
 	}
-	for _, variable := range s.Type.Variables() {
+	result.Fields = s.Type.Variables().Convert(func(variable measurementtype.Variable) interface{} {
 		switch variable.Type {
 		case measurementtype.FloatVariableType:
-			result.Fields[variable.Name] = data.Values[variable.DataIndex]
+			return data.Values[variable.DataIndex]
 		case measurementtype.AxisVariableType:
 			if strings.HasPrefix(variable.Name, "fft") {
-				result.Fields[variable.Name] = []float32{
+				return []float32{
 					data.Values[variable.DataIndex],
 					data.Values[variable.DataIndex+8],
 					data.Values[variable.DataIndex+16],
 				}
 			} else {
-				result.Fields[variable.Name] = []float32{
+				return []float32{
 					data.Values[variable.DataIndex],
 					data.Values[variable.DataIndex+16],
 					data.Values[variable.DataIndex+32],
 				}
 			}
 		}
-	}
+		return nil
+	})
 	return result, nil
 }

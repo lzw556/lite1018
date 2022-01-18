@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/request"
+	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/response"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/crontask"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/iot/command"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
@@ -13,6 +14,8 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/po"
 	spec "github.com/thetasensors/theta-cloud-lite/server/domain/specification"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/devicetype"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/errcode"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/transaction"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/xlog"
 	"gorm.io/gorm"
@@ -66,7 +69,7 @@ func (cmd MeasurementUpdateCmd) UpdateDeviceBindings(req request.UpdateMeasureme
 	err := transaction.Execute(context.TODO(), func(txCtx context.Context) error {
 		for i, binding := range bindings {
 			if device, err := cmd.deviceRepo.GetBySpecs(txCtx, spec.DeviceMacEqSpec(binding.MacAddress)); err != nil && errors.Is(err, gorm.ErrRecordNotFound) {
-				device.Sensors = cmd.SensorSettings
+				device.Settings = cmd.SensorSettings
 				device.MacAddress = binding.MacAddress
 				device.AssetID = cmd.Measurement.AssetID
 				device.Type = req.DeviceType
@@ -83,28 +86,43 @@ func (cmd MeasurementUpdateCmd) UpdateDeviceBindings(req request.UpdateMeasureme
 }
 
 func (cmd MeasurementUpdateCmd) UpdateSettings(req request.MeasurementSettings) error {
-	if cmd.SensorSettings == nil {
-		cmd.SensorSettings = make(map[string]interface{})
+	ctx := context.TODO()
+	bindings, err := cmd.bindingRepo.FindBySpecs(ctx, spec.MeasurementEqSpec(cmd.Measurement.ID))
+	if err != nil {
+		return err
 	}
-	for k, v := range req.Sensors {
-		cmd.SensorSettings[k] = v
-	}
-	cmd.Measurement.Settings = req.Settings
-	return transaction.Execute(context.TODO(), func(txCtx context.Context) error {
-		if err := cmd.measurementRepo.Save(txCtx, &cmd.Measurement); err != nil {
-			return err
-		}
-		bindings, err := cmd.bindingRepo.FindBySpecs(txCtx, spec.MeasurementEqSpec(cmd.Measurement.ID))
+	if len(bindings) > 0 {
+		device, err := cmd.deviceRepo.GetBySpecs(ctx, spec.DeviceMacEqSpec(bindings[0].MacAddress))
 		if err != nil {
 			return err
 		}
-		if len(bindings) > 0 {
+		t := devicetype.Get(device.Type)
+		if t == nil {
+			return errors.New("device type not found")
+		}
+		cmd.Measurement.SensorSettings = make(po.DeviceSettings, len(t.Settings()))
+		for i, setting := range t.Settings() {
+			s := po.DeviceSetting{
+				Key:      setting.Key,
+				Category: string(setting.Category),
+			}
+			if v, ok := req.Sensors[setting.Key]; ok {
+				s.Value = setting.Convert(v)
+			} else {
+				s.Value = setting.Convert(setting.Value)
+			}
+			cmd.Measurement.SensorSettings[i] = s
+		}
+		return transaction.Execute(context.TODO(), func(txCtx context.Context) error {
+			if err := cmd.measurementRepo.Save(txCtx, &cmd.Measurement); err != nil {
+				return err
+			}
 			macSpec := make(spec.DeviceMacInSpec, len(bindings))
 			for i, binding := range bindings {
 				macSpec[i] = binding.MacAddress
 			}
 			updates := map[string]interface{}{
-				"sensors": cmd.SensorSettings,
+				"settings": cmd.SensorSettings,
 			}
 			if err := cmd.deviceRepo.UpdatesBySpecs(txCtx, updates, macSpec); err != nil {
 				return err
@@ -115,9 +133,10 @@ func (cmd MeasurementUpdateCmd) UpdateSettings(req request.MeasurementSettings) 
 				return err
 			}
 			go cmd.syncDeviceSettings(devices)
-		}
-		return nil
-	})
+			return nil
+		})
+	}
+	return response.BusinessErr(errcode.MeasurementUnboundDeviceError, "")
 }
 
 func (cmd MeasurementUpdateCmd) updateSensorSettings(ctx context.Context, e po.SensorSetting, period uint) error {

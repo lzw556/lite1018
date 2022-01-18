@@ -1,12 +1,10 @@
 import {Measurement} from "../../../../../types/measurement";
-import {FC, useEffect} from "react";
+import {FC, useEffect, useState} from "react";
 import {Button, Col, Form, Row} from "antd";
-import {UpdateMeasurementSettingRequest} from "../../../../../apis/measurement";
-import {MeasurementType} from "../../../../../types/measurement_type";
-import SamplePeriodFormItem from "../../../../../components/formItems/samplePeriodFormItem";
-import PreloadFormItem from "../../../../../components/formItems/preloadFormItem";
-import WaveDataFormItem from "../../../../../components/formItems/waveDataFormItem";
+import {GetMeasurementSettingsRequest, UpdateMeasurementSettingRequest} from "../../../../../apis/measurement";
 import {defaultValidateMessages} from "../../../../../constants/validator";
+import DeviceSettingFormItem from "../../../../../components/formItems/deviceSettingFormItem";
+import {DeviceSetting} from "../../../../../types/device_setting";
 
 export interface MeasurementSettingsProps {
     measurement: Measurement;
@@ -14,11 +12,12 @@ export interface MeasurementSettingsProps {
 
 const MeasurementSettings:FC<MeasurementSettingsProps> = ({measurement}) => {
     const [form] = Form.useForm();
+    const [deviceSettings, setDeviceSettings] = useState<DeviceSetting[]>([]);
 
     useEffect(() => {
-        form.setFieldsValue({
-            sensors: {...measurement.sensorSettings},
-        })
+        GetMeasurementSettingsRequest(measurement.id).then(data => {
+            setDeviceSettings(data.sensorSettings);
+        });
     }, [])
 
     const onSave = () => {
@@ -27,24 +26,9 @@ const MeasurementSettings:FC<MeasurementSettingsProps> = ({measurement}) => {
         })
     }
 
-    const renderSettingFormItems = () => {
-        const items = [<SamplePeriodFormItem />]
-        if (measurement.sensorSettings) {
-            switch (measurement.type) {
-                case MeasurementType.BoltElongation:
-                    items.push(<PreloadFormItem enabled={measurement.sensorSettings["pretightening_is_enabled"]}/>)
-                    break
-                case MeasurementType.Vibration:
-                    items.push(<WaveDataFormItem defaultValue={measurement.sensorSettings["schedule1_sensor_flags"]}/>)
-                    break
-            }
-        }
-        return items
-    }
-
     return <Form form={form} labelCol={{span: 4}} wrapperCol={{span: 6}} validateMessages={defaultValidateMessages}>
         {
-            renderSettingFormItems()
+            deviceSettings.map(setting => <DeviceSettingFormItem key={setting.key} value={setting}/>)
         }
         <Row justify={"end"}>
             <Col span={17}>

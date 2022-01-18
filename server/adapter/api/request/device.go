@@ -17,7 +17,11 @@ type DeviceSearch struct {
 	Text   interface{} `json:"text"`
 }
 
-type DeviceSetting map[string]interface{}
+type DeviceSetting struct {
+	IPN     map[string]interface{} `json:"ipn"`
+	Sensors map[string]interface{} `json:"sensors"`
+	System  map[string]interface{} `json:"system"`
+}
 
 type DeviceUpgrade struct {
 	FirmwareID uint `json:"firmware_id"`

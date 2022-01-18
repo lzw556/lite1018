@@ -727,13 +727,13 @@ func EnvelopCalc(data []float64) (highEnvelop []float64, lowEnvelop []float64) {
 
 func DataConvert(fdataArr []float64, fs int, rangeVal int) (output []float64) {
 	var fullScale float64
-	if fs == 3200 || fs == 6400 || fs == 12800 || fs == 25600 {
+	switch fs {
+	case 3200, 6400, 12800, 25600:
 		fullScale = 65536 / 2
-		// rangeVal = 4
-	}
-	if fs == 4000 || fs == 8000 || fs == 16000 || fs == 32000 || fs == 64000 {
+	case 4000, 8000, 16000, 32000, 64000:
 		fullScale = 262144 / 2
-		// rangeVal = 50
+	default:
+		fullScale = 65536 / 2
 	}
 	gravityScale := fullScale / float64(rangeVal)
 

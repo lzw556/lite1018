@@ -13,6 +13,7 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/po"
 	spec "github.com/thetasensors/theta-cloud-lite/server/domain/specification"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/devicetype"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/errcode"
 	"gorm.io/gorm"
 )
@@ -40,12 +41,28 @@ func (factory Measurement) NewMeasurementCreateCmd(req request.CreateMeasurement
 	cmd := command.NewMeasurementCreateCmd()
 	cmd.Measurement.Name = req.Name
 	cmd.Measurement.AssetID = asset.ID
-	cmd.Measurement.Settings = req.Settings
-	cmd.SensorSettings = req.Sensors
 	cmd.Measurement.Type = req.Type
 	cmd.PollingPeriod = req.PollingPeriod
 	cmd.Mode = po.AcquisitionMode(req.Mode)
 	cmd.Bindings = make([]po.MeasurementDeviceBinding, len(req.BindingDevices))
+	t := devicetype.Get(req.DeviceType)
+	if t == nil {
+		return nil, response.BusinessErr(errcode.UnknownDeviceTypeError, "")
+	}
+	cmd.SensorSettings = make([]po.DeviceSetting, len(t.Settings()))
+	for i, setting := range t.Settings() {
+		s := po.DeviceSetting{
+			Key:      setting.Key,
+			Category: string(setting.Category),
+		}
+		if v, ok := req.Sensors[setting.Key]; ok {
+			s.Value = setting.Convert(v)
+		} else {
+			s.Value = setting.Convert(setting.Value)
+		}
+		cmd.SensorSettings[i] = s
+	}
+
 	for i, binding := range req.BindingDevices {
 		device, err := factory.deviceRepo.GetBySpecs(ctx, spec.DeviceMacEqSpec(binding.Value))
 		if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
@@ -57,7 +74,7 @@ func (factory Measurement) NewMeasurementCreateCmd(req request.CreateMeasurement
 				MacAddress: binding.Value,
 				Type:       req.DeviceType,
 				AssetID:    asset.ID,
-				Sensors:    req.Sensors,
+				Settings:   cmd.SensorSettings,
 				Category:   po.SensorCategory,
 			}
 		}

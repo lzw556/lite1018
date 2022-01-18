@@ -20,7 +20,7 @@ func (repo MeasurementDeviceBinding) GetBySpecs(ctx context.Context, specs ...sp
 	return e, err
 }
 
-func (repo MeasurementDeviceBinding) FindBySpecs(ctx context.Context, specs ...spec.Specification) ([]po.MeasurementDeviceBinding, error) {
+func (repo MeasurementDeviceBinding) FindBySpecs(ctx context.Context, specs ...spec.Specification) (po.MeasurementDeviceBindings, error) {
 	var es []po.MeasurementDeviceBinding
 	err := repo.DB(ctx).Scopes(spec.Scopes(specs)...).Find(&es).Error
 	return es, err

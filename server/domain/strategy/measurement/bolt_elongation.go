@@ -28,8 +28,11 @@ func (s BoltElongationStrategy) Do(m po.Measurement) (entity.MeasurementData, er
 		Time:          data.Time,
 		Fields:        map[string]interface{}{},
 	}
-	for _, variable := range s.Type.Variables() {
-		result.Fields[variable.Name] = data.Values[variable.DataIndex]
-	}
+	result.Fields = s.Type.Variables().Convert(func(variable measurementtype.Variable) interface{} {
+		if variable.Type == measurementtype.FloatVariableType {
+			return data.Values[variable.DataIndex]
+		}
+		return nil
+	})
 	return result, nil
 }

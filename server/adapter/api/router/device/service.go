@@ -20,7 +20,7 @@ type Service interface {
 	ExecuteDeviceUpgradeByID(id uint, req request.DeviceUpgrade) error
 	ExecuteDeviceCancelUpgradeByID(id uint) error
 
-	GetDeviceSettingByID(id uint) (*vo.DeviceSetting, error)
+	GetDeviceSettingsByID(id uint) (vo.DeviceSettings, error)
 	UpdateDeviceSettingByID(id uint, req request.DeviceSetting) error
 
 	GetPropertyDataByID(deviceID uint, pID uint, from, to int64) (vo.PropertyData, error)

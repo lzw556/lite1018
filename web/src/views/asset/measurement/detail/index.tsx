@@ -88,11 +88,16 @@ const MeasurementDetail = () => {
                     if (field.type === MeasurementFieldType.Float) {
                         return <Statistic title={data.title} valueStyle={{fontSize: "14pt"}}
                                           value={data.value.toFixed(data.precision)} suffix={data.unit}/>
-                    } else {
+                    } else if (field.type === MeasurementFieldType.Axis) {
                         return <Popover title={data.title} content={renderContent(data)}>
                             <Statistic title={data.title} valueStyle={{fontSize: "14pt"}}
                                        value={data.value[0].toFixed(data.precision)} suffix={data.unit}/>
                         </Popover>
+                    } else {
+                        return <>
+                            <Statistic title={`${data.title}最小值`} valueStyle={{fontSize: "14pt"}}
+                                       value={Math.min.apply(null, data.value).toFixed(data.precision)}/>
+                        </>
                     }
                 }
             }

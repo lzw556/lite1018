@@ -8,8 +8,10 @@ const RouterGuard = (props: any) => {
     const {routes, location} = props;
     const {pathname} = location
 
+    console.log(location)
+
     if (pathname === "/") {
-        return <Redirect to={"/dashboard"}/>
+        return <Redirect to={"/asset-management?locale=assetMonitor"}/>
     }
 
     const decodeLocation = () => {

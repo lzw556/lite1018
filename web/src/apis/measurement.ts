@@ -36,6 +36,10 @@ export function GetMeasurementAlertStatisticRequest(id: number) {
     return request.get<any>(`/statistics/measurements/${id}/alert`).then(GetResponse);
 }
 
+export function GetMeasurementSettingsRequest(id: number) {
+    return request.get<any>(`/measurements/${id}/settings`).then(GetResponse);
+}
+
 export function UpdateMeasurementSettingRequest(id: number, setting:any) {
     return request.patch(`/measurements/${id}/settings`, setting).then(PutResponse);
 }

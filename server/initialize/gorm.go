@@ -65,5 +65,6 @@ func InitTables(db *gorm.DB) error {
 	if err := initProject(db); err != nil {
 		return err
 	}
+	//fmt.Println(db.Session(&gorm.Session{AllowGlobalUpdate: true}).Unscoped().Model(&po.Measurement{}).Update("sensor_settings", po.DeviceSettings{}).Error)
 	return nil
 }

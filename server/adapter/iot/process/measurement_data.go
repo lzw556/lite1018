@@ -7,6 +7,7 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/ruleengine"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
+	"github.com/thetasensors/theta-cloud-lite/server/domain/po"
 	spec "github.com/thetasensors/theta-cloud-lite/server/domain/specification"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/strategy/measurement"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/errcode"
@@ -50,35 +51,35 @@ func (p MeasurementData) Process(ctx *iot.Context, msg iot.Message) error {
 		if err != nil {
 			return err
 		}
-		var strategy measurement.Strategy
-		switch m.Type {
-		case measurementtype.BoltLooseningType:
-			strategy = measurement.NewBoltLooseningStrategy()
-		case measurementtype.BoltElongationType:
-			strategy = measurement.NewBoltElongationStrategy()
-		case measurementtype.NormalTemperatureCorrosionType:
-			strategy = measurement.NewNormalTemperatureCorrosionStrategy()
-		case measurementtype.Vibration3AxisType:
-			strategy = measurement.NewVibration3AxisStrategy()
-		case measurementtype.AngleDipType:
-			strategy = measurement.NewAngleDipStrategy()
-		case measurementtype.FlangeElongationType:
-			strategy = measurement.NewFlangeElongationStrategy()
-		default:
-			return errcode.UnknownMeasurementTypeError
+		if m.Mode == po.TriggerAcquisitionMode {
+			var strategy measurement.Strategy
+			switch m.Type {
+			case measurementtype.BoltLooseningType:
+				strategy = measurement.NewBoltLooseningStrategy()
+			case measurementtype.BoltElongationType:
+				strategy = measurement.NewBoltElongationStrategy()
+			case measurementtype.NormalTemperatureCorrosionType:
+				strategy = measurement.NewNormalTemperatureCorrosionStrategy()
+			case measurementtype.Vibration3AxisType:
+				strategy = measurement.NewVibration3AxisStrategy()
+			case measurementtype.AngleDipType:
+				strategy = measurement.NewAngleDipStrategy()
+			default:
+				return errcode.UnknownMeasurementTypeError
+			}
+			result, err := strategy.Do(m)
+			if err != nil {
+				return err
+			}
+			if err := p.measurementDataRepo.Create(result); err != nil {
+				return fmt.Errorf("save measurement data failed: %v", err)
+			}
+			alarms, err := p.alarmRepo.FindBySpecs(context.TODO(), spec.MeasurementEqSpec(m.ID))
+			if err != nil {
+				return fmt.Errorf("find alarm failed: %v", err)
+			}
+			go ruleengine.ExecuteSelectedRules(m, alarms)
 		}
-		result, err := strategy.Do(m)
-		if err != nil {
-			return err
-		}
-		if err := p.measurementDataRepo.Create(result); err != nil {
-			return fmt.Errorf("save measurement data failed: %v", err)
-		}
-		alarms, err := p.alarmRepo.FindBySpecs(context.TODO(), spec.MeasurementEqSpec(m.ID))
-		if err != nil {
-			return fmt.Errorf("find alarm failed: %v", err)
-		}
-		go ruleengine.ExecuteSelectedRules(m, alarms)
 	}
 	return nil
 }

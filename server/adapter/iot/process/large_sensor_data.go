@@ -71,6 +71,7 @@ func (p LargeSensorData) Process(ctx *iot.Context, msg iot.Message) error {
 			Data:  m.Data,
 		})
 		if receiver.isComplete() {
+			fmt.Println("total data length:", receiver.TotalLength)
 			if value, ok := ctx.Get(msg.Body.Device); ok {
 				if device, ok := value.(entity.Device); ok {
 					data, err := receiver.sensorData()
@@ -79,8 +80,12 @@ func (p LargeSensorData) Process(ctx *iot.Context, msg iot.Message) error {
 					}
 					data.MacAddress = msg.Body.Device
 					if device.Type == devicetype.VibrationTemperature3AxisType {
-						data.Parameters["kx122_continuous_odr"] = getKx122ContinuousOdr(cast.ToInt(device.Sensors["kx122_continuous_odr"]))
-						data.Parameters["kx122_continuous_range"] = getKx122ContinuousRange(cast.ToInt(device.Sensors["kx122_continuous_range"]))
+						if setting, ok := device.GetSetting("kx122_continuous_odr"); ok {
+							data.Parameters[setting.Key] = getKx122ContinuousOdr(cast.ToInt(setting.Value))
+						}
+						if setting, ok := device.GetSetting("kx122_continuous_range"); ok {
+							data.Parameters[setting.Key] = getKx122ContinuousRange(cast.ToInt(setting.Value))
+						}
 					}
 					if err := p.repository.Create(&data); err != nil {
 						return err

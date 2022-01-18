@@ -1,16 +1,23 @@
 import {DeviceType} from "../../types/device_type";
 import {Select, SelectProps} from "antd";
-import {FC} from "react";
+import {FC, useEffect} from "react";
 import {CaretDownOutlined} from "@ant-design/icons";
 
 const {Option, OptGroup} = Select
 
 export interface DeviceTypeSelectProps extends SelectProps<any> {
     sensors?: DeviceType[]
+    onChange?: (value: any) => void
 }
 
 const DeviceTypeSelect: FC<DeviceTypeSelectProps> = (props) => {
-    const {sensors, children} = props
+    const {sensors, children, onChange} = props
+
+    useEffect(() => {
+        if (onChange && sensors) {
+            onChange(sensors[0])
+        }
+    }, [])
 
     const renderSensors = () => {
         return DeviceType.Sensors().filter((item:DeviceType) => sensors?.includes(item)).map(item => (<Option key={item} value={item}>{DeviceType.toString(item)}</Option>))

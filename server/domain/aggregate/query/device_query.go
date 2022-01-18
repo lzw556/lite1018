@@ -2,7 +2,7 @@ package query
 
 import (
 	"context"
-	"fmt"
+	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/response"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
@@ -10,6 +10,8 @@ import (
 	spec "github.com/thetasensors/theta-cloud-lite/server/domain/specification"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/vo"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/calculate"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/devicetype"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/errcode"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/xlog"
 	"time"
 )
@@ -39,10 +41,9 @@ func NewDeviceQuery() DeviceQuery {
 	}
 }
 
-func (query DeviceQuery) Detail() (*vo.Device, error) {
+func (query DeviceQuery) GetDetail() (*vo.Device, error) {
 	ctx := context.TODO()
 	result := vo.NewDevice(query.Device)
-	fmt.Println(query.Device)
 	if network, err := query.networkRepo.Get(ctx, query.Device.NetworkID); err == nil {
 		result.SetNetwork(network)
 	}
@@ -64,9 +65,21 @@ func (query DeviceQuery) Detail() (*vo.Device, error) {
 	return &result, nil
 }
 
-func (query DeviceQuery) Setting() *vo.DeviceSetting {
-	result := vo.NewDeviceSetting(query.Device)
-	return &result
+func (query DeviceQuery) GetSettings() (vo.DeviceSettings, error) {
+	t := devicetype.Get(query.Device.Type)
+	if t == nil {
+		return nil, response.BusinessErr(errcode.UnknownDeviceTypeError, "")
+	}
+	settings := t.Settings()
+	for i, setting := range t.Settings() {
+		if s, ok := query.Device.Settings.Get(setting.Key); ok {
+			settings[i].Value = setting.Convert(s.Value)
+		} else {
+			settings[i].Value = setting.Convert(setting.Value)
+		}
+	}
+	result := vo.NewDeviceSettings(settings)
+	return result, nil
 }
 
 func (query DeviceQuery) PropertyDataByRange(pid uint, from, to time.Time) (vo.PropertyData, error) {
