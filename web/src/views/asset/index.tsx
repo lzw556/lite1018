@@ -1,5 +1,5 @@
 import {FC, useCallback, useEffect, useState} from "react";
-import {Button, Card, ConfigProvider, List, Popconfirm, Skeleton} from "antd";
+import {Button, Card, Col, ConfigProvider, List, Popconfirm, Row, Skeleton, Image} from "antd";
 import {Content} from "antd/lib/layout/layout";
 import {GetAssetRequest, PagingAssetsRequest, RemoveAssetRequest} from "../../apis/asset";
 import {Asset} from "../../types/asset";
@@ -13,6 +13,7 @@ import {EmptyLayout} from "../layout";
 import {useHistory} from "react-router-dom";
 import usePermission, {Permission} from "../../permission/permission";
 import HasPermission from "../../permission";
+import "./index.css";
 
 
 const AssetPage: FC = () => {
@@ -65,6 +66,21 @@ const AssetPage: FC = () => {
         ]
     }
 
+    const renderAssetImage = (asset:Asset) => {
+        if (asset && asset.image) {
+            return <Row justify={"center"} align={"middle"} style={{height: "144px", padding: "0 4px", background: "rgba(190,190,190, 0.2)"}}>
+                <Col>
+                    <Image src={`/api/resources/assets/${asset.image}`} />
+                </Col>
+            </Row>
+        }
+        return <Row justify={"center"} align={"middle"} style={{height: "144px", padding: "0 4px", background: "rgba(190,190,190, 0.2)"}}>
+            <Col>
+                <Skeleton.Image className={"ant-skeleton-image"}/>
+            </Col>
+        </Row>
+    }
+
     return <Content>
         <MyBreadcrumb>
             <HasPermission value={Permission.AssetAdd}>
@@ -94,8 +110,7 @@ const AssetPage: FC = () => {
                               renderItem={asset => {
                                   return <List.Item key={asset.id}>
                                       <ShadowCard
-                                          cover={<img alt={asset.name} height={144} style={{objectFit: "cover"}}
-                                                      src={`/api/resources/assets/${asset.image}`}/>}
+                                          cover={renderAssetImage(asset)}
                                           actions={renderActions(asset.id)}
                                       >
                                           <Card.Meta title={asset.name}/>

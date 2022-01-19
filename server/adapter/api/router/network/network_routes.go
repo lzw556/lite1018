@@ -12,6 +12,7 @@ func (r networkRouter) create(ctx *gin.Context) (interface{}, error) {
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		return nil, response.InvalidParameterError(err.Error())
 	}
+	req.ProjectID = cast.ToUint(ctx.MustGet("project_id"))
 	return nil, r.service.CreateNetwork(req)
 }
 
@@ -20,6 +21,7 @@ func (r networkRouter) importNetwork(ctx *gin.Context) (interface{}, error) {
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		return nil, response.InvalidParameterError(err.Error())
 	}
+	req.ProjectID = cast.ToUint(ctx.MustGet("project_id"))
 	return nil, r.service.ImportNetwork(req)
 }
 
@@ -39,7 +41,7 @@ func (r networkRouter) sync(ctx *gin.Context) (interface{}, error) {
 }
 
 func (r networkRouter) find(ctx *gin.Context) (interface{}, error) {
-	filters := request.NewFilters(ctx.Request.URL.Query())
+	filters := request.NewFilters(ctx)
 	switch ctx.Query("method") {
 	case "paging":
 		page := cast.ToInt(ctx.Query("page"))
@@ -50,7 +52,7 @@ func (r networkRouter) find(ctx *gin.Context) (interface{}, error) {
 		}
 		return response.NewPageResult(page, size, total, result), nil
 	default:
-		return nil, nil
+		return r.service.FilterNetworks(filters)
 	}
 }
 
@@ -78,6 +80,7 @@ func (r networkRouter) update(ctx *gin.Context) (interface{}, error) {
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		return nil, response.InvalidParameterError(err.Error())
 	}
+	req.ProjectID = cast.ToUint(ctx.MustGet("project_id"))
 	return r.service.UpdateNetworkByID(id, req)
 }
 

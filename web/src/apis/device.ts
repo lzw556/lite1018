@@ -1,7 +1,6 @@
 import request from "../utils/request";
 import {PageResult} from "../types/page";
 import {Device} from "../types/device";
-import {PropertyData} from "../types/property_data";
 import {DeviceStatistic} from "../types/device_statistic";
 import {DeleteResponse, GetResponse, PostResponse, PutResponse} from "../utils/response";
 
@@ -37,8 +36,8 @@ export function DeleteDeviceRequest(id:number) {
     return request.delete(`/devices/${id}`).then(DeleteResponse)
 }
 
-export function GetDeviceDataRequest(id:number, pid:number, from:number, to:number) {
-    return request.get<PropertyData[] | PropertyData>(`/devices/${id}/data`, {from, to, pid}).then(GetResponse)
+export function GetDeviceDataRequest(id:number, pid:string, from:number, to:number) {
+    return request.get<any>(`/devices/${id}/data`, {from, to, pid}).then(GetResponse)
 }
 
 export function DownloadDeviceDataRequest(id:number, pids:string, from:number, to:number) {

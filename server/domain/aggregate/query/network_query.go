@@ -12,7 +12,6 @@ import (
 type NetworkQuery struct {
 	entity.Network
 
-	assetRepo             dependency.AssetRepository
 	deviceRepo            dependency.DeviceRepository
 	deviceStatusRepo      dependency.DeviceStatusRepository
 	deviceInformationRepo dependency.DeviceInformationRepository
@@ -20,7 +19,6 @@ type NetworkQuery struct {
 
 func NewNetworkQuery() NetworkQuery {
 	return NetworkQuery{
-		assetRepo:             repository.Asset{},
 		deviceRepo:            repository.Device{},
 		deviceStatusRepo:      repository.DeviceStatus{},
 		deviceInformationRepo: repository.DeviceInformation{},
@@ -33,9 +31,6 @@ func (query NetworkQuery) Detail() (*vo.Network, error) {
 	if gateway, err := query.deviceRepo.Get(ctx, query.Network.GatewayID); err == nil {
 		result.AddGateway(gateway)
 		result.Gateway.Information.DeviceInformation, _ = query.deviceInformationRepo.Get(gateway.ID)
-	}
-	if asset, err := query.assetRepo.Get(ctx, query.Network.AssetID); err == nil {
-		result.AddAsset(asset)
 	}
 	if devices, err := query.deviceRepo.FindBySpecs(ctx, spec.NetworkEqSpec(query.Network.ID)); err == nil {
 		nodes := make([]vo.Device, len(devices))

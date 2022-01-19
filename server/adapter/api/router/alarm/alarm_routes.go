@@ -17,11 +17,7 @@ func (r alarmRouter) createTemplate(ctx *gin.Context) (interface{}, error) {
 }
 
 func (r alarmRouter) findTemplates(ctx *gin.Context) (interface{}, error) {
-	filters := request.NewFilters(ctx.Request.URL.Query())
-	filters = append(filters, request.Filter{
-		Name:  "project_id",
-		Value: ctx.MustGet("project_id"),
-	})
+	filters := request.NewFilters(ctx)
 	switch ctx.Query("method") {
 	case "paging":
 		page := cast.ToInt(ctx.Query("page"))
@@ -79,9 +75,9 @@ func (r alarmRouter) createAlarm(ctx *gin.Context) (interface{}, error) {
 }
 
 func (r alarmRouter) findAlarms(ctx *gin.Context) (interface{}, error) {
+	filters := request.NewFilters(ctx)
 	switch ctx.Query("method") {
 	case "paging":
-		filters := request.NewFilters(ctx.Request.URL.Query())
 		page := cast.ToInt(ctx.Query("page"))
 		size := cast.ToInt(ctx.Query("size"))
 		result, total, err := r.service.FindAlarmsByPaginate(filters, page, size)
@@ -114,7 +110,7 @@ func (r alarmRouter) deleteAlarm(ctx *gin.Context) (interface{}, error) {
 }
 
 func (r alarmRouter) findRecords(ctx *gin.Context) (interface{}, error) {
-	filters := request.NewFilters(ctx.Request.URL.Query())
+	filters := request.NewFilters(ctx)
 	switch ctx.Query("method") {
 	case "paging":
 		page := cast.ToInt(ctx.Query("page"))

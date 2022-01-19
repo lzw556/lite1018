@@ -1,4 +1,4 @@
-import {Button, Card, Col, Divider, Form, message, Result, Row, Space, Upload} from "antd";
+import {Button, Card, Col, Form, message, Result, Row, Space, Upload} from "antd";
 import {Content} from "antd/lib/layout/layout";
 import {useEffect, useState} from "react";
 import {Canvas, Edge, Node, NodeProps, Remove} from "reaflow";
@@ -11,7 +11,6 @@ import CommunicationTimeOffsetSelect from "../../../components/communicationTime
 import CommunicationPeriodSelect from "../../../components/communicationPeriodSelect";
 import GroupSizeSelect from "../../../components/groupSizeSelect";
 import GroupIntervalSelect from "../../../components/groupIntervalSelect";
-import AssetSelect from "../../../components/assetSelect";
 import MyBreadcrumb from "../../../components/myBreadcrumb";
 
 const {Dragger} = Upload
@@ -150,7 +149,7 @@ const ImportNetworkPage = () => {
                 {
                     !success ?
                         <Row justify="space-between">
-                            <Col span={16}>
+                            <Col xl={16} xxl={18}>
                                 <Card type="inner" size={"small"} title={"预览"} style={{height: `${height}px`}}
                                       extra={renderActionButton()}>
                                     <div className="graph" style={{height: `${height - 56}px`}}>
@@ -205,14 +204,8 @@ const ImportNetworkPage = () => {
                                     </div>
                                 </Card>
                             </Col>
-                            <Col span={8} style={{paddingLeft: "4px"}}>
+                            <Col xl={8} xxl={6} style={{paddingLeft: "4px"}}>
                                 <Card type="inner" size={"small"} title={"编辑"} style={{height: `${height}px`}}>
-                                    <Divider orientation={"left"} plain>基本信息</Divider>
-                                    <Form.Item label={"所属资产"} name="asset"
-                                               rules={[{required: true, message: "请选择网络所属资产"}]}>
-                                        <AssetSelect defaultActiveFirstOption={false} placeholder={"请选择网络所属资产"}/>
-                                    </Form.Item>
-                                    <Divider orientation={"left"} plain>网络配置信息</Divider>
                                     <Form.Item label="通讯周期" name="communication_period"
                                                rules={[{required: true, message: "请选择网络通讯周期"}]}>
                                         <CommunicationPeriodSelect placeholder={"请选择网络通讯周期"}/>

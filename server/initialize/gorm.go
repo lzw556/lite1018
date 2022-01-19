@@ -17,7 +17,6 @@ func InitTables(db *gorm.DB) error {
 		&po.Permission{},
 		&po.Asset{},
 		&po.Device{},
-		&po.Property{},
 		&po.Network{},
 		&po.Firmware{},
 		&po.Alarm{},
@@ -53,9 +52,6 @@ func InitTables(db *gorm.DB) error {
 	if err := initUsers(db); err != nil {
 		return err
 	}
-	if err := initProperties(db); err != nil {
-		return err
-	}
 	if err := initMenus(db); err != nil {
 		return err
 	}
@@ -65,6 +61,5 @@ func InitTables(db *gorm.DB) error {
 	if err := initProject(db); err != nil {
 		return err
 	}
-	//fmt.Println(db.Session(&gorm.Session{AllowGlobalUpdate: true}).Unscoped().Model(&po.Measurement{}).Update("sensor_settings", po.DeviceSettings{}).Error)
 	return nil
 }

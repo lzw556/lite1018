@@ -19,10 +19,6 @@ import HistoryDataPage from "./data";
 
 const tabList = [
     {
-        key: "monitor",
-        tab: "监控",
-    },
-    {
         key: "settings",
         tab: "配置信息",
     },
@@ -37,9 +33,9 @@ const DeviceDetailPage = () => {
     const {hasPermission} = userPermission();
 
     const contents = new Map<string, any>([
-        ["monitor", <MonitorPage device={device}/>],
+        ["monitor", device && <MonitorPage device={device}/>],
         ["settings", <SettingPage device={device}/>],
-        ["historyData", <HistoryDataPage device={device}/>]
+        ["historyData", device && <HistoryDataPage device={device}/>]
     ])
 
     const fetchDevice = useCallback(() => {
@@ -68,6 +64,10 @@ const DeviceDetailPage = () => {
             device.typeId !== DeviceType.Gateway &&
             hasPermission(Permission.DeviceData)) {
             return [
+                {
+                    key: "monitor",
+                    tab: "监控",
+                },
                 ...tabList,
                 {
                     key: "historyData",
@@ -119,11 +119,13 @@ const DeviceDetailPage = () => {
                     device && <InformationCard device={device} isLoading={isLoading}/>
                 }
                 <br/>
-                <ShadowCard size={"small"} tabList={renderTabList()} onTabChange={key => {
-                    setCurrentKey(key)
-                }}>
-                    {contents.get(currentKey)}
-                </ShadowCard>
+                {
+                    device && <ShadowCard size={"small"} tabList={renderTabList()} onTabChange={key => {
+                        setCurrentKey(key)
+                    }}>
+                        {contents.get(currentKey)}
+                    </ShadowCard>
+                }
             </Col>
         </Row>
     </Content>

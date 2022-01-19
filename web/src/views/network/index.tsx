@@ -1,6 +1,12 @@
 import {Content} from "antd/lib/layout/layout";
 import {useCallback, useEffect, useState} from "react";
-import {DeleteNetworkRequest, ExportNetworkRequest, GetNetworkRequest, PagingNetworksRequest} from "../../apis/network";
+import {
+    DeleteNetworkRequest,
+    ExportNetworkRequest,
+    GetNetworkRequest,
+    PagingNetworksRequest,
+    SyncNetworkRequest
+} from "../../apis/network";
 import ShadowCard from "../../components/shadowCard";
 import "./index.css"
 import MyBreadcrumb from "../../components/myBreadcrumb";
@@ -8,20 +14,17 @@ import TableLayout from "../layout/TableLayout";
 import AddNetworkModal from "./modal/addNetworkModal";
 import {Button, Col, Dropdown, Menu, message, Popconfirm, Row, Space} from "antd";
 import {CodeOutlined, DeleteOutlined, EditOutlined, PlusOutlined} from "@ant-design/icons";
-import Label from "../../components/label";
 import {Network} from "../../types/network";
 import EditNetworkModal from "./modal/editNetworkModal";
 import moment from "moment";
 import {PageResult} from "../../types/page";
-import AssetTreeSelect from "../../components/select/assetTreeSelect";
 import {SendDeviceCommandRequest} from "../../apis/device";
 import {DeviceCommand} from "../../types/device_command";
 import usePermission, {Permission} from "../../permission/permission";
 import HasPermission from "../../permission";
 
 const NetworkPage = () => {
-    const {hasPermission, hasPermissions} = usePermission();
-    const [assetId, setAssetId] = useState<number>(0)
+    const {hasPermission} = usePermission();
     const [addVisible, setAddVisible] = useState<boolean>(false)
     const [editVisible, setEditVisible] = useState<boolean>(false)
     const [network, setNetwork] = useState<Network>()
@@ -30,11 +33,8 @@ const NetworkPage = () => {
 
     const fetchNetworks = useCallback((current: number, size: number) => {
         const filter: any = {}
-        if (assetId) {
-            filter.asset_id = assetId
-            PagingNetworksRequest(filter, current, size).then(setDataSource)
-        }
-    }, [assetId, refreshKey])
+        PagingNetworksRequest(filter, current, size).then(setDataSource)
+    }, [refreshKey])
 
     useEffect(() => {
         fetchNetworks(1, 10)
@@ -52,6 +52,9 @@ const NetworkPage = () => {
 
     const onCommand = (record: Network, key: any) => {
         switch (key) {
+            case "0":
+                SyncNetworkRequest(record.id).then()
+                break
             case "1":
                 SendDeviceCommandRequest(record.gateway.id, DeviceCommand.Provision).then(res => {
                     if (res.code === 200) {
@@ -178,14 +181,6 @@ const NetworkPage = () => {
             <Row justify={"start"}>
                 <Col span={12}>
                     <Space>
-                        <Label name={"资产"}>
-                            <AssetTreeSelect bordered={false}
-                                             defaultActiveFirstOption={true}
-                                             style={{width: "144px"}}
-                                             placeholder={"所有资产"}
-                                             value={assetId}
-                                             onChange={setAssetId}/>
-                        </Label>
                     </Space>
                 </Col>
             </Row>

@@ -8,9 +8,9 @@ type WSN struct {
 }
 
 type Network struct {
-	Name    string `json:"name"`
-	AssetID uint   `json:"asset_id"`
-	WSN     WSN    `json:"wsn"`
+	Name      string `json:"name"`
+	WSN       WSN    `json:"wsn"`
+	ProjectID uint   `json:"-"`
 }
 
 type AddDevices struct {
@@ -30,7 +30,6 @@ type RemoveDevices struct {
 }
 
 type ImportNetwork struct {
-	AssetID                 uint        `json:"asset_id"`
 	CommunicationPeriod     uint        `json:"communication_period"`
 	CommunicationTimeOffset uint        `json:"communication_time_offset"`
 	GroupSize               uint        `json:"group_size"`
@@ -44,14 +43,16 @@ type ImportNetwork struct {
 		System     map[string]interface{} `json:"system,omitempty"`
 		Sensors    map[string]interface{} `json:"sensors,omitempty"`
 	} `json:"devices"`
+
+	ProjectID uint `json:"project_id-"`
 }
 
 type CreateNetwork struct {
-	AssetID uint   `json:"asset_id"`
 	Name    string `json:"name"`
 	WSN     WSN    `json:"wsn"`
 	Gateway struct {
 		MacAddress string `json:"mac_address"`
 	}
-	IPN map[string]interface{} `json:"ipn"`
+	IPN       map[string]interface{} `json:"ipn"`
+	ProjectID uint                   `json:"-"`
 }

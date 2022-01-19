@@ -7,7 +7,7 @@ import (
 )
 
 func (r statisticRouter) statisticalMeasurements(ctx *gin.Context) (interface{}, error) {
-	filters := request.NewFilters(ctx.Request.URL.Query())
+	filters := request.NewFilters(ctx)
 	return r.service.StatisticalMeasurements(filters)
 }
 
@@ -22,12 +22,12 @@ func (r statisticRouter) statisticalMeasurementAlert(ctx *gin.Context) (interfac
 }
 
 func (r statisticRouter) statisticalDevices(ctx *gin.Context) (interface{}, error) {
-	filters := request.NewFilters(ctx.Request.URL.Query())
+	filters := request.NewFilters(ctx)
 	return r.service.StatisticalDevices(filters)
 }
 
 func (r statisticRouter) statisticalAlarmRecords(ctx *gin.Context) (interface{}, error) {
-	filters := request.NewFilters(ctx.Request.URL.Query())
+	filters := request.NewFilters(ctx)
 	from := cast.ToInt64(ctx.Query("from"))
 	to := cast.ToInt64(ctx.Query("to"))
 	return r.service.StatisticalAlarmRecords(from, to, filters)

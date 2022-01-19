@@ -10,8 +10,6 @@ type Service interface {
 
 	CheckDeviceBinding(macAddress string) error
 
-	FindMeasurementsByAssetID(assetID uint) ([]vo.Measurement, error)
-
 	FilterMeasurements(req request.Filters) ([]vo.Measurement, error)
 
 	GetMeasurement(id uint) (*vo.Measurement, error)

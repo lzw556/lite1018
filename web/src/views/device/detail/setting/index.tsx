@@ -49,7 +49,7 @@ const SettingPage: FC<SettingPageProps> = ({device}) => {
 
     return <Skeleton loading={isLoading}>
         <Row justify={"start"}>
-            <Col span={12}>
+            <Col span={16}>
                 {
                     device?.binding ?
                         <Typography.Text>设备已经绑定了监测点,请到<Typography.Link href={`#/asset-management?locale=assetMonitor/measurementDetail&id=${device.binding}`}>监测点页面</Typography.Link>进行配置修改</Typography.Text> :

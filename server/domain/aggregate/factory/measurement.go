@@ -74,7 +74,6 @@ func (factory Measurement) NewMeasurementCreateCmd(req request.CreateMeasurement
 				Name:       fmt.Sprintf("%s-%d", req.Name, binding.Index),
 				MacAddress: binding.Value,
 				Type:       req.DeviceType,
-				AssetID:    asset.ID,
 				Settings:   cmd.SensorSettings,
 				Category:   po.SensorCategory,
 			}
@@ -88,21 +87,6 @@ func (factory Measurement) NewMeasurementCreateCmd(req request.CreateMeasurement
 		cmd.Measurement.Display.Location.Y = req.Location.Y
 	}
 	return &cmd, nil
-}
-
-func (factory Measurement) NewMeasurementListQueryByAssetID(id uint) (*query.MeasurementListQuery, error) {
-	ctx := context.TODO()
-	asset, err := factory.assetRepo.Get(ctx, id)
-	if err != nil {
-		return nil, response.BusinessErr(errcode.AssetNotFoundError, "")
-	}
-	es, err := factory.measurementRepo.FindBySpecs(ctx, spec.AssetEqSpec(asset.ID))
-	if err != nil {
-		return nil, err
-	}
-	q := query.NewMeasurementListQuery()
-	q.Measurements = es
-	return &q, nil
 }
 
 func (factory Measurement) NewMeasurementFilterQuery(filters request.Filters) (*query.MeasurementFilterQuery, error) {

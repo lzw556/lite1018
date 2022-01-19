@@ -7,46 +7,50 @@ export function GetNetworkRequest(id: number) {
     return request.get<Network>(`/networks/${id}`).then(GetResponse)
 }
 
-export function PagingNetworksRequest(filter:any, page:number, size:number) {
+export function GetNetworksRequest() {
+    return request.get<Network[]>("/networks").then(GetResponse)
+}
+
+export function PagingNetworksRequest(filter: any, page: number, size: number) {
     return request.get<PageResult<Network[]>>(`/networks?method=paging`, {...filter, page, size}).then(GetResponse)
 }
 
-export function AccessDevicesRequest(networkId:number, params:any) {
+export function AccessDevicesRequest(networkId: number, params: any) {
     return request.patch(`/networks/${networkId}/devices`, params).then(PutResponse)
 }
 
-export function AddDeviceRequest(id:number, param:any) {
+export function AddDeviceRequest(id: number, param: any) {
     return request.post(`/networks/${id}/devices`, param).then(PostResponse)
 }
 
-export function RemoveDevicesRequest(networkId:number, params:any) {
+export function RemoveDevicesRequest(networkId: number, params: any) {
     return request.delete(`/networks/${networkId}/devices`, params).then(DeleteResponse)
 }
 
-export function ImportNetworkRequest(params:any) {
+export function ImportNetworkRequest(params: any) {
     return request.post("/networks/import", params).then(PostResponse)
 }
 
-export function CreateNetworkRequest(params:any) {
+export function CreateNetworkRequest(params: any) {
     return request.post("/networks", params).then(PostResponse)
 }
 
-export function ExportNetworkRequest(id:number) {
+export function ExportNetworkRequest(id: number) {
     return request.download<any>(`/networks/${id}/export`)
 }
 
-export function UpdateNetworkSettingRequest(gatewayId:number, wsn:any) {
+export function UpdateNetworkSettingRequest(gatewayId: number, wsn: any) {
     return request.put(`/networks/setting?gatewayId=${gatewayId}`, wsn).then(PutResponse)
 }
 
-export function UpdateNetworkRequest(id:number, params:any) {
+export function UpdateNetworkRequest(id: number, params: any) {
     return request.put<Network>(`/networks/${id}`, params).then(res => res.data)
 }
 
-export function SyncNetworkRequest(id:number) {
+export function SyncNetworkRequest(id: number) {
     return request.put(`/networks/${id}/sync`, null).then(res => res.data)
 }
 
-export function DeleteNetworkRequest(id:number) {
+export function DeleteNetworkRequest(id: number) {
     return request.delete(`/networks/${id}`).then(DeleteResponse)
 }

@@ -23,7 +23,7 @@ func (r measurementRouter) checkDeviceBinding(ctx *gin.Context) (interface{}, er
 }
 
 func (r measurementRouter) find(ctx *gin.Context) (interface{}, error) {
-	var req = request.NewFilters(ctx.Request.URL.Query())
+	var req = request.NewFilters(ctx)
 	switch ctx.Query("method") {
 	case "paging":
 		return nil, nil

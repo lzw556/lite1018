@@ -62,7 +62,7 @@ func (Vibration3Axis) Variables() Variables {
 		{
 			Name:      "displacement_peak_difference",
 			Title:     "位移峰峰值",
-			DataIndex: 7,
+			DataIndex: 6,
 			Unit:      "",
 			Type:      AxisVariableType,
 			Precision: 3,

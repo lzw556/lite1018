@@ -48,3 +48,39 @@ func (NormalTemperatureCorrosion) Settings() Settings {
 		},
 	}
 }
+
+func (NormalTemperatureCorrosion) Properties(sensorID uint) Properties {
+	switch sensorID {
+	case ThicknessSensor:
+		return Properties{
+			{
+				Key:         "thickness",
+				Name:        "厚度",
+				Unit:        "mm",
+				Type:        FloatPropertyType,
+				Precision:   3,
+				Sort:        0,
+				DataIndexes: []uint{0},
+			},
+			{
+				Key:         "temperature",
+				Name:        "温度",
+				Unit:        "°C",
+				Type:        FloatPropertyType,
+				Precision:   3,
+				Sort:        2,
+				DataIndexes: []uint{1},
+			},
+			{
+				Key:         "tof",
+				Name:        "飞行时间",
+				Unit:        "ns",
+				Type:        FloatPropertyType,
+				Precision:   3,
+				Sort:        3,
+				DataIndexes: []uint{3},
+			},
+		}
+	}
+	return nil
+}

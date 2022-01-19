@@ -168,3 +168,57 @@ func (BoltElongation) Settings() Settings {
 		},
 	}
 }
+
+func (BoltElongation) Properties(sensorID uint) Properties {
+	switch sensorID {
+	case LengthAttitudeAccelerationSensor:
+		return Properties{
+			{
+				Key:         "preload",
+				Name:        "预紧力",
+				Unit:        "kN",
+				Type:        FloatPropertyType,
+				Precision:   3,
+				Sort:        0,
+				DataIndexes: []uint{5},
+			},
+			{
+				Key:         "temperature",
+				Name:        "温度",
+				Unit:        "°C",
+				Type:        FloatPropertyType,
+				Precision:   3,
+				Sort:        1,
+				DataIndexes: []uint{1},
+			},
+			{
+				Key:         "length",
+				Name:        "长度",
+				Unit:        "mm",
+				Type:        FloatPropertyType,
+				Precision:   3,
+				Sort:        2,
+				DataIndexes: []uint{0},
+			},
+			{
+				Key:         "defect",
+				Name:        "缺陷位置",
+				Unit:        "mm",
+				Type:        FloatPropertyType,
+				Precision:   3,
+				Sort:        3,
+				DataIndexes: []uint{3},
+			},
+			{
+				Key:         "tof",
+				Name:        "飞行时间",
+				Unit:        "ns",
+				Type:        FloatPropertyType,
+				Precision:   3,
+				Sort:        4,
+				DataIndexes: []uint{2},
+			},
+		}
+	}
+	return nil
+}

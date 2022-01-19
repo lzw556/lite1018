@@ -21,9 +21,8 @@ func (r userRouter) getByID(ctx *gin.Context) (interface{}, error) {
 }
 
 func (r userRouter) paging(ctx *gin.Context) (interface{}, error) {
-	method := ctx.Query("method")
-	filters := request.NewFilters(ctx.Request.URL.Query())
-	switch method {
+	filters := request.NewFilters(ctx)
+	switch ctx.Query("method") {
 	case "paging":
 		page := cast.ToInt(ctx.Query("page"))
 		size := cast.ToInt(ctx.Query("size"))

@@ -21,7 +21,6 @@ import (
 type Device struct {
 	deviceRepo      dependency.DeviceRepository
 	networkRepo     dependency.NetworkRepository
-	propertyRepo    dependency.PropertyRepository
 	measurementRepo dependency.MeasurementRepository
 	bindingRepo     dependency.MeasurementDeviceBindingRepository
 }
@@ -30,7 +29,6 @@ func NewDevice() Device {
 	return Device{
 		deviceRepo:      repository.Device{},
 		networkRepo:     repository.Network{},
-		propertyRepo:    repository.Property{},
 		measurementRepo: repository.Measurement{},
 		bindingRepo:     repository.MeasurementDeviceBinding{},
 	}
@@ -45,6 +43,7 @@ func (factory Device) NewDeviceCreateCmd(req request.Device) (*command.DeviceCre
 	e.Name = req.Name
 	e.MacAddress = req.MacAddress
 	e.Type = req.TypeID
+	e.ProjectID = req.ProjectID
 	if t := devicetype.Get(req.TypeID); t != nil {
 		e.Settings = make(po.DeviceSettings, len(t.Settings()))
 		for i, setting := range t.Settings() {
@@ -108,44 +107,15 @@ func (factory Device) NewDeviceQuery(id uint) (*query.DeviceQuery, error) {
 	return &q, nil
 }
 
-func (factory Device) NewDeviceGroupByQuery(deviceType uint) (*query.DeviceGroupByQuery, error) {
-	ctx := context.TODO()
-	es, err := factory.deviceRepo.FindBySpecs(ctx, spec.TypeEqSpec(deviceType))
-	if err != nil {
-		return nil, err
-	}
-	q := query.NewDeviceGroupByQuery()
-	q.Devices = es
-	return &q, nil
-}
-
 func (factory Device) NewDevicePagingQuery(page, size int, filters request.Filters) (*query.DevicePagingQuery, error) {
 	ctx := context.TODO()
-	specs := make([]spec.Specification, 0)
-	for _, filter := range filters {
-		switch filter.Name {
-		case "asset_id":
-			specs = append(specs, spec.AssetEqSpec(cast.ToUint(filter.Value)))
-		case "name":
-			specs = append(specs, spec.DeviceNameEqSpec(cast.ToString(filter.Value)))
-		case "mac_address":
-			specs = append(specs, spec.DeviceMacEqSpec(cast.ToString(filter.Value)))
-		case "network_id":
-			specs = append(specs, spec.NetworkEqSpec(cast.ToUint(filter.Value)))
-		}
-	}
+	specs := factory.buildSpecs(filters)
 	es, total, err := factory.deviceRepo.PagingBySpecs(ctx, page, size, specs...)
 	if err != nil {
 		return nil, err
 	}
 	cmd := query.NewDevicePagingQuery(total)
 	cmd.Devices = es
-	cmd.PropertiesMap = map[uint][]po.Property{}
-	for _, e := range es {
-		if _, ok := cmd.PropertiesMap[e.Type]; !ok {
-			cmd.PropertiesMap[e.Type], _ = factory.propertyRepo.FindByDeviceTypeID(ctx, e.Type)
-		}
-	}
 	return &cmd, nil
 }
 
@@ -212,24 +182,24 @@ func (factory Device) NewDeviceUpgradeCmd(deviceID uint) (*command.DeviceUpgrade
 	return &cmd, nil
 }
 
-func (factory Device) NewDeviceListQueryByFilter(filters request.Filters) (*query.DeviceListQuery, error) {
+func (factory Device) NewDeviceFilterQuery(filters request.Filters) (*query.DeviceFilterQuery, error) {
 	ctx := context.TODO()
-	specs := factory.buildFilterSpec(filters)
+	specs := factory.buildSpecs(filters)
 	es, err := factory.deviceRepo.FindBySpecs(ctx, specs...)
 	if err != nil {
 		return nil, err
 	}
-	q := query.NewDeviceListQuery()
+	q := query.NewDeviceFilterQuery()
 	q.Devices = es
 	return &q, nil
 }
 
-func (factory Device) buildFilterSpec(filters request.Filters) []spec.Specification {
+func (factory Device) buildSpecs(filters request.Filters) []spec.Specification {
 	specs := make([]spec.Specification, 0)
 	for _, filter := range filters {
 		switch filter.Name {
-		case "asset_id":
-			specs = append(specs, spec.AssetEqSpec(cast.ToUint(filter.Value)))
+		case "project_id":
+			specs = append(specs, spec.ProjectEqSpec(cast.ToUint(filter.Value)))
 		case "network_id":
 			specs = append(specs, spec.NetworkEqSpec(cast.ToUint(filter.Value)))
 		case "measurement_id":
@@ -243,6 +213,10 @@ func (factory Device) buildFilterSpec(filters request.Filters) []spec.Specificat
 			specs = append(specs, spec.CategoryEqSpec(cast.ToUint(filter.Value)))
 		case "type":
 			specs = append(specs, spec.TypeEqSpec(cast.ToUint(filter.Value)))
+		case "name":
+			specs = append(specs, spec.DeviceNameEqSpec(cast.ToString(filter.Value)))
+		case "mac_address":
+			specs = append(specs, spec.DeviceMacEqSpec(cast.ToString(filter.Value)))
 		}
 	}
 	return specs

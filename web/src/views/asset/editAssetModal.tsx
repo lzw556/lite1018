@@ -73,14 +73,14 @@ const EditAssetModal:FC<AssetEditModalProps> = (props) => {
             </Form.Item>
             <Form.Item label={"资产图片"} name={"file"}>
                 <Upload name="file"
-                        defaultFileList={[
+                        defaultFileList={asset.image ? [
                             {
                                 uid: '-1',
                                 name: asset.image,
                                 status: 'done',
                                 url: `/api/resources/assets/${asset.image}`,
                             }
-                        ]}
+                        ]: []}
                         maxCount={1}
                         listType="picture"
                         className="upload-list-inline"

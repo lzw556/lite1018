@@ -42,7 +42,7 @@ const IpnFormItem:FC<IpnFromItemProps> = ({ipn}) => {
 
     return <div>
         <Form.Item label={"IP模式"} required name={["ipn", "ip_mode"]} initialValue={ipn?.ip_mode}>
-            <Radio.Group onChange={(e) => {
+            <Radio.Group buttonStyle={"solid"} onChange={(e) => {
                 setIsDhcpEnabled(e.target.value === 0)
             }
             }>
@@ -54,7 +54,7 @@ const IpnFormItem:FC<IpnFromItemProps> = ({ipn}) => {
             renderIPFormItem()
         }
         <Form.Item label={"是否启用NTP"} required name={["ipn", "ntp_is_enabled"]} initialValue={ipn?.ntp_is_enabled}>
-            <Radio.Group  onChange={(e) => {
+            <Radio.Group buttonStyle={"solid"}  onChange={(e) => {
                 setIsNtpEnabled(e.target.value)
             }
             }>

@@ -4,14 +4,12 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
-	"github.com/thetasensors/theta-cloud-lite/server/domain/po"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/vo"
 )
 
 type DevicePagingQuery struct {
 	entity.Devices
-	total         int64
-	PropertiesMap map[uint][]po.Property
+	total int64
 
 	deviceStatusRepo dependency.DeviceStatusRepository
 	alarmRecordRepo  dependency.AlarmRecordRepository
@@ -29,7 +27,6 @@ func (query DevicePagingQuery) Paging() ([]vo.Device, int64) {
 	result := make([]vo.Device, len(query.Devices))
 	for i, device := range query.Devices {
 		result[i] = vo.NewDevice(device)
-		result[i].SetProperties(query.PropertiesMap[device.Type])
 		result[i].SetUpgradeState(device)
 		result[i].State.DeviceStatus, _ = query.deviceStatusRepo.Get(device.ID)
 	}

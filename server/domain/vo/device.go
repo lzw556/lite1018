@@ -3,6 +3,7 @@ package vo
 import (
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/po"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/devicetype"
 )
 
 type Device struct {
@@ -18,8 +19,8 @@ type Device struct {
 
 	Network      *Network                   `json:"network,omitempty"`
 	Information  DeviceInformation          `json:"information"`
-	Properties   []Property                 `json:"properties"`
 	State        DeviceState                `json:"state"`
+	Properties   devicetype.Properties      `json:"properties,omitempty"`
 	UpgradeState *entity.DeviceUpgradeState `json:"upgradeState,omitempty"`
 	Binding      uint                       `json:"binding"`
 	Data         DeviceData                 `json:"data"`
@@ -54,11 +55,8 @@ func (d *Device) SetWSN(e entity.Network) {
 	}
 }
 
-func (d *Device) SetProperties(es []po.Property) {
-	d.Properties = make([]Property, len(es))
-	for i, e := range es {
-		d.Properties[i] = NewProperty(e)
-	}
+func (d *Device) SetProperties() {
+
 }
 
 func (d *Device) SetUpgradeState(e entity.Device) {

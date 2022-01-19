@@ -14,7 +14,7 @@ import TopologyView from "./topologyView";
 import {PlusOutlined} from "@ant-design/icons";
 import AddDeviceModal from "./addDeviceModal";
 import "../index.css";
-import usePermission, {Permission} from "../../../permission/permission";
+import {Permission} from "../../../permission/permission";
 import HasPermission from "../../../permission";
 
 const tabList = [
@@ -72,12 +72,9 @@ const NetworkDetail = () => {
                         </Space>
                     </Col>
                     <Col span={3} className="ts-detail-label">
-                        所属资产
                     </Col>
                     <Col span={6}>
-                        {
-                            network.asset.name
-                        }
+
                     </Col>
                 </Row>
                 <br/>

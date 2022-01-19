@@ -33,9 +33,11 @@ func NewAsset() asset.Service {
 func (s Asset) CreateAsset(req request.Asset) error {
 	e := po.Asset{
 		Name:      req.Name,
-		Image:     fmt.Sprintf("%s%s", uuid.NewV1().String(), req.GetFileExt()),
 		ParentID:  req.ParentID,
 		ProjectID: req.ProjectID,
+	}
+	if req.Image != nil {
+		e.Image = fmt.Sprintf("%s%s", uuid.NewV1().String(), req.GetFileExt())
 	}
 	if req.Location != nil {
 		e.Display.Location.X = req.Location.X
@@ -69,14 +71,20 @@ func (s Asset) UpdateAssetByID(assetID uint, req request.Asset) error {
 		e.Display.Location.X = req.Location.X
 		e.Display.Location.Y = req.Location.Y
 	}
+	if req.Image != nil {
+		if e.Image != "" {
+			if err := global.DeleteFile("resources/assets", e.Image); err != nil {
+				return err
+			}
+		} else {
+			e.Image = fmt.Sprintf("%s%s", uuid.NewV1().String(), req.GetFileExt())
+		}
+	}
 	return transaction.Execute(ctx, func(txCtx context.Context) error {
 		if err := s.repository.Save(txCtx, &e); err != nil {
 			return err
 		}
 		if req.Image != nil {
-			if err := global.DeleteFile("resources/assets", e.Image); err != nil {
-				return err
-			}
 			payload, err := req.UploadBytes()
 			if err != nil {
 				return err

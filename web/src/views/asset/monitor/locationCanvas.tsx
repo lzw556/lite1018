@@ -7,6 +7,7 @@ import {Asset} from "../../../types/asset";
 import {FC, useState} from "react";
 import moment from "moment";
 import {MeasurementType} from "../../../types/measurement_type";
+import {MeasurementFieldType} from "../../../types/measurement_data";
 
 export interface LocationCanvasProps {
     x: number
@@ -25,10 +26,15 @@ const LocationCanvas: FC<LocationCanvasProps> = ({x, y, value}) => {
                     <p>{`类型: ${MeasurementType.toString(measurement.type)}`}</p>
                     {
                         Measurement.getPrimaryFields(measurement)?.sort((a:any, b:any) => a.sort - b.sort).map(field => {
-                            if (Array.isArray(field.value)) {
-                                return <>
-                                    <p>{`${field.title}: ${field.value.map(v => v.toFixed(field.precision))}${field.unit}`}</p>
-                                </>
+                            switch (field.type) {
+                                case MeasurementFieldType.Axis:
+                                    return <>
+                                        <p>{`${field.title}: ${field.value.map((v:any) => v.toFixed(field.precision))}${field.unit}`}</p>
+                                    </>
+                                case MeasurementFieldType.Array:
+                                    return <>
+                                        <p>{`${field.title}最小值: ${Math.min.apply(null, field.value ? field.value : [0]).toFixed(field.precision)}${field.unit}`}</p>
+                                    </>
                             }
                             return <>
                                 <p>{`${field.title}: ${field.value.toFixed(field.precision)}${field.unit}`}</p>

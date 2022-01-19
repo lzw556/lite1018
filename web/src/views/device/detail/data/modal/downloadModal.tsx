@@ -22,7 +22,7 @@ const DownloadModal: FC<DownloadModalProps> = (props) => {
     useEffect(() => {
         if (visible) {
             form.setFieldsValue({
-                properties: property ? [property.id] : []
+                properties: property ? [property.key] : []
             })
         }
     }, [visible])
@@ -49,7 +49,7 @@ const DownloadModal: FC<DownloadModalProps> = (props) => {
             <Form.Item label={"设备属性"} name={"properties"} required>
                 <Select placeholder={"请选择设备属性"} mode={"multiple"} maxTagCount={2}>
                     {
-                        device.properties.map(item => <Option key={item.id} value={item.id}>{item.name}</Option>)
+                        device.properties.map(item => <Option key={item.key} value={item.key}>{item.name}</Option>)
                     }
                 </Select>
             </Form.Item>

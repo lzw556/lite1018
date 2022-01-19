@@ -45,13 +45,7 @@ func (factory Network) NewNetworkQuery(networkID uint) (*query.NetworkQuery, err
 
 func (factory Network) NewNetworkPagingQuery(filters request.Filters, page, size int) (*query.NetworkPagingQuery, error) {
 	ctx := context.TODO()
-	specs := make([]spec.Specification, 0)
-	for _, filter := range filters {
-		switch filter.Name {
-		case "asset_id":
-			specs = append(specs, spec.AssetEqSpec(cast.ToUint(filter.Value)))
-		}
-	}
+	specs := factory.buildSpecs(filters)
 	es, total, err := factory.networkRepo.PagingBySpecs(ctx, page, size, specs...)
 	if err != nil {
 		return nil, err
@@ -70,7 +64,7 @@ func (factory Network) NewNetworkCreateCmd(req request.CreateNetwork) (*command.
 	cmd := command.NewNetworkCreateCmd()
 	cmd.Network.Network = po.Network{
 		Name:                    req.Name,
-		AssetID:                 req.AssetID,
+		ProjectID:               req.ProjectID,
 		CommunicationPeriod:     req.WSN.CommunicationPeriod,
 		CommunicationTimeOffset: req.WSN.CommunicationTimeOffset,
 		GroupSize:               req.WSN.GroupSize,
@@ -81,18 +75,13 @@ func (factory Network) NewNetworkCreateCmd(req request.CreateNetwork) (*command.
 		MacAddress: req.Gateway.MacAddress,
 		Name:       fmt.Sprintf("%s-网关", req.Name),
 		Type:       devicetype.GatewayType,
-		AssetID:    req.AssetID,
+		ProjectID:  req.ProjectID,
 	}
 	return &cmd, nil
 }
 
 func (factory Network) NewNetworkImportCmd(req request.ImportNetwork) (*command.NetworkImportCmd, error) {
 	ctx := context.TODO()
-	asset, err := factory.assetRepo.Get(ctx, req.AssetID)
-	if err != nil {
-		return nil, response.BusinessErr(errcode.AssetNotFoundError, "")
-	}
-
 	cmd := command.NewNetworkImportCmd()
 	// 构建网络实体
 	cmd.Network = po.Network{
@@ -101,7 +90,7 @@ func (factory Network) NewNetworkImportCmd(req request.ImportNetwork) (*command.
 		GroupSize:               req.GroupSize,
 		GroupInterval:           req.GroupInterval,
 		RoutingTables:           make(po.RoutingTables, len(req.RoutingTables)),
-		AssetID:                 req.AssetID,
+		ProjectID:               req.ProjectID,
 	}
 	for i, table := range req.RoutingTables {
 		cmd.RoutingTables[i] = po.RoutingTable{
@@ -118,8 +107,8 @@ func (factory Network) NewNetworkImportCmd(req request.ImportNetwork) (*command.
 		}
 		e.Name = device.Name
 		e.MacAddress = device.MacAddress
-		e.AssetID = asset.ID
 		e.Type = device.TypeID
+		e.ProjectID = req.ProjectID
 		switch e.Type {
 		case devicetype.GatewayType:
 			cmd.Network.Name = device.Name
@@ -151,19 +140,14 @@ func (factory Network) NewNetworkExportCmd(networkID uint) (*command.NetworkExpo
 	return &cmd, nil
 }
 
-func (factory Network) NewNetworkUpdateCmd(gatewayID uint) (*command.NetworkUpdateCmd, error) {
+func (factory Network) NewNetworkUpdateCmd(id uint) (*command.NetworkUpdateCmd, error) {
 	ctx := context.TODO()
-	gateway, err := factory.deviceRepo.Get(ctx, gatewayID)
-	if err != nil {
-		return nil, response.BusinessErr(errcode.DeviceNotFoundError, "")
-	}
-	e, err := factory.networkRepo.GetBySpecs(ctx, spec.GatewayEqSpec(gateway.ID))
+	e, err := factory.networkRepo.Get(ctx, id)
 	if err != nil {
 		return nil, response.BusinessErr(errcode.NetworkNotFoundError, "")
 	}
 	cmd := command.NewNetworkUpdateCmd()
 	cmd.Network = e
-	cmd.Gateway = gateway
 	return &cmd, nil
 }
 
@@ -208,4 +192,27 @@ func (factory Network) NewNetworkRemoveCmd(networkID uint) (*command.NetworkRemo
 	cmd := command.NewNetworkRemoveCmd()
 	cmd.Network = network
 	return &cmd, nil
+}
+
+func (factory Network) NewNetworkFilterQuery(filters request.Filters) (*query.NetworkFilterQuery, error) {
+	ctx := context.TODO()
+	specs := factory.buildSpecs(filters)
+	es, err := factory.networkRepo.FindBySpecs(ctx, specs...)
+	if err != nil {
+		return nil, err
+	}
+	q := query.NewNetworkFilterQuery()
+	q.Networks = es
+	return &q, nil
+}
+
+func (factory Network) buildSpecs(filters request.Filters) []spec.Specification {
+	specs := make([]spec.Specification, 0)
+	for _, filter := range filters {
+		switch filter.Name {
+		case "project_id":
+			specs = append(specs, spec.ProjectEqSpec(cast.ToUint(filter.Value)))
+		}
+	}
+	return specs
 }

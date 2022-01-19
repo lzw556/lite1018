@@ -7,19 +7,19 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/domain/vo"
 )
 
-type DeviceListQuery struct {
+type DeviceFilterQuery struct {
 	entity.Devices
 
 	deviceDataRepo dependency.SensorDataRepository
 }
 
-func NewDeviceListQuery() DeviceListQuery {
-	return DeviceListQuery{
+func NewDeviceFilterQuery() DeviceFilterQuery {
+	return DeviceFilterQuery{
 		deviceDataRepo: repository.SensorData{},
 	}
 }
 
-func (query DeviceListQuery) Run() []vo.Device {
+func (query DeviceFilterQuery) Run() []vo.Device {
 	result := make([]vo.Device, len(query.Devices))
 	for i, device := range query.Devices {
 		result[i] = vo.NewDevice(device)

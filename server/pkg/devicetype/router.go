@@ -13,3 +13,7 @@ func (Router) SensorID() uint {
 func (Router) Settings() Settings {
 	return []Setting{}
 }
+
+func (Router) Properties(sensorID uint) Properties {
+	return nil
+}

@@ -71,7 +71,6 @@ func (cmd MeasurementUpdateCmd) UpdateDeviceBindings(req request.UpdateMeasureme
 			if device, err := cmd.deviceRepo.GetBySpecs(txCtx, spec.DeviceMacEqSpec(binding.MacAddress)); err != nil && errors.Is(err, gorm.ErrRecordNotFound) {
 				device.Settings = cmd.SensorSettings
 				device.MacAddress = binding.MacAddress
-				device.AssetID = cmd.Measurement.AssetID
 				device.Type = req.DeviceType
 				device.Category = 3
 				device.Name = fmt.Sprintf("%s-%d", cmd.Measurement.Name, i)

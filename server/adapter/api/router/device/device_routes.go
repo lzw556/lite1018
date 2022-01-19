@@ -11,20 +11,12 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/json"
 )
 
-func (r deviceRouter) getDeviceTypeParameters(ctx *gin.Context) (interface{}, error) {
-	id := cast.ToUint(ctx.Param("id"))
-	result, err := devicetype.GetParameter(id)
-	if err != nil {
-		return nil, response.BusinessErr(err.(errcode.BusinessErrorCode), "")
-	}
-	return result, nil
-}
-
 func (r deviceRouter) create(ctx *gin.Context) (interface{}, error) {
 	var req request.Device
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		return nil, response.InvalidParameterError(err.Error())
 	}
+	req.ProjectID = cast.ToUint(ctx.MustGet("project_id"))
 	return nil, r.service.CreateDevice(req)
 }
 
@@ -34,9 +26,8 @@ func (r deviceRouter) get(ctx *gin.Context) (interface{}, error) {
 }
 
 func (r deviceRouter) find(ctx *gin.Context) (interface{}, error) {
-	method := ctx.Query("method")
-	filters := request.NewFilters(ctx.Request.URL.Query())
-	switch method {
+	filters := request.NewFilters(ctx)
+	switch ctx.Query("method") {
 	case "paging":
 		page := cast.ToInt(ctx.Query("page"))
 		size := cast.ToInt(ctx.Query("size"))
@@ -106,10 +97,10 @@ func (r deviceRouter) delete(ctx *gin.Context) (interface{}, error) {
 
 func (r deviceRouter) findDataByID(ctx *gin.Context) (interface{}, error) {
 	id := cast.ToUint(ctx.Param("id"))
-	pid := cast.ToUint(ctx.Query("pid"))
+	pid := ctx.Query("pid")
 	from := cast.ToInt64(ctx.Query("from"))
 	to := cast.ToInt64(ctx.Query("to"))
-	if pid == 0 {
+	if pid == "" {
 		return r.service.FindDeviceDataByID(id, from, to)
 	}
 	return r.service.GetPropertyDataByID(id, pid, from, to)
@@ -119,15 +110,11 @@ func (r deviceRouter) downloadDataByID(ctx *gin.Context) (interface{}, error) {
 	id := cast.ToUint(ctx.Param("id"))
 	from := cast.ToInt64(ctx.Query("from"))
 	to := cast.ToInt64(ctx.Query("to"))
-	var pids []uint
+	var pids []string
 	if err := json.Unmarshal([]byte(ctx.Query("pids")), &pids); err != nil {
 		return nil, err
 	}
-	result, err := r.service.GetPropertyDataByIDs(id, pids, from, to)
-	if err != nil {
-		return nil, err
-	}
-	return result.ToExcelFile()
+	return r.service.DownloadPropertiesDataByID(id, pids, from, to)
 }
 
 func (r deviceRouter) removeDataByID(ctx *gin.Context) (interface{}, error) {

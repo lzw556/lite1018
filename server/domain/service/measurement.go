@@ -45,14 +45,6 @@ func (s Measurement) CheckDeviceBinding(macAddress string) error {
 	return response.BusinessErr(errcode.DeviceAlreadyBindingError, "")
 }
 
-func (s Measurement) FindMeasurementsByAssetID(assetID uint) ([]vo.Measurement, error) {
-	query, err := s.factory.NewMeasurementListQueryByAssetID(assetID)
-	if err != nil {
-		return nil, err
-	}
-	return query.Run(), nil
-}
-
 func (s Measurement) FilterMeasurements(req request.Filters) ([]vo.Measurement, error) {
 	query, err := s.factory.NewMeasurementFilterQuery(req)
 	if err != nil {

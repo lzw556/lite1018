@@ -21,6 +21,7 @@ type Typer interface {
 	ID() uint
 	SensorID() uint
 	Settings() Settings
+	Properties(sensorID uint) Properties
 }
 
 var types = []Typer{

@@ -96,7 +96,8 @@ const MeasurementDetail = () => {
                     } else {
                         return <>
                             <Statistic title={`${data.title}最小值`} valueStyle={{fontSize: "14pt"}}
-                                       value={Math.min.apply(null, data.value).toFixed(data.precision)}/>
+                                       value={Math.min.apply(null, data.value).toFixed(data.precision)}
+                                       suffix={data.unit}/>
                         </>
                     }
                 }

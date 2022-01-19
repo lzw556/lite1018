@@ -34,15 +34,15 @@ import MyBreadcrumb from "../../components/myBreadcrumb";
 import HasPermission from "../../permission";
 import usePermission, {Permission} from "../../permission/permission";
 import {PageResult} from "../../types/page";
-import AssetTreeSelect from "../../components/select/assetTreeSelect";
 import DeviceTable from "../../components/table/deviceTable";
+import NetworkSelect from "../../components/select/networkSelect";
 
 const {Search} = Input
 const {Option} = Select
 const {Text} = Typography
 
 const DevicePage = () => {
-    const [assetId, setAssetId] = useState<number>(0)
+    const [network, setNetwork] = useState<number>()
     const [searchTarget, setSearchTarget] = useState<number>(0)
     const [searchText, setSearchText] = useState<string>("")
     const [device, setDevice] = useState<Device>()
@@ -70,11 +70,11 @@ const DevicePage = () => {
         } else if (searchTarget === 1) {
             filter.mac_address = searchText
         }
-        if (assetId) {
-            filter.asset_id = assetId
-            PagingDevicesRequest(current, size, filter).then(setDataSource)
+        if (network) {
+            filter.network_id = network
         }
-    }, [assetId, searchText, refreshKey])
+        PagingDevicesRequest(current, size, filter).then(setDataSource)
+    }, [network, searchText, refreshKey])
 
     useEffect(() => {
         fetchDevices(1, 10)
@@ -269,12 +269,8 @@ const DevicePage = () => {
             <Row justify="center">
                 <Col span={24}>
                     <Space>
-                        <Label name={"资产"}>
-                            <AssetTreeSelect bordered={false}
-                                             style={{width: "144px"}}
-                                             defaultActiveFirstOption={true}
-                                             value={assetId}
-                                             placeholder={"所有资产"} onChange={setAssetId}/>
+                        <Label name={"网络"}>
+                            <NetworkSelect bordered={false} onChange={setNetwork} allowClear/>
                         </Label>
                         <Input.Group compact>
                             <Select defaultValue={searchTarget} style={{width: "80px"}}

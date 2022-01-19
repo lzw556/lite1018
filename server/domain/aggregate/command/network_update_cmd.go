@@ -19,7 +19,6 @@ import (
 
 type NetworkUpdateCmd struct {
 	entity.Network
-	Gateway entity.Device
 
 	networkRepo dependency.NetworkRepository
 	deviceRepo  dependency.DeviceRepository
@@ -33,29 +32,23 @@ func NewNetworkUpdateCmd() NetworkUpdateCmd {
 }
 
 func (cmd NetworkUpdateCmd) Update(req request.Network) (*vo.Network, error) {
-	isAssetChanged := cmd.Network.AssetID != req.AssetID
 	cmd.Network.CommunicationPeriod = req.WSN.CommunicationPeriod
 	cmd.Network.CommunicationTimeOffset = req.WSN.CommunicationTimeOffset
 	cmd.Network.GroupInterval = req.WSN.GroupInterval
 	cmd.Network.GroupSize = req.WSN.GroupSize
 	cmd.Network.Name = req.Name
-	cmd.Network.AssetID = req.AssetID
+	cmd.Network.ProjectID = req.ProjectID
 	err := transaction.Execute(context.TODO(), func(txCtx context.Context) error {
 		if err := cmd.networkRepo.Save(txCtx, &cmd.Network.Network); err != nil {
 			return err
 		}
-		if isAssetChanged {
-			updates := map[string]interface{}{
-				"asset_id": cmd.Network.AssetID,
-			}
-			return cmd.deviceRepo.UpdatesBySpecs(txCtx, updates, spec.NetworkEqSpec(cmd.Network.ID))
-		}
 		return nil
 	})
+	gateway, err := cmd.deviceRepo.Get(context.TODO(), cmd.Network.GatewayID)
 	if err != nil {
 		return nil, err
 	}
-	go command.SyncWsnSettings(cmd.Network, cmd.Gateway, true, 3*time.Second)
+	go command.SyncWsnSettings(cmd.Network, gateway, true, 3*time.Second)
 	result := vo.NewNetwork(cmd.Network)
 	return &result, nil
 }
@@ -119,7 +112,6 @@ func (cmd NetworkUpdateCmd) AccessNewDevice(req request.AddDevices) error {
 		MacAddress: req.MacAddress,
 		NetworkID:  cmd.Network.ID,
 		Type:       req.DeviceType,
-		AssetID:    cmd.Network.AssetID,
 	}
 	return transaction.Execute(ctx, func(txCtx context.Context) error {
 		if err := cmd.deviceRepo.Create(txCtx, &device.Device); err != nil {

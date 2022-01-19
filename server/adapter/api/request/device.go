@@ -9,7 +9,7 @@ type Device struct {
 	System     map[string]interface{} `json:"system,omitempty"`
 	Sensors    map[string]interface{} `json:"sensors,omitempty"`
 
-	WSN *WSN `json:"wsn,omitempty"`
+	ProjectID uint `json:"-"`
 }
 
 type DeviceSearch struct {

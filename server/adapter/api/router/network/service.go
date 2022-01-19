@@ -8,12 +8,12 @@ import (
 type Service interface {
 	GetNetworkByID(id uint) (*vo.Network, error)
 	FindNetworksByPaginate(filters request.Filters, page, size int) ([]vo.Network, int64, error)
+	FilterNetworks(filters request.Filters) ([]vo.Network, error)
 	ImportNetwork(req request.ImportNetwork) error
 	CreateNetwork(req request.CreateNetwork) error
 
 	UpdateNetworkByID(id uint, req request.Network) (*vo.Network, error)
 	DeleteNetworkByID(id uint) error
-	UpdateSettingByGatewayID(gatewayID uint, req request.WSN) error
 
 	ExportNetworkByID(id uint) (*vo.NetworkExportFile, error)
 	SyncNetworkByID(id uint) error

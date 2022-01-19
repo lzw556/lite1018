@@ -18,7 +18,7 @@ type Device struct {
 	MacAddress string `gorm:"type:varchar(12)"`
 	Type       uint
 	NetworkID  uint
-	AssetID    uint
+	ProjectID  uint
 	Category   DeviceCategory
 	Settings   DeviceSettings `gorm:"type:json"`
 }

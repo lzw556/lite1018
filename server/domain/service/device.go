@@ -70,7 +70,7 @@ func (s Device) FindDevicesByPaginate(page, size int, filters request.Filters) (
 }
 
 func (s Device) FilterDevices(filters request.Filters) ([]vo.Device, error) {
-	query, err := s.factory.NewDeviceListQueryByFilter(filters)
+	query, err := s.factory.NewDeviceFilterQuery(filters)
 	if err != nil {
 		return nil, err
 	}
@@ -105,30 +105,23 @@ func (s Device) ReplaceDeviceByID(deviceID uint, mac string) error {
 	return nil
 }
 
-func (s Device) GetPropertyDataByID(deviceID uint, pID uint, from, to int64) (vo.PropertyData, error) {
-	query, err := s.factory.NewDeviceQuery(deviceID)
-	if err != nil {
-		return vo.PropertyData{}, err
-	}
-	return query.PropertyDataByRange(pID, time.Unix(from, 0), time.Unix(to, 0))
-}
-
-func (s Device) GetPropertyDataByIDs(deviceID uint, pIDs []uint, from, to int64) (vo.PropertiesData, error) {
+func (s Device) GetPropertyDataByID(deviceID uint, pID string, from, to int64) ([]vo.PropertyData, error) {
 	query, err := s.factory.NewDeviceQuery(deviceID)
 	if err != nil {
 		return nil, err
 	}
-	result := make([]vo.PropertyData, len(pIDs))
-	for i, pid := range pIDs {
-		result[i], err = query.PropertyDataByRange(pid, time.Unix(from, 0), time.Unix(to, 0))
-		if err != nil {
-			return nil, err
-		}
-	}
-	return result, nil
+	return query.PropertyDataByRange(pID, time.Unix(from, 0), time.Unix(to, 0))
 }
 
-func (s Device) FindDeviceDataByID(deviceID uint, from, to int64) ([]vo.PropertyData, error) {
+func (s Device) DownloadPropertiesDataByID(deviceID uint, pIDs []string, from, to int64) (*vo.ExcelFile, error) {
+	query, err := s.factory.NewDeviceQuery(deviceID)
+	if err != nil {
+		return nil, err
+	}
+	return query.DownloadPropertiesDataByRange(pIDs, time.Unix(from, 0), time.Unix(to, 0))
+}
+
+func (s Device) FindDeviceDataByID(deviceID uint, from, to int64) (vo.PropertiesData, error) {
 	query, err := s.factory.NewDeviceQuery(deviceID)
 	if err != nil {
 		return nil, err

@@ -16,9 +16,8 @@ func (r projectRouter) create(ctx *gin.Context) (interface{}, error) {
 }
 
 func (r projectRouter) find(ctx *gin.Context) (interface{}, error) {
-	method := ctx.Query("method")
-	filters := request.NewFilters(ctx.Request.URL.Query())
-	switch method {
+	filters := request.NewFilters(ctx)
+	switch ctx.Query("method") {
 	case "paging":
 		page := cast.ToInt(ctx.Query("page"))
 		size := cast.ToInt(ctx.Query("size"))

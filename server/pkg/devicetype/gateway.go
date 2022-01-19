@@ -90,3 +90,7 @@ func (Gateway) Settings() Settings {
 		},
 	}
 }
+
+func (Gateway) Properties(sensorID uint) Properties {
+	return nil
+}

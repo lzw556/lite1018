@@ -14,26 +14,18 @@ import (
 type AssetRemoveCmd struct {
 	po.Asset
 
-	assetRepo             dependency.AssetRepository
-	deviceRepo            dependency.DeviceRepository
-	deviceStatus          dependency.DeviceStatusRepository
-	deviceInformationRepo dependency.DeviceInformationRepository
-	networkRepo           dependency.NetworkRepository
-	measurementRepo       dependency.MeasurementRepository
-	measurementAlertRepo  dependency.MeasurementAlertRepository
-	bindingRepo           dependency.MeasurementDeviceBindingRepository
+	assetRepo            dependency.AssetRepository
+	measurementRepo      dependency.MeasurementRepository
+	measurementAlertRepo dependency.MeasurementAlertRepository
+	bindingRepo          dependency.MeasurementDeviceBindingRepository
 }
 
 func NewAssetRemoveCmd() AssetRemoveCmd {
 	return AssetRemoveCmd{
-		assetRepo:             repository.Asset{},
-		deviceRepo:            repository.Device{},
-		deviceStatus:          repository.DeviceStatus{},
-		deviceInformationRepo: repository.DeviceInformation{},
-		networkRepo:           repository.Network{},
-		measurementRepo:       repository.Measurement{},
-		measurementAlertRepo:  repository.MeasurementAlert{},
-		bindingRepo:           repository.MeasurementDeviceBinding{},
+		assetRepo:            repository.Asset{},
+		measurementRepo:      repository.Measurement{},
+		measurementAlertRepo: repository.MeasurementAlert{},
+		bindingRepo:          repository.MeasurementDeviceBinding{},
 	}
 }
 
@@ -71,26 +63,6 @@ func (cmd AssetRemoveCmd) remove(ctx context.Context, assets ...po.Asset) error 
 				}
 			}
 		}
-		// Remove devices
-		if devices, err := cmd.deviceRepo.FindBySpecs(ctx, spec.AssetEqSpec(asset.ID)); err == nil {
-			for _, device := range devices {
-				if err := cmd.deviceStatus.Delete(device.ID); err != nil {
-					return err
-				}
-				if err := cmd.deviceInformationRepo.Delete(device.ID); err != nil {
-					return err
-				}
-			}
-		}
-		if err := cmd.deviceRepo.DeleteBySpecs(ctx, spec.AssetEqSpec(asset.ID)); err != nil {
-			return err
-		}
-
-		// Remove networks
-		if err := cmd.networkRepo.DeleteBySpecs(ctx, spec.AssetEqSpec(asset.ID)); err != nil {
-			return err
-		}
-
 		// Remove children
 		if children, err := cmd.assetRepo.FindBySpecs(ctx, spec.ParentIDEqSpec(asset.ID)); err == nil {
 			if err := cmd.remove(ctx, children...); err != nil {

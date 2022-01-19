@@ -6,14 +6,11 @@ import {GetChildrenRequest, GetDeviceDataRequest} from "../../../../apis/device"
 import moment from "moment";
 import {DefaultMonitorDataOption, LineChartStyles} from "../../../../constants/chart";
 import ReactECharts from "echarts-for-react";
-import {ColorDanger} from "../../../../constants/color";
-import {Alarm} from "../../../../types/alarm_rule";
 import Label from "../../../../components/label";
 import {ReloadOutlined} from "@ant-design/icons";
-import {GetFieldName} from "../../../../constants/field";
 
 export interface MonitorPageProps {
-    device?: Device
+    device: Device
 }
 
 const {Option} = Select
@@ -42,67 +39,98 @@ const MonitorPage: FC<MonitorPageProps> = ({device}) => {
         }
     }, [device, startDate, endDate])
 
-    const convertMarkLine = (alarms: Alarm[], unit: string) => {
-        if (alarms) {
-            const data = alarms.filter(item => item.level === 3).map(item => {
-                return {
-                    name: GetFieldName(item.rule.field),
-                    yAxis: item.rule.threshold,
-                    lineStyle: {color: ColorDanger},
-                    tooltip: {formatter: `紧急<br/>{b} ${item.rule.operation} {c} ${unit}`},
-                }
-            })
-            return {
-                silent: false,
-                symbol: "none",
-                data: data,
-                label: {position: 'insideEndTop', formatter: `阈值 {c}${unit}`}
-            }
-        }
-    }
-
     const onDeviceChanged = (id: number) => {
         fetchDeviceData(id)
     }
 
     const fetchDeviceData = (id: number) => {
         setSelectedDevice(id)
-        GetDeviceDataRequest(id, 0, startDate.utc().unix(), endDate.utc().unix()).then(data => {
-            setOptions([])
-            if (Array.isArray(data)) {
-                setOptions(data.map(item => {
-                    const series = Object.keys(item.fields).map((key, index) => {
-                        return {
-                            ...LineChartStyles[index],
-                            name: GetFieldName(key),
-                            type: 'line',
-                            data: item.fields[key].map((value: any) => Number(value).toFixed(3)),
-                            markLine: convertMarkLine(item.alarms, item.unit)
+        GetDeviceDataRequest(id, "", startDate.utc().unix(), endDate.utc().unix()).then(data => {
+            setOptions(device.properties.map(property => {
+                const key = property.key
+                let series: any[]
+                let legends: string[]
+                switch (property.type) {
+                    case 'axis':
+                        legends = ["X轴", "Y轴", "Z轴"]
+                        series = legends.map((item, index) => {
+                            return {
+                                ...LineChartStyles[index],
+                                name: item,
+                                type: 'line',
+                                data: data[key].map((item:any) => item.value[index]),
+                                showSymbol: false
+                            }
+                        })
+                        break;
+                    default:
+                        legends = [property.name]
+                        series = [
+                            {
+                                ...LineChartStyles[0],
+                                name: property.name,
+                                type: 'line',
+                                data: data[key].map((item:any) => item.value),
+                                showSymbol: false
+                            }
+                        ]
+                        break;
+                }
+                return {
+                    ...DefaultMonitorDataOption,
+                    tooltip: {
+                        trigger: 'axis',
+                        formatter: function (params: any) {
+                            let relVal = params[0].name;
+                            for (let i = 0; i < params.length; i++) {
+                                let value = Number(params[i].value).toFixed(3)
+                                relVal += `<br/> ${params[i].marker} ${params[i].seriesName}: ${value}${property.unit}`
+                            }
+                            return relVal;
                         }
-                    })
-                    const xAxis = [{
+                    },
+                    title: {text: property.name},
+                    series,
+                    xAxis: {
                         type: 'category',
                         boundaryGap: false,
-                        data: item.time.map(item => moment.unix(item).local().format("YYYY-MM-DD HH:mm:ss"))
-                    }]
-                    return Object.assign({}, DefaultMonitorDataOption, {
-                        title: {text: item.name, textStyle: {fontSize: 14}},
-                        tooltip: {
-                            trigger: 'axis',
-                            formatter: function (params: any) {
-                                let relVal = params[0].name;
-                                for (let i = 0; i < params.length; i++) {
-                                    let value = Number(params[i].value).toFixed(3)
-                                    relVal += `<br/> ${params[i].marker} ${params[i].seriesName}: ${value}${item.unit}`
-                                }
-                                return relVal;
-                            }
-                        },
-                        xAxis: xAxis,
-                        series: series
-                    })
-                }))
-            }
+                        data: data[key].map((item:any) => moment.unix(item.timestamp).local().format("YYYY-MM-DD HH:mm:ss"))
+                    }
+                }
+            }))
+
+                // setOptions(data.map(item => {
+                //     const series = Object.keys(item.fields).map((key, index) => {
+                //         return {
+                //             ...LineChartStyles[index],
+                //             name: GetFieldName(key),
+                //             type: 'line',
+                //             data: item.fields[key].map((value: any) => Number(value).toFixed(3)),
+                //             markLine: convertMarkLine(item.alarms, item.unit)
+                //         }
+                //     })
+                //     const xAxis = [{
+                //         type: 'category',
+                //         boundaryGap: false,
+                //         data: item.time.map(item => moment.unix(item).local().format("YYYY-MM-DD HH:mm:ss"))
+                //     }]
+                //     return Object.assign({}, DefaultMonitorDataOption, {
+                //         title: {text: item.name, textStyle: {fontSize: 14}},
+                //         tooltip: {
+                //             trigger: 'axis',
+                //             formatter: function (params: any) {
+                //                 let relVal = params[0].name;
+                //                 for (let i = 0; i < params.length; i++) {
+                //                     let value = Number(params[i].value).toFixed(3)
+                //                     relVal += `<br/> ${params[i].marker} ${params[i].seriesName}: ${value}${item.unit}`
+                //                 }
+                //                 return relVal;
+                //             }
+                //         },
+                //         xAxis: xAxis,
+                //         series: series
+                //     })
+                // }))
         })
     }
 

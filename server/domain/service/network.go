@@ -1,15 +1,12 @@
 package service
 
 import (
-	"context"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/request"
-	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/response"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/network"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/aggregate/factory"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/vo"
-	"github.com/thetasensors/theta-cloud-lite/server/pkg/errcode"
 )
 
 type Network struct {
@@ -65,6 +62,14 @@ func (s Network) FindNetworksByPaginate(filters request.Filters, page, size int)
 	return result, total, nil
 }
 
+func (s Network) FilterNetworks(filters request.Filters) ([]vo.Network, error) {
+	query, err := s.factory.NewNetworkFilterQuery(filters)
+	if err != nil {
+		return nil, err
+	}
+	return query.Run()
+}
+
 func (s Network) AddDevicesByID(networkID uint, req request.AddDevices) error {
 	cmd, err := s.factory.NewNetworkUpdateCmdByID(networkID)
 	if err != nil {
@@ -84,20 +89,8 @@ func (s Network) RemoveDevicesByID(networkID uint, req request.RemoveDevices) er
 	return cmd.RemoveDevices(req)
 }
 
-func (s Network) UpdateSettingByGatewayID(gatewayID uint, req request.WSN) error {
-	cmd, err := s.factory.NewNetworkUpdateCmd(gatewayID)
-	if err != nil {
-		return err
-	}
-	return cmd.UpdateSetting(req)
-}
-
 func (s Network) UpdateNetworkByID(networkID uint, req request.Network) (*vo.Network, error) {
-	e, err := s.repository.Get(context.TODO(), networkID)
-	if err != nil {
-		return nil, response.BusinessErr(errcode.NetworkNotFoundError, "")
-	}
-	cmd, err := s.factory.NewNetworkUpdateCmd(e.GatewayID)
+	cmd, err := s.factory.NewNetworkUpdateCmd(networkID)
 	if err != nil {
 		return nil, err
 	}
