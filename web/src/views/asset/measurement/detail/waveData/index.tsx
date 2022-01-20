@@ -86,7 +86,7 @@ const WaveData: React.FC<{ measurement: Measurement }> = ({measurement}) => {
             legend: {
                 data: [legends[envelope]],
                 itemStyle: {
-                    color:  LineChartStyles[envelope].itemStyle.normal.color
+                    color: LineChartStyles[envelope].itemStyle.normal.color
                 }
             },
             title: {text: `${getChartTitle()} ${data.frequency / 1000}KHz`, top: 0},
@@ -107,7 +107,7 @@ const WaveData: React.FC<{ measurement: Measurement }> = ({measurement}) => {
             },
             xAxis: {
                 type: 'category',
-                data: data.times![0].map((_: any, index: number) => index + 1),
+                data: data.times![0],
                 name: "ms"
             },
             series: [
@@ -167,11 +167,8 @@ const WaveData: React.FC<{ measurement: Measurement }> = ({measurement}) => {
             },
             xAxis: {
                 type: 'category',
-                xAxis: {
-                    type: 'category',
-                    data: data.frequencies![0].map((frequency: any) => frequency),
-                    name: "Hz"
-                },
+                data: data.frequencies![0],
+                name: "Hz"
             },
             series: legends.map((legend, i) => ({
                 name: legend,
@@ -202,7 +199,7 @@ const WaveData: React.FC<{ measurement: Measurement }> = ({measurement}) => {
             },
             xAxis: {
                 type: 'category',
-                data: data.times![0].map((time: any) => time),
+                data: data.times![0],
                 name: "ms"
             },
             series: legends.map((legend, i) => ({
