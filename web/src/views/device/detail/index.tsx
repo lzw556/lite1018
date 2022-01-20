@@ -29,7 +29,7 @@ const DeviceDetailPage = () => {
     const history = useHistory();
     const [device, setDevice] = useState<Device>();
     const [isLoading, setIsLoading] = useState<boolean>(false);
-    const [currentKey, setCurrentKey] = useState<string>("monitor");
+    const [currentKey, setCurrentKey] = useState<string>();
     const {hasPermission} = userPermission();
 
     const contents = new Map<string, any>([
@@ -46,6 +46,11 @@ const DeviceDetailPage = () => {
                 .then(data => {
                     setDevice(data)
                     setIsLoading(false)
+                    if (data.category === 3) {
+                        setCurrentKey("monitor")
+                    } else {
+                        setCurrentKey("settings")
+                    }
                 })
                 .catch(_ => history.push({pathname: "/device-management/devices"}))
         } else {
@@ -123,7 +128,7 @@ const DeviceDetailPage = () => {
                     device && <ShadowCard size={"small"} tabList={renderTabList()} onTabChange={key => {
                         setCurrentKey(key)
                     }}>
-                        {contents.get(currentKey)}
+                        {currentKey && contents.get(currentKey)}
                     </ShadowCard>
                 }
             </Col>

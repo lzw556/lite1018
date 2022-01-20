@@ -28,11 +28,15 @@ const MeasurementSettings:FC<MeasurementSettingsProps> = ({measurement}) => {
 
     return <Form form={form} labelCol={{span: 4}} wrapperCol={{span: 6}} validateMessages={defaultValidateMessages}>
         {
-            deviceSettings.map(setting => <DeviceSettingFormItem key={setting.key} value={setting}/>)
+            deviceSettings.map(setting => <DeviceSettingFormItem editable={true} key={setting.key} value={setting}/>)
         }
-        <Row justify={"end"}>
-            <Col span={17}>
-                <Button type={"primary"} onClick={onSave}>保存</Button>
+        <Row justify={"start"}>
+            <Col span={10}>
+                <Row justify={"end"}>
+                    <Col>
+                        <Button type={"primary"} onClick={onSave}>保存</Button>
+                    </Col>
+                </Row>
             </Col>
         </Row>
     </Form>;
