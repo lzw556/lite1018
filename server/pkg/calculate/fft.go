@@ -8,7 +8,7 @@ import (
 	gofft "github.com/mjibson/go-dsp/fft"
 )
 
-var pi = 3.1415926
+var PI float64 = 3.1415926
 
 func powerExponentGet(num int) int {
 	var i int = 0
@@ -23,6 +23,11 @@ func powerExponentGet(num int) int {
 	return i
 }
 
+type FFTOutput struct {
+	FFTValue  float64
+	Frequency float64
+}
+
 func fftFrequencyGet(n int, frequency int) (output []float64) {
 	output = make([]float64, n)
 	for i := 1; i < n; i++ {
@@ -31,15 +36,15 @@ func fftFrequencyGet(n int, frequency int) (output []float64) {
 	return
 }
 
-func defaultFFTOutputGet(pr []float64, n int, frequency int) (fftValues []float64, fftFrequencies []float64) {
+func defualtFFTOutputGet(pr []float64, n int, frequency int) (output []FFTOutput) {
 	frequencyArr := fftFrequencyGet(n, frequency)
 	sz := len(frequencyArr) / 2
-	fftValues = make([]float64, sz)
-	fftFrequencies = make([]float64, sz)
+	output = make([]FFTOutput, sz)
 	for i := 0; i < sz; i++ {
-		fftValues[i] = pr[i] / float64(sz)
-		fftFrequencies[i] = frequencyArr[i]
+		output[i].FFTValue = pr[i] / float64(sz)
+		output[i].Frequency = frequencyArr[i]
 	}
+
 	return
 }
 
@@ -446,7 +451,7 @@ func round(x float64) int {
 	return int(math.Floor(x + 0.5))
 }
 
-func FFTFrequencyCalc(data []float64, sampleNum int, paramFrequency int) (fftValues []float64, fftFrequencies []float64) {
+func FFTFrequencyCalc(data []float64, sampleNum int, paramFrequency int) (output []FFTOutput) {
 	sampleNum = sampleNumGet(sampleNum)
 	data = data[:sampleNum]
 	fdataArr := removeMean(data)
@@ -457,7 +462,7 @@ func FFTFrequencyCalc(data []float64, sampleNum int, paramFrequency int) (fftVal
 		fftr[i] = math.Sqrt(real(res[i])*real(res[i]) + imag(res[i])*imag(res[i]))
 	}
 
-	fftValues, fftFrequencies = defaultFFTOutputGet(fftr, sampleNum, paramFrequency)
+	output = defualtFFTOutputGet(fftr, sampleNum, paramFrequency)
 
 	return
 }
@@ -467,11 +472,11 @@ func AccelerationCalc(raw []float64, sigLen int, fs int, rangeVal int) []float64
 	return DataConvert(removeMean(raw), fs, rangeVal)
 }
 
-func AccelerationFrequencyCalc(raw []float64, sigLen int, fs int, rangeVal int) (fftValues []float64, fftFrequencies []float64) {
+func AccelerationFrequencyCalc(raw []float64, sigLen int, fs int, rangeVal int) []FFTOutput {
 	raw = raw[:sigLen]
 	data := DataConvert(removeMean(raw), fs, rangeVal)
-	fftValues, fftFrequencies = FFTFrequencyCalc(data, len(data), fs)
-	return
+	accFreq := FFTFrequencyCalc(data, len(data), fs)
+	return accFreq
 }
 
 func VelocityCalc(raw []float64, sigLen int, fs int, rangeVal int) []float64 {
@@ -484,10 +489,10 @@ func VelocityCalc(raw []float64, sigLen int, fs int, rangeVal int) []float64 {
 	return velX1
 }
 
-func VelocityFrequencyCalc(raw []float64, sigLen int, fs int, rangeVal int) (fftValues []float64, fftFrequencies []float64) {
+func VelocityFrequencyCalc(raw []float64, sigLen int, fs int, rangeVal int) []FFTOutput {
 	velX1 := VelocityCalc(raw, sigLen, fs, rangeVal)
-	fftValues, fftFrequencies = FFTFrequencyCalc(velX1, len(velX1), fs)
-	return
+	velFreq := FFTFrequencyCalc(velX1, len(velX1), fs)
+	return velFreq
 }
 
 func DisplacementCalc(raw []float64, sigLen int, fs int, rangeVal int) []float64 {
@@ -500,10 +505,10 @@ func DisplacementCalc(raw []float64, sigLen int, fs int, rangeVal int) []float64
 	return disX1
 }
 
-func DisplacementFrequencyCalc(raw []float64, sigLen int, fs int, rangeVal int) (fftValues []float64, fftFrequencies []float64) {
+func DisplacementFrequencyCalc(raw []float64, sigLen int, fs int, rangeVal int) []FFTOutput {
 	disX1 := DisplacementCalc(raw, sigLen, fs, rangeVal)
-	fftValues, fftFrequencies = FFTFrequencyCalc(disX1, len(disX1), fs)
-	return
+	disFreq := FFTFrequencyCalc(disX1, len(disX1), fs)
+	return disFreq
 }
 
 func vibrationDataProcess(data []complex128, s1 int, e1 int, s2 int, e2 int) []complex128 {
@@ -594,10 +599,10 @@ func displacementCalc(data []float64, sigLen int, fs int) []float64 {
 	res := gofft.FFTReal(data)
 	tmp := make([]float64, sigLen)
 
-	var fmin = 1.0 * float64(fs) / 340
-	var fmax = 2000.0
-	var df = 1.0 * float64(fs) / float64(sigLen)
-	var dw = 2 * pi * df
+	var fmin float64 = 1.0 * float64(fs) / 340
+	var fmax float64 = 2000.0
+	var df float64 = 1.0 * float64(fs) / float64(sigLen)
+	var dw float64 = 2 * PI * df
 
 	for i := 0; i < sigLen/2; i++ {
 		tmp[i] = float64(i) * dw
@@ -768,10 +773,10 @@ func velocityCalc(data []float64, sigLen int, fs int) []float64 {
 	res := gofft.FFTReal(data)
 	tmp := make([]float64, sigLen)
 
-	var fmin = 1.0 * float64(fs) / 340
-	var fmax = 2000.0
-	var df = 1.0 * float64(fs) / float64(sigLen)
-	var dw = 2 * pi * df
+	var fmin float64 = 1.0 * float64(fs) / 340
+	var fmax float64 = 2000.0
+	var df float64 = 1.0 * float64(fs) / float64(sigLen)
+	var dw float64 = 2 * PI * df
 	for i := 0; i < sigLen/2; i++ {
 		tmp[i] = float64(i) * dw
 	}
@@ -834,4 +839,71 @@ func velocityCalc(data []float64, sigLen int, fs int) []float64 {
 
 	vel = removeMean(vel)
 	return vel
+
+	// accX1 := FilterRMS(data, sigLen, fs)
+	// velX := make([]float64, sigLen)
+	// velX[0] = accX1[0] / 2.0
+	// for i := 1; i < sigLen; i++ {
+	// 	velX[i] = velX[i-1] + accX1[i]
+	// }
+	// for i := range velX {
+	// 	velX[i] = velX[i] * 1000 / float64(fs)
+	// }
+	// velX1 = FilterRMS(velX, sigLen, fs)
 }
+
+//
+//func main() {
+//	fdataArr := make([]float64, 0)
+//
+//	f, err := os.OpenFile("rawData.csv", os.O_RDONLY, 0600)
+//	if err != nil {
+//		panic(err)
+//	} else {
+//		fmt.Printf("Open vib.csv successful!\n")
+//	}
+//
+//	defer f.Close()
+//
+//	scanner := bufio.NewScanner(f)
+//	for scanner.Scan() {
+//		t := scanner.Text()
+//		dataArr := strings.Split(t, ",")
+//		for _, v := range dataArr {
+//			fdata, err := strconv.ParseFloat(v, 64)
+//			if err == nil {
+//				fdataArr = append(fdataArr, fdata)
+//			}
+//		}
+//	}
+//
+//	fdataArr = fdataArr[:1024]
+//
+//	// h, l := EnvelopCalc(disX1)
+//
+//	// var maxIndex int = 0
+//	// var maxVal float64 = 0
+//	// for i := 0; i < len(output); i++ {
+//	// 	if output[i].FFTValue > maxVal {
+//	// 		maxVal = output[i].FFTValue
+//	// 		maxIndex = i
+//	// 	}
+//	// }
+//
+//	// fmt.Printf("Max [len=%d] v %f, i %d, f %f", len(output), maxVal, maxIndex, output[maxIndex].Frequency)
+//
+//	fs := 12800
+//	rangeVal := 4
+//
+//	// rawData := AccelerationCalc(fdataArr, len(fdataArr), fs, 4)
+//	// accFreq := AccelerationFrequencyCalc(fdataArr, len(fdataArr), fs, 4)
+//
+//	velData := VelocityCalc(fdataArr, len(fdataArr), fs, rangeVal)
+//	dispData := DisplacementCalc(fdataArr, len(fdataArr), fs, rangeVal)
+//
+//	fmt.Printf("%f\n", dispData[0])
+//
+//	// printCurve("raw.csv", rawData)
+//	printCurve("vel.csv", velData)
+//	printCurve("disp.csv", dispData)
+//}
