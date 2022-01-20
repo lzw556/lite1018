@@ -65,7 +65,19 @@ func (factory Statistic) NewStatisticalDevicesQuery(filters request.Filters) (*q
 	for _, filter := range filters {
 		switch filter.Name {
 		case "asset_id":
-			specs = append(specs, spec.AssetEqSpec(cast.ToUint(filter.Value)))
+			if measurements, err := factory.measurementRepo.FindBySpecs(ctx, spec.AssetEqSpec(cast.ToUint(filter.Value))); err == nil {
+				measurementInSpec := make(spec.MeasurementInSpec, len(measurements))
+				for i, measurement := range measurements {
+					measurementInSpec[i] = measurement.ID
+				}
+				if bindings, err := factory.bindingRepo.FindBySpecs(ctx, measurementInSpec); err == nil {
+					macInSpec := make(spec.DeviceMacInSpec, len(bindings))
+					for i, binding := range bindings {
+						macInSpec[i] = binding.MacAddress
+					}
+					specs = append(specs, macInSpec)
+				}
+			}
 		case "measurement_id":
 			if bindings, err := factory.bindingRepo.FindBySpecs(ctx, spec.MeasurementEqSpec(cast.ToUint(filter.Value))); err == nil {
 				macInSpec := make(spec.DeviceMacInSpec, len(bindings))
