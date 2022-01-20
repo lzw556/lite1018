@@ -14,7 +14,7 @@ export interface PermissionDrawerProps extends DrawerProps {
 const PermissionDrawer: FC<PermissionDrawerProps> = (props) => {
     const {role, visible, onCancel} = props;
     const [permissions, setPermissions] = useState<any>();
-    const [checkPermissions, setCheckPermissions] = useState<number[]>([]);
+    const [checkPermissions, setCheckPermissions] = useState<any[]>([]);
     const {hasPermission} = usePermission();
 
     useEffect(() => {
@@ -22,29 +22,29 @@ const PermissionDrawer: FC<PermissionDrawerProps> = (props) => {
             GetPermissionsWithGroupRequest().then(res => {
                 if (res.code === 200) {
                     setPermissions(res.data)
-                    console.log(res.data)
+                    convertCheckPermissions(res.data)
                 }
             })
         }
     }, [visible])
 
     const onSave = () => {
-        AllocPermissionsRequest(role.id, checkPermissions).then(_ => {
+        AllocPermissionsRequest(role.id, checkPermissions.filter(item => (typeof item !== "string"))).then(_ => {
             onCancel()
         })
     }
 
-    const renderDefaultCheckedKeys = () => {
+    const convertCheckPermissions = (data: any) => {
         const ps = role.permissions.map((item: any) => `${item[0]}::${item[1]}`)
         const checked: any[] = []
-        Object.keys(permissions).forEach(key => {
-            permissions[key].filter((item: any) => {
+        Object.keys(data).forEach(key => {
+            data[key].filter((item: any) => {
                 return ps.includes(`${item.path}::${item.method}`)
             }).forEach((item: any) => {
                 checked.push(item.id)
             })
         })
-        return checked
+        setCheckPermissions(checked)
     }
 
     const renderExtra = () => {
@@ -66,7 +66,7 @@ const PermissionDrawer: FC<PermissionDrawerProps> = (props) => {
             treeData.push({
                 title: key,
                 key: key,
-                checkable: false,
+                checkable: true,
                 children: permissions[key].map((item: any) => {
                     return {
                         title: item.description,
@@ -83,7 +83,7 @@ const PermissionDrawer: FC<PermissionDrawerProps> = (props) => {
             return <Tree defaultExpandAll={true}
                          checkable={true}
                          showIcon={true} selectable={false}
-                         defaultCheckedKeys={renderDefaultCheckedKeys()} treeData={convertTreeData()}
+                         checkedKeys={checkPermissions} treeData={convertTreeData()}
                          onCheck={onCheck}/>
         }
     }
