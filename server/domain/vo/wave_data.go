@@ -39,7 +39,7 @@ func (d *WaveData) SetTimeDomainValues(index int, values []float64) {
 }
 
 func (d *WaveData) SetFrequencyDomainValues(index int, fftValues []float64, fftFrequencies []float64) {
-	d.Frequencies[index] = make([]int, len(fftValues))
+	d.Frequencies[index] = make([]int, len(fftFrequencies))
 	d.Values[index] = make([]float64, len(fftValues))
 	for i := range fftValues {
 		d.Values[index][i], _ = strconv.ParseFloat(fmt.Sprintf("%.3f", fftValues[i]), 64)
