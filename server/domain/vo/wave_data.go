@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/spf13/cast"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
-	"github.com/thetasensors/theta-cloud-lite/server/pkg/calculate"
 	"strconv"
 	"time"
 )
@@ -39,12 +38,12 @@ func (d *WaveData) SetTimeDomainValues(index int, values []float64) {
 	}
 }
 
-func (d *WaveData) SetFrequencyDomainValues(index int, fftOutputs []calculate.FFTOutput) {
+func (d *WaveData) SetFrequencyDomainValues(index int, fftOutputs [][2]float64) {
 	d.Frequencies[index] = make([]int, len(fftOutputs))
 	d.Values[index] = make([]float64, len(fftOutputs))
 	for i, output := range fftOutputs {
-		d.Values[index][i], _ = strconv.ParseFloat(fmt.Sprintf("%.3f", output.FFTValue), 64)
-		d.Frequencies[index][i] = int(output.Frequency)
+		d.Values[index][i], _ = strconv.ParseFloat(fmt.Sprintf("%.3f", output[0]), 64)
+		d.Frequencies[index][i] = int(output[1])
 	}
 }
 

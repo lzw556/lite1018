@@ -8,7 +8,7 @@ import (
 	gofft "github.com/mjibson/go-dsp/fft"
 )
 
-var PI float64 = 3.1415926
+var pi float64 = 3.1415926
 
 func powerExponentGet(num int) int {
 	var i int = 0
@@ -23,11 +23,6 @@ func powerExponentGet(num int) int {
 	return i
 }
 
-type FFTOutput struct {
-	FFTValue  float64
-	Frequency float64
-}
-
 func fftFrequencyGet(n int, frequency int) (output []float64) {
 	output = make([]float64, n)
 	for i := 1; i < n; i++ {
@@ -36,13 +31,13 @@ func fftFrequencyGet(n int, frequency int) (output []float64) {
 	return
 }
 
-func defualtFFTOutputGet(pr []float64, n int, frequency int) (output []FFTOutput) {
+func defaultFFTOutputGet(pr []float64, n int, frequency int) (output [][2]float64) {
 	frequencyArr := fftFrequencyGet(n, frequency)
 	sz := len(frequencyArr) / 2
-	output = make([]FFTOutput, sz)
+	output = make([][2]float64, sz)
 	for i := 0; i < sz; i++ {
-		output[i].FFTValue = pr[i] / float64(sz)
-		output[i].Frequency = frequencyArr[i]
+		output[i][0] = pr[i] / float64(sz)
+		output[i][1] = frequencyArr[i]
 	}
 
 	return
@@ -451,7 +446,7 @@ func round(x float64) int {
 	return int(math.Floor(x + 0.5))
 }
 
-func FFTFrequencyCalc(data []float64, sampleNum int, paramFrequency int) (output []FFTOutput) {
+func FFTFrequencyCalc(data []float64, sampleNum int, paramFrequency int) (output [][2]float64) {
 	sampleNum = sampleNumGet(sampleNum)
 	data = data[:sampleNum]
 	fdataArr := removeMean(data)
@@ -462,7 +457,7 @@ func FFTFrequencyCalc(data []float64, sampleNum int, paramFrequency int) (output
 		fftr[i] = math.Sqrt(real(res[i])*real(res[i]) + imag(res[i])*imag(res[i]))
 	}
 
-	output = defualtFFTOutputGet(fftr, sampleNum, paramFrequency)
+	output = defaultFFTOutputGet(fftr, sampleNum, paramFrequency)
 
 	return
 }
@@ -472,7 +467,7 @@ func AccelerationCalc(raw []float64, sigLen int, fs int, rangeVal int) []float64
 	return DataConvert(removeMean(raw), fs, rangeVal)
 }
 
-func AccelerationFrequencyCalc(raw []float64, sigLen int, fs int, rangeVal int) []FFTOutput {
+func AccelerationFrequencyCalc(raw []float64, sigLen int, fs int, rangeVal int) [][2]float64 {
 	raw = raw[:sigLen]
 	data := DataConvert(removeMean(raw), fs, rangeVal)
 	accFreq := FFTFrequencyCalc(data, len(data), fs)
@@ -489,7 +484,7 @@ func VelocityCalc(raw []float64, sigLen int, fs int, rangeVal int) []float64 {
 	return velX1
 }
 
-func VelocityFrequencyCalc(raw []float64, sigLen int, fs int, rangeVal int) []FFTOutput {
+func VelocityFrequencyCalc(raw []float64, sigLen int, fs int, rangeVal int) [][2]float64 {
 	velX1 := VelocityCalc(raw, sigLen, fs, rangeVal)
 	velFreq := FFTFrequencyCalc(velX1, len(velX1), fs)
 	return velFreq
@@ -505,7 +500,7 @@ func DisplacementCalc(raw []float64, sigLen int, fs int, rangeVal int) []float64
 	return disX1
 }
 
-func DisplacementFrequencyCalc(raw []float64, sigLen int, fs int, rangeVal int) []FFTOutput {
+func DisplacementFrequencyCalc(raw []float64, sigLen int, fs int, rangeVal int) [][2]float64 {
 	disX1 := DisplacementCalc(raw, sigLen, fs, rangeVal)
 	disFreq := FFTFrequencyCalc(disX1, len(disX1), fs)
 	return disFreq
@@ -602,7 +597,7 @@ func displacementCalc(data []float64, sigLen int, fs int) []float64 {
 	var fmin float64 = 1.0 * float64(fs) / 340
 	var fmax float64 = 2000.0
 	var df float64 = 1.0 * float64(fs) / float64(sigLen)
-	var dw float64 = 2 * PI * df
+	var dw float64 = 2 * pi * df
 
 	for i := 0; i < sigLen/2; i++ {
 		tmp[i] = float64(i) * dw
@@ -776,7 +771,7 @@ func velocityCalc(data []float64, sigLen int, fs int) []float64 {
 	var fmin float64 = 1.0 * float64(fs) / 340
 	var fmax float64 = 2000.0
 	var df float64 = 1.0 * float64(fs) / float64(sigLen)
-	var dw float64 = 2 * PI * df
+	var dw float64 = 2 * pi * df
 	for i := 0; i < sigLen/2; i++ {
 		tmp[i] = float64(i) * dw
 	}
