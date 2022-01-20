@@ -147,8 +147,7 @@ func (query MeasurementQuery) GetWaveData(timestamp int64, calc string) (*vo.Wav
 	}
 	var wg sync.WaitGroup
 	result.Values = make([][]float64, len(values))
-	result.Frequencies = make([][]int, len(values))
-	result.Times = make([][]int, len(values))
+	result.XAxis = make([][]int, len(values))
 	result.HighEnvelopes = make([][]float64, len(values))
 	result.LowEnvelopes = make([][]float64, len(values))
 	for i := range values {

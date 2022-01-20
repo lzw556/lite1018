@@ -107,7 +107,7 @@ const WaveData: React.FC<{ measurement: Measurement }> = ({measurement}) => {
             },
             xAxis: {
                 type: 'category',
-                data: data.times![0],
+                data: data.xAxis[0],
                 name: "ms"
             },
             series: [
@@ -167,7 +167,7 @@ const WaveData: React.FC<{ measurement: Measurement }> = ({measurement}) => {
             },
             xAxis: {
                 type: 'category',
-                data: data.frequencies![0],
+                data: data.xAxis[0],
                 name: "Hz"
             },
             series: legends.map((legend, i) => ({
@@ -199,7 +199,7 @@ const WaveData: React.FC<{ measurement: Measurement }> = ({measurement}) => {
             },
             xAxis: {
                 type: 'category',
-                data: data.times![0],
+                data: data.xAxis[0],
                 name: "ms"
             },
             series: legends.map((legend, i) => ({

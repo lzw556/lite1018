@@ -12,8 +12,7 @@ type WaveData struct {
 	Frequency     float32     `json:"frequency"`
 	Timestamp     int64       `json:"timestamp"`
 	Values        [][]float64 `json:"values,omitempty"`
-	Frequencies   [][]int     `json:"frequencies,omitempty"`
-	Times         [][]int     `json:"times,omitempty"`
+	XAxis         [][]int     `json:"xAxis,omitempty"`
 	HighEnvelopes [][]float64 `json:"highEnvelopes,omitempty"`
 	LowEnvelopes  [][]float64 `json:"lowEnvelopes,omitempty"`
 }
@@ -30,20 +29,20 @@ func NewWaveData(e entity.LargeSensorData) WaveData {
 }
 
 func (d *WaveData) SetTimeDomainValues(index int, values []float64) {
-	d.Times[index] = make([]int, len(values))
+	d.XAxis[index] = make([]int, len(values))
 	d.Values[index] = make([]float64, len(values))
 	for i, value := range values {
-		d.Times[index][i] = int((float32(i+1) / d.Frequency) * 1000)
+		d.XAxis[index][i] = int((float32(i+1) / d.Frequency) * 1000)
 		d.Values[index][i], _ = strconv.ParseFloat(fmt.Sprintf("%.3f", value), 64)
 	}
 }
 
 func (d *WaveData) SetFrequencyDomainValues(index int, fftOutputs [][2]float64) {
-	d.Frequencies[index] = make([]int, len(fftOutputs))
+	d.XAxis[index] = make([]int, len(fftOutputs))
 	d.Values[index] = make([]float64, len(fftOutputs))
 	for i, output := range fftOutputs {
 		d.Values[index][i], _ = strconv.ParseFloat(fmt.Sprintf("%.3f", output[0]), 64)
-		d.Frequencies[index][i] = int(output[1])
+		d.XAxis[index][i] = int(output[1])
 	}
 }
 
