@@ -30,7 +30,7 @@ const SettingPage: FC<SettingPageProps> = ({device}) => {
     const renderSetting = () => {
         if (device) {
             if (settings) {
-                return settings.map(setting => (<DeviceSettingFormItem value={setting} key={setting.key}/>))
+                return settings.map(setting => (<DeviceSettingFormItem editable={true} value={setting} key={setting.key}/>))
             }
             return <EmptyLayout description={"暂无配置信息"}/>
         }
@@ -49,11 +49,11 @@ const SettingPage: FC<SettingPageProps> = ({device}) => {
 
     return <Skeleton loading={isLoading}>
         <Row justify={"start"}>
-            <Col span={16}>
+            <Col xxl={8} xl={10}>
                 {
                     device?.binding ?
                         <Typography.Text>设备已经绑定了监测点,请到<Typography.Link href={`#/asset-management?locale=assetMonitor/measurementDetail&id=${device.binding}`}>监测点页面</Typography.Link>进行配置修改</Typography.Text> :
-                        <Form form={form} labelCol={{span: 6}} wrapperCol={{span:10}} validateMessages={defaultValidateMessages}>
+                        <Form form={form} labelCol={{xl: 7, xxl: 6}} validateMessages={defaultValidateMessages}>
                             {
                                 renderSetting()
                             }
@@ -62,10 +62,14 @@ const SettingPage: FC<SettingPageProps> = ({device}) => {
             </Col>
         </Row>
         <Row justify={"start"}>
-            <Col span={12} offset={6}>
-                {
-                    !device?.binding && <Button type={"primary"} onClick={onSave}>保存</Button>
-                }
+            <Col xl={10} xxl={8}>
+                <Row justify={"end"}>
+                    <Col>
+                        {
+                            !device?.binding && <Button type={"primary"} onClick={onSave}>保存</Button>
+                        }
+                    </Col>
+                </Row>
             </Col>
         </Row>
     </Skeleton>

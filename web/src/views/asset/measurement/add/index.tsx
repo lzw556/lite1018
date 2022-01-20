@@ -61,7 +61,7 @@ const AddMeasurement = () => {
 
     const renderDeviceSettingItems = () => {
         return settings.map(setting => {
-            return <DeviceSettingFormItem value={setting}/>
+            return <DeviceSettingFormItem editable={true} value={setting}/>
         })
     }
 

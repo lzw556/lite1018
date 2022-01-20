@@ -1,6 +1,8 @@
 package device
 
-import "github.com/thetasensors/theta-cloud-lite/server/adapter/api/router"
+import (
+	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router"
+)
 
 type deviceRouter struct {
 	service Service
