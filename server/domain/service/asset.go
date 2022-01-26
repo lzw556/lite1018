@@ -73,9 +73,7 @@ func (s Asset) UpdateAssetByID(assetID uint, req request.Asset) error {
 	}
 	if req.Image != nil {
 		if e.Image != "" {
-			if err := global.DeleteFile("resources/assets", e.Image); err != nil {
-				return err
-			}
+			_ = global.DeleteFile("resources/assets", e.Image)
 		} else {
 			e.Image = fmt.Sprintf("%s%s", uuid.NewV1().String(), req.GetFileExt())
 		}
