@@ -22,7 +22,7 @@ RUN go mod download
 # Build real binarie
 COPY ./server .
 
-RUN CGO_ENABLED=1 GOOS=linux GOARCH=amd64 -o ./bin/cloud-lite ./main.go
+RUN CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -o ./bin/cloud-lite ./main.go
 
 FROM alpine
 
