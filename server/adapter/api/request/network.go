@@ -44,7 +44,7 @@ type ImportNetwork struct {
 		Sensors    map[string]interface{} `json:"sensors,omitempty"`
 	} `json:"devices"`
 
-	ProjectID uint `json:"project_id-"`
+	ProjectID uint `json:"-"`
 }
 
 type CreateNetwork struct {

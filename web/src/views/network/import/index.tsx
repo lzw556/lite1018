@@ -16,7 +16,6 @@ import MyBreadcrumb from "../../../components/myBreadcrumb";
 const {Dragger} = Upload
 
 export interface NetworkRequestForm {
-    asset_id: number
     communication_period: number
     communication_time_offset: number
     group_size: number
@@ -78,7 +77,6 @@ const ImportNetworkPage = () => {
         if (nodes && nodes.length) {
             form.validateFields().then(values => {
                 const req: NetworkRequestForm = {
-                    asset_id: values.asset,
                     communication_period: values.communication_period,
                     communication_time_offset: values.communication_time_offset,
                     group_size: values.group_size,
@@ -93,6 +91,7 @@ const ImportNetworkPage = () => {
                         }
                     })
                 }
+                console.log(req)
                 ImportNetworkRequest(req).then(_ => setSuccess(true))
             })
         } else {
