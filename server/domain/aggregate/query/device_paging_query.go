@@ -28,7 +28,7 @@ func (query DevicePagingQuery) Paging() ([]vo.Device, int64) {
 	for i, device := range query.Devices {
 		result[i] = vo.NewDevice(device)
 		result[i].SetUpgradeState(device)
-		result[i].State.DeviceStatus, _ = query.deviceStatusRepo.Get(device.ID)
+		result[i].State.DeviceStatus, _ = query.deviceStatusRepo.Get(device.MacAddress)
 	}
 	return result, query.total
 }

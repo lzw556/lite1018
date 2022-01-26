@@ -49,7 +49,7 @@ func (query DeviceQuery) GetDetail() (*vo.Device, error) {
 		result.Properties = t.Properties(t.SensorID())
 	}
 	var err error
-	result.State.DeviceStatus, err = query.deviceStatusRepo.Get(query.Device.ID)
+	result.State.DeviceStatus, err = query.deviceStatusRepo.Get(query.Device.MacAddress)
 	if err != nil {
 		xlog.Errorf("get device [%s] status failed:%v", query.Device.MacAddress, err)
 	}
@@ -119,6 +119,22 @@ func (query DeviceQuery) DataByRange(from, to time.Time) (vo.PropertiesData, err
 		return result, nil
 	}
 	return nil, response.BusinessErr(errcode.UnknownDeviceTypeError, "")
+}
+
+func (query DeviceQuery) RuntimeDataByRange(from, to time.Time) ([]vo.SensorRuntimeData, error) {
+	data, err := query.deviceStatusRepo.Find(query.Device.MacAddress, from, to)
+	if err != nil {
+		return nil, err
+	}
+	result := make([]vo.SensorRuntimeData, len(data))
+	for i, d := range data {
+		result[i] = vo.SensorRuntimeData{
+			Timestamp:      d.Time.UTC().Unix(),
+			BatteryVoltage: d.BatteryVoltage,
+			SignalStrength: d.SignalLevel,
+		}
+	}
+	return result, nil
 }
 
 func (query DeviceQuery) DownloadPropertiesDataByRange(pIDs []string, from time.Time, to time.Time) (*vo.ExcelFile, error) {

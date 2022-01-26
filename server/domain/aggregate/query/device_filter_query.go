@@ -24,7 +24,7 @@ func (query DeviceFilterQuery) Run() []vo.Device {
 	for i, device := range query.Devices {
 		result[i] = vo.NewDevice(device)
 		result[i].SetUpgradeState(device)
-		result[i].State.DeviceStatus, _ = query.deviceStatusRepo.Get(device.ID)
+		result[i].State.DeviceStatus, _ = query.deviceStatusRepo.Get(device.MacAddress)
 	}
 	return result
 }

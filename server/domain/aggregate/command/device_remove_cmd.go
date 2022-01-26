@@ -46,7 +46,7 @@ func (cmd DeviceRemoveCmd) Run() error {
 			if err := cmd.deviceInformationRepo.Delete(cmd.Device.ID); err != nil {
 				return err
 			}
-			if err := cmd.deviceStatusRepo.Delete(cmd.Device.ID); err != nil {
+			if err := cmd.deviceStatusRepo.Delete(cmd.Device.MacAddress); err != nil {
 				return err
 			}
 		}

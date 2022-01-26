@@ -113,6 +113,14 @@ func (s Device) GetPropertyDataByID(deviceID uint, pID string, from, to int64) (
 	return query.PropertyDataByRange(pID, time.Unix(from, 0), time.Unix(to, 0))
 }
 
+func (s Device) GetRuntimeDataByID(deviceID uint, from, to int64) ([]vo.SensorRuntimeData, error) {
+	query, err := s.factory.NewDeviceQuery(deviceID)
+	if err != nil {
+		return nil, err
+	}
+	return query.RuntimeDataByRange(time.Unix(from, 0), time.Unix(to, 0))
+}
+
 func (s Device) DownloadPropertiesDataByID(deviceID uint, pIDs []string, from, to int64) (*vo.ExcelFile, error) {
 	query, err := s.factory.NewDeviceQuery(deviceID)
 	if err != nil {

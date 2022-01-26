@@ -30,6 +30,7 @@ func (r *deviceRouter) initRoutes() {
 		router.NewGetRoute("devices/:id/children", r.getChildren),
 		router.NewGetRoute("devices/:id/settings", r.getSettingByID),
 		router.NewGetRoute("devices/:id/data", r.findDataByID),
+		router.NewGetRoute("devices/:id/data/runtime", r.findRuntimeDataByID),
 		router.NewGetRoute("devices/:id/download/data", r.downloadDataByID),
 		router.NewGetRoute("devices/defaultSettings", r.defaultSettings),
 		router.NewGetRoute("check/devices/:mac", r.checkMacAddress),

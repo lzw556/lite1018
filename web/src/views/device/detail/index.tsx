@@ -16,6 +16,7 @@ import MyBreadcrumb from "../../../components/myBreadcrumb";
 import HasPermission from "../../../permission";
 import userPermission, {Permission} from "../../../permission/permission";
 import HistoryDataPage from "./data";
+import RuntimeData from "./runtime";
 
 const tabList = [
     {
@@ -35,7 +36,8 @@ const DeviceDetailPage = () => {
     const contents = new Map<string, any>([
         ["monitor", device && <MonitorPage device={device}/>],
         ["settings", <SettingPage device={device}/>],
-        ["historyData", device && <HistoryDataPage device={device}/>]
+        ["historyData", device && <HistoryDataPage device={device}/>],
+        ["runtime", device && <RuntimeData device={device}/>]
     ])
 
     const fetchDevice = useCallback(() => {
@@ -77,7 +79,11 @@ const DeviceDetailPage = () => {
                 {
                     key: "historyData",
                     tab: "历史数据"
-                }
+                },
+                {
+                    key: "runtime",
+                    tab: "运行状态"
+                },
             ]
         }
         return tabList
