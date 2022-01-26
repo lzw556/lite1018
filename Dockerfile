@@ -22,7 +22,7 @@ RUN go mod download
 # Build real binarie
 COPY ./server .
 
-RUN CGO_ENABLED=1 GOOS=linux GOARCH=amd64 CC=x86_64-linux-musl-gcc go build -ldflags "-linkmode external -extldflags -static" -o ../bin/cloud-lite ./main.go
+RUN CGO_ENABLED=1 GOOS=linux GOARCH=amd64 -o ../bin/cloud-lite ./main.go
 
 FROM alpine
 
