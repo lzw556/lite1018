@@ -1,5 +1,5 @@
 react_install:
-	yarn install
+	cd web && yarn install
 
 react_build:
 	rm -rf server/static
