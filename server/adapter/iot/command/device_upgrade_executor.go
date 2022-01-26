@@ -74,7 +74,6 @@ func (e DeviceUpgradeExecutor) loadFirmware(ctx context.Context, gateway string,
 			payload = payload[len(payload):]
 		}
 	}
-	//bar := progressbar.Default(int64(len(firmwareData)), "Loading Firmware...")
 	for seqID := 0; seqID < len(firmwareData); {
 		m, err := e.sendFirmwareData(ctx, gateway, device, seqID, firmwareData[seqID])
 		if err != nil {
@@ -82,9 +81,7 @@ func (e DeviceUpgradeExecutor) loadFirmware(ctx context.Context, gateway string,
 		}
 		device.UpdateUpgradeState(entity.DeviceUpgradeStatusLoading, m.Progress)
 		seqID = int(m.SeqId + 1)
-		//_ = bar.Set64(int64(m.SeqId))
 	}
-	//_ = bar.Finish()
 	xlog.Infof("load firmware data complete => [%s]", device.MacAddress)
 	return nil
 }
@@ -105,7 +102,6 @@ func (e DeviceUpgradeExecutor) sendFirmwareData(ctx context.Context, gateway str
 func (e DeviceUpgradeExecutor) upgrade(ctx context.Context, gateway string, device entity.Device) error {
 	xlog.Infof("start upgrade device => [%s]", device.MacAddress)
 	ch := make(chan int32)
-	//bar := progressbar.Default(100, "Upgrading...")
 	topic := fmt.Sprintf("iot/v2/gw/%s/dev/%s/msg/firmwareUpgradeStatus/", gateway, device.MacAddress)
 	err := adapter.IoT.Subscribe(topic, 1, func(c mqtt2.Client, msg mqtt2.Message) {
 		m := pd.FirmwareUpgradeStatusMessage{}
@@ -116,11 +112,9 @@ func (e DeviceUpgradeExecutor) upgrade(ctx context.Context, gateway string, devi
 			device.UpdateUpgradeState(entity.DeviceUpgradeStatusError, m.Progress)
 			ch <- m.Code
 		} else {
-			//_ = bar.Set(int(m.Progress))
 			device.UpdateUpgradeState(entity.DeviceUpgradeStatusUpgrading, m.Progress)
 		}
 		if m.Progress == 100 {
-			//_ = bar.Finish()
 			ch <- m.Code
 		}
 	})

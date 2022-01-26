@@ -81,14 +81,17 @@ const AlarmRecordPage = () => {
                             </Space>
                         </Col>
                     </Row>
+                    <br/>
                     <Row justify={"start"}>
                         <Col span={24}>
-                            <Card bordered={false} tabList={tabList} activeTabKey={currentKey} size={"small"}
-                                  onTabChange={key => {
-                                      setCurrentKey(key)
-                                  }}>
-                                {contents.get(currentKey)}
-                            </Card>
+                            {/*<Card bordered={false} tabList={tabList} activeTabKey={currentKey} size={"small"}*/}
+                            {/*      onTabChange={key => {*/}
+                            {/*          setCurrentKey(key)*/}
+                            {/*      }}>*/}
+                            {/*    {contents.get(currentKey)}*/}
+                            {/*</Card>*/}
+                            <AlarmRecordTable type={"active"} start={startDate.utc().unix()} stop={endDate.utc().unix()}
+                                              asset={assetId} levels={alarmLevels} statuses={statuses}/>
                         </Col>
                     </Row>
                 </Card>

@@ -5,8 +5,6 @@ import {Device} from "../../../../types/device";
 import {Space, Tag, Typography} from "antd";
 import {ColorHealth, ColorWarn} from "../../../../constants/color";
 import "../../../../string-extension"
-import {MeasurementType} from "../../../../types/measurement_type";
-import moment from "moment";
 import AddDeviceModal from "./addDeviceModal";
 import DeviceTable from "../../../../components/table/deviceTable";
 
@@ -70,37 +68,9 @@ const SensorList:FC<SensorListProps> = ({measurement}) => {
         GetDevicesRequest({measurement_id: measurement.id, category:3}).then(setDataSource)
     }, [measurement])
 
-    const renderColumns = () => {
-        switch (measurement.type) {
-            case MeasurementType.BoltLoosening:
-                return [
-                    ...columns,
-                    {
-                        title: "松动角度",
-                        dataIndex: "data",
-                        key: "data",
-                        render: (data: any) => {
-                            return data && data.values ? `${data.values[0]}°` : "-"
-                        }
-                    },
-                    {
-                        title: "上报时间",
-                        dataIndex: "data",
-                        key: "data",
-                        render: (data: any) => {
-                            return data && data.values ? moment.unix(data.timestamp).local().format("YYYY-MM-DD HH:mm:ss") : "-"
-                        }
-                    }
-                ]
-            case MeasurementType.FlangeLoosening:
-                return columns
-            default:
-                return columns
-        }
-    }
 
     return <>
-        <DeviceTable emptyText={<span>传感器列表为空 <a onClick={() => setVisible(true)}>去绑定</a></span>} columns={renderColumns()} dataSource={dataSource}/>
+        <DeviceTable emptyText={<span>传感器列表为空 <a onClick={() => setVisible(true)}>去绑定</a></span>} columns={columns} dataSource={dataSource}/>
         {
             measurement && <AddDeviceModal measurement={measurement}
                                            visible={visible}
