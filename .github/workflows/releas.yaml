@@ -19,7 +19,6 @@ jobs:
           retister-url: 'https://npm.pkg.github.com'
       - run: make react_install
       - run: CI=false make react_build
-      - run: make debug os=linux
 
       - name: Prepare
         id: prep
