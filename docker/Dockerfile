@@ -1,3 +1,7 @@
-FROM golang:1.17.2
+FROM alpine
 
-COPY ./bin/cloud-lite /etc/
+COPY ./bin/cloud-lite /cloud-lite
+
+WORKDIR /
+
+ENTRYPOINT ["./cloud-lite"]
