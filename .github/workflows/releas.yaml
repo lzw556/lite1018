@@ -18,4 +18,4 @@ jobs:
           check-latest: true
           retister-url: 'https://npm.pkg.github.com'
       - run: make react_install
-      - run: make react_build
+      - run: CI=false make react_build
