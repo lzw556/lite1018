@@ -27,7 +27,7 @@ RUN CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -o ./bin/cloud-lite ./main.go
 
 FROM alpine
 
-COPY --from=builder /go/src/github.com/thetasensors/webapp/bin/cloud-lite /cloud-lite
+COPY --from=builder /go/src/github.com/thetasensors/cloud-lite/bin/cloud-lite /cloud-lite
 
 WORKDIR /
 
