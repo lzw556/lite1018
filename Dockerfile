@@ -5,8 +5,8 @@ RUN apk add --no-cache \
 
 RUN git config --global url."http://onlylin:8da992bc6bc24c7eb9bd419913f277621e68dcf8@github.com".insteadOf "https://github.com"
 
-RUN mkdir -p /go/src/github.com/thetasensors/webapp
-WORKDIR /go/src/github.com/thetasensors/webapp
+RUN mkdir -p /go/src/github.com/thetasensors/cloud-lite
+WORKDIR /go/src/github.com/thetasensors/cloud-lite
 
 
 ENV GO11MODULE on
@@ -14,15 +14,15 @@ ENV GOPRIVATE github.com/thetasensors
 ENV GOPROXY https://goproxy.cn
 
 # Cache dependencies
-COPY go.mod .
-COPY go.sum .
+COPY ./server/go.mod .
+COPY ./server/go.sum .
 
 RUN go mod download
 
 # Build real binarie
-COPY . .
+COPY ./server .
 
-RUN cd server && CGO_ENABLED=1 GOOS=linux GOARCH=amd64 CC=x86_64-linux-musl-gcc go build -ldflags "-linkmode external -extldflags -static" -o ../bin/cloud-lite ./main.go
+RUN CGO_ENABLED=1 GOOS=linux GOARCH=amd64 CC=x86_64-linux-musl-gcc go build -ldflags "-linkmode external -extldflags -static" -o ../bin/cloud-lite ./main.go
 
 FROM alpine
 
