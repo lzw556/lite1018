@@ -10,12 +10,12 @@ import (
 type DeviceFilterQuery struct {
 	entity.Devices
 
-	deviceDataRepo dependency.SensorDataRepository
+	deviceStatusRepo dependency.DeviceStatusRepository
 }
 
 func NewDeviceFilterQuery() DeviceFilterQuery {
 	return DeviceFilterQuery{
-		deviceDataRepo: repository.SensorData{},
+		deviceStatusRepo: repository.DeviceStatus{},
 	}
 }
 
@@ -23,9 +23,8 @@ func (query DeviceFilterQuery) Run() []vo.Device {
 	result := make([]vo.Device, len(query.Devices))
 	for i, device := range query.Devices {
 		result[i] = vo.NewDevice(device)
-		if data, err := query.deviceDataRepo.Last(device.MacAddress); err == nil {
-			result[i].SetData(data)
-		}
+		result[i].SetUpgradeState(device)
+		result[i].State.DeviceStatus, _ = query.deviceStatusRepo.Get(device.ID)
 	}
 	return result
 }

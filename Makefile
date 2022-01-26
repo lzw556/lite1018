@@ -1,4 +1,7 @@
-build_react:
+react_install:
+	yarn install
+
+react_build:
 	rm -rf server/static
 	cd web && yarn build
 	cp -rf web/build server/static

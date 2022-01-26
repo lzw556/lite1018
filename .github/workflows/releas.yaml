@@ -1,0 +1,21 @@
+name: Release
+on:
+  release:
+    types:
+      - "published"
+jobs:
+  push_to_swr:
+    name: Push docker image to SWR
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up node env
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12
+          check-latest: true
+          retister-url: 'https://npm.pkg.github.com'
+      - run: make react_install
+      - run: make react_build
