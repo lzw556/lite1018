@@ -17,3 +17,25 @@ export const DEFAULT_WSN_SETTING: WsnSetting = {
     group_size: 4,
     group_interval: 2 * 60 * 1000
 }
+
+export enum DeviceSettingValueType {
+    uint8 = "uint8",
+    uint16 = "uint16",
+    uint32 = "uint32",
+    uint64 = "uint64",
+    float = "float",
+    string = "string",
+    bool = "bool"
+}
+
+export type DeviceSetting = {
+    name: string;
+    key: string;
+    value: any;
+    unit: string;
+    category: string;
+    type: string;
+    options?: any;
+    show: any;
+    children?: DeviceSetting[];
+}

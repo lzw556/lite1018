@@ -5,7 +5,7 @@ import {LoginResponse} from "../types/login";
 import {DeleteResponse, GetResponse, PostResponse, PutResponse} from "../utils/response";
 
 export function PagingUsersRequest(page:number, size:number) {
-    return request.get<PageResult<User[]>>("/users", {page, size}).then(GetResponse)
+    return request.get<PageResult<User[]>>("/users?method=paging", {page, size}).then(GetResponse)
 }
 
 export function AddUserRequest(user:any) {

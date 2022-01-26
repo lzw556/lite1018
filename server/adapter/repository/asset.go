@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/po"
+	spec "github.com/thetasensors/theta-cloud-lite/server/domain/specification"
 )
 
 type Asset struct {
@@ -21,8 +22,8 @@ func (repo Asset) Find(ctx context.Context) ([]po.Asset, error) {
 	return es, err
 }
 
-func (repo Asset) FindByPaginate(ctx context.Context, page int, size int) ([]po.Asset, int64, error) {
-	db := repo.DB(ctx).Model(&po.Asset{})
+func (repo Asset) PagingBySpecs(ctx context.Context, page int, size int, specs ...spec.Specification) ([]po.Asset, int64, error) {
+	db := repo.DB(ctx).Scopes(spec.Scopes(specs)...).Model(&po.Asset{})
 	var total int64
 	if err := db.Count(&total).Error; err != nil {
 		return nil, 0, err
@@ -44,4 +45,10 @@ func (repo Asset) Save(ctx context.Context, e *po.Asset) error {
 
 func (repo Asset) Delete(ctx context.Context, id uint) error {
 	return repo.DB(ctx).Delete(&po.Asset{}, id).Error
+}
+
+func (repo Asset) FindBySpecs(ctx context.Context, specs ...spec.Specification) ([]po.Asset, error) {
+	var es []po.Asset
+	err := repo.DB(ctx).Scopes(spec.Scopes(specs)...).Find(&es).Error
+	return es, err
 }

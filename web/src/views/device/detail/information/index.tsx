@@ -1,7 +1,6 @@
 import {Col, Row, Skeleton, Space, Tag, Typography} from "antd";
 import {FC, useEffect, useState} from "react";
 import {Device} from "../../../../types/device";
-import {DeviceType, DeviceTypeString} from "../../../../types/device_type";
 import "../../index.css"
 import moment from "moment";
 import ShadowCard from "../../../../components/shadowCard";
@@ -9,6 +8,7 @@ import {ColorHealth, ColorWarn} from "../../../../constants/color";
 import "../../../../string-extension";
 import useSocket, {SocketTopic} from "../../../../socket";
 import DeviceUpgradeState from "../../state/upgradeState";
+import {DeviceType} from "../../../../types/device_type";
 
 export interface GatewayInformationProps {
     device: Device
@@ -52,7 +52,7 @@ const InformationCard: FC<GatewayInformationProps> = ({device, isLoading}) => {
                 </Col>
                 <Col span={6}>
                     {
-                        DeviceTypeString(device.typeId)
+                        DeviceType.toString(device.typeId)
                     }
                 </Col>
             </Row>
@@ -89,11 +89,11 @@ const InformationCard: FC<GatewayInformationProps> = ({device, isLoading}) => {
                     }
                 </Col>
                 <Col span={3} className="ts-detail-label">
-                    所属资产
+                    所属网络
                 </Col>
                 <Col span={6}>
                     {
-                        device.asset.name
+                        device.network ? device.network.name : "无"
                     }
                 </Col>
             </Row>

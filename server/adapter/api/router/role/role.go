@@ -24,7 +24,7 @@ func (r *roleRouter) initRoutes() {
 		router.NewPutRoute("/roles/:id", r.update),
 
 		// GET
-		router.NewGetRoute("/roles", r.paging),
+		router.NewGetRoute("/roles", r.find),
 		router.NewGetRoute("/roles/:id", r.get),
 		router.NewGetRoute("/my/casbin", r.casbin),
 
@@ -33,7 +33,7 @@ func (r *roleRouter) initRoutes() {
 		router.NewPatchRoute("/roles/:id/permissions", r.allocPermissions),
 
 		// DELETE
-		router.NewDeleteRoute("/roles/:id", r.removeByID),
+		router.NewDeleteRoute("/roles/:id", r.delete),
 	}
 }
 

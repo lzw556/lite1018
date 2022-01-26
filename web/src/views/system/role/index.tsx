@@ -2,9 +2,9 @@ import MyBreadcrumb from "../../../components/myBreadcrumb";
 import {Button, Popconfirm, Space} from "antd";
 import {DeleteOutlined, EditOutlined, PlusOutlined} from "@ant-design/icons";
 import {Content} from "antd/es/layout/layout";
-import TableLayout, {TableProps} from "../../layout/TableLayout";
+import TableLayout from "../../layout/TableLayout";
 import ShadowCard from "../../../components/shadowCard";
-import {useCallback, useState} from "react";
+import {useCallback, useEffect, useState} from "react";
 import {GetRoleRequest, PagingRolesRequest, RemoveRoleRequest} from "../../../apis/role";
 import AddRoleModal from "./modal/add";
 import EditRoleModal from "./modal/edit";
@@ -13,6 +13,7 @@ import MenuDrawer from "./menuDrawer";
 import PermissionDrawer from "./permissionDrawer";
 import HasPermission from "../../../permission";
 import usePermission, {Permission} from "../../../permission/permission";
+import {PageResult} from "../../../types/page";
 
 const RolePage = () => {
     const [addVisible, setAddVisible] = useState(false);
@@ -20,22 +21,20 @@ const RolePage = () => {
     const [menuVisible, setMenuVisible] = useState(false);
     const [permissionVisible, setPermissionVisible] = useState(false);
     const [role, setRole] = useState<Role>()
-    const [table, setTable] = useState<TableProps>({
-        refreshKey: 0,
-        data: {},
-        isLoading: false,
-        pagination: true
-    })
+    const [dataSource, setDataSource] = useState<PageResult<any>>()
+    const [refreshKey, setRefreshKey] = useState(0)
     const {hasPermission} = usePermission()
 
-    const onChange = useCallback((current, size) => {
-        PagingRolesRequest(current, size).then(data => {
-            setTable({...table, data: data})
-        })
-    }, [])
+    const fetchRoles = useCallback((current, size) => {
+        PagingRolesRequest(current, size).then(setDataSource)
+    }, [refreshKey])
+
+    useEffect(() => {
+        fetchRoles(1, 10)
+    }, [fetchRoles])
 
     const onRefresh = () => {
-        setTable({...table, refreshKey: table.refreshKey + 1})
+        setRefreshKey(refreshKey + 1)
     }
 
     const onAllocMenus = (id: number) => {
@@ -54,7 +53,7 @@ const RolePage = () => {
 
     const onDelete = (id: number) => {
         RemoveRoleRequest(id).then(_ => {
-                onRefresh()
+            onRefresh()
         })
     }
 
@@ -117,24 +116,28 @@ const RolePage = () => {
                 emptyText={"角色列表为空"}
                 permissions={[Permission.RoleAllocMenus, Permission.RoleAllocPermissions, Permission.RoleDelete]}
                 columns={columns}
-                isLoading={table.isLoading}
-                refreshKey={table.refreshKey}
-                onChange={onChange}
-                pagination={true}
-                data={table.data}/>
+                dataSource={dataSource}
+                onPageChange={fetchRoles}/>
         </ShadowCard>
         <AddRoleModal visible={addVisible} onCancel={() => setAddVisible(false)} onSuccess={() => {
             setAddVisible(false)
             onRefresh()
         }}/>
-        <EditRoleModal role={role} visible={editVisible} onCancel={() => setEditVisible(false)} onSuccess={
-            () => {
-                setEditVisible(false)
-                onRefresh()
-            }
-        }/>
-        <MenuDrawer role={role} visible={menuVisible} onCancel={() => setMenuVisible(false)}/>
-        <PermissionDrawer role={role} visible={permissionVisible} onCancel={() => setPermissionVisible(false)}/>
+        {
+            role &&
+            <EditRoleModal role={role} visible={editVisible} onCancel={() => setEditVisible(false)} onSuccess={
+                () => {
+                    setEditVisible(false)
+                    onRefresh()
+                }
+            }/>
+        }
+        {
+            role &&  <MenuDrawer role={role} visible={menuVisible} onCancel={() => setMenuVisible(false)}/>
+        }
+        {
+            role && <PermissionDrawer role={role} visible={permissionVisible} onCancel={() => setPermissionVisible(false)}/>
+        }
     </Content>
 }
 

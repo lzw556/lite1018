@@ -36,7 +36,7 @@ func (s Device) CreateDevice(req request.Device) error {
 	return cmd.Run()
 }
 
-func (s Device) RemoveDevice(deviceID uint) error {
+func (s Device) DeleteDeviceByID(deviceID uint) error {
 	cmd, err := s.factory.NewDeviceRemoveCmd(deviceID)
 	if err != nil {
 		return err
@@ -44,7 +44,7 @@ func (s Device) RemoveDevice(deviceID uint) error {
 	return cmd.Run()
 }
 
-func (s Device) UpdateDevice(deviceID uint, req request.Device) error {
+func (s Device) UpdateDeviceByID(deviceID uint, req request.Device) error {
 	cmd, err := s.factory.NewDeviceUpdateCmd(deviceID)
 	if err != nil {
 		return err
@@ -52,16 +52,16 @@ func (s Device) UpdateDevice(deviceID uint, req request.Device) error {
 	return cmd.UpdateBaseInfo(req)
 }
 
-func (s Device) GetDevice(deviceID uint) (*vo.Device, error) {
+func (s Device) GetDeviceByID(deviceID uint) (*vo.Device, error) {
 	query, err := s.factory.NewDeviceQuery(deviceID)
 	if err != nil {
 		return nil, err
 	}
-	return query.Detail()
+	return query.GetDetail()
 }
 
-func (s Device) FindDevicesByPaginate(assetID, page, size int, req request.DeviceSearch) ([]vo.Device, int64, error) {
-	query, err := s.factory.NewDevicePagingQuery(assetID, page, size, req)
+func (s Device) FindDevicesByPaginate(page, size int, filters request.Filters) ([]vo.Device, int64, error) {
+	query, err := s.factory.NewDevicePagingQuery(page, size, filters)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -69,28 +69,28 @@ func (s Device) FindDevicesByPaginate(assetID, page, size int, req request.Devic
 	return result, total, nil
 }
 
-func (s Device) FindDevicesGroupByAsset(deviceType uint) ([]vo.Group, error) {
-	query, err := s.factory.NewDeviceGroupByQuery(deviceType)
+func (s Device) FilterDevices(filters request.Filters) ([]vo.Device, error) {
+	query, err := s.factory.NewDeviceFilterQuery(filters)
 	if err != nil {
 		return nil, err
 	}
-	return query.GroupBy("asset")
+	return query.Run(), nil
 }
 
-func (s Device) UpdateDeviceSetting(deviceID uint, req request.DeviceSetting) error {
+func (s Device) UpdateDeviceSettingByID(deviceID uint, req request.DeviceSetting) error {
 	cmd, err := s.factory.NewDeviceUpdateCmd(deviceID)
 	if err != nil {
 		return err
 	}
-	return cmd.UpdateSetting(req)
+	return cmd.UpdateSettings(req)
 }
 
-func (s Device) GetDeviceSetting(deviceID uint) (*vo.DeviceSetting, error) {
+func (s Device) GetDeviceSettingsByID(deviceID uint) (vo.DeviceSettings, error) {
 	query, err := s.factory.NewDeviceQuery(deviceID)
 	if err != nil {
 		return nil, err
 	}
-	return query.Setting(), nil
+	return query.GetSettings()
 }
 
 func (s Device) CheckDeviceMacAddress(mac string) error {
@@ -101,38 +101,27 @@ func (s Device) CheckDeviceMacAddress(mac string) error {
 	return response.BusinessErr(errcode.DeviceMacExistsError, mac)
 }
 
-func (s Device) ReplaceDevice(deviceID uint, mac string) error {
-	cmd, err := s.factory.NewDeviceUpdateCmd(deviceID)
-	if err != nil {
-		return err
-	}
-	return cmd.Replace(mac)
+func (s Device) ReplaceDeviceByID(deviceID uint, mac string) error {
+	return nil
 }
 
-func (s Device) GetPropertyDataByID(deviceID uint, pID uint, from, to int64) (vo.PropertyData, error) {
-	query, err := s.factory.NewDeviceQuery(deviceID)
-	if err != nil {
-		return vo.PropertyData{}, err
-	}
-	return query.PropertyDataByRange(pID, time.Unix(from, 0), time.Unix(to, 0))
-}
-
-func (s Device) GetPropertyDataByIDs(deviceID uint, pIDs []uint, from, to int64) (vo.PropertiesData, error) {
+func (s Device) GetPropertyDataByID(deviceID uint, pID string, from, to int64) ([]vo.PropertyData, error) {
 	query, err := s.factory.NewDeviceQuery(deviceID)
 	if err != nil {
 		return nil, err
 	}
-	result := make([]vo.PropertyData, len(pIDs))
-	for i, pid := range pIDs {
-		result[i], err = query.PropertyDataByRange(pid, time.Unix(from, 0), time.Unix(to, 0))
-		if err != nil {
-			return nil, err
-		}
-	}
-	return result, nil
+	return query.PropertyDataByRange(pID, time.Unix(from, 0), time.Unix(to, 0))
 }
 
-func (s Device) FindDeviceDataByID(deviceID uint, from, to int64) ([]vo.PropertyData, error) {
+func (s Device) DownloadPropertiesDataByID(deviceID uint, pIDs []string, from, to int64) (*vo.ExcelFile, error) {
+	query, err := s.factory.NewDeviceQuery(deviceID)
+	if err != nil {
+		return nil, err
+	}
+	return query.DownloadPropertiesDataByRange(pIDs, time.Unix(from, 0), time.Unix(to, 0))
+}
+
+func (s Device) FindDeviceDataByID(deviceID uint, from, to int64) (vo.PropertiesData, error) {
 	query, err := s.factory.NewDeviceQuery(deviceID)
 	if err != nil {
 		return nil, err
@@ -148,7 +137,7 @@ func (s Device) RemoveDataByID(deviceID uint, from, to int64) error {
 	return cmd.RemoveData(time.Unix(from, 0), time.Unix(to, 0))
 }
 
-func (s Device) ExecuteCommand(deviceID uint, cmdType uint) error {
+func (s Device) ExecuteCommandByID(deviceID uint, cmdType uint) error {
 	cmd, err := s.factory.NewDeviceExecuteCommandCmd(deviceID)
 	if err != nil {
 		return err
@@ -156,7 +145,7 @@ func (s Device) ExecuteCommand(deviceID uint, cmdType uint) error {
 	return cmd.Run(cmdType)
 }
 
-func (s Device) ExecuteDeviceUpgrade(deviceID uint, req request.DeviceUpgrade) error {
+func (s Device) ExecuteDeviceUpgradeByID(deviceID uint, req request.DeviceUpgrade) error {
 	cmd, err := s.factory.NewDeviceUpgradeCmd(deviceID)
 	if err != nil {
 		return err
@@ -164,7 +153,7 @@ func (s Device) ExecuteDeviceUpgrade(deviceID uint, req request.DeviceUpgrade) e
 	return cmd.Upgrade(req)
 }
 
-func (s Device) ExecuteDeviceCancelUpgrade(deviceID uint) error {
+func (s Device) ExecuteDeviceCancelUpgradeByID(deviceID uint) error {
 	cmd, err := s.factory.NewDeviceUpgradeCmd(deviceID)
 	if err != nil {
 		return err
@@ -178,12 +167,4 @@ func (s Device) GetChildren(deviceID uint) ([]vo.Device, error) {
 		return nil, err
 	}
 	return query.Query()
-}
-
-func (s Device) Statistic() ([]vo.DeviceStatistic, error) {
-	query, err := s.factory.NewDeviceStatisticQuery()
-	if err != nil {
-		return nil, err
-	}
-	return query.Statistic()
 }

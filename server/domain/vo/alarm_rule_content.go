@@ -6,15 +6,15 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/devicetype"
 )
 
-type AlarmRuleContent struct {
+type AlarmRule struct {
 	Field     string  `json:"field"`
 	Method    string  `json:"method"`
 	Threshold float32 `json:"threshold"`
 	Operation string  `json:"operation"`
 }
 
-func NewAlarmRuleContent(e po.AlarmRuleContent) AlarmRuleContent {
-	return AlarmRuleContent{
+func NewAlarmRule(e po.AlarmRule) AlarmRule {
+	return AlarmRule{
 		Field:     e.Field,
 		Method:    e.Method,
 		Threshold: e.Threshold,
@@ -22,7 +22,7 @@ func NewAlarmRuleContent(e po.AlarmRuleContent) AlarmRuleContent {
 	}
 }
 
-func (c AlarmRuleContent) Description() string {
+func (c AlarmRule) Description() string {
 	return fmt.Sprintf("属性【%s】的值: @%s设定的阈值:%.3f", devicetype.GetFieldName(c.Field), operation(c.Operation), c.Threshold)
 }
 

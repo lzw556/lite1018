@@ -12,6 +12,6 @@ func (s TypeEqSpec) IsSpecifiedBy(v interface{}) bool {
 
 func (s TypeEqSpec) Scope() func(db *gorm.DB) *gorm.DB {
 	return func(db *gorm.DB) *gorm.DB {
-		return db.Where("type_id = ?", s)
+		return db.Where("type = ?", s)
 	}
 }

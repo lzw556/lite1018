@@ -6,17 +6,18 @@ import (
 )
 
 type Service interface {
-	GetNetwork(networkID uint) (*vo.Network, error)
-	FindNetworks(assetID uint) ([]vo.Network, error)
-	CreateNetwork(req request.ImportNetwork) error
+	GetNetworkByID(id uint) (*vo.Network, error)
+	FindNetworksByPaginate(filters request.Filters, page, size int) ([]vo.Network, int64, error)
+	FilterNetworks(filters request.Filters) ([]vo.Network, error)
+	ImportNetwork(req request.ImportNetwork) error
+	CreateNetwork(req request.CreateNetwork) error
 
-	UpdateNetwork(networkID uint, req request.Network) (*vo.Network, error)
-	RemoveNetwork(networkID uint) error
-	UpdateSetting(gatewayID uint, req request.WSN) error
+	UpdateNetworkByID(id uint, req request.Network) (*vo.Network, error)
+	DeleteNetworkByID(id uint) error
 
-	ExportNetwork(networkID uint) (*vo.NetworkExportFile, error)
-	SyncNetwork(networkID uint) error
+	ExportNetworkByID(id uint) (*vo.NetworkExportFile, error)
+	SyncNetworkByID(id uint) error
 
-	AccessDevices(networkID uint, req request.AccessDevices) error
-	RemoveDevices(networkID uint, req request.RemoveDevices) error
+	AddDevicesByID(id uint, req request.AddDevices) error
+	RemoveDevicesByID(id uint, req request.RemoveDevices) error
 }

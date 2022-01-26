@@ -11,13 +11,17 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/asset"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/device"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/firmware"
+	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/measurement"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/menu"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/network"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/permission"
-	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/property"
+	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/project"
+	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/resource"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/role"
+	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/statistic"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/system"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/user"
+	"github.com/thetasensors/theta-cloud-lite/server/adapter/crontask"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/iot"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/iot/dispatcher"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/ruleengine"
@@ -25,7 +29,6 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/config"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/service"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/cache"
-	"github.com/thetasensors/theta-cloud-lite/server/pkg/task"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/utils"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/xlog"
 	"net/http"
@@ -39,10 +42,10 @@ import (
 func Start(mode string, dist embed.FS) {
 	xlog.Init(mode)
 	cache.Init(mode)
+	ruleengine.Init()
+
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGQUIT, syscall.SIGTERM, syscall.SIGINT)
 	defer stop()
-
-	adapter.RuleEngine = ruleengine.NewAdapter()
 
 	runTask()
 
@@ -66,9 +69,9 @@ func Start(mode string, dist embed.FS) {
 }
 
 func runTask() {
-	task.Init()
+	adapter.CronTask = crontask.NewAdapter()
 	go func() {
-		task.Run()
+		adapter.CronTask.Run()
 	}()
 }
 
@@ -81,6 +84,7 @@ func runIoTServer() {
 	adapter.IoT.RegisterDispatchers(
 		dispatcher.NewDeviceStatus(),
 		dispatcher.NewSensorData(),
+		dispatcher.NewLargeSensorData(),
 		dispatcher.NewLinkStatus(),
 		dispatcher.NewRestartStatus(),
 		dispatcher.NewDeviceInformation(),
@@ -95,19 +99,26 @@ func runIoTServer() {
 func runApiServer(dist embed.FS) {
 	adapter.Api = api.NewAdapter()
 	adapter.Api.StaticFS(dist)
-	adapter.Api.UseMiddleware(middleware.NewJWT("/login"), middleware.NewCasbinRbac("/login", "/my/*", "/check/*", "/menus/*", "/permissions/*", "/properties"))
+	adapter.Api.UseMiddleware(
+		middleware.NewJWT("/login", "/resources/*"),
+		middleware.NewCasbinRbac("/login", "/my/*", "/check/*", "/menus/*", "/permissions/*", "/resources/*", "/statistics/*", "/devices/defaultSettings"),
+		middleware.NewProjectChecker("/login", "/resources/*"),
+	)
 	adapter.Api.RegisterRouters(
+		project.NewRouter(service.NewProject()),
 		user.NewRouter(service.NewUser()),
 		menu.NewRouter(service.NewMenu()),
 		role.NewRouter(service.NewRole()),
 		permission.NewRouter(service.NewPermission()),
 		asset.NewRouter(service.NewAsset()),
+		resource.NewRouter(nil),
+		measurement.NewRouter(service.NewMeasurement()),
 		device.NewRouter(service.NewDevice()),
-		property.NewRouter(service.NewProperty()),
 		firmware.NewRouter(service.NewFirmware()),
 		network.NewRouter(service.NewNetwork()),
 		alarm.NewRouter(service.NewAlarm()),
 		system.NewRouter(service.NewSystem()),
+		statistic.NewRouter(service.NewStatistic()),
 	)
 	go func() {
 		if err := adapter.Api.Run(); err != nil && err != http.ErrServerClosed {

@@ -9,22 +9,23 @@ require (
 	github.com/allegro/bigcache/v3 v3.0.0
 	github.com/asaskevich/EventBus v0.0.0-20200907212545-49d423059eef
 	github.com/bilibili/gengine v1.5.7
-	github.com/casbin/casbin/v2 v2.39.1 // indirect
-	github.com/casbin/gorm-adapter/v3 v3.4.6 // indirect
+	github.com/casbin/casbin/v2 v2.39.1
+	github.com/casbin/gorm-adapter/v3 v3.4.6
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/eclipse/paho.mqtt.golang v1.3.5
-	github.com/fvbock/endless v0.0.0-20170109170031-447134032cb6 // indirect
+	github.com/fvbock/endless v0.0.0-20170109170031-447134032cb6
 	github.com/gin-contrib/cors v1.3.1
+	github.com/gin-contrib/gzip v0.0.5 // indirect
 	github.com/gin-contrib/static v0.0.1
 	github.com/gin-gonic/gin v1.7.4
-	github.com/go-kit/kit v0.10.0 // indirect
 	github.com/gogo/protobuf v1.3.2
 	github.com/golang/protobuf v1.5.2
 	github.com/googollee/go-socket.io v1.6.1
 	github.com/json-iterator/go v1.1.11
-	github.com/lib/pq v1.10.2 // indirect
 	github.com/mitchellh/mapstructure v1.4.1
+	github.com/mjibson/go-dsp v0.0.0-20180508042940-11479a337f12
 	github.com/mochi-co/mqtt v1.0.0
+	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/robfig/cron/v3 v3.0.0
 	github.com/satori/go.uuid v1.2.0
 	github.com/shirou/gopsutil v3.21.10+incompatible

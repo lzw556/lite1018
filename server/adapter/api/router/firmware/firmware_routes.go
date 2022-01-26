@@ -19,7 +19,7 @@ func (r firmwareRouter) create(ctx *gin.Context) (interface{}, error) {
 	return nil, r.service.CreateFirmware(req)
 }
 
-func (r firmwareRouter) paging(ctx *gin.Context) (interface{}, error) {
+func (r firmwareRouter) find(ctx *gin.Context) (interface{}, error) {
 	page := cast.ToInt(ctx.Query("page"))
 	size := cast.ToInt(ctx.Query("size"))
 	result, total, err := r.service.FindFirmwaresByPaginate(page, size)
@@ -29,9 +29,9 @@ func (r firmwareRouter) paging(ctx *gin.Context) (interface{}, error) {
 	return response.NewPageResult(page, size, total, result), nil
 }
 
-func (r firmwareRouter) removeByID(ctx *gin.Context) (interface{}, error) {
+func (r firmwareRouter) delete(ctx *gin.Context) (interface{}, error) {
 	id := cast.ToUint(ctx.Param("id"))
-	return nil, r.service.RemoveFirmware(id)
+	return nil, r.service.DeleteFirmwareByID(id)
 }
 
 func (r firmwareRouter) findFirmwares(ctx *gin.Context) (interface{}, error) {

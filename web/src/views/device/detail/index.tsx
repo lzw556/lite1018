@@ -8,7 +8,6 @@ import {Content} from "antd/lib/layout/layout";
 import InformationCard from "./information";
 import ShadowCard from "../../../components/shadowCard";
 import MonitorPage from "./monitor";
-import AlertPage from "./alert";
 import {DownOutlined} from "@ant-design/icons";
 import {DeviceCommand} from "../../../types/device_command";
 import SettingPage from "./setting";
@@ -20,16 +19,8 @@ import HistoryDataPage from "./data";
 
 const tabList = [
     {
-        key: "monitor",
-        tab: "监控",
-    },
-    {
         key: "settings",
         tab: "配置信息",
-    },
-    {
-        key: "alert",
-        tab: "报警记录"
     },
 ]
 
@@ -38,14 +29,13 @@ const DeviceDetailPage = () => {
     const history = useHistory();
     const [device, setDevice] = useState<Device>();
     const [isLoading, setIsLoading] = useState<boolean>(false);
-    const [currentKey, setCurrentKey] = useState<string>("monitor");
+    const [currentKey, setCurrentKey] = useState<string>();
     const {hasPermission} = userPermission();
 
     const contents = new Map<string, any>([
-        ["monitor", <MonitorPage device={device}/>],
-        ["alert", <AlertPage device={device}/>],
+        ["monitor", device && <MonitorPage device={device}/>],
         ["settings", <SettingPage device={device}/>],
-        ["historyData", <HistoryDataPage device={device}/>]
+        ["historyData", device && <HistoryDataPage device={device}/>]
     ])
 
     const fetchDevice = useCallback(() => {
@@ -56,6 +46,11 @@ const DeviceDetailPage = () => {
                 .then(data => {
                     setDevice(data)
                     setIsLoading(false)
+                    if (data.category === 3) {
+                        setCurrentKey("monitor")
+                    } else {
+                        setCurrentKey("settings")
+                    }
                 })
                 .catch(_ => history.push({pathname: "/device-management/devices"}))
         } else {
@@ -74,6 +69,10 @@ const DeviceDetailPage = () => {
             device.typeId !== DeviceType.Gateway &&
             hasPermission(Permission.DeviceData)) {
             return [
+                {
+                    key: "monitor",
+                    tab: "监控",
+                },
                 ...tabList,
                 {
                     key: "historyData",
@@ -125,11 +124,13 @@ const DeviceDetailPage = () => {
                     device && <InformationCard device={device} isLoading={isLoading}/>
                 }
                 <br/>
-                <ShadowCard size={"small"} tabList={renderTabList()} onTabChange={key => {
-                    setCurrentKey(key)
-                }}>
-                    {contents.get(currentKey)}
-                </ShadowCard>
+                {
+                    device && <ShadowCard size={"small"} tabList={renderTabList()} onTabChange={key => {
+                        setCurrentKey(key)
+                    }}>
+                        {currentKey && contents.get(currentKey)}
+                    </ShadowCard>
+                }
             </Col>
         </Row>
     </Content>

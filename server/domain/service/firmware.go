@@ -68,7 +68,7 @@ func (s Firmware) FindFirmwaresByPaginate(page, size int) (vo.Firmwares, int64, 
 	return result, total, nil
 }
 
-func (s Firmware) RemoveFirmware(firmwareID uint) error {
+func (s Firmware) DeleteFirmwareByID(firmwareID uint) error {
 	ctx := context.TODO()
 	e, err := s.repository.Get(ctx, firmwareID)
 	if err != nil {

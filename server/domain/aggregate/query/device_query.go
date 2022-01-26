@@ -2,50 +2,53 @@ package query
 
 import (
 	"context"
+	"fmt"
+	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/response"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
-	"github.com/thetasensors/theta-cloud-lite/server/domain/po"
 	spec "github.com/thetasensors/theta-cloud-lite/server/domain/specification"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/vo"
-	"github.com/thetasensors/theta-cloud-lite/server/pkg/calculate"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/devicetype"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/errcode"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/xlog"
+	"github.com/xuri/excelize/v2"
 	"time"
 )
 
 type DeviceQuery struct {
 	entity.Device
-	Network entity.Network
 
 	deviceRepo            dependency.DeviceRepository
 	deviceStatusRepo      dependency.DeviceStatusRepository
-	deviceDataRepo        dependency.DeviceDataRepository
+	deviceDataRepo        dependency.SensorDataRepository
 	deviceInformationRepo dependency.DeviceInformationRepository
-	assetRepo             dependency.AssetRepository
-	propertyRepo          dependency.PropertyRepository
-	alarmRuleRepo         dependency.AlarmRuleRepository
+	networkRepo           dependency.NetworkRepository
+	alarmRuleRepo         dependency.AlarmRepository
+	bindingRepo           dependency.MeasurementDeviceBindingRepository
 }
 
 func NewDeviceQuery() DeviceQuery {
 	return DeviceQuery{
 		deviceRepo:            repository.Device{},
 		deviceStatusRepo:      repository.DeviceStatus{},
-		deviceDataRepo:        repository.DeviceData{},
+		deviceDataRepo:        repository.SensorData{},
 		deviceInformationRepo: repository.DeviceInformation{},
-		assetRepo:             repository.Asset{},
-		propertyRepo:          repository.Property{},
-		alarmRuleRepo:         repository.AlarmRule{},
+		networkRepo:           repository.Network{},
+		bindingRepo:           repository.MeasurementDeviceBinding{},
 	}
 }
 
-func (query DeviceQuery) Detail() (*vo.Device, error) {
+func (query DeviceQuery) GetDetail() (*vo.Device, error) {
 	ctx := context.TODO()
-	asset, err := query.assetRepo.Get(ctx, query.Device.AssetID)
-	if err != nil {
-		return nil, err
-	}
 	result := vo.NewDevice(query.Device)
-	result.SetAsset(asset)
+	if network, err := query.networkRepo.Get(ctx, query.Device.NetworkID); err == nil {
+		result.SetNetwork(network)
+	}
+	if t := devicetype.Get(query.Device.Type); t != nil {
+		result.Properties = t.Properties(t.SensorID())
+	}
+	var err error
 	result.State.DeviceStatus, err = query.deviceStatusRepo.Get(query.Device.ID)
 	if err != nil {
 		xlog.Errorf("get device [%s] status failed:%v", query.Device.MacAddress, err)
@@ -54,84 +57,98 @@ func (query DeviceQuery) Detail() (*vo.Device, error) {
 	if err != nil {
 		xlog.Errorf("get device information failed:%v", query.Device.MacAddress, err)
 	}
-	if query.Network.ID != 0 {
-		result.SetWSN(query.Network)
-	}
-	if properties, err := query.propertyRepo.FindByDeviceTypeID(ctx, query.Device.TypeID); err == nil {
-		result.SetProperties(properties)
+	if binding, err := query.bindingRepo.GetBySpecs(ctx, spec.DeviceMacEqSpec(query.Device.MacAddress)); err == nil {
+		result.SetBinding(binding)
 	}
 	return &result, nil
 }
 
-func (query DeviceQuery) Setting() *vo.DeviceSetting {
-	result := vo.NewDeviceSetting(query.Device)
-	if query.Network.ID != 0 {
-		result.SetNetwork(query.Network)
+func (query DeviceQuery) GetSettings() (vo.DeviceSettings, error) {
+	t := devicetype.Get(query.Device.Type)
+	if t == nil {
+		return nil, response.BusinessErr(errcode.UnknownDeviceTypeError, "")
 	}
-	return &result
-}
-
-func (query DeviceQuery) PropertyDataByRange(pid uint, from, to time.Time) (vo.PropertyData, error) {
-	property, err := query.propertyRepo.Get(context.TODO(), pid)
-	if err != nil {
-		return vo.PropertyData{}, err
-	}
-	data, err := query.deviceDataRepo.Find(query.Device.ID, from, to)
-	if err != nil {
-		return vo.PropertyData{}, err
-	}
-	return query.getPropertyData(property, data), nil
-}
-
-func (query DeviceQuery) getPropertyData(property po.Property, data []po.DeviceData) vo.PropertyData {
-	result := vo.NewPropertyData(property)
-	for k := range property.Fields {
-		result.Fields[k] = make([]float32, len(data))
-	}
-	result.Time = make([]int64, len(data))
-	for i, d := range data {
-		result.Time[i] = d.Time.UTC().Unix()
-		for k, v := range property.Fields {
-			switch k {
-			case "corrosion_rate":
-				result.Fields[k][i] = query.calculateCorrosionRate(d, v, d.Time)
-			default:
-				result.Fields[k][i] = d.Values[v]
-			}
+	settings := t.Settings()
+	for i, setting := range t.Settings() {
+		if s, ok := query.Device.Settings.Get(setting.Key); ok {
+			settings[i].Value = setting.Convert(s.Value)
+		} else {
+			settings[i].Value = setting.Convert(setting.Value)
 		}
 	}
-	return result
+	result := vo.NewDeviceSettings(settings)
+	return result, nil
 }
 
-func (query DeviceQuery) calculateCorrosionRate(current po.DeviceData, idx uint, t time.Time) float32 {
-	monthAgo, err := query.deviceDataRepo.Get(query.Device.ID, t.AddDate(0, -1, 0))
-	if err != nil {
-		return 0
+func (query DeviceQuery) PropertyDataByRange(pid string, from, to time.Time) ([]vo.PropertyData, error) {
+	if t := devicetype.Get(query.Device.Type); t != nil {
+		if property, ok := t.Properties(t.SensorID()).Get(pid); ok {
+			data, err := query.deviceDataRepo.Find(query.Device.MacAddress, from, to)
+			if err != nil {
+				return nil, err
+			}
+			result := make([]vo.PropertyData, len(data))
+			for i, d := range data {
+				result[i] = vo.PropertyData{
+					Timestamp: d.Time.UTC().Unix(),
+					Value:     property.Convert(d.Values),
+				}
+			}
+			return result, nil
+		}
 	}
-	if current.Time == monthAgo.Time {
-		return 0
-	}
-	return calculate.CorrosionRate(monthAgo.Values[idx], current.Values[idx], current.Time.Sub(monthAgo.Time).Seconds())
+	return nil, response.BusinessErr(errcode.UnknownDeviceTypeError, "")
 }
 
-func (query DeviceQuery) DataByRange(from, to time.Time) ([]vo.PropertyData, error) {
-	ctx := context.TODO()
-	properties, err := query.propertyRepo.FindByDeviceTypeID(ctx, query.Device.TypeID)
-	if err != nil {
-		return nil, err
-	}
-	data, err := query.deviceDataRepo.Find(query.Device.ID, from, to)
-	if err != nil {
-		return nil, err
-	}
-	result := make([]vo.PropertyData, len(properties))
-	for i, property := range properties {
-		result[i] = query.getPropertyData(property, data)
-		alarmRules, err := query.alarmRuleRepo.FindBySpecs(ctx, spec.PropertyEqSpec(property.ID))
+func (query DeviceQuery) DataByRange(from, to time.Time) (vo.PropertiesData, error) {
+	if t := devicetype.Get(query.Device.Type); t != nil {
+		data, err := query.deviceDataRepo.Find(query.Device.MacAddress, from, to)
 		if err != nil {
 			return nil, err
 		}
-		result[i].AddAlarms(alarmRules...)
+		result := make(vo.PropertiesData)
+		for _, property := range t.Properties(t.SensorID()) {
+			result[property.Key] = make([]vo.PropertyData, len(data))
+			for i, d := range data {
+				result[property.Key][i] = vo.PropertyData{
+					Timestamp: d.Time.UTC().Unix(),
+					Value:     property.Convert(d.Values),
+				}
+			}
+		}
+		return result, nil
 	}
-	return result, nil
+	return nil, response.BusinessErr(errcode.UnknownDeviceTypeError, "")
+}
+
+func (query DeviceQuery) DownloadPropertiesDataByRange(pIDs []string, from time.Time, to time.Time) (*vo.ExcelFile, error) {
+	if t := devicetype.Get(query.Device.Type); t != nil {
+		data, err := query.DataByRange(from, to)
+		if err != nil {
+			return nil, err
+		}
+		result := vo.ExcelFile{
+			Name: fmt.Sprintf("%s_%s_%s.xlsx", query.Device.MacAddress, from.Format("20060102"), to.Format("20060102")),
+			File: excelize.NewFile(),
+		}
+		timestamp := make([]int64, 0)
+		for i, pid := range pIDs {
+			axis := string(rune(66 + i))
+			if property, ok := t.Properties(t.SensorID()).Get(pid); ok {
+				result.File.SetCellValue("Sheet1", fmt.Sprintf("%s%d", axis, 1), fmt.Sprintf("%s(%s)", property.Name, property.Unit))
+				for j, d := range data[property.Key] {
+					if len(timestamp) != len(data[property.Key]) {
+						timestamp = append(timestamp, d.Timestamp)
+					}
+					result.File.SetCellValue("Sheet1", fmt.Sprintf("%s%d", axis, j+2), d.Value)
+				}
+			}
+		}
+		result.File.SetCellValue("Sheet1", "A1", "时间")
+		for i, t := range timestamp {
+			result.File.SetCellValue("Sheet1", fmt.Sprintf("A%d", i+2), time.Unix(t, 0).Format("2006-01-02 15:04:05"))
+		}
+		return &result, nil
+	}
+	return nil, response.BusinessErr(errcode.UnknownDeviceTypeError, "")
 }

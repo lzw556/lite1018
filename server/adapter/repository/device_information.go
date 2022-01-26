@@ -25,7 +25,10 @@ func (repo DeviceInformation) Get(id uint) (po.DeviceInformation, error) {
 	var e po.DeviceInformation
 	err := repo.BoltDB().View(func(tx *bbolt.Tx) error {
 		bucket := tx.Bucket([]byte(e.BucketName()))
-		return json.Unmarshal(bucket.Get(itob(id)), &e)
+		if bytes := bucket.Get(itob(id)); bytes != nil {
+			return json.Unmarshal(bytes, &e)
+		}
+		return nil
 	})
 	return e, err
 }

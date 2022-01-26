@@ -19,18 +19,17 @@ const EditUserModal = (props: EditUserProps) => {
 
     useEffect(() => {
         if (visible) {
-            form.resetFields()
             form.setFieldsValue({
-                email: user.email,
                 phone: user.phone,
-                role: user.role ? user.role : null
+                email: user.email,
+                role: user.role
             })
         }
-    }, [visible])
+    }, [visible, user])
 
     const onSave = () => {
         setIsLoading(true)
-        form.validateFields(["role"]).then(values => {
+        form.validateFields().then(values => {
             UpdateUserRequest(user.id, values).then(_ => {
                 setIsLoading(false)
                 onSuccess()
@@ -58,12 +57,10 @@ const EditUserModal = (props: EditUserProps) => {
                     <RoleSelect placeholder={"请选择角色"}/>
                 </Form.Item>
             }
-            <Form.Item name="phone" label={"手机号码"} initialValue={user.phone}
-                       rules={[{required: true, message: "请输入手机号码"}]}>
+            <Form.Item name={"phone"} label={"手机号码"} initialValue={user.phone}>
                 <Input placeholder="手机号码"/>
             </Form.Item>
-            <Form.Item name="email" label={"邮箱"} initialValue={user.email}
-                       rules={[{required: true, message: "请输入邮箱地址"}]}>
+            <Form.Item name={"email"} label={"邮箱"} initialValue={user.email}>
                 <Input placeholder="邮箱"/>
             </Form.Item>
         </Form>

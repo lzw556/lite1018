@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/request"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/response"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
@@ -16,18 +17,18 @@ type AlarmRecordCmd struct {
 
 	repository           dependency.AlarmRecordRepository
 	acknowledgeRepo      dependency.AlarmRecordAcknowledgeRepository
-	deviceAlertStateRepo dependency.DeviceAlertStateRepository
+	measurementAlertRepo dependency.MeasurementAlertRepository
 }
 
 func NewAlarmRecordCmd() AlarmRecordCmd {
 	return AlarmRecordCmd{
 		repository:           repository.AlarmRecord{},
 		acknowledgeRepo:      repository.AlarmRecordAcknowledge{},
-		deviceAlertStateRepo: repository.DeviceAlertState{},
+		measurementAlertRepo: repository.MeasurementAlert{},
 	}
 }
 
-func (cmd AlarmRecordCmd) AcknowledgeBy(userID uint) error {
+func (cmd AlarmRecordCmd) AcknowledgeBy(req request.AcknowledgeAlarmRecord) error {
 	if !cmd.AlarmRecord.Acknowledged {
 		cmd.AlarmRecord.Acknowledge()
 		return transaction.Execute(context.TODO(), func(txCtx context.Context) error {
@@ -36,17 +37,18 @@ func (cmd AlarmRecordCmd) AcknowledgeBy(userID uint) error {
 			}
 			e := po.AlarmRecordAcknowledge{
 				AlarmRecordID: cmd.AlarmRecord.ID,
-				UserID:        userID,
+				UserID:        req.UserID,
+				Note:          req.Note,
 			}
 			if err := cmd.acknowledgeRepo.Create(txCtx, &e); err != nil {
 				return err
 			}
-			alertState, err := cmd.deviceAlertStateRepo.Get(cmd.AlarmRecord.DeviceID)
+			alert, err := cmd.measurementAlertRepo.Get(cmd.AlarmRecord.MeasurementID)
 			if err != nil {
 				return err
 			}
-			alertState.Acknowledged(cmd.AlarmRecord.ID)
-			return cmd.deviceAlertStateRepo.Save(cmd.AlarmRecord.DeviceID, &alertState)
+			alert.RemoveAlarmRecord(cmd.AlarmRecord.AlarmID)
+			return cmd.measurementAlertRepo.Create(&alert)
 		})
 	}
 	return response.BusinessErr(errcode.AlarmRecordAlreadyAcknowledgedError, "")

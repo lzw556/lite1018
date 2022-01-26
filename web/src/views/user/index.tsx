@@ -1,9 +1,9 @@
 import {Button, Col, Popconfirm, Row, Space} from "antd";
-import {useCallback, useState} from "react";
+import {useCallback, useEffect, useState} from "react";
 import {Content} from "antd/lib/layout/layout";
 import {GetUserRequest, PagingUsersRequest, RemoveUserRequest} from "../../apis/user";
-import TableLayout, {TableProps} from "../layout/TableLayout";
-import {InitializeUserState} from "../../types/user";
+import TableLayout from "../layout/TableLayout";
+import {InitializeUserState, User} from "../../types/user";
 import {DeleteOutlined, EditOutlined, UserAddOutlined} from "@ant-design/icons";
 import AddUserModal from "./add";
 import EditUserModal from "./edit";
@@ -11,46 +11,31 @@ import ShadowCard from "../../components/shadowCard";
 import MyBreadcrumb from "../../components/myBreadcrumb";
 import HasPermission from "../../permission";
 import {Permission} from "../../permission/permission";
+import {PageResult} from "../../types/page";
 
 const UserPage = () => {
     const [addUserVisible, setAddUserVisible] = useState<boolean>(false)
     const [editUserVisible, setEditUserVisible] = useState<boolean>(false)
     const [user, setUser] = useState(InitializeUserState)
-    const [table, setTable] = useState<TableProps>({
-        data: {},
-        isLoading: false,
-        pagination: false,
-        refreshKey: 0
-    })
+    const [dataSource, setDataSource] = useState<PageResult<User[]>>()
 
-    const onChange = useCallback((current: number, size: number) => {
-        onLoading(true)
-        PagingUsersRequest(current, size).then(data => {
-            onLoading(false)
-            setTable(old => Object.assign({}, old, {data: data}))
-        })
+    const fetchUsers = useCallback((current: number, size: number) => {
+        PagingUsersRequest(current, size).then(setDataSource)
     }, [])
+
+    useEffect(() => {
+        fetchUsers(1, 10)
+    }, [])
+
+    const onRefresh = () => {
+        if (dataSource) {
+            fetchUsers(dataSource.page, dataSource.size)
+        }
+    }
 
     const onAddUserSuccess = () => {
         setAddUserVisible(false)
         onRefresh()
-    }
-
-    const onEditUserSuccess = () => {
-        setEditUserVisible(false)
-        onRefresh()
-    }
-
-    const onLoading = (isLoading: boolean) => {
-        setTable(old => Object.assign({}, old, {isLoading: isLoading}))
-    }
-
-    const onRefresh = () => {
-        setTable(old => Object.assign({}, old, {refreshKey: old.refreshKey + 1}))
-    }
-
-    const onDelete = (id: number) => {
-        RemoveUserRequest(id).then(_ => onRefresh())
     }
 
     const onEdit = async (id: number) => {
@@ -58,6 +43,15 @@ const UserPage = () => {
             setUser(data)
             setEditUserVisible(true)
         })
+    }
+
+    const onEditUserSuccess = () => {
+        setEditUserVisible(false)
+        onRefresh()
+    }
+
+    const onDelete = (id: number) => {
+        RemoveUserRequest(id).then(_ => onRefresh())
     }
 
     const columns = [
@@ -117,11 +111,8 @@ const UserPage = () => {
                     <TableLayout
                         columns={columns}
                         permissions={[Permission.UserDelete, Permission.UserEdit]}
-                        data={table.data}
-                        isLoading={table.isLoading}
-                        refreshKey={table.refreshKey}
-                        pagination={true}
-                        onChange={onChange}
+                        dataSource={dataSource}
+                        onPageChange={fetchUsers}
                     />
                 </ShadowCard>
             </Col>

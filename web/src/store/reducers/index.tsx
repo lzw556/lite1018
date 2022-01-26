@@ -3,6 +3,7 @@ import userLogin from './user'
 import storage from "redux-persist/lib/storage";
 import {persistReducer} from "redux-persist";
 import getMenus from "./menu";
+import setProject from "./project";
 
 export interface State<T> {
     data: T
@@ -18,7 +19,13 @@ const menuPersistConfig = {
     storage: storage,
 }
 
+const projectPersistConfig = {
+    key: 'project',
+    storage: storage,
+}
+
 export default combineReducers({
     auth: persistReducer(authPersistConfig, userLogin),
-    menu: persistReducer(menuPersistConfig, getMenus)
+    menu: persistReducer(menuPersistConfig, getMenus),
+    project: persistReducer(projectPersistConfig, setProject),
 })

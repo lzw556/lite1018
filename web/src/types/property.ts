@@ -1,12 +1,10 @@
 import {DeviceType} from "./device_type";
-import {PropertyData} from "./property_data";
 
 export type Property = {
-    id: number
+    key: string
     name: string
     unit: string
-    fields: Field[]
-    data?: PropertyData
+    type: string
 }
 
 export function GetPrimaryProperty(properties: Property[], typeId: DeviceType) {

@@ -1,7 +1,7 @@
 import {FC, useEffect, useState} from "react";
 import Modal from "antd/es/modal/Modal";
 import {Form, Input} from "antd";
-import DeviceTypeSelect from "../../../components/deviceTypeSelect";
+import DeviceTypeSelect from "../../../components/select/deviceTypeSelect";
 import {DeviceType} from "../../../types/device_type";
 import IpnFormItem, {IPNSettingKeys} from "../../device/form/item/ipnFormItem";
 import {DEFAULT_DEVICE_SETTING_IPN} from "../../../types/device_setting";
@@ -107,7 +107,7 @@ const AddNodeModal: FC<AddNodeModalProps> = ({visible, onCancel, onSuccess}) => 
                 <Input placeholder={"请输入设备MAC地址"}/>
             </Form.Item>
             <Form.Item label={"设备类型"} name={"type"} rules={[{required:true, message: "请选择设备类型"}]}>
-                <DeviceTypeSelect sensor={false} placeholder={"请选择设备类型"} onChange={value => {
+                <DeviceTypeSelect placeholder={"请选择设备类型"} onChange={value => {
                     setDeviceType(value)
                 }}/>
             </Form.Item>

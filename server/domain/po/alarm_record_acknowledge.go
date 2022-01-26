@@ -7,6 +7,7 @@ type AlarmRecordAcknowledge struct {
 	ID            uint `json:"id"`
 	AlarmRecordID uint
 	UserID        uint
+	Note          string `gorm:"type:text"`
 }
 
 func (AlarmRecordAcknowledge) TableName() string {

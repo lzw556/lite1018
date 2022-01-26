@@ -38,7 +38,7 @@ func (s Role) CreateRole(req request.Role) error {
 	return s.repository.Create(ctx, &e)
 }
 
-func (s Role) UpdateRole(id uint, req request.Role) error {
+func (s Role) UpdateRoleByID(id uint, req request.Role) error {
 	ctx := context.TODO()
 	e, err := s.repository.Get(ctx, id)
 	if err != nil {
@@ -62,7 +62,7 @@ func (s Role) GetRolesByPaginate(page, size int) ([]vo.Role, int64, error) {
 	return result, total, nil
 }
 
-func (s Role) AllocMenus(id uint, req request.AllocMenus) error {
+func (s Role) AllocMenusByRoleID(id uint, req request.AllocMenus) error {
 	cmd, err := s.factory.NewRoleCmd(id)
 	if err != nil {
 		return err
@@ -70,7 +70,7 @@ func (s Role) AllocMenus(id uint, req request.AllocMenus) error {
 	return cmd.AllocMenus(req.IDs)
 }
 
-func (s Role) AllocPermissions(id uint, req request.AllocPermissions) error {
+func (s Role) AllocPermissionsByRoleID(id uint, req request.AllocPermissions) error {
 	cmd, err := s.factory.NewRoleCmd(id)
 	if err != nil {
 		return err
@@ -78,7 +78,7 @@ func (s Role) AllocPermissions(id uint, req request.AllocPermissions) error {
 	return cmd.AllocPermissions(req.IDs)
 }
 
-func (s Role) GetRole(id uint) (*vo.Role, error) {
+func (s Role) GetRoleByID(id uint) (*vo.Role, error) {
 	query, err := s.factory.NewRoleQuery(id)
 	if err != nil {
 		return nil, err
@@ -95,7 +95,7 @@ func (s Role) GetCasbinByUserID(id uint) (*vo.Casbin, error) {
 	return result, nil
 }
 
-func (s Role) RemoveRoleByID(id uint) error {
+func (s Role) DeleteRoleByID(id uint) error {
 	cmd, err := s.factory.NewRoleCmd(id)
 	if err != nil {
 		return err

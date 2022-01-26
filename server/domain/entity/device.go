@@ -16,6 +16,15 @@ type Device struct {
 	alarmState      map[uint]uint
 }
 
+func (d Device) GetSetting(key string) (po.DeviceSetting, bool) {
+	for _, setting := range d.Settings {
+		if setting.Key == key {
+			return setting, true
+		}
+	}
+	return po.DeviceSetting{}, false
+}
+
 func (d Device) UpdateConnectionState(isOnline bool) {
 	key := fmt.Sprintf("device_connection_status_%d", d.ID)
 	_ = cache.GetStruct(key, &d.connectionState)
@@ -61,3 +70,11 @@ func (d Device) GetUpgradeState() DeviceUpgradeState {
 }
 
 type Devices []Device
+
+func (ds Devices) PersistentObject() []po.Device {
+	pos := make([]po.Device, len(ds))
+	for i, device := range ds {
+		pos[i] = device.Device
+	}
+	return pos
+}

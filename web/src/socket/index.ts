@@ -46,7 +46,7 @@ const useSocket = () => {
                     })
                 }
             })
-            socket.on("socket::alertNotification", (res: ResponseResult<any>) => {
+            socket.on("socket::measurementAlertMessage", (res: ResponseResult<any>) => {
                 if (res.code === 200) {
                     PubSub.publish(SocketTopic.alert, res.data)
                 }

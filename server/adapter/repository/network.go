@@ -43,6 +43,23 @@ func (repo Network) FindBySpecs(ctx context.Context, specs ...spec.Specification
 	return es, err
 }
 
+func (repo Network) PagingBySpecs(ctx context.Context, page, size int, specs ...spec.Specification) ([]entity.Network, int64, error) {
+	db := repo.DB(ctx).Scopes(spec.Scopes(specs)...).Model(&po.Network{})
+	var (
+		es    []entity.Network
+		count int64
+	)
+	if err := db.Count(&count).Error; err != nil {
+		return nil, 0, err
+	}
+	err := db.Scopes(repo.paginate(page, size)).Find(&es).Error
+	return es, count, err
+}
+
+func (repo Network) DeleteBySpecs(ctx context.Context, specs ...spec.Specification) error {
+	return repo.DB(ctx).Scopes(spec.Scopes(specs)...).Delete(&po.Network{}).Error
+}
+
 func (repo Network) UpdateByGatewayID(ctx context.Context, gatewayID, period, timeOffset uint) error {
 	return repo.DB(ctx).Model(&po.Network{}).Where("gateway_id = ?", gatewayID).Updates(map[string]interface{}{"communication_period": period, "communication_time_offset": timeOffset}).Error
 }

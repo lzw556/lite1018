@@ -25,6 +25,12 @@ func (repo User) GetBySpecs(ctx context.Context, specs ...spec.Specification) (p
 	return e, err
 }
 
+func (repo User) FindBySpecs(ctx context.Context, specs ...spec.Specification) ([]po.User, error) {
+	var es []po.User
+	err := repo.DB(ctx).Scopes(spec.Scopes(specs)...).Find(&es).Error
+	return es, err
+}
+
 func (repo User) Paging(ctx context.Context, page, size int) ([]po.User, int64, error) {
 	db := repo.DB(ctx).Model(&po.User{})
 	var total int64

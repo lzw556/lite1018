@@ -2,6 +2,8 @@ package service
 
 import (
 	"context"
+	"fmt"
+	uuid "github.com/satori/go.uuid"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/request"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/response"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/asset"
@@ -9,8 +11,11 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/domain/aggregate/factory"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/po"
+	spec "github.com/thetasensors/theta-cloud-lite/server/domain/specification"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/vo"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/errcode"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/global"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/transaction"
 )
 
 type Asset struct {
@@ -27,26 +32,70 @@ func NewAsset() asset.Service {
 
 func (s Asset) CreateAsset(req request.Asset) error {
 	e := po.Asset{
-		Name: req.Name,
+		Name:      req.Name,
+		ParentID:  req.ParentID,
+		ProjectID: req.ProjectID,
 	}
-	return s.repository.Create(context.TODO(), &e)
+	if req.Image != nil {
+		e.Image = fmt.Sprintf("%s%s", uuid.NewV1().String(), req.GetFileExt())
+	}
+	if req.Location != nil {
+		e.Display.Location.X = req.Location.X
+		e.Display.Location.Y = req.Location.Y
+	}
+	payload, err := req.UploadBytes()
+	if err != nil {
+		return err
+	}
+	return transaction.Execute(context.TODO(), func(txCtx context.Context) error {
+		if err := s.repository.Create(txCtx, &e); err != nil {
+			return err
+		}
+		if payload != nil {
+			return global.SaveFile(e.Image, "resources/assets", payload)
+		}
+		return nil
+	})
 }
 
-func (s Asset) UpdateAsset(assetID uint, req request.Asset) (*vo.Asset, error) {
+func (s Asset) UpdateAssetByID(assetID uint, req request.Asset) error {
 	ctx := context.TODO()
 	e, err := s.repository.Get(ctx, assetID)
 	if err != nil {
-		return nil, response.BusinessErr(errcode.AssetNotFoundError, "")
+		return response.BusinessErr(errcode.AssetNotFoundError, "")
 	}
 	e.Name = req.Name
-	if err := s.repository.Save(ctx, &e); err != nil {
-		return nil, err
+	e.ParentID = req.ParentID
+	e.ProjectID = req.ProjectID
+	if req.Location != nil {
+		e.Display.Location.X = req.Location.X
+		e.Display.Location.Y = req.Location.Y
 	}
-	result := vo.NewAsset(e)
-	return &result, nil
+	if req.Image != nil {
+		if e.Image != "" {
+			if err := global.DeleteFile("resources/assets", e.Image); err != nil {
+				return err
+			}
+		} else {
+			e.Image = fmt.Sprintf("%s%s", uuid.NewV1().String(), req.GetFileExt())
+		}
+	}
+	return transaction.Execute(ctx, func(txCtx context.Context) error {
+		if err := s.repository.Save(txCtx, &e); err != nil {
+			return err
+		}
+		if req.Image != nil {
+			payload, err := req.UploadBytes()
+			if err != nil {
+				return err
+			}
+			return global.SaveFile(e.Image, "resources/assets", payload)
+		}
+		return nil
+	})
 }
 
-func (s Asset) RemoveAsset(assetID uint) error {
+func (s Asset) DeleteAssetByID(assetID uint) error {
 	cmd, err := s.factory.NewAssetRemoveCmd(assetID)
 	if err != nil {
 		return err
@@ -54,28 +103,29 @@ func (s Asset) RemoveAsset(assetID uint) error {
 	return cmd.Run()
 }
 
-func (s Asset) FindAssetsByPaginate(page, size int) ([]vo.Asset, int64, error) {
-	es, total, err := s.repository.FindByPaginate(context.TODO(), page, size)
+func (s Asset) FindAssetsByPaginate(page, size int, filters request.Filters) ([]vo.Asset, int64, error) {
+	query, err := s.factory.NewAssetPagingQuery(page, size, filters)
 	if err != nil {
 		return nil, 0, err
 	}
-	result := make([]vo.Asset, len(es))
-	for i, e := range es {
-		result[i] = vo.NewAsset(e)
-	}
+	result, total := query.Run()
 	return result, total, nil
 }
 
-func (s Asset) GetAsset(assetID uint) (*vo.Asset, error) {
-	e, err := s.repository.Get(context.TODO(), assetID)
+func (s Asset) GetAssetByID(assetID uint) (*vo.Asset, error) {
+	ctx := context.TODO()
+	e, err := s.repository.Get(ctx, assetID)
 	if err != nil {
 		return nil, response.BusinessErr(errcode.AssetNotFoundError, "")
 	}
 	result := vo.NewAsset(e)
+	if parent, err := s.repository.Get(ctx, e.ParentID); err == nil {
+		result.SetParent(parent)
+	}
 	return &result, nil
 }
 
-func (s Asset) Statistic(assetID uint) (*vo.AssetStatistic, error) {
+func (s Asset) StatisticalAssetByID(assetID uint) (*vo.AssetStatistic, error) {
 	cmd, err := s.factory.NewAssetStatisticQuery(assetID)
 	if err != nil {
 		return nil, err
@@ -83,7 +133,7 @@ func (s Asset) Statistic(assetID uint) (*vo.AssetStatistic, error) {
 	return cmd.Statistic()
 }
 
-func (s Asset) StatisticAll() ([]vo.AssetStatistic, error) {
+func (s Asset) StatisticalAssets() ([]vo.AssetStatistic, error) {
 	assets, err := s.repository.Find(context.TODO())
 	if err != nil {
 		return nil, err
@@ -99,6 +149,26 @@ func (s Asset) StatisticAll() ([]vo.AssetStatistic, error) {
 			return nil, err
 		}
 		result[i] = *statistic
+	}
+	return result, nil
+}
+
+func (s Asset) FilterAssets(filters request.Filters) ([]vo.Asset, error) {
+	query, err := s.factory.NewAssetFilterQuery(filters)
+	if err != nil {
+		return nil, err
+	}
+	return query.Run(), nil
+}
+
+func (s Asset) GetAssetChildrenByID(id uint) ([]vo.Asset, error) {
+	es, err := s.repository.FindBySpecs(context.TODO(), spec.ParentIDEqSpec(id))
+	if err != nil {
+		return nil, err
+	}
+	result := make([]vo.Asset, len(es))
+	for i, e := range es {
+		result[i] = vo.NewAsset(e)
 	}
 	return result, nil
 }

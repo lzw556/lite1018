@@ -3,8 +3,8 @@ package api
 import (
 	"embed"
 	"github.com/fvbock/endless"
-
 	"github.com/gin-contrib/cors"
+	"github.com/gin-contrib/gzip"
 	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/middleware"
@@ -45,10 +45,12 @@ func (a *Adapter) Run() error {
 	a.engine.Use(cors.New(cors.Config{
 		AllowAllOrigins: true,
 	}))
+	a.engine.Static("/res", "/resources")
 	group := a.engine.Group("api")
 	for _, m := range a.middlewares {
 		group.Use(m.WrapHandler())
 	}
+	group.Use(gzip.Gzip(gzip.DefaultCompression))
 	for _, r := range a.routers {
 		for _, route := range r.Routes() {
 			group.Handle(route.Method(), route.Path(), a.errorWrapper(route.Handler()))
@@ -76,7 +78,7 @@ func (a *Adapter) errorWrapper(handler middleware.ErrorWrapperHandler) gin.Handl
 				return
 			}
 			switch data := data.(type) {
-			case *vo.NetworkExportFile, *vo.PropertyDataFile:
+			case *vo.NetworkExportFile, *vo.ExcelFile, *vo.ImageFile, *vo.CsvFile:
 				if writer, ok := data.(response.FileWriter); ok {
 					response.WriteFile(ctx, writer)
 					return

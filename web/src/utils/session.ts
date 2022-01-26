@@ -13,3 +13,7 @@ export const getToken = (): string => {
 export const getMenus = (): Menu[] => {
     return store.getState().menu.data
 }
+
+export const getProject = () => {
+    return store.getState().project.data
+}

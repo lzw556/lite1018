@@ -1,12 +1,13 @@
 import {Breadcrumb, Col, Row} from "antd";
 import {FC, useEffect, useState} from "react";
-import {useLocation} from "react-router-dom";
+import {useHistory, useLocation} from "react-router-dom";
 import {GetParamValue} from "../utils/path";
 import {getMenus} from "../utils/session";
 import {SecondaryRoutes} from "../routers/routes";
 
 export interface MyBreadcrumbProps {
     children?: any
+    label?: string
 }
 
 const flattenRoutes: any = (children: any) => {
@@ -18,8 +19,9 @@ const flattenRoutes: any = (children: any) => {
 
 const routes = flattenRoutes(getMenus()).concat(SecondaryRoutes)
 
-const MyBreadcrumb:FC<MyBreadcrumbProps> = ({children}) => {
+const MyBreadcrumb:FC<MyBreadcrumbProps> = ({children, label}) => {
     const location = useLocation()
+    const history = useHistory()
     const locale = GetParamValue(location.search, "locale")
     const [items, setItems] = useState([])
 
@@ -34,19 +36,23 @@ const MyBreadcrumb:FC<MyBreadcrumbProps> = ({children}) => {
                 {
                     items.map((route:any, index:number) => {
                         if (items.length-1 === index) {
-                            return <Breadcrumb.Item key={route.name}>{route.title}</Breadcrumb.Item>
+                            return <Breadcrumb.Item key={route.name}>{label ? label : route.title}</Breadcrumb.Item>
                         }
-                        return <a href={`#${route.path}?locale=${route.name}`}>
+                        return <a onClick={() => history.go(index - items.length + 1)}>
                             <Breadcrumb.Item key={route.name}>{route.title}</Breadcrumb.Item>
                         </a>
                     })
                 }
             </Breadcrumb>
         </Col>
-        <Col span={12} style={{textAlign: "right"}}>
-            {
-                children
-            }
+        <Col span={12}>
+            <Row justify={"end"}>
+                <Col>
+                    {
+                        children
+                    }
+                </Col>
+            </Row>
         </Col>
     </Row>
 }

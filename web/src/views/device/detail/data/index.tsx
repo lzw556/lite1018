@@ -1,37 +1,36 @@
-import {FC, useEffect, useState} from "react";
+import {FC, useCallback, useEffect, useState} from "react";
 import {Button, Card, Col, DatePicker, Modal, Row, Select, Space} from "antd";
-import {CaretDownOutlined, DeleteOutlined, DownloadOutlined} from "@ant-design/icons";
+import {DeleteOutlined, DownloadOutlined} from "@ant-design/icons";
 import {Content} from "antd/lib/layout/layout";
 import {Device} from "../../../../types/device";
 import ReactECharts from "echarts-for-react";
 import moment from "moment";
-import LabelSelect from "../../../../components/labelSelect";
-import {DefaultHistoryDataOption, LineChartStyles} from "../../../../constants/chart";
-import {GetFieldName} from "../../../../constants/field";
 import {EmptyLayout} from "../../../layout";
 import {GetDeviceDataRequest, RemoveDeviceDataRequest} from "../../../../apis/device";
 import HasPermission from "../../../../permission";
 import {Permission} from "../../../../permission/permission";
 import DownloadModal from "./modal/downloadModal";
+import Label from "../../../../components/label";
+import {DefaultHistoryDataOption, LineChartStyles} from "../../../../constants/chart";
 
 const {Option} = Select
 const {RangePicker} = DatePicker
 
 export interface DeviceDataProps {
-    device?: Device
+    device: Device
 }
 
 const HistoryDataPage: FC<DeviceDataProps> = ({device}) => {
-    const [property, setProperty] = useState<any>(device?.properties[0])
+    const [property, setProperty] = useState<any>(device.properties[0])
     const [startDate, setStartDate] = useState<moment.Moment>(moment().startOf('day').subtract(7, 'd'))
     const [endDate, setEndDate] = useState<moment.Moment>(moment().endOf('day'))
     const [option, setOption] = useState<any>()
     const [downloadVisible, setDownloadVisible] = useState<boolean>(false)
 
 
-    const onPropertyChange = (value: number) => {
+    const onPropertyChange = (value: string) => {
         if (device) {
-            setProperty(device.properties.find(item => item.id === value))
+            setProperty(device.properties.find(item => item.key === value))
         }
     }
 
@@ -49,49 +48,62 @@ const HistoryDataPage: FC<DeviceDataProps> = ({device}) => {
         </Space>
     }
 
-    useEffect(() => {
-            if (device && property && startDate && endDate) {
-                setOption(undefined)
-                GetDeviceDataRequest(device.id, property.id, startDate.utc().unix(), endDate.utc().unix()).then(data => {
-                    if (!Array.isArray(data)) {
-                        const {fields, time, name, unit} = data
-                        const keys = Object.keys(data.fields)
-                        const legend = keys.map(key => GetFieldName(key))
-                        const series = keys.map((key, index) => {
-                            return {
-                                ...LineChartStyles[index],
-                                name: GetFieldName(key),
-                                type: 'line',
-                                data: fields[key]
-                            }
-                        })
-                        const xAxis = [{
-                            type: 'category',
-                            boundaryGap: false,
-                            data: time.map(item => moment.unix(item).local().format("YYYY-MM-DD HH:mm:ss"))
-                        }]
-                        setOption({
-                            ...DefaultHistoryDataOption,
-                            tooltip: {
-                                trigger: 'axis',
-                                formatter: function (params: any) {
-                                    let relVal = params[0].name;
-                                    for (let i = 0; i < params.length; i++) {
-                                        let value = Number(params[i].value).toFixed(3)
-                                        relVal += `<br/> ${params[i].marker} ${params[i].seriesName}: ${value}${unit}`
-                                    }
-                                    return relVal;
-                                }
-                            },
-                            title: {text: name},
-                            legend: {data: legend},
-                            series,
-                            xAxis
-                        })
-                    }
-                })
+    const fetchPropertyData = useCallback(() => {
+        GetDeviceDataRequest(device.id, property.key, startDate.utc().unix(), endDate.utc().unix()).then(data => {
+            let series: any[]
+            let legends: string[]
+            switch (property.type) {
+                case 'axis':
+                    legends = ["X轴", "Y轴", "Z轴"]
+                    series = legends.map((item, index) => {
+                        return {
+                            ...LineChartStyles[index],
+                            name: item,
+                            type: 'line',
+                            data: data.map((item:any) => item.value[index])
+                        }
+                    })
+                    break;
+                default:
+                    legends = [property.name]
+                    series = [
+                        {
+                            ...LineChartStyles[0],
+                            name: property.name,
+                            type: 'line',
+                            data: data.map((item:any) => item.value)
+                        }
+                    ]
+                    break;
             }
-        }, [property, startDate, endDate]
+            setOption({
+                ...DefaultHistoryDataOption,
+                tooltip: {
+                    trigger: 'axis',
+                    formatter: function (params: any) {
+                        let relVal = params[0].name;
+                        for (let i = 0; i < params.length; i++) {
+                            let value = Number(params[i].value).toFixed(3)
+                            relVal += `<br/> ${params[i].marker} ${params[i].seriesName}: ${value}${property.unit}`;
+                        }
+                        return relVal;
+                    }
+                },
+                title: {text: property.name},
+                legend: {data: legends},
+                series,
+                xAxis: {
+                    type: 'category',
+                    boundaryGap: false,
+                    data: data.map((item:any) => moment.unix(item.timestamp).local().format("YYYY-MM-DD HH:mm:ss"))
+                }
+            })
+        })
+    }, [property, startDate, endDate])
+
+    useEffect(() => {
+            fetchPropertyData()
+        }, [fetchPropertyData]
     )
 
     const onRemoveDeviceData = () => {
@@ -113,16 +125,17 @@ const HistoryDataPage: FC<DeviceDataProps> = ({device}) => {
             <Col span={24}>
                 <Row justify="end">
                     <Col span={24} style={{textAlign: "right"}}>
-                        <Space style={{textAlign:"center"}}>
-                            <LabelSelect label={"属性"} value={property?.id} placeholder={"请选择属性"}
-                                         style={{width: "120px"}}
-                                         onChange={onPropertyChange} suffixIcon={<CaretDownOutlined/>}>
-                                {
-                                    device ? device.properties.map(item =>
-                                        <Option key={item.id} value={item.id}>{item.name}</Option>
-                                    ) : null
-                                }
-                            </LabelSelect>
+                        <Space style={{textAlign: "center"}}>
+                            <Label name={"属性"}>
+                                <Select bordered={false} defaultValue={property.key} placeholder={"请选择属性"}
+                                        style={{width: "120px"}} onChange={onPropertyChange}>
+                                    {
+                                        device ? device.properties.map(item =>
+                                            <Option key={item.key} value={item.key}>{item.name}</Option>
+                                        ) : null
+                                    }
+                                </Select>
+                            </Label>
                             <RangePicker
                                 allowClear={false}
                                 value={[startDate, endDate]}
@@ -149,6 +162,7 @@ const HistoryDataPage: FC<DeviceDataProps> = ({device}) => {
                         <Card bordered={false} style={{height: `400px`}}>
                             {
                                 option ? <ReactECharts option={option}
+                                                       notMerge={true}
                                                        style={{height: `380px`, border: "none"}}/> :
                                     <EmptyLayout description={"暂无数据"} style={{height: `400px`}}/>
                             }

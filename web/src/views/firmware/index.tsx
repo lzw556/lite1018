@@ -1,19 +1,30 @@
 import {Button, Col, message, Popconfirm, Row, Space, Upload} from "antd";
 import {DeleteOutlined, UploadOutlined} from "@ant-design/icons";
 import {Content} from "antd/lib/layout/layout";
-import {useCallback, useState} from "react";
-import TableLayout, {DEFAULT_TABLE_PROPS, TableProps} from "../layout/TableLayout";
+import {useCallback, useEffect, useState} from "react";
+import TableLayout from "../layout/TableLayout";
 import {PagingFirmwaresRequest, RemoveFirmwareRequest, UploadFirmwareRequest} from "../../apis/firmware";
 import moment from "moment";
 import ShadowCard from "../../components/shadowCard";
 import MyBreadcrumb from "../../components/myBreadcrumb";
 import HasPermission from "../../permission";
 import {Permission} from "../../permission/permission";
+import {PageResult} from "../../types/page";
+import {Firmware} from "../../types/firmware";
 
 
 const FirmwarePage = () => {
     const [isUploading, setIsUploading] = useState<boolean>(false)
-    const [table, setTable] = useState<TableProps>(DEFAULT_TABLE_PROPS)
+    const [dataSource, setDataSource] = useState<PageResult<Firmware[]>>()
+    const [refreshKey, setRefreshKey] = useState<number>(0)
+
+    const fetchFirmwares = useCallback((current: number, size: number) => {
+        PagingFirmwaresRequest(current, size).then(setDataSource);
+    }, [refreshKey])
+
+    useEffect(() => {
+        fetchFirmwares(1, 10)
+    }, [fetchFirmwares])
 
     const onFileChange = (info: any) => {
         if (info.file.status === 'uploading') {
@@ -27,32 +38,20 @@ const FirmwarePage = () => {
         UploadFirmwareRequest(formData).then(res => {
             setIsUploading(false)
             if (res.code === 200) {
-                onRefresh()
                 message.success("固件上传成功").then()
+                onRefresh()
             } else {
                 message.error(`上传失败,${res.msg}`).then()
             }
         })
     }
 
-    const onLoading = (isLoading: boolean) => {
-        setTable(old => Object.assign({}, old, {isLoading: isLoading}))
-    }
-
-    const onChange = useCallback((current: number, size: number) => {
-        onLoading(true)
-        PagingFirmwaresRequest(current, size).then(data => {
-            onLoading(false)
-            setTable(old => Object.assign({}, old, {data: data}))
-        })
-    }, [])
-
     const onRefresh = () => {
-        setTable(old => Object.assign({}, old, {refreshKey: old.refreshKey + 1}))
+        setRefreshKey(refreshKey + 1)
     }
 
     const onDelete = (id: number) => {
-        RemoveFirmwareRequest(id).then(_ => onRefresh())
+        RemoveFirmwareRequest(id).then()
     }
 
     const columns = [
@@ -123,11 +122,9 @@ const FirmwarePage = () => {
                         emptyText={"固件列表为空"}
                         columns={columns}
                         permissions={[Permission.FirmwareDelete]}
-                        isLoading={table.isLoading}
-                        refreshKey={table.refreshKey}
-                        onChange={onChange}
-                        pagination={true}
-                        data={table.data}/>
+                        dataSource={dataSource}
+                        onPageChange={fetchFirmwares}
+                    />
                 </ShadowCard>
             </Col>
         </Row>

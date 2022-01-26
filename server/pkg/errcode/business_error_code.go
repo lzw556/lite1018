@@ -24,6 +24,7 @@ const (
 
 const (
 	AssetNotFoundError BusinessErrorCode = iota + 12001
+	AssetImageSizeTooLargeError
 )
 
 const (
@@ -35,6 +36,7 @@ const (
 	DeviceCommandExecFailedError
 	DeviceCommandCancelledError
 	UnknownDeviceCommandTypeError
+	DeviceAlreadyBindingError
 )
 
 const (
@@ -58,6 +60,18 @@ const (
 	RoleNotFoundError
 )
 
+const (
+	MeasurementNotFoundError BusinessErrorCode = iota + 18001
+	UnknownMeasurementTypeError
+	MeasurementUnboundDeviceError
+)
+
+const (
+	ProjectNotFoundError BusinessErrorCode = iota + 19001
+	ProjectExistsError
+	ProjectNotSelectedError
+)
+
 var businessErrorMap = map[BusinessErrorCode]string{
 	UnknownBusinessError:                "未知错误",
 	SystemNotReadyError:                 "系统未初始化完成",
@@ -74,6 +88,7 @@ var businessErrorMap = map[BusinessErrorCode]string{
 	DeviceCommandExecFailedError:        "命令执行失败",
 	DeviceCommandSendTimeoutError:       "命令发送超时",
 	DeviceCommandCancelledError:         "命令已取消",
+	DeviceAlreadyBindingError:           "设备已被绑定",
 	UnknownDeviceCommandTypeError:       "未知的设备命令",
 	NetworkNotFoundError:                "网络不存在",
 	FirmwareNotFoundError:               "固件不存在",
@@ -84,6 +99,13 @@ var businessErrorMap = map[BusinessErrorCode]string{
 	AlarmRecordAlreadyAcknowledgedError: "报警已被处理",
 	RoleExistsError:                     "角色已存在",
 	RoleNotFoundError:                   "角色不存在",
+	MeasurementNotFoundError:            "监测点不存在",
+	UnknownMeasurementTypeError:         "未知的监测点类型",
+	MeasurementUnboundDeviceError:       "监测点未绑定设备",
+	AssetImageSizeTooLargeError:         "资产图片大小超过限制(2MB)",
+	ProjectNotFoundError:                "项目不存在",
+	ProjectExistsError:                  "项目已存在",
+	ProjectNotSelectedError:             "请先选择项目",
 }
 
 func GetErrMessage(code BusinessErrorCode) string {

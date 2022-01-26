@@ -4,6 +4,7 @@ import "github.com/thetasensors/theta-cloud-lite/server/domain/po"
 
 type Network struct {
 	po.Network
+	Gateway Device
 }
 
 func (n *Network) UpdateRoutingTables(tables [][2]string) {
@@ -33,7 +34,7 @@ func (n *Network) RemoveDevice(e Device) {
 	n.RoutingTables = append(n.RoutingTables[0:rmIdx], n.RoutingTables[rmIdx+1:]...)
 }
 
-func (n *Network) AccessDevices(parent Device, children []Device) {
+func (n *Network) AccessDevices(parent Device, children ...Device) {
 	tables := make(po.RoutingTables, len(children))
 	for i, child := range children {
 		tables[i] = po.RoutingTable{
@@ -72,6 +73,13 @@ func (n Network) GetChildren(mac string) []string {
 		}
 	}
 	return macs
+}
+
+func (n Network) GetGatewayMacAddress() string {
+	if len(n.Network.RoutingTables) > 0 {
+		return n.Network.RoutingTables[0][1]
+	}
+	return ""
 }
 
 type Networks []Network

@@ -4,12 +4,12 @@ type Device struct {
 	Name       string                 `json:"name"`
 	MacAddress string                 `json:"mac_address,omitempty"`
 	TypeID     uint                   `json:"type_id,omitempty"`
-	AssetID    uint                   `json:"asset_id,omitempty"`
+	NetworkID  uint                   `json:"network_id,omitempty"`
 	IPN        map[string]interface{} `json:"ipn,omitempty"`
 	System     map[string]interface{} `json:"system,omitempty"`
 	Sensors    map[string]interface{} `json:"sensors,omitempty"`
 
-	WSN *WSN `json:"wsn,omitempty"`
+	ProjectID uint `json:"-"`
 }
 
 type DeviceSearch struct {
@@ -17,7 +17,11 @@ type DeviceSearch struct {
 	Text   interface{} `json:"text"`
 }
 
-type DeviceSetting map[string]interface{}
+type DeviceSetting struct {
+	IPN     map[string]interface{} `json:"ipn"`
+	Sensors map[string]interface{} `json:"sensors"`
+	System  map[string]interface{} `json:"system"`
+}
 
 type DeviceUpgrade struct {
 	FirmwareID uint `json:"firmware_id"`

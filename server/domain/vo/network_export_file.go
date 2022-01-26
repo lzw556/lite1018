@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/po"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/devicetype"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/json"
 	"sort"
 )
@@ -14,6 +15,7 @@ type ExportDevice struct {
 	Address  string `json:"address"`
 	Type     uint   `json:"type"`
 	Settings string `json:"settings"`
+	Modbus   int    `json:"modbus"`
 }
 
 type ExportDevices []ExportDevice
@@ -44,6 +46,8 @@ func NewNetworkExportFile(e entity.Network) NetworkExportFile {
 			"wsn": map[string]interface{}{
 				"communication_period":      e.CommunicationPeriod,
 				"communication_time_offset": e.CommunicationTimeOffset,
+				"group_interval":            e.GroupInterval,
+				"group_size":                e.GroupSize,
 			},
 		},
 		RoutingTable: e.RoutingTables,
@@ -58,13 +62,25 @@ func (n *NetworkExportFile) AddDevices(es []entity.Device) {
 			ID:      uint(i),
 			Name:    e.Name,
 			Address: e.MacAddress,
-			Type:    e.TypeID,
+			Modbus:  0,
+			Type:    e.Type,
 		}
-		bytes, err := json.Marshal(DeviceSetting{
-			IPN:     e.IPN,
-			System:  e.System,
-			Sensors: e.Sensors,
-		})
+		var exportSettings struct {
+			Ipn     map[string]interface{} `json:"ipn"`
+			Sensors map[string]interface{} `json:"sensors"`
+			System  map[string]interface{} `json:"system"`
+		}
+		for _, setting := range e.Settings {
+			switch devicetype.SettingCategory(setting.Category) {
+			case devicetype.IpnSettingCategory:
+				exportSettings.Ipn[setting.Key] = setting.Value
+			case devicetype.SensorsSettingCategory:
+				exportSettings.Sensors[setting.Key] = setting.Value
+			case devicetype.SystemSettingCategory:
+				exportSettings.System[setting.Key] = setting.Value
+			}
+		}
+		bytes, err := json.Marshal(exportSettings)
 		if err != nil {
 			n.DeviceList[i].Settings = "{}"
 		} else {

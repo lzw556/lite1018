@@ -22,21 +22,28 @@ export const Permission = {
     DeviceData: {path: "devices/:id/data", method: "GET"},
     NetworkSettingEdit: {path: "networks/setting", method: "PUT"},
     NetworkRemoveDevices: {path: "networks/:id/devices", method: "DELETE"},
-    NetworkAccessDevices: {path: "networks/:id/devices", method: "PATCH"},
+    NetworkAddDevices: {path: "networks/:id/devices", method: "PATCH"},
+    NetworkAdd: {path: "networks", method: "POST"},
     NetworkExport: {path: "networks/:id/export", method: "GET"},
     NetworkEdit: {path: "networks/:id", method: "PUT"},
     NetworkDelete: {path: "networks/:id", method: "DELETE"},
-    AlarmRuleAdd: {path: "alarmRules", method: "POST"},
-    AlarmRuleEdit: {path: "alarmRules/:id", method: "PUT"},
-    AlarmRuleDelete: {path: "alarmRules/:id", method: "DELETE"},
-    AlarmRuleTemplateAdd: {path: "alarmRuleTemplates", method: "POST"},
-    AlarmRuleTemplateEdit: {path: "alarmRuleTemplates/:id", method: "PUT"},
-    AlarmRuleTemplateDelete: {path: "alarmRuleTemplates/:id", method: "DELETE"},
+    AlarmAdd: {path: "alarms", method: "POST"},
+    AlarmEdit: {path: "alarms/:id", method: "PUT"},
+    AlarmDelete: {path: "alarms/:id", method: "DELETE"},
+    AlarmTemplateAdd: {path: "alarmTemplates", method: "POST"},
+    AlarmTemplateEdit: {path: "alarmTemplates/:id", method: "PUT"},
+    AlarmTemplateDelete: {path: "alarmTemplates/:id", method: "DELETE"},
     AlarmRecordDelete: {path: "alarmRecords/:id", method: "DELETE"},
     AlarmRecordAcknowledge: {path: "alarmRecords/:id/acknowledge", method: "PATCH"},
     AssetAdd: {path: "assets", method: "POST"},
     AssetEdit: {path: "assets/:id", method: "PUT"},
     AssetDelete: {path: "assets/:id", method: "DELETE"},
+    AssetChildren: {path: "assets/:id/children", method: "GET"},
+    MeasurementList: {path: "measurements", method: "GET"},
+    MeasurementStatistics: {path: "measurements/statistics", method: "GET"},
+    MeasurementDetail: {path: "measurements/:id", method: "GET"},
+    MeasurementEdit: {path: "measurements/:id", method: "PUT"},
+    MeasurementDelete: {path: "measurements/:id", method: "DELETE"},
     UserAdd: {path: "users", method: "POST"},
     UserEdit: {path: "users/:id", method: "PUT"},
     UserDelete: {path: "users/:id", method: "DELETE"},
@@ -68,10 +75,7 @@ GetCasbinRequest().then(data => {
 const usePermission = () => {
     return {
         hasPermission: (value: PermissionType) => {
-            if (enforcer) {
-                return enforcer?.enforceSync(subject, value.path, value.method)
-            }
-            return false
+            return !!(enforcer && enforcer.enforceSync(subject, value.path, value.method));
         },
         hasPermissions: (first: PermissionType, ...seconds: PermissionType[]) => {
             if (enforcer) {

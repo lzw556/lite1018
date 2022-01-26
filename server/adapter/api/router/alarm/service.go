@@ -6,23 +6,24 @@ import (
 )
 
 type Service interface {
-	CreateAlarmRuleTemplate(req request.AlarmRuleTemplate) error
-	FindAlarmRuleTemplatesByPaginate(page, size int, deviceType uint) ([]vo.AlarmRuleTemplate, int64, error)
-	GetAlarmRuleTemplate(id uint) (*vo.AlarmRuleTemplate, error)
-	UpdateAlarmRuleTemplate(id uint, req request.AlarmRuleTemplate) (*vo.AlarmRuleTemplate, error)
-	RemoveAlarmRuleTemplate(id uint) error
+	CreateAlarmTemplate(req request.AlarmTemplate) error
+	FindAlarmTemplatesByPaginate(filters request.Filters, page, size int) ([]vo.AlarmTemplate, int64, error)
+	GetAlarmTemplate(id uint) (*vo.AlarmTemplate, error)
+	UpdateAlarmTemplate(id uint, req request.AlarmTemplate) (*vo.AlarmTemplate, error)
+	RemoveAlarmTemplate(id uint) error
 
-	CheckAlarmRule(name string) error
-	CreateAlarmRule(req request.AlarmRule) error
-	FindAlarmRulesByPaginate(assetID, deviceID uint, page, size int) ([]vo.AlarmRule, int64, error)
-	GetAlarmRule(id uint) (*vo.AlarmRule, error)
-	UpdateAlarmRule(id uint, req request.UpdateAlarmRule) error
-	RemoveAlarmRule(id uint) error
+	CheckAlarm(name string) error
+	CreateAlarm(req request.CreateAlarm) error
+	CreateAlarmFromTemplate(req request.CreateAlarmFromTemplate) error
 
-	GetAlarmRecord(recordID uint) (*vo.AlarmRecord, error)
-	AcknowledgeAlarmRecord(recordID, userID uint) error
-	FindAlarmRecordsByPaginate(from, to int64, page, size int, req request.AlarmFilter) ([]vo.AlarmRecord, int64, error)
-	RemoveAlarmRecord(recordID uint) error
+	FindAlarmsByPaginate(filters request.Filters, page, size int) ([]vo.Alarm, int64, error)
+	GetAlarmByID(id uint) (*vo.Alarm, error)
+	UpdateAlarmByID(id uint, req request.UpdateAlarm) error
+	DeleteAlarmByID(id uint) error
 
-	GetAlarmStatistics(from, to int64, req request.AlarmFilter) (vo.AlarmStatistics, error)
+	GetAlarmRecordByID(id uint) (*vo.AlarmRecord, error)
+	GetAlarmRecordAcknowledgeByID(id uint) (*vo.AlarmRecordAcknowledge, error)
+	AcknowledgeAlarmRecordByID(id uint, req request.AcknowledgeAlarmRecord) error
+	FindAlarmRecordsByPaginate(filters request.Filters, from, to int64, page, size int) ([]vo.AlarmRecord, int64, error)
+	DeleteAlarmRecordByID(recordID uint) error
 }

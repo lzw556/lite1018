@@ -10,6 +10,7 @@ type UserRepository interface {
 	Get(ctx context.Context, id uint) (po.User, error)
 	GetBySpecs(ctx context.Context, specs ...spec.Specification) (po.User, error)
 	Paging(ctx context.Context, page, size int) ([]po.User, int64, error)
+	FindBySpecs(ctx context.Context, specs ...spec.Specification) ([]po.User, error)
 
 	Create(ctx context.Context, e *po.User) error
 

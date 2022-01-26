@@ -1,14 +1,13 @@
-import {Device} from "./device";
-import {Property} from "./property";
-import {AlarmRuleContent} from "./alarm_rule_template";
+import {AlarmRule} from "./alarm_rule_template";
+import {Measurement} from "./measurement";
 
-export type AlarmRule = {
+export type Alarm = {
     id: number
     name: string
-    device: Device
-    property: Property
-    rule: AlarmRuleContent
+    measurement: Measurement
+    rule: AlarmRule
     level: number
     description: string
     enabled: boolean
+    createdAt: number
 }

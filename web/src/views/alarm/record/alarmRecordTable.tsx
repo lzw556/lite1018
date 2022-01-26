@@ -1,62 +1,67 @@
-import {FC, useCallback, useState} from "react";
-import TableLayout, {TableProps} from "../../layout/TableLayout";
-import {AcknowledgeAlarmRecordRequest, PagingAlarmRecordsRequest, RemoveAlarmRecordRequest} from "../../../apis/alarm";
-import {Button, Dropdown, Menu, Popconfirm, Space, Tag} from "antd";
+import {FC, useCallback, useEffect, useState} from "react";
+import TableLayout from "../../layout/TableLayout";
+import {GetAcknowledgeRequest, PagingAlarmRecordsRequest, RemoveAlarmRecordRequest} from "../../../apis/alarm";
+import {Button, Popconfirm, Space, Tag} from "antd";
 import {ColorDanger, ColorInfo, ColorWarn} from "../../../constants/color";
-import {DeviceTypeString} from "../../../types/device_type";
-import {GetFieldName} from "../../../constants/field";
-import {OperationTranslate} from "../../../constants/rule";
 import moment from "moment";
-import {DeleteOutlined, EditOutlined} from "@ant-design/icons";
+import {DeleteOutlined} from "@ant-design/icons";
 import usePermission, {Permission} from "../../../permission/permission";
 import HasPermission from "../../../permission";
+import {PageResult} from "../../../types/page";
+import {Measurement} from "../../../types/measurement";
+import {MeasurementField} from "../../../types/measurement_data";
+import AcknowledgeModal from "./acknowledgeModal";
+import AcknowledgeViewModal from "./acknowledgeViewModal";
+import {getRuleMethodString} from "../../../types/alarm_rule_template";
 
 export interface AlarmRecordTableProps {
     type: "active" | "history"
     start: number
     stop: number
-    device: number;
-    asset: number;
+    asset?: number;
     levels: number[]
     statuses: number[]
 }
 
-const AlarmRecordTable: FC<AlarmRecordTableProps> = ({type, start, stop, device, asset, levels, statuses}) => {
-    const [table, setTable] = useState<TableProps>({data: {}, isLoading: false, pagination: true, refreshKey: 0})
+const AlarmRecordTable: FC<AlarmRecordTableProps> = ({type, start, stop, asset, levels, statuses}) => {
     const {hasPermission} = usePermission()
+    const [record, setRecord] = useState<any>()
+    const [acknowledge, setAcknowledge] = useState<any>()
+    const [dataSource, setDataSource] = useState<PageResult<any[]>>()
+    const [refreshKey, setRefreshKey] = useState<number>(0)
 
-    const onChange = useCallback((current: number, size: number) => {
-        const filter = {
-            device_id: device,
-            asset_id: asset,
-            levels: levels,
-            type: type,
-            statuses: statuses,
+    const fetchAlarmRecords = useCallback((current: number, size: number) => {
+        const filter: any = {
+            levels: levels.join(","),
+            statuses: statuses.join(","),
         }
-        PagingAlarmRecordsRequest(current, size, start, stop, filter).then(data => {
-            setTable(Object.assign({}, table, {data: data}))
-        })
-    }, [asset, device, start, stop, levels, type, statuses])
+        if (asset) {
+            filter.asset_id = asset
+            PagingAlarmRecordsRequest(current, size, start, stop, filter).then(setDataSource)
+        }
+    }, [asset, start, stop, levels, type, statuses, refreshKey])
+
+    useEffect(() => {
+        fetchAlarmRecords(1, 10)
+    }, [fetchAlarmRecords])
 
     const onDelete = (id: number) => {
         RemoveAlarmRecordRequest(id).then(_ => onRefresh())
     }
 
     const onRefresh = () => {
-        setTable(Object.assign({}, table, {refreshKey: table.refreshKey + 1}))
+        setRefreshKey(refreshKey + 1)
     }
 
-    const onAcknowledge = (id: number) => {
-        AcknowledgeAlarmRecordRequest(id).then(_ => onRefresh())
+    const onAcknowledge = (record:any) => {
+        setRecord(record)
     }
 
-    const renderEditMenu = (record: any) => {
-        return <Menu onClick={() => onAcknowledge(record.id)}>
-            <Menu.Item disabled={record.acknowledged}>标记为已处理</Menu.Item>
-        </Menu>
+    const onViewAcknowledge = (id:number) => {
+        GetAcknowledgeRequest(id).then(setAcknowledge)
     }
 
-    const columns:any = [
+    const columns: any = [
         {
             title: '报警级别',
             dataIndex: 'level',
@@ -73,29 +78,43 @@ const AlarmRecordTable: FC<AlarmRecordTableProps> = ({type, start, stop, device,
             }
         },
         {
-            title: '设备名称',
-            dataIndex: 'device',
-            key: 'device',
-            render: (device: any) => {
-                return device.name
+            title: '报警监测点',
+            dataIndex: 'measurement',
+            key: 'measurement',
+            render: (measurement: Measurement) => {
+                return measurement.name
             }
         },
         {
-            title: '设备类型',
-            dataIndex: 'device',
-            key: 'type',
-            render: (device: any) => {
-                return DeviceTypeString(device.typeId)
+            title: "报警属性",
+            dataIndex: "field",
+            key: "field",
+            render: (field: MeasurementField) => {
+                return field.title
+            }
+        },
+        {
+            title: "统计方式",
+            dataIndex: "rule",
+            key: "method",
+            render: (rule: any) => {
+                return getRuleMethodString(rule.method)
+            }
+        },
+        {
+            title: "报警值",
+            dataIndex: "value",
+            key: "value",
+            render: (value: number, record: any) => {
+                return `${value.toFixed(record.field.precision)}${record.field.unit}`
             }
         },
         {
             title: '报警内容',
             dataIndex: 'rule',
             key: 'rule',
-            render: (_: any, record: any) => {
-                return `当前【${GetFieldName(record.rule.field)}】值为: 
-                ${record.value.toFixed(record.property.precision)}${record.property.unit}\n
-                ${OperationTranslate(record.rule.operation)}设定的阈值:${record.rule.threshold.toFixed(record.property.precision)}${record.property.unit}`
+            render: (rule: any, record: any) => {
+                return `${rule.operation} ${rule.threshold}${record.field.unit}`
             }
         },
         {
@@ -158,9 +177,9 @@ const AlarmRecordTable: FC<AlarmRecordTableProps> = ({type, start, stop, device,
             render: (_: any, record: any) => {
                 return <Space>
                     {
-                        type === 'active' && hasPermission(Permission.AlarmRecordAcknowledge) && <Dropdown overlay={renderEditMenu(record)}>
-                            <Button type={"text"} size={"small"} icon={<EditOutlined/>}/>
-                        </Dropdown>
+                        record.status === 0 ?
+                            <Button type="link" ghost size={"small"} onClick={() => onAcknowledge(record)}>标记为已处理</Button> :
+                            <Button disabled={record.status === 2} type="link" ghost size={"small"} onClick={() => onViewAcknowledge(record.id)}>查看处理详情</Button>
                     }
                     <HasPermission value={Permission.AlarmRecordAcknowledge}>
                         <Popconfirm placement="left" title="确认要删除该规则吗?" onConfirm={() => onDelete(record.id)}
@@ -187,14 +206,22 @@ const AlarmRecordTable: FC<AlarmRecordTableProps> = ({type, start, stop, device,
         return columns
     }
 
-    return <TableLayout emptyText={"报警记录列表为空"}
-                        permissions={[Permission.AlarmRecordAcknowledge, Permission.AlarmRecordDelete]}
-                        columns={renderColumns()}
-                        isLoading={table.isLoading}
-                        pagination={table.pagination}
-                        refreshKey={table.refreshKey}
-                        data={table.data}
-                        onChange={onChange}/>
+    return <>
+        <TableLayout emptyText={"报警记录列表为空"}
+                     permissions={[Permission.AlarmRecordAcknowledge, Permission.AlarmRecordDelete]}
+                     columns={renderColumns()}
+                     dataSource={dataSource}
+                     onPageChange={fetchAlarmRecords}/>
+        {
+            record && <AcknowledgeModal visible={record} record={record} onCancel={() => setRecord(undefined)} onSuccess={() => {
+                setRecord(undefined)
+                onRefresh()
+            }}/>
+        }
+        {
+            acknowledge && <AcknowledgeViewModal visible={acknowledge} acknowledge={acknowledge} onCancel={() => setAcknowledge(undefined)}/>
+        }
+    </>
 }
 
 export default AlarmRecordTable

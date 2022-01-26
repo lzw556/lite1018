@@ -7,26 +7,25 @@ import (
 
 type Service interface {
 	CreateDevice(req request.Device) error
-	RemoveDevice(deviceID uint) error
-	UpdateDevice(deviceID uint, req request.Device) error
+	DeleteDeviceByID(id uint) error
+	UpdateDeviceByID(id uint, req request.Device) error
 
-	GetDevice(deviceID uint) (*vo.Device, error)
-	Statistic() ([]vo.DeviceStatistic, error)
-	FindDevicesByPaginate(assetID, page, size int, req request.DeviceSearch) ([]vo.Device, int64, error)
-	FindDevicesGroupByAsset(deviceType uint) ([]vo.Group, error)
+	GetDeviceByID(id uint) (*vo.Device, error)
+	FindDevicesByPaginate(page, size int, filters request.Filters) ([]vo.Device, int64, error)
+	FilterDevices(filters request.Filters) ([]vo.Device, error)
 	CheckDeviceMacAddress(mac string) error
-	ReplaceDevice(deviceID uint, mac string) error
+	ReplaceDeviceByID(id uint, mac string) error
 
-	ExecuteCommand(deviceID uint, cmdType uint) error
-	ExecuteDeviceUpgrade(deviceID uint, req request.DeviceUpgrade) error
-	ExecuteDeviceCancelUpgrade(deviceID uint) error
+	ExecuteCommandByID(id uint, cmdType uint) error
+	ExecuteDeviceUpgradeByID(id uint, req request.DeviceUpgrade) error
+	ExecuteDeviceCancelUpgradeByID(id uint) error
 
-	GetDeviceSetting(deviceID uint) (*vo.DeviceSetting, error)
-	UpdateDeviceSetting(deviceID uint, req request.DeviceSetting) error
+	GetDeviceSettingsByID(id uint) (vo.DeviceSettings, error)
+	UpdateDeviceSettingByID(id uint, req request.DeviceSetting) error
 
-	GetPropertyDataByID(deviceID uint, pID uint, from, to int64) (vo.PropertyData, error)
-	GetPropertyDataByIDs(deviceID uint, pIDs []uint, from, to int64) (vo.PropertiesData, error)
-	FindDeviceDataByID(deviceID uint, from, to int64) ([]vo.PropertyData, error)
+	GetPropertyDataByID(deviceID uint, pID string, from, to int64) ([]vo.PropertyData, error)
+	DownloadPropertiesDataByID(deviceID uint, pIDs []string, from, to int64) (*vo.ExcelFile, error)
+	FindDeviceDataByID(deviceID uint, from, to int64) (vo.PropertiesData, error)
 	RemoveDataByID(deviceID uint, from, to int64) error
 	GetChildren(deviceID uint) ([]vo.Device, error)
 }

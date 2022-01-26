@@ -7,13 +7,13 @@ import (
 
 type Service interface {
 	CreateRole(req request.Role) error
-	UpdateRole(id uint, req request.Role) error
+	UpdateRoleByID(id uint, req request.Role) error
 	GetRolesByPaginate(page, size int) ([]vo.Role, int64, error)
 
-	RemoveRoleByID(id uint) error
+	DeleteRoleByID(id uint) error
 
-	GetRole(id uint) (*vo.Role, error)
+	GetRoleByID(id uint) (*vo.Role, error)
 	GetCasbinByUserID(id uint) (*vo.Casbin, error)
-	AllocMenus(id uint, req request.AllocMenus) error
-	AllocPermissions(id uint, req request.AllocPermissions) error
+	AllocMenusByRoleID(id uint, req request.AllocMenus) error
+	AllocPermissionsByRoleID(id uint, req request.AllocPermissions) error
 }

@@ -1,11 +1,13 @@
 package device
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/cast"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/request"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/response"
+	"github.com/thetasensors/theta-cloud-lite/server/domain/vo"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/devicetype"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/errcode"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/json"
 )
 
@@ -14,51 +16,58 @@ func (r deviceRouter) create(ctx *gin.Context) (interface{}, error) {
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		return nil, response.InvalidParameterError(err.Error())
 	}
+	req.ProjectID = cast.ToUint(ctx.MustGet("project_id"))
 	return nil, r.service.CreateDevice(req)
 }
 
-func (r deviceRouter) getByID(ctx *gin.Context) (interface{}, error) {
+func (r deviceRouter) get(ctx *gin.Context) (interface{}, error) {
 	id := cast.ToUint(ctx.Param("id"))
-	return r.service.GetDevice(id)
+	return r.service.GetDeviceByID(id)
 }
 
-func (r deviceRouter) paging(ctx *gin.Context) (interface{}, error) {
-	assetID := cast.ToInt(ctx.Query("assetId"))
-	page := cast.ToInt(ctx.Query("page"))
-	size := cast.ToInt(ctx.Query("size"))
-	var req request.DeviceSearch
-	if err := json.Unmarshal([]byte(ctx.Query("search")), &req); err != nil {
-		return nil, response.InvalidParameterError(err.Error())
+func (r deviceRouter) find(ctx *gin.Context) (interface{}, error) {
+	filters := request.NewFilters(ctx)
+	switch ctx.Query("method") {
+	case "paging":
+		page := cast.ToInt(ctx.Query("page"))
+		size := cast.ToInt(ctx.Query("size"))
+		result, total, err := r.service.FindDevicesByPaginate(page, size, filters)
+		if err != nil {
+			return nil, err
+		}
+		return response.NewPageResult(page, size, total, result), nil
+	default:
+		return r.service.FilterDevices(filters)
 	}
-	result, total, err := r.service.FindDevicesByPaginate(assetID, page, size, req)
-	if err != nil {
-		return nil, err
-	}
-	return response.NewPageResult(page, size, total, result), nil
 }
 
-func (r deviceRouter) statistic(_ *gin.Context) (interface{}, error) {
-	return r.service.Statistic()
-}
-
-func (r deviceRouter) updateByID(ctx *gin.Context) (interface{}, error) {
+func (r deviceRouter) update(ctx *gin.Context) (interface{}, error) {
 	id := cast.ToUint(ctx.Param("id"))
 	var req request.Device
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		return nil, response.InvalidParameterError(err.Error())
 	}
-	return nil, r.service.UpdateDevice(id, req)
+	return nil, r.service.UpdateDeviceByID(id, req)
 }
 
 func (r deviceRouter) executeCommand(ctx *gin.Context) (interface{}, error) {
 	id := cast.ToUint(ctx.Param("id"))
 	cmd := cast.ToUint(ctx.Param("cmd"))
-	return nil, r.service.ExecuteCommand(id, cmd)
+	return nil, r.service.ExecuteCommandByID(id, cmd)
 }
 
 func (r deviceRouter) getSettingByID(ctx *gin.Context) (interface{}, error) {
 	id := cast.ToUint(ctx.Param("id"))
-	return r.service.GetDeviceSetting(id)
+	return r.service.GetDeviceSettingsByID(id)
+}
+
+func (r deviceRouter) defaultSettings(ctx *gin.Context) (interface{}, error) {
+	typeID := cast.ToUint(ctx.Query("type"))
+	if t := devicetype.Get(typeID); t != nil {
+		result := vo.NewDeviceSettings(t.Settings())
+		return result, nil
+	}
+	return nil, response.BusinessErr(errcode.UnknownDeviceTypeError, "")
 }
 
 func (r deviceRouter) updateSettingByID(ctx *gin.Context) (interface{}, error) {
@@ -67,7 +76,7 @@ func (r deviceRouter) updateSettingByID(ctx *gin.Context) (interface{}, error) {
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		return nil, response.InvalidParameterError(err.Error())
 	}
-	return nil, r.service.UpdateDeviceSetting(id, req)
+	return nil, r.service.UpdateDeviceSettingByID(id, req)
 }
 
 func (r deviceRouter) checkMacAddress(ctx *gin.Context) (interface{}, error) {
@@ -78,20 +87,20 @@ func (r deviceRouter) checkMacAddress(ctx *gin.Context) (interface{}, error) {
 func (r deviceRouter) replaceByID(ctx *gin.Context) (interface{}, error) {
 	id := cast.ToUint(ctx.Param("id"))
 	mac := ctx.Param("mac")
-	return nil, r.service.ReplaceDevice(id, mac)
+	return nil, r.service.ReplaceDeviceByID(id, mac)
 }
 
-func (r deviceRouter) removeByID(ctx *gin.Context) (interface{}, error) {
+func (r deviceRouter) delete(ctx *gin.Context) (interface{}, error) {
 	id := cast.ToUint(ctx.Param("id"))
-	return nil, r.service.RemoveDevice(id)
+	return nil, r.service.DeleteDeviceByID(id)
 }
 
 func (r deviceRouter) findDataByID(ctx *gin.Context) (interface{}, error) {
 	id := cast.ToUint(ctx.Param("id"))
-	pid := cast.ToUint(ctx.Query("pid"))
+	pid := ctx.Query("pid")
 	from := cast.ToInt64(ctx.Query("from"))
 	to := cast.ToInt64(ctx.Query("to"))
-	if pid == 0 {
+	if pid == "" {
 		return r.service.FindDeviceDataByID(id, from, to)
 	}
 	return r.service.GetPropertyDataByID(id, pid, from, to)
@@ -101,16 +110,11 @@ func (r deviceRouter) downloadDataByID(ctx *gin.Context) (interface{}, error) {
 	id := cast.ToUint(ctx.Param("id"))
 	from := cast.ToInt64(ctx.Query("from"))
 	to := cast.ToInt64(ctx.Query("to"))
-	var pids []uint
+	var pids []string
 	if err := json.Unmarshal([]byte(ctx.Query("pids")), &pids); err != nil {
 		return nil, err
 	}
-	fmt.Println(pids)
-	result, err := r.service.GetPropertyDataByIDs(id, pids, from, to)
-	if err != nil {
-		return nil, err
-	}
-	return result.ToExcelFile()
+	return r.service.DownloadPropertiesDataByID(id, pids, from, to)
 }
 
 func (r deviceRouter) removeDataByID(ctx *gin.Context) (interface{}, error) {
@@ -118,11 +122,6 @@ func (r deviceRouter) removeDataByID(ctx *gin.Context) (interface{}, error) {
 	from := cast.ToInt64(ctx.Query("from"))
 	to := cast.ToInt64(ctx.Query("to"))
 	return nil, r.service.RemoveDataByID(id, from, to)
-}
-
-func (r deviceRouter) findGroupByAsset(ctx *gin.Context) (interface{}, error) {
-	deviceType := cast.ToUint(ctx.Query("device_type"))
-	return r.service.FindDevicesGroupByAsset(deviceType)
 }
 
 func (r deviceRouter) getChildren(ctx *gin.Context) (interface{}, error) {
@@ -137,7 +136,7 @@ func (r deviceRouter) upgrade(ctx *gin.Context) (interface{}, error) {
 		return nil, response.InvalidParameterError(err.Error())
 	}
 	if req.Type == 1 {
-		return nil, r.service.ExecuteDeviceUpgrade(id, req)
+		return nil, r.service.ExecuteDeviceUpgradeByID(id, req)
 	}
-	return nil, r.service.ExecuteDeviceCancelUpgrade(id)
+	return nil, r.service.ExecuteDeviceCancelUpgradeByID(id)
 }

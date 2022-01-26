@@ -1,12 +1,14 @@
-import {AlarmRule} from "../../../../types/alarm_rule";
+import {Alarm} from "../../../../types/alarm_rule";
 import {Col, Form, Input, Modal, Row, Select} from "antd";
 import {FC, useEffect, useState} from "react";
 import {defaultValidateMessages} from "../../../../constants/validator";
-import {UpdateAlarmRuleRequest} from "../../../../apis/alarm";
-import {GetFieldName} from "../../../../constants/field";
+import {UpdateAlarmRequest} from "../../../../apis/alarm";
+import {GetMeasurementFieldsRequest} from "../../../../apis/measurement";
+import {MeasurementField} from "../../../../types/measurement_data";
+import {getRuleMethodString} from "../../../../types/alarm_rule_template";
 
 export interface EditProps {
-    rule?: AlarmRule
+    alarm: Alarm
     visible: boolean
     onCancel?: () => void
     onSuccess: () => void
@@ -14,48 +16,59 @@ export interface EditProps {
 
 const {Option} = Select
 
-const EditModal: FC<EditProps> = ({visible, rule, onCancel, onSuccess}) => {
+const EditModal: FC<EditProps> = ({visible, alarm, onCancel, onSuccess}) => {
     const [isLoading, setIsLoading] = useState<boolean>(false)
+    const [field, setField] = useState<MeasurementField>()
     const [form] = Form.useForm()
 
     useEffect(() => {
         if (visible) {
-            form.setFieldsValue({
-                property: rule ? `${rule.property.name}/${GetFieldName(rule.rule.field)}` : null,
-                operation: rule ? rule.rule.operation : ">",
-                threshold: rule?.rule.threshold,
-                level: rule?.level,
+            GetMeasurementFieldsRequest(alarm.measurement.type).then(data => {
+                const f = data.find(item => item.name === alarm.rule.field)
+                setField(f)
+                form.setFieldsValue({
+                    field: f?.title,
+                    operation: alarm.rule.operation,
+                    threshold: alarm.rule.threshold,
+                    method: getRuleMethodString(alarm.rule.method),
+                    level: alarm.level,
+                })
             })
         }
     }, [visible])
 
     const onSave = () => {
-        if (rule) {
-            setIsLoading(true)
-            form.validateFields().then(values => {
-                setIsLoading(false)
-                UpdateAlarmRuleRequest(rule.id, {
-                    rule: {
-                        operation: values.operation,
-                        threshold: parseFloat(values.threshold),
-                    },
-                    level: values.level,
-                }).then(_ => onSuccess())
-            }).catch(_ =>
-                setIsLoading(false)
-            )
-        }
+        setIsLoading(true)
+        form.validateFields().then(values => {
+            setIsLoading(false)
+            UpdateAlarmRequest(alarm.id, {
+                rule: {
+                    operation: values.operation,
+                    threshold: parseFloat(values.threshold),
+                },
+                level: values.level,
+            }).then(_ => onSuccess())
+        }).catch(_ =>
+            setIsLoading(false)
+        )
     }
 
     return <Modal width={380} visible={visible} title={"阈值修改"} okText={"更新"} onOk={onSave} cancelText={"取消"}
                   onCancel={onCancel} confirmLoading={isLoading}>
         <Form form={form} validateMessages={defaultValidateMessages}>
             <Row justify={"start"}>
-                <Col span={24}>
-                    <Form.Item label={"属性名称"} name="property">
-                        <Input disabled/>
-                    </Form.Item>
-                </Col>
+                <Input.Group compact>
+                    <Col span={16}>
+                        <Form.Item label={"属性名称"} name="field" required>
+                            <Input disabled/>
+                        </Form.Item>
+                    </Col>
+                    <Col span={8}>
+                        <Form.Item name={"method"}>
+                            <Input disabled/>
+                        </Form.Item>
+                    </Col>
+                </Input.Group>
             </Row>
             <Row justify={"start"}>
                 <Col span={12}>
@@ -78,7 +91,7 @@ const EditModal: FC<EditProps> = ({visible, rule, onCancel, onSuccess}) => {
                             }
                         }
                     }]}>
-                        <Input suffix={rule?.property.unit}/>
+                        <Input suffix={field?.unit}/>
                     </Form.Item>
                 </Col>
             </Row>

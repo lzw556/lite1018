@@ -2,7 +2,6 @@ package command
 
 import (
 	"context"
-	"errors"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/request"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/response"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/iot/command"
@@ -13,8 +12,6 @@ import (
 	spec "github.com/thetasensors/theta-cloud-lite/server/domain/specification"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/devicetype"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/errcode"
-	"github.com/thetasensors/theta-cloud-lite/server/pkg/transaction"
-	"gorm.io/gorm"
 	"time"
 )
 
@@ -55,21 +52,32 @@ func (cmd DeviceUpdateCmd) UpdateBaseInfo(req request.Device) error {
 	return nil
 }
 
-func (cmd DeviceUpdateCmd) UpdateSetting(req request.DeviceSetting) error {
-	switch cmd.Device.TypeID {
-	case devicetype.GatewayType:
-		for _, key := range po.IPNSettingKeys {
-			if value, ok := req[key]; ok {
-				cmd.Device.IPN[key] = value
+func (cmd DeviceUpdateCmd) UpdateSettings(req request.DeviceSetting) error {
+	t := devicetype.Get(cmd.Device.Type)
+	if t == nil {
+		return response.BusinessErr(errcode.UnknownDeviceTypeError, "")
+	}
+	cmd.Device.Settings = make(po.DeviceSettings, len(t.Settings()))
+	for i, setting := range t.Settings() {
+		s := po.DeviceSetting{
+			Key:      setting.Key,
+			Category: string(setting.Category),
+		}
+		switch setting.Category {
+		case devicetype.IpnSettingCategory:
+			if value, ok := req.IPN[s.Key]; ok {
+				s.Value = setting.Convert(value)
+			} else {
+				s.Value = setting.Convert(setting.Value)
+			}
+		case devicetype.SensorsSettingCategory:
+			if value, ok := req.Sensors[s.Key]; ok {
+				s.Value = setting.Convert(value)
+			} else {
+				s.Value = setting.Convert(setting.Value)
 			}
 		}
-	case devicetype.RouterType:
-	default:
-		for _, key := range po.SensorSettingKeys[cmd.Device.TypeID] {
-			if value, ok := req[key]; ok {
-				cmd.Device.Sensors[key] = value
-			}
-		}
+		cmd.Device.Settings[i] = s
 	}
 	ctx := context.TODO()
 	err := cmd.deviceRepo.Save(ctx, &cmd.Device.Device)
@@ -82,52 +90,6 @@ func (cmd DeviceUpdateCmd) UpdateSetting(req request.DeviceSetting) error {
 				command.SyncDeviceSettings(gateway, cmd.Device)
 			}
 		}
-	}
-	return nil
-}
-
-func (cmd DeviceUpdateCmd) updateGatewaySetting(period, timeOffset uint) error {
-	err := transaction.Execute(context.TODO(), func(txCtx context.Context) error {
-		if err := cmd.deviceRepo.Save(txCtx, &cmd.Device.Device); err != nil {
-			return err
-		}
-		return cmd.networkRepo.UpdateByGatewayID(txCtx, cmd.Device.ID, period, timeOffset)
-	})
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func (cmd DeviceUpdateCmd) updateSensorSetting() error {
-	err := transaction.Execute(context.TODO(), func(txCtx context.Context) error {
-		return cmd.deviceRepo.Save(txCtx, &cmd.Device.Device)
-	})
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func (cmd DeviceUpdateCmd) Replace(mac string) error {
-	ctx := context.TODO()
-	_, err := cmd.deviceRepo.GetBySpecs(ctx, spec.DeviceMacEqSpec(mac))
-	if !errors.Is(err, gorm.ErrRecordNotFound) {
-		return response.BusinessErr(errcode.DeviceMacExistsError, "")
-	}
-	network, err := cmd.networkRepo.Get(ctx, cmd.Device.NetworkID)
-	err = transaction.Execute(ctx, func(txCtx context.Context) error {
-		if network.ID != 0 {
-			network.ReplaceDevice(cmd.Device, mac)
-			if err := cmd.networkRepo.Save(txCtx, &network.Network); err != nil {
-				return err
-			}
-		}
-		cmd.Device.MacAddress = mac
-		return cmd.deviceRepo.Save(txCtx, &cmd.Device.Device)
-	})
-	if err != nil {
-		return err
 	}
 	return nil
 }

@@ -21,11 +21,11 @@ func (r *firmwareRouter) initRoutes() {
 		router.NewPostRoute("firmwares", r.create),
 
 		// GET
-		router.NewGetRoute("firmwares", r.paging),
+		router.NewGetRoute("firmwares", r.find),
 		router.NewGetRoute("devices/:id/firmwares", r.findFirmwares),
 
 		// DELETE
-		router.NewDeleteRoute("firmwares/:id", r.removeByID),
+		router.NewDeleteRoute("firmwares/:id", r.delete),
 	}
 }
 
