@@ -1,7 +1,8 @@
 FROM golang:1.17.2-alpine as builder
 
 RUN apk add --no-cache \
-    git
+    git \
+    build-base
 
 RUN git config --global url."http://onlylin:8da992bc6bc24c7eb9bd419913f277621e68dcf8@github.com".insteadOf "https://github.com"
 
