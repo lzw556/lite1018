@@ -35,7 +35,7 @@ func (query AssetStatisticQuery) buildDevices(devices []entity.Device) ([]vo.Dev
 	result := make([]vo.Device, len(devices))
 	for i, device := range devices {
 		result[i] = vo.NewDevice(device)
-		if status, err := query.deviceStatusRepo.Get(device.ID); err == nil {
+		if status, err := query.deviceStatusRepo.Get(device.MacAddress); err == nil {
 			result[i].State.DeviceStatus = status
 		}
 	}

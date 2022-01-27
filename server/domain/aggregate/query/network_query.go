@@ -36,7 +36,7 @@ func (query NetworkQuery) Detail() (*vo.Network, error) {
 		nodes := make([]vo.Device, len(devices))
 		for i, device := range devices {
 			nodes[i] = vo.NewDevice(device)
-			nodes[i].State.DeviceStatus, _ = query.deviceStatusRepo.Get(device.ID)
+			nodes[i].State.DeviceStatus, _ = query.deviceStatusRepo.Get(device.MacAddress)
 		}
 		result.SetNodes(nodes)
 	}

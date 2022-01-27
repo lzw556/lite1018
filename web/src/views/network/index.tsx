@@ -53,7 +53,13 @@ const NetworkPage = () => {
     const onCommand = (record: Network, key: any) => {
         switch (key) {
             case "0":
-                SyncNetworkRequest(record.id).then()
+                SyncNetworkRequest(record.id).then(res => {
+                    if (res.code === 200) {
+                        message.success("发送成功")
+                    } else {
+                        message.error(`发送失败: ${res.msg}`)
+                    }
+                })
                 break
             case "1":
                 SendDeviceCommandRequest(record.gateway.id, DeviceCommand.Provision).then(res => {

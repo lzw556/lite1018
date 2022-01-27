@@ -10,6 +10,7 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/po"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/json"
+	"time"
 )
 
 type DeviceStatus struct {
@@ -41,7 +42,8 @@ func (p DeviceStatus) Process(ctx *iot.Context, msg iot.Message) error {
 			if err := json.Unmarshal([]byte(m.Status), &e); err != nil {
 				return fmt.Errorf("unmarshal device %s status %s failed: %v", device.MacAddress, m.Status, err)
 			}
-			if err := p.repository.Create(device.ID, e); err != nil {
+			e.Time = time.Now()
+			if err := p.repository.Create(device.MacAddress, e); err != nil {
 				return fmt.Errorf("save device status failed: %v", err)
 			}
 		}

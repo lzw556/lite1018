@@ -83,3 +83,7 @@ export function GetDevicesStatisticsRequest(filter: any) {
 export function GetDefaultDeviceSettingsRequest(type: number) {
     return request.get<any>(`/devices/defaultSettings`, {type}).then(GetResponse)
 }
+
+export function GetDeviceRuntimeDataRequest(id:number, from:number, to:number) {
+    return request.get<any>(`/devices/${id}/data/runtime`, {from, to}).then(GetResponse)
+}

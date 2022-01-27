@@ -24,6 +24,7 @@ type Service interface {
 	UpdateDeviceSettingByID(id uint, req request.DeviceSetting) error
 
 	GetPropertyDataByID(deviceID uint, pID string, from, to int64) ([]vo.PropertyData, error)
+	GetRuntimeDataByID(deviceID uint, from, to int64) ([]vo.SensorRuntimeData, error)
 	DownloadPropertiesDataByID(deviceID uint, pIDs []string, from, to int64) (*vo.ExcelFile, error)
 	FindDeviceDataByID(deviceID uint, from, to int64) (vo.PropertiesData, error)
 	RemoveDataByID(deviceID uint, from, to int64) error

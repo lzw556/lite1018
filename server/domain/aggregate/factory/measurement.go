@@ -76,6 +76,7 @@ func (factory Measurement) NewMeasurementCreateCmd(req request.CreateMeasurement
 				Type:       req.DeviceType,
 				Settings:   cmd.SensorSettings,
 				Category:   po.SensorCategory,
+				ProjectID:  req.ProjectID,
 			}
 		}
 		cmd.Devices = append(cmd.Devices, device)

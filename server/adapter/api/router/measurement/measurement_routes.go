@@ -14,6 +14,7 @@ func (r measurementRouter) create(ctx *gin.Context) (interface{}, error) {
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		return nil, response.InvalidParameterError(err.Error())
 	}
+	req.ProjectID = cast.ToUint(ctx.MustGet("project_id"))
 	return r.service.CreateMeasurement(req)
 }
 

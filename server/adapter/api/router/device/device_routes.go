@@ -106,6 +106,13 @@ func (r deviceRouter) findDataByID(ctx *gin.Context) (interface{}, error) {
 	return r.service.GetPropertyDataByID(id, pid, from, to)
 }
 
+func (r deviceRouter) findRuntimeDataByID(ctx *gin.Context) (interface{}, error) {
+	id := cast.ToUint(ctx.Param("id"))
+	from := cast.ToInt64(ctx.Query("from"))
+	to := cast.ToInt64(ctx.Query("to"))
+	return r.service.GetRuntimeDataByID(id, from, to)
+}
+
 func (r deviceRouter) downloadDataByID(ctx *gin.Context) (interface{}, error) {
 	id := cast.ToUint(ctx.Param("id"))
 	from := cast.ToInt64(ctx.Query("from"))

@@ -98,39 +98,6 @@ const MonitorPage: FC<MonitorPageProps> = ({device}) => {
                     }
                 }
             }))
-
-                // setOptions(data.map(item => {
-                //     const series = Object.keys(item.fields).map((key, index) => {
-                //         return {
-                //             ...LineChartStyles[index],
-                //             name: GetFieldName(key),
-                //             type: 'line',
-                //             data: item.fields[key].map((value: any) => Number(value).toFixed(3)),
-                //             markLine: convertMarkLine(item.alarms, item.unit)
-                //         }
-                //     })
-                //     const xAxis = [{
-                //         type: 'category',
-                //         boundaryGap: false,
-                //         data: item.time.map(item => moment.unix(item).local().format("YYYY-MM-DD HH:mm:ss"))
-                //     }]
-                //     return Object.assign({}, DefaultMonitorDataOption, {
-                //         title: {text: item.name, textStyle: {fontSize: 14}},
-                //         tooltip: {
-                //             trigger: 'axis',
-                //             formatter: function (params: any) {
-                //                 let relVal = params[0].name;
-                //                 for (let i = 0; i < params.length; i++) {
-                //                     let value = Number(params[i].value).toFixed(3)
-                //                     relVal += `<br/> ${params[i].marker} ${params[i].seriesName}: ${value}${item.unit}`
-                //                 }
-                //                 return relVal;
-                //             }
-                //         },
-                //         xAxis: xAxis,
-                //         series: series
-                //     })
-                // }))
         })
     }
 
