@@ -14,6 +14,7 @@ type CreateMeasurement struct {
 		X float32 `json:"x"`
 		Y float32 `json:"y"`
 	} `json:"location"`
+	ProjectID uint `json:"-"`
 }
 
 type UpdateMeasurementDeviceBindings struct {
