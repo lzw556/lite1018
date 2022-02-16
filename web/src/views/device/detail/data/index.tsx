@@ -3,15 +3,15 @@ import {Button, Card, Col, DatePicker, Modal, Row, Select, Space} from "antd";
 import {DeleteOutlined, DownloadOutlined} from "@ant-design/icons";
 import {Content} from "antd/lib/layout/layout";
 import {Device} from "../../../../types/device";
-import ReactECharts from "echarts-for-react";
 import moment from "moment";
 import {EmptyLayout} from "../../../layout";
 import {GetDeviceDataRequest, RemoveDeviceDataRequest} from "../../../../apis/device";
 import HasPermission from "../../../../permission";
 import {Permission} from "../../../../permission/permission";
-import DownloadModal from "./modal/downloadModal";
 import Label from "../../../../components/label";
 import {DefaultHistoryDataOption, LineChartStyles} from "../../../../constants/chart";
+import ReactECharts from "echarts-for-react";
+import DownloadModal from "./modal/downloadModal";
 
 const {Option} = Select
 const {RangePicker} = DatePicker
@@ -24,15 +24,16 @@ const HistoryDataPage: FC<DeviceDataProps> = ({device}) => {
     const [property, setProperty] = useState<any>(device.properties[0])
     const [startDate, setStartDate] = useState<moment.Moment>(moment().startOf('day').subtract(7, 'd'))
     const [endDate, setEndDate] = useState<moment.Moment>(moment().endOf('day'))
-    const [option, setOption] = useState<any>()
+    const [dataSource, setDataSource] = useState<any>()
     const [downloadVisible, setDownloadVisible] = useState<boolean>(false)
 
+    const fetchDeviceData = useCallback(() => {
+        GetDeviceDataRequest(device.id, startDate.utc().unix(), endDate.utc().unix()).then(setDataSource)
+    }, [startDate, endDate])
 
-    const onPropertyChange = (value: string) => {
-        if (device) {
-            setProperty(device.properties.find(item => item.key === value))
-        }
-    }
+    useEffect(() => {
+        fetchDeviceData()
+    }, [fetchDeviceData])
 
     const onSetDateRange = (value: number) => {
         setStartDate(moment().startOf('day').subtract(value, 'months'))
@@ -48,35 +49,39 @@ const HistoryDataPage: FC<DeviceDataProps> = ({device}) => {
         </Space>
     }
 
-    const fetchPropertyData = useCallback(() => {
-        GetDeviceDataRequest(device.id, property.key, startDate.utc().unix(), endDate.utc().unix()).then(data => {
-            let series: any[]
-            let legends: string[]
-            switch (property.type) {
-                case 'axis':
-                    legends = ["X轴", "Y轴", "Z轴"]
-                    series = legends.map((item, index) => {
-                        return {
-                            ...LineChartStyles[index],
-                            name: item,
-                            type: 'line',
-                            data: data.map((item:any) => item.value[index])
-                        }
-                    })
-                    break;
-                default:
-                    legends = [property.name]
-                    series = [
-                        {
-                            ...LineChartStyles[0],
-                            name: property.name,
-                            type: 'line',
-                            data: data.map((item:any) => item.value)
-                        }
-                    ]
-                    break;
-            }
-            setOption({
+    const renderHistoryDataChart = () => {
+        if (dataSource) {
+            const data = dataSource.map((item: any) => {
+                return {
+                    time: moment.unix(item.timestamp).local(),
+                    property: item.properties.find((item: any) => item.key === property.key)
+                }
+            })
+            const fields = new Map<string, number[]>()
+            const times: any[] = []
+            data.forEach((item: any) => {
+                times.push(item.time)
+                Object.keys(item.property.data).forEach(key => {
+                    if (!fields.has(key)) {
+                        fields.set(key, [item.property.data[key]])
+                    } else {
+                        fields.get(key)?.push(item.property.data[key])
+                    }
+                })
+            })
+            const legends: string[] = []
+            const series: any[] = []
+            console.log(fields)
+            Array.from(fields.keys()).forEach((key, index) => {
+                legends.push(key)
+                series.push({
+                    ...LineChartStyles[index],
+                    name: key,
+                    type: 'line',
+                    data: fields.get(key)
+                })
+            })
+            const option = {
                 ...DefaultHistoryDataOption,
                 tooltip: {
                     trigger: 'axis',
@@ -95,16 +100,15 @@ const HistoryDataPage: FC<DeviceDataProps> = ({device}) => {
                 xAxis: {
                     type: 'category',
                     boundaryGap: false,
-                    data: data.map((item:any) => moment.unix(item.timestamp).local().format("YYYY-MM-DD HH:mm:ss"))
+                    data: times.map((item: any) => item.format("YYYY-MM-DD HH:mm:ss"))
                 }
-            })
-        })
-    }, [property, startDate, endDate])
-
-    useEffect(() => {
-            fetchPropertyData()
-        }, [fetchPropertyData]
-    )
+            }
+            return <ReactECharts option={option}
+                                 notMerge={true}
+                                 style={{height: `380px`, border: "none"}}/>
+        }
+        return <EmptyLayout description={"暂无数据"} style={{height: `400px`}}/>
+    }
 
     const onRemoveDeviceData = () => {
         if (device) {
@@ -128,7 +132,9 @@ const HistoryDataPage: FC<DeviceDataProps> = ({device}) => {
                         <Space style={{textAlign: "center"}}>
                             <Label name={"属性"}>
                                 <Select bordered={false} defaultValue={property.key} placeholder={"请选择属性"}
-                                        style={{width: "120px"}} onChange={onPropertyChange}>
+                                        style={{width: "120px"}} onChange={value => {
+                                    setProperty(device.properties.find((item: any) => item.key === value))
+                                }}>
                                     {
                                         device ? device.properties.map(item =>
                                             <Option key={item.key} value={item.key}>{item.name}</Option>
@@ -161,10 +167,7 @@ const HistoryDataPage: FC<DeviceDataProps> = ({device}) => {
                     <Col span={24}>
                         <Card bordered={false} style={{height: `400px`}}>
                             {
-                                option ? <ReactECharts option={option}
-                                                       notMerge={true}
-                                                       style={{height: `380px`, border: "none"}}/> :
-                                    <EmptyLayout description={"暂无数据"} style={{height: `400px`}}/>
+                                renderHistoryDataChart()
                             }
                         </Card>
                     </Col>

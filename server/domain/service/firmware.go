@@ -10,7 +10,7 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/aggregate/factory"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
-	"github.com/thetasensors/theta-cloud-lite/server/domain/po"
+	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	spec "github.com/thetasensors/theta-cloud-lite/server/domain/specification"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/vo"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/errcode"
@@ -37,7 +37,7 @@ func (s Firmware) CreateFirmware(req request.Firmware) error {
 	if !errors.Is(err, gorm.ErrRecordNotFound) {
 		return response.BusinessErr(errcode.FirmwareExistsError, req.Crc)
 	}
-	e = po.Firmware{
+	e = entity.Firmware{
 		Name:      req.Name,
 		Filename:  uuid.NewV1().String(),
 		ProductID: uint(req.ProductID),

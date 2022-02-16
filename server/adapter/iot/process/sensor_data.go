@@ -24,7 +24,6 @@ func NewSensorData() Processor {
 	return newRoot(SensorData{
 		deviceRepo:     repository.Device{},
 		sensorDataRepo: repository.SensorData{},
-		processor:      NewMeasurementData(),
 	})
 }
 

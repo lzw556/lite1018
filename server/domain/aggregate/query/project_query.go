@@ -5,14 +5,14 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/response"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
-	"github.com/thetasensors/theta-cloud-lite/server/domain/po"
+	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	spec "github.com/thetasensors/theta-cloud-lite/server/domain/specification"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/vo"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/errcode"
 )
 
 type ProjectQuery struct {
-	po.Project
+	entity.Project
 	userProjectRelationRepo dependency.UserProjectRelationRepository
 	userRepo                dependency.UserRepository
 }

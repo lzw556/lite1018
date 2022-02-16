@@ -5,12 +5,12 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/ruleengine"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
-	"github.com/thetasensors/theta-cloud-lite/server/domain/po"
+	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/transaction"
 )
 
 type AlarmCreateCmd struct {
-	po.Alarms
+	entity.Alarms
 
 	alarmRepo dependency.AlarmRepository
 }

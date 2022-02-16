@@ -1,7 +1,7 @@
 package vo
 
 import (
-	"github.com/thetasensors/theta-cloud-lite/server/domain/po"
+	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	"sort"
 )
 
@@ -18,7 +18,7 @@ type Menu struct {
 	Children Menus  `json:"children"`
 }
 
-func NewMenu(e po.Menu) Menu {
+func NewMenu(e entity.Menu) Menu {
 	return Menu{
 		ID:       e.ID,
 		Title:    e.Title,
@@ -33,7 +33,7 @@ func NewMenu(e po.Menu) Menu {
 	}
 }
 
-func (m *Menu) AddChildren(es []po.Menu) {
+func (m *Menu) AddChildren(es []entity.Menu) {
 	for _, e := range es {
 		if e.ParentID == m.ID {
 			child := NewMenu(e)
@@ -46,7 +46,7 @@ func (m *Menu) AddChildren(es []po.Menu) {
 
 type Menus []Menu
 
-func NewMenus(es []po.Menu) Menus {
+func NewMenus(es []entity.Menu) Menus {
 	ms := make(Menus, 0)
 	for _, e := range es {
 		if e.ParentID == 0 {

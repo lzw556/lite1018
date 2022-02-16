@@ -22,5 +22,5 @@ export type Device = {
     information?: any
     category: number
     properties: Property[]
-    binding: any
+    lastSampleTimestamp: number
 }

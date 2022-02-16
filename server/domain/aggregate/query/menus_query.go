@@ -1,13 +1,13 @@
 package query
 
 import (
-	"github.com/thetasensors/theta-cloud-lite/server/domain/po"
+	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/vo"
 	"sort"
 )
 
 type MenusQuery struct {
-	po.Menus
+	entity.Menus
 }
 
 func NewMenusQuery() MenusQuery {

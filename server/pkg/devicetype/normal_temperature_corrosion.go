@@ -54,31 +54,46 @@ func (NormalTemperatureCorrosion) Properties(sensorID uint) Properties {
 	case ThicknessSensor:
 		return Properties{
 			{
-				Key:         "thickness",
-				Name:        "厚度",
-				Unit:        "mm",
-				Type:        FloatPropertyType,
-				Precision:   3,
-				Sort:        0,
-				DataIndexes: []uint{0},
+				Key:       "thickness",
+				Name:      "厚度",
+				Unit:      "mm",
+				Precision: 3,
+				Sort:      0,
+				Fields: []Field{
+					{
+						Name:      "厚度",
+						Key:       "thickness",
+						DataIndex: 0,
+					},
+				},
 			},
 			{
-				Key:         "temperature",
-				Name:        "温度",
-				Unit:        "°C",
-				Type:        FloatPropertyType,
-				Precision:   3,
-				Sort:        2,
-				DataIndexes: []uint{1},
+				Key:       "temperature",
+				Name:      "温度",
+				Unit:      "°C",
+				Precision: 3,
+				Sort:      2,
+				Fields: []Field{
+					{
+						Name:      "温度",
+						Key:       "temperature",
+						DataIndex: 1,
+					},
+				},
 			},
 			{
-				Key:         "tof",
-				Name:        "飞行时间",
-				Unit:        "ns",
-				Type:        FloatPropertyType,
-				Precision:   3,
-				Sort:        3,
-				DataIndexes: []uint{3},
+				Key:       "tof",
+				Name:      "飞行时间",
+				Unit:      "ns",
+				Precision: 3,
+				Sort:      3,
+				Fields: []Field{
+					{
+						Name:      "飞行时间",
+						Key:       "tof",
+						DataIndex: 3,
+					},
+				},
 			},
 		}
 	}

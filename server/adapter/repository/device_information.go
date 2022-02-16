@@ -1,7 +1,7 @@
 package repository
 
 import (
-	"github.com/thetasensors/theta-cloud-lite/server/domain/po"
+	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/json"
 	"go.etcd.io/bbolt"
 )
@@ -10,7 +10,7 @@ type DeviceInformation struct {
 	repository
 }
 
-func (repo DeviceInformation) Create(id uint, e po.DeviceInformation) error {
+func (repo DeviceInformation) Create(id uint, e entity.DeviceInformation) error {
 	return repo.BoltDB().Update(func(tx *bbolt.Tx) error {
 		bucket := tx.Bucket([]byte(e.BucketName()))
 		buf, err := json.Marshal(e)
@@ -21,8 +21,8 @@ func (repo DeviceInformation) Create(id uint, e po.DeviceInformation) error {
 	})
 }
 
-func (repo DeviceInformation) Get(id uint) (po.DeviceInformation, error) {
-	var e po.DeviceInformation
+func (repo DeviceInformation) Get(id uint) (entity.DeviceInformation, error) {
+	var e entity.DeviceInformation
 	err := repo.BoltDB().View(func(tx *bbolt.Tx) error {
 		bucket := tx.Bucket([]byte(e.BucketName()))
 		if bytes := bucket.Get(itob(id)); bytes != nil {
@@ -35,7 +35,10 @@ func (repo DeviceInformation) Get(id uint) (po.DeviceInformation, error) {
 
 func (repo DeviceInformation) Delete(id uint) error {
 	err := repo.BoltDB().Update(func(tx *bbolt.Tx) error {
-		bucket := tx.Bucket([]byte(po.DeviceInformation{}.BucketName()))
+		bucket, err := tx.CreateBucketIfNotExists([]byte(entity.DeviceInformation{}.BucketName()))
+		if err != nil {
+			return err
+		}
 		return bucket.Delete(itob(id))
 	})
 	return err

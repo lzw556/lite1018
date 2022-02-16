@@ -9,7 +9,6 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
-	"github.com/thetasensors/theta-cloud-lite/server/domain/po"
 	spec "github.com/thetasensors/theta-cloud-lite/server/domain/specification"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/vo"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/errcode"
@@ -20,14 +19,16 @@ import (
 type NetworkUpdateCmd struct {
 	entity.Network
 
-	networkRepo dependency.NetworkRepository
-	deviceRepo  dependency.DeviceRepository
+	networkRepo     dependency.NetworkRepository
+	deviceRepo      dependency.DeviceRepository
+	deviceStateRepo dependency.DeviceStateRepository
 }
 
 func NewNetworkUpdateCmd() NetworkUpdateCmd {
 	return NetworkUpdateCmd{
-		networkRepo: repository.Network{},
-		deviceRepo:  repository.Device{},
+		networkRepo:     repository.Network{},
+		deviceRepo:      repository.Device{},
+		deviceStateRepo: repository.DeviceState{},
 	}
 }
 
@@ -39,7 +40,7 @@ func (cmd NetworkUpdateCmd) Update(req request.Network) (*vo.Network, error) {
 	cmd.Network.Name = req.Name
 	cmd.Network.ProjectID = req.ProjectID
 	err := transaction.Execute(context.TODO(), func(txCtx context.Context) error {
-		if err := cmd.networkRepo.Save(txCtx, &cmd.Network.Network); err != nil {
+		if err := cmd.networkRepo.Save(txCtx, &cmd.Network); err != nil {
 			return err
 		}
 		return nil
@@ -48,22 +49,11 @@ func (cmd NetworkUpdateCmd) Update(req request.Network) (*vo.Network, error) {
 	if err != nil {
 		return nil, err
 	}
-	go command.SyncWsnSettings(cmd.Network, gateway, true, 3*time.Second)
+	if state, err := cmd.deviceStateRepo.Get(gateway.MacAddress); err == nil && state.IsOnline {
+		go command.SyncWsnSettings(cmd.Network, gateway, true, 3*time.Second)
+	}
 	result := vo.NewNetwork(cmd.Network)
 	return &result, nil
-}
-
-func (cmd NetworkUpdateCmd) UpdateSetting(req request.WSN) error {
-	cmd.Network.CommunicationPeriod = req.CommunicationPeriod
-	cmd.Network.CommunicationTimeOffset = req.CommunicationTimeOffset
-	cmd.Network.GroupInterval = req.GroupInterval
-	cmd.Network.GroupSize = req.GroupSize
-	err := cmd.networkRepo.Save(context.TODO(), &cmd.Network.Network)
-	if err != nil {
-		return err
-	}
-	go command.SyncWsnSettings(cmd.Network, cmd.Gateway, true, 3*time.Second)
-	return nil
 }
 
 func (cmd NetworkUpdateCmd) AccessDevices(parentID uint, childrenID []uint) error {
@@ -76,10 +66,10 @@ func (cmd NetworkUpdateCmd) AccessDevices(parentID uint, childrenID []uint) erro
 	if err != nil {
 		return err
 	}
-	cmd.Network.AccessDevices(parent, children...)
+	cmd.Network.AddDevices(parent, children...)
 	fmt.Println(children)
 	err = transaction.Execute(context.TODO(), func(txCtx context.Context) error {
-		if err := cmd.networkRepo.Save(txCtx, &cmd.Network.Network); err != nil {
+		if err := cmd.networkRepo.Save(txCtx, &cmd.Network); err != nil {
 			return err
 		}
 		return cmd.deviceRepo.UpdatesBySpecs(txCtx, map[string]interface{}{"network_id": cmd.Network.ID}, spec.PrimaryKeyInSpec(childrenID))
@@ -107,18 +97,18 @@ func (cmd NetworkUpdateCmd) AccessNewDevice(req request.AddDevices) error {
 	if err != nil {
 		return response.BusinessErr(errcode.DeviceNotFoundError, "")
 	}
-	device.Device = po.Device{
+	device = entity.Device{
 		Name:       req.Name,
 		MacAddress: req.MacAddress,
 		NetworkID:  cmd.Network.ID,
 		Type:       req.DeviceType,
 	}
 	return transaction.Execute(ctx, func(txCtx context.Context) error {
-		if err := cmd.deviceRepo.Create(txCtx, &device.Device); err != nil {
+		if err := cmd.deviceRepo.Create(txCtx, &device); err != nil {
 			return err
 		}
-		cmd.Network.AccessDevices(parent, device)
-		return cmd.networkRepo.Save(txCtx, &cmd.Network.Network)
+		cmd.Network.AddDevices(parent, device)
+		return cmd.networkRepo.Save(txCtx, &cmd.Network)
 	})
 }
 
@@ -133,10 +123,10 @@ func (cmd NetworkUpdateCmd) RemoveDevices(req request.RemoveDevices) error {
 		devices[i].NetworkID = 0
 	}
 	err = transaction.Execute(ctx, func(txCtx context.Context) error {
-		if err := cmd.networkRepo.Save(txCtx, &cmd.Network.Network); err != nil {
+		if err := cmd.networkRepo.Save(txCtx, &cmd.Network); err != nil {
 			return err
 		}
-		return cmd.deviceRepo.BatchSave(txCtx, devices.PersistentObject())
+		return cmd.deviceRepo.BatchSave(txCtx, devices)
 	})
 	if err != nil {
 		return err

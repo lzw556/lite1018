@@ -4,7 +4,7 @@ import {
     CodeOutlined,
     DeleteOutlined,
     EditOutlined,
-    LoadingOutlined
+    LoadingOutlined, MonitorOutlined, PlusOutlined
 } from "@ant-design/icons";
 import {Content} from "antd/lib/layout/layout";
 import {useCallback, useEffect, useState} from "react";
@@ -36,6 +36,7 @@ import usePermission, {Permission} from "../../permission/permission";
 import {PageResult} from "../../types/page";
 import DeviceTable from "../../components/table/deviceTable";
 import NetworkSelect from "../../components/select/networkSelect";
+import DeviceMonitorDrawer from "./deviceMonitorDrawer";
 
 const {Search} = Input
 const {Option} = Select
@@ -48,6 +49,7 @@ const DevicePage = () => {
     const [device, setDevice] = useState<Device>()
     const [editSettingVisible, setEditSettingVisible] = useState<boolean>(false)
     const [editBaseInfoVisible, setEditBaseInfoVisible] = useState<boolean>(false)
+    const [monitorVisible, setMonitorVisible] = useState<boolean>(false)
     const [upgradeVisible, setUpgradeVisible] = useState<boolean>(false)
     const [replaceVisible, setReplaceVisible] = useState<boolean>(false)
     const [executeDevice, setExecuteDevice] = useState<Device>()
@@ -79,6 +81,14 @@ const DevicePage = () => {
     useEffect(() => {
         fetchDevices(1, 10)
     }, [fetchDevices])
+
+    useEffect(() => {
+        document.onkeyup = (e) => {
+            if (e.keyCode === 27) {
+                setMonitorVisible(false)
+            }
+        }
+    }, [])
 
 
     const onRefresh = () => {
@@ -147,6 +157,13 @@ const DevicePage = () => {
             setReplaceVisible(key === "0")
             setEditBaseInfoVisible(key === "1")
             setEditSettingVisible(key === "2")
+        })
+    }
+
+    const onMonitor = (id: number) => {
+        GetDeviceRequest(id).then(data => {
+            setDevice(data)
+            setMonitorVisible(true)
         })
     }
 
@@ -244,6 +261,12 @@ const DevicePage = () => {
             render: (text: any, record: any) => {
                 const isUpgrading = record.upgradeState && record.upgradeState.status >= 1 && record.upgradeState.status <= 3
                 return <Space>
+                    {
+                        record.typeId !== DeviceType.Router && record.typeId !== DeviceType.Gateway &&
+                        <Button type={"text"} size={"small"} onClick={_ => onMonitor(record.id)}>
+                            <MonitorOutlined />
+                        </Button>
+                    }
                     <Dropdown overlay={renderEditMenus(record)}>
                         <Button type="text" size="small" icon={<EditOutlined/>}
                                 hidden={!(hasPermission(Permission.DeviceEdit) || hasPermission(Permission.DeviceSettingsEdit))}/>
@@ -264,7 +287,11 @@ const DevicePage = () => {
     ]
 
     return <Content>
-        <MyBreadcrumb/>
+        <MyBreadcrumb>
+            <Space>
+                <Button type={"primary"} href={"#/device-management?locale=devices/addDevice"}>添加设备<PlusOutlined/></Button>
+            </Space>
+        </MyBreadcrumb>
         <ShadowCard>
             <Row justify="center">
                 <Col span={24}>
@@ -329,6 +356,9 @@ const DevicePage = () => {
             setDevice(undefined)
             setUpgradeVisible(false)
         }}/>
+        {
+            device && <DeviceMonitorDrawer device={device} visible={monitorVisible}/>
+        }
     </Content>
 }
 

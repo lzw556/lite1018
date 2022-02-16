@@ -45,7 +45,7 @@ const MonitorPage: FC<MonitorPageProps> = ({device}) => {
 
     const fetchDeviceData = (id: number) => {
         setSelectedDevice(id)
-        GetDeviceDataRequest(id, "", startDate.utc().unix(), endDate.utc().unix()).then(data => {
+        GetDeviceDataRequest(id, startDate.utc().unix(), endDate.utc().unix()).then(data => {
             setOptions(device.properties.map(property => {
                 const key = property.key
                 let series: any[]

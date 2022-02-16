@@ -4,16 +4,16 @@ import (
 	"context"
 	"github.com/gogo/protobuf/proto"
 	pd "github.com/thetasensors/theta-cloud-lite/server/adapter/iot/proto"
-	"github.com/thetasensors/theta-cloud-lite/server/domain/po"
+	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/devicetype"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/json"
 	"time"
 )
 
 type deviceSettings struct {
-	IPN     po.IPNSetting    `json:"ipn,omitempty"`
-	System  po.SystemSetting `json:"system,omitempty"`
-	Sensors po.SensorSetting `json:"sensors,omitempty"`
+	IPN     map[string]interface{} `json:"ipn,omitempty"`
+	System  map[string]interface{} `json:"system,omitempty"`
+	Sensors map[string]interface{} `json:"sensors,omitempty"`
 }
 
 type updateDeviceSettingsCmd struct {
@@ -21,7 +21,7 @@ type updateDeviceSettingsCmd struct {
 	settings deviceSettings
 }
 
-func newUpdateDeviceSettingsCmd(settings po.DeviceSettings) updateDeviceSettingsCmd {
+func newUpdateDeviceSettingsCmd(settings entity.DeviceSettings) updateDeviceSettingsCmd {
 	cmd := updateDeviceSettingsCmd{
 		settings: deviceSettings{
 			IPN:     map[string]interface{}{},

@@ -2,79 +2,50 @@ package entity
 
 import (
 	"fmt"
-	"github.com/thetasensors/theta-cloud-lite/server/domain/po"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/cache"
-	"github.com/thetasensors/theta-cloud-lite/server/pkg/eventbus"
-	"time"
+	"gorm.io/gorm"
+)
+
+type DeviceCategory uint
+
+const (
+	GatewayCategory DeviceCategory = iota + 1
+	RouterCategory
+	SensorCategory
 )
 
 type Device struct {
-	po.Device
+	gorm.Model
+	Name       string `gorm:"type:varchar(64)"`
+	MacAddress string `gorm:"type:varchar(12)"`
+	Type       uint
+	NetworkID  uint
+	ProjectID  uint
+	Category   DeviceCategory
+	Settings   DeviceSettings `gorm:"type:json"`
 
-	connectionState DeviceConnectionState
-	upgradeState    DeviceUpgradeState
-	alarmState      map[uint]uint
+	State DeviceState `gorm:"-"`
 }
 
-func (d Device) GetSetting(key string) (po.DeviceSetting, bool) {
-	for _, setting := range d.Settings {
-		if setting.Key == key {
-			return setting, true
-		}
-	}
-	return po.DeviceSetting{}, false
+func (Device) TableName() string {
+	return "ts_device"
 }
 
-func (d Device) UpdateConnectionState(isOnline bool) {
-	key := fmt.Sprintf("device_connection_status_%d", d.ID)
-	_ = cache.GetStruct(key, &d.connectionState)
-	isChanged := isOnline != d.connectionState.IsOnline
-	d.connectionState.IsOnline = isOnline
-	if isOnline {
-		d.connectionState.ConnectedAt = time.Now().UTC().Unix()
-	}
-	_ = cache.SetStruct(key, d.connectionState)
-	if isChanged {
-		eventbus.Publish(eventbus.SocketEmit, "socket::deviceConnectionStateChanged", map[string]interface{}{
-			"id":              d.ID,
-			"connectionState": d.connectionState,
-		})
-	}
+func (d Device) GetUpgradeStatus() DeviceUpgradeStatus {
+	status := DeviceUpgradeStatus{}
+	_ = cache.GetStruct(fmt.Sprintf("device_upgrade_status_%d", d.ID), &status)
+	return status
 }
 
-func (d Device) GetConnectionState() DeviceConnectionState {
-	_ = cache.GetStruct(fmt.Sprintf("device_connection_status_%d", d.ID), &d.connectionState)
-	return d.connectionState
-}
-
-func (d Device) UpdateUpgradeState(status DeviceUpgradeStatus, progress float32) {
-	key := fmt.Sprintf("device_upgrade_state_%d", d.ID)
-	_ = cache.GetStruct(key, &d.upgradeState)
-	d.upgradeState.Status = status
-	d.upgradeState.Progress = progress
-	_ = cache.SetStruct(key, d.upgradeState)
-	eventbus.Publish(eventbus.SocketEmit, "socket::deviceUpgradeStateChanged", map[string]interface{}{
-		"id":           d.ID,
-		"upgradeState": d.upgradeState,
-	})
+func (d Device) UpdateDeviceUpgradeStatus(code DeviceUpgradeCode, progress float32) {
+	status := d.GetUpgradeStatus()
+	status.Code = code
+	status.Progress = progress
+	_ = cache.SetStruct(fmt.Sprintf("device_upgrade_status_%d", d.ID), status)
 }
 
 func (d Device) CancelUpgrade() {
-	upgradeState := d.GetUpgradeState()
-	d.UpdateUpgradeState(DeviceUpgradeStatusCancelled, upgradeState.Progress)
-}
 
-func (d Device) GetUpgradeState() DeviceUpgradeState {
-	_ = cache.GetStruct(fmt.Sprintf("device_upgrade_state_%d", d.ID), &d.upgradeState)
-	return d.upgradeState
 }
 
 type Devices []Device
-
-func (ds Devices) PersistentObject() []po.Device {
-	pos := make([]po.Device, len(ds))
-	for i, device := range ds {
-		pos[i] = device.Device
-	}
-	return pos
-}

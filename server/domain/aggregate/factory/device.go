@@ -11,7 +11,7 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/domain/aggregate/command"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/aggregate/query"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
-	"github.com/thetasensors/theta-cloud-lite/server/domain/po"
+	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	spec "github.com/thetasensors/theta-cloud-lite/server/domain/specification"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/devicetype"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/errcode"
@@ -19,18 +19,14 @@ import (
 )
 
 type Device struct {
-	deviceRepo      dependency.DeviceRepository
-	networkRepo     dependency.NetworkRepository
-	measurementRepo dependency.MeasurementRepository
-	bindingRepo     dependency.MeasurementDeviceBindingRepository
+	deviceRepo  dependency.DeviceRepository
+	networkRepo dependency.NetworkRepository
 }
 
 func NewDevice() Device {
 	return Device{
-		deviceRepo:      repository.Device{},
-		networkRepo:     repository.Network{},
-		measurementRepo: repository.Measurement{},
-		bindingRepo:     repository.MeasurementDeviceBinding{},
+		deviceRepo:  repository.Device{},
+		networkRepo: repository.Network{},
 	}
 }
 
@@ -44,10 +40,15 @@ func (factory Device) NewDeviceCreateCmd(req request.Device) (*command.DeviceCre
 	e.MacAddress = req.MacAddress
 	e.Type = req.TypeID
 	e.ProjectID = req.ProjectID
+	e.NetworkID = req.NetworkID
+	parent, err := factory.deviceRepo.Get(ctx, req.ParentID)
+	if err != nil {
+		return nil, response.BusinessErr(errcode.DeviceNotFoundError, "")
+	}
 	if t := devicetype.Get(req.TypeID); t != nil {
-		e.Settings = make(po.DeviceSettings, len(t.Settings()))
+		e.Settings = make(entity.DeviceSettings, len(t.Settings()))
 		for i, setting := range t.Settings() {
-			s := po.DeviceSetting{
+			s := entity.DeviceSetting{
 				Key:      setting.Key,
 				Category: string(setting.Category),
 			}
@@ -66,7 +67,8 @@ func (factory Device) NewDeviceCreateCmd(req request.Device) (*command.DeviceCre
 			e.Settings[i] = s
 		}
 		cmd := command.NewDeviceCreateCmd()
-		cmd.Device = e.Device
+		cmd.Device = e
+		cmd.Parent = parent
 		return &cmd, nil
 	}
 	return nil, response.BusinessErr(errcode.UnknownDeviceTypeError, "")
@@ -149,7 +151,7 @@ func (factory Device) NewDeviceChildrenQuery(id uint) (*query.DeviceChildrenQuer
 	if err != nil {
 		return nil, response.BusinessErr(errcode.NetworkNotFoundError, "")
 	}
-	macs := network.GetChildren(e.MacAddress)
+	macs := network.GetChildrenMac(e.MacAddress)
 	if len(macs) > 0 {
 		children, err := factory.deviceRepo.FindBySpecs(ctx, spec.DeviceMacInSpec(macs))
 		if err != nil {
@@ -202,13 +204,6 @@ func (factory Device) buildSpecs(filters request.Filters) []spec.Specification {
 			specs = append(specs, spec.ProjectEqSpec(cast.ToUint(filter.Value)))
 		case "network_id":
 			specs = append(specs, spec.NetworkEqSpec(cast.ToUint(filter.Value)))
-		case "measurement_id":
-			bindings, _ := factory.bindingRepo.FindBySpecs(context.TODO(), spec.MeasurementEqSpec(cast.ToUint(filter.Value)))
-			macSpecs := make(spec.DeviceMacInSpec, len(bindings))
-			for i, binding := range bindings {
-				macSpecs[i] = binding.MacAddress
-			}
-			specs = append(specs, macSpecs)
 		case "category":
 			specs = append(specs, spec.CategoryEqSpec(cast.ToUint(filter.Value)))
 		case "type":

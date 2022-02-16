@@ -3,6 +3,7 @@ import {PageResult} from "../types/page";
 import {Device} from "../types/device";
 import {DeviceStatistic} from "../types/device_statistic";
 import {DeleteResponse, GetResponse, PostResponse, PutResponse} from "../utils/response";
+import {WaveData} from "../types/wave_data";
 
 export function CheckMacAddressRequest(mac: string) {
     return request.get(`/check/devices/${mac}`).then(GetResponse)
@@ -36,8 +37,12 @@ export function DeleteDeviceRequest(id:number) {
     return request.delete(`/devices/${id}`).then(DeleteResponse)
 }
 
-export function GetDeviceDataRequest(id:number, pid:string, from:number, to:number) {
-    return request.get<any>(`/devices/${id}/data`, {from, to, pid}).then(GetResponse)
+export function GetDeviceDataRequest(id:number, from:number, to:number) {
+    return request.get<any>(`/devices/${id}/data`, {from, to}).then(GetResponse)
+}
+
+export function GetLastDeviceDataRequest(id:number) {
+    return request.get<any>(`/devices/${id}/data/last`).then(GetResponse)
 }
 
 export function DownloadDeviceDataRequest(id:number, pids:string, from:number, to:number) {
@@ -86,4 +91,16 @@ export function GetDefaultDeviceSettingsRequest(type: number) {
 
 export function GetDeviceRuntimeDataRequest(id:number, from:number, to:number) {
     return request.get<any>(`/devices/${id}/data/runtime`, {from, to}).then(GetResponse)
+}
+
+export function GetDeviceWaveDataTimestampsRequest(id: number, from: number, to: number) {
+    return request.get<any>(`/devices/${id}/data/wave`, {from, to}).then(GetResponse);
+}
+
+export function GetDeviceWaveDataRequest(id: number, timestamp:number, params: any) {
+    return request.get<WaveData[]>(`/devices/${id}/data/wave/${timestamp}`, params).then(GetResponse);
+}
+
+export function DownloadDeviceWaveDataRequest(id: number, timestamp:number, params:any) {
+    return request.download<any>(`/devices/${id}/download/data/wave/${timestamp}`, params);
 }

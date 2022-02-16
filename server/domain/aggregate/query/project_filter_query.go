@@ -1,12 +1,12 @@
 package query
 
 import (
-	"github.com/thetasensors/theta-cloud-lite/server/domain/po"
+	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/vo"
 )
 
 type ProjectFilterQuery struct {
-	po.Projects
+	entity.Projects
 }
 
 func NewProjectFilterQuery() ProjectFilterQuery {

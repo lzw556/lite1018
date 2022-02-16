@@ -29,31 +29,46 @@ func (d AngleDip) Properties(sensorID uint) Properties {
 	case SCL3300Sensor:
 		return Properties{
 			{
-				Name:        "倾斜角",
-				Key:         "inclination",
-				Type:        FloatPropertyType,
-				Unit:        "°",
-				Precision:   3,
-				Sort:        0,
-				DataIndexes: []uint{0},
+				Name:      "倾斜角",
+				Key:       "inclination",
+				Unit:      "°",
+				Precision: 3,
+				Sort:      0,
+				Fields: []Field{
+					{
+						Name:      "倾斜角",
+						Key:       "inclination",
+						DataIndex: 0,
+					},
+				},
 			},
 			{
-				Name:        "俯仰角",
-				Key:         "pitch",
-				Type:        FloatPropertyType,
-				Unit:        "°",
-				Precision:   3,
-				Sort:        1,
-				DataIndexes: []uint{1},
+				Name:      "俯仰角",
+				Key:       "pitch",
+				Unit:      "°",
+				Precision: 3,
+				Sort:      1,
+				Fields: []Field{
+					{
+						Name:      "俯仰角",
+						Key:       "pitch",
+						DataIndex: 1,
+					},
+				},
 			},
 			{
-				Name:        "翻滚角",
-				Key:         "roll",
-				Type:        FloatPropertyType,
-				Unit:        "°",
-				Precision:   3,
-				Sort:        2,
-				DataIndexes: []uint{2},
+				Name:      "翻滚角",
+				Key:       "roll",
+				Unit:      "°",
+				Precision: 3,
+				Sort:      2,
+				Fields: []Field{
+					{
+						Name:      "翻滚角",
+						Key:       "roll",
+						DataIndex: 2,
+					},
+				},
 			},
 		}
 	}

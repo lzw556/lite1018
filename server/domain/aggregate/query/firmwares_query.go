@@ -1,12 +1,12 @@
 package query
 
 import (
-	"github.com/thetasensors/theta-cloud-lite/server/domain/po"
+	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/vo"
 )
 
 type FirmwaresQuery struct {
-	po.Firmwares
+	entity.Firmwares
 }
 
 func NewFirmwaresQuery() FirmwaresQuery {

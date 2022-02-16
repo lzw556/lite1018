@@ -18,11 +18,12 @@ type AlarmRule struct {
 }
 
 type CreateAlarm struct {
-	Name           string    `json:"name"`
-	Description    string    `json:"description"`
-	MeasurementIDs []uint    `json:"measurement_ids"`
-	Rule           AlarmRule `json:"rule"`
-	Level          uint      `json:"level"`
+	Name        string    `json:"name"`
+	Description string    `json:"description"`
+	Type        uint8     `json:"type"`
+	SourceIDs   []uint    `json:"source_ids"`
+	Rule        AlarmRule `json:"rule"`
+	Level       uint      `json:"level"`
 }
 
 type CreateAlarmFromTemplate struct {

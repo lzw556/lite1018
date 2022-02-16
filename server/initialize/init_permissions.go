@@ -1,12 +1,12 @@
 package initialize
 
 import (
-	"github.com/thetasensors/theta-cloud-lite/server/domain/po"
+	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	"gorm.io/gorm"
 )
 
 func initPermissions(db *gorm.DB) error {
-	permissions := []po.Permission{
+	permissions := []entity.Permission{
 		{
 			Path:        "projects",
 			Method:      "POST",

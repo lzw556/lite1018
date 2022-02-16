@@ -1,26 +1,37 @@
 package vo
 
 import (
-	"github.com/thetasensors/theta-cloud-lite/server/domain/po"
+	"fmt"
+	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/devicetype"
 )
 
-type Alarm struct {
-	ID          uint        `json:"id"`
-	Name        string      `json:"name"`
-	Measurement Measurement `json:"measurement"`
-	Rule        AlarmRule   `json:"rule"`
-	Level       uint        `json:"level"`
-	Enabled     bool        `json:"enabled"`
-	CreatedAt   int64       `json:"createdAt"`
+type AlarmRule struct {
+	Field     string  `json:"field"`
+	Method    string  `json:"method"`
+	Threshold float32 `json:"threshold"`
+	Operation string  `json:"operation"`
 }
 
-func NewAlarm(e po.Alarm) Alarm {
-	return Alarm{
-		ID:        e.ID,
-		Name:      e.Name,
-		Rule:      NewAlarmRule(e.Rule),
-		Level:     e.Level,
-		Enabled:   e.Enabled,
-		CreatedAt: e.CreatedAt.UTC().Unix(),
+func NewAlarmRule(e entity.AlarmRule) AlarmRule {
+	return AlarmRule{
+		Field:     e.Field,
+		Method:    e.Method,
+		Threshold: e.Threshold,
+		Operation: e.Operation,
 	}
+}
+
+func (c AlarmRule) Description() string {
+	return fmt.Sprintf("属性【%s】的值: @%s设定的阈值:%.3f", devicetype.GetFieldName(c.Field), operation(c.Operation), c.Threshold)
+}
+
+func operation(op string) string {
+	switch op {
+	case ">", ">=":
+		return "高于"
+	case "<", "<=":
+		return "低于"
+	}
+	return ""
 }

@@ -4,17 +4,17 @@ import (
 	"context"
 	"github.com/gogo/protobuf/proto"
 	pd "github.com/thetasensors/theta-cloud-lite/server/adapter/iot/proto"
-	"github.com/thetasensors/theta-cloud-lite/server/domain/po"
+	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	"strconv"
 	"time"
 )
 
 type upgradeFirmwareCmd struct {
 	request
-	firmware po.Firmware
+	firmware entity.Firmware
 }
 
-func newUpgradeFirmwareCmd(firmware po.Firmware) upgradeFirmwareCmd {
+func newUpgradeFirmwareCmd(firmware entity.Firmware) upgradeFirmwareCmd {
 	return upgradeFirmwareCmd{
 		request:  newRequest(),
 		firmware: firmware,

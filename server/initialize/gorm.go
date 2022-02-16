@@ -1,32 +1,29 @@
 package initialize
 
 import (
-	"github.com/thetasensors/theta-cloud-lite/server/domain/po"
+	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	"gorm.io/gorm"
 	"reflect"
 )
 
 func InitTables(db *gorm.DB) error {
 	tables := []interface{}{
-		&po.User{},
-		&po.Project{},
-		&po.Role{},
-		&po.Menu{},
-		&po.RoleMenuRelation{},
-		&po.UserProjectRelation{},
-		&po.Permission{},
-		&po.Asset{},
-		&po.Device{},
-		&po.Network{},
-		&po.Firmware{},
-		&po.Alarm{},
-		&po.AlarmTemplate{},
-		&po.AlarmRecord{},
-		&po.AlarmRecordAcknowledge{},
-		&po.Measurement{},
-		&po.MeasurementDeviceBinding{},
+		&entity.User{},
+		&entity.Project{},
+		&entity.Role{},
+		&entity.Menu{},
+		&entity.RoleMenuRelation{},
+		&entity.UserProjectRelation{},
+		&entity.Permission{},
+		&entity.Device{},
+		&entity.Network{},
+		&entity.Firmware{},
+		&entity.Alarm{},
+		&entity.AlarmTemplate{},
+		&entity.AlarmRecord{},
+		&entity.AlarmRecordAcknowledge{},
 	}
-	db.Migrator().DropTable(&po.Menu{}, &po.Permission{})
+	db.Migrator().DropTable(&entity.Menu{}, &entity.Permission{})
 	for _, table := range tables {
 		if !db.Migrator().HasTable(table) {
 			if err := db.Migrator().CreateTable(table); err != nil {

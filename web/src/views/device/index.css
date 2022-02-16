@@ -11,3 +11,20 @@
 .ts-setting-grid {
     width: 50%;
 }
+
+.ant-card-actions > li {
+    margin: 6px 0;
+    cursor: default;
+}
+
+.ts-row-selected {
+    color: #1890ff;
+}
+
+.ant-empty-normal {
+    margin: 140px 0 !important;
+}
+
+.ant-skeleton-image {
+    background: transparent !important;
+}

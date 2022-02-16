@@ -1,25 +1,26 @@
 package process
 
 import (
-	"context"
 	"fmt"
 	"github.com/gogo/protobuf/proto"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/iot"
 	pd "github.com/thetasensors/theta-cloud-lite/server/adapter/iot/proto"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
-	"github.com/thetasensors/theta-cloud-lite/server/domain/po"
-	spec "github.com/thetasensors/theta-cloud-lite/server/domain/specification"
+	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/json"
+	"time"
 )
 
 type LinkStatus struct {
-	deviceRepo dependency.DeviceRepository
+	deviceRepo      dependency.DeviceRepository
+	deviceStateRepo dependency.DeviceStateRepository
 }
 
 func NewLinkStatus() Processor {
 	return newRoot(LinkStatus{
-		deviceRepo: repository.Device{},
+		deviceRepo:      repository.Device{},
+		deviceStateRepo: repository.DeviceState{},
 	})
 }
 
@@ -36,14 +37,17 @@ func (p LinkStatus) Process(ctx *iot.Context, msg iot.Message) error {
 	if err := proto.Unmarshal(msg.Body.Payload, &m); err != nil {
 		return fmt.Errorf("unmarshal [LinkStatus] message failed: %v", err)
 	}
-	linkStatus := po.LinkStatus{}
+	linkStatus := entity.LinkStatus{}
 	if err := json.Unmarshal([]byte(m.Status), &linkStatus); err != nil {
 		return err
 	}
-	device, err := p.deviceRepo.GetBySpecs(context.TODO(), spec.DeviceMacEqSpec(linkStatus.Address))
+	deviceState, err := p.deviceStateRepo.Get(linkStatus.Address)
 	if err != nil {
 		return fmt.Errorf("device [%s] not found: %v", linkStatus.Address, err)
 	}
-	device.UpdateConnectionState(linkStatus.State == "online")
-	return nil
+	deviceState.IsOnline = linkStatus.State == "online"
+	if deviceState.IsOnline {
+		deviceState.ConnectedAt = time.Now().UTC().Unix()
+	}
+	return p.deviceStateRepo.Create(linkStatus.Address, deviceState)
 }

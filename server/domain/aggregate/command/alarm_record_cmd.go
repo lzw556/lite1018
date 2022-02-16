@@ -7,7 +7,6 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
-	"github.com/thetasensors/theta-cloud-lite/server/domain/po"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/errcode"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/transaction"
 )
@@ -15,40 +14,33 @@ import (
 type AlarmRecordCmd struct {
 	entity.AlarmRecord
 
-	repository           dependency.AlarmRecordRepository
-	acknowledgeRepo      dependency.AlarmRecordAcknowledgeRepository
-	measurementAlertRepo dependency.MeasurementAlertRepository
+	repository      dependency.AlarmRecordRepository
+	acknowledgeRepo dependency.AlarmRecordAcknowledgeRepository
 }
 
 func NewAlarmRecordCmd() AlarmRecordCmd {
 	return AlarmRecordCmd{
-		repository:           repository.AlarmRecord{},
-		acknowledgeRepo:      repository.AlarmRecordAcknowledge{},
-		measurementAlertRepo: repository.MeasurementAlert{},
+		repository:      repository.AlarmRecord{},
+		acknowledgeRepo: repository.AlarmRecordAcknowledge{},
 	}
 }
 
 func (cmd AlarmRecordCmd) AcknowledgeBy(req request.AcknowledgeAlarmRecord) error {
 	if !cmd.AlarmRecord.Acknowledged {
-		cmd.AlarmRecord.Acknowledge()
+		//cmd.AlarmRecord.Acknowledge()
 		return transaction.Execute(context.TODO(), func(txCtx context.Context) error {
-			if err := cmd.repository.Save(txCtx, &cmd.AlarmRecord.AlarmRecord); err != nil {
+			if err := cmd.repository.Save(txCtx, &cmd.AlarmRecord); err != nil {
 				return err
 			}
-			e := po.AlarmRecordAcknowledge{
+			_ = entity.AlarmRecordAcknowledge{
 				AlarmRecordID: cmd.AlarmRecord.ID,
 				UserID:        req.UserID,
 				Note:          req.Note,
 			}
-			if err := cmd.acknowledgeRepo.Create(txCtx, &e); err != nil {
-				return err
-			}
-			alert, err := cmd.measurementAlertRepo.Get(cmd.AlarmRecord.MeasurementID)
-			if err != nil {
-				return err
-			}
-			alert.RemoveAlarmRecord(cmd.AlarmRecord.AlarmID)
-			return cmd.measurementAlertRepo.Create(&alert)
+			//if err := cmd.acknowledgeReentity.Create(txCtx, &e); err != nil {
+			//	return err
+			//}
+			return nil
 		})
 	}
 	return response.BusinessErr(errcode.AlarmRecordAlreadyAcknowledgedError, "")

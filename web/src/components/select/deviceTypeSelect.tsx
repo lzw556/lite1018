@@ -20,12 +20,13 @@ const DeviceTypeSelect: FC<DeviceTypeSelectProps> = (props) => {
     }, [])
 
     const renderSensors = () => {
-        return DeviceType.Sensors().filter((item:DeviceType) => sensors?.includes(item)).map(item => (<Option key={item} value={item}>{DeviceType.toString(item)}</Option>))
+        return DeviceType.Sensors().filter((item: DeviceType) => sensors?.includes(item)).map(item => (
+            <Option key={item} value={item}>{DeviceType.toString(item)}</Option>))
     }
 
     const render = () => {
         if (sensors) {
-            return <Select {...props} suffixIcon={<CaretDownOutlined />}>
+            return <Select {...props} suffixIcon={<CaretDownOutlined/>}>
                 {children}
                 {
                     renderSensors()
@@ -39,11 +40,11 @@ const DeviceTypeSelect: FC<DeviceTypeSelectProps> = (props) => {
                 <OptGroup label={"中继器"} key={"router"}>
                     <Option key={257} value={257}>{DeviceType.toString(DeviceType.Router)}</Option>
                 </OptGroup>
-                {/*<OptGroup label={"传感器"} key={"sensor"}>*/}
-                {/*    {*/}
-                {/*        GetSensors().map(item => (<Option key={item} value={item}>{DeviceTypeString(item)}</Option>))*/}
-                {/*    }*/}
-                {/*</OptGroup>*/}
+                <OptGroup label={"传感器"} key={"sensor"}>
+                    {
+                        DeviceType.Sensors().map(item => (<Option key={item} value={item}>{DeviceType.toString(item)}</Option>))
+                    }
+                </OptGroup>
             </Select>
         }
     }

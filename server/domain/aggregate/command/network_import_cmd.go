@@ -4,14 +4,14 @@ import (
 	"context"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
-	"github.com/thetasensors/theta-cloud-lite/server/domain/po"
+	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/devicetype"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/transaction"
 )
 
 type NetworkImportCmd struct {
-	po.Network
-	Devices []po.Device
+	entity.Network
+	Devices []entity.Device
 
 	networkRepo dependency.NetworkRepository
 	deviceRepo  dependency.DeviceRepository

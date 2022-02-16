@@ -1,13 +1,13 @@
 package dependency
 
 import (
-	"github.com/thetasensors/theta-cloud-lite/server/domain/po"
+	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	"time"
 )
 
-type DeviceStatusRepository interface {
-	Create(mac string, e po.DeviceStatus) error
-	Get(mac string) (po.DeviceStatus, error)
-	Find(mac string, from, to time.Time) ([]po.DeviceStatus, error)
+type DeviceStateRepository interface {
+	Create(mac string, e entity.DeviceState) error
+	Get(mac string) (entity.DeviceState, error)
+	Find(mac string, from, to time.Time) ([]entity.DeviceState, error)
 	Delete(mac string) error
 }

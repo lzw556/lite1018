@@ -11,7 +11,7 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/domain/aggregate/command"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/aggregate/query"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
-	"github.com/thetasensors/theta-cloud-lite/server/domain/po"
+	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	spec "github.com/thetasensors/theta-cloud-lite/server/domain/specification"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/devicetype"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/errcode"
@@ -19,14 +19,12 @@ import (
 )
 
 type Network struct {
-	assetRepo   dependency.AssetRepository
 	deviceRepo  dependency.DeviceRepository
 	networkRepo dependency.NetworkRepository
 }
 
 func NewNetwork() Network {
 	return Network{
-		assetRepo:   repository.Asset{},
 		deviceRepo:  repository.Device{},
 		networkRepo: repository.Network{},
 	}
@@ -62,16 +60,16 @@ func (factory Network) NewNetworkCreateCmd(req request.CreateNetwork) (*command.
 		return nil, response.BusinessErr(errcode.DeviceMacExistsError, "")
 	}
 	cmd := command.NewNetworkCreateCmd()
-	cmd.Network.Network = po.Network{
+	cmd.Network = entity.Network{
 		Name:                    req.Name,
 		ProjectID:               req.ProjectID,
 		CommunicationPeriod:     req.WSN.CommunicationPeriod,
 		CommunicationTimeOffset: req.WSN.CommunicationTimeOffset,
 		GroupSize:               req.WSN.GroupSize,
 		GroupInterval:           req.WSN.GroupInterval,
-		RoutingTables:           make(po.RoutingTables, 0),
+		RoutingTables:           make(entity.RoutingTables, 0),
 	}
-	cmd.Network.Gateway.Device = po.Device{
+	cmd.Network.Gateway = entity.Device{
 		MacAddress: req.Gateway.MacAddress,
 		Name:       fmt.Sprintf("%s-网关", req.Name),
 		Type:       devicetype.GatewayType,
@@ -84,22 +82,22 @@ func (factory Network) NewNetworkImportCmd(req request.ImportNetwork) (*command.
 	ctx := context.TODO()
 	cmd := command.NewNetworkImportCmd()
 	// 构建网络实体
-	cmd.Network = po.Network{
+	cmd.Network = entity.Network{
 		CommunicationPeriod:     req.CommunicationPeriod,
 		CommunicationTimeOffset: req.CommunicationTimeOffset,
 		GroupSize:               req.GroupSize,
 		GroupInterval:           req.GroupInterval,
-		RoutingTables:           make(po.RoutingTables, len(req.RoutingTables)),
+		RoutingTables:           make(entity.RoutingTables, len(req.RoutingTables)),
 		ProjectID:               req.ProjectID,
 	}
 	for i, table := range req.RoutingTables {
-		cmd.RoutingTables[i] = po.RoutingTable{
+		cmd.RoutingTables[i] = entity.RoutingTable{
 			table[0],
 			table[1],
 		}
 	}
 	// 构建网络中的设备实体
-	cmd.Devices = make([]po.Device, len(req.Devices))
+	cmd.Devices = make([]entity.Device, len(req.Devices))
 	for i, device := range req.Devices {
 		e, err := factory.deviceRepo.GetBySpecs(ctx, spec.DeviceMacEqSpec(device.MacAddress))
 		if !errors.Is(err, gorm.ErrRecordNotFound) {
@@ -112,13 +110,13 @@ func (factory Network) NewNetworkImportCmd(req request.ImportNetwork) (*command.
 		switch e.Type {
 		case devicetype.GatewayType:
 			cmd.Network.Name = device.Name
-			e.Category = po.GatewayCategory
+			e.Category = entity.GatewayCategory
 		case devicetype.RouterType:
-			e.Category = po.SensorCategory
+			e.Category = entity.SensorCategory
 		default:
-			e.Category = po.SensorCategory
+			e.Category = entity.SensorCategory
 		}
-		cmd.Devices[i] = e.Device
+		cmd.Devices[i] = e
 	}
 
 	return &cmd, nil

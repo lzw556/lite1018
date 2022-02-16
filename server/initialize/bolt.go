@@ -3,19 +3,16 @@ package initialize
 import (
 	"github.com/thetasensors/theta-cloud-lite/server/core"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
-	"github.com/thetasensors/theta-cloud-lite/server/domain/po"
 	"go.etcd.io/bbolt"
 )
 
 func InitBuckets(db *bbolt.DB) {
 	buckets := []core.Bucket{
-		po.System{},
-		po.DeviceStatus{},
+		entity.System{},
+		entity.DeviceState{},
 		entity.SensorData{},
 		entity.LargeSensorData{},
-		po.DeviceInformation{},
-		entity.MeasurementAlert{},
-		entity.MeasurementData{},
+		entity.DeviceInformation{},
 	}
 	_ = db.Update(func(tx *bbolt.Tx) error {
 		for _, bucket := range buckets {

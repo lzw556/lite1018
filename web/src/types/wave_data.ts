@@ -1,7 +1,8 @@
 export type WaveData = {
     frequency: number;
-    values: number[][];
-    xAxis: number[][];
-    highEnvelope: number[][];
-    lowEnvelope: number[][];
+    values: number[];
+    xAxis: number[];
+    highEnvelopes: number[];
+    lowEnvelopes: number[];
+    xAxisUnit: string;
 }

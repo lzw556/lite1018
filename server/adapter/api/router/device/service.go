@@ -23,10 +23,12 @@ type Service interface {
 	GetDeviceSettingsByID(id uint) (vo.DeviceSettings, error)
 	UpdateDeviceSettingByID(id uint, req request.DeviceSetting) error
 
-	GetPropertyDataByID(deviceID uint, pID string, from, to int64) ([]vo.PropertyData, error)
+	FindDeviceDataByID(deviceID uint, from, to int64) ([]vo.DeviceData, error)
+	GetLastDeviceDataByID(deviceID uint) (*vo.DeviceData, error)
 	GetRuntimeDataByID(deviceID uint, from, to int64) ([]vo.SensorRuntimeData, error)
-	DownloadPropertiesDataByID(deviceID uint, pIDs []string, from, to int64) (*vo.ExcelFile, error)
-	FindDeviceDataByID(deviceID uint, from, to int64) (vo.PropertiesData, error)
+	FindWaveDataByID(deviceID uint, from, to int64) (vo.LargeSensorDataList, error)
+	GetWaveDataByID(deviceID uint, timestamp int64, calculate string) (vo.WaveDataList, error)
+	DownloadDeviceDataByID(deviceID uint, pIDs []string, from, to int64) (*vo.ExcelFile, error)
 	RemoveDataByID(deviceID uint, from, to int64) error
 	GetChildren(deviceID uint) ([]vo.Device, error)
 }

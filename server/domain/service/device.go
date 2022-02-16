@@ -105,12 +105,20 @@ func (s Device) ReplaceDeviceByID(deviceID uint, mac string) error {
 	return nil
 }
 
-func (s Device) GetPropertyDataByID(deviceID uint, pID string, from, to int64) ([]vo.PropertyData, error) {
+func (s Device) FindDeviceDataByID(deviceID uint, from, to int64) ([]vo.DeviceData, error) {
 	query, err := s.factory.NewDeviceQuery(deviceID)
 	if err != nil {
 		return nil, err
 	}
-	return query.PropertyDataByRange(pID, time.Unix(from, 0), time.Unix(to, 0))
+	return query.FindDataByRange(time.Unix(from, 0), time.Unix(to, 0))
+}
+
+func (s Device) GetLastDeviceDataByID(deviceID uint) (*vo.DeviceData, error) {
+	query, err := s.factory.NewDeviceQuery(deviceID)
+	if err != nil {
+		return nil, err
+	}
+	return query.GetLastData()
 }
 
 func (s Device) GetRuntimeDataByID(deviceID uint, from, to int64) ([]vo.SensorRuntimeData, error) {
@@ -121,20 +129,28 @@ func (s Device) GetRuntimeDataByID(deviceID uint, from, to int64) ([]vo.SensorRu
 	return query.RuntimeDataByRange(time.Unix(from, 0), time.Unix(to, 0))
 }
 
-func (s Device) DownloadPropertiesDataByID(deviceID uint, pIDs []string, from, to int64) (*vo.ExcelFile, error) {
+func (s Device) DownloadDeviceDataByID(deviceID uint, pIDs []string, from, to int64) (*vo.ExcelFile, error) {
 	query, err := s.factory.NewDeviceQuery(deviceID)
 	if err != nil {
 		return nil, err
 	}
-	return query.DownloadPropertiesDataByRange(pIDs, time.Unix(from, 0), time.Unix(to, 0))
+	return query.DownloadDeviceDataByRange(pIDs, time.Unix(from, 0), time.Unix(to, 0))
 }
 
-func (s Device) FindDeviceDataByID(deviceID uint, from, to int64) (vo.PropertiesData, error) {
+func (s Device) FindWaveDataByID(deviceID uint, from, to int64) (vo.LargeSensorDataList, error) {
 	query, err := s.factory.NewDeviceQuery(deviceID)
 	if err != nil {
 		return nil, err
 	}
-	return query.DataByRange(time.Unix(from, 0), time.Unix(to, 0))
+	return query.FindWaveDataByRange(time.Unix(from, 0), time.Unix(to, 0))
+}
+
+func (s Device) GetWaveDataByID(deviceID uint, timestamp int64, calculate string) (vo.WaveDataList, error) {
+	query, err := s.factory.NewDeviceQuery(deviceID)
+	if err != nil {
+		return nil, err
+	}
+	return query.GetWaveDataByTimestamp(timestamp, calculate)
 }
 
 func (s Device) RemoveDataByID(deviceID uint, from, to int64) error {

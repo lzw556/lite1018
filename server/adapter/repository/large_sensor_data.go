@@ -37,8 +37,8 @@ func (repo LargeSensorData) Find(mac string, from, to time.Time) ([]entity.Large
 		if bucket != nil {
 			if dataBucket := bucket.Bucket([]byte(mac)); dataBucket != nil {
 				c := dataBucket.Cursor()
-				min := []byte(from.Format("2006-01-02T15:04:05Z"))
-				max := []byte(to.Format("2006-01-02T15:04:05Z"))
+				min := []byte(from.UTC().Format("2006-01-02T15:04:05Z"))
+				max := []byte(to.UTC().Format("2006-01-02T15:04:05Z"))
 				for k, v := c.Seek(min); k != nil && bytes.Compare(k, max) <= 0; k, v = c.Next() {
 					var e entity.LargeSensorData
 					if err := json.Unmarshal(v, &e); err != nil {
@@ -55,20 +55,13 @@ func (repo LargeSensorData) Find(mac string, from, to time.Time) ([]entity.Large
 
 func (repo LargeSensorData) Get(mac string, time time.Time) (entity.LargeSensorData, error) {
 	var e entity.LargeSensorData
-	err := repo.BoltDB().Update(func(tx *bbolt.Tx) error {
-		bucket := tx.Bucket([]byte(e.BucketName()))
+	err := repo.BoltDB().View(func(tx *bbolt.Tx) error {
+		bucket := tx.Bucket([]byte(entity.LargeSensorData{}.BucketName()))
 		if bucket != nil {
 			if dataBucket := bucket.Bucket([]byte(mac)); dataBucket != nil {
-				c := dataBucket.Cursor()
-				current := []byte(time.UTC().Format("2006-01-02T15:04:05Z"))
-				var buf []byte
-				if k, v := c.Seek(current); k != nil {
-					buf = v
-				} else if bytes.Compare(k, current) <= 0 {
-					_, buf = c.Next()
-				}
-				if err := json.Unmarshal(buf, &e); err != nil {
-					return err
+				v := dataBucket.Get([]byte(time.UTC().Format("2006-01-02T15:04:05Z")))
+				if v != nil {
+					return json.Unmarshal(v, &e)
 				}
 			}
 		}

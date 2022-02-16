@@ -12,5 +12,4 @@ export type Network = {
     communicationTimeOffset: number
     groupSize: number
     groupInterval: number
-
 }

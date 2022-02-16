@@ -29,31 +29,46 @@ func (BoltLoosening) Properties(sensorID uint) Properties {
 	case BoltAngleSensor:
 		return Properties{
 			{
-				Key:         "loosening_angle",
-				Name:        "松动角度",
-				Unit:        "°",
-				Precision:   3,
-				Type:        FloatPropertyType,
-				Sort:        0,
-				DataIndexes: []uint{0},
+				Key:       "loosening_angle",
+				Name:      "松动角度",
+				Unit:      "°",
+				Precision: 3,
+				Sort:      0,
+				Fields: []Field{
+					{
+						Name:      "松动角度",
+						Key:       "loosening_angle",
+						DataIndex: 0,
+					},
+				},
 			},
 			{
-				Key:         "attitude",
-				Name:        "姿态指数",
-				Unit:        "",
-				Type:        FloatPropertyType,
-				Precision:   3,
-				Sort:        1,
-				DataIndexes: []uint{8},
+				Key:       "attitude",
+				Name:      "姿态指数",
+				Unit:      "",
+				Precision: 3,
+				Sort:      1,
+				Fields: []Field{
+					{
+						Name:      "姿态指数",
+						Key:       "attitude",
+						DataIndex: 1,
+					},
+				},
 			},
 			{
-				Key:         "motion",
-				Name:        "移动指数",
-				Unit:        "",
-				Type:        FloatPropertyType,
-				Precision:   3,
-				Sort:        2,
-				DataIndexes: []uint{5},
+				Key:       "motion",
+				Name:      "移动指数",
+				Unit:      "",
+				Precision: 3,
+				Sort:      2,
+				Fields: []Field{
+					{
+						Name:      "移动指数",
+						Key:       "motion",
+						DataIndex: 5,
+					},
+				},
 			},
 		}
 	}

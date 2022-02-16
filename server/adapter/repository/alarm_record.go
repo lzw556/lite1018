@@ -3,7 +3,6 @@ package repository
 import (
 	"context"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
-	"github.com/thetasensors/theta-cloud-lite/server/domain/po"
 	spec "github.com/thetasensors/theta-cloud-lite/server/domain/specification"
 )
 
@@ -11,7 +10,7 @@ type AlarmRecord struct {
 	repository
 }
 
-func (repo AlarmRecord) Create(ctx context.Context, e *po.AlarmRecord) error {
+func (repo AlarmRecord) Create(ctx context.Context, e *entity.AlarmRecord) error {
 	return repo.DB(ctx).Create(e).Error
 }
 
@@ -33,12 +32,12 @@ func (repo AlarmRecord) FindBySpecs(ctx context.Context, specs ...spec.Specifica
 }
 
 func (repo AlarmRecord) UpdateBySpecs(ctx context.Context, updates map[string]interface{}, specs ...spec.Specification) error {
-	return repo.DB(ctx).Scopes(spec.Scopes(specs)...).Model(&po.AlarmRecord{}).Updates(updates).Error
+	return repo.DB(ctx).Scopes(spec.Scopes(specs)...).Model(&entity.AlarmRecord{}).Updates(updates).Error
 }
 
 func (repo AlarmRecord) CountBySpecs(ctx context.Context, specs ...spec.Specification) (int64, error) {
 	var count int64
-	err := repo.DB(ctx).Model(&po.AlarmRecord{}).Scopes(spec.Scopes(specs)...).Count(&count).Error
+	err := repo.DB(ctx).Model(&entity.AlarmRecord{}).Scopes(spec.Scopes(specs)...).Count(&count).Error
 	return count, err
 }
 
@@ -49,13 +48,13 @@ func (repo AlarmRecord) Get(ctx context.Context, id uint) (entity.AlarmRecord, e
 }
 
 func (repo AlarmRecord) Delete(ctx context.Context, id uint) error {
-	return repo.DB(ctx).Delete(&po.AlarmRecord{}, id).Error
+	return repo.DB(ctx).Delete(&entity.AlarmRecord{}, id).Error
 }
 
-func (repo AlarmRecord) Save(ctx context.Context, e *po.AlarmRecord) error {
+func (repo AlarmRecord) Save(ctx context.Context, e *entity.AlarmRecord) error {
 	return repo.DB(ctx).Save(e).Error
 }
 
 func (repo AlarmRecord) Updates(ctx context.Context, id uint, updates map[string]interface{}) error {
-	return repo.DB(ctx).Model(&po.AlarmRecord{}).Where("id = ?", id).Updates(updates).Error
+	return repo.DB(ctx).Model(&entity.AlarmRecord{}).Where("id = ?", id).Updates(updates).Error
 }

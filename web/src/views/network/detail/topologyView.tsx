@@ -1,7 +1,6 @@
 import {Network} from "../../../types/network";
 import {FC, useEffect, useState} from "react";
 import {Canvas, Edge, EdgeProps, Label, MarkerArrow, Node, NodeProps, Remove} from "reaflow";
-import userPermission from "../../../permission/permission";
 import {Device} from "../../../types/device";
 import AlertIcon from "../../../components/alertIcon";
 import {ColorHealth, ColorWarn} from "../../../constants/color";
@@ -27,8 +26,6 @@ export interface TopologyViewProps {
 
 const TopologyView:FC<TopologyViewProps> = ({network}) => {
     const [data, setData] = useState<{ nodes: INode[], edges: IEdge[] }>()
-    const [selections, setSelections] = useState<string[]>([])
-    const {hasPermission} = userPermission()
     const [height] = useState(window.innerHeight - 200)
 
     useEffect(() => {
@@ -38,7 +35,6 @@ const TopologyView:FC<TopologyViewProps> = ({network}) => {
         const edges = network.routingTables.map(item => {
             return {from: item[1], to: item[0], id: item[0]}
         })
-        // setSelections(isEdit ? nodes.filter(item => item.data.device.typeId !== DeviceType.Gateway).map(item => item.id) : [])
         setData({nodes: nodes, edges: edges})
     }, [network])
 
@@ -88,16 +84,16 @@ const TopologyView:FC<TopologyViewProps> = ({network}) => {
                     <foreignObject height={event.height} width={event.width} x={0} y={0}>
                         {/*<Popover placement={"bottom"} content={<DeviceInfoPopover device={event.node.data.device}/>}*/}
                         {/*         title={event.node.text}>*/}
-                            <div className={clazz}
-                                 style={{textAlign: "center", position: "fixed", bottom: 0, top: 0, left: 0, right: 0}}>
-                                {
-                                        event.node.text
-                                }
-                                <br/>
-                                {
-                                    renderDeviceState(event.node.data.device)
-                                }
-                            </div>
+                        <div className={clazz}
+                             style={{textAlign: "center", position: "fixed", bottom: 0, top: 0, left: 0, right: 0}}>
+                            {
+                                event.node.text
+                            }
+                            <br/>
+                            {
+                                renderDeviceState(event.node.data.device)
+                            }
+                        </div>
                         {/*</Popover>*/}
                     </foreignObject>
                 )
@@ -113,7 +109,7 @@ const TopologyView:FC<TopologyViewProps> = ({network}) => {
         <Canvas pannable={true}
                 arrow={<MarkerArrow style={{fill: "#8a8e99"}}/>}
                 fit={true}
-                selections={selections} nodes={data?.nodes} edges={data?.edges}
+                nodes={data?.nodes} edges={data?.edges}
                 edge={renderEdge}
                 node={renderNode}
         />

@@ -7,18 +7,14 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/adapter"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/middleware"
-	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/alarm"
-	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/asset"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/device"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/firmware"
-	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/measurement"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/menu"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/network"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/permission"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/project"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/resource"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/role"
-	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/statistic"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/system"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/user"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/crontask"
@@ -110,15 +106,11 @@ func runApiServer(dist embed.FS) {
 		menu.NewRouter(service.NewMenu()),
 		role.NewRouter(service.NewRole()),
 		permission.NewRouter(service.NewPermission()),
-		asset.NewRouter(service.NewAsset()),
 		resource.NewRouter(nil),
-		measurement.NewRouter(service.NewMeasurement()),
 		device.NewRouter(service.NewDevice()),
 		firmware.NewRouter(service.NewFirmware()),
 		network.NewRouter(service.NewNetwork()),
-		alarm.NewRouter(service.NewAlarm()),
 		system.NewRouter(service.NewSystem()),
-		statistic.NewRouter(service.NewStatistic()),
 	)
 	go func() {
 		if err := adapter.Api.Run(); err != nil && err != http.ErrServerClosed {

@@ -24,14 +24,14 @@ func NewNetworkCreateCmd() NetworkCreateCmd {
 
 func (cmd NetworkCreateCmd) Run() error {
 	return transaction.Execute(context.TODO(), func(txCtx context.Context) error {
-		if err := cmd.networkRepo.Create(txCtx, &cmd.Network.Network); err != nil {
+		if err := cmd.networkRepo.Create(txCtx, &cmd.Network); err != nil {
 			return err
 		}
-		cmd.Network.Gateway.NetworkID = cmd.Network.Network.ID
-		if err := cmd.deviceRepo.Create(txCtx, &cmd.Network.Gateway.Device); err != nil {
+		cmd.Network.Gateway.NetworkID = cmd.Network.ID
+		if err := cmd.deviceRepo.Create(txCtx, &cmd.Network.Gateway); err != nil {
 			return err
 		}
-		cmd.Network.Network.GatewayID = cmd.Network.Gateway.Device.ID
-		return cmd.networkRepo.Save(txCtx, &cmd.Network.Network)
+		cmd.Network.GatewayID = cmd.Network.Gateway.ID
+		return cmd.networkRepo.Save(txCtx, &cmd.Network)
 	})
 }

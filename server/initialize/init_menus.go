@@ -1,12 +1,12 @@
 package initialize
 
 import (
-	"github.com/thetasensors/theta-cloud-lite/server/domain/po"
+	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	"gorm.io/gorm"
 )
 
 func initMenus(db *gorm.DB) error {
-	menus := []po.Menu{
+	menus := []entity.Menu{
 		{
 			ID:       1000,
 			Title:    "系统管理",
@@ -39,40 +39,40 @@ func initMenus(db *gorm.DB) error {
 			Hidden:   false,
 			Sort:     2,
 		},
-		{
-			ID:       2000,
-			Title:    "资产管理",
-			Name:     "asset-management",
-			ParentID: 0,
-			Icon:     "icon-asset-management",
-			IsAuth:   true,
-			Hidden:   false,
-			Sort:     0,
-		},
-		{
-			ID:       2001,
-			Title:    "资产监控",
-			Name:     "assetMonitor",
-			ParentID: 2000,
-			View:     "AssetMonitor",
-			Path:     "/asset-management",
-		},
-		{
-			ID:       2002,
-			Title:    "资产列表",
-			Name:     "assets",
-			ParentID: 2000,
-			View:     "Asset",
-			Path:     "/asset-management",
-		},
-		{
-			ID:       2003,
-			Title:    "添加监测点",
-			Name:     "addMeasurement",
-			ParentID: 2000,
-			View:     "AddMeasurement",
-			Path:     "/asset-management",
-		},
+		//{
+		//	ID:       2000,
+		//	Title:    "资产管理",
+		//	Name:     "asset-management",
+		//	ParentID: 0,
+		//	Icon:     "icon-asset-management",
+		//	IsAuth:   true,
+		//	Hidden:   false,
+		//	Sort:     0,
+		//},
+		//{
+		//	ID:       2001,
+		//	Title:    "资产监控",
+		//	Name:     "assetMonitor",
+		//	ParentID: 2000,
+		//	View:     "AssetMonitor",
+		//	Path:     "/asset-management",
+		//},
+		//{
+		//	ID:       2002,
+		//	Title:    "资产列表",
+		//	Name:     "assets",
+		//	ParentID: 2000,
+		//	View:     "Asset",
+		//	Path:     "/asset-management",
+		//},
+		//{
+		//	ID:       2003,
+		//	Title:    "添加监测点",
+		//	Name:     "addMeasurement",
+		//	ParentID: 2000,
+		//	View:     "AddMeasurement",
+		//	Path:     "/asset-management",
+		//},
 		{
 			ID:     3000,
 			Title:  "设备管理",
@@ -132,36 +132,36 @@ func initMenus(db *gorm.DB) error {
 			IsAuth:   true,
 			Hidden:   false,
 		},
-		{
-			ID:       5000,
-			Title:    "报警管理",
-			Name:     "alarm-management",
-			ParentID: 0,
-			Icon:     "icon-alarm-management",
-			IsAuth:   true,
-			Hidden:   false,
-			Sort:     4,
-		},
-		{
-			ID:       5001,
-			Title:    "报警列表",
-			Name:     "alerts",
-			ParentID: 5000,
-			Path:     "/alarm-management",
-			View:     "AlarmRecord",
-			IsAuth:   true,
-			Hidden:   false,
-		},
-		{
-			ID:       5002,
-			Title:    "报警规则",
-			Name:     "alarmRules",
-			ParentID: 5000,
-			Path:     "/alarm-management",
-			View:     "AlarmRule",
-			IsAuth:   true,
-			Hidden:   false,
-		},
+		//{
+		//	ID:       5000,
+		//	Title:    "报警管理",
+		//	Name:     "alarm-management",
+		//	ParentID: 0,
+		//	Icon:     "icon-alarm-management",
+		//	IsAuth:   true,
+		//	Hidden:   false,
+		//	Sort:     4,
+		//},
+		//{
+		//	ID:       5001,
+		//	Title:    "报警列表",
+		//	Name:     "alerts",
+		//	ParentID: 5000,
+		//	Path:     "/alarm-management",
+		//	View:     "AlarmRecord",
+		//	IsAuth:   true,
+		//	Hidden:   false,
+		//},
+		//{
+		//	ID:       5002,
+		//	Title:    "报警规则",
+		//	Name:     "alarmRules",
+		//	ParentID: 5000,
+		//	Path:     "/alarm-management",
+		//	View:     "AlarmRule",
+		//	IsAuth:   true,
+		//	Hidden:   false,
+		//},
 		{
 			ID:       8000,
 			Title:    "项目管理",

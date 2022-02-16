@@ -4,7 +4,7 @@ import (
 	"context"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
-	"github.com/thetasensors/theta-cloud-lite/server/domain/po"
+	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	spec "github.com/thetasensors/theta-cloud-lite/server/domain/specification"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/vo"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/casbin"
@@ -13,7 +13,7 @@ import (
 )
 
 type RoleQuery struct {
-	po.Role
+	entity.Role
 
 	roleMenuRepo dependency.RoleMenuRelationRepository
 }

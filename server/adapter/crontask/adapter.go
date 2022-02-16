@@ -1,11 +1,7 @@
 package crontask
 
 import (
-	"context"
 	"github.com/robfig/cron/v3"
-	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
-	"github.com/thetasensors/theta-cloud-lite/server/domain/po"
-	spec "github.com/thetasensors/theta-cloud-lite/server/domain/specification"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/xlog"
 	"sync"
 )
@@ -23,23 +19,8 @@ func NewAdapter() *Adapter {
 		entityIDs: make(map[string]cron.EntryID),
 		mu:        sync.RWMutex{},
 	}
-	a.initMeasurementJobs()
 	return a
 
-}
-
-func (a *Adapter) initMeasurementJobs() {
-	repo := repository.Measurement{}
-	es, err := repo.FindBySpecs(context.TODO(), spec.ModeEqSpec(po.PollingAcquisitionMode))
-	if err != nil {
-		xlog.Error("init measurement jobs", err)
-		return
-	}
-	jobs := make([]Job, len(es))
-	for i, e := range es {
-		jobs[i] = NewMeasurementDataJob(e)
-	}
-	a.AddJobs(jobs...)
 }
 
 func (a *Adapter) AddJobs(jobs ...Job) {

@@ -2,7 +2,7 @@ package vo
 
 import (
 	"fmt"
-	"github.com/thetasensors/theta-cloud-lite/server/domain/po"
+	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 )
 
 type Firmware struct {
@@ -14,7 +14,7 @@ type Firmware struct {
 	BuildTime int64  `json:"buildTime"`
 }
 
-func NewFirmware(e po.Firmware) Firmware {
+func NewFirmware(e entity.Firmware) Firmware {
 	return Firmware{
 		ID:        e.ID,
 		Name:      e.Name,

@@ -8,7 +8,6 @@ import (
 	"github.com/gogo/protobuf/proto"
 	pd "github.com/thetasensors/theta-cloud-lite/server/adapter/iot/proto"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
-	"github.com/thetasensors/theta-cloud-lite/server/domain/po"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/json"
 	"time"
 )
@@ -22,7 +21,7 @@ type wsnSettings struct {
 type updateWsnSettingsCmd struct {
 	request
 	settings        wsnSettings
-	routingTable    po.RoutingTables
+	routingTable    entity.RoutingTables
 	isUpdateWsnOnly bool
 }
 

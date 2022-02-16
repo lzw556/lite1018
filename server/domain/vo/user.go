@@ -1,6 +1,8 @@
 package vo
 
-import "github.com/thetasensors/theta-cloud-lite/server/domain/po"
+import (
+	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
+)
 
 type User struct {
 	ID       uint   `json:"id"`
@@ -10,7 +12,7 @@ type User struct {
 	Role     uint   `json:"role"`
 }
 
-func NewUser(e po.User) User {
+func NewUser(e entity.User) User {
 	return User{
 		ID:       e.ID,
 		Username: e.Username,

@@ -97,13 +97,9 @@ func (r deviceRouter) delete(ctx *gin.Context) (interface{}, error) {
 
 func (r deviceRouter) findDataByID(ctx *gin.Context) (interface{}, error) {
 	id := cast.ToUint(ctx.Param("id"))
-	pid := ctx.Query("pid")
 	from := cast.ToInt64(ctx.Query("from"))
 	to := cast.ToInt64(ctx.Query("to"))
-	if pid == "" {
-		return r.service.FindDeviceDataByID(id, from, to)
-	}
-	return r.service.GetPropertyDataByID(id, pid, from, to)
+	return r.service.FindDeviceDataByID(id, from, to)
 }
 
 func (r deviceRouter) findRuntimeDataByID(ctx *gin.Context) (interface{}, error) {
@@ -111,6 +107,35 @@ func (r deviceRouter) findRuntimeDataByID(ctx *gin.Context) (interface{}, error)
 	from := cast.ToInt64(ctx.Query("from"))
 	to := cast.ToInt64(ctx.Query("to"))
 	return r.service.GetRuntimeDataByID(id, from, to)
+}
+
+func (r deviceRouter) findWaveDataByID(ctx *gin.Context) (interface{}, error) {
+	id := cast.ToUint(ctx.Param("id"))
+	from := cast.ToInt64(ctx.Query("from"))
+	to := cast.ToInt64(ctx.Query("to"))
+	return r.service.FindWaveDataByID(id, from, to)
+}
+
+func (r deviceRouter) getLastDataByID(ctx *gin.Context) (interface{}, error) {
+	id := cast.ToUint(ctx.Param("id"))
+	return r.service.GetLastDeviceDataByID(id)
+}
+
+func (r deviceRouter) getWaveDataByID(ctx *gin.Context) (interface{}, error) {
+	id := cast.ToUint(ctx.Param("id"))
+	timestamp := cast.ToInt64(ctx.Param("timestamp"))
+	calculate := ctx.Query("calculate")
+	return r.service.GetWaveDataByID(id, timestamp, calculate)
+}
+
+func (r deviceRouter) downloadWaveDataByID(ctx *gin.Context) (interface{}, error) {
+	id := cast.ToUint(ctx.Param("id"))
+	timestamp := cast.ToInt64(ctx.Param("timestamp"))
+	result, err := r.service.GetWaveDataByID(id, timestamp, ctx.Query("calculate"))
+	if err != nil {
+		return nil, err
+	}
+	return result.ToCsvFile()
 }
 
 func (r deviceRouter) downloadDataByID(ctx *gin.Context) (interface{}, error) {
@@ -121,7 +146,7 @@ func (r deviceRouter) downloadDataByID(ctx *gin.Context) (interface{}, error) {
 	if err := json.Unmarshal([]byte(ctx.Query("pids")), &pids); err != nil {
 		return nil, err
 	}
-	return r.service.DownloadPropertiesDataByID(id, pids, from, to)
+	return r.service.DownloadDeviceDataByID(id, pids, from, to)
 }
 
 func (r deviceRouter) removeDataByID(ctx *gin.Context) (interface{}, error) {

@@ -4,7 +4,6 @@ import (
 	"context"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
-	"github.com/thetasensors/theta-cloud-lite/server/domain/po"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/specification"
 )
 
@@ -14,28 +13,28 @@ type Device struct {
 
 var _ dependency.DeviceRepository = &Device{}
 
-func (repo Device) Create(ctx context.Context, e *po.Device) error {
+func (repo Device) Create(ctx context.Context, e *entity.Device) error {
 	return repo.DB(ctx).Create(e).Error
 }
 
 func (repo Device) Delete(ctx context.Context, id uint) error {
-	return repo.DB(ctx).Delete(&po.Device{}, id).Error
+	return repo.DB(ctx).Delete(&entity.Device{}, id).Error
 }
 
 func (repo Device) DeleteBySpecs(ctx context.Context, specs ...specification.Specification) error {
-	return repo.DB(ctx).Scopes(specification.Scopes(specs)...).Delete(&po.Device{}).Error
+	return repo.DB(ctx).Scopes(specification.Scopes(specs)...).Delete(&entity.Device{}).Error
 }
 
-func (repo Device) Save(ctx context.Context, e *po.Device) error {
+func (repo Device) Save(ctx context.Context, e *entity.Device) error {
 	return repo.DB(ctx).Save(e).Error
 }
 
-func (repo Device) BatchSave(ctx context.Context, es []po.Device) error {
+func (repo Device) BatchSave(ctx context.Context, es []entity.Device) error {
 	return repo.DB(ctx).Save(&es).Error
 }
 
 func (repo Device) UpdatesBySpecs(ctx context.Context, updates map[string]interface{}, specs ...specification.Specification) error {
-	return repo.DB(ctx).Model(&po.Device{}).Scopes(specification.Scopes(specs)...).Updates(updates).Error
+	return repo.DB(ctx).Model(&entity.Device{}).Scopes(specification.Scopes(specs)...).Updates(updates).Error
 }
 
 func (repo Device) Get(ctx context.Context, id uint) (entity.Device, error) {

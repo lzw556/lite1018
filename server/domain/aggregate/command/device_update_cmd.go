@@ -8,7 +8,6 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
-	"github.com/thetasensors/theta-cloud-lite/server/domain/po"
 	spec "github.com/thetasensors/theta-cloud-lite/server/domain/specification"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/devicetype"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/errcode"
@@ -18,14 +17,16 @@ import (
 type DeviceUpdateCmd struct {
 	entity.Device
 
-	deviceRepo  dependency.DeviceRepository
-	networkRepo dependency.NetworkRepository
+	deviceRepo      dependency.DeviceRepository
+	deviceStateRepo dependency.DeviceStateRepository
+	networkRepo     dependency.NetworkRepository
 }
 
 func NewDeviceUpdateCmd() DeviceUpdateCmd {
 	return DeviceUpdateCmd{
-		deviceRepo:  repository.Device{},
-		networkRepo: repository.Network{},
+		deviceRepo:      repository.Device{},
+		deviceStateRepo: repository.DeviceState{},
+		networkRepo:     repository.Network{},
 	}
 }
 
@@ -33,7 +34,7 @@ func (cmd DeviceUpdateCmd) UpdateBaseInfo(req request.Device) error {
 	if cmd.Device.Name != req.Name {
 		ctx := context.TODO()
 		cmd.Device.Name = req.Name
-		err := cmd.deviceRepo.Save(ctx, &cmd.Device.Device)
+		err := cmd.deviceRepo.Save(ctx, &cmd.Device)
 		if err != nil {
 			return err
 		}
@@ -45,7 +46,7 @@ func (cmd DeviceUpdateCmd) UpdateBaseInfo(req request.Device) error {
 		if err != nil {
 			return err
 		}
-		if cmd.Device.GetConnectionState().IsOnline {
+		if state, err := cmd.deviceStateRepo.Get(cmd.Device.MacAddress); err == nil && state.IsOnline {
 			command.SyncNetwork(network, devices, 3*time.Second)
 		}
 	}
@@ -57,9 +58,9 @@ func (cmd DeviceUpdateCmd) UpdateSettings(req request.DeviceSetting) error {
 	if t == nil {
 		return response.BusinessErr(errcode.UnknownDeviceTypeError, "")
 	}
-	cmd.Device.Settings = make(po.DeviceSettings, len(t.Settings()))
+	cmd.Device.Settings = make(entity.DeviceSettings, len(t.Settings()))
 	for i, setting := range t.Settings() {
-		s := po.DeviceSetting{
+		s := entity.DeviceSetting{
 			Key:      setting.Key,
 			Category: string(setting.Category),
 		}
@@ -80,13 +81,13 @@ func (cmd DeviceUpdateCmd) UpdateSettings(req request.DeviceSetting) error {
 		cmd.Device.Settings[i] = s
 	}
 	ctx := context.TODO()
-	err := cmd.deviceRepo.Save(ctx, &cmd.Device.Device)
+	err := cmd.deviceRepo.Save(ctx, &cmd.Device)
 	if err != nil {
 		return err
 	}
 	if network, err := cmd.networkRepo.Get(ctx, cmd.Device.NetworkID); err == nil {
 		if gateway, err := cmd.deviceRepo.Get(ctx, network.GatewayID); err == nil {
-			if gateway.GetConnectionState().IsOnline {
+			if state, err := cmd.deviceStateRepo.Get(gateway.MacAddress); err == nil && state.IsOnline {
 				command.SyncDeviceSettings(gateway, cmd.Device)
 			}
 		}

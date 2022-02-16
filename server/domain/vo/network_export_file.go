@@ -3,8 +3,6 @@ package vo
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
-	"github.com/thetasensors/theta-cloud-lite/server/domain/po"
-	"github.com/thetasensors/theta-cloud-lite/server/pkg/devicetype"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/json"
 	"sort"
 )
@@ -35,7 +33,7 @@ func (e ExportDevices) Swap(i, j int) {
 type NetworkExportFile struct {
 	Name         string                 `json:"-"`
 	Settings     map[string]interface{} `json:"settings"`
-	RoutingTable po.RoutingTables       `json:"routingTable"`
+	RoutingTable entity.RoutingTables   `json:"routingTable"`
 	DeviceList   ExportDevices          `json:"deviceList"`
 }
 
@@ -65,22 +63,17 @@ func (n *NetworkExportFile) AddDevices(es []entity.Device) {
 			Modbus:  0,
 			Type:    e.Type,
 		}
-		var exportSettings struct {
-			Ipn     map[string]interface{} `json:"ipn"`
-			Sensors map[string]interface{} `json:"sensors"`
-			System  map[string]interface{} `json:"system"`
-		}
+		settings := map[string]map[string]interface{}{}
 		for _, setting := range e.Settings {
-			switch devicetype.SettingCategory(setting.Category) {
-			case devicetype.IpnSettingCategory:
-				exportSettings.Ipn[setting.Key] = setting.Value
-			case devicetype.SensorsSettingCategory:
-				exportSettings.Sensors[setting.Key] = setting.Value
-			case devicetype.SystemSettingCategory:
-				exportSettings.System[setting.Key] = setting.Value
+			if _, ok := settings[setting.Category]; ok {
+				settings[setting.Category][setting.Key] = setting.Value
+			} else {
+				settings[setting.Category] = map[string]interface{}{
+					setting.Key: setting.Value,
+				}
 			}
 		}
-		bytes, err := json.Marshal(exportSettings)
+		bytes, err := json.Marshal(settings)
 		if err != nil {
 			n.DeviceList[i].Settings = "{}"
 		} else {

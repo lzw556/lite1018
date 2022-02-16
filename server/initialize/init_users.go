@@ -1,12 +1,12 @@
 package initialize
 
 import (
-	"github.com/thetasensors/theta-cloud-lite/server/domain/po"
+	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	"gorm.io/gorm"
 )
 
 func initUsers(db *gorm.DB) error {
-	user := po.User{
+	user := entity.User{
 		Username: "admin",
 		Password: "123456",
 	}

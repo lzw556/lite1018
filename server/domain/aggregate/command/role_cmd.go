@@ -5,7 +5,6 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
-	"github.com/thetasensors/theta-cloud-lite/server/domain/po"
 	spec "github.com/thetasensors/theta-cloud-lite/server/domain/specification"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/casbin"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/transaction"
@@ -13,7 +12,7 @@ import (
 )
 
 type RoleCmd struct {
-	po.Role
+	entity.Role
 
 	roleMenuRepo   dependency.RoleMenuRelationRepository
 	permissionRepo dependency.PermissionRepository
@@ -32,9 +31,9 @@ func NewRoleCmd() RoleCmd {
 
 func (cmd RoleCmd) AllocMenus(ids []uint) error {
 	ctx := context.TODO()
-	es := make([]po.RoleMenuRelation, len(ids))
+	es := make([]entity.RoleMenuRelation, len(ids))
 	for i, id := range ids {
-		es[i] = po.RoleMenuRelation{
+		es[i] = entity.RoleMenuRelation{
 			RoleID: cmd.Role.ID,
 			MenuID: id,
 		}

@@ -45,7 +45,7 @@ const AddDeviceModal:FC<AddDeviceModalProps> = (props) => {
             </>
         }
         return <Form.Item label={"设备选择"} name={"devices"} rules={[Rules.required]}>
-            <DeviceSelect filters={{asset_id: network.asset.id, network_id: 0, category: 3}} mode={"multiple"} maxTagCount={"responsive"} placeholder={"请选择需要接入的设备"} />
+            <DeviceSelect filters={{network_id: 0, category: 3}} mode={"multiple"} maxTagCount={"responsive"} placeholder={"请选择需要接入的设备"} />
         </Form.Item>
     }
 

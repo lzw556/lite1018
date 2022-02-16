@@ -39,6 +39,17 @@ const AppRoutes = [
 const SecondaryRoutes: Menu[] = [
     {
         id: 100,
+        name: "addDevice",
+        path: "/device-management",
+        title: "添加设备",
+        view: "AddDevice",
+        icon: "",
+        hidden: true,
+        isAuth: true,
+        children: [],
+    },
+    {
+        id: 100,
         name: "deviceDetail",
         path: "/device-management",
         title: "设备详情",

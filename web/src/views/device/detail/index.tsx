@@ -16,7 +16,7 @@ import MyBreadcrumb from "../../../components/myBreadcrumb";
 import HasPermission from "../../../permission";
 import userPermission, {Permission} from "../../../permission/permission";
 import HistoryDataPage from "./data";
-import RuntimeData from "./runtime";
+import WaveDataChart from "./waveData";
 
 const tabList = [
     {
@@ -30,14 +30,13 @@ const DeviceDetailPage = () => {
     const history = useHistory();
     const [device, setDevice] = useState<Device>();
     const [isLoading, setIsLoading] = useState<boolean>(false);
-    const [currentKey, setCurrentKey] = useState<string>();
+    const [currentKey, setCurrentKey] = useState<string>("settings");
     const {hasPermission} = userPermission();
 
     const contents = new Map<string, any>([
-        ["monitor", device && <MonitorPage device={device}/>],
         ["settings", <SettingPage device={device}/>],
         ["historyData", device && <HistoryDataPage device={device}/>],
-        ["runtime", device && <RuntimeData device={device}/>]
+        ["waveData", device && <WaveDataChart device={device}/>]
     ])
 
     const fetchDevice = useCallback(() => {
@@ -48,45 +47,48 @@ const DeviceDetailPage = () => {
                 .then(data => {
                     setDevice(data)
                     setIsLoading(false)
-                    if (data.category === 3) {
-                        setCurrentKey("monitor")
-                    } else {
-                        setCurrentKey("settings")
-                    }
                 })
                 .catch(_ => history.push({pathname: "/device-management/devices"}))
         } else {
             message.error("设备不存在").then()
             history.push({pathname: "/device-management/devices"})
         }
-    }, [])
+    }, []);
 
     useEffect(() => {
-        fetchDevice()
+        fetchDevice();
     }, [fetchDevice])
 
     const renderTabList = () => {
-        if (device &&
-            device.typeId !== DeviceType.Router &&
-            device.typeId !== DeviceType.Gateway &&
-            hasPermission(Permission.DeviceData)) {
-            return [
-                {
-                    key: "monitor",
-                    tab: "监控",
-                },
-                ...tabList,
-                {
-                    key: "historyData",
-                    tab: "历史数据"
-                },
-                {
-                    key: "runtime",
-                    tab: "运行状态"
-                },
-            ]
+        let tabs = []
+        if (device) {
+            switch (device.typeId) {
+                case DeviceType.VibrationTemperature3Axis:
+                    return [
+                        ...tabList,
+                        {
+                            key: "historyData",
+                            tab: "历史数据"
+                        },
+                        {
+                            key: "waveData",
+                            tab: "波形数据"
+                        }
+                    ]
+                case DeviceType.Gateway:
+                    return tabList
+                case DeviceType.Router:
+                    return tabList
+                default:
+                    return [
+                        ...tabList,
+                        {
+                            key: "historyData",
+                            tab: "历史数据"
+                        },
+                    ]
+            }
         }
-        return tabList
     }
 
     const onCommand = ({key}: any) => {

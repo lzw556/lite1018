@@ -9,7 +9,6 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/iot/background"
 	pd "github.com/thetasensors/theta-cloud-lite/server/adapter/iot/proto"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
-	"github.com/thetasensors/theta-cloud-lite/server/domain/po"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/errcode"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/global"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/xlog"
@@ -17,10 +16,10 @@ import (
 )
 
 type DeviceUpgradeExecutor struct {
-	firmware po.Firmware
+	firmware entity.Firmware
 }
 
-func NewDeviceUpgradeExecutor(firmware po.Firmware) background.Executor {
+func NewDeviceUpgradeExecutor(firmware entity.Firmware) background.Executor {
 	return DeviceUpgradeExecutor{
 		firmware: firmware,
 	}
@@ -54,7 +53,7 @@ func (e DeviceUpgradeExecutor) Execute(ctx context.Context, gateway, device enti
 			queue.Stop()
 		}
 	}
-	device.UpdateUpgradeState(entity.DeviceUpgradeStatusSuccess, 100)
+	device.UpdateDeviceUpgradeStatus(entity.DeviceUpgradeSuccess, 100)
 	xlog.Infof("device upgrade successful => [%s]", device.MacAddress)
 	return nil
 }
@@ -79,7 +78,7 @@ func (e DeviceUpgradeExecutor) loadFirmware(ctx context.Context, gateway string,
 		if err != nil {
 			return err
 		}
-		device.UpdateUpgradeState(entity.DeviceUpgradeStatusLoading, m.Progress)
+		device.UpdateDeviceUpgradeStatus(entity.DeviceUpgradeLoading, m.Progress)
 		seqID = int(m.SeqId + 1)
 	}
 	xlog.Infof("load firmware data complete => [%s]", device.MacAddress)
@@ -109,10 +108,10 @@ func (e DeviceUpgradeExecutor) upgrade(ctx context.Context, gateway string, devi
 			return
 		}
 		if m.Code != 0 {
-			device.UpdateUpgradeState(entity.DeviceUpgradeStatusError, m.Progress)
+			device.UpdateDeviceUpgradeStatus(entity.DeviceUpgradeError, m.Progress)
 			ch <- m.Code
 		} else {
-			device.UpdateUpgradeState(entity.DeviceUpgradeStatusUpgrading, m.Progress)
+			device.UpdateDeviceUpgradeStatus(entity.DeviceUpgradeUpgrading, m.Progress)
 		}
 		if m.Progress == 100 {
 			ch <- m.Code

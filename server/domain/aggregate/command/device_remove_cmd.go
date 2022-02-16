@@ -7,7 +7,6 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	spec "github.com/thetasensors/theta-cloud-lite/server/domain/specification"
-	"github.com/thetasensors/theta-cloud-lite/server/pkg/devicetype"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/transaction"
 	"time"
 )
@@ -18,20 +17,18 @@ type DeviceRemoveCmd struct {
 
 	deviceDataRepo        dependency.SensorDataRepository
 	deviceRepo            dependency.DeviceRepository
-	deviceStatusRepo      dependency.DeviceStatusRepository
+	deviceStatusRepo      dependency.DeviceStateRepository
 	deviceInformationRepo dependency.DeviceInformationRepository
 	networkRepo           dependency.NetworkRepository
-	bindingRepo           dependency.MeasurementDeviceBindingRepository
 }
 
 func NewDeviceRemoveCmd() DeviceRemoveCmd {
 	return DeviceRemoveCmd{
 		deviceRepo:            repository.Device{},
 		deviceDataRepo:        repository.SensorData{},
-		deviceStatusRepo:      repository.DeviceStatus{},
+		deviceStatusRepo:      repository.DeviceState{},
 		deviceInformationRepo: repository.DeviceInformation{},
 		networkRepo:           repository.Network{},
-		bindingRepo:           repository.MeasurementDeviceBinding{},
 	}
 }
 
@@ -40,21 +37,13 @@ func (cmd DeviceRemoveCmd) Run() error {
 		if err := cmd.deviceRepo.Delete(txCtx, cmd.Device.ID); err != nil {
 			return err
 		}
-		switch cmd.Device.Type {
-		case devicetype.GatewayType, devicetype.RouterType:
-		default:
-			if err := cmd.deviceInformationRepo.Delete(cmd.Device.ID); err != nil {
-				return err
-			}
-			if err := cmd.deviceStatusRepo.Delete(cmd.Device.MacAddress); err != nil {
-				return err
-			}
-		}
+		_ = cmd.deviceInformationRepo.Delete(cmd.Device.ID)
+		_ = cmd.deviceStatusRepo.Delete(cmd.Device.MacAddress)
 		if cmd.Device.NetworkID > 0 {
 			cmd.Network.RemoveDevice(cmd.Device)
-			return cmd.networkRepo.Save(txCtx, &cmd.Network.Network)
+			return cmd.networkRepo.Save(txCtx, &cmd.Network)
 		}
-		return cmd.bindingRepo.DeleteBySpecs(txCtx, spec.DeviceMacEqSpec(cmd.Device.MacAddress))
+		return nil
 	})
 	if err != nil {
 		return err

@@ -4,13 +4,13 @@ import (
 	"context"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
-	"github.com/thetasensors/theta-cloud-lite/server/domain/po"
+	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	spec "github.com/thetasensors/theta-cloud-lite/server/domain/specification"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/transaction"
 )
 
 type ProjectUpdateCmd struct {
-	po.Project
+	entity.Project
 
 	userProjectRelationRepo dependency.UserProjectRelationRepository
 }
@@ -22,9 +22,9 @@ func NewProjectUpdateCmd() ProjectUpdateCmd {
 }
 
 func (cmd ProjectUpdateCmd) AllocUsers(userIDs []uint) error {
-	relations := make([]po.UserProjectRelation, len(userIDs))
+	relations := make([]entity.UserProjectRelation, len(userIDs))
 	for i, userID := range userIDs {
-		relations[i] = po.UserProjectRelation{
+		relations[i] = entity.UserProjectRelation{
 			UserID:    userID,
 			ProjectID: cmd.Project.ID,
 		}
