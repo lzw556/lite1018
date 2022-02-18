@@ -7,9 +7,10 @@ import {EmptyLayout} from "../../../layout";
 import {DeviceSetting} from "../../../../types/device_setting";
 import DeviceSettingFormItem from "../../../../components/formItems/deviceSettingFormItem";
 import {defaultValidateMessages} from "../../../../constants/validator";
+import {DeviceType} from "../../../../types/device_type";
 
 export interface SettingPageProps {
-    device?: Device
+    device: Device
 }
 
 const SettingPage: FC<SettingPageProps> = ({device}) => {
@@ -18,34 +19,25 @@ const SettingPage: FC<SettingPageProps> = ({device}) => {
     const [form] = Form.useForm();
 
     useEffect(() => {
-        if (device) {
-            setIsLoading(true)
-            GetDeviceSettingRequest(device.id).then(data => {
-                setIsLoading(false)
-                setSettings(data)
-            })
-        }
+        setIsLoading(true)
+        GetDeviceSettingRequest(device.id).then(data => {
+            setIsLoading(false)
+            setSettings(data)
+        })
     }, [device])
 
     const renderSetting = () => {
-        if (device) {
-            if (settings) {
-                return settings.map(setting => (
-                    <DeviceSettingFormItem editable={true} value={setting} key={setting.key}/>))
-            }
-            return <EmptyLayout description={"暂无配置信息"}/>
+        if (device.typeId !== DeviceType.Router && settings) {
+            return settings.map(setting => (
+                <DeviceSettingFormItem editable={true} value={setting} key={setting.key}/>))
         }
-        return <div>
-
-        </div>
+        return <EmptyLayout description={"暂无配置信息"}/>
     }
 
     const onSave = () => {
-        if (device) {
-            form.validateFields().then(values => {
-                UpdateDeviceSettingRequest(device.id, values).then()
-            })
-        }
+        form.validateFields().then(values => {
+            UpdateDeviceSettingRequest(device.id, values).then()
+        })
     }
 
     return <Skeleton loading={isLoading}>
@@ -62,7 +54,9 @@ const SettingPage: FC<SettingPageProps> = ({device}) => {
             <Col xl={10} xxl={8}>
                 <Row justify={"end"}>
                     <Col>
-                        <Button type={"primary"} onClick={onSave}>保存</Button>
+                        {
+                            device.typeId !== DeviceType.Router && <Button type={"primary"} onClick={onSave}>保存</Button>
+                        }
                     </Col>
                 </Row>
             </Col>

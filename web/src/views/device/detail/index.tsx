@@ -35,7 +35,7 @@ const DeviceDetailPage = () => {
     const {hasPermission} = userPermission();
 
     const contents = new Map<string, any>([
-        ["settings", <SettingPage device={device}/>],
+        ["settings", device && <SettingPage device={device}/>],
         ["historyData", device && <HistoryDataPage device={device}/>],
         ["waveData", device && <WaveDataChart device={device}/>]
     ])
