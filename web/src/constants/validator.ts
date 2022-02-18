@@ -82,10 +82,15 @@ export const Normalizes = {
         }
         return value
     },
-    number: (value:any) => {
+    number: (value: any) => {
         if (value) {
             return Number(value)
         }
         return value
+    },
+    macAddress: (value: string) => {
+        if (value) {
+            return value.toLowerCase().replaceAll("-", "");
+        }
     }
 }

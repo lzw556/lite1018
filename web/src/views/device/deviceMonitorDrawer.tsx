@@ -17,6 +17,7 @@ const DeviceMonitorDrawer: FC<DeviceMonitorDrawerProps> = (props) => {
     const [deviceData, setDeviceData] = useState<any>()
     const [startDate] = useState<moment.Moment>(moment().startOf('day').subtract(13, 'd'));
     const [endDate] = useState<moment.Moment>(moment().endOf('day'));
+    const [height] = useState<number>(window.innerHeight);
 
     useEffect(() => {
         if (visible) {
@@ -169,11 +170,11 @@ const DeviceMonitorDrawer: FC<DeviceMonitorDrawerProps> = (props) => {
         }
     ]
 
-    return <Drawer {...props} placement={"top"} closable={false} size={"large"}>
+    return <Drawer {...props} placement={"top"} closable={false} height={height - 100}>
         <Row justify={"start"}>
             <Col span={24}>
                 <Typography.Title level={4}>设备监控: {device.name}</Typography.Title>
-                <Typography.Text>提示: 当前窗口只显示14天内的监控数据, 按<Typography.Text keyboard>ESC</Typography.Text>可以退出此窗口</Typography.Text>
+                <Typography.Text>提示: 当前窗口显示14天内的监控数据, 按<Typography.Text keyboard>ESC</Typography.Text>可以退出此窗口</Typography.Text>
             </Col>
         </Row>
         <br/>

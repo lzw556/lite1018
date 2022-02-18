@@ -3,6 +3,7 @@ package entity
 import (
 	"fmt"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/cache"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/eventbus"
 	"gorm.io/gorm"
 )
 
@@ -38,14 +39,27 @@ func (d Device) GetUpgradeStatus() DeviceUpgradeStatus {
 }
 
 func (d Device) UpdateDeviceUpgradeStatus(code DeviceUpgradeCode, progress float32) {
-	status := d.GetUpgradeStatus()
-	status.Code = code
-	status.Progress = progress
+	status := DeviceUpgradeStatus{
+		Code:     code,
+		Progress: progress,
+	}
+	d.UpgradeNotify(status)
 	_ = cache.SetStruct(fmt.Sprintf("device_upgrade_status_%d", d.ID), status)
 }
 
 func (d Device) CancelUpgrade() {
+	status := d.GetUpgradeStatus()
+	status.Code = DeviceUpgradeCancelled
+	d.UpgradeNotify(status)
+	_ = cache.SetStruct(fmt.Sprintf("device_upgrade_status_%d", d.ID), status)
+}
 
+func (d Device) UpgradeNotify(status DeviceUpgradeStatus) {
+	eventbus.Publish(eventbus.SocketEmit, "socket::deviceUpgradeStatusChangedEvent", map[string]interface{}{
+		"macAddress": d.MacAddress,
+		"code":       status.Code,
+		"progress":   status.Progress,
+	})
 }
 
 type Devices []Device

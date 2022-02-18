@@ -1,5 +1,7 @@
 package entity
 
+import "github.com/thetasensors/theta-cloud-lite/server/pkg/eventbus"
+
 type DeviceState struct {
 	BatteryLevel         float32 `json:"batteryLevel"`
 	SignalLevel          float32 `json:"signalLevel"`
@@ -11,4 +13,11 @@ type DeviceState struct {
 
 func (DeviceState) BucketName() string {
 	return "ts_device_state"
+}
+
+func (s DeviceState) Notify(mac string) {
+	eventbus.Publish(eventbus.SocketEmit, "socket::deviceStateChangedEvent", map[string]interface{}{
+		"macAddress": mac,
+		"state":      s,
+	})
 }

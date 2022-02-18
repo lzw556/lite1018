@@ -36,6 +36,7 @@ func (p Bye) Process(ctx *iot.Context, msg iot.Message) error {
 				if err := p.deviceStateRepo.Create(device.MacAddress, state); err != nil {
 					xlog.Errorf("update device state failed: %v => [%s]", err, device.MacAddress)
 				}
+				state.Notify(device.MacAddress)
 			}
 		}
 	}

@@ -52,7 +52,7 @@ func (BoltLoosening) Properties(sensorID uint) Properties {
 					{
 						Name:      "姿态指数",
 						Key:       "attitude",
-						DataIndex: 1,
+						DataIndex: 8,
 					},
 				},
 			},

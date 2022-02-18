@@ -26,7 +26,6 @@ import ReplaceMacModal from "./replace/replaceMacModal";
 import ShadowCard from "../../components/shadowCard";
 import UpgradeModal from "./upgrade";
 import "../../string-extension";
-import DeviceUpgradeState from "./state/upgradeState";
 import {IsUpgrading} from "../../types/device_upgrade_status";
 import "../../assets/iconfont.css";
 import AlertIcon from "../../components/alertIcon";
@@ -37,6 +36,7 @@ import {PageResult} from "../../types/page";
 import DeviceTable from "../../components/table/deviceTable";
 import NetworkSelect from "../../components/select/networkSelect";
 import DeviceMonitorDrawer from "./deviceMonitorDrawer";
+import DeviceUpgradeSpin from "./spin/deviceUpgradeSpin";
 
 const {Search} = Input
 const {Option} = Select
@@ -130,7 +130,7 @@ const DevicePage = () => {
 
     const renderCommandMenus = (record: Device) => {
         const disabled = record.state && record.state.isOnline
-        const isUpgrading = record.upgradeState && IsUpgrading(record.upgradeState.status)
+        const isUpgrading = record.upgradeStatus && IsUpgrading(record.upgradeStatus.code)
         return <Menu onClick={(e) => {
             onCommand(record, e.key)
         }}>
@@ -168,7 +168,7 @@ const DevicePage = () => {
     }
 
     const renderEditMenus = (record: Device) => {
-        const isUpgrading = record.upgradeState && IsUpgrading(record.upgradeState.status)
+        const isUpgrading = record.upgradeStatus && IsUpgrading(record.upgradeStatus.code)
         return <Menu onClick={(e) => {
             onEdit(record.id, e.key)
         }} disabled={isUpgrading}>
@@ -212,9 +212,8 @@ const DevicePage = () => {
                             <a href={`#/device-management?locale=devices/deviceDetail&id=${record.id}`}>{text}</a> : text
                     }
                     {
-                        record.upgradeState && (
-                            <DeviceUpgradeState status={record.upgradeState.status}
-                                                progress={record.upgradeState.progress}/>)
+                        record.upgradeStatus && (
+                            <DeviceUpgradeSpin status={record.upgradeStatus}/>)
                     }
                 </Space>
             }
@@ -259,7 +258,7 @@ const DevicePage = () => {
             title: '操作',
             key: 'action',
             render: (text: any, record: any) => {
-                const isUpgrading = record.upgradeState && record.upgradeState.status >= 1 && record.upgradeState.status <= 3
+                const isUpgrading = record.upgradeStatus && IsUpgrading(record.upgradeStatus.code)
                 return <Space>
                     {
                         record.typeId !== DeviceType.Router && record.typeId !== DeviceType.Gateway &&
@@ -349,13 +348,16 @@ const DevicePage = () => {
             setDevice(undefined)
             setEditSettingVisible(false)
         }}/>
-        <UpgradeModal visible={upgradeVisible} device={device} onSuccess={() => {
-            setDevice(undefined)
-            setUpgradeVisible(false)
-        }} onCancel={() => {
-            setDevice(undefined)
-            setUpgradeVisible(false)
-        }}/>
+        {
+            device &&
+            <UpgradeModal visible={upgradeVisible} device={device} onSuccess={() => {
+                setDevice(undefined)
+                setUpgradeVisible(false)
+            }} onCancel={() => {
+                setDevice(undefined)
+                setUpgradeVisible(false)
+            }}/>
+        }
         {
             device && <DeviceMonitorDrawer device={device} visible={monitorVisible}/>
         }

@@ -9,7 +9,7 @@ let socket: any = null
 
 export const SocketTopic = {
     connectionState: "connectionState",
-    upgradeState: "upgradeState",
+    upgradeStatus: "upgradeStatus",
     alert: "alert"
 }
 
@@ -28,21 +28,21 @@ const useSocket = () => {
             socket.on("ready", (data: any) => {
                 console.log(data)
             })
-            socket.on('socket::deviceConnectionStateChanged', (res: ResponseResult<any>) => {
+            socket.on('socket::deviceStateChangedEvent', (res: ResponseResult<any>) => {
                 if (res.code === 200) {
                     PubSub.publish(SocketTopic.connectionState, {
-                        id: res.data.id,
-                        isOnline: res.data.connectionState.isOnline,
-                        connectAt: res.data.connectionState.connectAt
+                        macAddress: res.data.macAddress,
+                        isOnline: res.data.state.isOnline,
+                        connectAt: res.data.state.connectedAt
                     })
                 }
             })
-            socket.on('socket::deviceUpgradeStateChanged', (res: ResponseResult<any>) => {
+            socket.on('socket::deviceUpgradeStatusChangedEvent', (res: ResponseResult<any>) => {
                 if (res.code === 200) {
-                    PubSub.publish(SocketTopic.upgradeState, {
-                        id: res.data.id,
-                        status: res.data.upgradeState.status,
-                        progress: res.data.upgradeState.progress,
+                    PubSub.publish(SocketTopic.upgradeStatus, {
+                        macAddress: res.data.macAddress,
+                        code: res.data.code,
+                        progress: res.data.progress,
                     })
                 }
             })

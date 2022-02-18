@@ -37,7 +37,6 @@
     "react-router-dom": "^5.2.0",
     "react-scripts": "4.0.3",
     "react-socket-io": "^0.2.5",
-    "reaflow": "^4.2.11",
     "redux": "^4.1.1",
     "redux-persist": "^6.0.0",
     "redux-react-hook": "^4.0.3",

@@ -6,7 +6,6 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/iot"
 	pd "github.com/thetasensors/theta-cloud-lite/server/adapter/iot/proto"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
-	"github.com/thetasensors/theta-cloud-lite/server/pkg/eventbus"
 )
 
 type FirmwareUpgradeStatus struct {
@@ -36,7 +35,6 @@ func (p FirmwareUpgradeStatus) Process(ctx *iot.Context, msg iot.Message) error 
 				return fmt.Errorf("loading firmware failed: error_code = %d", m.Code)
 			} else {
 				device.UpdateDeviceUpgradeStatus(entity.DeviceUpgradeUpgrading, m.Progress)
-				eventbus.Publish(eventbus.DeviceUpgradeStatus, m)
 			}
 		}
 	}

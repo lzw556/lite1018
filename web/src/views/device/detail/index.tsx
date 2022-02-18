@@ -7,7 +7,6 @@ import {GetDeviceRequest, SendDeviceCommandRequest} from "../../../apis/device";
 import {Content} from "antd/lib/layout/layout";
 import InformationCard from "./information";
 import ShadowCard from "../../../components/shadowCard";
-import MonitorPage from "./monitor";
 import {DownOutlined} from "@ant-design/icons";
 import {DeviceCommand} from "../../../types/device_command";
 import SettingPage from "./setting";
@@ -17,6 +16,7 @@ import HasPermission from "../../../permission";
 import userPermission, {Permission} from "../../../permission/permission";
 import HistoryDataPage from "./data";
 import WaveDataChart from "./waveData";
+import useSocket, {SocketTopic} from "../../../socket";
 
 const tabList = [
     {
@@ -28,6 +28,7 @@ const tabList = [
 const DeviceDetailPage = () => {
     const location = useLocation<any>();
     const history = useHistory();
+    const {PubSub} = useSocket();
     const [device, setDevice] = useState<Device>();
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [currentKey, setCurrentKey] = useState<string>("settings");
@@ -59,8 +60,20 @@ const DeviceDetailPage = () => {
         fetchDevice();
     }, [fetchDevice])
 
+    useEffect(() => {
+        if (device) {
+            PubSub.subscribe(SocketTopic.connectionState, (msg: any, state: any) => {
+                if (device.macAddress === state.macAddress){
+                    setDevice({...device, state: {...device.state, isOnline: state.isOnline}})
+                }
+            })
+        }
+        return () => {
+            PubSub.unsubscribe(SocketTopic.connectionState)
+        }
+    }, [device])
+
     const renderTabList = () => {
-        let tabs = []
         if (device) {
             switch (device.typeId) {
                 case DeviceType.VibrationTemperature3Axis:

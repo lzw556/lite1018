@@ -1,17 +1,16 @@
 import {Button, Card, Col, Form, message, Result, Row, Space, Upload} from "antd";
 import {Content} from "antd/lib/layout/layout";
 import {useEffect, useState} from "react";
-import {Canvas, Edge, Node, NodeProps, Remove} from "reaflow";
 import {ImportOutlined, InboxOutlined} from "@ant-design/icons";
-import {DeviceType} from "../../../types/device_type";
 import {ImportNetworkRequest} from "../../../apis/network";
 import ShadowCard from "../../../components/shadowCard";
-import AddNodeModal from "../modal/addNode";
 import CommunicationTimeOffsetSelect from "../../../components/communicationTimeOffsetSelect";
 import CommunicationPeriodSelect from "../../../components/communicationPeriodSelect";
 import GroupSizeSelect from "../../../components/groupSizeSelect";
 import GroupIntervalSelect from "../../../components/groupIntervalSelect";
 import MyBreadcrumb from "../../../components/myBreadcrumb";
+import G6 from "@antv/g6";
+import "../../../components/shape/shape"
 
 const {Dragger} = Upload
 
@@ -26,12 +25,10 @@ export interface NetworkRequestForm {
 
 const ImportNetworkPage = () => {
     const [height] = useState<number>(window.innerHeight - 190)
-    const [edges, setEdges] = useState<any>([])
-    const [nodes, setNodes] = useState<any>([])
-    const [current, setCurrent] = useState<number>(0)
+    const [network, setNetwork] = useState<any>()
     const [success, setSuccess] = useState<boolean>(false)
-    const [addNodeVisible, setAddNodeVisible] = useState<boolean>(false)
     const [form] = Form.useForm()
+    let graph: any = null
 
     const checkJSONFormat = (source: any) => {
         return source.hasOwnProperty("deviceList") && source.hasOwnProperty("settings") && source.hasOwnProperty("routingTable")
@@ -47,12 +44,13 @@ const ImportNetworkPage = () => {
                     const devices = json.deviceList
                     if (devices && devices.length) {
                         if (devices.reduce((acc: Map<string, any>, item: any) => acc.set(item.address, item), new Map()).size === devices.length) {
-                            setNodes(devices.map((item: any) => {
-                                return {id: item.address, text: item.name, data: item}
-                            }))
-                            setEdges(json.routingTable.map((item: any) => {
-                                return {id: `${item[0]}`, from: item[1], to: item[0]}
-                            }))
+                            const nodes = devices.map((item: any) => {
+                                return {macAddress: item.address, name: item.name, type: item.type, settings: JSON.parse(item.settings)}
+                            })
+                            const edges = json.routingTable.map((item: any) => {
+                                return [item[0], item[1]]
+                            })
+                            setNetwork({nodes, edges})
                             const wsn = json.settings.wsn
                             form.setFieldsValue(
                                 {
@@ -74,6 +72,7 @@ const ImportNetworkPage = () => {
     }
 
     const onSave = () => {
+        const nodes = network.nodes
         if (nodes && nodes.length) {
             form.validateFields().then(values => {
                 const req: NetworkRequestForm = {
@@ -81,17 +80,17 @@ const ImportNetworkPage = () => {
                     communication_time_offset: values.communication_time_offset,
                     group_size: values.group_size,
                     group_interval: values.group_interval,
-                    routing_tables: edges.map((e: any) => [e.to, e.from]),
+                    routing_tables: network.edges,
                     devices: nodes.map((n: any) => {
                         return {
-                            name: n.data.name,
-                            mac_address: n.data.address,
-                            type_id: n.data.type,
-                            ...JSON.parse(n.data.settings)
+                            name: n.name,
+                            mac_address: n.macAddress,
+                            type_id: n.type,
+                            ...n.settings,
                         }
                     })
                 }
-                console.log(req)
+                console.log(req);
                 ImportNetworkRequest(req).then(_ => setSuccess(true))
             })
         } else {
@@ -99,41 +98,73 @@ const ImportNetworkPage = () => {
         }
     }
 
-    const onRemove = (node: any) => {
-        const newNodes = nodes.filter((n: any) => n.id !== node.id)
-        const newEdges = edges.filter((e: any) => e.from !== node.id && e.to !== node.id)
-        const parents = edges.filter((e: any) => e.to === node.id)
-        const children = edges.filter((e: any) => e.from === node.id)
-        parents.forEach((parent: any) => {
-            children.forEach((child: any) => {
-                const parentNode = nodes.find((n: any) => n.id === parent.from)
-                const childNode = nodes.find((n: any) => n.id === child.to)
-                if (parentNode && childNode) {
-                    newEdges.push({id: childNode.id, from: parentNode.id, to: childNode.id})
-                }
-            })
-        })
-        setNodes(newNodes)
-        setEdges(newEdges)
-        setCurrent(0)
-    }
-
-    const renderActionButton = () => {
-        if (nodes && nodes.length) {
-            return <Space>
-                <a onClick={() => setAddNodeVisible(true)}>添加设备</a>
-            </Space>
-        }
+    const tree: any = (root: any) => {
+        const children: string[] = network.edges.filter((item:any) => item[1] === root.macAddress).map((item:any) => item[0]);
+        return network.nodes.filter((node:any) => children.includes(node.macAddress)).map((item:any) => {
+            return {
+                id: item.macAddress,
+                data: item,
+                children: tree(item)
+            }
+        });
     }
 
     useEffect(() => {
-        if (nodes[current]) {
-            form.setFieldsValue({
-                name: nodes[current].data.name,
-                mac_address: nodes[current].data.address
-            })
+        if (network?.nodes && network?.nodes.length) {
+            if (!graph){
+                graph = new G6.TreeGraph({
+                    container: 'container',
+                    width: document.querySelector("#container")?.clientWidth,
+                    height: document.querySelector("#container")?.clientHeight,
+                    modes: {
+                        default: [{type: 'collapse-expand'}, 'drag-canvas', 'zoom-canvas']
+                    },
+                    defaultNode: {
+                        type: 'gateway',
+                        size: [120, 40],
+                        anchorPoints: [[0, 0.5], [1, 0.5]]
+                    },
+                    defaultEdge: {
+                        type: 'cubic-horizontal',
+                        style: {
+                            stroke: '#A3B1BF',
+                        }
+                    },
+                    layout: {
+                        type: 'compactBox',
+                        direction: 'LR',
+                        getId: function getId(d: any) {
+                            return d.id;
+                        },
+                        getHeight: function getHeight() {
+                            return 16;
+                        },
+                        getWidth: function getWidth() {
+                            return 16;
+                        },
+                        getVGap: function getVGap() {
+                            return 20;
+                        },
+                        getHGap: function getHGap() {
+                            return 80;
+                        }
+                    }
+                });
+                console.log({
+                    id: network.nodes[0].macAddress,
+                    data: network.nodes[0],
+                    children: tree(network.nodes[0])
+                });
+                graph.data({
+                    id: network.nodes[0].macAddress,
+                    data: network.nodes[0],
+                    children: tree(network.nodes[0])
+                });
+                graph.render();
+                graph.fitView();
+            }
         }
-    }, [current])
+    }, [network])
 
     return <Content>
         <MyBreadcrumb>
@@ -149,46 +180,11 @@ const ImportNetworkPage = () => {
                     !success ?
                         <Row justify="space-between">
                             <Col xl={16} xxl={18}>
-                                <Card type="inner" size={"small"} title={"预览"} style={{height: `${height}px`}}
-                                      extra={renderActionButton()}>
-                                    <div className="graph" style={{height: `${height - 56}px`}}>
+                                <Card type="inner" size={"small"} title={"预览"} style={{height: `${height}px`}}>
+                                    <div className="graph" style={{height: `${height - 56}px`, width: "100%"}}>
                                         {
-                                            nodes.length ?
-                                                <Canvas
-                                                    selections={nodes[current] ? [nodes[current].data.address] : []}
-                                                    nodes={nodes} edges={edges}
-                                                    direction="DOWN"
-                                                    onNodeLink={(event, from, to) => {
-                                                        setEdges([
-                                                            ...edges,
-                                                            {
-                                                                id: to.id,
-                                                                from: from.id,
-                                                                to: to.id
-                                                            }
-                                                        ])
-                                                    }}
-                                                    node={(props: NodeProps) => (
-                                                        <Node
-                                                            onClick={(event, node) => {
-                                                                const index = nodes.map((item: any) => item.id).indexOf(node.id)
-                                                                setCurrent(index)
-                                                            }}
-                                                            remove={<Remove
-                                                                hidden={props.properties.data.type === DeviceType.Gateway}/>}
-                                                            onRemove={(event, node) => {
-                                                                onRemove(node)
-                                                            }}
-                                                        />
-                                                    )}
-                                                    edge={
-                                                        <Edge onRemove={(event, edge) => {
-                                                            const newEdges = edges.filter((item: any) => item.id !== edge.id)
-                                                            setEdges(newEdges)
-                                                            console.log(edge)
-                                                        }}/>
-                                                    }
-                                                /> :
+                                            network?.nodes.length ?
+                                                <div id={"container"} style={{width: "100%", height: "100%"}}/>:
                                                 <Dragger accept={".json"} beforeUpload={onBeforeUpload}
                                                          showUploadList={false}>
                                                     <p className="ant-upload-drag-icon">
@@ -236,9 +232,7 @@ const ImportNetworkPage = () => {
                                 </Button>,
                                 <Button key="add" onClick={() => {
                                     form.resetFields()
-                                    setNodes([])
-                                    setEdges([])
-                                    setCurrent(0)
+                                    setNetwork({nodes: [], edges: []})
                                     setSuccess(false)
                                 }}>继续导入网络</Button>,
                             ]}
@@ -246,13 +240,6 @@ const ImportNetworkPage = () => {
                 }
             </Form>
         </ShadowCard>
-        <AddNodeModal visible={addNodeVisible} onCancel={() => setAddNodeVisible(false)} onSuccess={node => {
-            setNodes([
-                ...nodes,
-                node
-            ])
-            setAddNodeVisible(false)
-        }}/>
     </Content>
 }
 

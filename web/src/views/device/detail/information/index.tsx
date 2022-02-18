@@ -7,7 +7,7 @@ import ShadowCard from "../../../../components/shadowCard";
 import {ColorHealth, ColorWarn} from "../../../../constants/color";
 import "../../../../string-extension";
 import useSocket, {SocketTopic} from "../../../../socket";
-import DeviceUpgradeState from "../../state/upgradeState";
+import DeviceUpgradeSpin from "../../spin/deviceUpgradeSpin";
 import {DeviceType} from "../../../../types/device_type";
 
 export interface GatewayInformationProps {
@@ -18,15 +18,18 @@ export interface GatewayInformationProps {
 const {Text} = Typography;
 
 const InformationCard: FC<GatewayInformationProps> = ({device, isLoading}) => {
-    const [upgradeState, setUpgradeState] = useState<any>(device.upgradeState)
-    const {PubSub} = useSocket()
+    const [upgradeStatus, setUpgradeStatus] = useState<any>(device.upgradeStatus);
+    const {PubSub} = useSocket();
 
     useEffect(() => {
-        PubSub.subscribe(SocketTopic.upgradeState, (msg:string, state:any) => {
-            setUpgradeState(state)
-        })
+        PubSub.subscribe(SocketTopic.upgradeStatus, (msg:string, status:any) => {
+            if (device.macAddress === status.macAddress) {
+                setUpgradeStatus({code: status.code, progress: status.progress});
+            }
+            setUpgradeStatus({});
+        });
         return () => {
-            PubSub.unsubscribe(SocketTopic.upgradeState)
+            PubSub.unsubscribe(SocketTopic.upgradeStatus);
         }
     }, [])
 
@@ -42,8 +45,8 @@ const InformationCard: FC<GatewayInformationProps> = ({device, isLoading}) => {
                             device.name
                         }
                         {
-                            upgradeState && upgradeState.id === device.id && (
-                                <DeviceUpgradeState status={upgradeState.status} progress={upgradeState.progress}/>)
+                            upgradeStatus && upgradeStatus.id === device.id && (
+                                <DeviceUpgradeSpin status={upgradeStatus.status}/>)
                         }
                     </Space>
                 </Col>

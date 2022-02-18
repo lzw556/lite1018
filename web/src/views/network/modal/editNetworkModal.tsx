@@ -19,7 +19,6 @@ const EditNetworkModal:FC<EditNetworkModalProps> = (props) => {
         if (visible) {
             form.setFieldsValue({
                 name: network.name,
-                asset_id: network.asset.id,
                 wsn: {
                     communication_period: network.communicationPeriod,
                     communication_time_offset: network.communicationTimeOffset,

@@ -49,5 +49,9 @@ func (p LinkStatus) Process(ctx *iot.Context, msg iot.Message) error {
 	if deviceState.IsOnline {
 		deviceState.ConnectedAt = time.Now().UTC().Unix()
 	}
-	return p.deviceStateRepo.Create(linkStatus.Address, deviceState)
+	if err := p.deviceStateRepo.Create(linkStatus.Address, deviceState); err != nil {
+		return fmt.Errorf("update device state failed: %v", err)
+	}
+	deviceState.Notify(linkStatus.Address)
+	return nil
 }

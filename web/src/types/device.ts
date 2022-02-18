@@ -15,7 +15,7 @@ export type Device = {
     sensors: Map<string, any>
     wsn?: WsnSetting
     state?: any
-    upgradeState?: any
+    upgradeStatus?: any
     alertState?: AlertState
     accessState: number
     network?: Network

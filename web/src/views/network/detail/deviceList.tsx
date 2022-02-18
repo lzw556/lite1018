@@ -6,12 +6,13 @@ import {PagingDevicesRequest} from "../../../apis/device";
 import {Network} from "../../../types/network";
 import {DeleteOutlined} from "@ant-design/icons";
 import AlertIcon from "../../../components/alertIcon";
-import DeviceUpgradeState from "../../../views/device/state/upgradeState";
+import DeviceUpgradeSpin from "../../../views/device/spin/deviceUpgradeSpin";
 import {PageResult} from "../../../types/page";
 import {DeviceType} from "../../../types/device_type";
 import {RemoveDevicesRequest} from "../../../apis/network";
 import DeviceTable from "../../../components/table/deviceTable";
 import usePermission, {Permission} from "../../../permission/permission";
+import {IsUpgrading} from "../../../types/device_upgrade_status";
 
 export interface DeviceTableProps {
     network: Network
@@ -64,9 +65,8 @@ const DeviceList: FC<DeviceTableProps> = ({network, onRefresh}) => {
                         <a href={`#/device-management?locale=networks/deviceDetail&id=${record.id}`}>{text}</a>
                     }
                     {
-                        record.upgradeState && (
-                            <DeviceUpgradeState status={record.upgradeState.status}
-                                                progress={record.upgradeState.progress}/>)
+                        record.upgradeStatus && (
+                            <DeviceUpgradeSpin status={record.upgradeStatus}/>)
                     }
                 </Space>
             }
@@ -111,7 +111,7 @@ const DeviceList: FC<DeviceTableProps> = ({network, onRefresh}) => {
             title: '操作',
             key: 'action',
             render: (text: any, record: any) => {
-                const isUpgrading = record.upgradeState && record.upgradeState.status >= 1 && record.upgradeState.status <= 3
+                const isUpgrading = record.upgradeStatus && IsUpgrading(record.upgradeStatus.code)
                 return <Space>
                     {
                         hasPermission(Permission.NetworkRemoveDevices) && record.id !== network.gateway.id &&

@@ -84,7 +84,6 @@ func (a *Adapter) Run() error {
 }
 
 func (a *Adapter) emit(event string, data interface{}) {
-	fmt.Println(data)
 	a.socket.BroadcastToNamespace("/", event, response.SuccessResponse(data))
 }
 

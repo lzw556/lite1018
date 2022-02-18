@@ -26,7 +26,6 @@ const MyBreadcrumb:FC<MyBreadcrumbProps> = ({children, label}) => {
     const [items, setItems] = useState([])
 
     useEffect(() => {
-        console.log(routes.filter((route:any) => locale?.split("/").includes(route.name)))
         setItems(routes.filter((route:any) => locale?.split("/").includes(route.name)))
     }, [])
 
@@ -36,10 +35,10 @@ const MyBreadcrumb:FC<MyBreadcrumbProps> = ({children, label}) => {
                 {
                     items.map((route:any, index:number) => {
                         if (items.length-1 === index) {
-                            return <Breadcrumb.Item key={route.name}>{label ? label : route.title}</Breadcrumb.Item>
+                            return <Breadcrumb.Item key={index}>{label ? label : route.title}</Breadcrumb.Item>
                         }
                         return <a onClick={() => history.go(index - items.length + 1)}>
-                            <Breadcrumb.Item key={route.name}>{route.title}</Breadcrumb.Item>
+                            <Breadcrumb.Item key={index}>{route.title}</Breadcrumb.Item>
                         </a>
                     })
                 }

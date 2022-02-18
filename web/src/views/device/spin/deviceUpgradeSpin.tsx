@@ -4,15 +4,14 @@ import Text from "antd/es/typography/Text";
 import {FC} from "react";
 import {DeviceUpgradeStatus} from "../../../types/device_upgrade_status";
 
-export interface UpgradeStateProps {
-    status: number
-    progress: number
+export interface DeviceUpgradeSpinProps {
+    status: any
 }
 
-const DeviceUpgradeState:FC<UpgradeStateProps> = ({status, progress}) => {
+const DeviceUpgradeSpin:FC<DeviceUpgradeSpinProps> = ({status}) => {
 
     const render = () => {
-        switch (status) {
+        switch (status.code) {
             case DeviceUpgradeStatus.Pending:
                 return <>
                     <Spin size={"small"} indicator={<LoadingOutlined/>} spinning={true}/>
@@ -20,25 +19,25 @@ const DeviceUpgradeState:FC<UpgradeStateProps> = ({status, progress}) => {
                 </>
             case DeviceUpgradeStatus.Loading:
                 return <>
-                    <Progress type="circle" showInfo={false} percent={progress} strokeWidth={12}
+                    <Progress type="circle" showInfo={false} percent={status.progress} strokeWidth={12}
                               width={16}/>
                     <Text strong style={{
                         fontSize: "9pt",
                         color: "#8a8e99"
-                    }}>{`固件下载中${progress.toFixed(0)}%`}</Text>
+                    }}>{`固件下载中${status.progress.toFixed(0)}%`}</Text>
                 </>
             case DeviceUpgradeStatus.Upgrading:
                 return <>
-                    <Progress type="circle" showInfo={false} percent={progress} strokeWidth={12}
+                    <Progress type="circle" showInfo={false} percent={status.progress} strokeWidth={12}
                               width={16}/>
                     <Text style={{
                         fontSize: "9pt",
                         color: "#8a8e99"
-                    }}>{`升级中${progress.toFixed(0)}%`}</Text>
+                    }}>{`升级中${status.progress.toFixed(0)}%`}</Text>
                 </>
             case DeviceUpgradeStatus.Cancelled:
                 return <>
-                    <Progress type="circle" showInfo={false} percent={progress} strokeWidth={12}
+                    <Progress type="circle" showInfo={false} percent={status.progress} strokeWidth={12}
                               width={16}/>
                     <Text style={{
                         fontSize: "9pt",
@@ -46,13 +45,13 @@ const DeviceUpgradeState:FC<UpgradeStateProps> = ({status, progress}) => {
                 </>
             case DeviceUpgradeStatus.Error:
                 return <>
-                    <Progress type="circle" showInfo={false} percent={progress} strokeWidth={12}
+                    <Progress type="circle" showInfo={false} percent={status.progress} strokeWidth={12}
                               width={16} status={"exception"}/>
                     <Text style={{fontSize: "9pt"}} type={"danger"}>升级失败</Text>
                 </>
             case DeviceUpgradeStatus.Success:
                 return <>
-                    <Progress type="circle" percent={progress} strokeWidth={12}
+                    <Progress type="circle" percent={status.progress} strokeWidth={12}
                               width={16}/>
                     <Text style={{fontSize: "9pt"}} type={"success"}>升级成功</Text>
                 </>
@@ -67,4 +66,4 @@ const DeviceUpgradeState:FC<UpgradeStateProps> = ({status, progress}) => {
     </Space>
 }
 
-export default DeviceUpgradeState
+export default DeviceUpgradeSpin
