@@ -107,14 +107,18 @@ func (factory Network) NewNetworkImportCmd(req request.ImportNetwork) (*command.
 		e.MacAddress = device.MacAddress
 		e.Type = device.TypeID
 		e.ProjectID = req.ProjectID
-		switch e.Type {
-		case devicetype.GatewayType:
+		e.Settings = make(entity.DeviceSettings, 0)
+		for category, setting := range device.Settings {
+			for k, v := range setting {
+				e.Settings = append(e.Settings, entity.DeviceSetting{
+					Category: category,
+					Key:      k,
+					Value:    v,
+				})
+			}
+		}
+		if e.Type == devicetype.GatewayType {
 			cmd.Network.Name = device.Name
-			e.Category = entity.GatewayCategory
-		case devicetype.RouterType:
-			e.Category = entity.SensorCategory
-		default:
-			e.Category = entity.SensorCategory
 		}
 		cmd.Devices[i] = e
 	}

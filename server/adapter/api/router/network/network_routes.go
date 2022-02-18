@@ -42,8 +42,7 @@ func (r networkRouter) sync(ctx *gin.Context) (interface{}, error) {
 
 func (r networkRouter) find(ctx *gin.Context) (interface{}, error) {
 	filters := request.NewFilters(ctx)
-	switch ctx.Query("method") {
-	case "paging":
+	if _, ok := ctx.GetQuery("page"); ok {
 		page := cast.ToInt(ctx.Query("page"))
 		size := cast.ToInt(ctx.Query("size"))
 		result, total, err := r.service.FindNetworksByPaginate(filters, page, size)
@@ -51,9 +50,8 @@ func (r networkRouter) find(ctx *gin.Context) (interface{}, error) {
 			return nil, err
 		}
 		return response.NewPageResult(page, size, total, result), nil
-	default:
-		return r.service.FilterNetworks(filters)
 	}
+	return r.service.FilterNetworks(filters)
 }
 
 func (r networkRouter) addDevices(ctx *gin.Context) (interface{}, error) {
@@ -62,6 +60,7 @@ func (r networkRouter) addDevices(ctx *gin.Context) (interface{}, error) {
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		return nil, response.InvalidParameterError(err.Error())
 	}
+	req.ProjectID = cast.ToUint(ctx.MustGet("project_id"))
 	return nil, r.service.AddDevicesByID(id, req)
 }
 

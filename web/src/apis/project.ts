@@ -5,7 +5,7 @@ import {Project} from "../types/project";
 import {AllocUser} from "../types/alloc_user";
 
 export function PagingProjectsRequest(page: number, size: number) {
-    return request.get<PageResult<Project[]>>('/projects?method=paging', {page, size}).then(GetResponse)
+    return request.get<PageResult<Project[]>>('/projects', {page, size}).then(GetResponse)
 }
 
 export function CreateProjectRequest(params: any) {

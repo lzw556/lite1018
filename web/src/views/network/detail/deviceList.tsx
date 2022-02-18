@@ -4,7 +4,6 @@ import {Device} from "../../../types/device";
 import {FC, useCallback, useEffect, useState} from "react";
 import {PagingDevicesRequest} from "../../../apis/device";
 import {Network} from "../../../types/network";
-import {DeleteOutlined} from "@ant-design/icons";
 import AlertIcon from "../../../components/alertIcon";
 import DeviceUpgradeSpin from "../../../views/device/spin/deviceUpgradeSpin";
 import {PageResult} from "../../../types/page";
@@ -117,7 +116,7 @@ const DeviceList: FC<DeviceTableProps> = ({network, onRefresh}) => {
                         hasPermission(Permission.NetworkRemoveDevices) && record.id !== network.gateway.id &&
                         <Popconfirm placement="left" title="确认要将该设备移除网络吗?" onConfirm={() => onDelete(record.id)}
                                     okText="移除" cancelText="取消">
-                            <Button type="text" size="small" icon={<DeleteOutlined/>} danger disabled={isUpgrading}/>
+                            <Button type="text" size="small" danger disabled={isUpgrading}>移除</Button>
                         </Popconfirm>
                     }
                 </Space>
@@ -126,7 +125,7 @@ const DeviceList: FC<DeviceTableProps> = ({network, onRefresh}) => {
     ]
 
     return <>
-        <DeviceTable columns={columns} permissions={[Permission.NetworkRemoveDevices]} dataSource={dataSource} onChange={fetchDevices}/>
+        <DeviceTable columns={columns} permissions={[Permission.NetworkRemoveDevices]} dataSource={dataSource?.result.sort((a:any, b:any) => a.typeId - b.typeId)} onChange={fetchDevices}/>
     </>
 }
 

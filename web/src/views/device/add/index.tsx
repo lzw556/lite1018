@@ -57,7 +57,7 @@ const AddDevicePage = () => {
                         subTitle="您可以返回设备列表查看设备信息或者继续创建设备"
                         extra={[
                             <Button type="primary" key="devices" onClick={() => {
-                                window.location.hash = "device-management/devices"
+                                window.location.hash = "device-management?locale=devices"
                             }}>
                                 返回设备列表
                             </Button>,

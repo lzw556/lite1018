@@ -86,11 +86,10 @@ const ImportNetworkPage = () => {
                             name: n.name,
                             mac_address: n.macAddress,
                             type_id: n.type,
-                            ...n.settings,
+                            settings: n.settings,
                         }
                     })
                 }
-                console.log(req);
                 ImportNetworkRequest(req).then(_ => setSuccess(true))
             })
         } else {

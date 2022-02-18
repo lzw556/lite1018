@@ -32,14 +32,6 @@ export const COMMUNICATION_PERIOD = [
     {
         value: 2 * 60 * 60 * millisecond,
         text: "2小时"
-    },
-    {
-        value: 3 * 60 * 60 * millisecond,
-        text: "3小时"
-    },
-    {
-        value: 4 * 60 * 60 * millisecond,
-        text: "4小时"
     }
 ]
 

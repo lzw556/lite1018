@@ -58,6 +58,7 @@ const ProjectPage = () => {
         {
             title: '操作',
             key: 'action',
+            width: "20%",
             render: (_: any, record: any) => {
                 return <Space>
                     <Button type={"link"} size={"small"} onClick={() => onAllocUser(record)}>分配用户</Button>

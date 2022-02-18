@@ -12,7 +12,7 @@ export function GetNetworksRequest() {
 }
 
 export function PagingNetworksRequest(filter: any, page: number, size: number) {
-    return request.get<PageResult<Network[]>>(`/networks?method=paging`, {...filter, page, size}).then(GetResponse)
+    return request.get<PageResult<Network[]>>(`/networks`, {...filter, page, size}).then(GetResponse)
 }
 
 export function AccessDevicesRequest(networkId: number, params: any) {

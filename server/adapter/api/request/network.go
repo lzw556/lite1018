@@ -14,15 +14,13 @@ type Network struct {
 }
 
 type AddDevices struct {
-	ParentID   uint                   `json:"parent_id"`
-	Devices    []uint                 `json:"devices"`
-	IsNew      bool                   `json:"is_new"`
-	DeviceType uint                   `json:"device_type"`
-	Name       string                 `json:"name"`
-	MacAddress string                 `json:"mac_address"`
-	Sensors    map[string]interface{} `json:"sensors"`
-	System     map[string]interface{} `json:"system"`
-	IPN        map[string]interface{} `json:"ipn"`
+	ParentID   uint   `json:"parent_id"`
+	Devices    []uint `json:"devices"`
+	IsNew      bool   `json:"is_new"`
+	DeviceType uint   `json:"device_type"`
+	Name       string `json:"name"`
+	MacAddress string `json:"mac_address"`
+	ProjectID  uint   `json:"-"`
 }
 
 type RemoveDevices struct {
@@ -36,12 +34,10 @@ type ImportNetwork struct {
 	GroupInterval           uint        `json:"group_interval"`
 	RoutingTables           [][2]string `json:"routing_tables"`
 	Devices                 []struct {
-		Name       string                 `json:"name"`
-		MacAddress string                 `json:"mac_address"`
-		TypeID     uint                   `json:"type_id"`
-		IPN        map[string]interface{} `json:"ipn,omitempty"`
-		System     map[string]interface{} `json:"system,omitempty"`
-		Sensors    map[string]interface{} `json:"sensors,omitempty"`
+		Name       string                            `json:"name"`
+		MacAddress string                            `json:"mac_address"`
+		TypeID     uint                              `json:"type_id"`
+		Settings   map[string]map[string]interface{} `json:"settings,omitempty"`
 	} `json:"devices"`
 
 	ProjectID uint `json:"-"`

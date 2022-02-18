@@ -14,7 +14,7 @@ export function AddDeviceRequest(device: any) {
 }
 
 export function PagingDevicesRequest(page:number, size: number, filters:any) {
-    return request.get<PageResult<Device[]>>("/devices?method=paging", {page, size, ...filters}).then(GetResponse)
+    return request.get<PageResult<Device[]>>("/devices", {page, size, ...filters}).then(GetResponse)
 }
 
 export function GetDevicesRequest(filters:any) {

@@ -76,9 +76,9 @@ func (s Network) AddDevicesByID(networkID uint, req request.AddDevices) error {
 		return err
 	}
 	if req.IsNew {
-		return cmd.AccessNewDevice(req)
+		return cmd.AddNewDevices(req)
 	}
-	return cmd.AccessDevices(req.ParentID, req.Devices)
+	return cmd.AddDevices(req.ParentID, req.Devices)
 }
 
 func (s Network) RemoveDevicesByID(networkID uint, req request.RemoveDevices) error {

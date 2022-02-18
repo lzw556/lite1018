@@ -27,8 +27,7 @@ func (r deviceRouter) get(ctx *gin.Context) (interface{}, error) {
 
 func (r deviceRouter) find(ctx *gin.Context) (interface{}, error) {
 	filters := request.NewFilters(ctx)
-	switch ctx.Query("method") {
-	case "paging":
+	if _, ok := ctx.GetQuery("page"); ok {
 		page := cast.ToInt(ctx.Query("page"))
 		size := cast.ToInt(ctx.Query("size"))
 		result, total, err := r.service.FindDevicesByPaginate(page, size, filters)
@@ -36,9 +35,8 @@ func (r deviceRouter) find(ctx *gin.Context) (interface{}, error) {
 			return nil, err
 		}
 		return response.NewPageResult(page, size, total, result), nil
-	default:
-		return r.service.FilterDevices(filters)
 	}
+	return r.service.FilterDevices(filters)
 }
 
 func (r deviceRouter) update(ctx *gin.Context) (interface{}, error) {

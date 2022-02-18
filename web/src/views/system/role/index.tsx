@@ -71,6 +71,7 @@ const RolePage = () => {
         {
             title: '操作',
             key: 'action',
+            width: '25%',
             render: (text: string, record: any) => {
                 return <Space>
                     {

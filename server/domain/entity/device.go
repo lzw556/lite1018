@@ -22,7 +22,6 @@ type Device struct {
 	Type       uint
 	NetworkID  uint
 	ProjectID  uint
-	Category   DeviceCategory
 	Settings   DeviceSettings `gorm:"type:json"`
 
 	State DeviceState `gorm:"-"`

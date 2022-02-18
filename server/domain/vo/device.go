@@ -28,7 +28,6 @@ func NewDevice(e entity.Device) Device {
 		Name:       e.Name,
 		MacAddress: e.MacAddress,
 		TypeID:     e.Type,
-		Category:   uint(e.Category),
 	}
 	return d
 }

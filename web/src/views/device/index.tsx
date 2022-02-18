@@ -340,14 +340,17 @@ const DevicePage = () => {
             setDevice(undefined)
             setEditBaseInfoVisible(false)
         }}/>
-        <EditSettingModal device={device} visible={editSettingVisible} onSuccess={() => {
-            setDevice(undefined)
-            setEditSettingVisible(false)
-            onRefresh()
-        }} onCancel={() => {
-            setDevice(undefined)
-            setEditSettingVisible(false)
-        }}/>
+        {
+            device &&
+            <EditSettingModal device={device} visible={editSettingVisible} onSuccess={() => {
+                setDevice(undefined)
+                setEditSettingVisible(false)
+                onRefresh()
+            }} onCancel={() => {
+                setDevice(undefined)
+                setEditSettingVisible(false)
+            }}/>
+        }
         {
             device &&
             <UpgradeModal visible={upgradeVisible} device={device} onSuccess={() => {

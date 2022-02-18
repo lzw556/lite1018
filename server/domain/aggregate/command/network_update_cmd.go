@@ -11,6 +11,7 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	spec "github.com/thetasensors/theta-cloud-lite/server/domain/specification"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/vo"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/devicetype"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/errcode"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/transaction"
 	"time"
@@ -56,7 +57,7 @@ func (cmd NetworkUpdateCmd) Update(req request.Network) (*vo.Network, error) {
 	return &result, nil
 }
 
-func (cmd NetworkUpdateCmd) AccessDevices(parentID uint, childrenID []uint) error {
+func (cmd NetworkUpdateCmd) AddDevices(parentID uint, childrenID []uint) error {
 	ctx := context.TODO()
 	parent, err := cmd.deviceRepo.Get(ctx, parentID)
 	if err != nil {
@@ -87,29 +88,41 @@ func (cmd NetworkUpdateCmd) AccessDevices(parentID uint, childrenID []uint) erro
 	return nil
 }
 
-func (cmd NetworkUpdateCmd) AccessNewDevice(req request.AddDevices) error {
-	ctx := context.TODO()
-	device, err := cmd.deviceRepo.GetBySpecs(ctx, spec.DeviceMacEqSpec(req.MacAddress))
-	if device.ID != 0 {
-		return response.BusinessErr(errcode.DeviceMacExistsError, "")
-	}
-	parent, err := cmd.deviceRepo.Get(ctx, req.ParentID)
-	if err != nil {
-		return response.BusinessErr(errcode.DeviceNotFoundError, "")
-	}
-	device = entity.Device{
-		Name:       req.Name,
-		MacAddress: req.MacAddress,
-		NetworkID:  cmd.Network.ID,
-		Type:       req.DeviceType,
-	}
-	return transaction.Execute(ctx, func(txCtx context.Context) error {
-		if err := cmd.deviceRepo.Create(txCtx, &device); err != nil {
-			return err
+func (cmd NetworkUpdateCmd) AddNewDevices(req request.AddDevices) error {
+	if t := devicetype.Get(req.DeviceType); t != nil {
+		ctx := context.TODO()
+		device, err := cmd.deviceRepo.GetBySpecs(ctx, spec.DeviceMacEqSpec(req.MacAddress))
+		if device.ID != 0 {
+			return response.BusinessErr(errcode.DeviceMacExistsError, "")
 		}
-		cmd.Network.AddDevices(parent, device)
-		return cmd.networkRepo.Save(txCtx, &cmd.Network)
-	})
+		parent, err := cmd.deviceRepo.Get(ctx, req.ParentID)
+		if err != nil {
+			return response.BusinessErr(errcode.DeviceNotFoundError, "")
+		}
+		device = entity.Device{
+			Name:       req.Name,
+			MacAddress: req.MacAddress,
+			NetworkID:  cmd.Network.ID,
+			Type:       req.DeviceType,
+			ProjectID:  req.ProjectID,
+		}
+		device.Settings = make(entity.DeviceSettings, len(t.Settings()))
+		for i, setting := range t.Settings() {
+			device.Settings[i] = entity.DeviceSetting{
+				Key:      setting.Key,
+				Value:    setting.Value,
+				Category: string(setting.Category),
+			}
+		}
+		return transaction.Execute(ctx, func(txCtx context.Context) error {
+			if err := cmd.deviceRepo.Create(txCtx, &device); err != nil {
+				return err
+			}
+			cmd.Network.AddDevices(parent, device)
+			return cmd.networkRepo.Save(txCtx, &cmd.Network)
+		})
+	}
+	return response.BusinessErr(errcode.UnknownDeviceTypeError, "")
 }
 
 func (cmd NetworkUpdateCmd) RemoveDevices(req request.RemoveDevices) error {
