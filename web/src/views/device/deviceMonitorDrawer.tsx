@@ -2,9 +2,10 @@ import {Card, Col, Drawer, DrawerProps, Empty, Row, Table, Tag, Typography} from
 import {Device} from "../../types/device";
 import {FC, useEffect, useState} from "react";
 import ReactECharts from "echarts-for-react";
-import {GetDeviceDataRequest, GetDeviceRuntimeDataRequest, GetLastDeviceDataRequest} from "../../apis/device";
+import {GetDeviceDataRequest, GetLastDeviceDataRequest} from "../../apis/device";
 import {DefaultMonitorDataOption, LineChartStyles} from "../../constants/chart";
 import moment from "moment";
+import { Property } from "../../types/property";
 
 export interface DeviceMonitorDrawerProps extends DrawerProps {
     device: Device;
@@ -13,63 +14,17 @@ export interface DeviceMonitorDrawerProps extends DrawerProps {
 const DeviceMonitorDrawer: FC<DeviceMonitorDrawerProps> = (props) => {
     const {device, visible} = props;
     const [historyOptions, setHistoryOptions] = useState<any>();
-    const [runtimeOptions, setRuntimeOptions] = useState<any>();
-    const [deviceData, setDeviceData] = useState<any>()
     const [startDate] = useState<moment.Moment>(moment().startOf('day').subtract(13, 'd'));
     const [endDate] = useState<moment.Moment>(moment().endOf('day'));
     const [height] = useState<number>(window.innerHeight);
+    const [timestamp, setTimestamp] = useState(0)
+    const [properties,setProperties]=useState<(Property&{data:any}& {precision:number})[]>([])
 
     useEffect(() => {
         if (visible) {
             fetchDeviceHistoryData();
-            fetchDeviceRuntimeData();
-            fetchLastDeviceData();
         }
     }, [visible]);
-
-    const fetchDeviceRuntimeData = () => {
-        GetDeviceRuntimeDataRequest(device.id, startDate.utc().unix(), endDate.utc().unix()).then(data => {
-            const batteryOption = {
-                ...DefaultMonitorDataOption,
-                title: {text: "电池电压"},
-                tooltip: {
-                    trigger: "axis",
-                    formatter: "{b}<br/>{a}: {c}mV"
-                },
-                series: [{
-                    ...LineChartStyles[0],
-                    name: "电池电压",
-                    type: "line",
-                    data: data.map((item:any) => item.batteryVoltage)
-                }],
-                xAxis: {
-                    type: 'category',
-                    boundaryGap: false,
-                    data: data.map((item:any) => moment.unix(item.timestamp).local().format("YYYY-MM-DD HH:mm:ss"))
-                }
-            }
-            const signalOption = {
-                ...DefaultMonitorDataOption,
-                title: {text: "信号强度"},
-                tooltip: {
-                    trigger: "axis",
-                    formatter: "{b}<br/>{a}: {c}dB"
-                },
-                series: [{
-                    ...LineChartStyles[0],
-                    name: "信号强度",
-                    type: "line",
-                    data: data.map((item:any) => item.signalStrength)
-                }],
-                xAxis: {
-                    type: 'category',
-                    boundaryGap: false,
-                    data: data.map((item:any) => moment.unix(item.timestamp).local().format("YYYY-MM-DD HH:mm:ss"))
-                }
-            }
-            setRuntimeOptions([batteryOption, signalOption])
-        })
-    }
 
     const fetchDeviceHistoryData = () => {
         GetDeviceDataRequest(device.id, startDate.utc().unix(), endDate.utc().unix()).then(data => {
@@ -122,12 +77,40 @@ const DeviceMonitorDrawer: FC<DeviceMonitorDrawerProps> = (props) => {
                     }
                 }
             }))
+            fetchLastDeviceData();
         })
     }
 
     const fetchLastDeviceData = () => {
-        GetLastDeviceDataRequest(device.id).then(setDeviceData)
+        GetLastDeviceDataRequest(device.id).then(({timestamp,properties})=>{
+            setTimestamp(timestamp);
+            setProperties(properties)
+        })
     }
+
+    useEffect(()=>{
+        if(historyOptions && historyOptions.length && historyOptions.length === properties.length){
+            const _properties = properties
+            setProperties([])
+            setHistoryOptions((prev:any)=>prev.map((item:any, index:number)=>{
+                const property = _properties[index];
+                let properName = item.title.text;
+                let text = properName;
+                let subtext = ''
+                const relativedValue = property.data[properName]
+                if(relativedValue !== undefined){
+                    text += ' ' + relativedValue.toFixed(property.precision) + property.unit;
+                }else{
+                    for (const key in property.data) {
+                        const value = property.data[key].toFixed(property.precision) + property.unit;
+                        subtext += `${key}:${value} `
+                    }
+                }
+                
+                return {...item,title: {text, subtext} }
+            }))
+        }
+    },[historyOptions, properties])
 
     const renderDeviceHistoryDataChart = () => {
         if (historyOptions && historyOptions.length) {
@@ -140,36 +123,6 @@ const DeviceMonitorDrawer: FC<DeviceMonitorDrawerProps> = (props) => {
         return <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={"数据不足"}/>
     }
 
-    const renderDeviceRuntimeDataChart = () => {
-        if (runtimeOptions && runtimeOptions.length) {
-            return runtimeOptions.map((item: any, index: number) => {
-                return <Card.Grid key={index} style={{boxShadow: "none", border: "none", width: "50%"}}>
-                    <ReactECharts option={item} style={{border: "none", height: "256px"}}/>
-                </Card.Grid>
-            })
-        }
-        return <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={"数据不足"}/>
-    }
-
-    const columns = [
-        {
-            title: '名称',
-            dataIndex: 'name',
-            key: 'name',
-            width: '20%',
-        },
-        {
-            title: '值',
-            dataIndex: 'data',
-            key: 'data',
-            render: (data:any, property:any) => {
-                return Object.keys(data).map(key => {
-                    return <Tag>{key}:{data[key].toFixed(property.precision)}{property.unit}</Tag>
-                })
-            }
-        }
-    ]
-
     return <Drawer {...props} placement={"top"} closable={false} height={height - 100}>
         <Row justify={"start"}>
             <Col span={24}>
@@ -179,23 +132,23 @@ const DeviceMonitorDrawer: FC<DeviceMonitorDrawerProps> = (props) => {
         </Row>
         <br/>
         <Row justify={"start"}>
-            <Col span={12}>
-                <Typography.Title level={4}>运行状态</Typography.Title>
-                <Card bordered={false}>
-                    {
-                        renderDeviceRuntimeDataChart()
-                    }
-                </Card>
+            <Col span={24}>
+                <Typography.Title level={4}>电池电压</Typography.Title>
+                <Typography.Text>{device.state.batteryVoltage}mV</Typography.Text>
             </Col>
-            <Col span={12}>
-                <Typography.Title level={4}>当前特征值数据</Typography.Title>
-                {
-                    deviceData &&
-                    <Typography.Text>最近一次采集时间: {moment.unix(deviceData.timestamp).local().format("YYYY-MM-DD HH:mm:ss")}</Typography.Text>
-                }
-                <Table columns={columns} size={"small"} scroll={{y: 300}} dataSource={deviceData?.properties} pagination={false}/>
+        </Row><br/>
+        <Row justify={"start"}>
+            <Col span={24}>
+                <Typography.Title level={4}>信号强度</Typography.Title>
+                <Typography.Text>{device.state.signalLevel}dB</Typography.Text>
             </Col>
-        </Row>
+        </Row><br/>
+        {timestamp && <><Row justify={"start"}>
+            <Col span={24}>
+                <Typography.Title level={4}>最近一次采集时间</Typography.Title>
+                <Typography.Text>{moment.unix(timestamp).local().format("YYYY-MM-DD HH:mm:ss")}</Typography.Text>
+            </Col>
+        </Row><br/></>}
         <Row justify={"start"}>
             <Col span={24}>
                 <Typography.Title level={4}>历史数据</Typography.Title>
