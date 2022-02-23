@@ -18,17 +18,27 @@ import HistoryDataPage from "./data";
 import WaveDataChart from "./waveData";
 import useSocket, {SocketTopic} from "../../../socket";
 import { DeviceMonitor } from "../DeviceMonitor";
+import { RuntimeChart } from "../RuntimeChart";
 
 const tabList = [
+    {
+        key: "settings",
+        tab: "配置信息",
+    },
+    {
+        key: "ta",
+        tab: "TA(状态历史)",
+    }
+]
+const tabTitleList = [   
     {
         key: "monitor",
         tab: "监控",
     },
     {
-        key: "settings",
-        tab: "配置信息",
-    },
-]
+        key: "historyData",
+        tab: "历史数据"
+    }]
 
 const DeviceDetailPage = () => {
     const location = useLocation<any>();
@@ -36,14 +46,15 @@ const DeviceDetailPage = () => {
     const {PubSub} = useSocket();
     const [device, setDevice] = useState<Device>();
     const [isLoading, setIsLoading] = useState<boolean>(false);
-    const [currentKey, setCurrentKey] = useState<string>("monitor");
+    const [currentKey, setCurrentKey] = useState<string>('');
     const {hasPermission} = userPermission();
 
     const contents = new Map<string, any>([
         ["settings", device && <SettingPage device={device}/>],
         ["historyData", device && <HistoryDataPage device={device}/>],
         ["waveData", device && <WaveDataChart device={device}/>],
-        ['monitor',device && <DeviceMonitor device={device}/>]
+        ['monitor',device && <DeviceMonitor device={device}/>],
+        ['ta',device && <RuntimeChart deviceId={device.id}/>]
     ])
 
     const fetchDevice = useCallback(() => {
@@ -73,6 +84,11 @@ const DeviceDetailPage = () => {
                     setDevice({...device, state: {...device.state, isOnline: state.isOnline}})
                 }
             })
+            if(device.typeId===DeviceType.Gateway||device.typeId===DeviceType.Router){
+                setCurrentKey(tabList[0].key)
+            }else{
+                setCurrentKey(tabTitleList[0].key)
+            }
         }
         return () => {
             PubSub.unsubscribe(SocketTopic.connectionState)
@@ -84,15 +100,12 @@ const DeviceDetailPage = () => {
             switch (device.typeId) {
                 case DeviceType.VibrationTemperature3Axis:
                     return [
-                        ...tabList,
-                        {
-                            key: "historyData",
-                            tab: "历史数据"
-                        },
+                        ...tabTitleList,
                         {
                             key: "waveData",
                             tab: "波形数据"
-                        }
+                        },
+                        ...tabList
                     ]
                 case DeviceType.Gateway:
                     return tabList
@@ -100,11 +113,8 @@ const DeviceDetailPage = () => {
                     return tabList
                 default:
                     return [
+                        ...tabTitleList,
                         ...tabList,
-                        {
-                            key: "historyData",
-                            tab: "历史数据"
-                        },
                     ]
             }
         }
