@@ -17,8 +17,13 @@ import userPermission, {Permission} from "../../../permission/permission";
 import HistoryDataPage from "./data";
 import WaveDataChart from "./waveData";
 import useSocket, {SocketTopic} from "../../../socket";
+import { DeviceMonitor } from "../DeviceMonitor";
 
 const tabList = [
+    {
+        key: "monitor",
+        tab: "监控",
+    },
     {
         key: "settings",
         tab: "配置信息",
@@ -31,13 +36,14 @@ const DeviceDetailPage = () => {
     const {PubSub} = useSocket();
     const [device, setDevice] = useState<Device>();
     const [isLoading, setIsLoading] = useState<boolean>(false);
-    const [currentKey, setCurrentKey] = useState<string>("settings");
+    const [currentKey, setCurrentKey] = useState<string>("monitor");
     const {hasPermission} = userPermission();
 
     const contents = new Map<string, any>([
         ["settings", device && <SettingPage device={device}/>],
         ["historyData", device && <HistoryDataPage device={device}/>],
-        ["waveData", device && <WaveDataChart device={device}/>]
+        ["waveData", device && <WaveDataChart device={device}/>],
+        ['monitor',device && <DeviceMonitor device={device}/>]
     ])
 
     const fetchDevice = useCallback(() => {
