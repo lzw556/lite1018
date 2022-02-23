@@ -11,13 +11,13 @@ type AlarmRecordPagingQuery struct {
 	entity.AlarmRecords
 
 	total     int64
-	alarmRepo dependency.AlarmRepository
+	alarmRepo dependency.AlarmRuleRepository
 }
 
 func NewAlarmRecordPagingQuery(total int64) AlarmRecordPagingQuery {
 	return AlarmRecordPagingQuery{
 		total:     total,
-		alarmRepo: repository.Alarm{},
+		alarmRepo: repository.AlarmRule{},
 	}
 }
 

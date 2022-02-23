@@ -13,13 +13,6 @@ type Alarm struct {
 	CreatedAt int64     `json:"createdAt"`
 }
 
-func NewAlarm(e entity.Alarm) Alarm {
-	return Alarm{
-		ID:        e.ID,
-		Name:      e.Name,
-		Rule:      NewAlarmRule(e.Rule),
-		Level:     e.Level,
-		Enabled:   e.Enabled,
-		CreatedAt: e.CreatedAt.UTC().Unix(),
-	}
+func NewAlarm(e entity.AlarmRule) Alarm {
+	return Alarm{}
 }

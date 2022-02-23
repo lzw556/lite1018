@@ -6,7 +6,7 @@ import (
 )
 
 type AlarmQuery struct {
-	entity.Alarm
+	entity.AlarmRule
 }
 
 func NewAlarmQuery() AlarmQuery {
@@ -14,6 +14,5 @@ func NewAlarmQuery() AlarmQuery {
 }
 
 func (query AlarmQuery) Detail() *vo.Alarm {
-	result := vo.NewAlarm(query.Alarm)
-	return &result
+	return nil
 }

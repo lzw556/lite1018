@@ -25,7 +25,7 @@ func NewNetworkQuery() NetworkQuery {
 	}
 }
 
-func (query NetworkQuery) Detail() (*vo.Network, error) {
+func (query NetworkQuery) GetDetail() (*vo.Network, error) {
 	ctx := context.TODO()
 	result := vo.NewNetwork(query.Network)
 	if gateway, err := query.deviceRepo.Get(ctx, query.Network.GatewayID); err == nil {

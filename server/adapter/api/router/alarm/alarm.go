@@ -18,7 +18,11 @@ func NewRouter(s Service) router.Router {
 func (r *alarmRouter) initRoutes() {
 	r.routes = []router.Route{
 		// POST
-		router.NewPostRoute("/alarms", r.createAlarm),
+		router.NewPostRoute("alarmRules", r.createAlarmRule),
+
+		// GET
+		router.NewGetRoute("alarmRules", r.findAlarmRules),
+		router.NewGetRoute("alarmRules/:id", r.getAlarmRule),
 	}
 }
 

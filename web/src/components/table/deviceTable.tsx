@@ -10,9 +10,10 @@ export interface DeviceTableProps {
     permissions?: any
     emptyText?: any
     onChange?: any
+    rowSelection?: any
 }
 
-const DeviceTable: FC<DeviceTableProps> = ({columns, emptyText, dataSource, permissions, onChange}) => {
+const DeviceTable: FC<DeviceTableProps> = ({columns, emptyText, dataSource, permissions, rowSelection, onChange}) => {
     const {PubSub} = useSocket()
     const [data, setData] = useState<any>(dataSource)
 
@@ -52,6 +53,7 @@ const DeviceTable: FC<DeviceTableProps> = ({columns, emptyText, dataSource, perm
     }, [data])
 
     return <TableLayout
+        rowSelection={rowSelection}
         emptyText={emptyText ? emptyText : "设备列表为空"}
         columns={columns}
         permissions={permissions}

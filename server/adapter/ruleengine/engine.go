@@ -2,8 +2,11 @@ package ruleengine
 
 import (
 	"bytes"
+	"context"
 	"github.com/bilibili/gengine/engine"
+	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
+	spec "github.com/thetasensors/theta-cloud-lite/server/domain/specification"
 )
 
 var pool *engine.GenginePool
@@ -23,22 +26,22 @@ func Init() {
 }
 
 func initRules() {
-	//alarmRepo := repository.Alarm{}
-	//alarms, err := alarmReentity.FindBySpecs(context.TODO())
-	//if err != nil {
-	//	panic(err)
-	//}
-	//if len(alarms) > 0 {
-	//	if err := UpdateRules(alarms...); err != nil {
-	//		panic(err)
-	//	}
-	//}
+	alarmRuleRepo := repository.AlarmRule{}
+	alarmRules, err := alarmRuleRepo.FindBySpecs(context.TODO(), spec.EnabledEqSpec(true))
+	if err != nil {
+		panic(err)
+	}
+	if len(alarmRules) > 0 {
+		if err := UpdateRules(alarmRules...); err != nil {
+			panic(err)
+		}
+	}
 }
 
-func UpdateRules(alarms ...entity.Alarm) error {
+func UpdateRules(alarmRules ...entity.AlarmRule) error {
 	buf := bytes.Buffer{}
-	for _, a := range alarms {
-		buf.WriteString(a.RuleSpec())
+	for _, rule := range alarmRules {
+		buf.WriteString(rule.Name)
 	}
 	return pool.UpdatePooledRulesIncremental(buf.String())
 }

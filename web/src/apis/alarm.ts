@@ -1,6 +1,6 @@
 import request from "../utils/request";
 import {PageResult} from "../types/page";
-import {AlarmRuleTemplate} from "../types/alarm_rule_template";
+import {AlarmRule, AlarmRuleTemplate} from "../types/alarm_rule_template";
 import {Alarm} from "../types/alarm_rule";
 import {AlarmRecordStatistics} from "../types/alarm_statistics";
 import {DeleteResponse, GetResponse, PostResponse, PutResponse} from "../utils/response";
@@ -34,16 +34,16 @@ export function CheckAlarmNameRequest(name: string) {
     return request.get(`/check/alarms/${name}`).then(GetResponse)
 }
 
-export function AddAlarmRequest(createType: number, params: any) {
-    return request.post(`/alarms?create_type=${createType}`, params).then(PostResponse)
+export function AddAlarmRuleRequest(params: any) {
+    return request.post("/alarmRules", params).then(PostResponse)
 }
 
-export function PagingAlarmsRequest(filter:any, page: number, size: number) {
-    return request.get<PageResult<Alarm[]>>("/alarms?method=paging", {...filter, page, size}).then(GetResponse)
+export function PagingAlarmRuleRequest(filters:any, page: number, size: number) {
+    return request.get<PageResult<AlarmRule[]>>("/alarmRules", {...filters, page, size}).then(GetResponse)
 }
 
-export function GetAlarmRequest(id: number) {
-    return request.get<Alarm>(`/alarms/${id}`).then(GetResponse)
+export function GetAlarmRuleRequest(id: number) {
+    return request.get<any>(`/alarmRules/${id}`).then(GetResponse)
 }
 
 export function UpdateAlarmRequest(id: number, params: any) {
