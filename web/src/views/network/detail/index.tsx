@@ -77,7 +77,7 @@ const NetworkDetail = () => {
 
                     </Col>
                 </Row>
-                <br/>
+                
                 <Row justify={"start"}>
                     <Col span={3} className="ts-detail-label">
                         通讯周期
@@ -98,7 +98,7 @@ const NetworkDetail = () => {
                         }
                     </Col>
                 </Row>
-                <br/>
+                
                 <Row justify={"start"}>
                     <Col span={3} className="ts-detail-label">
                         通讯延时
@@ -139,7 +139,7 @@ const NetworkDetail = () => {
                         网关
                     </Col>
                 </Row>
-                <br/>
+                
                 <Row justify={"start"}>
                     <Col span={3} className="ts-detail-label">
                         MAC地址
@@ -160,7 +160,7 @@ const NetworkDetail = () => {
                         }
                     </Col>
                 </Row>
-                <br/>
+                
                 <Row justify={"start"}>
                     <Col span={3} className="ts-detail-label">
                         固件版本号
@@ -179,7 +179,7 @@ const NetworkDetail = () => {
                         }
                     </Col>
                 </Row>
-                <br/>
+                
                 <Row justify={"start"}>
                     <Col span={3} className="ts-detail-label">
                         最近连接时间
@@ -198,7 +198,7 @@ const NetworkDetail = () => {
                         }
                     </Col>
                 </Row>
-                <br/>
+                
                 <Row justify={"start"}>
                     <Col span={3} className="ts-detail-label">
                         生产厂商
