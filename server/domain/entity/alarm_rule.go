@@ -1,27 +1,33 @@
 package entity
 
-import (
-	"database/sql/driver"
-	"errors"
-	"fmt"
-	"github.com/thetasensors/theta-cloud-lite/server/pkg/json"
+import "gorm.io/gorm"
+
+type AlarmRuleType uint8
+
+const (
+	AlarmRuleTypeDevice AlarmRuleType = iota + 1
+	AlarmRuleTypeAsset
 )
 
 type AlarmRule struct {
-	Field     string  `json:"field"`
-	Method    string  `json:"method"`
-	Operation string  `json:"operation"`
-	Threshold float32 `json:"threshold"`
+	gorm.Model
+	Name        string          `gorm:"type:varchar(30)"`
+	Description string          `gorm:"type:varchar(128)"`
+	SourceType  string          `gorm:"type:varchar(32)"`
+	Metric      AlarmRuleMetric `gorm:"type:json"`
+	Duration    int
+	Threshold   float64
+	Operation   string `gorm:"type:varchar(8)"`
+	Level       uint8
+	Enabled     bool
 }
 
-func (s AlarmRule) Value() (driver.Value, error) {
-	return json.Marshal(s)
+func (AlarmRule) TableName() string {
+	return "ts_alarm_rule"
 }
 
-func (s *AlarmRule) Scan(v interface{}) error {
-	bytes, ok := v.([]byte)
-	if !ok {
-		return errors.New(fmt.Sprint("failed to unmarshal AlarmRules value:", v))
-	}
-	return json.Unmarshal(bytes, s)
+func (a AlarmRule) RuleSpec() string {
+	return ``
 }
+
+type AlarmRules []AlarmRule

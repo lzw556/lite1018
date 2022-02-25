@@ -7,6 +7,7 @@ import (
 	"github.com/gin-contrib/gzip"
 	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
+	socketio "github.com/googollee/go-socket.io"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/middleware"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/response"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router"
@@ -37,6 +38,11 @@ func (a *Adapter) StaticFS(dist embed.FS) {
 
 func (a *Adapter) UseMiddleware(middlewares ...middleware.Middleware) {
 	a.middlewares = append(a.middlewares, middlewares...)
+}
+
+func (a Adapter) Socket(server *socketio.Server) {
+	a.engine.GET("/socket.io/*any", gin.WrapH(server))
+	a.engine.POST("/socket.io/*any", gin.WrapH(server))
 }
 
 func (a *Adapter) Run() error {

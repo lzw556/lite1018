@@ -8,11 +8,12 @@ type Property struct {
 	Unit      string                 `json:"unit"`
 	Sort      int                    `json:"sort"`
 	Precision int                    `json:"precision"`
-	Data      map[string]interface{} `json:"data"`
+	Fields    Fields                 `json:"fields"`
+	Data      map[string]interface{} `json:"data,omitempty"`
 }
 
 func NewProperty(e devicetype.Property) Property {
-	return Property{
+	p := Property{
 		Name:      e.Name,
 		Key:       e.Key,
 		Unit:      e.Unit,
@@ -20,6 +21,11 @@ func NewProperty(e devicetype.Property) Property {
 		Sort:      e.Sort,
 		Data:      map[string]interface{}{},
 	}
+	p.Fields = make(Fields, len(e.Fields))
+	for i, field := range e.Fields {
+		p.Fields[i] = NewField(field)
+	}
+	return p
 }
 
 func (p *Property) SetData(key string, value interface{}) {

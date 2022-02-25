@@ -12,6 +12,6 @@ func (s AlarmRuleEqSpec) IsSpecifiedBy(v interface{}) bool {
 
 func (s AlarmRuleEqSpec) Scope() func(db *gorm.DB) *gorm.DB {
 	return func(db *gorm.DB) *gorm.DB {
-		return db.Where("alarm_id = ?", s)
+		return db.Where("alarm_rule_id = ?", s)
 	}
 }

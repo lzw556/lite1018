@@ -28,7 +28,6 @@ const EditAlarmRuleTemplate = () => {
                     measurement_type: data.measurementType,
                     rule: {
                         ...data.rule,
-                        field: data.rule.field,
                     },
                     description: data.description,
                     level: data.level,

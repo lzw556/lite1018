@@ -17,7 +17,6 @@ func NewAlarmTemplate(e entity.AlarmTemplate) AlarmTemplate {
 		ID:          e.ID,
 		Name:        e.Name,
 		Level:       e.Level,
-		Rule:        NewAlarmRule(e.Rule),
 		Description: e.Description,
 	}
 }

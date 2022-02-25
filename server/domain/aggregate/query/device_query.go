@@ -26,7 +26,7 @@ type DeviceQuery struct {
 	sensorDataRepo        dependency.SensorDataRepository
 	deviceInformationRepo dependency.DeviceInformationRepository
 	networkRepo           dependency.NetworkRepository
-	alarmRuleRepo         dependency.AlarmRepository
+	alarmRuleRepo         dependency.AlarmRuleRepository
 	largeSensorDataRepo   dependency.LargeSensorDataRepository
 }
 

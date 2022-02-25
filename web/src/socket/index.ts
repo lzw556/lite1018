@@ -17,7 +17,7 @@ const useSocket = () => {
 
     if (isLogin()) {
         if (!socket) {
-            socket = io.connect(":8291/", {
+            socket = io.connect("/", {
                 transports: ["websocket"]
             })
         }

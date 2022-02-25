@@ -7,13 +7,14 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/adapter"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/middleware"
+	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/alarm"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/device"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/firmware"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/menu"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/network"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/permission"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/project"
-	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/resource"
+	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/property"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/role"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/system"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/user"
@@ -94,6 +95,7 @@ func runIoTServer() {
 
 func runApiServer(dist embed.FS) {
 	adapter.Api = api.NewAdapter()
+	adapter.Api.Socket(adapter.Socket.Server())
 	adapter.Api.StaticFS(dist)
 	adapter.Api.UseMiddleware(
 		middleware.NewJWT("/login", "/resources/*"),
@@ -106,8 +108,9 @@ func runApiServer(dist embed.FS) {
 		menu.NewRouter(service.NewMenu()),
 		role.NewRouter(service.NewRole()),
 		permission.NewRouter(service.NewPermission()),
-		resource.NewRouter(nil),
 		device.NewRouter(service.NewDevice()),
+		property.NewRouter(service.NewProperty()),
+		alarm.NewRouter(service.NewAlarm()),
 		firmware.NewRouter(service.NewFirmware()),
 		network.NewRouter(service.NewNetwork()),
 		system.NewRouter(service.NewSystem()),

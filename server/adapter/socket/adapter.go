@@ -79,8 +79,7 @@ func (a *Adapter) Run() error {
 			log.Fatalln(err)
 		}
 	}()
-	http.Handle("/socket.io/", a.socket)
-	return http.ListenAndServe(":8291", nil)
+	return nil
 }
 
 func (a *Adapter) emit(event string, data interface{}) {
@@ -92,6 +91,10 @@ func (a *Adapter) Close() {
 	if err := a.socket.Close(); err != nil && err != io.EOF {
 		xlog.Errorf("socket server close failed: %s", err.Error())
 	}
+}
+
+func (a *Adapter) Server() *socketio.Server {
+	return a.socket
 }
 
 func (a *Adapter) NewID() string {

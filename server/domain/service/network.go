@@ -50,7 +50,7 @@ func (s Network) GetNetworkByID(networkID uint) (*vo.Network, error) {
 	if err != nil {
 		return nil, err
 	}
-	return query.Detail()
+	return query.GetDetail()
 }
 
 func (s Network) FindNetworksByPaginate(filters request.Filters, page, size int) ([]vo.Network, int64, error) {
