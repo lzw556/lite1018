@@ -106,9 +106,9 @@ const AlarmRecordPage = () => {
             title: '报警详情',
             dataIndex: 'metric',
             key: 'metric',
-            width: '10%',
+            width: '15%',
             render: (metric: any, record: any) => {
-                return `${metric.name} ${record.operation} ${record.value} ${metric.unit}`
+                return `${metric.name} ${record.operation} ${record.threshold} ${metric.unit} 当前值: ${record.value}`
             }
         },
         {
