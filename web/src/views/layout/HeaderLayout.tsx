@@ -1,23 +1,25 @@
 import {Header} from "antd/es/layout/layout";
-import {Button, Col, Dropdown, Menu, Row, Space, Typography} from "antd";
+import {Button, Col, Divider, Drawer, Dropdown, Menu, Row, Space, Typography} from "antd";
 import "../../App.css";
 import "./layout.css"
 import "../../assets/iconfont.css"
 import {NavLink} from "react-router-dom";
 import logo from "../../assets/images/logo-dark.png";
-import {CaretDownOutlined, CreditCardOutlined, DashboardOutlined, UserOutlined} from "@ant-design/icons";
+import {CaretDownOutlined, CreditCardOutlined, DashboardOutlined, MenuOutlined, UserOutlined} from "@ant-design/icons";
 import {persistor, store} from "../../store";
 import {useState} from "react";
 import moment from "moment";
 import ProjectSelect from "../../components/select/projectSelect";
 import {getProject} from "../../utils/session";
+import { NavMenu } from "./NavMenu";
 
 const {Text} = Typography;
 
 const HeaderLayout = (props: any) => {
-    const {hideConsole} = props
+    const {hideConsole, menus} = props
     const [currentUser] = useState<any>(store.getState().auth.data.user)
     const [now, setNow] = useState<string>(moment().format("YYYY-MM-DD HH:mm:ss"))
+    const [visible, setVisible] = useState(false)
 
     setInterval(() => {
         setNow(moment().format("YYYY-MM-DD HH:mm:ss"))
@@ -44,7 +46,7 @@ const HeaderLayout = (props: any) => {
     )
 
     return <Header className="ts-header">
-        <Row justify="start">
+        <Row justify="start" className="pc">
             <Col span={6}>
                 <Space className={"ts-title"}>
                     <img src={logo} width={100} alt="ThetaSensors" style={{verticalAlign: "middle"}}/>
@@ -90,6 +92,29 @@ const HeaderLayout = (props: any) => {
                 </Row>
             </Col>
         </Row>
+        <div className="mobile">
+           <MenuOutlined onClick={()=>setVisible(true)}/>
+           <div className="logo"><img src={logo} width={100} alt="ThetaSensors" style={{verticalAlign: "middle"}}/></div>
+           <Dropdown overlay={menu}>
+               <UserOutlined/>  
+            </Dropdown>
+            <Drawer visible={visible} placement='left' width='60%'
+                closable={false} 
+                onClose={()=>setVisible(false)} 
+                bodyStyle={{paddingLeft:0, paddingRight:0}}>
+              <NavMenu menus={menus}/>
+              <Divider/>
+              {currentUser && 
+               <div style={{paddingLeft:24,paddingBottom:100}}>
+                  <ProjectSelect
+                    defaultValue={getProject()}
+                    defaultActiveFirstOption={true}
+                    suffixIcon={<CaretDownOutlined/>}
+                    style={{width: "120px", textAlign: "center"}}
+                    size={"small"} onChange={onProjectChange}/>
+                </div>}
+            </Drawer>          
+        </div>
     </Header>
 }
 

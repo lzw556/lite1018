@@ -56,7 +56,7 @@ const ConsoleLayout = (props: any) => {
     }
 
     return <Layout className="ts-console">
-        <HeaderLayout hideConsole={true}/>
+        <HeaderLayout hideConsole={true} menus={menus}/>
         {
             renderChildren()
         }
