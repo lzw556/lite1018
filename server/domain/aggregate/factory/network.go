@@ -108,14 +108,20 @@ func (factory Network) NewNetworkImportCmd(req request.ImportNetwork) (*command.
 		e.Type = device.TypeID
 		e.ProjectID = req.ProjectID
 		e.Settings = make(entity.DeviceSettings, 0)
-		for category, setting := range device.Settings {
-			for k, v := range setting {
-				e.Settings = append(e.Settings, entity.DeviceSetting{
-					Category: category,
-					Key:      k,
-					Value:    v,
-				})
+		if t := devicetype.Get(device.TypeID); t != nil {
+			for _, setting := range t.Settings() {
+				for k, v := range device.Settings[string(setting.Category)] {
+					if k == setting.Key {
+						e.Settings = append(e.Settings, entity.DeviceSetting{
+							Category: string(setting.Category),
+							Key:      setting.Key,
+							Value:    v,
+						})
+					}
+				}
 			}
+		} else {
+			return nil, response.BusinessErr(errcode.UnknownDeviceTypeError, "")
 		}
 		if e.Type == devicetype.GatewayType {
 			cmd.Network.Name = device.Name

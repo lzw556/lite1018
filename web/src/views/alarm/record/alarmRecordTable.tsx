@@ -1,6 +1,6 @@
 import {FC, useCallback, useEffect, useState} from "react";
 import TableLayout from "../../layout/TableLayout";
-import {GetAcknowledgeRequest, PagingAlarmRecordsRequest, RemoveAlarmRecordRequest} from "../../../apis/alarm";
+import {PagingAlarmRecordRequest, RemoveAlarmRecordRequest} from "../../../apis/alarm";
 import {Button, Popconfirm, Space, Tag} from "antd";
 import {ColorDanger, ColorInfo, ColorWarn} from "../../../constants/color";
 import moment from "moment";
@@ -37,7 +37,7 @@ const AlarmRecordTable: FC<AlarmRecordTableProps> = ({type, start, stop, asset, 
         }
         if (asset) {
             filter.asset_id = asset
-            PagingAlarmRecordsRequest(current, size, start, stop, filter).then(setDataSource)
+            PagingAlarmRecordRequest(current, size, start, stop, filter).then(setDataSource)
         }
     }, [asset, start, stop, levels, type, statuses, refreshKey])
 
@@ -58,7 +58,7 @@ const AlarmRecordTable: FC<AlarmRecordTableProps> = ({type, start, stop, asset, 
     }
 
     const onViewAcknowledge = (id:number) => {
-        GetAcknowledgeRequest(id).then(setAcknowledge)
+        // GetAcknowledgeRequest(id).then(setAcknowledge)
     }
 
     const columns: any = [

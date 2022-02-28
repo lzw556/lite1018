@@ -42,9 +42,11 @@ func initializeConfig() {
 	iotConf := config.IoT{Username: "admin", Password: "123456", Broker: "127.0.0.1:1883"}
 	iotConf.Server.Enabled = true
 	iotConf.Server.Port = 1883
-	dbConf := config.Database{Driver: "sqlite", Name: "theta_cloud", MaxIdleTime: 60, MaxLifetime: 60, MaxIdle: 10, MaxActive: 10}
+	dbConf := config.Database{Driver: "sqlite", Name: "cloud", MaxIdleTime: 60, MaxLifetime: 60, MaxIdle: 10, MaxActive: 10}
+	svrConf := config.Server{Mode: "debug"}
 	v.Set("iot", iotConf)
 	v.Set("database", dbConf)
+	v.Set("server", svrConf)
 	if err := v.WriteConfigAs("config.yaml"); err != nil {
 		fmt.Println(fmt.Errorf("init config file failed: %v", err))
 	}

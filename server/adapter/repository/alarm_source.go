@@ -19,3 +19,7 @@ func (repo AlarmSource) FindBySpecs(ctx context.Context, specs ...spec.Specifica
 	err := repo.DB(ctx).Scopes(spec.Scopes(specs)...).Find(&es).Error
 	return es, err
 }
+
+func (repo AlarmSource) DeleteBySpecs(ctx context.Context, specs ...spec.Specification) error {
+	return repo.DB(ctx).Scopes(spec.Scopes(specs)...).Delete(&entity.AlarmSource{}).Error
+}

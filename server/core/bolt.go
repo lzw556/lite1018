@@ -7,7 +7,7 @@ type Bucket interface {
 }
 
 func BoltDB() *bbolt.DB {
-	db, err := bbolt.Open("./data/sensor_data.db", 0600, nil)
+	db, err := bbolt.Open("./data/iot.db", 0600, nil)
 	if err != nil {
 		panic(err)
 	}

@@ -30,8 +30,8 @@ export function RemoveAlarmTemplateRequest(id: number) {
     return request.delete(`/alarmTemplates/${id}`).then(DeleteResponse)
 }
 
-export function CheckAlarmNameRequest(name: string) {
-    return request.get(`/check/alarms/${name}`).then(GetResponse)
+export function CheckAlarmRuleNameRequest(name: string) {
+    return request.get(`/check/alarmRules/${name}`).then(GetResponse)
 }
 
 export function AddAlarmRuleRequest(params: any) {
@@ -46,16 +46,28 @@ export function GetAlarmRuleRequest(id: number) {
     return request.get<any>(`/alarmRules/${id}`).then(GetResponse)
 }
 
-export function UpdateAlarmRequest(id: number, params: any) {
-    return request.put<Alarm>(`/alarms/${id}`, params).then(PutResponse)
+export function UpdateAlarmRuleRequest(id: number, params: any) {
+    return request.put<Alarm>(`/alarmRules/${id}`, params).then(PutResponse)
 }
 
-export function RemoveAlarmRequest(id: number) {
-    return request.delete(`/alarms/${id}`).then(DeleteResponse)
+export function UpdateAlarmRuleStatusRequest(id: number, status: number) {
+    return request.put(`/alarmRules/${id}/status/${status}`, null).then(PutResponse)
 }
 
-export function PagingAlarmRecordsRequest(page: number, size: number, from: number, to: number, filter: any) {
-    return request.get<PageResult<any>>("/alarmRecords?method=paging", {page, size, from, to, ...filter}).then(GetResponse)
+export function RemoveAlarmRuleRequest(id: number) {
+    return request.delete(`/alarmRules/${id}`).then(DeleteResponse)
+}
+
+export function PagingAlarmRecordRequest(page: number, size: number, from: number, to: number, filter: any) {
+    return request.get<PageResult<any>>("/alarmRecords", {page, size, from, to, ...filter}).then(GetResponse)
+}
+
+export function AcknowledgeAlarmRecordRequest(id: number, params: any) {
+    return request.post(`/alarmRecords/${id}/acknowledge`, params).then(PutResponse)
+}
+
+export function GetAlarmRecordAcknowledgeRequest(id: number) {
+    return request.get(`/alarmRecords/${id}/acknowledge`).then(GetResponse)
 }
 
 export function GetAlarmRecordStatisticsRequest(from: number, to: number, filter: any) {
@@ -68,12 +80,4 @@ export function GetAlarmRecordRequest(id: number) {
 
 export function RemoveAlarmRecordRequest(id: number) {
     return request.delete(`/alarmRecords/${id}`).then(DeleteResponse)
-}
-
-export function AcknowledgeAlarmRecordRequest(id: number, params: any) {
-    return request.patch(`/alarmRecords/${id}/acknowledge`, params).then(PutResponse)
-}
-
-export function GetAcknowledgeRequest(id: number) {
-    return request.get<any>(`/alarmRecords/${id}/acknowledge`).then(GetResponse)
 }

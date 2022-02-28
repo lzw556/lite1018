@@ -11,36 +11,33 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/transaction"
 )
 
-type AlarmRecordCmd struct {
+type AlarmRecordUpdateCmd struct {
 	entity.AlarmRecord
 
-	repository      dependency.AlarmRecordRepository
+	alarmRecordRepo dependency.AlarmRecordRepository
 	acknowledgeRepo dependency.AlarmRecordAcknowledgeRepository
 }
 
-func NewAlarmRecordCmd() AlarmRecordCmd {
-	return AlarmRecordCmd{
-		repository:      repository.AlarmRecord{},
+func NewAlarmRecordUpdateCmd() AlarmRecordUpdateCmd {
+	return AlarmRecordUpdateCmd{
+		alarmRecordRepo: repository.AlarmRecord{},
 		acknowledgeRepo: repository.AlarmRecordAcknowledge{},
 	}
 }
 
-func (cmd AlarmRecordCmd) AcknowledgeBy(req request.AcknowledgeAlarmRecord) error {
+func (cmd AlarmRecordUpdateCmd) AcknowledgeBy(req request.AcknowledgeAlarmRecord) error {
 	if !cmd.AlarmRecord.Acknowledged {
-		//cmd.AlarmRecord.Acknowledge()
+		cmd.AlarmRecord.Acknowledge()
 		return transaction.Execute(context.TODO(), func(txCtx context.Context) error {
-			if err := cmd.repository.Save(txCtx, &cmd.AlarmRecord); err != nil {
+			if err := cmd.alarmRecordRepo.Save(txCtx, &cmd.AlarmRecord); err != nil {
 				return err
 			}
-			_ = entity.AlarmRecordAcknowledge{
+			e := entity.AlarmRecordAcknowledge{
 				AlarmRecordID: cmd.AlarmRecord.ID,
 				UserID:        req.UserID,
 				Note:          req.Note,
 			}
-			//if err := cmd.acknowledgeReentity.Create(txCtx, &e); err != nil {
-			//	return err
-			//}
-			return nil
+			return cmd.acknowledgeRepo.Create(txCtx, &e)
 		})
 	}
 	return response.BusinessErr(errcode.AlarmRecordAlreadyAcknowledgedError, "")

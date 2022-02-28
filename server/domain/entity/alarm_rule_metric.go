@@ -10,6 +10,7 @@ import (
 type AlarmRuleMetric struct {
 	Key  string `json:"key"`
 	Name string `json:"name"`
+	Unit string `json:"unit"`
 }
 
 func (s AlarmRuleMetric) Value() (driver.Value, error) {

@@ -5,8 +5,9 @@ import (
 	"context"
 	"github.com/bilibili/gengine/engine"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
+	"github.com/thetasensors/theta-cloud-lite/server/adapter/ruleengine/rule"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
-	spec "github.com/thetasensors/theta-cloud-lite/server/domain/specification"
+	"strings"
 )
 
 var pool *engine.GenginePool
@@ -27,7 +28,7 @@ func Init() {
 
 func initRules() {
 	alarmRuleRepo := repository.AlarmRule{}
-	alarmRules, err := alarmRuleRepo.FindBySpecs(context.TODO(), spec.EnabledEqSpec(true))
+	alarmRules, err := alarmRuleRepo.FindBySpecs(context.TODO())
 	if err != nil {
 		panic(err)
 	}
@@ -40,8 +41,10 @@ func initRules() {
 
 func UpdateRules(alarmRules ...entity.AlarmRule) error {
 	buf := bytes.Buffer{}
-	for _, rule := range alarmRules {
-		buf.WriteString(rule.Name)
+	for _, r := range alarmRules {
+		if s := r.RuleSpec(); len(s) > 0 {
+			buf.WriteString(s)
+		}
 	}
 	return pool.UpdatePooledRulesIncremental(buf.String())
 }
@@ -50,15 +53,17 @@ func RemoveRules(names ...string) error {
 	return pool.RemoveRules(names)
 }
 
-//func ExecuteSelectedRules(m entity.Measurement, alarms []entity.Alarm) {
-//	for _, alarm := range alarms {
-//		s := NewMeasurementAlert(m, alarm)
-//		data := map[string]interface{}{}
-//		data["scene"] = s
-//		err, _ := pool.ExecuteSelectedRules(data, []string{alarm.Name})
-//		if err != nil {
-//			xlog.Errorf("rule %s execute failed: %v", alarm.Name, err)
-//			return
-//		}
-//	}
-//}
+func ExecuteSelectedRules(sourceID uint, rules ...entity.AlarmRule) {
+	for _, r := range rules {
+		var alert Rule
+		if r.IsEnabled() {
+			switch {
+			case strings.HasPrefix(r.SourceType, entity.AlarmSourceTypeDevice):
+				alert = rule.NewDeviceAlert(sourceID, r)
+			}
+			if err := alert.Execute(pool); err != nil {
+				return
+			}
+		}
+	}
+}

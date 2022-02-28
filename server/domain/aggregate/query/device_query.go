@@ -52,13 +52,12 @@ func (query DeviceQuery) GetDetail() (*vo.Device, error) {
 		if err != nil {
 			return nil, err
 		}
-		result.LastSampleTimestamp = data.Time.UTC().Unix()
 		result.Properties = make(vo.Properties, 0)
 		for _, p := range t.Properties(t.SensorID()) {
 			property := vo.NewProperty(p)
 			if len(data.Values) > 0 {
 				for _, field := range p.Fields {
-					property.SetData(field.Name, data.Values[field.DataIndex])
+					property.SetData(field.Name, data.Values[field.Key])
 				}
 			}
 			result.Properties = append(result.Properties, property)
@@ -103,7 +102,7 @@ func (query DeviceQuery) FindDataByRange(from, to time.Time) ([]vo.DeviceData, e
 			for _, p := range t.Properties(t.SensorID()) {
 				property := vo.NewProperty(p)
 				for _, field := range p.Fields {
-					property.SetData(field.Name, data[i].Values[field.DataIndex])
+					property.SetData(field.Name, data[i].Values[field.Key])
 				}
 				properties = append(properties, property)
 			}
@@ -123,7 +122,7 @@ func (query DeviceQuery) GetLastData() (*vo.DeviceData, error) {
 		for _, p := range t.Properties(t.SensorID()) {
 			property := vo.NewProperty(p)
 			for _, field := range p.Fields {
-				property.SetData(field.Name, data.Values[field.DataIndex])
+				property.SetData(field.Name, data.Values[field.Key])
 			}
 			properties = append(properties, property)
 		}

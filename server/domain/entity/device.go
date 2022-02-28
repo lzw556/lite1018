@@ -24,7 +24,8 @@ type Device struct {
 	ProjectID  uint
 	Settings   DeviceSettings `gorm:"type:json"`
 
-	State DeviceState `gorm:"-"`
+	State           DeviceState             `gorm:"-"`
+	AlarmRuleStates map[uint]AlarmRuleState `gorm:"-"`
 }
 
 func (Device) TableName() string {
@@ -58,6 +59,53 @@ func (d Device) UpgradeNotify(status DeviceUpgradeStatus) {
 		"macAddress": d.MacAddress,
 		"code":       status.Code,
 		"progress":   status.Progress,
+	})
+}
+
+func (d *Device) UpdateAlarmRuleState(e AlarmRule) {
+	_ = cache.GetStruct(fmt.Sprintf("device_alarm_rule_state_%d", d.ID), &d.AlarmRuleStates)
+	if d.AlarmRuleStates == nil {
+		d.AlarmRuleStates = make(map[uint]AlarmRuleState)
+	}
+	if state, ok := d.AlarmRuleStates[e.ID]; ok {
+		state.Level = e.Level
+		state.Duration += 1
+		d.AlarmRuleStates[e.ID] = state
+	} else {
+		if d.AlarmRuleStates[e.ID].Duration == e.Duration {
+
+		}
+		d.AlarmRuleStates[e.ID] = AlarmRuleState{
+			Level:    e.Level,
+			Duration: 1,
+		}
+	}
+	_ = cache.SetStruct(fmt.Sprintf("device_alarm_rule_state_%d", d.ID), d.AlarmRuleStates)
+}
+
+func (d *Device) RemoveAlarmRuleState(id uint) {
+	_ = cache.GetStruct(fmt.Sprintf("device_alarm_rule_state_%d", d.ID), &d.AlarmRuleStates)
+	delete(d.AlarmRuleStates, id)
+	_ = cache.SetStruct(fmt.Sprintf("device_alarm_rule_state_%d", d.ID), d.AlarmRuleStates)
+}
+
+func (d *Device) GetAlarmRuleState(id uint) AlarmRuleState {
+	_ = cache.GetStruct(fmt.Sprintf("device_alarm_rule_state_%d", d.ID), &d.AlarmRuleStates)
+	if d.AlarmRuleStates == nil {
+		return AlarmRuleState{}
+	}
+	return d.AlarmRuleStates[id]
+}
+
+func (d Device) AlertNotify(m AlarmRuleMetric, value float64, level uint8) {
+	eventbus.Publish(eventbus.SocketEmit, "socket::deviceAlertStateEvent", map[string]interface{}{
+		"device": map[string]interface{}{
+			"name":       d.Name,
+			"macAddress": d.MacAddress,
+		},
+		"metric": m,
+		"level":  level,
+		"value":  value,
 	})
 }
 

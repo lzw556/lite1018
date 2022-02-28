@@ -13,8 +13,8 @@ const AcknowledgeModal: FC<AcknowledgeModalProps> = (props) => {
 
     useEffect(() => {
         form.setFieldsValue({
-            name: record.name,
-            field: record.field.title,
+            source: record.source,
+            content: `${record.metric.name} ${record.operation} ${record.value} ${record.metric.unit}`
         });
     }, [record]);
 
@@ -27,10 +27,10 @@ const AcknowledgeModal: FC<AcknowledgeModalProps> = (props) => {
 
     return <Modal {...props} width={420} title={"报警处理"} onOk={onSave}>
         <Form form={form}>
-            <Form.Item label={"报警名称"} name={"name"}>
+            <Form.Item label={"资源名称"} name={["source", "name"]}>
                 <Input disabled/>
             </Form.Item>
-            <Form.Item label={"报警属性"} name={"field"}>
+            <Form.Item label={"报警详情"} name={["content"]}>
                 <Input disabled/>
             </Form.Item>
             <Form.Item label={"处理意见"} name={"note"}>

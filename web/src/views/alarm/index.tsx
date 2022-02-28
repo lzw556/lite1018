@@ -17,10 +17,10 @@ const tabList = [
         key: "rules",
         tab: "规则列表",
     },
-    {
-        key: "templates",
-        tab: "规则模板",
-    }
+    // {
+    //     key: "templates",
+    //     tab: "规则模板",
+    // }
 ]
 
 const contents = new Map<string, any>([

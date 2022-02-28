@@ -6,35 +6,32 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/ruleengine"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
+	spec "github.com/thetasensors/theta-cloud-lite/server/domain/specification"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/transaction"
 )
 
-type AlarmRuleCreateCmd struct {
+type AlarmRuleDeleteCmd struct {
 	entity.AlarmRule
-	AlarmSources []entity.AlarmSource
 
 	alarmRuleRepo   dependency.AlarmRuleRepository
 	alarmSourceRepo dependency.AlarmSourceRepository
 }
 
-func NewAlarmRuleCreateCmd() AlarmRuleCreateCmd {
-	return AlarmRuleCreateCmd{
+func NewAlarmRuleDeleteCmd() AlarmRuleDeleteCmd {
+	return AlarmRuleDeleteCmd{
 		alarmRuleRepo:   repository.AlarmRule{},
 		alarmSourceRepo: repository.AlarmSource{},
 	}
 }
 
-func (cmd AlarmRuleCreateCmd) Run() error {
+func (cmd AlarmRuleDeleteCmd) Delete() error {
 	return transaction.Execute(context.TODO(), func(txCtx context.Context) error {
-		if err := cmd.alarmRuleRepo.Create(txCtx, &cmd.AlarmRule); err != nil {
+		if err := cmd.alarmRuleRepo.Delete(txCtx, cmd.AlarmRule.ID); err != nil {
 			return err
 		}
-		for i := range cmd.AlarmSources {
-			cmd.AlarmSources[i].AlarmRuleID = cmd.AlarmRule.ID
-		}
-		if err := cmd.alarmSourceRepo.Create(txCtx, cmd.AlarmSources...); err != nil {
+		if err := cmd.alarmSourceRepo.DeleteBySpecs(txCtx, spec.AlarmRuleEqSpec(cmd.AlarmRule.ID)); err != nil {
 			return err
 		}
-		return ruleengine.UpdateRules(cmd.AlarmRule)
+		return ruleengine.RemoveRules(cmd.AlarmRule.Name)
 	})
 }

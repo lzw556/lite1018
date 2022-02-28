@@ -21,7 +21,7 @@ func Debug(msg string) {
 }
 
 func Debugf(template string, args ...interface{}) {
-	log.Debugf(template, args)
+	log.Debugf(template, args...)
 }
 
 func Info(msg string) {

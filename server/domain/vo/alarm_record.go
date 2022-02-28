@@ -5,27 +5,30 @@ import (
 )
 
 type AlarmRecord struct {
-	ID           uint      `json:"id"`
-	Name         string    `json:"name"`
-	Rule         AlarmRule `json:"rule"`
-	Level        uint      `json:"level"`
-	Value        float32   `json:"value"`
-	Content      string    `json:"content"`
-	Status       uint      `json:"status"`
-	Acknowledged bool      `json:"acknowledged"`
-	Timestamp    int64     `json:"timestamp"`
-	UpdatedAt    int64     `json:"updatedAt"`
+	ID           uint                   `json:"id"`
+	Metric       entity.AlarmRuleMetric `json:"metric"`
+	Source       interface{}            `json:"source"`
+	SourceType   string                 `json:"sourceType"`
+	Operation    string                 `json:"operation"`
+	Level        uint8                  `json:"level"`
+	Value        float64                `json:"value"`
+	Status       uint                   `json:"status"`
+	Acknowledged bool                   `json:"acknowledged"`
+	CreatedAt    int64                  `json:"createdAt"`
+	UpdatedAt    int64                  `json:"updatedAt"`
 }
 
 func NewAlarmRecord(e entity.AlarmRecord) AlarmRecord {
 	return AlarmRecord{
 		ID:           e.ID,
+		SourceType:   e.SourceType,
+		Metric:       e.Metric,
 		Level:        e.Level,
-		Rule:         NewAlarmRule(e.Rule),
 		Value:        e.Value,
-		Timestamp:    e.CreatedAt.Unix(),
-		UpdatedAt:    e.UpdatedAt.Unix(),
+		Operation:    e.Operation,
 		Status:       uint(e.Status),
 		Acknowledged: e.Acknowledged,
+		CreatedAt:    e.CreatedAt.UTC().Unix(),
+		UpdatedAt:    e.UpdatedAt.UTC().Unix(),
 	}
 }

@@ -34,5 +34,9 @@ func main() {
 		initialize.InitBuckets(global.BoltDB)
 	}
 	casbin.Init(rbacModel, global.DB)
-	app.Start("release", dist)
+	svrConf := config.Server{}
+	if err := config.Scan("server", &svrConf); err != nil {
+		panic(err)
+	}
+	app.Start(svrConf.Mode, dist)
 }

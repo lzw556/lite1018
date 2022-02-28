@@ -45,8 +45,8 @@ const InformationCard: FC<GatewayInformationProps> = ({device, isLoading}) => {
                             device.name
                         }
                         {
-                            upgradeStatus && upgradeStatus.id === device.id && (
-                                <DeviceUpgradeSpin status={upgradeStatus.status}/>)
+                            upgradeStatus && (
+                                <DeviceUpgradeSpin status={upgradeStatus}/>)
                         }
                     </Space>
                 </Col>

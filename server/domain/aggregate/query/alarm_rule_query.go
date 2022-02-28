@@ -2,6 +2,7 @@ package query
 
 import (
 	"context"
+	"fmt"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
@@ -13,20 +14,23 @@ import (
 type AlarmRuleQuery struct {
 	Specs spec.Specifications
 
-	alarmRuleRepo   dependency.AlarmRuleRepository
-	alarmSourceRepo dependency.AlarmSourceRepository
-	deviceRepo      dependency.DeviceRepository
+	alarmRuleRepo        dependency.AlarmRuleRepository
+	alarmSourceRepo      dependency.AlarmSourceRepository
+	deviceRepo           dependency.DeviceRepository
+	deviceAlertStateRepo dependency.DeviceAlertStateRepository
 }
 
 func NewAlarmRuleQuery() AlarmRuleQuery {
 	return AlarmRuleQuery{
-		alarmRuleRepo:   repository.AlarmRule{},
-		alarmSourceRepo: repository.AlarmSource{},
-		deviceRepo:      repository.Device{},
+		alarmRuleRepo:        repository.AlarmRule{},
+		alarmSourceRepo:      repository.AlarmSource{},
+		deviceRepo:           repository.Device{},
+		deviceAlertStateRepo: repository.DeviceAlertState{},
 	}
 }
 
 func (query AlarmRuleQuery) Paging(page, size int) ([]vo.AlarmRule, int64, error) {
+	fmt.Println(query.Specs)
 	es, total, err := query.alarmRuleRepo.PagingBySpecs(context.TODO(), page, size, query.Specs...)
 	if err != nil {
 		return nil, 0, err
@@ -58,27 +62,11 @@ func (query AlarmRuleQuery) Get(id uint) (*vo.AlarmRule, error) {
 		sources := make([]vo.Device, len(es))
 		for i, device := range es {
 			sources[i] = vo.NewDevice(device)
+			if alerts, err := query.deviceAlertStateRepo.Find(device.MacAddress); err == nil {
+				sources[i].SetAlertStates(alerts)
+			}
 		}
 		result.Sources = sources
 	}
 	return &result, nil
-}
-
-func (query AlarmRuleQuery) getSources(ids []uint, typ string) []vo.AlarmSource {
-	var result []vo.AlarmSource
-	switch typ {
-	case entity.AlarmSourceTypeDevice:
-		es, err := query.deviceRepo.FindBySpecs(context.TODO(), spec.PrimaryKeyInSpec(ids))
-		if err != nil {
-			return nil
-		}
-		result = make([]vo.AlarmSource, len(es))
-		for i, e := range es {
-			result[i] = vo.AlarmSource{
-				ID:   e.ID,
-				Name: e.Name,
-			}
-		}
-	}
-	return result
 }
