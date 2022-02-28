@@ -59,7 +59,6 @@ const InformationCard: FC<GatewayInformationProps> = ({device, isLoading}) => {
                     }
                 </Col>
             </Row>
-            <br/>
             <Row justify={"start"}>
                 <Col span={3} className="ts-detail-label">
                     MAC地址
@@ -80,7 +79,6 @@ const InformationCard: FC<GatewayInformationProps> = ({device, isLoading}) => {
                     }
                 </Col>
             </Row>
-            <br/>
             <Row justify={"start"}>
                 <Col span={3} className="ts-detail-label">
                     状态
@@ -100,7 +98,6 @@ const InformationCard: FC<GatewayInformationProps> = ({device, isLoading}) => {
                     }
                 </Col>
             </Row>
-            <br/>
             <Row justify={"start"}>
                 <Col span={3} className="ts-detail-label">
                     电池电压(mV)
@@ -119,7 +116,6 @@ const InformationCard: FC<GatewayInformationProps> = ({device, isLoading}) => {
                     }
                 </Col>
             </Row>
-            <br/>
             <Row justify={"start"}>
                 <Col span={3} className="ts-detail-label">
                     信号强度(dB)
@@ -138,7 +134,6 @@ const InformationCard: FC<GatewayInformationProps> = ({device, isLoading}) => {
                     }
                 </Col>
             </Row>
-            <br/>
             <Row justify={"start"}>
                 <Col span={3} className="ts-detail-label">
                     最近连接时间
@@ -157,7 +152,6 @@ const InformationCard: FC<GatewayInformationProps> = ({device, isLoading}) => {
                     }
                 </Col>
             </Row>
-            <br/>
             <Row justify={"start"}>
                 <Col span={3} className="ts-detail-label">
                     生产厂商

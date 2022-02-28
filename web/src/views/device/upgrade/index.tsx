@@ -28,7 +28,7 @@ const UpgradeModal: FC<UpgradeModalProps> = ({visible, device, onCancel, onSucce
             setFirmware(undefined)
             GetDeviceFirmwaresRequest(device.id).then(setFirmwares)
         }
-    }, [device])
+    }, [device, visible])
 
     const renderFirmware = () => {
         if (firmware) {

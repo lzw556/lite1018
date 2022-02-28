@@ -3,7 +3,7 @@ import {useHistory, useLocation} from "react-router-dom";
 import {GetParamValue} from "../../../utils/path";
 import {Button, Col, Dropdown, Menu, message, Row, Space} from "antd";
 import {Device} from "../../../types/device";
-import {GetDeviceRequest, SendDeviceCommandRequest} from "../../../apis/device";
+import {DeviceUpgradeRequest, GetDeviceRequest, SendDeviceCommandRequest} from "../../../apis/device";
 import {Content} from "antd/lib/layout/layout";
 import InformationCard from "./information";
 import ShadowCard from "../../../components/shadowCard";
@@ -17,13 +17,30 @@ import userPermission, {Permission} from "../../../permission/permission";
 import HistoryDataPage from "./data";
 import WaveDataChart from "./waveData";
 import useSocket, {SocketTopic} from "../../../socket";
+import { DeviceMonitor } from "../DeviceMonitor";
+import { RuntimeChart } from "../RuntimeChart";
+import { IsUpgrading } from "../../../types/device_upgrade_status";
+import UpgradeModal from "../upgrade";
 
 const tabList = [
     {
         key: "settings",
         tab: "配置信息",
     },
+    {
+        key: "ta",
+        tab: "TA(状态历史)",
+    }
 ]
+const tabTitleList = [   
+    {
+        key: "monitor",
+        tab: "监控",
+    },
+    {
+        key: "historyData",
+        tab: "历史数据"
+    }]
 
 const DeviceDetailPage = () => {
     const location = useLocation<any>();
@@ -31,13 +48,16 @@ const DeviceDetailPage = () => {
     const {PubSub} = useSocket();
     const [device, setDevice] = useState<Device>();
     const [isLoading, setIsLoading] = useState<boolean>(false);
-    const [currentKey, setCurrentKey] = useState<string>("settings");
-    const {hasPermission} = userPermission();
+    const [currentKey, setCurrentKey] = useState<string>('');
+    const {hasPermission, hasPermissions} = userPermission();
+    const [upgradeVisible, setUpgradeVisible] = useState<boolean>(false)
 
     const contents = new Map<string, any>([
         ["settings", device && <SettingPage device={device}/>],
         ["historyData", device && <HistoryDataPage device={device}/>],
-        ["waveData", device && <WaveDataChart device={device}/>]
+        ["waveData", device && <WaveDataChart device={device}/>],
+        ['monitor',device && <DeviceMonitor device={device}/>],
+        ['ta',device && <RuntimeChart deviceId={device.id}/>]
     ])
 
     const fetchDevice = useCallback(() => {
@@ -67,6 +87,11 @@ const DeviceDetailPage = () => {
                     setDevice({...device, state: {...device.state, isOnline: state.isOnline}})
                 }
             })
+            if(device.typeId===DeviceType.Gateway||device.typeId===DeviceType.Router){
+                setCurrentKey(tabList[0].key)
+            }else{
+                setCurrentKey(tabTitleList[0].key)
+            }
         }
         return () => {
             PubSub.unsubscribe(SocketTopic.connectionState)
@@ -78,15 +103,12 @@ const DeviceDetailPage = () => {
             switch (device.typeId) {
                 case DeviceType.VibrationTemperature3Axis:
                     return [
-                        ...tabList,
-                        {
-                            key: "historyData",
-                            tab: "历史数据"
-                        },
+                        ...tabTitleList,
                         {
                             key: "waveData",
                             tab: "波形数据"
-                        }
+                        },
+                        ...tabList
                     ]
                 case DeviceType.Gateway:
                     return tabList
@@ -94,11 +116,8 @@ const DeviceDetailPage = () => {
                     return tabList
                 default:
                     return [
+                        ...tabTitleList,
                         ...tabList,
-                        {
-                            key: "historyData",
-                            tab: "历史数据"
-                        },
                     ]
             }
         }
@@ -106,29 +125,53 @@ const DeviceDetailPage = () => {
 
     const onCommand = ({key}: any) => {
         if (device) {
-            SendDeviceCommandRequest(device.id, key).then(res => {
-                if (res.code === 200) {
-                    message.success("发送成功").then()
-                } else {
-                    message.error("发送失败").then()
-                }
-            })
+            switch (Number(key)) {
+                case DeviceCommand.Upgrade:
+                    setDevice(device)
+                    setUpgradeVisible(true)
+                    break
+                case DeviceCommand.CancelUpgrade:
+                    DeviceUpgradeRequest(device.id, {type: DeviceCommand.CancelUpgrade}).then(res => {
+                        if (res.code === 200) {
+                            message.success("取消升级成功").then()
+                        } else {
+                            message.error(`取消升级失败,${res.msg}`).then()
+                        }
+                    })
+                    break
+            
+                default:
+                    SendDeviceCommandRequest(device.id, key).then(res => {
+                        if (res.code === 200) {
+                            message.success("发送成功").then()
+                        } else {
+                            message.error("发送失败").then()
+                        }
+                    })
+                    break;
+            }           
         }
     }
 
     const renderCommandMenu = () => {
         const isOnline = device && device.state.isOnline
+        const isUpgrading = device && device.upgradeStatus && IsUpgrading(device.upgradeStatus.code)
         return <Menu onClick={onCommand}>
-            <Menu.Item key={DeviceCommand.Reboot} disabled={!isOnline}>重启</Menu.Item>
+            <Menu.Item key={DeviceCommand.Reboot} disabled={!isOnline} hidden={isUpgrading}>重启</Menu.Item>
             {
                 device && device.typeId !== DeviceType.Router &&
                 device.typeId !== DeviceType.Gateway &&
-                <Menu.Item key={DeviceCommand.ResetData} disabled={!isOnline}>重置数据</Menu.Item>
+                <Menu.Item key={DeviceCommand.ResetData} disabled={!isOnline} hidden={isUpgrading}>重置数据</Menu.Item>
             }
-            <Menu.Item key={DeviceCommand.Reset} disabled={!isOnline}>恢复出厂设置</Menu.Item>
+            <Menu.Item key={DeviceCommand.Reset} disabled={!isOnline} hidden={isUpgrading}>恢复出厂设置</Menu.Item>
+            {hasPermissions(Permission.DeviceUpgrade, Permission.DeviceFirmwares) &&
+                (<>
+                    <Menu.Item key={DeviceCommand.Upgrade} disabled={!isOnline} hidden={isUpgrading}>固件升级</Menu.Item>
+                    <Menu.Item key={DeviceCommand.CancelUpgrade} hidden={!isUpgrading}>取消升级</Menu.Item>
+                </>)}
         </Menu>
     }
-
+    
     return <Content>
         <MyBreadcrumb>
             <Space>
@@ -154,6 +197,14 @@ const DeviceDetailPage = () => {
                 }
             </Col>
         </Row>
+        {
+            device &&
+            <UpgradeModal visible={upgradeVisible} device={device} onSuccess={() => {               
+                setUpgradeVisible(false)
+            }} onCancel={() => {
+                setUpgradeVisible(false)
+            }}/>
+        }
     </Content>
 }
 
