@@ -67,4 +67,7 @@
         flex-grow:1;
         text-align: center;
     }
+    .ts-console aside.sider{
+        display: none;
+    }
 }

@@ -27,7 +27,7 @@ const ConsoleLayout = (props: any) => {
         if (project) {
             return <>
                 <Layout>
-                    <Sider width={200} style={{
+                    <Sider className="sider" width={200} style={{
                         background: "white",
                         height: "100%",
                         overflowY: "scroll",
