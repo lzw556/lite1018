@@ -1,7 +1,6 @@
 import {Button, Card, Col, Form, Input, message, Radio, Result, Row, Select, Space, Table, Typography} from "antd";
 import {Content} from "antd/lib/layout/layout";
 import {useCallback, useEffect, useState} from "react";
-import {useHistory} from "react-router-dom";
 import {AddAlarmRuleRequest, CheckAlarmRuleNameRequest} from "../../../apis/alarm";
 import MyBreadcrumb from "../../../components/myBreadcrumb";
 import ShadowCard from "../../../components/shadowCard";
@@ -9,7 +8,7 @@ import SourceSelectModal from "./modal/sourceSelectModal";
 import {DeleteOutlined} from "@ant-design/icons";
 import {defaultValidateMessages, Normalizes, Rules} from "../../../constants/validator";
 
-const {Option} = Select
+const {Option} = Select;
 
 const AddAlarmRule = () => {
     const [selectedTemplates, setSelectedTemplates] = useState<number[]>([])
@@ -18,7 +17,6 @@ const AddAlarmRule = () => {
     const [selected, setSelected] = useState<any>()
     const [form] = Form.useForm()
     const [success, setSuccess] = useState<boolean>(false)
-    const history = useHistory()
 
     const fetchAlarmTemplates = useCallback((current: number, size: number) => {
     }, [])
@@ -37,6 +35,7 @@ const AddAlarmRule = () => {
             values.source_ids = selected.sources.map((item:any) => item.id)
             values.source_type = selected.sourceType
             values.metric = selected.metric
+            values.threshold = parseFloat(values.threshold)
             AddAlarmRuleRequest(values).then(data => {
                 setSuccess(true)
             })
@@ -202,9 +201,8 @@ const AddAlarmRule = () => {
                                                             <Option key={"<="} value={"<="}>&lt;=</Option>
                                                         </Select>
                                                     </Form.Item>
-                                                    <Form.Item name={["threshold"]} normalize={Normalizes.float}
-                                                               rules={[Rules.number]} noStyle>
-                                                        <Input size={"small"} style={{width: "64px"}}/>
+                                                    <Form.Item name={["threshold"]} rules={[Rules.number]} noStyle>
+                                                        <Input size={"small"} style={{width: "64px"}} suffix={selected?.metric?.unit}/>
                                                     </Form.Item><Typography.Text type={"secondary"}>时, 产生</Typography.Text>
                                                     <Form.Item name={["level"]} noStyle>
                                                         <Select size={"small"}
@@ -253,6 +251,7 @@ const AddAlarmRule = () => {
                         </Button>,
                         <Button key="add" onClick={() => {
                             form.resetFields()
+                            setSelected(undefined)
                             setSuccess(false)
                         }}>继续创建报警规则</Button>,
                     ]}

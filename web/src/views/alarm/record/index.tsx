@@ -36,7 +36,7 @@ const AlarmRecordPage = () => {
             levels: alertLevels.join(",")
         }
         PagingAlarmRecordRequest(current, size, startDate.utc().unix(), endDate.utc().unix(), filters).then(setDataSource)
-    }, [startDate, endDate, alertLevels])
+    }, [startDate, endDate, alertLevels, refreshKey])
 
     useEffect(() => {
         fetchAlarmRecords(1, 10)

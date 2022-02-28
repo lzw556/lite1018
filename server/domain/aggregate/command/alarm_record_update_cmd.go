@@ -9,19 +9,24 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/errcode"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/transaction"
+	"strings"
 )
 
 type AlarmRecordUpdateCmd struct {
 	entity.AlarmRecord
 
-	alarmRecordRepo dependency.AlarmRecordRepository
-	acknowledgeRepo dependency.AlarmRecordAcknowledgeRepository
+	alarmRecordRepo      dependency.AlarmRecordRepository
+	acknowledgeRepo      dependency.AlarmRecordAcknowledgeRepository
+	deviceAlertStateRepo dependency.DeviceAlertStateRepository
+	deviceRepo           dependency.DeviceRepository
 }
 
 func NewAlarmRecordUpdateCmd() AlarmRecordUpdateCmd {
 	return AlarmRecordUpdateCmd{
-		alarmRecordRepo: repository.AlarmRecord{},
-		acknowledgeRepo: repository.AlarmRecordAcknowledge{},
+		alarmRecordRepo:      repository.AlarmRecord{},
+		acknowledgeRepo:      repository.AlarmRecordAcknowledge{},
+		deviceAlertStateRepo: repository.DeviceAlertState{},
+		deviceRepo:           repository.Device{},
 	}
 }
 
@@ -37,7 +42,15 @@ func (cmd AlarmRecordUpdateCmd) AcknowledgeBy(req request.AcknowledgeAlarmRecord
 				UserID:        req.UserID,
 				Note:          req.Note,
 			}
-			return cmd.acknowledgeRepo.Create(txCtx, &e)
+			if err := cmd.acknowledgeRepo.Create(txCtx, &e); err != nil {
+				return err
+			}
+			if strings.HasPrefix(cmd.AlarmRecord.SourceType, entity.AlarmSourceTypeDevice) {
+				if device, err := cmd.deviceRepo.Get(txCtx, cmd.AlarmRecord.SourceID); err == nil {
+					return cmd.deviceAlertStateRepo.Delete(device.MacAddress, cmd.AlarmRecord.AlarmRuleID)
+				}
+			}
+			return nil
 		})
 	}
 	return response.BusinessErr(errcode.AlarmRecordAlreadyAcknowledgedError, "")

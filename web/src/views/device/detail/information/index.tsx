@@ -26,7 +26,6 @@ const InformationCard: FC<GatewayInformationProps> = ({device, isLoading}) => {
             if (device.macAddress === status.macAddress) {
                 setUpgradeStatus({code: status.code, progress: status.progress});
             }
-            setUpgradeStatus({});
         });
         return () => {
             PubSub.unsubscribe(SocketTopic.upgradeStatus);

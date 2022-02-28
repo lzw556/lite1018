@@ -1,16 +1,17 @@
 package devicetype
 
-type NormalTemperatureCorrosion struct{}
-
-func (NormalTemperatureCorrosion) ID() uint {
-	return NormalTemperatureCorrosionType
+type HighTemperatureCorrosion struct {
 }
 
-func (NormalTemperatureCorrosion) SensorID() uint {
+func (HighTemperatureCorrosion) ID() uint {
+	return HighTemperatureCorrosionType
+}
+
+func (HighTemperatureCorrosion) SensorID() uint {
 	return ThicknessSensor
 }
 
-func (NormalTemperatureCorrosion) Settings() Settings {
+func (HighTemperatureCorrosion) Settings() Settings {
 	return []Setting{
 		{
 			Name:     "采集周期",
@@ -26,15 +27,31 @@ func (NormalTemperatureCorrosion) Settings() Settings {
 			Name:     "波速",
 			Key:      "speed_object",
 			Type:     FloatValueType,
-			Value:    6000,
+			Value:    5920,
 			Category: SensorsSettingCategory,
 			Sort:     1,
 			Group:    SettingGroupCorrosion,
 		},
+		{
+			Name:     "导波杆长",
+			Key:      "length_rod",
+			Type:     FloatValueType,
+			Value:    400,
+			Category: SensorsSettingCategory,
+			Sort:     2,
+			Options: map[int]string{
+				124: "124mm",
+				125: "125mm",
+				200: "200mm",
+				300: "300mm",
+				400: "400mm",
+			},
+			Group: SettingGroupCorrosion,
+		},
 	}
 }
 
-func (NormalTemperatureCorrosion) Properties(sensorID uint) Properties {
+func (HighTemperatureCorrosion) Properties(sensorID uint) Properties {
 	switch sensorID {
 	case ThicknessSensor:
 		return Properties{

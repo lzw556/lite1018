@@ -3,10 +3,10 @@ import {useCallback, useEffect, useState} from "react";
 import {
     GetAlarmRuleRequest,
     PagingAlarmRuleRequest,
-    RemoveAlarmRuleRequest,
+    RemoveAlarmRuleRequest, RemoveAlarmRuleSourceRequest,
     UpdateAlarmRuleStatusRequest
 } from "../../../apis/alarm";
-import {Button, Col, Divider, Popconfirm, Row, Space, Table, Tag, Typography} from "antd";
+import {Button, Col, Divider, Dropdown, Menu, Popconfirm, Row, Space, Table, Tag, Typography} from "antd";
 import HasPermission from "../../../permission";
 import {Permission} from "../../../permission/permission";
 import {PageResult} from "../../../types/page";
@@ -14,14 +14,15 @@ import moment from "moment";
 import "../../../string-extension"
 import {ColorDanger, ColorHealth, ColorInfo, ColorWarn} from "../../../constants/color";
 import EditAlarmRuleModal from "./modal/editAlarmRuleModal";
-import {DeleteOutlined} from "@ant-design/icons";
+import {DeleteOutlined, EditOutlined} from "@ant-design/icons";
+import AddSourceModal from "./modal/addSourceModal";
 
 const AlarmRule = () => {
     const [dataSource, setDataSource] = useState<PageResult<any[]>>()
-    const [alarmSource, setAlarmSource] = useState<any>()
     const [refreshKey, setRefreshKey] = useState<number>(0)
     const [alarmRule, setAlarmRule] = useState<any>()
-
+    const [editVisible, setEditVisible] = useState<boolean>(false)
+    const [addVisible, setAddVisible] = useState<boolean>(false)
 
     const onDelete = (id: number) => {
         RemoveAlarmRuleRequest(id).then(_ => onRefresh())
@@ -31,12 +32,27 @@ const AlarmRule = () => {
         setRefreshKey(refreshKey + 1)
     }
 
-    const onEdit = (id: number) => {
+    const onEdit = (key: any, id: number) => {
+        switch (key) {
+            case "editCondition":
+                setEditVisible(true)
+                break
+            case "addMonitor":
+                setAddVisible(true)
+                break
+        }
         GetAlarmRuleRequest(id).then(setAlarmRule)
     }
 
     const onEditStatus = (id: number, status: number) => {
         UpdateAlarmRuleStatusRequest(id, status).then(_ => onRefresh())
+    }
+
+    const renderEditMenus = (record:any) => {
+        return <Menu onClick={e => onEdit(e.key, record.id)}>
+            <Menu.Item key={"editCondition"}>更新报警条件</Menu.Item>
+            <Menu.Item key={"addMonitor"}>添加监控对象</Menu.Item>
+        </Menu>
     }
 
     const columns: any = [
@@ -68,13 +84,29 @@ const AlarmRule = () => {
             }
         },
         {
+            title: '报警等级',
+            dataIndex: 'level',
+            key: 'level',
+            render: (level: any) => {
+                switch (level) {
+                    case 1:
+                        return <Tag color={ColorInfo}>提示</Tag>
+                    case 2:
+                        return <Tag color={ColorWarn}>重要</Tag>
+                    case 3:
+                        return <Tag color={ColorDanger}>紧急</Tag>
+                }
+                return "无"
+            }
+        },
+        {
             title: '启停状态',
             dataIndex: 'enabled',
             key: 'enabled',
             render: (enabled: boolean) => {
                 return enabled ?
                     <Typography.Text strong style={{color: ColorHealth}}>启用</Typography.Text> :
-                    <Typography.Text strong style={{color: ColorDanger}}>禁用</Typography.Text>
+                    <Typography.Text strong style={{color: ColorDanger}}>停用</Typography.Text>
             }
         },
         {
@@ -90,15 +122,17 @@ const AlarmRule = () => {
             render: (_: any, record: any) => {
                 return <>
                     <HasPermission value={Permission.AlarmEdit}>
-                        <a onClick={() => onEdit(record.id)}>修改</a>
+                        {
+                            record.enabled ?
+                                <a style={{color: ColorDanger}} onClick={() => onEditStatus(record.id, 0)}>停用</a> :
+                                <a style={{color: ColorHealth}} onClick={() => onEditStatus(record.id, 1)}>启用</a>
+                        }
                     </HasPermission>
                     <HasPermission value={Permission.AlarmEdit}>
                         <Divider type={"vertical"}/>
-                        {
-                            record.enabled ?
-                                <a style={{color: ColorDanger}} onClick={() => onEditStatus(record.id, 0)}>禁用</a> :
-                                <a style={{color: ColorHealth}} onClick={() => onEditStatus(record.id, 1)}>启用</a>
-                        }
+                        <Dropdown overlay={renderEditMenus(record)}>
+                            <Button type="text" size="small" icon={<EditOutlined/>}/>
+                        </Dropdown>
                     </HasPermission>
                     <HasPermission value={Permission.AlarmDelete}>
                         <Divider type={"vertical"}/>
@@ -120,6 +154,10 @@ const AlarmRule = () => {
         fetchAlarmRules(1, 10)
     }, [fetchAlarmRules])
 
+    const onRemoveDeviceFromAlarmRule = (ruleId: number, sourceId: number) => {
+        RemoveAlarmRuleSourceRequest(ruleId, {ids: [sourceId]}).then(data => onRefresh());
+    }
+
     const onExpandedRowRender = (record: any) => {
         let columns;
         if (record.sourceType.indexOf("device") > -1) {
@@ -138,7 +176,7 @@ const AlarmRule = () => {
                     render: (text: string) => text.toUpperCase().macSeparator()
                 },
                 {
-                    title: '报警级别',
+                    title: '报警状态',
                     dataIndex: 'alertStates',
                     key: 'alertStates',
                     width: '10%',
@@ -163,24 +201,28 @@ const AlarmRule = () => {
                     key: 'alertValue',
                     render: (states: any) => {
                         const state = states?.find((state: any) => state.rule.id === record.id)
-                        console.log(state);
                         if (state && state.record) {
                             return `${state.record.value} ${record.metric.unit}`
                         }
                         return "无"
                     }
+                },
+                {
+                    title:'操作',
+                    key: 'action',
+                    width: '20%',
+                    render: (_:any, source:any) => {
+                        return <Space>
+                            <Popconfirm title={`确认要将【${source.name}】移除【${record.name}】报警规则吗?`} onConfirm={() => onRemoveDeviceFromAlarmRule(record.id, source.id)}
+                                        okText="移除" cancelText="取消">
+                                <Button type="text" size="small" danger>移除</Button>
+                            </Popconfirm>
+                        </Space>
+                    },
                 }
             ]
         }
-        return <Table columns={columns} dataSource={alarmSource} pagination={false}/>
-    }
-
-    const onExpand = (expanded: boolean, record: any) => {
-        if (expanded) {
-            GetAlarmRuleRequest(record.id).then(data => {
-                setAlarmSource(data.sources)
-            })
-        }
+        return <Table rowKey={record => record.id} columns={columns} dataSource={record.sources} pagination={false}/>
     }
 
     return <div>
@@ -198,7 +240,6 @@ const AlarmRule = () => {
                              permissions={[Permission.AlarmEdit, Permission.AlarmDelete]}
                              expandable={{
                                  expandedRowRender: onExpandedRowRender,
-                                 onExpand: onExpand,
                                  indentSize: 5,
                              }}
                              dataSource={dataSource}
@@ -206,12 +247,27 @@ const AlarmRule = () => {
             </Col>
         </Row>
         {
-            alarmRule && <EditAlarmRuleModal value={alarmRule} visible={!!alarmRule}
-                                             onCancel={() => setAlarmRule(undefined)}
+            alarmRule && <EditAlarmRuleModal value={alarmRule} visible={editVisible}
+                                             onCancel={() => {
+                                                 setAlarmRule(undefined)
+                                                 setEditVisible(false)
+                                             }}
                                              onSuccess={() => {
                                                  setAlarmRule(undefined)
+                                                 setEditVisible(false)
                                                  onRefresh();
                                              }}/>
+        }
+        {
+            alarmRule && <AddSourceModal value={alarmRule} visible={addVisible}
+                                         onCancel={() => {
+                                             setAddVisible(false);
+                                             setAlarmRule(undefined)
+                                         }} onSuccess={() => {
+                                             setAddVisible(false);
+                                             setAlarmRule(undefined);
+                                             onRefresh();
+                                         }}/>
         }
     </div>
 }

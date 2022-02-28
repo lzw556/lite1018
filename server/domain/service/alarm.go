@@ -65,6 +65,22 @@ func (s Alarm) UpdateAlarmRuleStatusByID(id uint, status uint8) error {
 	return cmd.UpdateStatus(status)
 }
 
+func (s Alarm) AddSourcesToAlarmRule(id uint, sources []uint) error {
+	cmd, err := s.factory.NewAlarmRuleUpdateCmd(id)
+	if err != nil {
+		return err
+	}
+	return cmd.AddSources(sources)
+}
+
+func (s Alarm) RemoveSourcesFromAlarmRule(id uint, sources []uint) error {
+	cmd, err := s.factory.NewAlarmRuleUpdateCmd(id)
+	if err != nil {
+		return err
+	}
+	return cmd.RemoveSources(sources)
+}
+
 func (s Alarm) DeleteAlarmRuleByID(id uint) error {
 	cmd, err := s.factory.NewAlarmRuleDeleteCmd(id)
 	if err != nil {

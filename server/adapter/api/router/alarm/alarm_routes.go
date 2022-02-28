@@ -49,6 +49,24 @@ func (r alarmRouter) updateAlarmRule(ctx *gin.Context) (interface{}, error) {
 	return nil, r.service.UpdateAlarmRuleByID(id, req)
 }
 
+func (r alarmRouter) addSourcesToAlarmRule(ctx *gin.Context) (interface{}, error) {
+	id := cast.ToUint(ctx.Param("id"))
+	var req request.AlarmSources
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		return nil, response.InvalidParameterError(err.Error())
+	}
+	return nil, r.service.AddSourcesToAlarmRule(id, req.IDs)
+}
+
+func (r alarmRouter) removeSourcesFromAlarmRule(ctx *gin.Context) (interface{}, error) {
+	id := cast.ToUint(ctx.Param("id"))
+	var req request.AlarmSources
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		return nil, response.InvalidParameterError(err.Error())
+	}
+	return nil, r.service.RemoveSourcesFromAlarmRule(id, req.IDs)
+}
+
 func (r alarmRouter) updateAlarmRuleStatus(ctx *gin.Context) (interface{}, error) {
 	id := cast.ToUint(ctx.Param("id"))
 	status := cast.ToUint8(ctx.Param("status"))

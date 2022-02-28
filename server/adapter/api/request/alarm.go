@@ -27,6 +27,10 @@ type AlarmRule struct {
 	ProjectID uint `json:"-"`
 }
 
+type AlarmSources struct {
+	IDs []uint `json:"ids"`
+}
+
 type CreateAlarmFromTemplate struct {
 	Name        string `json:"name"`
 	Description string `json:"description"`

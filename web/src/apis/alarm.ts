@@ -54,6 +54,14 @@ export function UpdateAlarmRuleStatusRequest(id: number, status: number) {
     return request.put(`/alarmRules/${id}/status/${status}`, null).then(PutResponse)
 }
 
+export function AddAlarmRuleSourceRequest(id: number, params: any) {
+    return request.post(`/alarmRules/${id}/sources`, params).then(PostResponse)
+}
+
+export function RemoveAlarmRuleSourceRequest(id: number, params: any) {
+    return request.delete(`/alarmRules/${id}/sources`, params).then(DeleteResponse)
+}
+
 export function RemoveAlarmRuleRequest(id: number) {
     return request.delete(`/alarmRules/${id}`).then(DeleteResponse)
 }

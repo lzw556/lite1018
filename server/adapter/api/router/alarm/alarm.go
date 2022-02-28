@@ -19,7 +19,7 @@ func (r *alarmRouter) initRoutes() {
 	r.routes = []router.Route{
 		// POST
 		router.NewPostRoute("alarmRules", r.createAlarmRule),
-
+		router.NewPostRoute("alarmRules/:id/sources", r.addSourcesToAlarmRule),
 		router.NewPostRoute("alarmRecords/:id/acknowledge", r.acknowledgeAlarmRecord),
 
 		// GET
@@ -37,6 +37,7 @@ func (r *alarmRouter) initRoutes() {
 
 		//DELETE
 		router.NewDeleteRoute("alarmRules/:id", r.deleteAlarmRule),
+		router.NewDeleteRoute("alarmRules/:id/sources", r.removeSourcesFromAlarmRule),
 	}
 }
 

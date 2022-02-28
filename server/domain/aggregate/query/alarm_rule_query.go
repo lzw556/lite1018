@@ -38,6 +38,7 @@ func (query AlarmRuleQuery) Paging(page, size int) ([]vo.AlarmRule, int64, error
 	result := make([]vo.AlarmRule, len(es))
 	for i, e := range es {
 		result[i] = vo.NewAlarmRule(e)
+		query.setSources(&result[i])
 	}
 	return result, total, nil
 }
@@ -48,16 +49,21 @@ func (query AlarmRuleQuery) Get(id uint) (*vo.AlarmRule, error) {
 		return nil, err
 	}
 	result := vo.NewAlarmRule(e)
+	query.setSources(&result)
+	return &result, nil
+}
+
+func (query AlarmRuleQuery) setSources(alarmRule *vo.AlarmRule) {
 	sourceIDs := make([]uint, 0)
-	if es, err := query.alarmSourceRepo.FindBySpecs(context.TODO(), spec.AlarmRuleEqSpec(e.ID)); err == nil {
+	if es, err := query.alarmSourceRepo.FindBySpecs(context.TODO(), spec.AlarmRuleEqSpec(alarmRule.ID)); err == nil {
 		for _, source := range es {
 			sourceIDs = append(sourceIDs, source.SourceID)
 		}
 	}
-	if strings.HasPrefix(result.SourceType, entity.AlarmSourceTypeDevice) {
+	if strings.HasPrefix(alarmRule.SourceType, entity.AlarmSourceTypeDevice) {
 		es, err := query.deviceRepo.FindBySpecs(context.TODO(), spec.PrimaryKeyInSpec(sourceIDs))
 		if err != nil {
-			return nil, err
+			return
 		}
 		sources := make([]vo.Device, len(es))
 		for i, device := range es {
@@ -66,7 +72,6 @@ func (query AlarmRuleQuery) Get(id uint) (*vo.AlarmRule, error) {
 				sources[i].SetAlertStates(alerts)
 			}
 		}
-		result.Sources = sources
+		alarmRule.Sources = sources
 	}
-	return &result, nil
 }

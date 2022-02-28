@@ -12,6 +12,7 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	spec "github.com/thetasensors/theta-cloud-lite/server/domain/specification"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/devicetype"
+	"sync"
 	"time"
 )
 
@@ -21,6 +22,8 @@ type SensorData struct {
 	alarmSourceRepo dependency.AlarmSourceRepository
 	alarmRuleRepo   dependency.AlarmRuleRepository
 	processor       Processor
+
+	mu sync.RWMutex
 }
 
 func NewSensorData() Processor {
@@ -29,6 +32,7 @@ func NewSensorData() Processor {
 		sensorDataRepo:  repository.SensorData{},
 		alarmSourceRepo: repository.AlarmSource{},
 		alarmRuleRepo:   repository.AlarmRule{},
+		mu:              sync.RWMutex{},
 	})
 }
 
@@ -71,6 +75,8 @@ func (p *SensorData) Process(ctx *iot.Context, msg iot.Message) error {
 						ids[i] = source.AlarmRuleID
 					}
 					if alarmRules, err := p.alarmRuleRepo.FindBySpecs(context.TODO(), spec.PrimaryKeyInSpec(ids)); err == nil {
+						p.mu.Lock()
+						defer p.mu.Unlock()
 						ruleengine.ExecuteSelectedRules(device.ID, alarmRules...)
 					}
 				}

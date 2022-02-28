@@ -13,6 +13,8 @@ type Service interface {
 	UpdateAlarmRuleStatusByID(id uint, status uint8) error
 	DeleteAlarmRuleByID(id uint) error
 	CheckAlarmRuleName(name string) (bool, error)
+	AddSourcesToAlarmRule(id uint, sources []uint) error
+	RemoveSourcesFromAlarmRule(id uint, sources []uint) error
 
 	FindAlarmRecordByPaginate(page, size int, filters request.Filters) ([]vo.AlarmRecord, int64, error)
 	AcknowledgeAlarmRecordByID(id uint, req request.AcknowledgeAlarmRecord) error
