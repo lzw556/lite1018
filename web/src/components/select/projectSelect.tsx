@@ -23,7 +23,15 @@ const ProjectSelect:FC<ProjectSelectProps> = (props) => {
         });
     }, [])
 
-    return <Select {...props}>
+    const onProjectChange = (open:any) => {
+        if (open) {
+            GetMyProjectsRequest().then(data => {
+                setDataSource(data);
+            });
+        }
+    }
+
+    return <Select {...props} onDropdownVisibleChange={onProjectChange}>
         {
             dataSource.map(item => <Option key={item.id} value={item.id}>{item.name}</Option>)
         }
