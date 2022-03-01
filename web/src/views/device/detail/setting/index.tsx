@@ -2,12 +2,13 @@ import {Device} from "../../../../types/device";
 import {FC, useEffect, useState} from "react";
 import {GetDeviceSettingRequest, UpdateDeviceSettingRequest} from "../../../../apis/device";
 import "../../index.css"
-import {Button, Col, Form, Row, Skeleton} from "antd";
+import {Button, Col, Divider, Form, Row, Skeleton} from "antd";
 import {EmptyLayout} from "../../../layout";
 import {DeviceSetting} from "../../../../types/device_setting";
 import DeviceSettingFormItem from "../../../../components/formItems/deviceSettingFormItem";
 import {defaultValidateMessages} from "../../../../constants/validator";
 import {DeviceType} from "../../../../types/device_type";
+import { SETTING_GROUPS } from "../../../../constants/settingGroup";
 
 export interface SettingPageProps {
     device: Device
@@ -28,8 +29,26 @@ const SettingPage: FC<SettingPageProps> = ({device}) => {
 
     const renderSetting = () => {
         if (device.typeId !== DeviceType.Router && settings) {
-            return settings.map(setting => (
-                <DeviceSettingFormItem editable={true} value={setting} key={setting.key}/>))
+            if(device.typeId=== DeviceType.BoltElongation){
+                let groups:(DeviceSetting['group'])[] = []
+                settings.forEach((setting)=>{
+                    if(setting.group && (groups.length === 0 || !groups.find(group => group === setting.group))){
+                        groups.push(setting.group)
+                    }
+                })
+                if(groups.length > 0){
+                   return groups.map((group) => {
+                        return <>
+                            <Divider orientation="left"><strong>{(group && SETTING_GROUPS[group]) || group}</strong></Divider>
+                            {settings.filter(setting => setting.group === group).map(setting => (
+                                <DeviceSettingFormItem editable={true} value={setting} key={setting.key}/>))}
+                        </>
+                    })
+                }  
+              }else{
+                return settings.map(setting => (
+                    <DeviceSettingFormItem editable={true} value={setting} key={setting.key}/>))
+              }
         }
         return <EmptyLayout description={"暂无配置信息"}/>
     }

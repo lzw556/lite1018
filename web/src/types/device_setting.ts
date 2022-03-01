@@ -1,6 +1,7 @@
 import {COMMUNICATION_PERIOD, COMMUNICATION_TIME_OFFSET} from "../constants";
 import {WsnSetting} from "./wsn_setting";
 import {IpnSetting} from "./ipn_setting";
+import { SETTING_GROUPS } from "../constants/settingGroup";
 
 export const DEFAULT_DEVICE_SETTING_IPN: IpnSetting = {
     ip_mode: 0,
@@ -38,4 +39,5 @@ export type DeviceSetting = {
     options?: any;
     show: any;
     children?: DeviceSetting[];
+    group?:keyof typeof SETTING_GROUPS;
 }
