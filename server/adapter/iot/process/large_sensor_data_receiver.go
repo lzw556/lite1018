@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/binary"
 	pd "github.com/thetasensors/theta-cloud-lite/server/adapter/iot/proto"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/xlog"
 	"sort"
 )
 
@@ -30,6 +31,7 @@ func NewLargeSensorDataReceiver(m pd.LargeSensorDataMessage) LargeSensorDataRece
 		},
 	}
 	r.ReceiveLength = len(m.Data)
+	xlog.Debugf("start receive large sensor data => [%d]", r.Timestamp)
 	return r
 }
 
@@ -39,6 +41,9 @@ func (r *LargeSensorDataReceiver) Receive(seqID int32, data []byte) {
 		Data:  data,
 	})
 	r.ReceiveLength += len(data)
+	xlog.Debugf(
+		"receive large sensor data => [packet len = %d, receive len = %d, data len = %d, seqId= %d]",
+		len(data), r.ReceiveLength, r.DataLength, seqID)
 }
 
 func (r LargeSensorDataReceiver) IsCompleted() bool {

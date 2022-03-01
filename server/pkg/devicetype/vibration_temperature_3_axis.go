@@ -20,6 +20,7 @@ func (VibrationTemperature3Axis) Settings() Settings {
 			Category: SensorsSettingCategory,
 			Options:  samplePeriodOption1,
 			Sort:     0,
+			Group:    SettingGroupGeneral,
 		},
 		{
 			Name:  "是否启用原始数据采集",
@@ -32,6 +33,7 @@ func (VibrationTemperature3Axis) Settings() Settings {
 			},
 			Category: SensorsSettingCategory,
 			Sort:     1,
+			Group:    SettingGroupAcceleration,
 		},
 		{
 			Name:     "原始数据采集周期",
@@ -44,6 +46,7 @@ func (VibrationTemperature3Axis) Settings() Settings {
 			Sort:     2,
 			Parent:   "schedule1_sensor_flags",
 			Show:     32,
+			Group:    SettingGroupAcceleration,
 		},
 		{
 			Name:     "原始数据采集延时",
@@ -55,6 +58,7 @@ func (VibrationTemperature3Axis) Settings() Settings {
 			Options:  smaplePeriodOffsetOption1,
 			Parent:   "schedule1_sensor_flags",
 			Show:     32,
+			Group:    SettingGroupAcceleration,
 		},
 		{
 			Name:     "原始数据采集量程",
@@ -71,6 +75,7 @@ func (VibrationTemperature3Axis) Settings() Settings {
 			Sort:   4,
 			Parent: "schedule1_sensor_flags",
 			Show:   32,
+			Group:  SettingGroupAcceleration,
 		},
 		{
 			Name:     "原始数据采集频率",
@@ -88,6 +93,7 @@ func (VibrationTemperature3Axis) Settings() Settings {
 			Sort:   5,
 			Parent: "schedule1_sensor_flags",
 			Show:   32,
+			Group:  SettingGroupAcceleration,
 		},
 	}
 }

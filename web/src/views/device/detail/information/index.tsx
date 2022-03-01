@@ -26,7 +26,6 @@ const InformationCard: FC<GatewayInformationProps> = ({device, isLoading}) => {
             if (device.macAddress === status.macAddress) {
                 setUpgradeStatus({code: status.code, progress: status.progress});
             }
-            setUpgradeStatus({});
         });
         return () => {
             PubSub.unsubscribe(SocketTopic.upgradeStatus);
@@ -45,8 +44,8 @@ const InformationCard: FC<GatewayInformationProps> = ({device, isLoading}) => {
                             device.name
                         }
                         {
-                            upgradeStatus && upgradeStatus.id === device.id && (
-                                <DeviceUpgradeSpin status={upgradeStatus.status}/>)
+                            upgradeStatus && (
+                                <DeviceUpgradeSpin status={upgradeStatus}/>)
                         }
                     </Space>
                 </Col>

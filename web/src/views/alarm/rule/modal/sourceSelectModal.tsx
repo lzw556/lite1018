@@ -100,16 +100,18 @@ const SourceSelectModal: FC<SourceSelectModalProps> = (props) => {
                 let metric = {
                     key: "",
                     name: "",
+                    unit: "",
                 }
                 if (property && property.fields.length === 1) {
                     metric.key = property.key + "." + property.fields[0].key;
                     metric.name = property.name
+                    metric.unit = property.unit
                 }else {
                     const field = property.fields.find((item:any) => item.key === values.dimension)
                     metric.key = metric.key = property.key + "." + field.key;
                     metric.name = `${property.name}(${field.name})`
+                    metric.unit = property.unit
                 }
-
                 onSuccess({sources: selected, metric:metric, sourceType: `${sourceType}::${deviceType}`})
             })
         }

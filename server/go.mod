@@ -29,6 +29,7 @@ require (
 	github.com/robfig/cron/v3 v3.0.0
 	github.com/satori/go.uuid v1.2.0
 	github.com/shirou/gopsutil v3.21.10+incompatible
+	github.com/shopspring/decimal v1.3.1 // indirect
 	github.com/spf13/cast v1.4.1
 	github.com/spf13/viper v1.8.1
 	github.com/tklauser/go-sysconf v0.3.9 // indirect

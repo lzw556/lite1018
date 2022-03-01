@@ -28,7 +28,7 @@ func (s System) GetSystem() (*vo.System, error) {
 	if result.Server.Disk, err = utils.InitDisk(); err != nil {
 		return &result, err
 	}
-	conf := config.MQTT{}
+	conf := config.IoT{}
 	if err := config.Scan("iot", &conf); err != nil {
 		return &result, err
 	}

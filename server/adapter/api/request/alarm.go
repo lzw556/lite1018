@@ -18,10 +18,17 @@ type AlarmRule struct {
 	Metric      struct {
 		Key  string `json:"key"`
 		Name string `json:"name"`
+		Unit string `json:"unit"`
 	} `json:"metric"`
 	Operation string  `json:"operation"`
 	Threshold float64 `json:"threshold"`
 	Level     uint8   `json:"level"`
+
+	ProjectID uint `json:"-"`
+}
+
+type AlarmSources struct {
+	IDs []uint `json:"ids"`
 }
 
 type CreateAlarmFromTemplate struct {
@@ -31,6 +38,7 @@ type CreateAlarmFromTemplate struct {
 }
 
 type AcknowledgeAlarmRecord struct {
-	UserID uint   `json:"user_id"`
-	Note   string `json:"note"`
+	UserID uint `json:"-"`
+
+	Note string `json:"note"`
 }

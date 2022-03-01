@@ -13,6 +13,7 @@ func InitBuckets(db *bbolt.DB) {
 		entity.SensorData{},
 		entity.LargeSensorData{},
 		entity.DeviceInformation{},
+		entity.DeviceAlertState{},
 	}
 	_ = db.Update(func(tx *bbolt.Tx) error {
 		for _, bucket := range buckets {

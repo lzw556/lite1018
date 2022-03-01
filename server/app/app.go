@@ -4,6 +4,7 @@ import (
 	"context"
 	"embed"
 	"fmt"
+	"github.com/gin-gonic/gin"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/middleware"
@@ -50,7 +51,7 @@ func Start(mode string, dist embed.FS) {
 
 	runSocketServer()
 
-	runApiServer(dist)
+	runApiServer(mode, dist)
 
 	<-ctx.Done()
 
@@ -93,7 +94,14 @@ func runIoTServer() {
 	}
 }
 
-func runApiServer(dist embed.FS) {
+func runApiServer(mode string, dist embed.FS) {
+	switch mode {
+	case "debug":
+		gin.SetMode(gin.DebugMode)
+	default:
+		gin.SetMode(gin.ReleaseMode)
+	}
+
 	adapter.Api = api.NewAdapter()
 	adapter.Api.Socket(adapter.Socket.Server())
 	adapter.Api.StaticFS(dist)
@@ -115,6 +123,7 @@ func runApiServer(dist embed.FS) {
 		network.NewRouter(service.NewNetwork()),
 		system.NewRouter(service.NewSystem()),
 	)
+
 	go func() {
 		if err := adapter.Api.Run(); err != nil && err != http.ErrServerClosed {
 			xlog.Error("api server start failed", err)

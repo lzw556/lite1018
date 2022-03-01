@@ -27,7 +27,10 @@ const DeviceList: FC<DeviceTableProps> = ({network, onRefresh}) => {
         const filter = {
             network_id: network.id,
         }
-        PagingDevicesRequest(current, size, filter).then(setDataSource)
+        PagingDevicesRequest(current, size, filter).then(data => {
+            data.result.sort((a:any, b:any) => a.typeId - b.typeId)
+            setDataSource(data)
+        })
     }, [onRefresh, refreshKey])
 
     useEffect(() => {
@@ -125,7 +128,7 @@ const DeviceList: FC<DeviceTableProps> = ({network, onRefresh}) => {
     ]
 
     return <>
-        <DeviceTable columns={columns} permissions={[Permission.NetworkRemoveDevices]} dataSource={dataSource?.result.sort((a:any, b:any) => a.typeId - b.typeId)} onChange={fetchDevices}/>
+        <DeviceTable columns={columns} permissions={[Permission.NetworkRemoveDevices]} dataSource={dataSource} onChange={fetchDevices}/>
     </>
 }
 

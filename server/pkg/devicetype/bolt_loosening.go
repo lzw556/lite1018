@@ -20,6 +20,7 @@ func (BoltLoosening) Settings() Settings {
 			Category: SensorsSettingCategory,
 			Options:  samplePeriodOption1,
 			Sort:     0,
+			Group:    SettingGroupGeneral,
 		},
 	}
 }

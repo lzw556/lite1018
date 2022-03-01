@@ -15,7 +15,6 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/errcode"
 	"gorm.io/gorm"
 	"strings"
-	"time"
 )
 
 type Alarm struct {
@@ -61,7 +60,9 @@ func (factory Alarm) NewAlarmRuleCreateCmd(req request.AlarmRule) (*command.Alar
 	e.Metric = entity.AlarmRuleMetric{
 		Key:  req.Metric.Key,
 		Name: req.Metric.Name,
+		Unit: req.Metric.Unit,
 	}
+	e.ProjectID = req.ProjectID
 	cmd := command.NewAlarmRuleCreateCmd()
 	cmd.AlarmRule = e
 	cmd.AlarmSources = make([]entity.AlarmSource, len(req.SourceIDs))
@@ -73,88 +74,64 @@ func (factory Alarm) NewAlarmRuleCreateCmd(req request.AlarmRule) (*command.Alar
 	return &cmd, nil
 }
 
+func (factory Alarm) NewAlarmRuleUpdateCmd(id uint) (*command.AlarmRuleUpdateCmd, error) {
+	ctx := context.TODO()
+	e, err := factory.alarmRuleRepo.Get(ctx, id)
+	if err != nil {
+		return nil, response.BusinessErr(errcode.AlarmRuleNotFoundError, "")
+	}
+	cmd := command.NewAlarmRuleUpdateCmd()
+	cmd.AlarmRule = e
+	return &cmd, nil
+}
+
 func (factory Alarm) NewAlarmRuleQuery(filters ...request.Filter) (*query.AlarmRuleQuery, error) {
 	q := query.NewAlarmRuleQuery()
+	q.Specs = make([]spec.Specification, 0)
+	for _, filter := range filters {
+		switch filter.Name {
+		case "project_id":
+			q.Specs = append(q.Specs, spec.ProjectEqSpec(cast.ToUint(filter.Value)))
+		}
+	}
 	return &q, nil
 }
 
-func (factory Alarm) NewAlarmPagingQuery(filters request.Filters, page, size int) (*query.AlarmPagingQuery, error) {
-	//ctx := context.TODO()
-	specs := make([]spec.Specification, 0)
-	for _, filter := range filters {
-		switch filter.Name {
-		case "asset_id":
-		case "measurement_id":
-			specs = append(specs, spec.MeasurementEqSpec(cast.ToUint(filter.Value)))
-		}
-	}
-	//es, total, err := factory.alarmRuleRepo.PagingBySpecs(ctx, page, size, specs...)
-	//if err != nil {
-	//	return nil, err
-	//}
-	return nil, nil
-}
-
-func (factory Alarm) NewAlarmQuery(id uint) (*query.AlarmQuery, error) {
-	//ctx := context.TODO()
-	//e, err := factory.alarmRuleRepo.Get(ctx, id)
-	//if err != nil {
-	//	return nil, err
-	//}
-	//q := query.NewAlarmQuery()
-	//q.Alarm = e
-	return nil, nil
-}
-
-func (factory Alarm) NewAlarmRecordPagingQuery(filters request.Filters, from, to int64, page, size int) (*query.AlarmRecordPagingQuery, error) {
+func (factory Alarm) NewAlarmRuleDeleteCmd(id uint) (*command.AlarmRuleDeleteCmd, error) {
 	ctx := context.TODO()
-	specs := factory.buildFilterSpecs(filters)
-	specs = append(specs, spec.CreatedAtRangeSpec{time.Unix(from, 0), time.Unix(to, 0)})
-
-	es, total, err := factory.alarmRecordRepo.PagingBySpecs(ctx, page, size, specs...)
+	e, err := factory.alarmRuleRepo.Get(ctx, id)
 	if err != nil {
-		return nil, err
+		return nil, response.BusinessErr(errcode.AlarmRuleNotFoundError, "")
 	}
-	q := query.NewAlarmRecordPagingQuery(total)
-	q.AlarmRecords = es
-	return &q, nil
+	cmd := command.NewAlarmRuleDeleteCmd()
+	cmd.AlarmRule = e
+	return &cmd, nil
 }
 
-func (factory Alarm) buildFilterSpecs(filters request.Filters) []spec.Specification {
-	specs := make([]spec.Specification, 0)
+func (factory Alarm) NewAlarmRecordQuery(filters ...request.Filter) (*query.AlarmRecordQuery, error) {
+	q := query.NewAlarmRecordQuery()
 	for _, filter := range filters {
 		switch filter.Name {
-		case "measurement_id":
-			specs = append(specs, spec.MeasurementEqSpec(cast.ToUint(filter.Value)))
-		case "asset_id":
-		case "statues":
-			statues := strings.Split(cast.ToString(filter.Value), ",")
-			statuesSpec := make(spec.StatusInSpec, len(statues))
-			for i, status := range statues {
-				statuesSpec[i] = cast.ToUint(status)
+		case "project_id":
+			q.Specs = append(q.Specs, spec.ProjectEqSpec(cast.ToUint(filter.Value)))
+		case "levels":
+			levels := strings.Split(cast.ToString(filter.Value), ",")
+			levelsInSpec := make(spec.LevelInSpec, len(levels))
+			for i, level := range levels {
+				levelsInSpec[i] = cast.ToUint(level)
 			}
-			specs = append(specs, statuesSpec)
+			q.Specs = append(q.Specs, spec.LevelInSpec(levelsInSpec))
 		}
 	}
-	return specs
-}
-
-func (factory Alarm) NewAlarmRecordQuery(id uint) (*query.AlarmRecordQuery, error) {
-	e, err := factory.alarmRecordRepo.Get(context.TODO(), id)
-	if err != nil {
-		return nil, err
-	}
-	q := query.NewAlarmRecordQuery()
-	q.AlarmRecord = e
 	return &q, nil
 }
 
-func (factory Alarm) NewAlarmRecordCmd(id uint) (*command.AlarmRecordCmd, error) {
+func (factory Alarm) NewAlarmRecordUpdateCmd(id uint) (*command.AlarmRecordUpdateCmd, error) {
 	e, err := factory.alarmRecordRepo.Get(context.TODO(), id)
 	if err != nil {
 		return nil, err
 	}
-	cmd := command.NewAlarmRecordCmd()
+	cmd := command.NewAlarmRecordUpdateCmd()
 	cmd.AlarmRecord = e
 	return &cmd, nil
 }
