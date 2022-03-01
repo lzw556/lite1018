@@ -9,6 +9,7 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/devicetype"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/errcode"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/json"
+	"golang.org/x/sync/errgroup"
 )
 
 func (r deviceRouter) create(ctx *gin.Context) (interface{}, error) {
@@ -117,14 +118,27 @@ func (r deviceRouter) getWaveDataByID(ctx *gin.Context) (interface{}, error) {
 	id := cast.ToUint(ctx.Param("id"))
 	timestamp := cast.ToInt64(ctx.Param("timestamp"))
 	calculate := ctx.Query("calculate")
-	return r.service.GetWaveDataByID(id, timestamp, calculate)
+	dimension := cast.ToInt(ctx.Query("dimension"))
+	return r.service.GetWaveDataByID(id, timestamp, calculate, dimension)
 }
 
 func (r deviceRouter) downloadWaveDataByID(ctx *gin.Context) (interface{}, error) {
 	id := cast.ToUint(ctx.Param("id"))
 	timestamp := cast.ToInt64(ctx.Param("timestamp"))
-	result, err := r.service.GetWaveDataByID(id, timestamp, ctx.Query("calculate"))
-	if err != nil {
+	result := make(vo.WaveDataList, 3)
+	var eg errgroup.Group
+	for i := range result {
+		index := i
+		eg.Go(func() error {
+			data, err := r.service.GetWaveDataByID(id, timestamp, ctx.Query("calculate"), index)
+			if err != nil {
+				return err
+			}
+			result[index] = *data
+			return nil
+		})
+	}
+	if err := eg.Wait(); err != nil {
 		return nil, err
 	}
 	return result.ToCsvFile()

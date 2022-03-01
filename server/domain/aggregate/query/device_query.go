@@ -15,7 +15,6 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/xlog"
 	"github.com/xuri/excelize/v2"
 	"sort"
-	"sync"
 	"time"
 )
 
@@ -285,7 +284,7 @@ func (query DeviceQuery) FindWaveDataByRange(id uint, from time.Time, to time.Ti
 	return result, nil
 }
 
-func (query DeviceQuery) GetWaveDataByTimestamp(id uint, timestamp int64, calc string) ([]vo.WaveData, error) {
+func (query DeviceQuery) GetWaveDataByTimestamp(id uint, timestamp int64, calc string, dimension int) (*vo.WaveData, error) {
 	device, err := query.check(id)
 	if err != nil {
 		return nil, err
@@ -299,35 +298,24 @@ func (query DeviceQuery) GetWaveDataByTimestamp(id uint, timestamp int64, calc s
 	if err := json.Unmarshal(data.Data, &svtRawData); err != nil {
 		return nil, err
 	}
-	axisData := []entity.AxisSensorData{svtRawData.XAxis, svtRawData.YAxis, svtRawData.ZAxis}
-	result := make([]vo.WaveData, 3)
-	var wg sync.WaitGroup
-	for i := range axisData {
-		wg.Add(1)
-		go func(m int) {
-			axis := axisData[m]
-			r := vo.NewWaveData(axis)
-			defer wg.Done()
-			switch calc {
-			case "accelerationTimeDomain":
-				r.SetTimeDomainValues(axis.AccelerationTimeDomain())
-				r.SetEnvelopeValues(axis.Envelope(axis.AccelerationTimeDomain()))
-			case "accelerationFrequencyDomain":
-				r.SetFrequencyDomainValues(axis.AccelerationFrequencyDomain())
-			case "velocityTimeDomain":
-				r.SetTimeDomainValues(axis.VelocityTimeDomain())
-				r.SetEnvelopeValues(axis.Envelope(axis.VelocityTimeDomain()))
-			case "velocityFrequencyDomain":
-				r.SetFrequencyDomainValues(axis.VelocityFrequencyDomain())
-			case "displacementTimeDomain":
-				r.SetTimeDomainValues(axis.DisplacementTimeDomain())
-				r.SetEnvelopeValues(axis.Envelope(axis.DisplacementTimeDomain()))
-			case "displacementFrequencyDomain":
-				r.SetFrequencyDomainValues(axis.DisplacementFrequencyDomain())
-			}
-			result[m] = r
-		}(i)
+	axis := []entity.AxisSensorData{svtRawData.XAxis, svtRawData.YAxis, svtRawData.ZAxis}[dimension]
+	result := vo.NewWaveData(axis)
+	switch calc {
+	case "accelerationTimeDomain":
+		result.SetTimeDomainValues(axis.AccelerationTimeDomain())
+		result.SetEnvelopeValues(axis.Envelope(axis.AccelerationTimeDomain()))
+	case "accelerationFrequencyDomain":
+		result.SetFrequencyDomainValues(axis.AccelerationFrequencyDomain())
+	case "velocityTimeDomain":
+		result.SetTimeDomainValues(axis.VelocityTimeDomain())
+		result.SetEnvelopeValues(axis.Envelope(axis.VelocityTimeDomain()))
+	case "velocityFrequencyDomain":
+		result.SetFrequencyDomainValues(axis.VelocityFrequencyDomain())
+	case "displacementTimeDomain":
+		result.SetTimeDomainValues(axis.DisplacementTimeDomain())
+		result.SetEnvelopeValues(axis.Envelope(axis.DisplacementTimeDomain()))
+	case "displacementFrequencyDomain":
+		result.SetFrequencyDomainValues(axis.DisplacementFrequencyDomain())
 	}
-	wg.Wait()
-	return result, nil
+	return &result, nil
 }

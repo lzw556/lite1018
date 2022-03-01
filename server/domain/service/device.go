@@ -113,9 +113,9 @@ func (s Device) FindWaveDataByID(deviceID uint, from, to int64) (vo.LargeSensorD
 	return query.FindWaveDataByRange(deviceID, time.Unix(from, 0), time.Unix(to, 0))
 }
 
-func (s Device) GetWaveDataByID(deviceID uint, timestamp int64, calculate string) (vo.WaveDataList, error) {
+func (s Device) GetWaveDataByID(deviceID uint, timestamp int64, calculate string, dimension int) (*vo.WaveData, error) {
 	query := s.factory.NewDeviceQuery()
-	return query.GetWaveDataByTimestamp(deviceID, timestamp, calculate)
+	return query.GetWaveDataByTimestamp(deviceID, timestamp, calculate, dimension)
 }
 
 func (s Device) RemoveDataByID(deviceID uint, from, to int64) error {
