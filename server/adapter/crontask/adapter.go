@@ -22,7 +22,7 @@ func NewAdapter() *Adapter {
 		entityIDs: make(map[string]cron.EntryID),
 		mu:        sync.RWMutex{},
 	}
-	a.initJobs()
+	//a.initJobs()
 	return a
 }
 
