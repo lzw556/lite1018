@@ -9,6 +9,7 @@ import DeviceSettingFormItem from "../../../../components/formItems/deviceSettin
 import {defaultValidateMessages} from "../../../../constants/validator";
 import {DeviceType} from "../../../../types/device_type";
 import { SETTING_GROUPS } from "../../../../constants/settingGroup";
+import { DeviceSettingContent } from "../../DeviceSettingContent";
 
 export interface SettingPageProps {
     device: Device
@@ -27,32 +28,6 @@ const SettingPage: FC<SettingPageProps> = ({device}) => {
         })
     }, [device])
 
-    const renderSetting = () => {
-        if (device.typeId !== DeviceType.Router && settings) {
-            if(device.typeId=== DeviceType.BoltElongation){
-                let groups:(DeviceSetting['group'])[] = []
-                settings.forEach((setting)=>{
-                    if(setting.group && (groups.length === 0 || !groups.find(group => group === setting.group))){
-                        groups.push(setting.group)
-                    }
-                })
-                if(groups.length > 0){
-                   return groups.map((group) => {
-                        return <>
-                            <Divider orientation="left"><strong>{(group && SETTING_GROUPS[group]) || group}</strong></Divider>
-                            {settings.filter(setting => setting.group === group).map(setting => (
-                                <DeviceSettingFormItem editable={true} value={setting} key={setting.key}/>))}
-                        </>
-                    })
-                }  
-              }else{
-                return settings.map(setting => (
-                    <DeviceSettingFormItem editable={true} value={setting} key={setting.key}/>))
-              }
-        }
-        return <EmptyLayout description={"暂无配置信息"}/>
-    }
-
     const onSave = () => {
         form.validateFields().then(values => {
             UpdateDeviceSettingRequest(device.id, values).then()
@@ -63,9 +38,7 @@ const SettingPage: FC<SettingPageProps> = ({device}) => {
         <Row justify={"start"}>
             <Col xxl={8} xl={10}>
                 <Form form={form} labelCol={{xl: 7, xxl: 6}} validateMessages={defaultValidateMessages}>
-                    {
-                        renderSetting()
-                    }
+                   <DeviceSettingContent deviceType={device.typeId} settings={settings}/>
                 </Form>
             </Col>
         </Row>
