@@ -11,6 +11,7 @@ import DeviceSelect from "../../../components/select/deviceSelect";
 import DeviceTypeSelect from "../../../components/select/deviceTypeSelect";
 import {DeviceSetting} from "../../../types/device_setting";
 import DeviceSettingFormItem from "../../../components/formItems/deviceSettingFormItem";
+import { isMobile } from "../../../utils/deviceDetection";
 
 
 const AddDevicePage = () => {
@@ -69,7 +70,7 @@ const AddDevicePage = () => {
                     />)
                 }
                 <Row justify="space-between" hidden={success}>
-                    <Col span={12}>
+                    <Col span={isMobile?24:12}>
                         <Row>
                             <Col span={20}>
                                 <Form  form={form} labelCol={{span: 8}} validateMessages={defaultValidateMessages}>

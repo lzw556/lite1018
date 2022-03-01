@@ -129,7 +129,7 @@ const HistoryDataPage: FC<DeviceDataProps> = ({device}) => {
             <Col span={24}>
                 <Row justify="end">
                     <Col span={24} style={{textAlign: "right"}}>
-                        <Space style={{textAlign: "center"}}>
+                        <Space style={{textAlign: "center"}} wrap={true}>
                             <Label name={"属性"}>
                                 <Select bordered={false} defaultValue={property.key} placeholder={"请选择属性"}
                                         style={{width: "120px"}} onChange={value => {

@@ -4,6 +4,8 @@ import {useHistory, useLocation} from "react-router-dom";
 import {GetParamValue} from "../utils/path";
 import {getMenus} from "../utils/session";
 import {SecondaryRoutes} from "../routers/routes";
+import { isMobile } from "../utils/deviceDetection";
+import { ArrowLeftOutlined, BackwardOutlined } from "@ant-design/icons";
 
 export interface MyBreadcrumbProps {
     children?: any
@@ -28,9 +30,9 @@ const MyBreadcrumb:FC<MyBreadcrumbProps> = ({children, label}) => {
     useEffect(() => {
         setItems(routes.filter((route:any) => locale?.split("/").includes(route.name)))
     }, [])
-
+ 
     return <Row justify={"space-between"} style={{paddingBottom: "8px"}}>
-        <Col span={12}>
+        <Col span={children ? 12 : 24}>
             <Breadcrumb style={{fontSize: "16pt", fontWeight: "bold"}}>
                 {
                     items.map((route:any, index:number) => {
@@ -38,13 +40,13 @@ const MyBreadcrumb:FC<MyBreadcrumbProps> = ({children, label}) => {
                             return <Breadcrumb.Item key={index}>{label ? label : route.title}</Breadcrumb.Item>
                         }
                         return <a onClick={() => history.go(index - items.length + 1)}>
-                            <Breadcrumb.Item key={index}>{route.title}</Breadcrumb.Item>
+                            {isMobile ? <ArrowLeftOutlined style={{paddingRight:8, fontSize: '16pt'}}/> : <Breadcrumb.Item key={index}>{route.title}</Breadcrumb.Item>}
                         </a>
                     })
                 }
             </Breadcrumb>
         </Col>
-        <Col span={12}>
+        {children && <Col span={12}>
             <Row justify={"end"}>
                 <Col>
                     {
@@ -52,7 +54,7 @@ const MyBreadcrumb:FC<MyBreadcrumbProps> = ({children, label}) => {
                     }
                 </Col>
             </Row>
-        </Col>
+        </Col>}
     </Row>
 }
 

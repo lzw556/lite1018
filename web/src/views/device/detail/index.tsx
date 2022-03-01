@@ -21,6 +21,7 @@ import { DeviceMonitor } from "../DeviceMonitor";
 import { RuntimeChart } from "../RuntimeChart";
 import { IsUpgrading } from "../../../types/device_upgrade_status";
 import UpgradeModal from "../upgrade";
+import { isMobile } from "../../../utils/deviceDetection";
 
 const tabList = [
     {
@@ -176,7 +177,7 @@ const DeviceDetailPage = () => {
         <MyBreadcrumb>
             <Space>
                 <HasPermission value={Permission.DeviceCommand}>
-                    <Dropdown overlay={renderCommandMenu}>
+                    <Dropdown overlay={renderCommandMenu} trigger={isMobile ? ['click'] :undefined}>
                         <Button type={"primary"}>设备命令<DownOutlined/></Button>
                     </Dropdown>
                 </HasPermission>

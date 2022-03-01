@@ -37,6 +37,7 @@ import DeviceTable from "../../components/table/deviceTable";
 import NetworkSelect from "../../components/select/networkSelect";
 import DeviceMonitorDrawer from "./deviceMonitorDrawer";
 import DeviceUpgradeSpin from "./spin/deviceUpgradeSpin";
+import { isMobile } from "../../utils/deviceDetection";
 
 const {Search} = Input
 const {Option} = Select
@@ -193,7 +194,9 @@ const DevicePage = () => {
                         state && state.isOnline ? <Tag color={ColorHealth}>在线</Tag> : <Tag color={ColorWarn}>离线</Tag>
                     }
                 </Space>
-            }
+            },
+            fixed:isMobile,
+            width: isMobile ? 60 :''
         },
         {
             title: '设备名称',
@@ -216,7 +219,9 @@ const DevicePage = () => {
                             <DeviceUpgradeSpin status={record.upgradeStatus}/>)
                     }
                 </Space>
-            }
+            },
+            fixed: isMobile,
+            width: isMobile?150:''
         },
         {
             title: 'MAC地址',
@@ -294,17 +299,17 @@ const DevicePage = () => {
         <ShadowCard>
             <Row justify="center">
                 <Col span={24}>
-                    <Space>
+                    <Space wrap={true}>
                         <Label name={"网络"}>
                             <NetworkSelect bordered={false} onChange={setNetwork} allowClear/>
                         </Label>
                         <Input.Group compact>
-                            <Select defaultValue={searchTarget} style={{width: "80px"}}
+                            <Select defaultValue={searchTarget} style={{width: "70px"}}
                                     onChange={onTargetChange} suffixIcon={<CaretDownOutlined/>}>
                                 <Option value={0}>名称</Option>
                                 <Option value={1}>MAC</Option>
                             </Select>
-                            <Search style={{width: "256px"}} placeholder={
+                            <Search style={{width:!isMobile? "256px":'70%'}} placeholder={
                                 searchTarget === 0 ? "请输入设备名称进行查询" : "请输入设备MAC进行查询"
                             }
                                     onSearch={onSearch}
