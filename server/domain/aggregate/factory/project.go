@@ -25,25 +25,10 @@ func NewProject() Project {
 	}
 }
 
-func (factory Project) NewProjectQuery(id uint) (*query.ProjectQuery, error) {
-	e, err := factory.projectRepo.Get(context.TODO(), id)
-	if err != nil {
-		return nil, response.BusinessErr(errcode.ProjectNotFoundError, "")
-	}
+func (factory Project) NewProjectQuery(filters ...request.Filter) *query.ProjectQuery {
 	q := query.NewProjectQuery()
-	q.Project = e
-	return &q, nil
-}
-
-func (factory Project) NewProjectFilterQuery(filters request.Filters) (*query.ProjectFilterQuery, error) {
-	specs := factory.buildSpecs(filters)
-	es, err := factory.projectRepo.FindBySpecs(context.TODO(), specs...)
-	if err != nil {
-		return nil, err
-	}
-	q := query.NewProjectFilterQuery()
-	q.Projects = es
-	return &q, nil
+	q.Specs = factory.buildSpecs(filters)
+	return &q
 }
 
 func (factory Project) NewProjectUpdateCmd(id uint) (*command.ProjectUpdateCmd, error) {

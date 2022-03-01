@@ -36,7 +36,7 @@ func (r deviceRouter) find(ctx *gin.Context) (interface{}, error) {
 		}
 		return response.NewPageResult(page, size, total, result), nil
 	}
-	return r.service.FilterDevices(filters)
+	return r.service.FindDevices(filters)
 }
 
 func (r deviceRouter) update(ctx *gin.Context) (interface{}, error) {
@@ -80,12 +80,6 @@ func (r deviceRouter) updateSettingByID(ctx *gin.Context) (interface{}, error) {
 func (r deviceRouter) checkMacAddress(ctx *gin.Context) (interface{}, error) {
 	mac := ctx.Param("mac")
 	return nil, r.service.CheckDeviceMacAddress(mac)
-}
-
-func (r deviceRouter) replaceByID(ctx *gin.Context) (interface{}, error) {
-	id := cast.ToUint(ctx.Param("id"))
-	mac := ctx.Param("mac")
-	return nil, r.service.ReplaceDeviceByID(id, mac)
 }
 
 func (r deviceRouter) delete(ctx *gin.Context) (interface{}, error) {
@@ -152,11 +146,6 @@ func (r deviceRouter) removeDataByID(ctx *gin.Context) (interface{}, error) {
 	from := cast.ToInt64(ctx.Query("from"))
 	to := cast.ToInt64(ctx.Query("to"))
 	return nil, r.service.RemoveDataByID(id, from, to)
-}
-
-func (r deviceRouter) getChildren(ctx *gin.Context) (interface{}, error) {
-	id := cast.ToUint(ctx.Param("id"))
-	return r.service.GetChildren(id)
 }
 
 func (r deviceRouter) upgrade(ctx *gin.Context) (interface{}, error) {

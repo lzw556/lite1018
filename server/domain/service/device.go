@@ -53,28 +53,18 @@ func (s Device) UpdateDeviceByID(deviceID uint, req request.Device) error {
 }
 
 func (s Device) GetDeviceByID(deviceID uint) (*vo.Device, error) {
-	query, err := s.factory.NewDeviceQuery(deviceID)
-	if err != nil {
-		return nil, err
-	}
-	return query.GetDetail()
+	query := s.factory.NewDeviceQuery()
+	return query.Get(deviceID)
 }
 
 func (s Device) FindDevicesByPaginate(page, size int, filters request.Filters) ([]vo.Device, int64, error) {
-	query, err := s.factory.NewDevicePagingQuery(page, size, filters)
-	if err != nil {
-		return nil, 0, err
-	}
-	result, total := query.Paging()
-	return result, total, nil
+	query := s.factory.NewDeviceQuery(filters...)
+	return query.Paging(page, size)
 }
 
-func (s Device) FilterDevices(filters request.Filters) ([]vo.Device, error) {
-	query, err := s.factory.NewDeviceFilterQuery(filters)
-	if err != nil {
-		return nil, err
-	}
-	return query.Run(), nil
+func (s Device) FindDevices(filters request.Filters) ([]vo.Device, error) {
+	query := s.factory.NewDeviceQuery(filters...)
+	return query.List()
 }
 
 func (s Device) UpdateDeviceSettingByID(deviceID uint, req request.DeviceSetting) error {
@@ -86,11 +76,8 @@ func (s Device) UpdateDeviceSettingByID(deviceID uint, req request.DeviceSetting
 }
 
 func (s Device) GetDeviceSettingsByID(deviceID uint) (vo.DeviceSettings, error) {
-	query, err := s.factory.NewDeviceQuery(deviceID)
-	if err != nil {
-		return nil, err
-	}
-	return query.GetSettings()
+	query := s.factory.NewDeviceQuery()
+	return query.GetSettings(deviceID)
 }
 
 func (s Device) CheckDeviceMacAddress(mac string) error {
@@ -101,56 +88,34 @@ func (s Device) CheckDeviceMacAddress(mac string) error {
 	return response.BusinessErr(errcode.DeviceMacExistsError, mac)
 }
 
-func (s Device) ReplaceDeviceByID(deviceID uint, mac string) error {
-	return nil
-}
-
 func (s Device) FindDeviceDataByID(deviceID uint, from, to int64) ([]vo.DeviceData, error) {
-	query, err := s.factory.NewDeviceQuery(deviceID)
-	if err != nil {
-		return nil, err
-	}
-	return query.FindDataByRange(time.Unix(from, 0), time.Unix(to, 0))
+	query := s.factory.NewDeviceQuery()
+	return query.FindDataByRange(deviceID, time.Unix(from, 0), time.Unix(to, 0))
 }
 
 func (s Device) GetLastDeviceDataByID(deviceID uint) (*vo.DeviceData, error) {
-	query, err := s.factory.NewDeviceQuery(deviceID)
-	if err != nil {
-		return nil, err
-	}
-	return query.GetLastData()
+	query := s.factory.NewDeviceQuery()
+	return query.GetLastData(deviceID)
 }
 
 func (s Device) GetRuntimeDataByID(deviceID uint, from, to int64) ([]vo.SensorRuntimeData, error) {
-	query, err := s.factory.NewDeviceQuery(deviceID)
-	if err != nil {
-		return nil, err
-	}
-	return query.RuntimeDataByRange(time.Unix(from, 0), time.Unix(to, 0))
+	query := s.factory.NewDeviceQuery()
+	return query.RuntimeDataByRange(deviceID, time.Unix(from, 0), time.Unix(to, 0))
 }
 
 func (s Device) DownloadDeviceDataByID(deviceID uint, pIDs []string, from, to int64) (*vo.ExcelFile, error) {
-	query, err := s.factory.NewDeviceQuery(deviceID)
-	if err != nil {
-		return nil, err
-	}
-	return query.DownloadDeviceDataByRange(pIDs, time.Unix(from, 0), time.Unix(to, 0))
+	query := s.factory.NewDeviceQuery()
+	return query.DownloadDeviceDataByRange(deviceID, pIDs, time.Unix(from, 0), time.Unix(to, 0))
 }
 
 func (s Device) FindWaveDataByID(deviceID uint, from, to int64) (vo.LargeSensorDataList, error) {
-	query, err := s.factory.NewDeviceQuery(deviceID)
-	if err != nil {
-		return nil, err
-	}
-	return query.FindWaveDataByRange(time.Unix(from, 0), time.Unix(to, 0))
+	query := s.factory.NewDeviceQuery()
+	return query.FindWaveDataByRange(deviceID, time.Unix(from, 0), time.Unix(to, 0))
 }
 
 func (s Device) GetWaveDataByID(deviceID uint, timestamp int64, calculate string) (vo.WaveDataList, error) {
-	query, err := s.factory.NewDeviceQuery(deviceID)
-	if err != nil {
-		return nil, err
-	}
-	return query.GetWaveDataByTimestamp(timestamp, calculate)
+	query := s.factory.NewDeviceQuery()
+	return query.GetWaveDataByTimestamp(deviceID, timestamp, calculate)
 }
 
 func (s Device) RemoveDataByID(deviceID uint, from, to int64) error {
@@ -183,12 +148,4 @@ func (s Device) ExecuteDeviceCancelUpgradeByID(deviceID uint) error {
 		return err
 	}
 	return cmd.CancelUpgrade()
-}
-
-func (s Device) GetChildren(deviceID uint) ([]vo.Device, error) {
-	query, err := s.factory.NewDeviceChildrenQuery(deviceID)
-	if err != nil {
-		return nil, err
-	}
-	return query.Query()
 }

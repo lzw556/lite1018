@@ -37,7 +37,7 @@ func (r projectRouter) getMyProjects(ctx *gin.Context) (interface{}, error) {
 			Value: userID,
 		},
 	}
-	return r.service.FilterProjects(filters)
+	return r.service.FindProjects(filters)
 }
 
 func (r projectRouter) update(ctx *gin.Context) (interface{}, error) {

@@ -3,7 +3,6 @@ package factory
 import (
 	"context"
 	"errors"
-	"fmt"
 	"github.com/spf13/cast"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/request"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/response"
@@ -98,27 +97,10 @@ func (factory Device) NewDeviceUpdateCmd(deviceID uint) (*command.DeviceUpdateCm
 	return &cmd, nil
 }
 
-func (factory Device) NewDeviceQuery(id uint) (*query.DeviceQuery, error) {
-	ctx := context.TODO()
-	e, err := factory.deviceRepo.Get(ctx, id)
-	if err != nil {
-		return nil, response.BusinessErr(errcode.DeviceNotFoundError, "")
-	}
+func (factory Device) NewDeviceQuery(filters ...request.Filter) *query.DeviceQuery {
 	q := query.NewDeviceQuery()
-	q.Device = e
-	return &q, nil
-}
-
-func (factory Device) NewDevicePagingQuery(page, size int, filters request.Filters) (*query.DevicePagingQuery, error) {
-	ctx := context.TODO()
-	specs := factory.buildSpecs(filters)
-	es, total, err := factory.deviceRepo.PagingBySpecs(ctx, page, size, specs...)
-	if err != nil {
-		return nil, err
-	}
-	cmd := query.NewDevicePagingQuery(total)
-	cmd.Devices = es
-	return &cmd, nil
+	q.Specs = factory.buildSpecs(filters)
+	return &q
 }
 
 func (factory Device) NewDeviceExecuteCommandCmd(deviceID uint) (*command.DeviceExecuteCommandCmd, error) {
@@ -141,29 +123,6 @@ func (factory Device) NewDeviceExecuteCommandCmd(deviceID uint) (*command.Device
 	return &cmd, nil
 }
 
-func (factory Device) NewDeviceChildrenQuery(id uint) (*query.DeviceChildrenQuery, error) {
-	ctx := context.TODO()
-	e, err := factory.deviceRepo.Get(ctx, id)
-	if err != nil {
-		return nil, response.BusinessErr(errcode.DeviceNotFoundError, "")
-	}
-	network, err := factory.networkRepo.Get(ctx, e.NetworkID)
-	if err != nil {
-		return nil, response.BusinessErr(errcode.NetworkNotFoundError, "")
-	}
-	macs := network.GetChildrenMac(e.MacAddress)
-	if len(macs) > 0 {
-		children, err := factory.deviceRepo.FindBySpecs(ctx, spec.DeviceMacInSpec(macs))
-		if err != nil {
-			return nil, err
-		}
-		q := query.NewDeviceChildrenQuery()
-		q.Devices = children
-		return &q, nil
-	}
-	return nil, fmt.Errorf("has no children")
-}
-
 func (factory Device) NewDeviceUpgradeCmd(deviceID uint) (*command.DeviceUpgradeCmd, error) {
 	ctx := context.TODO()
 	e, err := factory.deviceRepo.Get(ctx, deviceID)
@@ -182,18 +141,6 @@ func (factory Device) NewDeviceUpgradeCmd(deviceID uint) (*command.DeviceUpgrade
 	cmd.Device = e
 	cmd.Gateway = gateway
 	return &cmd, nil
-}
-
-func (factory Device) NewDeviceFilterQuery(filters request.Filters) (*query.DeviceFilterQuery, error) {
-	ctx := context.TODO()
-	specs := factory.buildSpecs(filters)
-	es, err := factory.deviceRepo.FindBySpecs(ctx, specs...)
-	if err != nil {
-		return nil, err
-	}
-	q := query.NewDeviceFilterQuery()
-	q.Devices = es
-	return &q, nil
 }
 
 func (factory Device) buildSpecs(filters request.Filters) []spec.Specification {

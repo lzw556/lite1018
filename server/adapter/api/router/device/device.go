@@ -27,7 +27,6 @@ func (r *deviceRouter) initRoutes() {
 		// GET
 		router.NewGetRoute("devices", r.find),
 		router.NewGetRoute("devices/:id", r.get),
-		router.NewGetRoute("devices/:id/children", r.getChildren),
 		router.NewGetRoute("devices/:id/settings", r.getSettingByID),
 		router.NewGetRoute("devices/:id/data", r.findDataByID),
 		router.NewGetRoute("devices/:id/data/last", r.getLastDataByID),
@@ -44,7 +43,6 @@ func (r *deviceRouter) initRoutes() {
 
 		// PATCH
 		router.NewPatchRoute("devices/:id/settings", r.updateSettingByID),
-		router.NewPatchRoute("devices/:id/mac/:mac", r.replaceByID),
 
 		// DELETE
 		router.NewDeleteRoute("devices/:id", r.delete),

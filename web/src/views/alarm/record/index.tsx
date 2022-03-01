@@ -108,7 +108,7 @@ const AlarmRecordPage = () => {
             key: 'metric',
             width: '15%',
             render: (metric: any, record: any) => {
-                return `${metric.name} ${record.operation} ${record.threshold} ${metric.unit} 当前值: ${record.value}`
+                return `${metric.name} ${record.operation} ${record.threshold}${metric.unit} 报警值: ${record.value}${metric.unit}`
             }
         },
         {

@@ -7,6 +7,7 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
+	spec "github.com/thetasensors/theta-cloud-lite/server/domain/specification"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/vo"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/devicetype"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/errcode"
@@ -19,12 +20,13 @@ import (
 )
 
 type DeviceQuery struct {
-	entity.Device
+	Specs []spec.Specification
 
 	deviceRepo            dependency.DeviceRepository
 	deviceStateRepo       dependency.DeviceStateRepository
 	sensorDataRepo        dependency.SensorDataRepository
 	deviceInformationRepo dependency.DeviceInformationRepository
+	deviceAlertStateRepo  dependency.DeviceAlertStateRepository
 	networkRepo           dependency.NetworkRepository
 	alarmRuleRepo         dependency.AlarmRuleRepository
 	largeSensorDataRepo   dependency.LargeSensorDataRepository
@@ -36,19 +38,68 @@ func NewDeviceQuery() DeviceQuery {
 		deviceStateRepo:       repository.DeviceState{},
 		sensorDataRepo:        repository.SensorData{},
 		deviceInformationRepo: repository.DeviceInformation{},
+		deviceAlertStateRepo:  repository.DeviceAlertState{},
 		networkRepo:           repository.Network{},
 		largeSensorDataRepo:   repository.LargeSensorData{},
 	}
 }
 
-func (query DeviceQuery) GetDetail() (*vo.Device, error) {
+func (query DeviceQuery) check(id uint) (entity.Device, error) {
 	ctx := context.TODO()
-	result := vo.NewDevice(query.Device)
-	if network, err := query.networkRepo.Get(ctx, query.Device.NetworkID); err == nil {
+	device, err := query.deviceRepo.Get(ctx, id)
+	if err != nil {
+		return entity.Device{}, response.BusinessErr(errcode.DeviceNotFoundError, err.Error())
+	}
+	return device, nil
+}
+
+func (query DeviceQuery) Paging(page, size int) ([]vo.Device, int64, error) {
+	ctx := context.TODO()
+	es, total, err := query.deviceRepo.PagingBySpecs(ctx, page, size, query.Specs...)
+	if err != nil {
+		return nil, 0, err
+	}
+	result := make([]vo.Device, len(es))
+	for i, device := range es {
+		result[i] = vo.NewDevice(device)
+		result[i].SetUpgradeState(device)
+		result[i].State, _ = query.deviceStateRepo.Get(device.MacAddress)
+		if states, err := query.deviceAlertStateRepo.Find(device.MacAddress); err == nil {
+			result[i].SetAlertStates(states)
+		}
+	}
+	return result, total, nil
+}
+
+func (query DeviceQuery) List() ([]vo.Device, error) {
+	ctx := context.TODO()
+	es, err := query.deviceRepo.FindBySpecs(ctx, query.Specs...)
+	if err != nil {
+		return nil, err
+	}
+	result := make([]vo.Device, len(es))
+	for i, device := range es {
+		result[i] = vo.NewDevice(device)
+		result[i].SetUpgradeState(device)
+		result[i].State, _ = query.deviceStateRepo.Get(device.MacAddress)
+	}
+	return result, nil
+}
+
+func (query DeviceQuery) Get(id uint) (*vo.Device, error) {
+	device, err := query.check(id)
+	if err != nil {
+		return nil, err
+	}
+	result := vo.NewDevice(device)
+
+	ctx := context.TODO()
+	if network, err := query.networkRepo.Get(ctx, device.NetworkID); err == nil {
 		result.SetNetwork(network)
 	}
-	if t := devicetype.Get(query.Device.Type); t != nil {
-		data, err := query.sensorDataRepo.Last(query.Device.MacAddress)
+
+	if t := devicetype.Get(device.Type); t != nil {
+		data, err := query.sensorDataRepo.Last(device.MacAddress)
 		if err != nil {
 			return nil, err
 		}
@@ -64,36 +115,46 @@ func (query DeviceQuery) GetDetail() (*vo.Device, error) {
 		}
 		sort.Sort(result.Properties)
 	}
-	var err error
-	result.State, _ = query.deviceStateRepo.Get(query.Device.MacAddress)
-	result.Information, err = query.deviceInformationRepo.Get(query.Device.ID)
+
+	result.State, _ = query.deviceStateRepo.Get(device.MacAddress)
+	result.Information, err = query.deviceInformationRepo.Get(device.ID)
 	if err != nil {
-		xlog.Errorf("get device information failed:%v", query.Device.MacAddress, err)
+		xlog.Errorf("get device information failed:%v", device.MacAddress, err)
 	}
+
 	return &result, nil
 }
 
-func (query DeviceQuery) GetSettings() (vo.DeviceSettings, error) {
-	t := devicetype.Get(query.Device.Type)
-	if t == nil {
-		return nil, response.BusinessErr(errcode.UnknownDeviceTypeError, "")
+func (query DeviceQuery) GetSettings(id uint) (vo.DeviceSettings, error) {
+	device, err := query.check(id)
+	if err != nil {
+		return nil, err
 	}
-	settings := t.Settings()
-	for i, setting := range t.Settings() {
-		if s, ok := query.Device.Settings.Get(setting.Key); ok {
-			settings[i].Value = setting.Convert(s.Value)
-		} else {
-			settings[i].Value = setting.Convert(setting.Value)
+
+	if t := devicetype.Get(device.Type); t != nil {
+		settings := t.Settings()
+		for i, setting := range t.Settings() {
+			if s, ok := device.Settings.Get(setting.Key); ok {
+				settings[i].Value = setting.Convert(s.Value)
+			} else {
+				settings[i].Value = setting.Convert(setting.Value)
+			}
 		}
+		result := vo.NewDeviceSettings(settings)
+		return result, nil
 	}
-	result := vo.NewDeviceSettings(settings)
-	return result, nil
+
+	return nil, response.BusinessErr(errcode.UnknownDeviceTypeError, "")
 }
 
-func (query DeviceQuery) FindDataByRange(from, to time.Time) ([]vo.DeviceData, error) {
+func (query DeviceQuery) FindDataByRange(id uint, from, to time.Time) ([]vo.DeviceData, error) {
+	device, err := query.check(id)
+	if err != nil {
+		return nil, err
+	}
 	result := make([]vo.DeviceData, 0)
-	if t := devicetype.Get(query.Device.Type); t != nil {
-		data, err := query.sensorDataRepo.Find(query.Device.MacAddress, from, to)
+	if t := devicetype.Get(device.Type); t != nil {
+		data, err := query.sensorDataRepo.Find(device.MacAddress, from, to)
 		if err != nil {
 			return nil, err
 		}
@@ -112,9 +173,13 @@ func (query DeviceQuery) FindDataByRange(from, to time.Time) ([]vo.DeviceData, e
 	return result, nil
 }
 
-func (query DeviceQuery) GetLastData() (*vo.DeviceData, error) {
-	if t := devicetype.Get(query.Device.Type); t != nil {
-		data, err := query.sensorDataRepo.Last(query.Device.MacAddress)
+func (query DeviceQuery) GetLastData(id uint) (*vo.DeviceData, error) {
+	device, err := query.check(id)
+	if err != nil {
+		return nil, err
+	}
+	if t := devicetype.Get(device.Type); t != nil {
+		data, err := query.sensorDataRepo.Last(device.MacAddress)
 		if err != nil {
 			return nil, err
 		}
@@ -132,8 +197,13 @@ func (query DeviceQuery) GetLastData() (*vo.DeviceData, error) {
 	return nil, response.BusinessErr(errcode.UnknownDeviceTypeError, "")
 }
 
-func (query DeviceQuery) RuntimeDataByRange(from, to time.Time) ([]vo.SensorRuntimeData, error) {
-	data, err := query.deviceStateRepo.Find(query.Device.MacAddress, from, to)
+func (query DeviceQuery) RuntimeDataByRange(id uint, from, to time.Time) ([]vo.SensorRuntimeData, error) {
+	device, err := query.check(id)
+	if err != nil {
+		return nil, err
+	}
+
+	data, err := query.deviceStateRepo.Find(device.MacAddress, from, to)
 	if err != nil {
 		return nil, err
 	}
@@ -148,20 +218,24 @@ func (query DeviceQuery) RuntimeDataByRange(from, to time.Time) ([]vo.SensorRunt
 	return result, nil
 }
 
-func (query DeviceQuery) DownloadDeviceDataByRange(pIDs []string, from time.Time, to time.Time) (*vo.ExcelFile, error) {
+func (query DeviceQuery) DownloadDeviceDataByRange(id uint, pIDs []string, from time.Time, to time.Time) (*vo.ExcelFile, error) {
+	device, err := query.check(id)
+	if err != nil {
+		return nil, err
+	}
 	downloadKeys := make(map[string]struct{})
 	for _, key := range pIDs {
 		downloadKeys[key] = struct{}{}
 	}
-	deviceData, err := query.FindDataByRange(from, to)
+	deviceData, err := query.FindDataByRange(id, from, to)
 	if err != nil {
 		return nil, err
 	}
 	result := vo.ExcelFile{
-		Name: fmt.Sprintf("%s_%s_%s.xlsx", query.Device.MacAddress, from.Format("20060102"), to.Format("20060102")),
+		Name: fmt.Sprintf("%s_%s_%s.xlsx", device.MacAddress, from.Format("20060102"), to.Format("20060102")),
 		File: excelize.NewFile(),
 	}
-	if t := devicetype.Get(query.Device.Type); t != nil {
+	if t := devicetype.Get(device.Type); t != nil {
 		// set cell title
 		axis := 65
 		result.File.SetCellValue("Sheet1", "A1", "时间")
@@ -194,8 +268,12 @@ func (query DeviceQuery) DownloadDeviceDataByRange(pIDs []string, from time.Time
 	return &result, nil
 }
 
-func (query DeviceQuery) FindWaveDataByRange(from time.Time, to time.Time) (vo.LargeSensorDataList, error) {
-	es, err := query.largeSensorDataRepo.Find(query.Device.MacAddress, from, to)
+func (query DeviceQuery) FindWaveDataByRange(id uint, from time.Time, to time.Time) (vo.LargeSensorDataList, error) {
+	device, err := query.check(id)
+	if err != nil {
+		return nil, err
+	}
+	es, err := query.largeSensorDataRepo.Find(device.MacAddress, from, to)
 	if err != nil {
 		return nil, err
 	}
@@ -207,8 +285,13 @@ func (query DeviceQuery) FindWaveDataByRange(from time.Time, to time.Time) (vo.L
 	return result, nil
 }
 
-func (query DeviceQuery) GetWaveDataByTimestamp(timestamp int64, calc string) ([]vo.WaveData, error) {
-	data, err := query.largeSensorDataRepo.Get(query.Device.MacAddress, time.Unix(timestamp, 0))
+func (query DeviceQuery) GetWaveDataByTimestamp(id uint, timestamp int64, calc string) ([]vo.WaveData, error) {
+	device, err := query.check(id)
+	if err != nil {
+		return nil, err
+	}
+
+	data, err := query.largeSensorDataRepo.Get(device.MacAddress, time.Unix(timestamp, 0))
 	if err != nil {
 		return nil, err
 	}
