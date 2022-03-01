@@ -6,6 +6,7 @@ import {useEffect, useState} from "react";
 import {defaultValidateMessages} from "../../../constants/validator";
 import DeviceSettingFormItem from "../../../components/formItems/deviceSettingFormItem";
 import {EmptyLayout} from "../../layout";
+import { DeviceSettingContent } from "../DeviceSettingContent";
 
 export interface EditSettingProps extends ModalProps {
     device: Device
@@ -35,20 +36,10 @@ const EditSettingModal = (props: EditSettingProps) => {
         })
     }
 
-    const renderSettings = () => {
-        if (device.typeId !== DeviceType.Router && settings.length) {
-            return settings.map(setting => (
-                <DeviceSettingFormItem editable={true} value={setting} key={setting.key}/>))
-        }
-        return <EmptyLayout description={"暂无配置信息"}/>
-    }
-
     return <Modal width={480} visible={visible} title={"设备配置"} okText={"更新"} onOk={onSave} cancelText={"取消"}
                   onCancel={onCancel} confirmLoading={isLoading}>
         <Form form={form} labelCol={{span: 8}} validateMessages={defaultValidateMessages}>
-            {
-                renderSettings()
-            }
+            <DeviceSettingContent deviceType={device.typeId} settings={settings}/>
         </Form>
     </Modal>
 }
