@@ -13,11 +13,13 @@ export interface TableLayoutProps {
     emptyText?: string | any;
     permissions?: PermissionType[];
     onPageChange?: (page: number, pageSize: number) => void;
+    scroll?:{x:number};
+    simple?:boolean;
 }
 
 
 const TableLayout: FC<TableLayoutProps> = (props) => {
-    const {columns, permissions, rowSelection, dataSource, emptyText, onPageChange, expandable} = props;
+    const {columns, permissions, rowSelection, dataSource, emptyText, onPageChange, expandable, scroll, simple} = props;
     const pagination: PaginationProps = {
         showSizeChanger: true,
         pageSizeOptions: ['10', '20', '30', '40', '50'],
@@ -55,7 +57,8 @@ const TableLayout: FC<TableLayoutProps> = (props) => {
                        rowSelection={rowSelection}
                        dataSource={renderDataSource()}
                        expandable={expandable}
-                       pagination={false}/>
+                       pagination={false}
+                       scroll={scroll}/>
             </Col>
         </Row>
         <br/>
@@ -66,7 +69,7 @@ const TableLayout: FC<TableLayoutProps> = (props) => {
                     <Pagination {...pagination}
                                 current={dataSource.page}
                                 total={dataSource.total}
-                                pageSize={dataSource.size}/>
+                                pageSize={dataSource.size} simple={simple}/>
                 }
             </Col>
         </Row>
