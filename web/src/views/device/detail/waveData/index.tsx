@@ -1,4 +1,4 @@
-import {Checkbox, Col, ConfigProvider, DatePicker, Row, Select, Space, Spin, Table} from 'antd';
+import {Checkbox, Col, ConfigProvider, DatePicker, Row, Select, Space, Table} from 'antd';
 import EChartsReact from 'echarts-for-react';
 import moment from 'moment';
 import * as React from 'react';
@@ -59,6 +59,8 @@ const WaveDataChart: React.FC<{ device: Device }> = ({device}) => {
             setDataSource(data);
             if (data.length > 0) {
                 setTimestamp(data[0].timestamp);
+            }else {
+                setTimestamp(undefined);
             }
         });
     }, [beginDate, endDate, device.id]);
@@ -78,6 +80,8 @@ const WaveDataChart: React.FC<{ device: Device }> = ({device}) => {
             ).catch(() => {
                 setIsLoading(false);
             });
+        }else {
+            setWaveDataSource(undefined);
         }
     }, [timestamp, calculate, dimension]);
 
@@ -132,81 +136,82 @@ const WaveDataChart: React.FC<{ device: Device }> = ({device}) => {
     }
 
     const renderChart = () => {
-        if (waveDataSource) {
-            const legends = ["X轴", "Y轴", "Z轴"];
-            let series: any[] = [
-                {
-                    name: legends[dimension],
-                    type: 'line',
-                    data: waveDataSource.values,
-                    itemStyle: LineChartStyles[dimension].itemStyle,
-                    showSymbol: false,
-                }
-            ]
-            if (isShowEnvelope) {
-                series = [
+        if (waveDataSource === undefined && !isLoading) {
+            return <EmptyLayout description="数据不足"/>
+        } else {
+            let option: any = {...defaultChartOption};
+            if (waveDataSource) {
+                const legends = ["X轴", "Y轴", "Z轴"];
+                let series: any[] = [
                     {
                         name: legends[dimension],
                         type: 'line',
-                        data: waveDataSource.highEnvelopes,
-                        lineStyle: {
-                            opacity: 0
-                        },
-                        areaStyle: {
-                            color: '#ccc'
-                        },
-                        stack: 'confidence-band',
-                        symbol: 'none'
-                    },
-                    {
-                        name: legends[dimension],
-                        type: 'line',
-                        data: waveDataSource.lowEnvelopes,
-                        lineStyle: {
-                            opacity: 0
-                        },
-                        areaStyle: {
-                            color: '#ccc'
-                        },
-                        stack: 'confidence-band',
-                        symbol: 'none'
-                    },
-                    ...series
-                ]
-            }
-            const option = {
-                ...defaultChartOption,
-                legend: {
-                    data: [legends[dimension]],
-                    itemStyle: {
-                        color: LineChartStyles[dimension].itemStyle.normal.color
+                        data: waveDataSource.values,
+                        itemStyle: LineChartStyles[dimension].itemStyle,
+                        showSymbol: false,
                     }
-                },
-                title: {text: `${getChartTitle()} ${waveDataSource.frequency / 1000}KHz`, top: 0},
-                tooltip: {
-                    trigger: 'axis',
-                    axisPointer: {
-                        type: 'cross',
-                        crossStyle: {
-                            color: '#999'
+                ]
+                if (isShowEnvelope) {
+                    series = [
+                        {
+                            name: legends[dimension],
+                            type: 'line',
+                            data: waveDataSource.highEnvelopes,
+                            lineStyle: {
+                                opacity: 0
+                            },
+                            areaStyle: {
+                                color: '#ccc'
+                            },
+                            stack: 'confidence-band',
+                            symbol: 'none'
+                        },
+                        {
+                            name: legends[dimension],
+                            type: 'line',
+                            data: waveDataSource.lowEnvelopes,
+                            lineStyle: {
+                                opacity: 0
+                            },
+                            areaStyle: {
+                                color: '#ccc'
+                            },
+                            stack: 'confidence-band',
+                            symbol: 'none'
+                        },
+                        ...series
+                    ]
+                }
+                option = {
+                    ...defaultChartOption,
+                    legend: {
+                        data: [legends[dimension]],
+                        itemStyle: {
+                            color: LineChartStyles[dimension].itemStyle.normal.color
                         }
                     },
-                    formatter: `{b} ${waveDataSource.xAxisUnit}<br/>${legends[dimension]}: {c}`
-                },
-                xAxis: {
-                    type: 'category',
-                    data: waveDataSource.xAxis,
-                    name: waveDataSource.xAxisUnit,
-                },
-                series: series
+                    title: {text: `${getChartTitle()} ${waveDataSource.frequency / 1000}KHz`, top: 0},
+                    tooltip: {
+                        trigger: 'axis',
+                        axisPointer: {
+                            type: 'cross',
+                            crossStyle: {
+                                color: '#999'
+                            }
+                        },
+                        formatter: `{b} ${waveDataSource.xAxisUnit}<br/>${legends[dimension]}: {c}`
+                    },
+                    xAxis: {
+                        type: 'category',
+                        data: waveDataSource.xAxis,
+                        name: waveDataSource.xAxisUnit,
+                    },
+                    series: series
+                }
             }
-            return<EChartsReact loadingOption={{text: '正在加载数据, 请稍等...'}} showLoading={isLoading} style={{height: 500}}
-                              option={option} notMerge={true}/>
-
-        }else if (waveDataSource === undefined && !isLoading) {
-            return <EmptyLayout description="数据不足"/>
+            return <EChartsReact loadingOption={{text: '正在加载数据, 请稍等...'}} showLoading={isLoading} style={{height: 500}}
+                                 option={option} notMerge={true}/>
         }
-        return <div style={{height: "500px"}}/>;
     }
 
     return <Row>
@@ -283,9 +288,7 @@ const WaveDataChart: React.FC<{ device: Device }> = ({device}) => {
                     </Row>
                 </Col>
                 <Col span={24}>
-                    <Spin spinning={isLoading} tip={"加载中..."}>
-                        {renderChart()}
-                    </Spin>
+                    {renderChart()}
                 </Col>
             </Row>
         </Col>
