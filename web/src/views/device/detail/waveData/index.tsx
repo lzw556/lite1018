@@ -54,6 +54,7 @@ const WaveDataChart: React.FC<{ device: Device }> = ({device}) => {
     const [isShowEnvelope, setIsShowEnvelope] = React.useState(false);
 
     const fetchDeviceDataByTimestamp = useCallback((timestamp:number) => {
+        console.log(dimension);
         setIsLoading(true);
         GetDeviceDataRequest(device.id, timestamp, {calculate, dimension, data_type:16842753}).then(data => {
             setIsLoading(false);
@@ -76,6 +77,12 @@ const WaveDataChart: React.FC<{ device: Device }> = ({device}) => {
     React.useEffect(() => {
         fetchDeviceWaveDataTimestamps();
     }, [fetchDeviceWaveDataTimestamps]);
+
+    React.useEffect(() => {
+        if (deviceData) {
+            fetchDeviceDataByTimestamp(deviceData.timestamp);
+        }
+    }, [fetchDeviceDataByTimestamp])
 
     const getChartTitle = () => {
         switch (calculate) {
