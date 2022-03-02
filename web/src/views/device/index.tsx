@@ -367,7 +367,7 @@ const DevicePage = () => {
             }}/>
         }
         {
-            device && <DeviceMonitorDrawer device={device} visible={monitorVisible}/>
+            device && <DeviceMonitorDrawer device={device} visible={monitorVisible} onClose={()=> isMobile && setMonitorVisible(false)}/>
         }
     </Content>
 }

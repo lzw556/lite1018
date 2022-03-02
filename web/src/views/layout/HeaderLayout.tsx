@@ -102,7 +102,7 @@ const HeaderLayout = (props: any) => {
                 closable={false} 
                 onClose={()=>setVisible(false)} 
                 bodyStyle={{paddingLeft:0, paddingRight:0}}>
-              <NavMenu menus={menus}/>
+              <NavMenu menus={menus} setVisible={setVisible}/>
               <Divider/>
               {currentUser && 
                <div style={{paddingLeft:24,paddingBottom:100}}>
