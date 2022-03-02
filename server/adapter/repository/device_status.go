@@ -49,8 +49,8 @@ func (repo DeviceState) Find(mac string, from, to time.Time) ([]entity.DeviceSta
 		if bucket != nil {
 			if dataBucket := bucket.Bucket([]byte(mac)); dataBucket != nil {
 				c := dataBucket.Cursor()
-				min := []byte(from.UTC().Format("2006-01-02T15:00:00Z"))
-				max := []byte(to.UTC().Format("2006-01-02T15:00:00Z"))
+				min := []byte(from.UTC().Format("2006-01-02T15:04:02Z"))
+				max := []byte(to.UTC().Format("2006-01-02T15:04:02Z"))
 				for k, v := c.Seek(min); k != nil && bytes.Compare(k, max) <= 0; k, v = c.Next() {
 					var e entity.DeviceState
 					if err := json.Unmarshal(v, &e); err != nil {

@@ -22,7 +22,6 @@ import {Device} from "../../types/device";
 import EditBaseInfoModel from "./edit/editBaseInfoModel";
 import {ColorHealth, ColorWarn} from "../../constants/color";
 import Label from "../../components/label";
-import ReplaceMacModal from "./replace/replaceMacModal";
 import ShadowCard from "../../components/shadowCard";
 import UpgradeModal from "./upgrade";
 import "../../string-extension";
@@ -324,14 +323,6 @@ const DevicePage = () => {
                 </Col>
             </Row>
         </ShadowCard>
-        <ReplaceMacModal visible={replaceVisible} device={device} onCancel={() => {
-            setDevice(undefined)
-            setReplaceVisible(false)
-        }} onSuccess={() => {
-            setDevice(undefined)
-            setReplaceVisible(false)
-            onRefresh()
-        }}/>
         <EditBaseInfoModel device={device} visible={editBaseInfoVisible} onSuccess={() => {
             setDevice(undefined)
             setEditBaseInfoVisible(false)

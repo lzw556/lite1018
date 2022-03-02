@@ -2,14 +2,14 @@ import * as React from 'react';
 import { Card, Empty } from 'antd';
 import moment from 'moment';
 import ReactECharts from "echarts-for-react";
-import { GetDeviceRuntimeDataRequest } from '../../apis/device';
+import { GetDeviceRuntimeRequest } from '../../apis/device';
 import { DefaultMonitorDataOption, LineChartStyles } from '../../constants/chart';
 
 export const RuntimeChart: React.FC<{ deviceId: number }> = ({ deviceId }) => {
   const [runtimeOptions, setRuntimeOptions] = React.useState<any>();
 
   React.useEffect(() => {
-    GetDeviceRuntimeDataRequest(
+    GetDeviceRuntimeRequest(
       deviceId,
       moment().startOf('day').subtract(13, 'd').utc().unix(),
       moment().endOf('day').utc().unix()

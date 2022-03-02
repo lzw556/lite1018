@@ -119,29 +119,6 @@ func (r deviceRouter) findRuntimeDataByID(ctx *gin.Context) (interface{}, error)
 	return r.service.GetRuntimeDataByID(id, from, to)
 }
 
-func (r deviceRouter) downloadWaveDataByID(ctx *gin.Context) (interface{}, error) {
-	//id := cast.ToUint(ctx.Param("id"))
-	//timestamp := cast.ToInt64(ctx.Param("timestamp"))
-	//result := make(vo.WaveDataList, 3)
-	//var eg errgroup.Group
-	//for i := range result {
-	//	index := i
-	//	eg.Go(func() error {
-	//		data, err := r.service.GetWaveDataByID(id, timestamp, ctx.Query("calculate"), index)
-	//		if err != nil {
-	//			return err
-	//		}
-	//		result[index] = *data
-	//		return nil
-	//	})
-	//}
-	//if err := eg.Wait(); err != nil {
-	//	return nil, err
-	//}
-	//return result.ToCsvFile()
-	return nil, nil
-}
-
 func (r deviceRouter) downloadDataByID(ctx *gin.Context) (interface{}, error) {
 	id := cast.ToUint(ctx.Param("id"))
 	from := cast.ToInt64(ctx.Query("from"))

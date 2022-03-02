@@ -239,6 +239,7 @@ func (query DeviceQuery) RuntimeDataByRange(id uint, from, to time.Time) ([]vo.S
 	}
 
 	data, err := query.deviceStateRepo.Find(device.MacAddress, from, to)
+	fmt.Println(data)
 	if err != nil {
 		return nil, err
 	}

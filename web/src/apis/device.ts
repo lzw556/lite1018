@@ -61,10 +61,6 @@ export function RemoveDeviceDataRequest(id:number, from:number, to:number) {
     return request.delete(`/devices/${id}/data?from=${from}&to=${to}`).then(DeleteResponse)
 }
 
-export function ReplaceDeviceMacRequest(id:number, mac: string) {
-    return request.patch(`/devices/${id}/mac/${mac}`, {}).then(PutResponse)
-}
-
 export function SendDeviceCommandRequest(id:number, cmd:any) {
     return request.post(`/devices/${id}/commands/${cmd}`, {}).then(res => res.data)
 }
@@ -85,6 +81,6 @@ export function GetDefaultDeviceSettingsRequest(type: number) {
     return request.get<any>(`/devices/defaultSettings`, {type}).then(GetResponse)
 }
 
-export function GetDeviceRuntimeDataRequest(id:number, from:number, to:number) {
-    return request.get<any>(`/devices/${id}/data/runtime`, {from, to}).then(GetResponse)
+export function GetDeviceRuntimeRequest(id:number, from:number, to:number) {
+    return request.get<any>(`/devices/${id}/runtime`, {from, to}).then(GetResponse)
 }
