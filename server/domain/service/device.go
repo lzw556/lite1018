@@ -52,8 +52,8 @@ func (s Device) UpdateDeviceByID(id uint, req request.Device) error {
 	return cmd.UpdateBaseInfo(req)
 }
 
-func (s Device) GetDeviceByID(id uint) (*vo.Device, error) {
-	query := s.factory.NewDeviceQuery(nil)
+func (s Device) GetDeviceByID(id uint, filters request.Filters) (*vo.Device, error) {
+	query := s.factory.NewDeviceQuery(filters)
 	return query.Get(id)
 }
 

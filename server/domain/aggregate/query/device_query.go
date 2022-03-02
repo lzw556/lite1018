@@ -48,7 +48,8 @@ func NewDeviceQuery() DeviceQuery {
 
 func (query DeviceQuery) check(id uint) (entity.Device, error) {
 	ctx := context.TODO()
-	device, err := query.deviceRepo.Get(ctx, id)
+	query.Specs = append(query.Specs, spec.PrimaryKeyInSpec{id})
+	device, err := query.deviceRepo.GetBySpecs(ctx, query.Specs...)
 	if err != nil {
 		return entity.Device{}, response.BusinessErr(errcode.DeviceNotFoundError, err.Error())
 	}

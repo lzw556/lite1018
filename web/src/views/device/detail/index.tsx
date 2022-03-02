@@ -70,10 +70,10 @@ const DeviceDetailPage = () => {
                     setDevice(data)
                     setIsLoading(false)
                 })
-                .catch(_ => history.push({pathname: "/device-management/devices"}))
+                .catch(_ => window.location.hash = "/device-management?locale=devices")
         } else {
             message.error("设备不存在").then()
-            history.push({pathname: "/device-management/devices"})
+            window.location.hash = "/device-management?locale=devices"
         }
     }, []);
 

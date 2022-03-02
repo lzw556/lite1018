@@ -22,7 +22,8 @@ func (r deviceRouter) create(ctx *gin.Context) (interface{}, error) {
 
 func (r deviceRouter) get(ctx *gin.Context) (interface{}, error) {
 	id := cast.ToUint(ctx.Param("id"))
-	return r.service.GetDeviceByID(id)
+	filters := request.NewFilters(ctx)
+	return r.service.GetDeviceByID(id, filters)
 }
 
 func (r deviceRouter) find(ctx *gin.Context) (interface{}, error) {

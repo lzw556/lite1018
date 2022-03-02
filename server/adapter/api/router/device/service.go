@@ -10,7 +10,7 @@ type Service interface {
 	DeleteDeviceByID(id uint) error
 	UpdateDeviceByID(id uint, req request.Device) error
 
-	GetDeviceByID(id uint) (*vo.Device, error)
+	GetDeviceByID(id uint, filters request.Filters) (*vo.Device, error)
 	FindDevicesByPaginate(page, size int, filters request.Filters) ([]vo.Device, int64, error)
 	FindDevices(filters request.Filters) ([]vo.Device, error)
 	CheckDeviceMacAddress(mac string) error
