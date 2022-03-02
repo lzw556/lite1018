@@ -2,9 +2,8 @@ import {Device} from "../../../../types/device";
 import {FC, useEffect, useState} from "react";
 import {Button, Card, Col, DatePicker, Empty, Row, Select, Space} from "antd";
 import {DeviceType} from "../../../../types/device_type";
-import {GetChildrenRequest, FindDeviceDataRequest} from "../../../../apis/device";
+import {FindDeviceDataRequest} from "../../../../apis/device";
 import moment from "moment";
-import {DefaultMonitorDataOption, LineChartStyles} from "../../../../constants/chart";
 import ReactECharts from "echarts-for-react";
 import Label from "../../../../components/label";
 import {ReloadOutlined} from "@ant-design/icons";
@@ -26,13 +25,7 @@ const MonitorPage: FC<MonitorPageProps> = ({device}) => {
     useEffect(() => {
         if (device) {
             if (device.typeId === DeviceType.Gateway || device.typeId === DeviceType.Router) {
-                GetChildrenRequest(device.id).then(data => {
-                    const result = data.filter(item => DeviceType.Sensors().includes(item.typeId))
-                    setDevices(result)
-                    if (result.length > 0) {
-                        fetchDeviceData(result[0].id)
-                    }
-                })
+
             } else {
                 fetchDeviceData(device.id)
             }

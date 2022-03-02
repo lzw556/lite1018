@@ -7,7 +7,10 @@ import {LineChartStyles} from '../../../../constants/chart';
 import "../../../../index.css";
 import {EmptyLayout} from "../../../layout";
 import {Device} from "../../../../types/device";
-import {GetDeviceDataRequest, PagingDeviceDataRequest
+import {
+    DownloadDeviceDataByTimestampRequest,
+    GetDeviceDataRequest,
+    PagingDeviceDataRequest
 } from "../../../../apis/device";
 import {PageResult} from "../../../../types/page";
 
@@ -112,16 +115,16 @@ const WaveDataChart: React.FC<{ device: Device }> = ({device}) => {
     ]
 
     const onDownload = (timestamp: number) => {
-        // DownloadDeviceWaveDataRequest(device.id, timestamp, {calculate}).then(res => {
-        //     if (res.status === 200) {
-        //         const url = window.URL.createObjectURL(new Blob([res.data]))
-        //         const link = document.createElement('a')
-        //         link.href = url
-        //         link.setAttribute('download', `${moment.unix(timestamp).local().format("YYYY-MM-DD_hh-mm-ss")}${getChartTitle()}.csv`)
-        //         document.body.appendChild(link)
-        //         link.click()
-        //     }
-        // });
+        DownloadDeviceDataByTimestampRequest(device.id, timestamp, {calculate, data_type:16842753}).then(res => {
+            if (res.status === 200) {
+                const url = window.URL.createObjectURL(new Blob([res.data]))
+                const link = document.createElement('a')
+                link.href = url
+                link.setAttribute('download', `${moment.unix(timestamp).local().format("YYYY-MM-DD_hh-mm-ss")}${getChartTitle()}.csv`)
+                document.body.appendChild(link)
+                link.click()
+            }
+        })
     }
 
     const renderChart = () => {
@@ -231,14 +234,18 @@ const WaveDataChart: React.FC<{ device: Device }> = ({device}) => {
                                dataSource={dataSource?.result}
                                rowClassName={(record) => record.timestamp === deviceData?.timestamp ? 'ant-table-row-selected' : ''}
                                onRow={(record) => ({
-                                   onClick: () => fetchDeviceDataByTimestamp(record.timestamp),
+                                   onClick: () => {
+                                       if (record.timestamp !== deviceData?.timestamp) {
+                                           fetchDeviceDataByTimestamp(record.timestamp)
+                                       }
+                                   },
                                    onMouseLeave: () => window.document.body.style.cursor = 'default',
                                    onMouseEnter: () => window.document.body.style.cursor = 'pointer'
                                })}
                         />
-                        <br/>
                         {
                             dataSource && <Pagination size={"small"}
+                                                      style={{paddingTop: "8px"}}
                                                       current={dataSource.page}
                                                       total={dataSource.total}
                                                       pageSize={dataSource.size}/>

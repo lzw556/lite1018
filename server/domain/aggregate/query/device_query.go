@@ -232,31 +232,6 @@ func (query DeviceQuery) GetDataByIDAndTimestamp(id uint, sensorType uint, time 
 	return &result, nil
 }
 
-func (query DeviceQuery) GetLastData(id uint) (*vo.DeviceData, error) {
-	device, err := query.check(id)
-	if err != nil {
-		return nil, err
-	}
-	if t := devicetype.Get(device.Type); t != nil {
-		data, err := query.sensorDataRepo.Last(device.MacAddress, t.SensorID())
-		if err != nil {
-			return nil, err
-		}
-		properties := make(vo.Properties, 0)
-		for _, p := range t.Properties(t.SensorID()) {
-			property := vo.NewProperty(p)
-			for _, field := range p.Fields {
-				property.SetData(field.Name, data.Values[field.Key])
-			}
-			properties = append(properties, property)
-		}
-		result := vo.NewDeviceData(data.Time)
-		result.Values = properties
-		return &result, nil
-	}
-	return nil, response.BusinessErr(errcode.UnknownDeviceTypeError, "")
-}
-
 func (query DeviceQuery) RuntimeDataByRange(id uint, from, to time.Time) ([]vo.SensorRuntimeData, error) {
 	device, err := query.check(id)
 	if err != nil {
@@ -278,24 +253,24 @@ func (query DeviceQuery) RuntimeDataByRange(id uint, from, to time.Time) ([]vo.S
 	return result, nil
 }
 
-func (query DeviceQuery) DownloadDeviceDataByRange(id uint, sensorType uint, pIDs []string, from time.Time, to time.Time) (*vo.ExcelFile, error) {
+func (query DeviceQuery) DownloadCharacteristicData(id uint, pids []string, from, to time.Time) (*vo.ExcelFile, error) {
 	device, err := query.check(id)
 	if err != nil {
 		return nil, err
 	}
 	downloadKeys := make(map[string]struct{})
-	for _, key := range pIDs {
+	for _, key := range pids {
 		downloadKeys[key] = struct{}{}
-	}
-	deviceData, err := query.FindDataByID(id, sensorType, from, to)
-	if err != nil {
-		return nil, err
 	}
 	result := vo.ExcelFile{
 		Name: fmt.Sprintf("%s_%s_%s.xlsx", device.MacAddress, from.Format("20060102"), to.Format("20060102")),
 		File: excelize.NewFile(),
 	}
 	if t := devicetype.Get(device.Type); t != nil {
+		deviceData, err := query.FindDataByID(device.ID, t.SensorID(), from, to)
+		if err != nil {
+			return nil, err
+		}
 		// set cell title
 		axis := 65
 		result.File.SetCellValue("Sheet1", "A1", "时间")
@@ -310,41 +285,62 @@ func (query DeviceQuery) DownloadDeviceDataByRange(id uint, sensorType uint, pID
 				axis += len(property.Fields) - 1
 			}
 		}
-	}
 
-	// set cell value
-	for i, data := range deviceData {
-		axis := 65
-		result.File.SetCellValue("Sheet1", fmt.Sprintf("A%d", i+3), time.Unix(data.Timestamp, 0).Format("2006-01-02 15:04:05"))
-		if properties, ok := data.Values.(vo.Properties); ok {
-			for _, property := range properties {
-				if _, ok := downloadKeys[property.Key]; ok {
-					for _, v := range property.Data {
-						axis += 1
-						result.File.SetCellValue("Sheet1", fmt.Sprintf("%s%d", string(rune(axis)), i+3), v)
+		// set cell value
+		for i, data := range deviceData {
+			axis := 65
+			result.File.SetCellValue("Sheet1", fmt.Sprintf("A%d", i+3), time.Unix(data.Timestamp, 0).Format("2006-01-02 15:04:05"))
+			if properties, ok := data.Values.(vo.Properties); ok {
+				for _, property := range properties {
+					if _, ok := downloadKeys[property.Key]; ok {
+						for _, v := range property.Data {
+							fmt.Println(property.Data)
+							axis += 1
+							result.File.SetCellValue("Sheet1", fmt.Sprintf("%s%d", string(rune(axis)), i+3), v)
+						}
 					}
 				}
 			}
 		}
+		return &result, nil
 	}
-	return &result, nil
+	return nil, response.BusinessErr(errcode.UnknownDeviceTypeError, "")
 }
 
-func (query DeviceQuery) FindWaveDataByRange(id uint, from time.Time, to time.Time) (vo.LargeSensorDataList, error) {
+func (query DeviceQuery) DownloadLargeSensorData(id uint, sensorType uint, time time.Time, filters request.Filters) (*vo.ExcelFile, error) {
 	device, err := query.check(id)
 	if err != nil {
 		return nil, err
 	}
-	es, err := query.largeSensorDataRepo.Find(device.MacAddress, from, to)
+	switch sensorType {
+	case devicetype.KxSensor:
+		return query.downloadKxSensorData(device, time, cast.ToString(filters["calculate"]))
+	}
+	return nil, response.BusinessErr(errcode.UnknownBusinessError, "")
+}
+
+func (query DeviceQuery) downloadKxSensorData(device entity.Device, time time.Time, calculate string) (*vo.ExcelFile, error) {
+	data, err := query.sensorDataRepo.Get(device.MacAddress, devicetype.KxSensor, time)
 	if err != nil {
 		return nil, err
 	}
-	result := make(vo.LargeSensorDataList, len(es))
-	for i, e := range es {
-		result[i] = vo.NewLargeSensorData(e)
+	result := vo.ExcelFile{
+		Name: fmt.Sprintf("%s_%s.xlsx", device.MacAddress, time.Format("20060102")),
+		File: excelize.NewFile(),
 	}
-	sort.Sort(result)
-	return result, nil
+	col := 66
+	for k, v := range data.Values {
+		var e entity.AxisSensorData
+		if err := mapstructure.Decode(v, &e); err != nil {
+			return nil, err
+		}
+		result.File.SetCellValue("Sheet1", fmt.Sprintf("%s1", string(rune(col))), k)
+		for i, value := range getKxSensorData(e, calculate).Values {
+			result.File.SetCellValue("Sheet1", fmt.Sprintf("%s%d", string(rune(col)), i+1), value)
+		}
+		col += 1
+	}
+	return &result, nil
 }
 
 func getKxSensorData(value entity.AxisSensorData, calc string) vo.KxData {

@@ -103,29 +103,19 @@ func (s Device) GetDeviceDataByIDAndTimestamp(id uint, sensorType uint, timestam
 	return query.GetDataByIDAndTimestamp(id, sensorType, time.Unix(timestamp, 0), filters)
 }
 
-func (s Device) GetLastDeviceDataByID(id uint) (*vo.DeviceData, error) {
-	query := s.factory.NewDeviceQuery(nil)
-	return query.GetLastData(id)
-}
-
 func (s Device) GetRuntimeDataByID(id uint, from, to int64) ([]vo.SensorRuntimeData, error) {
 	query := s.factory.NewDeviceQuery(nil)
 	return query.RuntimeDataByRange(id, time.Unix(from, 0), time.Unix(to, 0))
 }
 
-func (s Device) DownloadDeviceDataByID(id uint, sensorType uint, pIDs []string, from, to int64) (*vo.ExcelFile, error) {
+func (s Device) DownloadDeviceDataByID(id uint, pids []string, from, to int64) (*vo.ExcelFile, error) {
 	query := s.factory.NewDeviceQuery(nil)
-	return query.DownloadDeviceDataByRange(id, sensorType, pIDs, time.Unix(from, 0), time.Unix(to, 0))
+	return query.DownloadCharacteristicData(id, pids, time.Unix(from, 0), time.Unix(to, 0))
 }
 
-func (s Device) FindWaveDataByID(id uint, from, to int64) (vo.LargeSensorDataList, error) {
+func (s Device) DownloadDeviceDataByIDAndTimestamp(id uint, sensorType uint, timestamp int64, filters request.Filters) (*vo.ExcelFile, error) {
 	query := s.factory.NewDeviceQuery(nil)
-	return query.FindWaveDataByRange(id, time.Unix(from, 0), time.Unix(to, 0))
-}
-
-func (s Device) GetWaveDataByID(id uint, timestamp int64, calculate string, dimension int) (*vo.KxData, error) {
-	query := s.factory.NewDeviceQuery(nil)
-	return query.GetWaveDataByTimestamp(id, timestamp, calculate, dimension)
+	return query.DownloadLargeSensorData(id, sensorType, time.Unix(timestamp, 0), filters)
 }
 
 func (s Device) RemoveDataByID(id uint, sensorType uint, from, to int64) error {

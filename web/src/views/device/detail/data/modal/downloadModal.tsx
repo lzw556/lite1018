@@ -29,8 +29,7 @@ const DownloadModal: FC<DownloadModalProps> = (props) => {
 
     const onDownload = () => {
         form.validateFields(["properties"]).then(values => {
-            console.log(JSON.stringify(values.properties))
-            DownloadDeviceDataRequest(device.id, JSON.stringify(values.properties), startDate.utc().unix(), endDate.utc().unix()).then(res => {
+            DownloadDeviceDataRequest(device.id, startDate.utc().unix(), endDate.utc().unix(), {pids: JSON.stringify(values.properties)}).then(res => {
                 if (res.status === 200) {
                     const url = window.URL.createObjectURL(new Blob([res.data]))
                     const link = document.createElement('a')

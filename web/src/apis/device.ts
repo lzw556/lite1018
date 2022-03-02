@@ -49,12 +49,12 @@ export function GetDeviceDataRequest(id:number, timestamp:number, filters:any) {
     return request.get<any>(`/devices/${id}/data/${timestamp}`, {...filters}).then(GetResponse)
 }
 
-export function GetLastDeviceDataRequest(id:number) {
-    return request.get<any>(`/devices/${id}/data/last`).then(GetResponse)
+export function DownloadDeviceDataRequest(id:number, from:number, to:number, filters:any) {
+    return request.download<any>(`/devices/${id}/download/data`, {from, to, ...filters})
 }
 
-export function DownloadDeviceDataRequest(id:number, pids:string, from:number, to:number) {
-    return request.download<any>(`/devices/${id}/download/data`, {pids, from, to})
+export function DownloadDeviceDataByTimestampRequest(id:number, timestamp:number, filters:any) {
+    return request.download<any>(`/devices/${id}/download/data/${timestamp}`, {...filters})
 }
 
 export function RemoveDeviceDataRequest(id:number, from:number, to:number) {
@@ -77,20 +77,8 @@ export function DeviceCancelUpgradeRequest(id:number) {
     return request.delete(`/devices/${id}/upgrade`).then(res => res.data)
 }
 
-export function GetDeviceGroupByAsset(deviceType: number) {
-    return request.get(`/devices?method=groupByAsset`, {device_type: deviceType}).then(GetResponse)
-}
-
-export function GetChildrenRequest(id:number) {
-    return request.get<Device[]>(`/devices/${id}/children`).then(GetResponse)
-}
-
 export function GetDeviceSettingRequest(id:number) {
     return request.get<any>(`/devices/${id}/settings`).then(GetResponse)
-}
-
-export function GetDevicesStatisticsRequest(filter: any) {
-    return request.get<DeviceStatistic[]>(`/statistics/devices`, {...filter}).then(GetResponse)
 }
 
 export function GetDefaultDeviceSettingsRequest(type: number) {

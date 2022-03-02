@@ -119,28 +119,6 @@ func (r deviceRouter) findRuntimeDataByID(ctx *gin.Context) (interface{}, error)
 	return r.service.GetRuntimeDataByID(id, from, to)
 }
 
-func (r deviceRouter) findWaveDataByID(ctx *gin.Context) (interface{}, error) {
-	//id := cast.ToUint(ctx.Param("id"))
-	//from := cast.ToInt64(ctx.Query("from"))
-	//to := cast.ToInt64(ctx.Query("to"))
-	//return r.service.FindWaveDataByID(id, from, to)
-	return nil, nil
-}
-
-func (r deviceRouter) getLastDataByID(ctx *gin.Context) (interface{}, error) {
-	id := cast.ToUint(ctx.Param("id"))
-	return r.service.GetLastDeviceDataByID(id)
-}
-
-func (r deviceRouter) getWaveDataByID(ctx *gin.Context) (interface{}, error) {
-	//id := cast.ToUint(ctx.Param("id"))
-	//timestamp := cast.ToInt64(ctx.Param("timestamp"))
-	//calculate := ctx.Query("calculate")
-	//dimension := cast.ToInt(ctx.Query("dimension"))
-	//return r.service.GetWaveDataByID(id, timestamp, calculate, dimension)
-	return nil, nil
-}
-
 func (r deviceRouter) downloadWaveDataByID(ctx *gin.Context) (interface{}, error) {
 	//id := cast.ToUint(ctx.Param("id"))
 	//timestamp := cast.ToInt64(ctx.Param("timestamp"))
@@ -168,12 +146,19 @@ func (r deviceRouter) downloadDataByID(ctx *gin.Context) (interface{}, error) {
 	id := cast.ToUint(ctx.Param("id"))
 	from := cast.ToInt64(ctx.Query("from"))
 	to := cast.ToInt64(ctx.Query("to"))
-	sensorType := cast.ToUint(ctx.Query("data_type"))
 	var pids []string
 	if err := json.Unmarshal([]byte(ctx.Query("pids")), &pids); err != nil {
 		return nil, err
 	}
-	return r.service.DownloadDeviceDataByID(id, sensorType, pids, from, to)
+	return r.service.DownloadDeviceDataByID(id, pids, from, to)
+}
+
+func (r deviceRouter) downloadDataByIDAndTimestamp(ctx *gin.Context) (interface{}, error) {
+	id := cast.ToUint(ctx.Param("id"))
+	timestamp := cast.ToInt64(ctx.Param("timestamp"))
+	sensorType := cast.ToUint(ctx.Query("data_type"))
+	filters := request.NewFilters(ctx)
+	return r.service.DownloadDeviceDataByIDAndTimestamp(id, sensorType, timestamp, filters)
 }
 
 func (r deviceRouter) removeDataByID(ctx *gin.Context) (interface{}, error) {
