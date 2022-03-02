@@ -1,4 +1,4 @@
-import {Checkbox, Col, ConfigProvider, DatePicker, Row, Select, Space, Table} from 'antd';
+import {Checkbox, Col, ConfigProvider, DatePicker, Pagination, Row, Select, Space, Table} from 'antd';
 import EChartsReact from 'echarts-for-react';
 import moment from 'moment';
 import * as React from 'react';
@@ -7,12 +7,9 @@ import {LineChartStyles} from '../../../../constants/chart';
 import "../../../../index.css";
 import {EmptyLayout} from "../../../layout";
 import {Device} from "../../../../types/device";
-import {
-    DownloadDeviceWaveDataRequest,
-    GetDeviceWaveDataRequest,
-    GetDeviceWaveDataTimestampsRequest
+import {GetDeviceDataRequest, PagingDeviceDataRequest
 } from "../../../../apis/device";
-import {WaveData} from "../../../../types/wave_data";
+import {PageResult} from "../../../../types/page";
 
 const {Option} = Select;
 
@@ -46,44 +43,36 @@ const defaultChartOption = {
 const WaveDataChart: React.FC<{ device: Device }> = ({device}) => {
     const [beginDate, setBeginDate] = React.useState(moment().subtract(3, 'days').startOf('day'));
     const [endDate, setEndDate] = React.useState(moment().endOf('day'));
-    const [dataSource, setDataSource] = React.useState<any>();
-    const [timestamp, setTimestamp] = React.useState<number>();
+    const [dataSource, setDataSource] = React.useState<PageResult<any>>();
+    const [deviceData, setDeviceData] = React.useState<any>();
     const [calculate, setCalculate] = React.useState<string>("accelerationTimeDomain");
     const [dimension, setDimension] = React.useState<number>(0);
-    const [waveDataSource, setWaveDataSource] = React.useState<WaveData>();
     const [isLoading, setIsLoading] = React.useState(false);
     const [isShowEnvelope, setIsShowEnvelope] = React.useState(false);
 
+    const fetchDeviceDataByTimestamp = useCallback((timestamp:number) => {
+        setIsLoading(true);
+        GetDeviceDataRequest(device.id, timestamp, {calculate, dimension, data_type:16842753}).then(data => {
+            setIsLoading(false);
+            setDeviceData(data);
+        }).catch(e => {
+            setIsLoading(false);
+        })
+    }, [calculate, dimension])
+
     const fetchDeviceWaveDataTimestamps = useCallback(() => {
-        GetDeviceWaveDataTimestampsRequest(device.id, beginDate.utc().unix(), endDate.utc().unix()).then(data => {
-            setDataSource(data);
-            if (data.length > 0) {
-                setTimestamp(data[0].timestamp);
-            }else {
-                setTimestamp(undefined);
+        PagingDeviceDataRequest(device.id, 1, 10, {from: beginDate.utc().unix(), to: endDate.utc().unix(), data_type:16842753}).then(data => {
+            setDataSource(data)
+            if (data.total > 0) {
+                fetchDeviceDataByTimestamp(data.result[0].timestamp)
             }
-        });
+        })
     }, [beginDate, endDate, device.id]);
 
 
     React.useEffect(() => {
         fetchDeviceWaveDataTimestamps();
     }, [fetchDeviceWaveDataTimestamps]);
-
-    React.useEffect(() => {
-        if (timestamp) {
-            setIsLoading(true);
-            GetDeviceWaveDataRequest(device.id, timestamp, {calculate, dimension}).then(data => {
-                    setWaveDataSource(data);
-                    setIsLoading(false);
-                }
-            ).catch(() => {
-                setIsLoading(false);
-            });
-        }else {
-            setWaveDataSource(undefined);
-        }
-    }, [timestamp, calculate, dimension]);
 
     const getChartTitle = () => {
         switch (calculate) {
@@ -123,30 +112,31 @@ const WaveDataChart: React.FC<{ device: Device }> = ({device}) => {
     ]
 
     const onDownload = (timestamp: number) => {
-        DownloadDeviceWaveDataRequest(device.id, timestamp, {calculate}).then(res => {
-            if (res.status === 200) {
-                const url = window.URL.createObjectURL(new Blob([res.data]))
-                const link = document.createElement('a')
-                link.href = url
-                link.setAttribute('download', `${moment.unix(timestamp).local().format("YYYY-MM-DD_hh-mm-ss")}${getChartTitle()}.csv`)
-                document.body.appendChild(link)
-                link.click()
-            }
-        });
+        // DownloadDeviceWaveDataRequest(device.id, timestamp, {calculate}).then(res => {
+        //     if (res.status === 200) {
+        //         const url = window.URL.createObjectURL(new Blob([res.data]))
+        //         const link = document.createElement('a')
+        //         link.href = url
+        //         link.setAttribute('download', `${moment.unix(timestamp).local().format("YYYY-MM-DD_hh-mm-ss")}${getChartTitle()}.csv`)
+        //         document.body.appendChild(link)
+        //         link.click()
+        //     }
+        // });
     }
 
     const renderChart = () => {
-        if (waveDataSource === undefined && !isLoading) {
+        if (deviceData === undefined && !isLoading) {
             return <EmptyLayout description="数据不足"/>
         } else {
             let option: any = {...defaultChartOption};
-            if (waveDataSource) {
+            if (deviceData) {
+                const data = deviceData.values
                 const legends = ["X轴", "Y轴", "Z轴"];
                 let series: any[] = [
                     {
                         name: legends[dimension],
                         type: 'line',
-                        data: waveDataSource.values,
+                        data: data.values,
                         itemStyle: LineChartStyles[dimension].itemStyle,
                         showSymbol: false,
                     }
@@ -156,7 +146,7 @@ const WaveDataChart: React.FC<{ device: Device }> = ({device}) => {
                         {
                             name: legends[dimension],
                             type: 'line',
-                            data: waveDataSource.highEnvelopes,
+                            data: data.highEnvelopes,
                             lineStyle: {
                                 opacity: 0
                             },
@@ -169,7 +159,7 @@ const WaveDataChart: React.FC<{ device: Device }> = ({device}) => {
                         {
                             name: legends[dimension],
                             type: 'line',
-                            data: waveDataSource.lowEnvelopes,
+                            data: data.lowEnvelopes,
                             lineStyle: {
                                 opacity: 0
                             },
@@ -190,7 +180,7 @@ const WaveDataChart: React.FC<{ device: Device }> = ({device}) => {
                             color: LineChartStyles[dimension].itemStyle.normal.color
                         }
                     },
-                    title: {text: `${getChartTitle()} ${waveDataSource.frequency / 1000}KHz`, top: 0},
+                    title: {text: `${getChartTitle()} ${data.frequency / 1000}KHz`, top: 0},
                     tooltip: {
                         trigger: 'axis',
                         axisPointer: {
@@ -199,12 +189,12 @@ const WaveDataChart: React.FC<{ device: Device }> = ({device}) => {
                                 color: '#999'
                             }
                         },
-                        formatter: `{b} ${waveDataSource.xAxisUnit}<br/>${legends[dimension]}: {c}`
+                        formatter: `{b} ${data.xAxisUnit}<br/>${legends[dimension]}: {c}`
                     },
                     xAxis: {
                         type: 'category',
-                        data: waveDataSource.xAxis,
-                        name: waveDataSource.xAxisUnit,
+                        data: data.xAxis,
+                        name: data.xAxisUnit,
                     },
                     series: series
                 }
@@ -238,14 +228,22 @@ const WaveDataChart: React.FC<{ device: Device }> = ({device}) => {
                                showHeader={false}
                                columns={columns}
                                pagination={false}
-                               dataSource={dataSource}
-                               rowClassName={(record) => record.timestamp === timestamp ? 'ant-table-row-selected' : ''}
+                               dataSource={dataSource?.result}
+                               rowClassName={(record) => record.timestamp === deviceData?.timestamp ? 'ant-table-row-selected' : ''}
                                onRow={(record) => ({
-                                   onClick: () => setTimestamp(record.timestamp),
+                                   onClick: () => fetchDeviceDataByTimestamp(record.timestamp),
                                    onMouseLeave: () => window.document.body.style.cursor = 'default',
                                    onMouseEnter: () => window.document.body.style.cursor = 'pointer'
                                })}
                         />
+                        <br/>
+                        {
+                            dataSource && <Pagination size={"small"}
+                                                      current={dataSource.page}
+                                                      total={dataSource.total}
+                                                      pageSize={dataSource.size}/>
+                        }
+
                     </ConfigProvider>
                 </Col>
             </Row>

@@ -3,6 +3,9 @@ package query
 import (
 	"context"
 	"fmt"
+	"github.com/mitchellh/mapstructure"
+	"github.com/spf13/cast"
+	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/request"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/response"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
@@ -98,20 +101,25 @@ func (query DeviceQuery) Get(id uint) (*vo.Device, error) {
 	}
 
 	if t := devicetype.Get(device.Type); t != nil {
-		data, err := query.sensorDataRepo.Last(device.MacAddress)
+		data, err := query.sensorDataRepo.Last(device.MacAddress, t.SensorID())
 		if err != nil {
 			return nil, err
 		}
 		result.Properties = make(vo.Properties, 0)
+		deviceData := vo.NewDeviceData(data.Time)
+		values := map[string]interface{}{}
 		for _, p := range t.Properties(t.SensorID()) {
 			property := vo.NewProperty(p)
 			if len(data.Values) > 0 {
 				for _, field := range p.Fields {
-					property.SetData(field.Name, data.Values[field.Key])
+					values[field.Key] = data.Values[field.Key]
 				}
 			}
 			result.Properties = append(result.Properties, property)
+			result.SetDataTypes(t.SensorID())
 		}
+		deviceData.Values = values
+		result.Data = &deviceData
 		sort.Sort(result.Properties)
 	}
 
@@ -146,14 +154,34 @@ func (query DeviceQuery) GetSettings(id uint) (vo.DeviceSettings, error) {
 	return nil, response.BusinessErr(errcode.UnknownDeviceTypeError, "")
 }
 
-func (query DeviceQuery) FindDataByRange(id uint, from, to time.Time) ([]vo.DeviceData, error) {
+func (query DeviceQuery) PagingDataByID(id uint, sensorType uint, page, size int, from, to int64) ([]vo.DeviceData, int64, error) {
+	device, err := query.check(id)
+	if err != nil {
+		return nil, 0, err
+	}
+	data, total, err := query.sensorDataRepo.Paging(device.MacAddress, sensorType, time.Unix(from, 0), time.Unix(to, 0), page, size)
+	if err != nil {
+		return nil, 0, err
+	}
+	result := make(vo.DeviceDataList, len(data))
+	for i, d := range data {
+		result[i] = vo.NewDeviceData(d.Time)
+	}
+	sort.Sort(result)
+	return result, total, nil
+}
+
+func (query DeviceQuery) FindDataByID(id uint, sensorType uint, from, to time.Time) ([]vo.DeviceData, error) {
 	device, err := query.check(id)
 	if err != nil {
 		return nil, err
 	}
 	result := make([]vo.DeviceData, 0)
 	if t := devicetype.Get(device.Type); t != nil {
-		data, err := query.sensorDataRepo.Find(device.MacAddress, from, to)
+		if sensorType == 0 {
+			sensorType = t.SensorID()
+		}
+		data, err := query.sensorDataRepo.Find(device.MacAddress, sensorType, from, to)
 		if err != nil {
 			return nil, err
 		}
@@ -166,10 +194,42 @@ func (query DeviceQuery) FindDataByRange(id uint, from, to time.Time) ([]vo.Devi
 				}
 				properties = append(properties, property)
 			}
-			result = append(result, vo.NewDeviceData(data[i].Time, properties))
+			r := vo.NewDeviceData(data[i].Time)
+			r.Values = properties
+			result = append(result, r)
 		}
 	}
 	return result, nil
+}
+
+func (query DeviceQuery) GetDataByIDAndTimestamp(id uint, sensorType uint, time time.Time, filters request.Filters) (*vo.DeviceData, error) {
+	device, err := query.check(id)
+	if err != nil {
+		return nil, err
+	}
+	data, err := query.sensorDataRepo.Get(device.MacAddress, sensorType, time)
+	if err != nil {
+		return nil, err
+	}
+	result := vo.NewDeviceData(data.Time)
+	switch sensorType {
+	case devicetype.KxSensor:
+		axis := "x"
+		switch cast.ToInt(filters["dimension"]) {
+		case 0:
+			axis = "x"
+		case 1:
+			axis = "y"
+		case 2:
+			axis = "z"
+		}
+		var e entity.AxisSensorData
+		if err := mapstructure.Decode(data.Values[axis], &e); err != nil {
+			return nil, err
+		}
+		result.Values = getKxSensorData(e, cast.ToString(filters["calculate"]))
+	}
+	return &result, nil
 }
 
 func (query DeviceQuery) GetLastData(id uint) (*vo.DeviceData, error) {
@@ -178,7 +238,7 @@ func (query DeviceQuery) GetLastData(id uint) (*vo.DeviceData, error) {
 		return nil, err
 	}
 	if t := devicetype.Get(device.Type); t != nil {
-		data, err := query.sensorDataRepo.Last(device.MacAddress)
+		data, err := query.sensorDataRepo.Last(device.MacAddress, t.SensorID())
 		if err != nil {
 			return nil, err
 		}
@@ -190,7 +250,8 @@ func (query DeviceQuery) GetLastData(id uint) (*vo.DeviceData, error) {
 			}
 			properties = append(properties, property)
 		}
-		result := vo.NewDeviceData(data.Time, properties)
+		result := vo.NewDeviceData(data.Time)
+		result.Values = properties
 		return &result, nil
 	}
 	return nil, response.BusinessErr(errcode.UnknownDeviceTypeError, "")
@@ -217,7 +278,7 @@ func (query DeviceQuery) RuntimeDataByRange(id uint, from, to time.Time) ([]vo.S
 	return result, nil
 }
 
-func (query DeviceQuery) DownloadDeviceDataByRange(id uint, pIDs []string, from time.Time, to time.Time) (*vo.ExcelFile, error) {
+func (query DeviceQuery) DownloadDeviceDataByRange(id uint, sensorType uint, pIDs []string, from time.Time, to time.Time) (*vo.ExcelFile, error) {
 	device, err := query.check(id)
 	if err != nil {
 		return nil, err
@@ -226,7 +287,7 @@ func (query DeviceQuery) DownloadDeviceDataByRange(id uint, pIDs []string, from 
 	for _, key := range pIDs {
 		downloadKeys[key] = struct{}{}
 	}
-	deviceData, err := query.FindDataByRange(id, from, to)
+	deviceData, err := query.FindDataByID(id, sensorType, from, to)
 	if err != nil {
 		return nil, err
 	}
@@ -255,11 +316,13 @@ func (query DeviceQuery) DownloadDeviceDataByRange(id uint, pIDs []string, from 
 	for i, data := range deviceData {
 		axis := 65
 		result.File.SetCellValue("Sheet1", fmt.Sprintf("A%d", i+3), time.Unix(data.Timestamp, 0).Format("2006-01-02 15:04:05"))
-		for _, property := range data.Properties {
-			if _, ok := downloadKeys[property.Key]; ok {
-				for _, v := range property.Data {
-					axis += 1
-					result.File.SetCellValue("Sheet1", fmt.Sprintf("%s%d", string(rune(axis)), i+3), v)
+		if properties, ok := data.Values.(vo.Properties); ok {
+			for _, property := range properties {
+				if _, ok := downloadKeys[property.Key]; ok {
+					for _, v := range property.Data {
+						axis += 1
+						result.File.SetCellValue("Sheet1", fmt.Sprintf("%s%d", string(rune(axis)), i+3), v)
+					}
 				}
 			}
 		}
@@ -284,7 +347,32 @@ func (query DeviceQuery) FindWaveDataByRange(id uint, from time.Time, to time.Ti
 	return result, nil
 }
 
-func (query DeviceQuery) GetWaveDataByTimestamp(id uint, timestamp int64, calc string, dimension int) (*vo.WaveData, error) {
+func getKxSensorData(value entity.AxisSensorData, calc string) vo.KxData {
+	result := vo.NewKxData(value)
+	switch calc {
+	case "accelerationTimeDomain":
+		domain := value.AccelerationTimeDomain()
+		result.SetTimeDomainValues(domain)
+		result.SetEnvelopeValues(value.Envelope(domain))
+	case "accelerationFrequencyDomain":
+		result.SetFrequencyDomainValues(value.AccelerationFrequencyDomain())
+	case "velocityTimeDomain":
+		domain := value.VelocityTimeDomain()
+		result.SetTimeDomainValues(domain)
+		result.SetEnvelopeValues(value.Envelope(domain))
+	case "velocityFrequencyDomain":
+		result.SetFrequencyDomainValues(value.VelocityFrequencyDomain())
+	case "displacementTimeDomain":
+		domain := value.DisplacementTimeDomain()
+		result.SetTimeDomainValues(domain)
+		result.SetEnvelopeValues(value.Envelope(domain))
+	case "displacementFrequencyDomain":
+		result.SetFrequencyDomainValues(value.DisplacementFrequencyDomain())
+	}
+	return result
+}
+
+func (query DeviceQuery) GetWaveDataByTimestamp(id uint, timestamp int64, calc string, dimension int) (*vo.KxData, error) {
 	device, err := query.check(id)
 	if err != nil {
 		return nil, err
@@ -299,7 +387,7 @@ func (query DeviceQuery) GetWaveDataByTimestamp(id uint, timestamp int64, calc s
 		return nil, err
 	}
 	axis := []entity.AxisSensorData{svtRawData.XAxis, svtRawData.YAxis, svtRawData.ZAxis}[dimension]
-	result := vo.NewWaveData(axis)
+	result := vo.NewKxData(axis)
 	switch calc {
 	case "accelerationTimeDomain":
 		result.SetTimeDomainValues(axis.AccelerationTimeDomain())

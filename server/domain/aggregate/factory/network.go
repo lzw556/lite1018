@@ -30,7 +30,7 @@ func NewNetwork() Network {
 	}
 }
 
-func (factory Network) NewNetworkQuery(filters ...request.Filter) *query.NetworkQuery {
+func (factory Network) NewNetworkQuery(filters request.Filters) *query.NetworkQuery {
 	q := query.NewNetworkQuery()
 	q.Specs = factory.buildSpecs(filters)
 	return &q
@@ -187,10 +187,10 @@ func (factory Network) NewNetworkRemoveCmd(networkID uint) (*command.NetworkRemo
 
 func (factory Network) buildSpecs(filters request.Filters) []spec.Specification {
 	specs := make([]spec.Specification, 0)
-	for _, filter := range filters {
-		switch filter.Name {
+	for name, v := range filters {
+		switch name {
 		case "project_id":
-			specs = append(specs, spec.ProjectEqSpec(cast.ToUint(filter.Value)))
+			specs = append(specs, spec.ProjectEqSpec(cast.ToUint(v)))
 		}
 	}
 	return specs

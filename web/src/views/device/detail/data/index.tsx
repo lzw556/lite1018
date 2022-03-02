@@ -5,7 +5,7 @@ import {Content} from "antd/lib/layout/layout";
 import {Device} from "../../../../types/device";
 import moment from "moment";
 import {EmptyLayout} from "../../../layout";
-import {GetDeviceDataRequest, RemoveDeviceDataRequest} from "../../../../apis/device";
+import {FindDeviceDataRequest, RemoveDeviceDataRequest} from "../../../../apis/device";
 import HasPermission from "../../../../permission";
 import {Permission} from "../../../../permission/permission";
 import Label from "../../../../components/label";
@@ -28,7 +28,7 @@ const HistoryDataPage: FC<DeviceDataProps> = ({device}) => {
     const [downloadVisible, setDownloadVisible] = useState<boolean>(false)
 
     const fetchDeviceData = useCallback(() => {
-        GetDeviceDataRequest(device.id, startDate.utc().unix(), endDate.utc().unix()).then(setDataSource)
+        FindDeviceDataRequest(device.id, startDate.utc().unix(), endDate.utc().unix()).then(setDataSource)
     }, [startDate, endDate])
 
     useEffect(() => {
@@ -54,7 +54,7 @@ const HistoryDataPage: FC<DeviceDataProps> = ({device}) => {
             const data = dataSource.map((item: any) => {
                 return {
                     time: moment.unix(item.timestamp).local(),
-                    property: item.properties.find((item: any) => item.key === property.key)
+                    property: item.values.find((item: any) => item.key === property.key)
                 }
             })
             const fields = new Map<string, number[]>()
@@ -71,7 +71,6 @@ const HistoryDataPage: FC<DeviceDataProps> = ({device}) => {
             })
             const legends: string[] = []
             const series: any[] = []
-            console.log(fields)
             Array.from(fields.keys()).forEach((key, index) => {
                 legends.push(key)
                 series.push({

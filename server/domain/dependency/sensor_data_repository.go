@@ -7,9 +7,10 @@ import (
 
 type SensorDataRepository interface {
 	Create(e entity.SensorData) error
-	Find(mac string, from, to time.Time) ([]entity.SensorData, error)
-	Get(mac string, time time.Time) (entity.SensorData, error)
-	Last(mac string) (entity.SensorData, error)
+	Find(mac string, sensorType uint, from, to time.Time) ([]entity.SensorData, error)
+	Get(mac string, sensorType uint, time time.Time) (entity.SensorData, error)
+	Last(mac string, sensorType uint) (entity.SensorData, error)
 	Top(mac string, limit int) ([]entity.SensorData, error)
-	Delete(mac string, from, to time.Time) error
+	Delete(mac string, sensorType uint, from, to time.Time) error
+	Paging(mac string, sensorType uint, from, to time.Time, page, size int) ([]entity.SensorData, int64, error)
 }

@@ -16,4 +16,6 @@ export type Device = {
     network?: Network
     information?: any
     properties: Property[]
+    dataTypes: number[]
+    data?: any
 }

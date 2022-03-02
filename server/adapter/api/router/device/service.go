@@ -22,11 +22,13 @@ type Service interface {
 	GetDeviceSettingsByID(id uint) (vo.DeviceSettings, error)
 	UpdateDeviceSettingByID(id uint, req request.DeviceSetting) error
 
-	FindDeviceDataByID(deviceID uint, from, to int64) ([]vo.DeviceData, error)
-	GetLastDeviceDataByID(deviceID uint) (*vo.DeviceData, error)
-	GetRuntimeDataByID(deviceID uint, from, to int64) ([]vo.SensorRuntimeData, error)
-	FindWaveDataByID(deviceID uint, from, to int64) (vo.LargeSensorDataList, error)
-	GetWaveDataByID(deviceID uint, timestamp int64, calculate string, dimension int) (*vo.WaveData, error)
-	DownloadDeviceDataByID(deviceID uint, pIDs []string, from, to int64) (*vo.ExcelFile, error)
-	RemoveDataByID(deviceID uint, from, to int64) error
+	FindDeviceDataByPaginate(id uint, sensorType uint, from, to int64, page, size int) ([]vo.DeviceData, int64, error)
+	FindDeviceDataByID(id uint, sensorType uint, from, to int64) ([]vo.DeviceData, error)
+	GetDeviceDataByIDAndTimestamp(id uint, sensorType uint, timestamp int64, filters request.Filters) (*vo.DeviceData, error)
+	GetLastDeviceDataByID(id uint) (*vo.DeviceData, error)
+	GetRuntimeDataByID(id uint, from, to int64) ([]vo.SensorRuntimeData, error)
+	//FindWaveDataByID(deviceID uint, from, to int64) (vo.LargeSensorDataList, error)
+	//GetWaveDataByID(deviceID uint, timestamp int64, calculate string, dimension int) (*vo.KxData, error)
+	DownloadDeviceDataByID(id uint, sensorType uint, pIDs []string, from, to int64) (*vo.ExcelFile, error)
+	RemoveDataByID(id uint, sensorType uint, from, to int64) error
 }

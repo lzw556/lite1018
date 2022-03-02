@@ -37,8 +37,16 @@ export function DeleteDeviceRequest(id:number) {
     return request.delete(`/devices/${id}`).then(DeleteResponse)
 }
 
-export function GetDeviceDataRequest(id:number, from:number, to:number) {
+export function PagingDeviceDataRequest(id:number, page:number, size:number, filters:any) {
+    return request.get<PageResult<any>>(`/devices/${id}/data`, {page, size, ...filters}).then(GetResponse)
+}
+
+export function FindDeviceDataRequest(id:number, from:number, to:number) {
     return request.get<any>(`/devices/${id}/data`, {from, to}).then(GetResponse)
+}
+
+export function GetDeviceDataRequest(id:number, timestamp:number, filters:any) {
+    return request.get<any>(`/devices/${id}/data/${timestamp}`, {...filters}).then(GetResponse)
 }
 
 export function GetLastDeviceDataRequest(id:number) {
@@ -91,16 +99,4 @@ export function GetDefaultDeviceSettingsRequest(type: number) {
 
 export function GetDeviceRuntimeDataRequest(id:number, from:number, to:number) {
     return request.get<any>(`/devices/${id}/data/runtime`, {from, to}).then(GetResponse)
-}
-
-export function GetDeviceWaveDataTimestampsRequest(id: number, from: number, to: number) {
-    return request.get<any>(`/devices/${id}/data/wave`, {from, to}).then(GetResponse);
-}
-
-export function GetDeviceWaveDataRequest(id: number, timestamp:number, params: any) {
-    return request.get<WaveData>(`/devices/${id}/data/wave/${timestamp}`, params).then(GetResponse);
-}
-
-export function DownloadDeviceWaveDataRequest(id: number, timestamp:number, params:any) {
-    return request.download<any>(`/devices/${id}/download/data/wave/${timestamp}`, params);
 }

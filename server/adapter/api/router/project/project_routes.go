@@ -32,10 +32,7 @@ func (r projectRouter) find(ctx *gin.Context) (interface{}, error) {
 func (r projectRouter) getMyProjects(ctx *gin.Context) (interface{}, error) {
 	userID := cast.ToUint(ctx.MustGet("user_id"))
 	filters := request.Filters{
-		{
-			Name:  "user_id",
-			Value: userID,
-		},
+		"user_id": userID,
 	}
 	return r.service.FindProjects(filters)
 }

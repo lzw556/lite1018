@@ -58,6 +58,6 @@ func (cmd DeviceRemoveCmd) Run() error {
 	return nil
 }
 
-func (cmd DeviceRemoveCmd) RemoveData(from, to time.Time) error {
-	return cmd.deviceDataRepo.Delete(cmd.Device.MacAddress, from, to)
+func (cmd DeviceRemoveCmd) RemoveData(sensorType uint, from, to time.Time) error {
+	return cmd.deviceDataRepo.Delete(cmd.Device.MacAddress, sensorType, from, to)
 }

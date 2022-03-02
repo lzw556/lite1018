@@ -9,7 +9,6 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/devicetype"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/errcode"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/json"
-	"golang.org/x/sync/errgroup"
 )
 
 func (r deviceRouter) create(ctx *gin.Context) (interface{}, error) {
@@ -92,7 +91,25 @@ func (r deviceRouter) findDataByID(ctx *gin.Context) (interface{}, error) {
 	id := cast.ToUint(ctx.Param("id"))
 	from := cast.ToInt64(ctx.Query("from"))
 	to := cast.ToInt64(ctx.Query("to"))
-	return r.service.FindDeviceDataByID(id, from, to)
+	sensorType := cast.ToUint(ctx.Query("data_type"))
+	if _, ok := ctx.GetQuery("page"); ok {
+		page := cast.ToInt(ctx.Query("page"))
+		size := cast.ToInt(ctx.Query("size"))
+		result, total, err := r.service.FindDeviceDataByPaginate(id, sensorType, from, to, page, size)
+		if err != nil {
+			return nil, err
+		}
+		return response.NewPageResult(page, size, total, result), nil
+	}
+	return r.service.FindDeviceDataByID(id, sensorType, from, to)
+}
+
+func (r deviceRouter) getDataByIDAndTimestamp(ctx *gin.Context) (interface{}, error) {
+	id := cast.ToUint(ctx.Param("id"))
+	timestamp := cast.ToInt64(ctx.Param("timestamp"))
+	sensorType := cast.ToUint(ctx.Query("data_type"))
+	filters := request.NewFilters(ctx)
+	return r.service.GetDeviceDataByIDAndTimestamp(id, sensorType, timestamp, filters)
 }
 
 func (r deviceRouter) findRuntimeDataByID(ctx *gin.Context) (interface{}, error) {
@@ -103,10 +120,11 @@ func (r deviceRouter) findRuntimeDataByID(ctx *gin.Context) (interface{}, error)
 }
 
 func (r deviceRouter) findWaveDataByID(ctx *gin.Context) (interface{}, error) {
-	id := cast.ToUint(ctx.Param("id"))
-	from := cast.ToInt64(ctx.Query("from"))
-	to := cast.ToInt64(ctx.Query("to"))
-	return r.service.FindWaveDataByID(id, from, to)
+	//id := cast.ToUint(ctx.Param("id"))
+	//from := cast.ToInt64(ctx.Query("from"))
+	//to := cast.ToInt64(ctx.Query("to"))
+	//return r.service.FindWaveDataByID(id, from, to)
+	return nil, nil
 }
 
 func (r deviceRouter) getLastDataByID(ctx *gin.Context) (interface{}, error) {
@@ -115,51 +133,55 @@ func (r deviceRouter) getLastDataByID(ctx *gin.Context) (interface{}, error) {
 }
 
 func (r deviceRouter) getWaveDataByID(ctx *gin.Context) (interface{}, error) {
-	id := cast.ToUint(ctx.Param("id"))
-	timestamp := cast.ToInt64(ctx.Param("timestamp"))
-	calculate := ctx.Query("calculate")
-	dimension := cast.ToInt(ctx.Query("dimension"))
-	return r.service.GetWaveDataByID(id, timestamp, calculate, dimension)
+	//id := cast.ToUint(ctx.Param("id"))
+	//timestamp := cast.ToInt64(ctx.Param("timestamp"))
+	//calculate := ctx.Query("calculate")
+	//dimension := cast.ToInt(ctx.Query("dimension"))
+	//return r.service.GetWaveDataByID(id, timestamp, calculate, dimension)
+	return nil, nil
 }
 
 func (r deviceRouter) downloadWaveDataByID(ctx *gin.Context) (interface{}, error) {
-	id := cast.ToUint(ctx.Param("id"))
-	timestamp := cast.ToInt64(ctx.Param("timestamp"))
-	result := make(vo.WaveDataList, 3)
-	var eg errgroup.Group
-	for i := range result {
-		index := i
-		eg.Go(func() error {
-			data, err := r.service.GetWaveDataByID(id, timestamp, ctx.Query("calculate"), index)
-			if err != nil {
-				return err
-			}
-			result[index] = *data
-			return nil
-		})
-	}
-	if err := eg.Wait(); err != nil {
-		return nil, err
-	}
-	return result.ToCsvFile()
+	//id := cast.ToUint(ctx.Param("id"))
+	//timestamp := cast.ToInt64(ctx.Param("timestamp"))
+	//result := make(vo.WaveDataList, 3)
+	//var eg errgroup.Group
+	//for i := range result {
+	//	index := i
+	//	eg.Go(func() error {
+	//		data, err := r.service.GetWaveDataByID(id, timestamp, ctx.Query("calculate"), index)
+	//		if err != nil {
+	//			return err
+	//		}
+	//		result[index] = *data
+	//		return nil
+	//	})
+	//}
+	//if err := eg.Wait(); err != nil {
+	//	return nil, err
+	//}
+	//return result.ToCsvFile()
+	return nil, nil
 }
 
 func (r deviceRouter) downloadDataByID(ctx *gin.Context) (interface{}, error) {
 	id := cast.ToUint(ctx.Param("id"))
 	from := cast.ToInt64(ctx.Query("from"))
 	to := cast.ToInt64(ctx.Query("to"))
+	sensorType := cast.ToUint(ctx.Query("data_type"))
 	var pids []string
 	if err := json.Unmarshal([]byte(ctx.Query("pids")), &pids); err != nil {
 		return nil, err
 	}
-	return r.service.DownloadDeviceDataByID(id, pids, from, to)
+	return r.service.DownloadDeviceDataByID(id, sensorType, pids, from, to)
 }
 
 func (r deviceRouter) removeDataByID(ctx *gin.Context) (interface{}, error) {
 	id := cast.ToUint(ctx.Param("id"))
 	from := cast.ToInt64(ctx.Query("from"))
 	to := cast.ToInt64(ctx.Query("to"))
-	return nil, r.service.RemoveDataByID(id, from, to)
+	sensorType := cast.ToUint(ctx.Query("data_type"))
+	return nil, r.service.RemoveDataByID(id, sensorType, from, to)
 }
 
 func (r deviceRouter) upgrade(ctx *gin.Context) (interface{}, error) {

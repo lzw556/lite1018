@@ -58,7 +58,7 @@ func (s Project) FindProjectsByPaginate(page, size int, filters request.Filters)
 }
 
 func (s Project) FindProjects(filters request.Filters) ([]vo.Project, error) {
-	query := s.factory.NewProjectQuery(filters...)
+	query := s.factory.NewProjectQuery(filters)
 	return query.List()
 }
 
@@ -74,7 +74,7 @@ func (s Project) UpdateProjectByID(id uint, req request.Project) error {
 }
 
 func (s Project) GetAllocUsersByID(id uint) ([]vo.AllocUser, error) {
-	query := s.factory.NewProjectQuery()
+	query := s.factory.NewProjectQuery(nil)
 	return query.GetAllocUsersByID(id)
 }
 

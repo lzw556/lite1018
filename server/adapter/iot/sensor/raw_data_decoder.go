@@ -1,5 +1,5 @@
 package sensor
 
 type RawDataDecoder interface {
-	Decode(data []byte) ([]byte, error)
+	Decode(data []byte) (map[string]interface{}, error)
 }

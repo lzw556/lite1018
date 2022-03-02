@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-type WaveData struct {
+type KxData struct {
 	Frequency     uint32    `json:"frequency"`
 	Values        []float64 `json:"values,omitempty"`
 	XAxis         []int     `json:"xAxis,omitempty"`
@@ -16,14 +16,14 @@ type WaveData struct {
 	XAxisUnit     string    `json:"xAxisUnit"`
 }
 
-func NewWaveData(axis entity.AxisSensorData) WaveData {
-	m := WaveData{
+func NewKxData(axis entity.AxisSensorData) KxData {
+	m := KxData{
 		Frequency: axis.Metadata.Odr,
 	}
 	return m
 }
 
-func (data *WaveData) SetFrequencyDomainValues(values [][2]float64) {
+func (data *KxData) SetFrequencyDomainValues(values [][2]float64) {
 	data.Values = make([]float64, len(values))
 	data.XAxis = make([]int, len(values))
 	data.XAxisUnit = "Hz"
@@ -33,7 +33,7 @@ func (data *WaveData) SetFrequencyDomainValues(values [][2]float64) {
 	}
 }
 
-func (data *WaveData) SetTimeDomainValues(values []float64) {
+func (data *KxData) SetTimeDomainValues(values []float64) {
 	data.Values = make([]float64, len(values))
 	data.XAxis = make([]int, len(values))
 	data.XAxisUnit = "ms"
@@ -43,7 +43,7 @@ func (data *WaveData) SetTimeDomainValues(values []float64) {
 	}
 }
 
-func (data *WaveData) SetEnvelopeValues(high, low []float64) {
+func (data *KxData) SetEnvelopeValues(high, low []float64) {
 	data.HighEnvelopes = make([]float64, len(high))
 	data.LowEnvelopes = make([]float64, len(low))
 	for i := range high {
@@ -52,7 +52,7 @@ func (data *WaveData) SetEnvelopeValues(high, low []float64) {
 	}
 }
 
-type WaveDataList []WaveData
+type WaveDataList []KxData
 
 func (list WaveDataList) ToCsvFile() (*CsvFile, error) {
 	filename := fmt.Sprintf("%s.csv", time.Now().Format("2006-01-02_15-04-05"))

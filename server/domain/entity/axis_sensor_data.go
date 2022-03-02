@@ -4,11 +4,11 @@ import "github.com/thetasensors/theta-cloud-lite/server/pkg/calculate"
 
 type AxisSensorData struct {
 	Metadata struct {
-		Range  uint8  `json:"range"`
-		Odr    uint32 `json:"odr"`
-		Number uint32 `json:"number"`
-	} `json:"metadata"`
-	Values []float64 `json:"values"`
+		Range  uint8  `json:"range" mapstructure:"range"`
+		Odr    uint32 `json:"odr" mapstructure:"odr"`
+		Number uint32 `json:"number" mapstructure:"number"`
+	} `json:"metadata" mapstructure:"metadata"`
+	Values []float64 `json:"values" mapstructure:"values"`
 }
 
 func (axis AxisSensorData) AccelerationTimeDomain() []float64 {

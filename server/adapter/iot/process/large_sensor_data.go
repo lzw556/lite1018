@@ -16,14 +16,14 @@ import (
 )
 
 type LargeSensorData struct {
-	repository dependency.LargeSensorDataRepository
+	repository dependency.SensorDataRepository
 
 	mu sync.RWMutex
 }
 
 func NewLargeSensorData() Processor {
 	return newRoot(&LargeSensorData{
-		repository: repository.LargeSensorData{},
+		repository: repository.SensorData{},
 		mu:         sync.RWMutex{},
 	})
 }
@@ -56,19 +56,19 @@ func (p *LargeSensorData) Process(ctx *iot.Context, msg iot.Message) error {
 				return fmt.Errorf("get cache failed: %v", err)
 			}
 			if receiver.Receive(m.SeqId, m.Data); receiver.IsCompleted() {
-				e := entity.LargeSensorData{
+				e := entity.SensorData{
 					Time:       time.UnixMilli(int64(receiver.Timestamp)),
-					SensorType: receiver.SensorType,
+					SensorType: uint(receiver.SensorType),
 					MacAddress: device.MacAddress,
 				}
 				var decoder sensor.RawDataDecoder
 				switch receiver.SensorType {
-				case devicetype.Kx122Sensor:
+				case devicetype.KxSensor:
 					decoder = sensor.NewKx122Decoder()
 				}
 				if data, err := decoder.Decode(receiver.Bytes()); err == nil {
-					e.Data = data
-					if err := p.repository.Create(&e); err != nil {
+					e.Values = data
+					if err := p.repository.Create(e); err != nil {
 						return fmt.Errorf("create large sensor data failed: %v", err)
 					}
 				} else {

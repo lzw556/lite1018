@@ -13,6 +13,7 @@ type Device struct {
 	Sensors    map[string]interface{} `json:"sensors,omitempty"`
 	System     map[string]interface{} `json:"system,omitempty"`
 	Category   uint                   `json:"category"`
+	DataTypes  []uint                 `json:"dataTypes"`
 
 	Network       *Network                    `json:"network,omitempty"`
 	Information   entity.DeviceInformation    `json:"information"`
@@ -20,6 +21,7 @@ type Device struct {
 	Properties    Properties                  `json:"properties,omitempty"`
 	UpgradeStatus *entity.DeviceUpgradeStatus `json:"upgradeStatus,omitempty"`
 	AlertStates   []AlertState                `json:"alertStates,omitempty"`
+	Data          *DeviceData                 `json:"data,omitempty"`
 }
 
 func NewDevice(e entity.Device) Device {
@@ -55,4 +57,8 @@ func (d *Device) SetAlertStates(es []entity.DeviceAlertState) {
 		d.AlertStates[i].Record.ID = e.Record.ID
 		d.AlertStates[i].Record.Value = e.Record.Value
 	}
+}
+
+func (d *Device) SetDataTypes(t uint) {
+	d.DataTypes = []uint{t}
 }

@@ -5,8 +5,6 @@ import (
 )
 
 type SvtRawData struct {
-	Metadata [3]struct {
-	}
 	XAxis AxisSensorData `json:"xAxis"`
 	YAxis AxisSensorData `json:"yAxis"`
 	ZAxis AxisSensorData `json:"zAxis"`

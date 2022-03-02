@@ -9,22 +9,19 @@ type Filter struct {
 	Value interface{} `json:"value"`
 }
 
-type Filters []Filter
+type Filters map[string]interface{}
 
 func NewFilters(ctx *gin.Context) Filters {
-	filters := make(Filters, 0)
+	filters := make(Filters)
 	for k, v := range ctx.Request.URL.Query() {
 		if len(v) == 1 {
-			filters = append(filters, Filter{Name: k, Value: v[0]})
+			filters[k] = v[0]
 		} else {
-			filters = append(filters, Filter{Name: k, Value: v})
+			filters[k] = v
 		}
 	}
 	if projectID, ok := ctx.Get("project_id"); ok {
-		filters = append(filters, Filter{
-			Name:  "project_id",
-			Value: projectID,
-		})
+		filters["project_id"] = projectID
 	}
 	return filters
 }

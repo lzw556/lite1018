@@ -2,7 +2,7 @@ import {Device} from "../../../../types/device";
 import {FC, useEffect, useState} from "react";
 import {Button, Card, Col, DatePicker, Empty, Row, Select, Space} from "antd";
 import {DeviceType} from "../../../../types/device_type";
-import {GetChildrenRequest, GetDeviceDataRequest} from "../../../../apis/device";
+import {GetChildrenRequest, FindDeviceDataRequest} from "../../../../apis/device";
 import moment from "moment";
 import {DefaultMonitorDataOption, LineChartStyles} from "../../../../constants/chart";
 import ReactECharts from "echarts-for-react";
@@ -45,7 +45,7 @@ const MonitorPage: FC<MonitorPageProps> = ({device}) => {
 
     const fetchDeviceData = (id: number) => {
         setSelectedDevice(id)
-        GetDeviceDataRequest(id, startDate.utc().unix(), endDate.utc().unix()).then(data => {
+        FindDeviceDataRequest(id, startDate.utc().unix(), endDate.utc().unix()).then(data => {
         })
     }
 
