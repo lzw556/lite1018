@@ -6,15 +6,15 @@ import (
 	"sort"
 )
 
-type MenusQuery struct {
+type MenuQuery struct {
 	entity.Menus
 }
 
-func NewMenusQuery() MenusQuery {
-	return MenusQuery{}
+func NewMenuQuery() MenuQuery {
+	return MenuQuery{}
 }
 
-func (query MenusQuery) MenuTrees() vo.Menus {
+func (query MenuQuery) MenuTrees() vo.Menus {
 	result := make(vo.Menus, 0)
 	for _, e := range query.Menus {
 		if e.ParentID == 0 {

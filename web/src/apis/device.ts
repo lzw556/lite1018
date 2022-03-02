@@ -98,7 +98,7 @@ export function GetDeviceWaveDataTimestampsRequest(id: number, from: number, to:
 }
 
 export function GetDeviceWaveDataRequest(id: number, timestamp:number, params: any) {
-    return request.get<WaveData[]>(`/devices/${id}/data/wave/${timestamp}`, params).then(GetResponse);
+    return request.get<WaveData>(`/devices/${id}/data/wave/${timestamp}`, params).then(GetResponse);
 }
 
 export function DownloadDeviceWaveDataRequest(id: number, timestamp:number, params:any) {

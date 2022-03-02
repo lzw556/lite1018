@@ -10,7 +10,7 @@ let socket: any = null
 export const SocketTopic = {
     connectionState: "connectionState",
     upgradeStatus: "upgradeStatus",
-    alert: "alert"
+    deviceAlert: "deviceAlert",
 }
 
 const useSocket = () => {
@@ -46,9 +46,14 @@ const useSocket = () => {
                     })
                 }
             })
-            socket.on("socket::measurementAlertMessage", (res: ResponseResult<any>) => {
+            socket.on("socket::deviceAlertStateEvent", (res: ResponseResult<any>) => {
                 if (res.code === 200) {
-                    PubSub.publish(SocketTopic.alert, res.data)
+                    PubSub.publish(SocketTopic.deviceAlert, {
+                        device: res.data.device,
+                        metric: res.data.metric,
+                        value: res.data.value,
+                        level: res.data.level,
+                    })
                 }
             })
         }

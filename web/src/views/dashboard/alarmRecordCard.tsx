@@ -2,7 +2,6 @@ import ShadowCard from "../../components/shadowCard";
 import {Divider, List, Skeleton, Typography} from "antd";
 import InfiniteScroll from "react-infinite-scroll-component";
 import {useEffect, useState} from "react";
-import {PagingAlarmRecordsRequest} from "../../apis/alarm";
 import moment from "moment";
 import {GetFieldName} from "../../constants/field";
 import {OperationTranslate} from "../../constants/rule";
@@ -22,13 +21,13 @@ const AlarmRecordCard = () => {
 
     const fetchAlarmRecords = (current: number) => {
         setIsLoading(true)
-        PagingAlarmRecordsRequest(current, 10, startDate.utc().unix(), endDate.utc().unix(), {})
-            .then(data => {
-                setIsLoading(false)
-                setRecords([...records, ...data.result])
-                setTotal(data.total)
-                setCurrent(data.page)
-            })
+        // PagingAlarmRecordsRequest(current, 10, startDate.utc().unix(), endDate.utc().unix(), {})
+        //     .then(data => {
+        //         setIsLoading(false)
+        //         setRecords([...records, ...data.result])
+        //         setTotal(data.total)
+        //         setCurrent(data.page)
+        //     })
     }
 
     useEffect(() => {

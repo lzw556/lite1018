@@ -16,6 +16,7 @@ type DeviceSetting struct {
 	Children DeviceSettings `json:"children"`
 	Show     interface{}    `json:"show"`
 	Sort     int            `json:"sort"`
+	Group    string         `json:"group"`
 }
 
 func NewDeviceSetting(e devicetype.Setting) DeviceSetting {
@@ -29,6 +30,7 @@ func NewDeviceSetting(e devicetype.Setting) DeviceSetting {
 		Show:     e.Show,
 		Category: string(e.Category),
 		Sort:     e.Sort,
+		Group:    e.Group,
 	}
 }
 

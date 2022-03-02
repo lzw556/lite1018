@@ -52,6 +52,7 @@ const DeviceDetailPage = () => {
     const [currentKey, setCurrentKey] = useState<string>('');
     const {hasPermission, hasPermissions} = userPermission();
     const [upgradeVisible, setUpgradeVisible] = useState<boolean>(false)
+    const [upgradeStatus, setUpgradeStatus] = useState<any>()
 
     const contents = new Map<string, any>([
         ["settings", device && <SettingPage device={device}/>],
@@ -88,6 +89,11 @@ const DeviceDetailPage = () => {
                     setDevice({...device, state: {...device.state, isOnline: state.isOnline}})
                 }
             })
+            PubSub.subscribe(SocketTopic.upgradeStatus, (msg:string, status:any) => {
+                if (device.macAddress === status.macAddress) {
+                    setUpgradeStatus({code: status.code, progress: status.progress});
+                }
+            });
             if(device.typeId===DeviceType.Gateway||device.typeId===DeviceType.Router){
                 setCurrentKey(tabList[0].key)
             }else{
@@ -95,6 +101,7 @@ const DeviceDetailPage = () => {
             }
         }
         return () => {
+            PubSub.unsubscribe(SocketTopic.upgradeStatus);
             PubSub.unsubscribe(SocketTopic.connectionState)
         }
     }, [device])
@@ -156,7 +163,7 @@ const DeviceDetailPage = () => {
 
     const renderCommandMenu = () => {
         const isOnline = device && device.state.isOnline
-        const isUpgrading = device && device.upgradeStatus && IsUpgrading(device.upgradeStatus.code)
+        const isUpgrading = device && upgradeStatus && IsUpgrading(upgradeStatus.code)
         return <Menu onClick={onCommand}>
             <Menu.Item key={DeviceCommand.Reboot} disabled={!isOnline} hidden={isUpgrading}>重启</Menu.Item>
             {

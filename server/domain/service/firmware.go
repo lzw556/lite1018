@@ -57,15 +57,8 @@ func (s Firmware) CreateFirmware(req request.Firmware) error {
 }
 
 func (s Firmware) FindFirmwaresByPaginate(page, size int) (vo.Firmwares, int64, error) {
-	es, total, err := s.repository.FindByPaginate(context.TODO(), page, size)
-	if err != nil {
-		return nil, 0, err
-	}
-	result := make(vo.Firmwares, len(es))
-	for i, e := range es {
-		result[i] = vo.NewFirmware(e)
-	}
-	return result, total, nil
+	query := s.factory.NewFirmwareQuery()
+	return query.Paging(page, size)
 }
 
 func (s Firmware) DeleteFirmwareByID(firmwareID uint) error {
@@ -83,9 +76,6 @@ func (s Firmware) DeleteFirmwareByID(firmwareID uint) error {
 }
 
 func (s Firmware) FindFirmwaresByDeviceID(deviceID uint) (vo.Firmwares, error) {
-	query, err := s.factory.NewFirmwaresQuery(deviceID)
-	if err != nil {
-		return nil, err
-	}
-	return query.Query(), nil
+	query := s.factory.NewFirmwareQuery()
+	return query.FindByDeviceID(deviceID)
 }

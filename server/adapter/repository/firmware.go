@@ -20,7 +20,7 @@ func (repo Firmware) GetBySpecs(ctx context.Context, specs ...spec.Specification
 	return e, err
 }
 
-func (repo Firmware) FindByPaginate(ctx context.Context, page, size int) ([]entity.Firmware, int64, error) {
+func (repo Firmware) Paging(ctx context.Context, page, size int) ([]entity.Firmware, int64, error) {
 	db := repo.DB(ctx).Model(&entity.Firmware{})
 	var total int64
 	if err := db.Count(&total).Error; err != nil {

@@ -24,10 +24,10 @@ func NewMenu() Menu {
 	}
 }
 
-func (factory Menu) NewMenusQueryByUserID(id uint) (*query.MenusQuery, error) {
+func (factory Menu) NewMenuQueryByUserID(id uint) (*query.MenuQuery, error) {
 	ctx := context.TODO()
 	var err error
-	q := query.NewMenusQuery()
+	q := query.NewMenuQuery()
 	user, err := factory.userRepo.Get(ctx, id)
 	if err != nil {
 		return nil, response.BusinessErr(errcode.UserNotFoundError, "")

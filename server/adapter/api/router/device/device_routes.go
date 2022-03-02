@@ -9,6 +9,7 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/devicetype"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/errcode"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/json"
+	"golang.org/x/sync/errgroup"
 )
 
 func (r deviceRouter) create(ctx *gin.Context) (interface{}, error) {
@@ -36,7 +37,7 @@ func (r deviceRouter) find(ctx *gin.Context) (interface{}, error) {
 		}
 		return response.NewPageResult(page, size, total, result), nil
 	}
-	return r.service.FilterDevices(filters)
+	return r.service.FindDevices(filters)
 }
 
 func (r deviceRouter) update(ctx *gin.Context) (interface{}, error) {
@@ -82,12 +83,6 @@ func (r deviceRouter) checkMacAddress(ctx *gin.Context) (interface{}, error) {
 	return nil, r.service.CheckDeviceMacAddress(mac)
 }
 
-func (r deviceRouter) replaceByID(ctx *gin.Context) (interface{}, error) {
-	id := cast.ToUint(ctx.Param("id"))
-	mac := ctx.Param("mac")
-	return nil, r.service.ReplaceDeviceByID(id, mac)
-}
-
 func (r deviceRouter) delete(ctx *gin.Context) (interface{}, error) {
 	id := cast.ToUint(ctx.Param("id"))
 	return nil, r.service.DeleteDeviceByID(id)
@@ -123,14 +118,27 @@ func (r deviceRouter) getWaveDataByID(ctx *gin.Context) (interface{}, error) {
 	id := cast.ToUint(ctx.Param("id"))
 	timestamp := cast.ToInt64(ctx.Param("timestamp"))
 	calculate := ctx.Query("calculate")
-	return r.service.GetWaveDataByID(id, timestamp, calculate)
+	dimension := cast.ToInt(ctx.Query("dimension"))
+	return r.service.GetWaveDataByID(id, timestamp, calculate, dimension)
 }
 
 func (r deviceRouter) downloadWaveDataByID(ctx *gin.Context) (interface{}, error) {
 	id := cast.ToUint(ctx.Param("id"))
 	timestamp := cast.ToInt64(ctx.Param("timestamp"))
-	result, err := r.service.GetWaveDataByID(id, timestamp, ctx.Query("calculate"))
-	if err != nil {
+	result := make(vo.WaveDataList, 3)
+	var eg errgroup.Group
+	for i := range result {
+		index := i
+		eg.Go(func() error {
+			data, err := r.service.GetWaveDataByID(id, timestamp, ctx.Query("calculate"), index)
+			if err != nil {
+				return err
+			}
+			result[index] = *data
+			return nil
+		})
+	}
+	if err := eg.Wait(); err != nil {
 		return nil, err
 	}
 	return result.ToCsvFile()
@@ -152,11 +160,6 @@ func (r deviceRouter) removeDataByID(ctx *gin.Context) (interface{}, error) {
 	from := cast.ToInt64(ctx.Query("from"))
 	to := cast.ToInt64(ctx.Query("to"))
 	return nil, r.service.RemoveDataByID(id, from, to)
-}
-
-func (r deviceRouter) getChildren(ctx *gin.Context) (interface{}, error) {
-	id := cast.ToUint(ctx.Param("id"))
-	return r.service.GetChildren(id)
 }
 
 func (r deviceRouter) upgrade(ctx *gin.Context) (interface{}, error) {

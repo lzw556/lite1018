@@ -2,6 +2,7 @@ package query
 
 import (
 	"context"
+	"fmt"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
@@ -13,20 +14,23 @@ import (
 type AlarmRuleQuery struct {
 	Specs spec.Specifications
 
-	alarmRuleRepo   dependency.AlarmRuleRepository
-	alarmSourceRepo dependency.AlarmSourceRepository
-	deviceRepo      dependency.DeviceRepository
+	alarmRuleRepo        dependency.AlarmRuleRepository
+	alarmSourceRepo      dependency.AlarmSourceRepository
+	deviceRepo           dependency.DeviceRepository
+	deviceAlertStateRepo dependency.DeviceAlertStateRepository
 }
 
 func NewAlarmRuleQuery() AlarmRuleQuery {
 	return AlarmRuleQuery{
-		alarmRuleRepo:   repository.AlarmRule{},
-		alarmSourceRepo: repository.AlarmSource{},
-		deviceRepo:      repository.Device{},
+		alarmRuleRepo:        repository.AlarmRule{},
+		alarmSourceRepo:      repository.AlarmSource{},
+		deviceRepo:           repository.Device{},
+		deviceAlertStateRepo: repository.DeviceAlertState{},
 	}
 }
 
 func (query AlarmRuleQuery) Paging(page, size int) ([]vo.AlarmRule, int64, error) {
+	fmt.Println(query.Specs)
 	es, total, err := query.alarmRuleRepo.PagingBySpecs(context.TODO(), page, size, query.Specs...)
 	if err != nil {
 		return nil, 0, err
@@ -34,6 +38,7 @@ func (query AlarmRuleQuery) Paging(page, size int) ([]vo.AlarmRule, int64, error
 	result := make([]vo.AlarmRule, len(es))
 	for i, e := range es {
 		result[i] = vo.NewAlarmRule(e)
+		query.setSources(&result[i])
 	}
 	return result, total, nil
 }
@@ -44,41 +49,29 @@ func (query AlarmRuleQuery) Get(id uint) (*vo.AlarmRule, error) {
 		return nil, err
 	}
 	result := vo.NewAlarmRule(e)
+	query.setSources(&result)
+	return &result, nil
+}
+
+func (query AlarmRuleQuery) setSources(alarmRule *vo.AlarmRule) {
 	sourceIDs := make([]uint, 0)
-	if es, err := query.alarmSourceRepo.FindBySpecs(context.TODO(), spec.AlarmRuleEqSpec(e.ID)); err == nil {
+	if es, err := query.alarmSourceRepo.FindBySpecs(context.TODO(), spec.AlarmRuleEqSpec(alarmRule.ID)); err == nil {
 		for _, source := range es {
 			sourceIDs = append(sourceIDs, source.SourceID)
 		}
 	}
-	if strings.HasPrefix(result.SourceType, entity.AlarmSourceTypeDevice) {
+	if strings.HasPrefix(alarmRule.SourceType, entity.AlarmSourceTypeDevice) {
 		es, err := query.deviceRepo.FindBySpecs(context.TODO(), spec.PrimaryKeyInSpec(sourceIDs))
 		if err != nil {
-			return nil, err
+			return
 		}
 		sources := make([]vo.Device, len(es))
 		for i, device := range es {
 			sources[i] = vo.NewDevice(device)
-		}
-		result.Sources = sources
-	}
-	return &result, nil
-}
-
-func (query AlarmRuleQuery) getSources(ids []uint, typ string) []vo.AlarmSource {
-	var result []vo.AlarmSource
-	switch typ {
-	case entity.AlarmSourceTypeDevice:
-		es, err := query.deviceRepo.FindBySpecs(context.TODO(), spec.PrimaryKeyInSpec(ids))
-		if err != nil {
-			return nil
-		}
-		result = make([]vo.AlarmSource, len(es))
-		for i, e := range es {
-			result[i] = vo.AlarmSource{
-				ID:   e.ID,
-				Name: e.Name,
+			if alerts, err := query.deviceAlertStateRepo.Find(device.MacAddress); err == nil {
+				sources[i].SetAlertStates(alerts)
 			}
 		}
+		alarmRule.Sources = sources
 	}
-	return result
 }

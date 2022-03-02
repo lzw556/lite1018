@@ -23,7 +23,7 @@ func NewMenu() menu.Service {
 }
 
 func (s Menu) GetMenusByUserID(userID uint) (vo.Menus, error) {
-	query, err := s.factory.NewMenusQueryByUserID(userID)
+	query, err := s.factory.NewMenuQueryByUserID(userID)
 	if err != nil {
 		return nil, err
 	}

@@ -2,12 +2,14 @@ import {Device} from "../../../../types/device";
 import {FC, useEffect, useState} from "react";
 import {GetDeviceSettingRequest, UpdateDeviceSettingRequest} from "../../../../apis/device";
 import "../../index.css"
-import {Button, Col, Form, Row, Skeleton} from "antd";
+import {Button, Col, Divider, Form, Row, Skeleton} from "antd";
 import {EmptyLayout} from "../../../layout";
 import {DeviceSetting} from "../../../../types/device_setting";
 import DeviceSettingFormItem from "../../../../components/formItems/deviceSettingFormItem";
 import {defaultValidateMessages} from "../../../../constants/validator";
 import {DeviceType} from "../../../../types/device_type";
+import { SETTING_GROUPS } from "../../../../constants/settingGroup";
+import { DeviceSettingContent } from "../../DeviceSettingContent";
 
 export interface SettingPageProps {
     device: Device
@@ -26,14 +28,6 @@ const SettingPage: FC<SettingPageProps> = ({device}) => {
         })
     }, [device])
 
-    const renderSetting = () => {
-        if (device.typeId !== DeviceType.Router && settings) {
-            return settings.map(setting => (
-                <DeviceSettingFormItem editable={true} value={setting} key={setting.key}/>))
-        }
-        return <EmptyLayout description={"暂无配置信息"}/>
-    }
-
     const onSave = () => {
         form.validateFields().then(values => {
             UpdateDeviceSettingRequest(device.id, values).then()
@@ -44,9 +38,7 @@ const SettingPage: FC<SettingPageProps> = ({device}) => {
         <Row justify={"start"}>
             <Col xxl={8} xl={10}>
                 <Form form={form} labelCol={{xl: 7, xxl: 6}} validateMessages={defaultValidateMessages}>
-                    {
-                        renderSetting()
-                    }
+                   <DeviceSettingContent deviceType={device.typeId} settings={settings}/>
                 </Form>
             </Col>
         </Row>

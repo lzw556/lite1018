@@ -6,12 +6,16 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/response"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/iot/background"
 	pd "github.com/thetasensors/theta-cloud-lite/server/adapter/iot/proto"
+	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/errcode"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/json"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/xlog"
+	"golang.org/x/sync/errgroup"
 	"time"
 )
+
+var deviceStateRepo = repository.DeviceState{}
 
 func Execute(gateway, device entity.Device, t Type) error {
 	var cmd Request
@@ -76,7 +80,6 @@ func SyncNetworkLinkStatus(network entity.Network, devices []entity.Device, time
 		}
 	}
 	xlog.Infof("starting sync devices link status => [%s]", gateway.MacAddress)
-	//if gateway.GetConnectionState().IsOnline {
 	cmd := newGetAllLinkStatusCmd()
 	payload, err := cmd.Execute(context.TODO(), gateway.MacAddress, gateway.MacAddress, timeout)
 	if err != nil {
@@ -93,20 +96,33 @@ func SyncNetworkLinkStatus(network entity.Network, devices []entity.Device, time
 		State int    `json:"state"`
 	}
 	if err := json.Unmarshal([]byte(m.AllStatus), &result); err != nil {
-		xlog.Errorf("unmarshal [DeviceStatus] failed:%v", err)
+		xlog.Errorf("unmarshal [AllStatus] failed:%v", err)
 		return
 	}
 	statusMap := make(map[string]bool)
 	for _, r := range result {
-		statusMap[r.Mac] = r.State == 3
+		if r.Mac != gateway.MacAddress {
+			statusMap[r.Mac] = r.State == 3
+		}
 	}
-	//for _, device := range devices {
-	//if isOnline, ok := statusMap[device.MacAddress]; ok {
-	//	device.UpdateConnectionState(isOnline)
-	//}
-	//}
+	var eg errgroup.Group
+	for i := range devices {
+		device := devices[i]
+		eg.Go(func() error {
+			if state, err := deviceStateRepo.Get(device.MacAddress); err == nil {
+				if isOnline, ok := statusMap[device.MacAddress]; ok {
+					state.IsOnline = isOnline
+					state.Notify(device.MacAddress)
+				}
+			}
+			return nil
+		})
+	}
+	if err := eg.Wait(); err != nil {
+		xlog.Errorf("sync devices link status failed:%v => [%s]", gateway.MacAddress)
+		return
+	}
 	xlog.Infof("sync devices link status successful=> [%s]", gateway.MacAddress)
-	//}
 }
 
 func SyncWsnSettings(network entity.Network, gateway entity.Device, isSyncWsnOnly bool, timeout time.Duration) error {

@@ -1,15 +1,14 @@
-import {Button, Card, Col, Form, Input, message, Radio, Row, Select, Space, Table, Typography} from "antd";
+import {Button, Card, Col, Form, Input, message, Radio, Result, Row, Select, Space, Table, Typography} from "antd";
 import {Content} from "antd/lib/layout/layout";
 import {useCallback, useEffect, useState} from "react";
-import {useHistory} from "react-router-dom";
-import {AddAlarmRuleRequest, CheckAlarmNameRequest, PagingAlarmTemplateRequest} from "../../../apis/alarm";
+import {AddAlarmRuleRequest, CheckAlarmRuleNameRequest} from "../../../apis/alarm";
 import MyBreadcrumb from "../../../components/myBreadcrumb";
 import ShadowCard from "../../../components/shadowCard";
 import SourceSelectModal from "./modal/sourceSelectModal";
 import {DeleteOutlined} from "@ant-design/icons";
 import {defaultValidateMessages, Normalizes, Rules} from "../../../constants/validator";
 
-const {Option} = Select
+const {Option} = Select;
 
 const AddAlarmRule = () => {
     const [selectedTemplates, setSelectedTemplates] = useState<number[]>([])
@@ -17,7 +16,7 @@ const AddAlarmRule = () => {
     const [visible, setVisible] = useState<boolean>(false)
     const [selected, setSelected] = useState<any>()
     const [form] = Form.useForm()
-    const history = useHistory()
+    const [success, setSuccess] = useState<boolean>(false)
 
     const fetchAlarmTemplates = useCallback((current: number, size: number) => {
     }, [])
@@ -36,8 +35,9 @@ const AddAlarmRule = () => {
             values.source_ids = selected.sources.map((item:any) => item.id)
             values.source_type = selected.sourceType
             values.metric = selected.metric
+            values.threshold = parseFloat(values.threshold)
             AddAlarmRuleRequest(values).then(data => {
-                console.log(data);
+                setSuccess(true)
             })
         }).catch(err => {
             message.error(err)
@@ -50,7 +50,13 @@ const AddAlarmRule = () => {
                 reject("输入不能为空")
                 return
             }
-            CheckAlarmNameRequest(value).then(_ => resolve()).catch(_ => reject("该名称已存在"))
+            CheckAlarmRuleNameRequest(value).then(data => {
+                if (data) {
+                    resolve()
+                }else {
+                    reject("该名称已存在")
+                }
+            }).catch(_ => reject("该名称已存在"))
         })
     }
 
@@ -102,13 +108,13 @@ const AddAlarmRule = () => {
         }
     ]
 
-    return <Content>
-        <MyBreadcrumb/>
-        <Form form={form} validateMessages={defaultValidateMessages}>
+    const renderAlarmRuleForm = () => {
+        return <Form form={form} validateMessages={defaultValidateMessages}>
             <ShadowCard>
                 <Row justify={"space-between"}>
                     <Col span={24}>
-                        <Form.Item label={"规则名称"} labelCol={{span: 2}} wrapperCol={{span: 8}} name={"name"} required>
+                        <Form.Item label={"规则名称"} labelCol={{span: 2}} wrapperCol={{span: 8}} name={"name"} required
+                                   rules={[{validator: onNameValidator}]}>
                             <Input placeholder={"请输入规则名称"}/>
                         </Form.Item>
                     </Col>
@@ -177,15 +183,16 @@ const AddAlarmRule = () => {
                                     <Card>
                                         <Row justify={"space-between"}>
                                             <Col span={3}>
-                                                <Typography.Text>触发条件</Typography.Text>
+                                                <Typography.Text strong>触发条件</Typography.Text>
                                             </Col>
                                             <Col span={20}>
                                                 <Space>
-                                                    <Typography.Text>当<Typography.Text
-                                                        mark>监控对象</Typography.Text>连续</Typography.Text>
-                                                    <Form.Item name={["duration"]} noStyle rules={[Rules.number]}>
+                                                    <Typography.Text type={"secondary"}>
+                                                        当<Typography.Text strong>监控对象</Typography.Text>连续
+                                                    </Typography.Text>
+                                                    <Form.Item name={["duration"]} normalize={Normalizes.number} noStyle rules={[Rules.number]}>
                                                         <Input size={"small"} style={{width: "64px"}}/>
-                                                    </Form.Item>个周期内
+                                                    </Form.Item><Typography.Text type={"secondary"}>个周期内</Typography.Text>
                                                     <Form.Item name={["operation"]} noStyle>
                                                         <Select size={"small"} style={{width: "64px"}}>
                                                             <Option key={">"} value={">"}>&gt;</Option>
@@ -194,10 +201,9 @@ const AddAlarmRule = () => {
                                                             <Option key={"<="} value={"<="}>&lt;=</Option>
                                                         </Select>
                                                     </Form.Item>
-                                                    <Form.Item name={["threshold"]} normalize={Normalizes.float}
-                                                               rules={[Rules.number]} noStyle>
-                                                        <Input size={"small"} style={{width: "64px"}}/>
-                                                    </Form.Item>时, 产生
+                                                    <Form.Item name={["threshold"]} rules={[Rules.number]} noStyle>
+                                                        <Input size={"small"} style={{width: "64px"}} suffix={selected?.metric?.unit}/>
+                                                    </Form.Item><Typography.Text type={"secondary"}>时, 产生</Typography.Text>
                                                     <Form.Item name={["level"]} noStyle>
                                                         <Select size={"small"}
                                                                 style={{width: "88px"}}>
@@ -205,7 +211,7 @@ const AddAlarmRule = () => {
                                                             <Option key={2} value={2}>重要</Option>
                                                             <Option key={3} value={3}>紧急</Option>
                                                         </Select>
-                                                    </Form.Item>报警
+                                                    </Form.Item><Typography.Text type={"secondary"}>报警</Typography.Text>
                                                 </Space>
                                             </Col>
                                         </Row>
@@ -227,6 +233,32 @@ const AddAlarmRule = () => {
                 </Row>
             </ShadowCard>
         </Form>
+    }
+
+    return <Content>
+        <MyBreadcrumb/>
+        {
+            success ? (<ShadowCard>
+                <Result
+                    status="success"
+                    title="报警规则创建成功!"
+                    subTitle="您可以返回规则列表查看报警规则信息或者继续创建报警规则"
+                    extra={[
+                        <Button type="primary" key="alarmRules" onClick={() => {
+                            window.location.hash = "alarm-management?locale=alarmRules"
+                        }}>
+                            返回规则列表
+                        </Button>,
+                        <Button key="add" onClick={() => {
+                            form.resetFields()
+                            setSelected(undefined)
+                            setSuccess(false)
+                        }}>继续创建报警规则</Button>,
+                    ]}
+                />
+            </ShadowCard>) : renderAlarmRuleForm()
+
+        }
         <SourceSelectModal visible={visible}
                            onCancel={() => setVisible(false)}
                            onSuccess={value => {

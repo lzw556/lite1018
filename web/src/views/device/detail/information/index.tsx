@@ -22,17 +22,16 @@ const InformationCard: FC<GatewayInformationProps> = ({ device, isLoading }) => 
   const [upgradeStatus, setUpgradeStatus] = useState<any>(device.upgradeStatus);
   const { PubSub } = useSocket();
 
-  useEffect(() => {
-    PubSub.subscribe(SocketTopic.upgradeStatus, (msg: string, status: any) => {
-      if (device.macAddress === status.macAddress) {
-        setUpgradeStatus({ code: status.code, progress: status.progress });
-      }
-      setUpgradeStatus({});
-    });
-    return () => {
-      PubSub.unsubscribe(SocketTopic.upgradeStatus);
-    };
-  }, []);
+    useEffect(() => {
+        PubSub.subscribe(SocketTopic.upgradeStatus, (msg:string, status:any) => {
+            if (device.macAddress === status.macAddress) {
+                setUpgradeStatus({code: status.code, progress: status.progress});
+            }
+        });
+        return () => {
+            PubSub.unsubscribe(SocketTopic.upgradeStatus);
+        }
+    }, [])
 
   return (
     <ShadowCard>
@@ -47,10 +46,13 @@ const InformationCard: FC<GatewayInformationProps> = ({ device, isLoading }) => 
                   </Col>
                   <Col span={24}>
                     <Space>
-                      {device.name}
-                      {upgradeStatus && upgradeStatus.id === device.id && (
-                        <DeviceUpgradeSpin status={upgradeStatus.status} />
-                      )}
+                        {
+                            device.name
+                        }
+                        {
+                            upgradeStatus && (
+                                <DeviceUpgradeSpin status={upgradeStatus}/>)
+                        }
                     </Space>
                   </Col>
                 </Row>

@@ -51,7 +51,7 @@ func (r networkRouter) find(ctx *gin.Context) (interface{}, error) {
 		}
 		return response.NewPageResult(page, size, total, result), nil
 	}
-	return r.service.FilterNetworks(filters)
+	return r.service.FindNetworks(filters)
 }
 
 func (r networkRouter) addDevices(ctx *gin.Context) (interface{}, error) {

@@ -11,28 +11,32 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/cache"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/devicetype"
+	"sync"
 	"time"
 )
 
 type LargeSensorData struct {
 	repository dependency.LargeSensorDataRepository
+
+	mu sync.RWMutex
 }
 
 func NewLargeSensorData() Processor {
 	return newRoot(&LargeSensorData{
 		repository: repository.LargeSensorData{},
+		mu:         sync.RWMutex{},
 	})
 }
 
-func (p LargeSensorData) Name() string {
+func (p *LargeSensorData) Name() string {
 	return "LargeSensorData"
 }
 
-func (p LargeSensorData) Next() Processor {
+func (p *LargeSensorData) Next() Processor {
 	return nil
 }
 
-func (p LargeSensorData) Process(ctx *iot.Context, msg iot.Message) error {
+func (p *LargeSensorData) Process(ctx *iot.Context, msg iot.Message) error {
 	if value, ok := ctx.Get(msg.Body.Device); ok {
 		device := value.(entity.Device)
 		m := pd.LargeSensorDataMessage{}
@@ -45,13 +49,15 @@ func (p LargeSensorData) Process(ctx *iot.Context, msg iot.Message) error {
 				return fmt.Errorf("set cache failed: %v", err)
 			}
 		} else {
+			p.mu.Lock()
+			defer p.mu.Unlock()
 			var receiver LargeSensorDataReceiver
 			if err := cache.GetStruct(device.MacAddress, &receiver); err != nil {
 				return fmt.Errorf("get cache failed: %v", err)
 			}
 			if receiver.Receive(m.SeqId, m.Data); receiver.IsCompleted() {
 				e := entity.LargeSensorData{
-					Time:       time.Unix(int64(receiver.Timestamp/1000), int64(receiver.Timestamp%1000)*1000),
+					Time:       time.UnixMilli(int64(receiver.Timestamp)),
 					SensorType: receiver.SensorType,
 					MacAddress: device.MacAddress,
 				}

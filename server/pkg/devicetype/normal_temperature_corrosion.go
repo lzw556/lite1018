@@ -20,6 +20,7 @@ func (NormalTemperatureCorrosion) Settings() Settings {
 			Category: SensorsSettingCategory,
 			Options:  samplePeriodOption1,
 			Sort:     0,
+			Group:    SettingGroupGeneral,
 		},
 		{
 			Name:     "波速",
@@ -28,23 +29,7 @@ func (NormalTemperatureCorrosion) Settings() Settings {
 			Value:    6000,
 			Category: SensorsSettingCategory,
 			Sort:     1,
-		},
-		{
-			Name:     "时间偏移量",
-			Key:      "tof_offset",
-			Type:     FloatValueType,
-			Value:    688.0,
-			Category: SensorsSettingCategory,
-			Unit:     "ns",
-			Sort:     2,
-		},
-		{
-			Name:     "扫描模式",
-			Key:      "scan_mode",
-			Type:     Uint8ValueType,
-			Value:    0,
-			Category: SensorsSettingCategory,
-			Sort:     3,
+			Group:    SettingGroupCorrosion,
 		},
 	}
 }
