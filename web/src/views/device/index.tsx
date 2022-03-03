@@ -242,7 +242,10 @@ const DevicePage = () => {
             title: '电池电压(mV)',
             dataIndex: 'state',
             key: 'batteryVoltage',
-            render: (state: any) => {
+            render: (state: any, record: Device) => {
+                if(record.typeId === DeviceType.Gateway){
+                    return '-'
+                }
                 return state ? state.batteryVoltage : 0
             }
         },

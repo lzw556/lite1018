@@ -80,19 +80,20 @@ const InformationCard: FC<GatewayInformationProps> = ({ device, isLoading }) => 
           </Col>
           <Col span={6}>{device.network ? device.network.name : '无'}</Col>
         </Row>
-        {device.typeId !== DeviceType.Gateway && (
-          <Row justify={'start'}>
-            <Col span={3} className='ts-detail-label'>
-              电池电压(mV)
-            </Col>
-            <Col span={6}>{device.state ? device.state.batteryVoltage : '-'}</Col>
-
-            <Col span={3} className='ts-detail-label'>
-              信号强度(dB)
-            </Col>
-            <Col span={6}>{device.state ? device.state.signalLevel : '-'}</Col>
-          </Row>
-        )}
+        <Row justify={'start'}>
+          <Col span={3} className='ts-detail-label'>
+            电池电压(mV)
+          </Col>
+          <Col span={6}>
+            {device.state && device.typeId !== DeviceType.Gateway
+              ? device.state.batteryVoltage
+              : '-'}
+          </Col>
+          <Col span={3} className='ts-detail-label'>
+            信号强度(dB)
+          </Col>
+          <Col span={6}>{device.state ? device.state.signalLevel : '-'}</Col>
+        </Row>
         <Row justify={'start'}>
           <Col span={3} className='ts-detail-label'>
             固件版本号
@@ -125,10 +126,12 @@ const InformationCard: FC<GatewayInformationProps> = ({ device, isLoading }) => 
         </Row>
         <Row justify={'start'}>
           <Col span={3} className='ts-detail-label'>
-             最近一次采集时间
+            最近一次采集时间
           </Col>
           <Col span={6}>
-            {device.data && device.data.timestamp  && device.data.timestamp > 0 ? moment.unix(device.data.timestamp).local().format('YYYY-MM-DD HH:mm:ss') : '-'}
+            {device.data && device.data.timestamp && device.data.timestamp > 0
+              ? moment.unix(device.data.timestamp).local().format('YYYY-MM-DD HH:mm:ss')
+              : '-'}
           </Col>
           <Col span={3} className='ts-detail-label' hidden={device.typeId !== DeviceType.Gateway}>
             IP地址
