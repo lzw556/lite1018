@@ -2,6 +2,7 @@ package repository
 
 import (
 	"bytes"
+	"fmt"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/json"
 	"go.etcd.io/bbolt"
@@ -162,6 +163,7 @@ func (repo SensorData) Paging(mac string, sensorType uint, from, to time.Time, p
 						if err := json.Unmarshal(v, &e); err != nil {
 							return err
 						}
+						fmt.Println(e)
 						es = append(es, e)
 					}
 				}

@@ -50,7 +50,10 @@ func (p *LargeSensorData) Process(ctx *iot.Context, msg iot.Message) error {
 			}
 		} else {
 			p.mu.Lock()
-			defer p.mu.Unlock()
+			defer func() {
+				p.mu.Unlock()
+				_ = cache.Delete(device.MacAddress)
+			}()
 			var receiver LargeSensorDataReceiver
 			if err := cache.GetStruct(device.MacAddress, &receiver); err != nil {
 				return fmt.Errorf("get cache failed: %v", err)
