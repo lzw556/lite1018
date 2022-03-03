@@ -155,33 +155,23 @@ func (query DeviceQuery) GetSettings(id uint) (vo.DeviceSettings, error) {
 	return nil, response.BusinessErr(errcode.UnknownDeviceTypeError, "")
 }
 
-func (query DeviceQuery) PagingDataByID(id uint, sensorType uint, page, size int, from, to int64) ([]vo.DeviceData, int64, error) {
-	device, err := query.check(id)
-	if err != nil {
-		return nil, 0, err
-	}
-	data, total, err := query.sensorDataRepo.Paging(device.MacAddress, sensorType, time.Unix(from, 0), time.Unix(to, 0), page, size)
-	if err != nil {
-		return nil, 0, err
-	}
-	result := make(vo.DeviceDataList, len(data))
-	for i, d := range data {
-		result[i] = vo.NewDeviceData(d.Time)
-	}
-	return result, total, nil
-}
-
 func (query DeviceQuery) FindDataByID(id uint, sensorType uint, from, to time.Time) ([]vo.DeviceData, error) {
 	device, err := query.check(id)
 	if err != nil {
 		return nil, err
 	}
+	switch sensorType {
+	case devicetype.KxSensor:
+		return query.findKxSensorData(device, from, to)
+	default:
+		return query.findCharacteristicData(device, from, to)
+	}
+}
+
+func (query DeviceQuery) findCharacteristicData(device entity.Device, from, to time.Time) ([]vo.DeviceData, error) {
 	result := make([]vo.DeviceData, 0)
 	if t := devicetype.Get(device.Type); t != nil {
-		if sensorType == 0 {
-			sensorType = t.SensorID()
-		}
-		data, err := query.sensorDataRepo.Find(device.MacAddress, sensorType, from, to)
+		data, err := query.sensorDataRepo.Find(device.MacAddress, t.SensorID(), from, to)
 		if err != nil {
 			return nil, err
 		}
@@ -199,6 +189,19 @@ func (query DeviceQuery) FindDataByID(id uint, sensorType uint, from, to time.Ti
 			result = append(result, r)
 		}
 	}
+	return result, nil
+}
+
+func (query DeviceQuery) findKxSensorData(device entity.Device, from, to time.Time) ([]vo.DeviceData, error) {
+	times, err := query.sensorDataRepo.FindTimes(device.MacAddress, devicetype.KxSensor, from, to)
+	if err != nil {
+		return nil, err
+	}
+	result := make(vo.DeviceDataList, len(times))
+	for i, t := range times {
+		result[i] = vo.NewDeviceData(t)
+	}
+	sort.Sort(result)
 	return result, nil
 }
 

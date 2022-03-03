@@ -13,7 +13,8 @@ export const DeviceMonitor: React.FC<{ device: Device }> = ({device}) => {
         FindDeviceDataRequest(
             device.id,
             moment().startOf('day').subtract(13, 'd').utc().unix(),
-            moment().endOf('day').utc().unix()
+            moment().endOf('day').utc().unix(),
+            {}
         ).then((data) => {
             setHistoryOptions(
                 device.properties.map((property: any) => {

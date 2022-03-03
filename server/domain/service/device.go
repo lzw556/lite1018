@@ -88,11 +88,6 @@ func (s Device) CheckDeviceMacAddress(mac string) error {
 	return response.BusinessErr(errcode.DeviceMacExistsError, mac)
 }
 
-func (s Device) FindDeviceDataByPaginate(id uint, sensorType uint, from, to int64, page, size int) ([]vo.DeviceData, int64, error) {
-	query := s.factory.NewDeviceQuery(nil)
-	return query.PagingDataByID(id, sensorType, page, size, from, to)
-}
-
 func (s Device) FindDeviceDataByID(id uint, sensorType uint, from, to int64) ([]vo.DeviceData, error) {
 	query := s.factory.NewDeviceQuery(nil)
 	return query.FindDataByID(id, sensorType, time.Unix(from, 0), time.Unix(to, 0))

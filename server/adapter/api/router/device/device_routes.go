@@ -93,15 +93,6 @@ func (r deviceRouter) findDataByID(ctx *gin.Context) (interface{}, error) {
 	from := cast.ToInt64(ctx.Query("from"))
 	to := cast.ToInt64(ctx.Query("to"))
 	sensorType := cast.ToUint(ctx.Query("data_type"))
-	if _, ok := ctx.GetQuery("page"); ok {
-		page := cast.ToInt(ctx.Query("page"))
-		size := cast.ToInt(ctx.Query("size"))
-		result, total, err := r.service.FindDeviceDataByPaginate(id, sensorType, from, to, page, size)
-		if err != nil {
-			return nil, err
-		}
-		return response.NewPageResult(page, size, total, result), nil
-	}
 	return r.service.FindDeviceDataByID(id, sensorType, from, to)
 }
 

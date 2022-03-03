@@ -37,12 +37,8 @@ export function DeleteDeviceRequest(id:number) {
     return request.delete(`/devices/${id}`).then(DeleteResponse)
 }
 
-export function PagingDeviceDataRequest(id:number, page:number, size:number, filters:any) {
-    return request.get<PageResult<any>>(`/devices/${id}/data`, {page, size, ...filters}).then(GetResponse)
-}
-
-export function FindDeviceDataRequest(id:number, from:number, to:number) {
-    return request.get<any>(`/devices/${id}/data`, {from, to}).then(GetResponse)
+export function FindDeviceDataRequest(id:number, from:number, to:number, filters:any) {
+    return request.get<any>(`/devices/${id}/data`, {from, to, ...filters}).then(GetResponse)
 }
 
 export function GetDeviceDataRequest(id:number, timestamp:number, filters:any) {

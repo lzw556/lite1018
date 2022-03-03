@@ -22,7 +22,6 @@ type Service interface {
 	GetDeviceSettingsByID(id uint) (vo.DeviceSettings, error)
 	UpdateDeviceSettingByID(id uint, req request.DeviceSetting) error
 
-	FindDeviceDataByPaginate(id uint, sensorType uint, from, to int64, page, size int) ([]vo.DeviceData, int64, error)
 	FindDeviceDataByID(id uint, sensorType uint, from, to int64) ([]vo.DeviceData, error)
 	GetDeviceDataByIDAndTimestamp(id uint, sensorType uint, timestamp int64, filters request.Filters) (*vo.DeviceData, error)
 	GetRuntimeDataByID(id uint, from, to int64) ([]vo.SensorRuntimeData, error)

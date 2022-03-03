@@ -9,8 +9,8 @@ import {EmptyLayout} from "../../../layout";
 import {Device} from "../../../../types/device";
 import {
     DownloadDeviceDataByTimestampRequest,
-    GetDeviceDataRequest,
-    PagingDeviceDataRequest
+    FindDeviceDataRequest,
+    GetDeviceDataRequest
 } from "../../../../apis/device";
 import {PageResult} from "../../../../types/page";
 
@@ -46,17 +46,17 @@ const defaultChartOption = {
 const WaveDataChart: React.FC<{ device: Device }> = ({device}) => {
     const [beginDate, setBeginDate] = React.useState(moment().subtract(3, 'days').startOf('day'));
     const [endDate, setEndDate] = React.useState(moment().endOf('day'));
-    const [dataSource, setDataSource] = React.useState<PageResult<any>>();
+    const [dataSource, setDataSource] = React.useState<any>();
     const [deviceData, setDeviceData] = React.useState<any>();
     const [calculate, setCalculate] = React.useState<string>("accelerationTimeDomain");
     const [dimension, setDimension] = React.useState<number>(0);
     const [isLoading, setIsLoading] = React.useState(false);
+    const [isLoadingPage, setIsLoadingPage] = React.useState(false);
     const [isShowEnvelope, setIsShowEnvelope] = React.useState(false);
 
-    const fetchDeviceDataByTimestamp = useCallback((timestamp:number) => {
-        console.log(dimension);
+    const fetchDeviceDataByTimestamp = useCallback((timestamp: number) => {
         setIsLoading(true);
-        GetDeviceDataRequest(device.id, timestamp, {calculate, dimension, data_type:16842753}).then(data => {
+        GetDeviceDataRequest(device.id, timestamp, {calculate, dimension, data_type: 16842753}).then(data => {
             setIsLoading(false);
             setDeviceData(data);
         }).catch(e => {
@@ -64,18 +64,28 @@ const WaveDataChart: React.FC<{ device: Device }> = ({device}) => {
         })
     }, [calculate, dimension])
 
-    const fetchDeviceWaveDataTimestamps = useCallback((current: number, size: number) => {
-        PagingDeviceDataRequest(device.id, current, size, {from: beginDate.utc().unix(), to: endDate.utc().unix(), data_type:16842753}).then(data => {
-            setDataSource(data)
-            if (data.total > 0) {
-                fetchDeviceDataByTimestamp(data.result[0].timestamp)
+    const fetchDeviceWaveDataTimestamps = useCallback(() => {
+        setIsLoadingPage(true);
+        FindDeviceDataRequest(device.id,
+            beginDate.utc().unix(),
+            endDate.utc().unix(),
+            {
+                data_type: 16842753,
             }
+        ).then(data => {
+            setIsLoadingPage(false);
+            setDataSource(data)
+            if (data.length > 0) {
+                fetchDeviceDataByTimestamp(data[0].timestamp)
+            }
+        }).catch(_ => {
+            setIsLoadingPage(false);
         })
     }, [beginDate, endDate, device.id]);
 
 
     React.useEffect(() => {
-        fetchDeviceWaveDataTimestamps(1, 10);
+        fetchDeviceWaveDataTimestamps();
     }, [fetchDeviceWaveDataTimestamps]);
 
     React.useEffect(() => {
@@ -122,7 +132,7 @@ const WaveDataChart: React.FC<{ device: Device }> = ({device}) => {
     ]
 
     const onDownload = (timestamp: number) => {
-        DownloadDeviceDataByTimestampRequest(device.id, timestamp, {calculate, data_type:16842753}).then(res => {
+        DownloadDeviceDataByTimestampRequest(device.id, timestamp, {calculate, data_type: 16842753}).then(res => {
             if (res.status === 200) {
                 const url = window.URL.createObjectURL(new Blob([res.data]))
                 const link = document.createElement('a')
@@ -234,11 +244,12 @@ const WaveDataChart: React.FC<{ device: Device }> = ({device}) => {
                 <Col span={24}>
                     <ConfigProvider renderEmpty={() => <EmptyLayout description={"波形数据列表为空"}/>}>
                         <Table size={"middle"}
+                               loading={isLoadingPage}
                                scroll={{y: 500}}
                                showHeader={false}
                                columns={columns}
                                pagination={false}
-                               dataSource={dataSource?.result}
+                               dataSource={dataSource}
                                rowClassName={(record) => record.timestamp === deviceData?.timestamp ? 'ant-table-row-selected' : ''}
                                onRow={(record) => ({
                                    onClick: () => {
@@ -250,17 +261,6 @@ const WaveDataChart: React.FC<{ device: Device }> = ({device}) => {
                                    onMouseEnter: () => window.document.body.style.cursor = 'pointer'
                                })}
                         />
-                        {
-                            dataSource && <Pagination size={"small"}
-                                                      style={{paddingTop: "8px"}}
-                                                      current={dataSource.page}
-                                                      total={dataSource.total}
-                                                      showSizeChanger={false}
-                                                      onChange={(page, pageSize) => {
-                                                          fetchDeviceWaveDataTimestamps(page, pageSize)
-                                                      }}
-                                                      pageSize={dataSource.size}/>
-                        }
                     </ConfigProvider>
                 </Col>
             </Row>

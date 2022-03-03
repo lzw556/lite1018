@@ -28,7 +28,7 @@ const HistoryDataPage: FC<DeviceDataProps> = ({device}) => {
     const [downloadVisible, setDownloadVisible] = useState<boolean>(false)
 
     const fetchDeviceData = useCallback(() => {
-        FindDeviceDataRequest(device.id, startDate.utc().unix(), endDate.utc().unix()).then(setDataSource)
+        FindDeviceDataRequest(device.id, startDate.utc().unix(), endDate.utc().unix(), {}).then(setDataSource)
     }, [startDate, endDate])
 
     useEffect(() => {
