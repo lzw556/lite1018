@@ -147,8 +147,8 @@ func (repo SensorData) Delete(mac string, sensorType uint, from, to time.Time) e
 	return err
 }
 
-func (repo SensorData) Paging(mac string, sensorType uint, from, to time.Time, page, size int) ([]entity.SensorData, int64, error) {
-	var es []entity.SensorData
+func (repo SensorData) FindTimes(mac string, sensorType uint, from, to time.Time) ([]time.Time, error) {
+	var es []time.Time
 	err := repo.BoltDB().View(func(tx *bbolt.Tx) error {
 		bucket := tx.Bucket([]byte(entity.SensorData{}.BucketName()))
 		if bucket != nil {
@@ -157,23 +157,14 @@ func (repo SensorData) Paging(mac string, sensorType uint, from, to time.Time, p
 					c := dataBucket.Cursor()
 					min := []byte(from.UTC().Format("2006-01-02T15:04:05Z"))
 					max := []byte(to.UTC().Format("2006-01-02T15:04:05Z"))
-					for k, v := c.Seek(min); k != nil && bytes.Compare(k, max) <= 0; k, v = c.Next() {
-						var e entity.SensorData
-						if err := json.Unmarshal(v, &e); err != nil {
-							return err
-						}
-						es = append(es, e)
+					for k, _ := c.Seek(min); k != nil && bytes.Compare(k, max) <= 0; k, _ = c.Next() {
+						date, _ := time.Parse("2006-01-02T15:04:05Z", string(k))
+						es = append(es, date)
 					}
 				}
 			}
 		}
 		return nil
 	})
-	offset := (page - 1) * size
-	total := len(es)
-	if offset+size < total {
-		return es[offset : offset+size], int64(total), err
-	} else {
-		return es[offset:], int64(total), err
-	}
+	return es, err
 }

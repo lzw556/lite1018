@@ -38,7 +38,7 @@ const MonitorPage: FC<MonitorPageProps> = ({device}) => {
 
     const fetchDeviceData = (id: number) => {
         setSelectedDevice(id)
-        FindDeviceDataRequest(id, startDate.utc().unix(), endDate.utc().unix()).then(data => {
+        FindDeviceDataRequest(id, startDate.utc().unix(), endDate.utc().unix(), {}).then(data => {
         })
     }
 

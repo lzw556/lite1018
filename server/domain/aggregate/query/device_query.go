@@ -48,7 +48,8 @@ func NewDeviceQuery() DeviceQuery {
 
 func (query DeviceQuery) check(id uint) (entity.Device, error) {
 	ctx := context.TODO()
-	device, err := query.deviceRepo.Get(ctx, id)
+	query.Specs = append(query.Specs, spec.PrimaryKeyInSpec{id})
+	device, err := query.deviceRepo.GetBySpecs(ctx, query.Specs...)
 	if err != nil {
 		return entity.Device{}, response.BusinessErr(errcode.DeviceNotFoundError, err.Error())
 	}
@@ -63,12 +64,7 @@ func (query DeviceQuery) Paging(page, size int) ([]vo.Device, int64, error) {
 	}
 	result := make([]vo.Device, len(es))
 	for i, device := range es {
-		result[i] = vo.NewDevice(device)
-		result[i].SetUpgradeState(device)
-		result[i].State, _ = query.deviceStateRepo.Get(device.MacAddress)
-		if states, err := query.deviceAlertStateRepo.Find(device.MacAddress); err == nil {
-			result[i].SetAlertStates(states)
-		}
+		result[i] = query.newDevice(device)
 	}
 	return result, total, nil
 }
@@ -81,9 +77,7 @@ func (query DeviceQuery) List() ([]vo.Device, error) {
 	}
 	result := make([]vo.Device, len(es))
 	for i, device := range es {
-		result[i] = vo.NewDevice(device)
-		result[i].SetUpgradeState(device)
-		result[i].State, _ = query.deviceStateRepo.Get(device.MacAddress)
+		result[i] = query.newDevice(device)
 	}
 	return result, nil
 }
@@ -93,43 +87,49 @@ func (query DeviceQuery) Get(id uint) (*vo.Device, error) {
 	if err != nil {
 		return nil, err
 	}
-	result := vo.NewDevice(device)
+	result := query.newDevice(device)
 
 	ctx := context.TODO()
 	if network, err := query.networkRepo.Get(ctx, device.NetworkID); err == nil {
 		result.SetNetwork(network)
 	}
 
-	if t := devicetype.Get(device.Type); t != nil {
-		data, err := query.sensorDataRepo.Last(device.MacAddress, t.SensorID())
-		if err != nil {
-			return nil, err
-		}
-		result.Properties = make(vo.Properties, 0)
-		deviceData := vo.NewDeviceData(data.Time)
-		values := map[string]interface{}{}
-		for _, p := range t.Properties(t.SensorID()) {
-			property := vo.NewProperty(p)
-			if len(data.Values) > 0 {
-				for _, field := range p.Fields {
-					values[field.Key] = data.Values[field.Key]
-				}
-			}
-			result.Properties = append(result.Properties, property)
-			result.SetDataTypes(t.SensorID())
-		}
-		deviceData.Values = values
-		result.Data = &deviceData
-		sort.Sort(result.Properties)
-	}
-
-	result.State, _ = query.deviceStateRepo.Get(device.MacAddress)
-	result.Information, err = query.deviceInformationRepo.Get(device.ID)
 	if err != nil {
 		xlog.Errorf("get device information failed:%v", device.MacAddress, err)
 	}
 
 	return &result, nil
+}
+
+func (query DeviceQuery) newDevice(device entity.Device) vo.Device {
+	result := vo.NewDevice(device)
+	result.SetUpgradeState(device)
+	result.State, _ = query.deviceStateRepo.Get(device.MacAddress)
+	result.Information, _ = query.deviceInformationRepo.Get(device.ID)
+	if states, err := query.deviceAlertStateRepo.Find(device.MacAddress); err == nil {
+		result.SetAlertStates(states)
+	}
+	if t := devicetype.Get(device.Type); t != nil {
+		result.Properties = make(vo.Properties, 0)
+		for _, property := range t.Properties(t.SensorID()) {
+			result.Properties = append(result.Properties, vo.NewProperty(property))
+		}
+		sort.Sort(result.Properties)
+
+		// set data
+		if data, err := query.sensorDataRepo.Last(device.MacAddress, t.SensorID()); err == nil {
+			deviceData := vo.NewDeviceData(data.Time)
+			values := map[string]interface{}{}
+			for _, property := range result.Properties {
+				for _, field := range property.Fields {
+					values[field.Key] = data.Values[field.Key]
+				}
+			}
+			deviceData.Values = values
+			result.Data = &deviceData
+		}
+	}
+	return result
 }
 
 func (query DeviceQuery) GetSettings(id uint) (vo.DeviceSettings, error) {
@@ -154,34 +154,23 @@ func (query DeviceQuery) GetSettings(id uint) (vo.DeviceSettings, error) {
 	return nil, response.BusinessErr(errcode.UnknownDeviceTypeError, "")
 }
 
-func (query DeviceQuery) PagingDataByID(id uint, sensorType uint, page, size int, from, to int64) ([]vo.DeviceData, int64, error) {
-	device, err := query.check(id)
-	if err != nil {
-		return nil, 0, err
-	}
-	data, total, err := query.sensorDataRepo.Paging(device.MacAddress, sensorType, time.Unix(from, 0), time.Unix(to, 0), page, size)
-	if err != nil {
-		return nil, 0, err
-	}
-	result := make(vo.DeviceDataList, len(data))
-	for i, d := range data {
-		result[i] = vo.NewDeviceData(d.Time)
-	}
-	sort.Sort(result)
-	return result, total, nil
-}
-
 func (query DeviceQuery) FindDataByID(id uint, sensorType uint, from, to time.Time) ([]vo.DeviceData, error) {
 	device, err := query.check(id)
 	if err != nil {
 		return nil, err
 	}
+	switch sensorType {
+	case devicetype.KxSensor:
+		return query.findKxSensorData(device, from, to)
+	default:
+		return query.findCharacteristicData(device, from, to)
+	}
+}
+
+func (query DeviceQuery) findCharacteristicData(device entity.Device, from, to time.Time) ([]vo.DeviceData, error) {
 	result := make([]vo.DeviceData, 0)
 	if t := devicetype.Get(device.Type); t != nil {
-		if sensorType == 0 {
-			sensorType = t.SensorID()
-		}
-		data, err := query.sensorDataRepo.Find(device.MacAddress, sensorType, from, to)
+		data, err := query.sensorDataRepo.Find(device.MacAddress, t.SensorID(), from, to)
 		if err != nil {
 			return nil, err
 		}
@@ -199,6 +188,19 @@ func (query DeviceQuery) FindDataByID(id uint, sensorType uint, from, to time.Ti
 			result = append(result, r)
 		}
 	}
+	return result, nil
+}
+
+func (query DeviceQuery) findKxSensorData(device entity.Device, from, to time.Time) ([]vo.DeviceData, error) {
+	times, err := query.sensorDataRepo.FindTimes(device.MacAddress, devicetype.KxSensor, from, to)
+	if err != nil {
+		return nil, err
+	}
+	result := make(vo.DeviceDataList, len(times))
+	for i, t := range times {
+		result[i] = vo.NewDeviceData(t)
+	}
+	sort.Sort(result)
 	return result, nil
 }
 

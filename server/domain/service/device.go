@@ -52,8 +52,8 @@ func (s Device) UpdateDeviceByID(id uint, req request.Device) error {
 	return cmd.UpdateBaseInfo(req)
 }
 
-func (s Device) GetDeviceByID(id uint) (*vo.Device, error) {
-	query := s.factory.NewDeviceQuery(nil)
+func (s Device) GetDeviceByID(id uint, filters request.Filters) (*vo.Device, error) {
+	query := s.factory.NewDeviceQuery(filters)
 	return query.Get(id)
 }
 
@@ -86,11 +86,6 @@ func (s Device) CheckDeviceMacAddress(mac string) error {
 		return nil
 	}
 	return response.BusinessErr(errcode.DeviceMacExistsError, mac)
-}
-
-func (s Device) FindDeviceDataByPaginate(id uint, sensorType uint, from, to int64, page, size int) ([]vo.DeviceData, int64, error) {
-	query := s.factory.NewDeviceQuery(nil)
-	return query.PagingDataByID(id, sensorType, page, size, from, to)
 }
 
 func (s Device) FindDeviceDataByID(id uint, sensorType uint, from, to int64) ([]vo.DeviceData, error) {

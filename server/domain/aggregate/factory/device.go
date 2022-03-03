@@ -3,7 +3,6 @@ package factory
 import (
 	"context"
 	"errors"
-	"fmt"
 	"github.com/spf13/cast"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/request"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/response"
@@ -147,7 +146,6 @@ func (factory Device) NewDeviceUpgradeCmd(deviceID uint) (*command.DeviceUpgrade
 func (factory Device) buildSpecs(filters request.Filters) []spec.Specification {
 	specs := make([]spec.Specification, 0)
 	for name, v := range filters {
-		fmt.Println(v)
 		switch name {
 		case "project_id":
 			specs = append(specs, spec.ProjectEqSpec(cast.ToUint(v)))
