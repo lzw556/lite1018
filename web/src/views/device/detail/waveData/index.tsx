@@ -232,9 +232,9 @@ const WaveDataChart: React.FC<{ device: Device }> = ({device}) => {
                         allowClear={false}
                         value={[beginDate, endDate]}
                         onChange={(date, dateString) => {
-                            if (dateString) {
-                                setBeginDate(moment(dateString[0]).startOf('day'));
-                                setEndDate(moment(dateString[1]).endOf('day'));
+                            if (date) {
+                                setBeginDate(moment(date[0]));
+                                setEndDate(moment(date[1]));
                             }
                         }}
                     />
