@@ -36,6 +36,7 @@ import DeviceTable from "../../components/table/deviceTable";
 import NetworkSelect from "../../components/select/networkSelect";
 import DeviceMonitorDrawer from "./deviceMonitorDrawer";
 import DeviceUpgradeSpin from "./spin/deviceUpgradeSpin";
+import "./index.css"
 
 const {Search} = Input
 const {Option} = Select
