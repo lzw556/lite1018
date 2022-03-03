@@ -168,7 +168,6 @@ func (query DeviceQuery) PagingDataByID(id uint, sensorType uint, page, size int
 	for i, d := range data {
 		result[i] = vo.NewDeviceData(d.Time)
 	}
-	sort.Sort(result)
 	return result, total, nil
 }
 

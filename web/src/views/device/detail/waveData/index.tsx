@@ -64,8 +64,8 @@ const WaveDataChart: React.FC<{ device: Device }> = ({device}) => {
         })
     }, [calculate, dimension])
 
-    const fetchDeviceWaveDataTimestamps = useCallback(() => {
-        PagingDeviceDataRequest(device.id, 1, 10, {from: beginDate.utc().unix(), to: endDate.utc().unix(), data_type:16842753}).then(data => {
+    const fetchDeviceWaveDataTimestamps = useCallback((current: number, size: number) => {
+        PagingDeviceDataRequest(device.id, current, size, {from: beginDate.utc().unix(), to: endDate.utc().unix(), data_type:16842753}).then(data => {
             setDataSource(data)
             if (data.total > 0) {
                 fetchDeviceDataByTimestamp(data.result[0].timestamp)
@@ -75,7 +75,7 @@ const WaveDataChart: React.FC<{ device: Device }> = ({device}) => {
 
 
     React.useEffect(() => {
-        fetchDeviceWaveDataTimestamps();
+        fetchDeviceWaveDataTimestamps(1, 10);
     }, [fetchDeviceWaveDataTimestamps]);
 
     React.useEffect(() => {
@@ -255,9 +255,12 @@ const WaveDataChart: React.FC<{ device: Device }> = ({device}) => {
                                                       style={{paddingTop: "8px"}}
                                                       current={dataSource.page}
                                                       total={dataSource.total}
+                                                      showSizeChanger={false}
+                                                      onChange={(page, pageSize) => {
+                                                          fetchDeviceWaveDataTimestamps(page, pageSize)
+                                                      }}
                                                       pageSize={dataSource.size}/>
                         }
-
                     </ConfigProvider>
                 </Col>
             </Row>

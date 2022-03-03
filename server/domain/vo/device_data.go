@@ -20,7 +20,7 @@ func (list DeviceDataList) Len() int {
 }
 
 func (list DeviceDataList) Less(i, j int) bool {
-	return list[i].Timestamp > list[j].Timestamp
+	return list[i].Timestamp < list[j].Timestamp
 }
 
 func (list DeviceDataList) Swap(i, j int) {
