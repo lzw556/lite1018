@@ -161,9 +161,7 @@ func (query DeviceQuery) PagingDataByID(id uint, sensorType uint, page, size int
 		return nil, 0, err
 	}
 	data, total, err := query.sensorDataRepo.Paging(device.MacAddress, sensorType, time.Unix(from, 0), time.Unix(to, 0), page, size)
-	fmt.Println(data)
 	if err != nil {
-		fmt.Println(err)
 		return nil, 0, err
 	}
 	result := make(vo.DeviceDataList, len(data))

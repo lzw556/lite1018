@@ -158,13 +158,12 @@ func (repo SensorData) Paging(mac string, sensorType uint, from, to time.Time, p
 					c := dataBucket.Cursor()
 					min := []byte(from.UTC().Format("2006-01-02T15:04:05Z"))
 					max := []byte(to.UTC().Format("2006-01-02T15:04:05Z"))
-					for k, v := c.Seek(min); k != nil && bytes.Compare(k, max) <= 0; k, v = c.Next() {
-						var e entity.SensorData
-						if err := json.Unmarshal(v, &e); err != nil {
-							return err
-						}
-						fmt.Println(e)
-						es = append(es, e)
+					for k, _ := c.Seek(min); k != nil && bytes.Compare(k, max) <= 0; k, _ = c.Next() {
+						date, _ := time.Parse("2006-01-02T15:04:05Z", string(k))
+						fmt.Println(date)
+						es = append(es, entity.SensorData{
+							Time: date,
+						})
 					}
 				}
 			}
