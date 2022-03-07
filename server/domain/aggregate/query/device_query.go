@@ -241,7 +241,6 @@ func (query DeviceQuery) RuntimeDataByRange(id uint, from, to time.Time) ([]vo.S
 	}
 
 	data, err := query.deviceStateRepo.Find(device.MacAddress, from, to)
-	fmt.Println(data)
 	if err != nil {
 		return nil, err
 	}
@@ -292,7 +291,7 @@ func (query DeviceQuery) DownloadCharacteristicData(id uint, pids []string, from
 		// set cell value
 		for i, data := range deviceData {
 			axis := 65
-			result.File.SetCellValue("Sheet1", fmt.Sprintf("A%d", i+3), time.Unix(data.Timestamp, 0).Format("2006-01-02 15:04:05"))
+			result.File.SetCellValue("Sheet1", fmt.Sprintf("A%d", i+3), time.Unix(data.Timestamp, 0).Local().Format("2006-01-02 15:04:05"))
 			if properties, ok := data.Values.(vo.Properties); ok {
 				for _, property := range properties {
 					if _, ok := downloadKeys[property.Key]; ok {
