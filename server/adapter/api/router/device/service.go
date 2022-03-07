@@ -25,7 +25,7 @@ type Service interface {
 	FindDeviceDataByID(id uint, sensorType uint, from, to int64) ([]vo.DeviceData, error)
 	GetDeviceDataByIDAndTimestamp(id uint, sensorType uint, timestamp int64, filters request.Filters) (*vo.DeviceData, error)
 	GetRuntimeDataByID(id uint, from, to int64) ([]vo.SensorRuntimeData, error)
-	DownloadDeviceDataByID(id uint, pids []string, from, to int64) (*vo.ExcelFile, error)
+	DownloadDeviceDataByID(id uint, pids []string, from, to int64, timezone string) (*vo.ExcelFile, error)
 	DownloadDeviceDataByIDAndTimestamp(id uint, sensorType uint, timestamp int64, filters request.Filters) (*vo.ExcelFile, error)
 	RemoveDataByID(id uint, sensorType uint, from, to int64) error
 }

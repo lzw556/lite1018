@@ -103,9 +103,9 @@ func (s Device) GetRuntimeDataByID(id uint, from, to int64) ([]vo.SensorRuntimeD
 	return query.RuntimeDataByRange(id, time.Unix(from, 0), time.Unix(to, 0))
 }
 
-func (s Device) DownloadDeviceDataByID(id uint, pids []string, from, to int64) (*vo.ExcelFile, error) {
+func (s Device) DownloadDeviceDataByID(id uint, pids []string, from, to int64, timezone string) (*vo.ExcelFile, error) {
 	query := s.factory.NewDeviceQuery(nil)
-	return query.DownloadCharacteristicData(id, pids, time.Unix(from, 0), time.Unix(to, 0))
+	return query.DownloadCharacteristicData(id, pids, time.Unix(from, 0), time.Unix(to, 0), timezone)
 }
 
 func (s Device) DownloadDeviceDataByIDAndTimestamp(id uint, sensorType uint, timestamp int64, filters request.Filters) (*vo.ExcelFile, error) {

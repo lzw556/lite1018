@@ -23,5 +23,6 @@ func NewFilters(ctx *gin.Context) Filters {
 	if projectID, ok := ctx.Get("project_id"); ok {
 		filters["project_id"] = projectID
 	}
+	filters["timezone"] = ctx.GetHeader("Timezone")
 	return filters
 }
