@@ -119,7 +119,7 @@ func (r deviceRouter) downloadDataByID(ctx *gin.Context) (interface{}, error) {
 	if err := json.Unmarshal([]byte(ctx.Query("pids")), &pids); err != nil {
 		return nil, err
 	}
-	return r.service.DownloadDeviceDataByID(id, pids, from, to)
+	return r.service.DownloadDeviceDataByID(id, pids, from, to, ctx.GetHeader("Timezone"))
 }
 
 func (r deviceRouter) downloadDataByIDAndTimestamp(ctx *gin.Context) (interface{}, error) {

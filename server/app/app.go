@@ -17,6 +17,7 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/project"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/property"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/role"
+	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/statistic"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/system"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/user"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/crontask"
@@ -122,6 +123,7 @@ func runApiServer(mode string, dist embed.FS) {
 		firmware.NewRouter(service.NewFirmware()),
 		network.NewRouter(service.NewNetwork()),
 		system.NewRouter(service.NewSystem()),
+		statistic.NewRouter(service.NewStatistic()),
 	)
 
 	go func() {
