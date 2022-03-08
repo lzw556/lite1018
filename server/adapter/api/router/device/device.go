@@ -36,6 +36,8 @@ func (r *deviceRouter) initRoutes() {
 		router.NewGetRoute("devices/defaultSettings", r.defaultSettings),
 		router.NewGetRoute("check/devices/:mac", r.checkMacAddress),
 
+		router.NewGetRoute("devices/:id/events", r.findEventsByID),
+
 		// PUT
 		router.NewPutRoute("devices/:id", r.update),
 
@@ -45,6 +47,7 @@ func (r *deviceRouter) initRoutes() {
 		// DELETE
 		router.NewDeleteRoute("devices/:id", r.delete),
 		router.NewDeleteRoute("devices/:id/data", r.removeDataByID),
+		router.NewDeleteRoute("devices/:id/events", r.removeEventsByID),
 	}
 }
 

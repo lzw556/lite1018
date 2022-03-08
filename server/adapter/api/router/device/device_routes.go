@@ -149,3 +149,30 @@ func (r deviceRouter) upgrade(ctx *gin.Context) (interface{}, error) {
 	}
 	return nil, r.service.ExecuteDeviceCancelUpgradeByID(id)
 }
+
+func (r deviceRouter) findEventsByID(ctx *gin.Context) (interface{}, error) {
+	id := cast.ToUint(ctx.Param("id"))
+	from := cast.ToInt64(ctx.Query("from"))
+	to := cast.ToInt64(ctx.Query("to"))
+	if _, ok := ctx.GetQuery("page"); ok {
+		page := cast.ToInt(ctx.Query("page"))
+		size := cast.ToInt(ctx.Query("size"))
+		result, total, err := r.service.PagingDeviceEventsByID(id, from, to, page, size)
+		if err != nil {
+			return nil, err
+		}
+		return response.NewPageResult(page, size, total, result), nil
+	}
+	return r.service.FindDeviceEventsByID(id, from, to)
+}
+
+func (r deviceRouter) removeEventsByID(ctx *gin.Context) (interface{}, error) {
+	id := cast.ToUint(ctx.Param("id"))
+	events := struct {
+		IDs []uint `json:"ids"`
+	}{}
+	if err := ctx.ShouldBindJSON(&events); err != nil {
+		return nil, response.InvalidParameterError(err.Error())
+	}
+	return nil, r.service.RemoveDeviceEventsByID(id, events.IDs)
+}

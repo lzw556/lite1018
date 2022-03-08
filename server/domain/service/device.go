@@ -144,3 +144,21 @@ func (s Device) ExecuteDeviceCancelUpgradeByID(id uint) error {
 	}
 	return cmd.CancelUpgrade()
 }
+
+func (s Device) FindDeviceEventsByID(id uint, from, to int64) ([]vo.DeviceEvent, error) {
+	query := s.factory.NewDeviceQuery(nil)
+	return query.FindEventsByID(id, from, to)
+}
+
+func (s Device) PagingDeviceEventsByID(id uint, from, to int64, page, size int) ([]vo.DeviceEvent, int64, error) {
+	query := s.factory.NewDeviceQuery(nil)
+	return query.PagingEventsByID(id, from, to, page, size)
+}
+
+func (s Device) RemoveDeviceEventsByID(id uint, eventIDs []uint) error {
+	cmd, err := s.factory.NewDeviceRemoveCmd(id)
+	if err != nil {
+		return err
+	}
+	return cmd.RemoveEvents(eventIDs)
+}

@@ -122,6 +122,18 @@ func initPermissions(db *gorm.DB) error {
 			Group:       "设备模块",
 		},
 		{
+			Path:        "devices/:id/events",
+			Method:      "GET",
+			Description: "查看设备事件列表",
+			Group:       "设备模块",
+		},
+		{
+			Path:        "devices/:id/events",
+			Method:      "DELETE",
+			Description: "删除设备事件",
+			Group:       "设备模块",
+		},
+		{
 			Path:        "devices/:id/data",
 			Method:      "GET",
 			Description: "查看设备数据",

@@ -23,6 +23,7 @@ func InitTables(db *gorm.DB) error {
 		&entity.AlarmTemplate{},
 		&entity.AlarmRecord{},
 		&entity.AlarmRecordAcknowledge{},
+		&entity.Event{},
 	}
 	db.Migrator().DropTable(&entity.Menu{}, &entity.Permission{})
 	for _, table := range tables {

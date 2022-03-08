@@ -82,12 +82,13 @@ func runIoTServer() {
 	adapter.IoT = iot.NewAdapter(conf)
 	adapter.IoT.RegisterDispatchers(
 		dispatcher.NewDeviceStatus(),
-		dispatcher.NewSensorData(),
-		dispatcher.NewLargeSensorData(),
 		dispatcher.NewLinkStatus(),
 		dispatcher.NewRestartStatus(),
+		dispatcher.NewSensorData(),
+		dispatcher.NewLargeSensorData(),
 		dispatcher.NewDeviceInformation(),
 		dispatcher.NewBye(),
+		dispatcher.NewEvent(),
 	)
 	if err := adapter.IoT.Run(); err != nil {
 		xlog.Error("iot server start failed", err)

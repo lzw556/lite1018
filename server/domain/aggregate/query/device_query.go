@@ -14,7 +14,6 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/domain/vo"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/devicetype"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/errcode"
-	"github.com/thetasensors/theta-cloud-lite/server/pkg/json"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/xlog"
 	"github.com/xuri/excelize/v2"
 	"sort"
@@ -32,6 +31,7 @@ type DeviceQuery struct {
 	networkRepo           dependency.NetworkRepository
 	alarmRuleRepo         dependency.AlarmRuleRepository
 	largeSensorDataRepo   dependency.LargeSensorDataRepository
+	eventRepo             dependency.EventRepository
 }
 
 func NewDeviceQuery() DeviceQuery {
@@ -43,6 +43,7 @@ func NewDeviceQuery() DeviceQuery {
 		deviceAlertStateRepo:  repository.DeviceAlertState{},
 		networkRepo:           repository.Network{},
 		largeSensorDataRepo:   repository.LargeSensorData{},
+		eventRepo:             repository.Event{},
 	}
 }
 
@@ -376,38 +377,35 @@ func getKxSensorData(value entity.AxisSensorData, calc string) vo.KxData {
 	return result
 }
 
-func (query DeviceQuery) GetWaveDataByTimestamp(id uint, timestamp int64, calc string, dimension int) (*vo.KxData, error) {
+func (query DeviceQuery) FindEventsByID(id uint, from, to int64) ([]vo.DeviceEvent, error) {
 	device, err := query.check(id)
 	if err != nil {
 		return nil, err
 	}
-
-	data, err := query.largeSensorDataRepo.Get(device.MacAddress, time.Unix(timestamp, 0))
+	es, err := query.eventRepo.FindBySpecs(context.TODO(), spec.SourceEqSpec(device.ID), spec.TimestampBetweenSpec{from, to})
 	if err != nil {
 		return nil, err
 	}
-	var svtRawData entity.SvtRawData
-	if err := json.Unmarshal(data.Data, &svtRawData); err != nil {
-		return nil, err
+	result := make(vo.DeviceEventList, len(es))
+	for i, e := range es {
+		result[i] = vo.NewDeviceEvent(e)
 	}
-	axis := []entity.AxisSensorData{svtRawData.XAxis, svtRawData.YAxis, svtRawData.ZAxis}[dimension]
-	result := vo.NewKxData(axis)
-	switch calc {
-	case "accelerationTimeDomain":
-		result.SetTimeDomainValues(axis.AccelerationTimeDomain())
-		result.SetEnvelopeValues(axis.Envelope(axis.AccelerationTimeDomain()))
-	case "accelerationFrequencyDomain":
-		result.SetFrequencyDomainValues(axis.AccelerationFrequencyDomain())
-	case "velocityTimeDomain":
-		result.SetTimeDomainValues(axis.VelocityTimeDomain())
-		result.SetEnvelopeValues(axis.Envelope(axis.VelocityTimeDomain()))
-	case "velocityFrequencyDomain":
-		result.SetFrequencyDomainValues(axis.VelocityFrequencyDomain())
-	case "displacementTimeDomain":
-		result.SetTimeDomainValues(axis.DisplacementTimeDomain())
-		result.SetEnvelopeValues(axis.Envelope(axis.DisplacementTimeDomain()))
-	case "displacementFrequencyDomain":
-		result.SetFrequencyDomainValues(axis.DisplacementFrequencyDomain())
+	sort.Sort(result)
+	return result, nil
+}
+
+func (query DeviceQuery) PagingEventsByID(id uint, from, to int64, page int, size int) ([]vo.DeviceEvent, int64, error) {
+	device, err := query.check(id)
+	if err != nil {
+		return nil, 0, err
 	}
-	return &result, nil
+	es, total, err := query.eventRepo.PagingBySpecs(context.TODO(), page, size, spec.SourceEqSpec(device.ID), spec.TimestampBetweenSpec{from, to})
+	if err != nil {
+		return nil, 0, err
+	}
+	result := make(vo.DeviceEventList, len(es))
+	for i, e := range es {
+		result[i] = vo.NewDeviceEvent(e)
+	}
+	return result, total, nil
 }

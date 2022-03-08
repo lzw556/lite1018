@@ -21,6 +21,7 @@ import { DeviceMonitor } from "../DeviceMonitor";
 import { RuntimeChart } from "../RuntimeChart";
 import { IsUpgrading } from "../../../types/device_upgrade_status";
 import UpgradeModal from "../upgrade";
+import DeviceEvent from "./event";
 
 const tabList = [
     {
@@ -40,7 +41,8 @@ const tabTitleList = [
     {
         key: "historyData",
         tab: "历史数据"
-    }]
+    }
+]
 
 const DeviceDetailPage = () => {
     const location = useLocation<any>();
@@ -58,7 +60,8 @@ const DeviceDetailPage = () => {
         ["historyData", device && <HistoryDataPage device={device}/>],
         ["waveData", device && <WaveDataChart device={device}/>],
         ['monitor',device && <DeviceMonitor device={device}/>],
-        ['ta',device && <RuntimeChart deviceId={device.id}/>]
+        ['ta',device && <RuntimeChart deviceId={device.id}/>],
+        ['events', device && <DeviceEvent device={device}/>]
     ])
 
     const fetchDevice = useCallback(() => {
@@ -122,6 +125,16 @@ const DeviceDetailPage = () => {
                 case DeviceType.Router:
                     return tabList
                 default:
+                    if (hasPermission(Permission.DeviceEventList)) {
+                        return [
+                            ...tabTitleList,
+                            ...tabList,
+                            {
+                                key: "events",
+                                tab: "事件",
+                            }
+                        ]
+                    }
                     return [
                         ...tabTitleList,
                         ...tabList,

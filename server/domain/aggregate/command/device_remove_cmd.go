@@ -20,6 +20,7 @@ type DeviceRemoveCmd struct {
 	deviceStatusRepo      dependency.DeviceStateRepository
 	deviceInformationRepo dependency.DeviceInformationRepository
 	networkRepo           dependency.NetworkRepository
+	eventRepo             dependency.EventRepository
 }
 
 func NewDeviceRemoveCmd() DeviceRemoveCmd {
@@ -29,6 +30,7 @@ func NewDeviceRemoveCmd() DeviceRemoveCmd {
 		deviceStatusRepo:      repository.DeviceState{},
 		deviceInformationRepo: repository.DeviceInformation{},
 		networkRepo:           repository.Network{},
+		eventRepo:             repository.Event{},
 	}
 }
 
@@ -60,4 +62,8 @@ func (cmd DeviceRemoveCmd) Run() error {
 
 func (cmd DeviceRemoveCmd) RemoveData(sensorType uint, from, to time.Time) error {
 	return cmd.deviceDataRepo.Delete(cmd.Device.MacAddress, sensorType, from, to)
+}
+
+func (cmd DeviceRemoveCmd) RemoveEvents(ids []uint) error {
+	return cmd.eventRepo.DeleteBySpecs(context.TODO(), spec.SourceEqSpec(cmd.Device.ID), spec.PrimaryKeyInSpec(ids))
 }
