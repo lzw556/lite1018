@@ -50,18 +50,21 @@ func (p RestartStatus) Process(ctx *iot.Context, msg iot.Message) error {
 			if err != nil {
 				return fmt.Errorf("network not found: %v", err)
 			}
-			devices, err := p.deviceRepo.FindBySpecs(c, spec.NetworkEqSpec(network.ID))
-			if err != nil {
-				return fmt.Errorf("find device list failed: %v", err)
-			}
 			var eg errgroup.Group
-			eg.Go(func() error {
-				command.SyncNetworkLinkStatus(network, devices, 3*time.Second)
-				return nil
-			})
-			eg.Go(func() error {
-				return command.SyncNetwork(network, devices, 3*time.Second)
-			})
+
+			if network.GatewayID == device.ID {
+				devices, err := p.deviceRepo.FindBySpecs(c, spec.NetworkEqSpec(network.ID))
+				if err != nil {
+					return fmt.Errorf("find device list failed: %v", err)
+				}
+				eg.Go(func() error {
+					command.SyncNetworkLinkStatus(network, devices, 3*time.Second)
+					return nil
+				})
+				eg.Go(func() error {
+					return command.SyncNetwork(network, devices, 3*time.Second)
+				})
+			}
 
 			// save event
 			eg.Go(func() error {

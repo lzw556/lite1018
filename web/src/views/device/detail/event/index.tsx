@@ -22,7 +22,7 @@ const DeviceEvent:FC<DeviceEventProps> = ({device}) => {
     const [startDate, setStartDate] = useState<moment.Moment>(moment().startOf('day').subtract(7, 'd'))
     const [endDate, setEndDate] = useState<moment.Moment>(moment().endOf('day'))
     const [dataSource, setDataSource] = useState<any>()
-    const [selectedRowKeys, setSelectedRowKeys] = useState<any>()
+    const [selectedRowKeys, setSelectedRowKeys] = useState<any[]>([])
 
     const fetchDeviceEvents = useCallback((current:number, size:number) => {
         PagingDeviceEventsRequest(device.id, startDate.utc().unix(), endDate.utc().unix(), current, size).then(setDataSource)
@@ -72,7 +72,7 @@ const DeviceEvent:FC<DeviceEventProps> = ({device}) => {
                 <Row justify={"start"}>
                     <Col span={6}>
                         <HasPermission value={Permission.DeviceEventDelete}>
-                            <Button disabled={!selectedRowKeys} onClick={() => onBatchDelete()}>批量删除</Button>
+                            <Button disabled={!selectedRowKeys.length} onClick={() => onBatchDelete()}>批量删除</Button>
                         </HasPermission>
                     </Col>
                 </Row>

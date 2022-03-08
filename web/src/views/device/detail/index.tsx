@@ -112,6 +112,20 @@ const DeviceDetailPage = () => {
         if (device) {
             switch (device.typeId) {
                 case DeviceType.VibrationTemperature3Axis:
+                    if (hasPermission(Permission.DeviceEventList)) {
+                        return [
+                            ...tabTitleList,
+                            {
+                                key: "waveData",
+                                tab: "波形数据"
+                            },
+                            ...tabList,
+                            {
+                                key: "events",
+                                tab: "事件"
+                            }
+                        ]
+                    }
                     return [
                         ...tabTitleList,
                         {
@@ -121,8 +135,16 @@ const DeviceDetailPage = () => {
                         ...tabList
                     ]
                 case DeviceType.Gateway:
-                    return tabList
                 case DeviceType.Router:
+                    if (hasPermission(Permission.DeviceEventList)) {
+                        return [
+                            ...tabList,
+                            {
+                                key: "events",
+                                tab: "事件"
+                            }
+                        ]
+                    }
                     return tabList
                 default:
                     if (hasPermission(Permission.DeviceEventList)) {
