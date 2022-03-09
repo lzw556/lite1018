@@ -1,6 +1,7 @@
 package vo
 
 import (
+	"fmt"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/json"
 )
@@ -26,15 +27,12 @@ func NewDeviceEvent(e entity.Event) DeviceEvent {
 	if err := json.Unmarshal([]byte(e.Content), &content); err != nil {
 		return event
 	}
-	event.Message = eventMessage[content.Code]
-	return event
-}
-
-func (e *DeviceEvent) SetMessage(code int) {
-	switch code {
-	case 1073872902:
-
+	if message, ok := eventMessage[e.Code][content.Code]; ok {
+		event.Message = message
+	} else {
+		event.Message = fmt.Sprintf("%s(错误码: %d)", e.Code.String(), content.Code)
 	}
+	return event
 }
 
 type DeviceEventList []DeviceEvent
