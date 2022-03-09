@@ -11,6 +11,7 @@ var eventMessage = map[entity.EventCode]map[int]string{
 	},
 	entity.EventCodeUpgrade: {
 		0: "设备升级成功",
+		1: "设备升级取消",
 	},
 	entity.EventCodeDataAcquisitionFailed: {
 		33619969:   "温度传感器通讯错误",

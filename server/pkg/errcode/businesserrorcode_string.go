@@ -25,7 +25,7 @@ func _() {
 	_ = x[DeviceCommandExecFailedError-13006]
 	_ = x[DeviceCommandCancelledError-13007]
 	_ = x[UnknownDeviceCommandTypeError-13008]
-	_ = x[DeviceAlreadyBindingError-13009]
+	_ = x[DeviceOfflineError-13009]
 	_ = x[FirmwareNotFoundError-14001]
 	_ = x[FirmwareFormatError-14002]
 	_ = x[FirmwareExistsError-14003]
@@ -37,6 +37,7 @@ func _() {
 	_ = x[RoleNotFoundError-17002]
 	_ = x[MeasurementNotFoundError-18001]
 	_ = x[UnknownMeasurementTypeError-18002]
+	_ = x[MeasurementUnboundDeviceError-18003]
 	_ = x[ProjectNotFoundError-19001]
 	_ = x[ProjectExistsError-19002]
 	_ = x[ProjectNotSelectedError-19003]
@@ -46,12 +47,12 @@ const (
 	_BusinessErrorCode_name_0 = "UnknownBusinessErrorSystemNotReadyError"
 	_BusinessErrorCode_name_1 = "UserNotFoundErrorInvalidUsernameOrPasswordErrorInvalidOldPasswordErrorUserExistsErrorInvalidTokenError"
 	_BusinessErrorCode_name_2 = "AssetNotFoundErrorAssetImageSizeTooLargeError"
-	_BusinessErrorCode_name_3 = "DeviceNotFoundErrorDeviceMacExistsErrorUnknownDeviceTypeErrorDeviceCommandSendFailedErrorDeviceCommandSendTimeoutErrorDeviceCommandExecFailedErrorDeviceCommandCancelledErrorUnknownDeviceCommandTypeErrorDeviceAlreadyBindingError"
+	_BusinessErrorCode_name_3 = "DeviceNotFoundErrorDeviceMacExistsErrorUnknownDeviceTypeErrorDeviceCommandSendFailedErrorDeviceCommandSendTimeoutErrorDeviceCommandExecFailedErrorDeviceCommandCancelledErrorUnknownDeviceCommandTypeErrorDeviceOfflineError"
 	_BusinessErrorCode_name_4 = "FirmwareNotFoundErrorFirmwareFormatErrorFirmwareExistsError"
 	_BusinessErrorCode_name_5 = "NetworkNotFoundError"
 	_BusinessErrorCode_name_6 = "AlarmRuleNameExistsAlarmRuleNotFoundErrorAlarmRecordAlreadyAcknowledgedError"
 	_BusinessErrorCode_name_7 = "RoleExistsErrorRoleNotFoundError"
-	_BusinessErrorCode_name_8 = "MeasurementNotFoundErrorUnknownMeasurementTypeError"
+	_BusinessErrorCode_name_8 = "MeasurementNotFoundErrorUnknownMeasurementTypeErrorMeasurementUnboundDeviceError"
 	_BusinessErrorCode_name_9 = "ProjectNotFoundErrorProjectExistsErrorProjectNotSelectedError"
 )
 
@@ -59,11 +60,11 @@ var (
 	_BusinessErrorCode_index_0 = [...]uint8{0, 20, 39}
 	_BusinessErrorCode_index_1 = [...]uint8{0, 17, 47, 70, 85, 102}
 	_BusinessErrorCode_index_2 = [...]uint8{0, 18, 45}
-	_BusinessErrorCode_index_3 = [...]uint8{0, 19, 39, 61, 89, 118, 146, 173, 202, 227}
+	_BusinessErrorCode_index_3 = [...]uint8{0, 19, 39, 61, 89, 118, 146, 173, 202, 220}
 	_BusinessErrorCode_index_4 = [...]uint8{0, 21, 40, 59}
 	_BusinessErrorCode_index_6 = [...]uint8{0, 19, 41, 76}
 	_BusinessErrorCode_index_7 = [...]uint8{0, 15, 32}
-	_BusinessErrorCode_index_8 = [...]uint8{0, 24, 51}
+	_BusinessErrorCode_index_8 = [...]uint8{0, 24, 51, 80}
 	_BusinessErrorCode_index_9 = [...]uint8{0, 20, 38, 61}
 )
 
@@ -92,7 +93,7 @@ func (i BusinessErrorCode) String() string {
 	case 17001 <= i && i <= 17002:
 		i -= 17001
 		return _BusinessErrorCode_name_7[_BusinessErrorCode_index_7[i]:_BusinessErrorCode_index_7[i+1]]
-	case 18001 <= i && i <= 18002:
+	case 18001 <= i && i <= 18003:
 		i -= 18001
 		return _BusinessErrorCode_name_8[_BusinessErrorCode_index_8[i]:_BusinessErrorCode_index_8[i+1]]
 	case 19001 <= i && i <= 19003:

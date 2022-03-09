@@ -31,11 +31,16 @@ func Execute(gateway, device entity.Device, t Type) error {
 	default:
 		return response.BusinessErr(errcode.UnknownDeviceTypeError, "")
 	}
-	_, err := cmd.Execute(context.TODO(), gateway.MacAddress, device.MacAddress, 3*time.Second)
-	if err != nil {
-		return err
+	if gateway.State.IsOnline {
+		xlog.Infof("execute command %s => [%s]", cmd.Name(), device.MacAddress)
+		_, err := cmd.Execute(context.TODO(), gateway.MacAddress, device.MacAddress, 3*time.Second)
+		if err != nil {
+			return err
+		}
+		xlog.Infof("execute command %s successful => [%s]", cmd.Name(), device.MacAddress)
+		return nil
 	}
-	return nil
+	return errcode.DeviceOfflineError
 }
 
 func SyncDeviceSettings(gateway, device entity.Device) {
@@ -55,20 +60,21 @@ func SyncNetwork(network entity.Network, devices []entity.Device, timeout time.D
 			break
 		}
 	}
-	//if gateway.GetConnectionState().IsOnline {
-	err := SyncWsnSettings(network, gateway, false, timeout)
-	if err != nil {
-		return err
+	if gateway.State.IsOnline {
+		err := SyncWsnSettings(network, gateway, false, timeout)
+		if err != nil {
+			return err
+		}
+		if err := SyncDeviceList(gateway, devices, timeout); err != nil {
+			return err
+		}
+		for i := range devices {
+			device := devices[i]
+			go SyncDeviceSettings(gateway, device)
+		}
+		return nil
 	}
-	if err := SyncDeviceList(gateway, devices, timeout); err != nil {
-		return err
-	}
-	for i := range devices {
-		device := devices[i]
-		go SyncDeviceSettings(gateway, device)
-	}
-	//}
-	return nil
+	return errcode.DeviceOfflineError
 }
 
 func SyncNetworkLinkStatus(network entity.Network, devices []entity.Device, timeout time.Duration) {

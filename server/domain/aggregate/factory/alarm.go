@@ -31,16 +31,6 @@ func NewAlarm() Alarm {
 	}
 }
 
-func (factory Alarm) NewAlarmTemplateQuery(id uint) (*query.AlarmTemplateQuery, error) {
-	e, err := factory.alarmTemplateRepo.Get(context.TODO(), id)
-	if err != nil {
-		return nil, err
-	}
-	q := query.NewAlarmTemplateQuery()
-	q.AlarmTemplate = e
-	return &q, nil
-}
-
 func (factory Alarm) NewAlarmRuleCreateCmd(req request.AlarmRule) (*command.AlarmRuleCreateCmd, error) {
 	ctx := context.TODO()
 	e, err := factory.alarmRuleRepo.GetBySpecs(ctx, spec.NameEqSpec(req.Name))
