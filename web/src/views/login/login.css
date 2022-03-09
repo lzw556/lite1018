@@ -31,6 +31,7 @@
 
 #login-page .ts-login-form {
     padding-top: 18%;
+    text-align: start;
 }
 
 #login-page Form Button {
