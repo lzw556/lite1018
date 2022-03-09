@@ -4,7 +4,7 @@ import {Network} from "../../../types/network";
 import DeviceTypeSelect from "../../../components/select/deviceTypeSelect";
 import DeviceSelect from "../../../components/select/deviceSelect";
 import {AccessDevicesRequest} from "../../../apis/network";
-import {Rules} from "../../../constants/validator";
+import {Normalizes, Rules} from "../../../constants/validator";
 import {DeviceType} from "../../../types/device_type";
 import IpnFormItem from "../../../components/formItems/ipnFormItem";
 import {DEFAULT_IPN_SETTING} from "../../../types/ipn_setting";
@@ -35,7 +35,7 @@ const AddDeviceModal:FC<AddDeviceModalProps> = (props) => {
                 <Form.Item label={"设备名称"} name={"name"} rules={[Rules.required]}>
                     <Input placeholder={"请输入设备名称"}/>
                 </Form.Item>
-                <Form.Item label={"MAC地址"} name={"mac_address"} rules={[Rules.required]}>
+                <Form.Item label={"MAC地址"} name={"mac_address"} normalize={Normalizes.macAddress} rules={[Rules.required]}>
                     <Input placeholder={"请输入设备MAC地址"}/>
                 </Form.Item>
                 <Form.Item label={"设备类型"} name={"device_type"} rules={[Rules.required]}>
