@@ -8,6 +8,7 @@ import {Rules} from "../../../constants/validator";
 import {DeviceType} from "../../../types/device_type";
 import IpnFormItem from "../../../components/formItems/ipnFormItem";
 import {DEFAULT_IPN_SETTING} from "../../../types/ipn_setting";
+import {GetDevicesRequest} from "../../../apis/device";
 
 export interface AddDeviceModalProps extends ModalProps {
     network: Network
@@ -18,6 +19,7 @@ const AddDeviceModal:FC<AddDeviceModalProps> = (props) => {
     const {visible, network, onSuccess} = props;
     const [isNew, setIsNew] = useState(false);
     const [deviceType, setDeviceType] = useState<DeviceType>();
+    const [parents, setParents] = useState<any[]>([])
     const [form] = Form.useForm();
 
     useEffect(() => {
@@ -57,12 +59,18 @@ const AddDeviceModal:FC<AddDeviceModalProps> = (props) => {
         }).catch(e => {})
     }
 
+    const onParentChange = (open:any) => {
+        if (open) {
+            GetDevicesRequest({network_id: network.id}).then(setParents)
+        }
+    }
+
     return <Modal {...props} title={"设备添加"} width={420} onOk={onSave}>
         <Form form={form} labelCol={{span: 6}}>
             <Form.Item label={"父节点设备"} name={"parent_id"} rules={[Rules.required]}>
-                <Select placeholder={"请选择父节点设备"}>
+                <Select placeholder={"请选择父节点设备"} onDropdownVisibleChange={onParentChange}>
                     {
-                        network.nodes.map(node => <Select.Option key={node.id} value={node.id}>{node.name}</Select.Option>)
+                        parents.map(node => <Select.Option key={node.id} value={node.id}>{node.name}</Select.Option>)
                     }
                 </Select>
             </Form.Item>

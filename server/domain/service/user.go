@@ -83,7 +83,7 @@ func (s User) GetUserByID(userID uint) (*vo.User, error) {
 	return &result, nil
 }
 
-func (s User) FindUsersByPaginate(page, size int) ([]vo.User, int64, error) {
+func (s User) PagingUsers(page, size int) ([]vo.User, int64, error) {
 	es, total, err := s.repository.Paging(context.TODO(), page, size)
 	if err != nil {
 		return nil, 0, err
@@ -138,6 +138,6 @@ func (s User) UpdatePassByUserID(userID uint, req request.UserPass) error {
 	return s.repository.Save(ctx, &e)
 }
 
-func (s User) FilterUsers(filters request.Filters) ([]vo.User, error) {
+func (s User) FindUsers(filters request.Filters) ([]vo.User, error) {
 	return nil, nil
 }

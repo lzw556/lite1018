@@ -22,7 +22,7 @@ func (r *userRouter) initRoutes() {
 		router.NewPostRoute("users", r.create),
 
 		// GET
-		router.NewGetRoute("users", r.paging),
+		router.NewGetRoute("users", r.find),
 		router.NewGetRoute("users/:id", r.getByID),
 		router.NewGetRoute("my/profile", r.profile),
 

@@ -1,5 +1,6 @@
 import G6 from '@antv/g6';
 import {ColorHealth, ColorInfo, ColorWarn} from "../../constants/color";
+import "../../string-extension";
 
 const Color = require('color');
 
@@ -36,7 +37,7 @@ G6.registerNode('gateway', {
                 x: 8,
                 y: 30,
                 fontSize: 8,
-                text: cfg.data.macAddress,
+                text: cfg.data.macAddress.toUpperCase().macSeparator(),
                 textBaseline: "center",
                 fill: "#fff",
             }

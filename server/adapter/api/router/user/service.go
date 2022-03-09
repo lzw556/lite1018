@@ -13,8 +13,8 @@ type Service interface {
 	UpdatePassByUserID(userID uint, req request.UserPass) error
 
 	GetUserByID(id uint) (*vo.User, error)
-	FindUsersByPaginate(page, size int) ([]vo.User, int64, error)
-	FilterUsers(filters request.Filters) ([]vo.User, error)
+	PagingUsers(page, size int) ([]vo.User, int64, error)
+	FindUsers(filters request.Filters) ([]vo.User, error)
 
 	DeleteUserByID(id uint) error
 }

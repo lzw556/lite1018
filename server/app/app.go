@@ -110,7 +110,7 @@ func runApiServer(mode string, dist embed.FS) {
 	adapter.Api.UseMiddleware(
 		middleware.NewJWT("/login", "/resources/*"),
 		middleware.NewCasbinRbac("/login", "/my/*", "/check/*", "/menus/*", "/permissions/*", "/resources/*", "/statistics/*", "/devices/defaultSettings"),
-		middleware.NewProjectChecker("/login", "/resources/*"),
+		middleware.NewProjectChecker("/login", "/resources/*", "/users/*", "/my/*"),
 	)
 	adapter.Api.RegisterRouters(
 		project.NewRouter(service.NewProject()),
