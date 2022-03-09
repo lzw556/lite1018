@@ -8,10 +8,15 @@ var eventMessage = map[entity.EventCode]map[int]string{
 		1: "设备硬件重启",
 		2: "设备软件重启",
 		3: "设备看门狗重启",
+		4: "设备NFC重启",
 	},
 	entity.EventCodeUpgrade: {
 		0: "设备升级成功",
 		1: "设备升级取消",
+	},
+	entity.EventCodeStatus: {
+		0: "设备离线",
+		1: "设备上线",
 	},
 	entity.EventCodeDataAcquisitionFailed: {
 		33619969:   "温度传感器通讯错误",

@@ -7,7 +7,13 @@ const (
 	EventCodeReboot
 	EventCodeReset
 	EventCodeUpgrade
+)
 
+const (
+	EventCodeStatus EventCode = 90201 + iota
+)
+
+const (
 	EventCodeDataAcquisitionFailed EventCode = iota + 90401
 )
 
@@ -21,6 +27,8 @@ func (e EventCode) String() string {
 		return "恢复出厂设置"
 	case EventCodeUpgrade:
 		return "设备升级"
+	case EventCodeStatus:
+		return "设备状态"
 	case EventCodeDataAcquisitionFailed:
 		return "数据采集失败"
 	default:
