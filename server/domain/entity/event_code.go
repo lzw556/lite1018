@@ -28,7 +28,7 @@ func (e EventCode) String() string {
 	case EventCodeUpgrade:
 		return "设备升级"
 	case EventCodeStatus:
-		return "设备状态"
+		return "设备状态变化"
 	case EventCodeDataAcquisitionFailed:
 		return "数据采集失败"
 	default:

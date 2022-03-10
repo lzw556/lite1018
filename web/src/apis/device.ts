@@ -55,8 +55,8 @@ export function RemoveDeviceDataRequest(id: number, from: number, to: number) {
     return request.delete(`/devices/${id}/data?from=${from}&to=${to}`).then(DeleteResponse)
 }
 
-export function SendDeviceCommandRequest(id: number, cmd: any) {
-    return request.post(`/devices/${id}/commands/${cmd}`, {}).then(res => res.data)
+export function SendDeviceCommandRequest(id: number, cmd: any, params: any) {
+    return request.post(`/devices/${id}/commands/${cmd}`, params).then(res => res.data)
 }
 
 export function DeviceUpgradeRequest(id: number, params: any) {

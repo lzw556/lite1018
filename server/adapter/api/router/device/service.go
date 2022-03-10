@@ -15,7 +15,7 @@ type Service interface {
 	FindDevices(filters request.Filters) ([]vo.Device, error)
 	CheckDeviceMacAddress(mac string) error
 
-	ExecuteCommandByID(id uint, cmdType uint) error
+	ExecuteCommandByID(id uint, cmdType uint, req request.DeviceCommand) error
 	ExecuteDeviceUpgradeByID(id uint, req request.DeviceUpgrade) error
 	ExecuteDeviceCancelUpgradeByID(id uint) error
 

@@ -24,3 +24,8 @@ func (cmd DeviceExecuteCommandCmd) Run(cmdType uint) error {
 	cmd.Gateway.State, _ = cmd.deviceStateRepo.Get(cmd.Gateway.MacAddress)
 	return command.Execute(cmd.Gateway, cmd.Device, command.Type(cmdType))
 }
+
+func (cmd DeviceExecuteCommandCmd) Calibrate(param float32) error {
+	cmd.Gateway.State, _ = cmd.deviceStateRepo.Get(cmd.Gateway.MacAddress)
+	return command.Calibrate(cmd.Gateway, cmd.Device, param)
+}

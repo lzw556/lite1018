@@ -6,6 +6,7 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/request"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/response"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/device"
+	"github.com/thetasensors/theta-cloud-lite/server/adapter/iot/command"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/aggregate/factory"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
@@ -121,10 +122,14 @@ func (s Device) RemoveDataByID(id uint, sensorType uint, from, to int64) error {
 	return cmd.RemoveData(sensorType, time.Unix(from, 0), time.Unix(to, 0))
 }
 
-func (s Device) ExecuteCommandByID(id uint, cmdType uint) error {
+func (s Device) ExecuteCommandByID(id uint, cmdType uint, req request.DeviceCommand) error {
 	cmd, err := s.factory.NewDeviceExecuteCommandCmd(id)
 	if err != nil {
 		return err
+	}
+	switch command.Type(cmdType) {
+	case command.CalibrateCmdType:
+		return cmd.Calibrate(req.Param)
 	}
 	return cmd.Run(cmdType)
 }

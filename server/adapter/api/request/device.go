@@ -28,3 +28,7 @@ type DeviceUpgrade struct {
 	FirmwareID uint `json:"firmware_id"`
 	Type       uint `json:"type"`
 }
+
+type DeviceCommand struct {
+	Param float32 `json:"param"`
+}

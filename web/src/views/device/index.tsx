@@ -112,10 +112,20 @@ const DevicePage = () => {
                         message.error(`取消升级失败,${res.msg}`).then()
                     }
                 })
-                break
+                break;
+            case DeviceCommand.Calibrate:
+                SendDeviceCommandRequest(device.id, key, {param: 60}).then(res => {
+                    setExecuteDevice(undefined)
+                    if (res.code === 200) {
+                        message.success("命令发送成功").then()
+                    } else {
+                        message.error(res.msg).then()
+                    }
+                })
+                break;
             default:
                 setExecuteDevice(device)
-                SendDeviceCommandRequest(device.id, key).then(res => {
+                SendDeviceCommandRequest(device.id, key, {param: 0}).then(res => {
                     setExecuteDevice(undefined)
                     if (res.code === 200) {
                         message.success("命令发送成功").then()
@@ -137,6 +147,7 @@ const DevicePage = () => {
                 hasPermission(Permission.DeviceCommand) &&
                 (<>
                     <Menu.Item key={DeviceCommand.Reboot} disabled={!disabled} hidden={isUpgrading}>重启</Menu.Item>
+                    {/*<Menu.Item key={DeviceCommand.Calibrate} disabled={!disabled} hidden={isUpgrading}>校准</Menu.Item>*/}
                     <Menu.Item key={DeviceCommand.Reset} disabled={!disabled} hidden={isUpgrading}>恢复出厂设置</Menu.Item>
                 </>)
             }

@@ -52,7 +52,11 @@ func (r deviceRouter) update(ctx *gin.Context) (interface{}, error) {
 func (r deviceRouter) executeCommand(ctx *gin.Context) (interface{}, error) {
 	id := cast.ToUint(ctx.Param("id"))
 	cmd := cast.ToUint(ctx.Param("cmd"))
-	return nil, r.service.ExecuteCommandByID(id, cmd)
+	var req request.DeviceCommand
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		return nil, response.InvalidParameterError(err.Error())
+	}
+	return nil, r.service.ExecuteCommandByID(id, cmd, req)
 }
 
 func (r deviceRouter) getSettingByID(ctx *gin.Context) (interface{}, error) {

@@ -183,7 +183,7 @@ const DeviceDetailPage = () => {
                     break
             
                 default:
-                    SendDeviceCommandRequest(device.id, key).then(res => {
+                    SendDeviceCommandRequest(device.id, key, {}).then(res => {
                         if (res.code === 200) {
                             message.success("发送成功").then()
                         } else {
