@@ -81,9 +81,9 @@ const DashboardPage = () => {
 
     const renderDeviceStatistics = () => {
         const total = deviceStatistics.length
-        const info = deviceStatistics.filter(item => item.device.alertState?.level === 1).length
-        const warn = deviceStatistics.filter(item => item.device.alertState?.level === 2).length
-        const critical = deviceStatistics.filter(item => item.device.alertState?.level === 3).length
+        const info = 0
+        const warn = 0
+        const critical = 0
         const legend = new Map<string, number>([
             ['正常', total - info - warn - critical],
             ['提示', info],

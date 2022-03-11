@@ -33,7 +33,7 @@ const tabList = [
         tab: "TA(状态历史)",
     }
 ]
-const tabTitleList = [   
+const tabTitleList = [
     {
         key: "monitor",
         tab: "监控",
@@ -44,15 +44,15 @@ const tabTitleList = [
     }]
 
 const DeviceDetailPage = () => {
-    const location = useLocation<any>();
-    const history = useHistory();
-    const {PubSub} = useSocket();
-    const [device, setDevice] = useState<Device>();
-    const [isLoading, setIsLoading] = useState<boolean>(false);
-    const [currentKey, setCurrentKey] = useState<string>('');
-    const {hasPermission, hasPermissions} = userPermission();
-    const [upgradeVisible, setUpgradeVisible] = useState<boolean>(false)
-    const [upgradeStatus, setUpgradeStatus] = useState<any>()
+  const location = useLocation<any>();
+  const history = useHistory();
+  const { PubSub } = useSocket();
+  const [device, setDevice] = useState<Device>();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [currentKey, setCurrentKey] = useState<string>('');
+  const { hasPermission, hasPermissions } = userPermission();
+  const [upgradeVisible, setUpgradeVisible] = useState<boolean>(false);
+  const [upgradeStatus, setUpgradeStatus] = useState<any>();
 
     const contents = new Map<string, any>([
         ["settings", device && <SettingPage device={device}/>],
@@ -79,33 +79,33 @@ const DeviceDetailPage = () => {
         }
     }, []);
 
-    useEffect(() => {
-        fetchDevice();
-    }, [fetchDevice])
+  useEffect(() => {
+    fetchDevice();
+  }, [fetchDevice]);
 
-    useEffect(() => {
-        if (device) {
-            PubSub.subscribe(SocketTopic.connectionState, (msg: any, state: any) => {
-                if (device.macAddress === state.macAddress){
-                    setDevice({...device, state: {...device.state, isOnline: state.isOnline}})
-                }
-            })
-            PubSub.subscribe(SocketTopic.upgradeStatus, (msg:string, status:any) => {
-                if (device.macAddress === status.macAddress) {
-                    setUpgradeStatus({code: status.code, progress: status.progress});
-                }
-            });
-            if(device.typeId===DeviceType.Gateway||device.typeId===DeviceType.Router){
-                setCurrentKey(tabList[0].key)
-            }else{
-                setCurrentKey(tabTitleList[0].key)
-            }
+  useEffect(() => {
+    if (device) {
+      PubSub.subscribe(SocketTopic.connectionState, (msg: any, state: any) => {
+        if (device.macAddress === state.macAddress) {
+          setDevice({ ...device, state: { ...device.state, isOnline: state.isOnline } });
         }
-        return () => {
-            PubSub.unsubscribe(SocketTopic.upgradeStatus);
-            PubSub.unsubscribe(SocketTopic.connectionState)
+      });
+      PubSub.subscribe(SocketTopic.upgradeStatus, (msg: string, status: any) => {
+        if (device.macAddress === status.macAddress) {
+          setUpgradeStatus({ code: status.code, progress: status.progress });
         }
-    }, [device])
+      });
+      if (device.typeId === DeviceType.Gateway || device.typeId === DeviceType.Router) {
+        setCurrentKey(tabList[0].key);
+      } else {
+        setCurrentKey(tabTitleList[0].key);
+      }
+    }
+    return () => {
+      PubSub.unsubscribe(SocketTopic.upgradeStatus);
+      PubSub.unsubscribe(SocketTopic.connectionState);
+    };
+  }, [device]);
 
     const renderTabList = () => {
         if (device) {
@@ -180,7 +180,7 @@ const DeviceDetailPage = () => {
                         }
                     })
                     break
-            
+
                 default:
                     SendDeviceCommandRequest(device.id, key, {}).then(res => {
                         if (res.code === 200) {
@@ -190,63 +190,87 @@ const DeviceDetailPage = () => {
                         }
                     })
                     break;
-            }           
-        }
-    }
-
-    const renderCommandMenu = () => {
-        const isOnline = device && device.state.isOnline
-        const isUpgrading = device && upgradeStatus && IsUpgrading(upgradeStatus.code)
-        return <Menu onClick={onCommand}>
-            <Menu.Item key={DeviceCommand.Reboot} disabled={!isOnline} hidden={isUpgrading}>重启</Menu.Item>
-            {
-                device && device.typeId !== DeviceType.Router &&
-                device.typeId !== DeviceType.Gateway &&
-                <Menu.Item key={DeviceCommand.ResetData} disabled={!isOnline} hidden={isUpgrading}>重置数据</Menu.Item>
             }
-            <Menu.Item key={DeviceCommand.Reset} disabled={!isOnline} hidden={isUpgrading}>恢复出厂设置</Menu.Item>
-            {hasPermissions(Permission.DeviceUpgrade, Permission.DeviceFirmwares) &&
-                (<>
-                    <Menu.Item key={DeviceCommand.Upgrade} disabled={!isOnline} hidden={isUpgrading}>固件升级</Menu.Item>
-                    <Menu.Item key={DeviceCommand.CancelUpgrade} hidden={!isUpgrading}>取消升级</Menu.Item>
-                </>)}
-        </Menu>
-    }
-    
-    return <Content>
-        <MyBreadcrumb>
-            <Space>
-                <HasPermission value={Permission.DeviceCommand}>
-                    <Dropdown overlay={renderCommandMenu}>
-                        <Button type={"primary"}>设备命令<DownOutlined/></Button>
-                    </Dropdown>
-                </HasPermission>
-            </Space>
-        </MyBreadcrumb>
-        <Row justify="center">
-            <Col span={24}>
-                {
-                    device && <InformationCard device={device} isLoading={isLoading}/>
-                }
-                <br/>
-                {
-                    device && <ShadowCard size={"small"} tabList={renderTabList()} onTabChange={key => {
-                        setCurrentKey(key)
-                    }}>
-                        {currentKey && contents.get(currentKey)}
-                    </ShadowCard>
-                }
-            </Col>
-        </Row>
-        {
-            device &&
-            <UpgradeModal visible={upgradeVisible} device={device} onSuccess={() => {               
-                setUpgradeVisible(false)
-            }} onCancel={() => {
-                setUpgradeVisible(false)
-            }}/>
         }
-    </Content>
-}
+    }
 
-export default DeviceDetailPage
+  const renderCommandMenu = () => {
+    const isOnline = device && device.state.isOnline;
+    const isUpgrading = device && upgradeStatus && IsUpgrading(upgradeStatus.code);
+    return (
+      <Menu onClick={onCommand}>
+        <Menu.Item key={DeviceCommand.Reboot} disabled={!isOnline} hidden={isUpgrading}>
+          重启
+        </Menu.Item>
+        {device && device.typeId !== DeviceType.Router && device.typeId !== DeviceType.Gateway && (
+          <Menu.Item key={DeviceCommand.ResetData} disabled={!isOnline} hidden={isUpgrading}>
+            重置数据
+          </Menu.Item>
+        )}
+        <Menu.Item key={DeviceCommand.Reset} disabled={!isOnline} hidden={isUpgrading}>
+          恢复出厂设置
+        </Menu.Item>
+        {hasPermissions(Permission.DeviceUpgrade, Permission.DeviceFirmwares) && (
+          <>
+            <Menu.Item key={DeviceCommand.Upgrade} disabled={!isOnline} hidden={isUpgrading}>
+              固件升级
+            </Menu.Item>
+            <Menu.Item key={DeviceCommand.CancelUpgrade} hidden={!isUpgrading}>
+              取消升级
+            </Menu.Item>
+          </>
+        )}
+      </Menu>
+    );
+  };
+
+  return (
+    <Content>
+      <MyBreadcrumb
+        firstBreadState={location && location.search.indexOf('displayDevicesByCard') > -1 ? { displayDevicesByCard: true } : undefined}
+      >
+        <Space>
+          <HasPermission value={Permission.DeviceCommand}>
+            <Dropdown overlay={renderCommandMenu}>
+              <Button type={'primary'}>
+                设备命令
+                <DownOutlined />
+              </Button>
+            </Dropdown>
+          </HasPermission>
+        </Space>
+      </MyBreadcrumb>
+      <Row justify='center'>
+        <Col span={24}>
+          {device && <InformationCard device={device} isLoading={isLoading} />}
+          <br />
+          {device && (
+            <ShadowCard
+              size={'small'}
+              tabList={renderTabList()}
+              onTabChange={(key) => {
+                setCurrentKey(key);
+              }}
+            >
+              {currentKey && contents.get(currentKey)}
+            </ShadowCard>
+          )}
+        </Col>
+      </Row>
+      {device && (
+        <UpgradeModal
+          visible={upgradeVisible}
+          device={device}
+          onSuccess={() => {
+            setUpgradeVisible(false);
+          }}
+          onCancel={() => {
+            setUpgradeVisible(false);
+          }}
+        />
+      )}
+    </Content>
+  );
+};
+
+export default DeviceDetailPage;

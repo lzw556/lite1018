@@ -1,4 +1,4 @@
-import { ColorDanger, ColorInfo, ColorWarn } from "./color"
+import {ColorDanger, ColorInfo, ColorWarn} from "./color";
 
 export function OperationTranslate(op: string) {
     switch (op) {

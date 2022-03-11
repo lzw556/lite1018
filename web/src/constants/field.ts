@@ -1,4 +1,4 @@
-import { DeviceType } from "../types/device_type"
+import {DeviceType} from "../types/device_type";
 
 export function GetFieldName(key:string) {
     switch (key) {
