@@ -136,7 +136,6 @@ const DevicePage = () => {
                 break
         }
     }
-  };
 
     const renderCommandMenus = (record: Device) => {
         const disabled = record.state && record.state.isOnline
