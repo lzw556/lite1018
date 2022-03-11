@@ -41,8 +41,7 @@ const tabTitleList = [
     {
         key: "historyData",
         tab: "历史数据"
-    }
-]
+    }]
 
 const DeviceDetailPage = () => {
     const location = useLocation<any>();

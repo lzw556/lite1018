@@ -11,7 +11,7 @@ const DeviceMonitorDrawer: FC<DeviceMonitorDrawerProps> = (props) => {
     const {device} = props;
     const [height] = useState<number>(window.innerHeight);
 
-    return <Drawer {...props} placement={"top"} closable={false} height={height - 100}>
+    return <Drawer {...props} placement={"top"} closable={false} height='auto' drawerStyle={{maxHeight:'90vh'}}>
         <Row justify={"start"}>
             <Col span={24}>
                 <Typography.Title level={4}>设备监控: {device.name}</Typography.Title>

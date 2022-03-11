@@ -73,29 +73,33 @@ const AddDevicePage = () => {
                         <Row>
                             <Col span={20}>
                                 <Form  form={form} labelCol={{span: 8}} validateMessages={defaultValidateMessages}>
-                                    <Divider orientation={"left"}>基本信息</Divider>
-                                    <Form.Item label="设备名称" name="name" rules={[Rules.required]}>
-                                        <Input placeholder={"请输入设备名称"}/>
-                                    </Form.Item>
-                                    <Form.Item label="设备MAC地址" normalize={Normalizes.macAddress} required name="mac_address" rules={[{validator: onMacValidator}]}>
-                                        <Input placeholder={`请输入设备MAC地址`} />
-                                    </Form.Item>
-                                    <Form.Item label={"所属网络"} name={"network"} rules={[Rules.required]}>
-                                        <NetworkSelect placeholder={"请选择设备所属网络"} onChange={setNetwork}/>
-                                    </Form.Item>
-                                    {
-                                        network &&
-                                        <Form.Item label={"设备父节点"} name={"parent"} rules={[Rules.required]}>
-                                            <DeviceSelect filters={{network_id: network}} placeholder={"请选择设备所属父节点"}/>
+                                    <fieldset>
+                                        <legend>基本信息</legend>
+                                        <Form.Item label="设备名称" name="name" rules={[Rules.required]}>
+                                            <Input placeholder={"请输入设备名称"}/>
                                         </Form.Item>
-                                    }
-                                    <Divider orientation={"left"}>设备类型</Divider>
-                                    <Form.Item label={"设备类型"} name={"type"} rules={[Rules.required]}>
-                                        <DeviceTypeSelect placeholder={"请选择设备类型"} onChange={fetchDeviceDefaultSettings}/>
-                                    </Form.Item>
-                                    {
-                                        deviceSettings?.map(item => (<DeviceSettingFormItem value={item} editable={true}/>))
-                                    }
+                                        <Form.Item label="设备MAC地址" normalize={Normalizes.macAddress} required name="mac_address" rules={[{validator: onMacValidator}]}>
+                                            <Input placeholder={`请输入设备MAC地址`} />
+                                        </Form.Item>
+                                        <Form.Item label={"所属网络"} name={"network"} rules={[Rules.required]}>
+                                            <NetworkSelect placeholder={"请选择设备所属网络"} onChange={setNetwork}/>
+                                        </Form.Item>
+                                        {
+                                            network &&
+                                            <Form.Item label={"设备父节点"} name={"parent"} rules={[Rules.required]}>
+                                                <DeviceSelect filters={{network_id: network}} placeholder={"请选择设备所属父节点"}/>
+                                            </Form.Item>
+                                        }
+                                    </fieldset>
+                                    <fieldset>
+                                        <legend>设备类型</legend>
+                                        <Form.Item label={"设备类型"} name={"type"} rules={[Rules.required]}>
+                                            <DeviceTypeSelect placeholder={"请选择设备类型"} onChange={fetchDeviceDefaultSettings}/>
+                                        </Form.Item>
+                                        {
+                                            deviceSettings?.map(item => (<DeviceSettingFormItem value={item} editable={true}/>))
+                                        }
+                                    </fieldset>
                                 </Form>
                             </Col>
                             <Col span={20} style={{textAlign: "right"}}>

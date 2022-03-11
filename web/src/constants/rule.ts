@@ -1,3 +1,5 @@
+import { ColorDanger, ColorInfo, ColorWarn } from "./color"
+
 export function OperationTranslate(op: string) {
     switch (op) {
         case ">":
@@ -22,6 +24,18 @@ export function GetAlarmLevelString(level: number) {
             return AlarmLevelWarn
         case 3:
             return AlarmLevelCritical
+    }
+    return ""
+}
+
+export function GetAlarmLevelSkin(level: number) {
+    switch (level) {
+        case 1:
+            return ColorInfo
+        case 2:
+            return ColorWarn
+        case 3:
+            return ColorDanger
     }
     return ""
 }

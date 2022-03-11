@@ -26,16 +26,14 @@ export const DeviceSettingContent: React.FC<{
           <>
             {groups.map((group) => {
               return (
-                <>
-                  <Divider orientation='left'>
-                    <span style={{fontSize:16}}>{(group && SETTING_GROUPS[group]) || group}</span>
-                  </Divider>
+                <fieldset>
+                  <legend>{(group && SETTING_GROUPS[group]) || group}</legend>
                   {settings
                     .filter((setting) => setting.group === group)
                     .map((setting) => (
                       <DeviceSettingFormItem editable={true} value={setting} key={setting.key} />
                     ))}
-                </>
+                </fieldset>
               );
             })}
           </>
