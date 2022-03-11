@@ -2,54 +2,39 @@
 .site-navigation-steps {
     margin-bottom: 60px;
     box-shadow: 0 -1px 0 0 #e8e8e8 inset;
-    margin-bottom: 60px;
-    box-shadow: 0 -1px 0 0 #e8e8e8 inset;
 }
 
 .ts-detail-label {
-    line-height: 30px;
-    color: #8a8e99;
     line-height: 30px;
     color: #8a8e99;
 }
 
 .ts-setting-grid {
     width: 50%;
-    width: 50%;
 }
 
 .ant-card-actions > li {
-    margin: 6px 0;
-    cursor: default;
     margin: 6px 0;
     cursor: default;
 }
 
 .ts-row-selected {
     color: #1890ff;
-    color: #1890ff;
 }
 
 .ant-empty-normal {
     margin: 140px 0 !important;
-    margin: 140px 0 !important;
 }
 
 .ant-skeleton-image {
-    background: transparent !important;
     background: transparent !important;
 }
 .ant-form fieldset {
     margin-bottom: 10px;
     padding: 20px;
     border: solid 1px #d9d9d9;
-    margin-bottom: 10px;
-    padding: 20px;
-    border: solid 1px #d9d9d9;
 }
 .ant-form fieldset legend {
-    width: initial;
-    border: initial;
     width: initial;
     border: initial;
 }
