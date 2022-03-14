@@ -52,7 +52,7 @@ func (query AlarmRecordQuery) Paging(page, size int) ([]vo.AlarmRecord, int64, e
 
 func (query AlarmRecordQuery) GetAcknowledge(id uint) (*vo.AlarmRecordAcknowledge, error) {
 	ctx := context.TODO()
-	e, err := query.alarmRecordAcknowledgeRepo.GetSpecs(ctx, spec.AlarmRecordEqSpec(id))
+	e, err := query.alarmRecordAcknowledgeRepo.GetBySpecs(ctx, spec.AlarmRecordEqSpec(id))
 	if err != nil {
 		return nil, err
 	}

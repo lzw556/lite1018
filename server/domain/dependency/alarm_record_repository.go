@@ -17,4 +17,5 @@ type AlarmRecordRepository interface {
 	FindBySpecs(ctx context.Context, specs ...spec.Specification) ([]entity.AlarmRecord, error)
 	UpdateBySpecs(ctx context.Context, updates map[string]interface{}, specs ...spec.Specification) error
 	CountBySpecs(ctx context.Context, specs ...spec.Specification) (int64, error)
+	DeleteBySpecs(ctx context.Context, specs ...spec.Specification) error
 }

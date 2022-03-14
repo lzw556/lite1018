@@ -79,3 +79,13 @@ func (repo DeviceAlertState) Delete(mac string, id uint) error {
 		return dataBucket.Delete(itob(id))
 	})
 }
+
+func (repo DeviceAlertState) DeleteAll(mac string) error {
+	return repo.BoltDB().Update(func(tx *bbolt.Tx) error {
+		bucket, err := tx.CreateBucketIfNotExists([]byte(entity.DeviceAlertState{}.BucketName()))
+		if err != nil {
+			return err
+		}
+		return bucket.DeleteBucket([]byte(mac))
+	})
+}

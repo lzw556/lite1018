@@ -41,6 +41,16 @@ func (factory Project) NewProjectUpdateCmd(id uint) (*command.ProjectUpdateCmd, 
 	return &cmd, nil
 }
 
+func (factory Project) NewProjectDeleteCmd(id uint) (*command.ProjectDeleteCmd, error) {
+	e, err := factory.projectRepo.Get(context.TODO(), id)
+	if err != nil {
+		return nil, response.BusinessErr(errcode.ProjectNotFoundError, "")
+	}
+	cmd := command.NewProjectDeleteCmd()
+	cmd.Project = e
+	return &cmd, nil
+}
+
 func (factory Project) buildSpecs(filters request.Filters) []spec.Specification {
 	specs := make([]spec.Specification, 0)
 	for name, v := range filters {

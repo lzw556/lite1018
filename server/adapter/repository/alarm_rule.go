@@ -61,3 +61,7 @@ func (repo AlarmRule) GetBySpecs(ctx context.Context, specs ...spec.Specificatio
 	err := repo.DB(ctx).Scopes(spec.Scopes(specs)...).First(&e).Error
 	return e, err
 }
+
+func (repo AlarmRule) DeleteBySpecs(ctx context.Context, specs ...spec.Specification) error {
+	return repo.DB(ctx).Scopes(spec.Scopes(specs)...).Delete(&entity.AlarmRule{}).Error
+}

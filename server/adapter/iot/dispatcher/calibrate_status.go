@@ -18,7 +18,7 @@ func NewCalibrateStatus() iot.Dispatcher {
 }
 
 func (d CalibrateStatus) Name() string {
-	return "calibrateStatus"
+	return "calibrationStatus"
 }
 
 func (d CalibrateStatus) Dispatch(msg iot.Message) {

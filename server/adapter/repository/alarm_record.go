@@ -41,6 +41,10 @@ func (repo AlarmRecord) CountBySpecs(ctx context.Context, specs ...spec.Specific
 	return count, err
 }
 
+func (repo AlarmRecord) DeleteBySpecs(ctx context.Context, specs ...spec.Specification) error {
+	return repo.DB(ctx).Scopes(spec.Scopes(specs)...).Delete(&entity.AlarmRecord{}).Error
+}
+
 func (repo AlarmRecord) Get(ctx context.Context, id uint) (entity.AlarmRecord, error) {
 	var e entity.AlarmRecord
 	err := repo.DB(ctx).First(&e, id).Error

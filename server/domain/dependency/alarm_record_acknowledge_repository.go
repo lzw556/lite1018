@@ -8,5 +8,6 @@ import (
 
 type AlarmRecordAcknowledgeRepository interface {
 	Create(ctx context.Context, e *entity.AlarmRecordAcknowledge) error
-	GetSpecs(ctx context.Context, specs ...spec.Specification) (entity.AlarmRecordAcknowledge, error)
+	GetBySpecs(ctx context.Context, specs ...spec.Specification) (entity.AlarmRecordAcknowledge, error)
+	DeleteBySpecs(ctx context.Context, specs ...spec.Specification) error
 }
