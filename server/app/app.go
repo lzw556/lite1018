@@ -89,7 +89,7 @@ func runIoTServer() {
 		dispatcher.NewDeviceInformation(),
 		dispatcher.NewBye(),
 		dispatcher.NewEvent(),
-		dispatcher.NewCalibrateStatus(),
+		dispatcher.NewCalibrationStatus(),
 	)
 	if err := adapter.IoT.Run(); err != nil {
 		xlog.Error("iot server start failed", err)

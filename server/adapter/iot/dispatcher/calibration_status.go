@@ -5,22 +5,22 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/iot/process"
 )
 
-type CalibrateStatus struct {
+type CalibrationStatus struct {
 	context   *iot.Context
 	processor process.Processor
 }
 
-func NewCalibrateStatus() iot.Dispatcher {
-	return &CalibrateStatus{
+func NewCalibrationStatus() iot.Dispatcher {
+	return &CalibrationStatus{
 		context:   iot.NewContext(),
-		processor: process.NewCalibrateStatus(),
+		processor: process.NewCalibrationStatus(),
 	}
 }
 
-func (d CalibrateStatus) Name() string {
+func (d CalibrationStatus) Name() string {
 	return "calibrationStatus"
 }
 
-func (d CalibrateStatus) Dispatch(msg iot.Message) {
+func (d CalibrationStatus) Dispatch(msg iot.Message) {
 	process.Do(d.context, d.processor, msg)
 }

@@ -139,6 +139,12 @@ func (cmd NetworkUpdateCmd) RemoveDevices(req request.RemoveDevices) error {
 		if err := cmd.networkRepo.Save(txCtx, &cmd.Network); err != nil {
 			return err
 		}
+		for _, device := range devices {
+			if state, err := cmd.deviceStateRepo.Get(device.MacAddress); err == nil {
+				state.IsOnline = false
+				_ = cmd.deviceStateRepo.Create(device.MacAddress, state)
+			}
+		}
 		return cmd.deviceRepo.BatchSave(txCtx, devices)
 	})
 	if err != nil {

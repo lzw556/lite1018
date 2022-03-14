@@ -42,4 +42,8 @@ var eventMessage = map[entity.EventCode]map[int]string{
 		1074003969: "加速度传感器通讯错误",
 		1074003970: "加速度传感器计算错误",
 	},
+	entity.EventCodeCalibration: {
+		0:  "校准成功",
+		-1: "校准失败",
+	},
 }

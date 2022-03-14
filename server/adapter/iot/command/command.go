@@ -62,6 +62,7 @@ func SyncNetwork(network entity.Network, devices []entity.Device, timeout time.D
 			break
 		}
 	}
+	gateway.State, _ = deviceStateRepo.Get(gateway.MacAddress)
 	if gateway.State.IsOnline {
 		err := SyncWsnSettings(network, gateway, false, timeout)
 		if err != nil {

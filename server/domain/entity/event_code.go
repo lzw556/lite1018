@@ -17,6 +17,11 @@ const (
 	EventCodeDataAcquisitionFailed EventCode = iota + 90401
 )
 
+const (
+	EventCodeResetData EventCode = iota + 90501
+	EventCodeCalibration
+)
+
 func (e EventCode) String() string {
 	switch e {
 	case EventCodeError:

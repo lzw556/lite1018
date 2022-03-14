@@ -30,8 +30,9 @@ func (cmd calibrateCmd) Qos() byte {
 
 func (cmd calibrateCmd) Payload() []byte {
 	m := pd.CalibrateCommand{
-		Timestamp: int32(time.Now().Unix()),
+		Timestamp: int32(time.Now().UTC().Unix()),
 		ReqId:     cmd.reqID,
+		Type:      1073872896,
 		Param1:    cmd.param,
 	}
 	payload, err := proto.Marshal(&m)

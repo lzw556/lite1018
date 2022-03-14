@@ -55,8 +55,9 @@ func (p LinkStatus) Process(ctx *iot.Context, msg iot.Message) error {
 	if err != nil {
 		return fmt.Errorf("device [%s] not found: %v", linkStatus.Address, err)
 	}
-
-	deviceState.IsOnline = linkStatus.State == "online"
+	isOnline := linkStatus.State == "online"
+	isChanged := deviceState.IsOnline != isOnline
+	deviceState.IsOnline = isOnline
 	if deviceState.IsOnline {
 		deviceState.ConnectedAt = time.Now().UTC().Unix()
 	}
@@ -64,10 +65,11 @@ func (p LinkStatus) Process(ctx *iot.Context, msg iot.Message) error {
 		return fmt.Errorf("update device state failed: %v", err)
 	}
 
-	deviceState.Notify(linkStatus.Address)
-	device.State = deviceState
-
-	go p.addEvent(device, linkStatus.StateUpdateTime)
+	if isChanged {
+		deviceState.Notify(linkStatus.Address)
+		device.State = deviceState
+		go p.addEvent(device, linkStatus.StateUpdateTime)
+	}
 	return nil
 }
 
