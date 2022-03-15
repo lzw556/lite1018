@@ -1,7 +1,7 @@
 package request
 
 type Role struct {
-	Name        string `json:"name"`
+	Name        string `json:"name" binding:"required,max=16,min=2"`
 	Description string `json:"description"`
 }
 

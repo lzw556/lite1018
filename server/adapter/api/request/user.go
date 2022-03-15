@@ -6,10 +6,10 @@ type Login struct {
 }
 
 type User struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
-	Email    string `json:"email"`
-	Phone    string `json:"phone"`
+	Username string `json:"username" binding:"required,min=4,max=16,alphanum"`
+	Password string `json:"password" binding:"required,min=6,max=16"`
+	Email    string `json:"email,omitempty"`
+	Phone    string `json:"phone,omitempty"`
 	Role     uint   `json:"role"`
 }
 

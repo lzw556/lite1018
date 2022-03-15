@@ -29,7 +29,8 @@ const AddUserModal = (props: AddUserProps) => {
             AddUserRequest(values).then(_ => {
                 setIsLoading(false)
                 onSuccess()
-
+            }).catch(e => {
+                setIsLoading(false)
             })
         }).catch(e => {
             setIsLoading(false)

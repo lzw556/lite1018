@@ -1,4 +1,4 @@
-import {Button, Card, Col, Form, Input, message, Radio, Result, Row, Select, Space, Table, Typography} from "antd";
+import {Button, Card, Col, Form, Input, message, Result, Row, Select, Space, Table, Typography} from "antd";
 import {Content} from "antd/lib/layout/layout";
 import {useCallback, useEffect, useState} from "react";
 import {AddAlarmRuleRequest, CheckAlarmRuleNameRequest} from "../../../apis/alarm";
@@ -166,18 +166,18 @@ const AddAlarmRule = () => {
                 <Row justify={"space-between"}>
                     <Col span={24}>
                         <Form.Item label={"报警条件"} labelCol={{span: 2}}>
-                            <Row justify={"start"}>
-                                <Col span={24}>
-                                    <Radio.Group buttonStyle="solid" style={{width: "200px"}}
-                                                 defaultValue={createType}
-                                                 onChange={e => {
-                                                     setCreateType(e.target.value)
-                                                 }}>
-                                        <Radio.Button value={0}>自定义创建</Radio.Button>
-                                        <Radio.Button value={1}>模板导入</Radio.Button>
-                                    </Radio.Group>
-                                </Col>
-                            </Row>
+                            {/*<Row justify={"start"}>*/}
+                            {/*    <Col span={24}>*/}
+                            {/*        <Radio.Group buttonStyle="solid" style={{width: "200px"}}*/}
+                            {/*                     defaultValue={createType}*/}
+                            {/*                     onChange={e => {*/}
+                            {/*                         setCreateType(e.target.value)*/}
+                            {/*                     }}>*/}
+                            {/*            <Radio.Button value={0}>自定义创建</Radio.Button>*/}
+                            {/*            <Radio.Button value={1}>模板导入</Radio.Button>*/}
+                            {/*        </Radio.Group>*/}
+                            {/*    </Col>*/}
+                            {/*</Row>*/}
                             <Row justify={"start"} style={{paddingTop: "8px"}}>
                                 <Col span={24}>
                                     <Card>
