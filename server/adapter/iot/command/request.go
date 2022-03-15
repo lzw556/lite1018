@@ -8,6 +8,7 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/adapter"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/response"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/errcode"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/xlog"
 	"time"
 )
 
@@ -37,6 +38,7 @@ func newRequest() request {
 
 func (cmd request) do(ctx context.Context, gateway string, target string, request Request, timeout time.Duration) ([]byte, error) {
 	ch := make(chan []byte)
+	xlog.Debugf("executing %s command => [%s]", request.Name(), target)
 	topic := fmt.Sprintf("iot/v2/gw/%s/dev/%s", gateway, target)
 	err := adapter.IoT.Subscribe(fmt.Sprintf("%s/msg/%s/", topic, request.Response()), 1, func(c mqtt.Client, msg mqtt.Message) {
 		ch <- msg.Payload()
@@ -52,6 +54,7 @@ func (cmd request) do(ctx context.Context, gateway string, target string, reques
 	}
 	select {
 	case payload := <-ch:
+		xlog.Debugf("%s command executed successful => [%s]", request.Name(), target)
 		return payload, nil
 	case <-ctx.Done():
 		return nil, response.BusinessErr(errcode.DeviceCommandCancelledError, "")

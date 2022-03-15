@@ -6,10 +6,11 @@ import {Button, Popconfirm, Space} from "antd";
 import {DeleteOutlined, EditOutlined, PlusOutlined} from "@ant-design/icons";
 import {useCallback, useEffect, useState} from "react";
 import {PageResult} from "../../types/page";
-import {PagingProjectsRequest} from "../../apis/project";
+import {DeleteProjectRequest, PagingProjectsRequest} from "../../apis/project";
 import EditProjectModal from "./editProjectModal";
 import {Project} from "../../types/project";
 import AllocUserDrawer from "./allocUserDrawer";
+import {store} from "../../store";
 
 const ProjectPage = () => {
     const [visible, setVisible] = useState(false);
@@ -41,7 +42,13 @@ const ProjectPage = () => {
     };
 
     const onDelete = (id: number) => {
-
+        DeleteProjectRequest(id).then(() => {
+            store.dispatch({
+                type: "SET_PROJECT",
+                payload: 0
+            });
+            window.location.reload();
+        });
     };
 
     const columns = [

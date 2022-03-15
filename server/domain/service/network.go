@@ -46,17 +46,17 @@ func (s Network) ExportNetworkByID(networkID uint) (*vo.NetworkExportFile, error
 }
 
 func (s Network) GetNetworkByID(networkID uint) (*vo.Network, error) {
-	query := s.factory.NewNetworkQuery()
+	query := s.factory.NewNetworkQuery(nil)
 	return query.Get(networkID)
 }
 
 func (s Network) FindNetworksByPaginate(filters request.Filters, page, size int) ([]vo.Network, int64, error) {
-	query := s.factory.NewNetworkQuery(filters...)
+	query := s.factory.NewNetworkQuery(filters)
 	return query.Paging(page, size)
 }
 
 func (s Network) FindNetworks(filters request.Filters) ([]vo.Network, error) {
-	query := s.factory.NewNetworkQuery(filters...)
+	query := s.factory.NewNetworkQuery(filters)
 	return query.List()
 }
 

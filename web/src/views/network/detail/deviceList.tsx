@@ -61,9 +61,6 @@ const DeviceList: FC<DeviceTableProps> = ({network, onRefresh}) => {
             render: (text: string, record: Device) => {
                 return <Space>
                     {
-                        record.alertState && <AlertIcon popoverPlacement={"right"} state={record.alertState}/>
-                    }
-                    {
                         <a href={`#/device-management?locale=networks/deviceDetail&id=${record.id}`}>{text}</a>
                     }
                     {

@@ -36,7 +36,7 @@ const (
 	DeviceCommandExecFailedError
 	DeviceCommandCancelledError
 	UnknownDeviceCommandTypeError
-	DeviceAlreadyBindingError
+	DeviceOfflineError
 )
 
 const (
@@ -88,7 +88,7 @@ var businessErrorMap = map[BusinessErrorCode]string{
 	DeviceCommandExecFailedError:        "命令执行失败",
 	DeviceCommandSendTimeoutError:       "命令发送超时",
 	DeviceCommandCancelledError:         "命令已取消",
-	DeviceAlreadyBindingError:           "设备已被绑定",
+	DeviceOfflineError:                  "设备已离线",
 	UnknownDeviceCommandTypeError:       "未知的设备命令",
 	NetworkNotFoundError:                "网络不存在",
 	FirmwareNotFoundError:               "固件不存在",

@@ -12,6 +12,7 @@ import moment from "moment";
 import ProjectSelect from "../../components/select/projectSelect";
 import {getProject} from "../../utils/session";
 import { NavMenu } from "./NavMenu";
+import {GetProjectRequest} from "../../apis/project";
 
 const {Text} = Typography;
 
@@ -32,11 +33,15 @@ const HeaderLayout = (props: any) => {
     }
 
     const onProjectChange = (value: any) => {
-        store.dispatch({
-            type: "SET_PROJECT",
-            payload: value
+        GetProjectRequest(value).then(data => {
+            store.dispatch({
+                type: "SET_PROJECT",
+                payload: data.id
+            })
+            window.location.reload()
+        }).catch(e => {
+            console.log(e)
         })
-        window.location.reload()
     }
 
     const menu = (

@@ -29,14 +29,14 @@ func (r *deviceRouter) initRoutes() {
 		router.NewGetRoute("devices/:id", r.get),
 		router.NewGetRoute("devices/:id/settings", r.getSettingByID),
 		router.NewGetRoute("devices/:id/data", r.findDataByID),
-		router.NewGetRoute("devices/:id/data/last", r.getLastDataByID),
-		router.NewGetRoute("devices/:id/data/runtime", r.findRuntimeDataByID),
-		router.NewGetRoute("devices/:id/data/wave", r.findWaveDataByID),
-		router.NewGetRoute("devices/:id/data/wave/:timestamp", r.getWaveDataByID),
-		router.NewGetRoute("devices/:id/download/data/wave/:timestamp", r.downloadWaveDataByID),
 		router.NewGetRoute("devices/:id/download/data", r.downloadDataByID),
+		router.NewGetRoute("devices/:id/data/:timestamp", r.getDataByIDAndTimestamp),
+		router.NewGetRoute("devices/:id/download/data/:timestamp", r.downloadDataByIDAndTimestamp),
+		router.NewGetRoute("devices/:id/runtime", r.findRuntimeDataByID),
 		router.NewGetRoute("devices/defaultSettings", r.defaultSettings),
 		router.NewGetRoute("check/devices/:mac", r.checkMacAddress),
+
+		router.NewGetRoute("devices/:id/events", r.findEventsByID),
 
 		// PUT
 		router.NewPutRoute("devices/:id", r.update),
@@ -47,6 +47,7 @@ func (r *deviceRouter) initRoutes() {
 		// DELETE
 		router.NewDeleteRoute("devices/:id", r.delete),
 		router.NewDeleteRoute("devices/:id/data", r.removeDataByID),
+		router.NewDeleteRoute("devices/:id/events", r.removeEventsByID),
 	}
 }
 

@@ -176,7 +176,7 @@ const SourceSelectModal: FC<SourceSelectModalProps> = (props) => {
             <br/>
             <Row justify={"space-between"}>
                 <Col span={12}>
-                    <Typography.Text>已选中{selectedRowKeys.length}个设备</Typography.Text>
+                    <Typography.Text>已选中{selectedRowKeys.length}个资源</Typography.Text>
                 </Col>
                 <Col span={12}>
                     <Row justify={"end"}>

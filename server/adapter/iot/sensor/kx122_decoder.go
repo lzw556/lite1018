@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/binary"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
-	"github.com/thetasensors/theta-cloud-lite/server/pkg/json"
 )
 
 type Kx122Decoder struct {
@@ -14,7 +13,7 @@ func NewKx122Decoder() RawDataDecoder {
 	return &Kx122Decoder{}
 }
 
-func (s Kx122Decoder) Decode(data []byte) ([]byte, error) {
+func (s Kx122Decoder) Decode(data []byte) (map[string]interface{}, error) {
 	// decode metadata
 	metadata := [3]SvtMetadata{}
 	metaDataBytes := data[16:]
@@ -47,7 +46,11 @@ func (s Kx122Decoder) Decode(data []byte) ([]byte, error) {
 		svtRawData.SetValues(i, values)
 		rawDataOffset += int(m.DataLength)
 	}
-	return json.Marshal(svtRawData)
+	return map[string]interface{}{
+		"x": svtRawData.XAxis,
+		"y": svtRawData.YAxis,
+		"z": svtRawData.ZAxis,
+	}, nil
 }
 
 type SvtMetadata struct {

@@ -10,23 +10,26 @@ type Service interface {
 	DeleteDeviceByID(id uint) error
 	UpdateDeviceByID(id uint, req request.Device) error
 
-	GetDeviceByID(id uint) (*vo.Device, error)
+	GetDeviceByID(id uint, filters request.Filters) (*vo.Device, error)
 	FindDevicesByPaginate(page, size int, filters request.Filters) ([]vo.Device, int64, error)
 	FindDevices(filters request.Filters) ([]vo.Device, error)
 	CheckDeviceMacAddress(mac string) error
 
-	ExecuteCommandByID(id uint, cmdType uint) error
+	ExecuteCommandByID(id uint, cmdType uint, req request.DeviceCommand) error
 	ExecuteDeviceUpgradeByID(id uint, req request.DeviceUpgrade) error
 	ExecuteDeviceCancelUpgradeByID(id uint) error
 
 	GetDeviceSettingsByID(id uint) (vo.DeviceSettings, error)
 	UpdateDeviceSettingByID(id uint, req request.DeviceSetting) error
 
-	FindDeviceDataByID(deviceID uint, from, to int64) ([]vo.DeviceData, error)
-	GetLastDeviceDataByID(deviceID uint) (*vo.DeviceData, error)
-	GetRuntimeDataByID(deviceID uint, from, to int64) ([]vo.SensorRuntimeData, error)
-	FindWaveDataByID(deviceID uint, from, to int64) (vo.LargeSensorDataList, error)
-	GetWaveDataByID(deviceID uint, timestamp int64, calculate string, dimension int) (*vo.WaveData, error)
-	DownloadDeviceDataByID(deviceID uint, pIDs []string, from, to int64) (*vo.ExcelFile, error)
-	RemoveDataByID(deviceID uint, from, to int64) error
+	FindDeviceDataByID(id uint, sensorType uint, from, to int64) ([]vo.DeviceData, error)
+	GetDeviceDataByIDAndTimestamp(id uint, sensorType uint, timestamp int64, filters request.Filters) (*vo.DeviceData, error)
+	GetRuntimeDataByID(id uint, from, to int64) ([]vo.SensorRuntimeData, error)
+	DownloadDeviceDataByID(id uint, pids []string, from, to int64, timezone string) (*vo.ExcelFile, error)
+	DownloadDeviceDataByIDAndTimestamp(id uint, sensorType uint, timestamp int64, filters request.Filters) (*vo.ExcelFile, error)
+	RemoveDataByID(id uint, sensorType uint, from, to int64) error
+
+	FindDeviceEventsByID(id uint, from, to int64) ([]vo.DeviceEvent, error)
+	PagingDeviceEventsByID(id uint, from, to int64, page, size int) ([]vo.DeviceEvent, int64, error)
+	RemoveDeviceEventsByID(id uint, eventIDs []uint) error
 }

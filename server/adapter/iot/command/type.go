@@ -9,4 +9,5 @@ const (
 	ResetDataCmdType
 	RebootCmdType
 	ProvisionCmdType
+	CalibrateCmdType
 )

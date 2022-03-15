@@ -1,5 +1,5 @@
 import request from "../utils/request";
-import {GetResponse, PostResponse, PutResponse} from "../utils/response";
+import {DeleteResponse, GetResponse, PostResponse, PutResponse} from "../utils/response";
 import {PageResult} from "../types/page";
 import {Project} from "../types/project";
 import {AllocUser} from "../types/alloc_user";
@@ -26,4 +26,12 @@ export function AllocUsersRequest(id: number, params: any) {
 
 export function GetMyProjectsRequest() {
     return request.get<Project[]>('/my/projects').then(GetResponse)
+}
+
+export function DeleteProjectRequest(id:number) {
+    return request.delete(`/projects/${id}`, null).then(DeleteResponse)
+}
+
+export function GetProjectRequest(id:number) {
+    return request.get<Project>(`/projects/${id}`).then(GetResponse)
 }

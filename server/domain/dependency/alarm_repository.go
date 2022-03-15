@@ -16,4 +16,5 @@ type AlarmRuleRepository interface {
 	PagingBySpecs(ctx context.Context, page, size int, specs ...specification.Specification) ([]entity.AlarmRule, int64, error)
 	FindBySpecs(ctx context.Context, specs ...specification.Specification) ([]entity.AlarmRule, error)
 	GetBySpecs(ctx context.Context, specs ...specification.Specification) (entity.AlarmRule, error)
+	DeleteBySpecs(ctx context.Context, specs ...specification.Specification) error
 }

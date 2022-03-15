@@ -29,3 +29,51 @@
 .ant-skeleton-image {
     background: transparent !important;
 }
+.ant-form fieldset {
+    margin-bottom: 10px;
+    padding: 20px;
+    border: solid 1px #d9d9d9;
+}
+.ant-form fieldset legend {
+    width: initial;
+    border: initial;
+}
+.device-list {
+    display: flex;
+    flex-wrap: wrap;
+}
+.device-list > .device .ant-card-head {
+    border: 0;
+}
+.device-list > .device .ant-card-body {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 120px;
+    padding-top: 8px;
+}
+.device-list > .device .ant-statistic {
+    font-size: 18px;
+    text-align: center;
+}
+@media (min-width: 576px) {
+    .device-list > .device {
+        flex: 0 0 100%;
+    }
+}
+@media (min-width: 1000px) {
+    .device-list > .device {
+        flex: 0 0 50%;
+    }
+}
+@media (min-width: 1400px) {
+    .device-list > .device {
+        flex: 0 0 33.333%;
+    }
+}
+@media (min-width: 1700px) {
+    .device-list > .device {
+        flex: 0 0 25%;
+    }
+}
+

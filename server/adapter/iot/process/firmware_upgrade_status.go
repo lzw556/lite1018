@@ -5,14 +5,19 @@ import (
 	"github.com/gogo/protobuf/proto"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/iot"
 	pd "github.com/thetasensors/theta-cloud-lite/server/adapter/iot/proto"
+	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
+	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 )
 
 type FirmwareUpgradeStatus struct {
+	eventRepo dependency.EventRepository
 }
 
 func NewFirmwareUpgradeStatus() Processor {
-	return newRoot(&FirmwareUpgradeStatus{})
+	return newRoot(&FirmwareUpgradeStatus{
+		eventRepo: repository.Event{},
+	})
 }
 
 func (p FirmwareUpgradeStatus) Name() string {

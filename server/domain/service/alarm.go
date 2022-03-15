@@ -34,7 +34,7 @@ func (s Alarm) CreateAlarmRule(req request.AlarmRule) error {
 }
 
 func (s Alarm) FindAlarmRuleByPaginate(page, size int, filters request.Filters) ([]vo.AlarmRule, int64, error) {
-	query, err := s.factory.NewAlarmRuleQuery(filters...)
+	query, err := s.factory.NewAlarmRuleQuery(filters)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -42,7 +42,7 @@ func (s Alarm) FindAlarmRuleByPaginate(page, size int, filters request.Filters) 
 }
 
 func (s Alarm) GetAlarmRuleByID(id uint) (*vo.AlarmRule, error) {
-	query, err := s.factory.NewAlarmRuleQuery()
+	query, err := s.factory.NewAlarmRuleQuery(nil)
 	if err != nil {
 		return nil, err
 	}
@@ -98,7 +98,7 @@ func (s Alarm) CheckAlarmRuleName(name string) (bool, error) {
 }
 
 func (s Alarm) FindAlarmRecordByPaginate(page, size int, filters request.Filters) ([]vo.AlarmRecord, int64, error) {
-	query, err := s.factory.NewAlarmRecordQuery(filters...)
+	query, err := s.factory.NewAlarmRecordQuery(filters)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -114,7 +114,7 @@ func (s Alarm) AcknowledgeAlarmRecordByID(id uint, req request.AcknowledgeAlarmR
 }
 
 func (s Alarm) GetAlarmRecordAcknowledgeByID(id uint) (*vo.AlarmRecordAcknowledge, error) {
-	query, err := s.factory.NewAlarmRecordQuery()
+	query, err := s.factory.NewAlarmRecordQuery(nil)
 	if err != nil {
 		return nil, err
 	}

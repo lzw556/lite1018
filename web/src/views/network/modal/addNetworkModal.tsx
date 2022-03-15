@@ -41,16 +41,20 @@ const AddNetworkModal:FC<AddNetworkModalProps> = (props) => {
 
     return <Modal {...props} width={420} title={"网络添加"} okText={"确定"} onOk={onAdd} cancelText={"取消"} confirmLoading={isLoading}>
         <Form form={form} labelCol={{span: 7}} validateMessages={defaultValidateMessages}>
-            <Divider orientation={"left"} plain>基本信息</Divider>
-            <Form.Item label={"名称"} name={"name"} rules={[Rules.required]}>
-                <Input placeholder={"请输入网络名称"}/>
-            </Form.Item>
-            <WsnFormItem/>
-            <Divider orientation={"left"} plain>网关信息</Divider>
-            <Form.Item label={"MAC地址"} name={["gateway", "mac_address"]} rules={[Rules.required]}>
-                <Input placeholder={"请输入网关MAC地址"}/>
-            </Form.Item>
-            <IpnFormItem ipn={DEFAULT_IPN_SETTING}/>
+            <fieldset>
+                <legend>基本信息</legend>
+                <Form.Item label={"名称"} name={"name"} rules={[Rules.required]}>
+                    <Input placeholder={"请输入网络名称"}/>
+                </Form.Item>
+                <WsnFormItem/>
+            </fieldset>
+            <fieldset>
+                <legend>网关信息</legend>
+                <Form.Item label={"MAC地址"} name={["gateway", "mac_address"]} rules={[Rules.required]}>
+                    <Input placeholder={"请输入网关MAC地址"}/>
+                </Form.Item>
+                <IpnFormItem ipn={DEFAULT_IPN_SETTING}/>
+            </fieldset>
         </Form>
     </Modal>
 }

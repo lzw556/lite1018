@@ -14,8 +14,12 @@ func (repo AlarmRecordAcknowledge) Create(ctx context.Context, e *entity.AlarmRe
 	return repo.DB(ctx).Create(e).Error
 }
 
-func (repo AlarmRecordAcknowledge) GetSpecs(ctx context.Context, specs ...spec.Specification) (entity.AlarmRecordAcknowledge, error) {
+func (repo AlarmRecordAcknowledge) GetBySpecs(ctx context.Context, specs ...spec.Specification) (entity.AlarmRecordAcknowledge, error) {
 	var e entity.AlarmRecordAcknowledge
 	err := repo.DB(ctx).Scopes(spec.Scopes(specs)...).First(&e).Error
 	return e, err
+}
+
+func (repo AlarmRecordAcknowledge) DeleteBySpecs(ctx context.Context, specs ...spec.Specification) error {
+	return repo.DB(ctx).Scopes(spec.Scopes(specs)...).Delete(&entity.AlarmRecordAcknowledge{}).Error
 }

@@ -97,7 +97,7 @@ func (factory Device) NewDeviceUpdateCmd(deviceID uint) (*command.DeviceUpdateCm
 	return &cmd, nil
 }
 
-func (factory Device) NewDeviceQuery(filters ...request.Filter) *query.DeviceQuery {
+func (factory Device) NewDeviceQuery(filters request.Filters) *query.DeviceQuery {
 	q := query.NewDeviceQuery()
 	q.Specs = factory.buildSpecs(filters)
 	return &q
@@ -145,20 +145,18 @@ func (factory Device) NewDeviceUpgradeCmd(deviceID uint) (*command.DeviceUpgrade
 
 func (factory Device) buildSpecs(filters request.Filters) []spec.Specification {
 	specs := make([]spec.Specification, 0)
-	for _, filter := range filters {
-		switch filter.Name {
+	for name, v := range filters {
+		switch name {
 		case "project_id":
-			specs = append(specs, spec.ProjectEqSpec(cast.ToUint(filter.Value)))
+			specs = append(specs, spec.ProjectEqSpec(cast.ToUint(v)))
 		case "network_id":
-			specs = append(specs, spec.NetworkEqSpec(cast.ToUint(filter.Value)))
-		case "category":
-			specs = append(specs, spec.CategoryEqSpec(cast.ToUint(filter.Value)))
+			specs = append(specs, spec.NetworkEqSpec(cast.ToUint(v)))
 		case "type":
-			specs = append(specs, spec.TypeEqSpec(cast.ToUint(filter.Value)))
+			specs = append(specs, spec.TypeEqSpec(cast.ToUint(v)))
 		case "name":
-			specs = append(specs, spec.DeviceNameEqSpec(cast.ToString(filter.Value)))
+			specs = append(specs, spec.DeviceNameEqSpec(cast.ToString(v)))
 		case "mac_address":
-			specs = append(specs, spec.DeviceMacEqSpec(cast.ToString(filter.Value)))
+			specs = append(specs, spec.DeviceMacEqSpec(cast.ToString(v)))
 		}
 	}
 	return specs

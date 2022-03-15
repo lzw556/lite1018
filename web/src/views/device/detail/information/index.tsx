@@ -22,23 +22,23 @@ const InformationCard: FC<GatewayInformationProps> = ({ device, isLoading }) => 
   const [upgradeStatus, setUpgradeStatus] = useState<any>(device.upgradeStatus);
   const { PubSub } = useSocket();
 
-    useEffect(() => {
-        PubSub.subscribe(SocketTopic.upgradeStatus, (msg:string, status:any) => {
-            if (device.macAddress === status.macAddress) {
-                setUpgradeStatus({code: status.code, progress: status.progress});
-            }
-        });
-        return () => {
-            PubSub.unsubscribe(SocketTopic.upgradeStatus);
-        }
-    }, [])
+  useEffect(() => {
+    PubSub.subscribe(SocketTopic.upgradeStatus, (msg: string, status: any) => {
+      if (device.macAddress === status.macAddress) {
+        setUpgradeStatus({ code: status.code, progress: status.progress });
+      }
+    });
+    return () => {
+      PubSub.unsubscribe(SocketTopic.upgradeStatus);
+    };
+  }, []);
 
   return (
     <ShadowCard>
       <Skeleton loading={isLoading}>
         {isMobile ? (
           <>
-            <Row style={{marginBottom:8}}>
+            <Row style={{ marginBottom: 8 }}>
               <Col span={12}>
                 <Row>
                   <Col span={24} className='ts-detail-label'>
@@ -46,13 +46,8 @@ const InformationCard: FC<GatewayInformationProps> = ({ device, isLoading }) => 
                   </Col>
                   <Col span={24}>
                     <Space>
-                        {
-                            device.name
-                        }
-                        {
-                            upgradeStatus && (
-                                <DeviceUpgradeSpin status={upgradeStatus}/>)
-                        }
+                      {device.name}
+                      {upgradeStatus && <DeviceUpgradeSpin status={upgradeStatus} />}
                     </Space>
                   </Col>
                 </Row>
@@ -66,7 +61,7 @@ const InformationCard: FC<GatewayInformationProps> = ({ device, isLoading }) => 
                 </Row>
               </Col>
             </Row>
-            <Row style={{marginBottom:8}}>
+            <Row style={{ marginBottom: 8 }}>
               <Col span={12}>
                 <Row>
                   <Col span={24} className='ts-detail-label'>
@@ -88,7 +83,7 @@ const InformationCard: FC<GatewayInformationProps> = ({ device, isLoading }) => 
                 </Row>
               </Col>
             </Row>
-            <Row style={{marginBottom:8}}>
+            <Row style={{ marginBottom: 8 }}>
               <Col span={12}>
                 <Row>
                   <Col span={24} className='ts-detail-label'>
@@ -112,15 +107,29 @@ const InformationCard: FC<GatewayInformationProps> = ({ device, isLoading }) => 
                 </Row>
               </Col>
             </Row>
-            <Row style={{marginBottom:8}}>
+            <Row style={{ marginBottom: 8 }}>
               <Col span={12}>
                 <Row>
                   <Col span={24} className='ts-detail-label'>
                     电池电压(mV)
                   </Col>
-                  <Col span={24}>{device.state ? device.state.batteryVoltage : '-'}</Col>
+                  <Col span={24}>
+                    {device.state && device.typeId !== DeviceType.Gateway
+                      ? device.state.batteryVoltage
+                      : '-'}
+                  </Col>
                 </Row>
               </Col>
+              <Col span={12}>
+                <Row>
+                  <Col span={24} className='ts-detail-label'>
+                    信号强度(dB)
+                  </Col>
+                  <Col span={24}>{device.state ? device.state.signalLevel : '-'}</Col>
+                </Row>
+              </Col>
+            </Row>
+            <Row style={{ marginBottom: 8 }}>
               <Col span={12}>
                 <Row>
                   <Col span={24} className='ts-detail-label'>
@@ -131,16 +140,6 @@ const InformationCard: FC<GatewayInformationProps> = ({ device, isLoading }) => 
                       ? device.information.firmware_version
                       : '-'}
                   </Col>
-                </Row>
-              </Col>
-            </Row>
-            <Row style={{marginBottom:8}}>
-              <Col span={12}>
-                <Row>
-                  <Col span={24} className='ts-detail-label'>
-                    信号强度(dB)
-                  </Col>
-                  <Col span={24}>{device.state ? device.state.signalLevel : '-'}</Col>
                 </Row>
               </Col>
               <Col span={12}>
@@ -156,7 +155,7 @@ const InformationCard: FC<GatewayInformationProps> = ({ device, isLoading }) => 
                 </Row>
               </Col>
             </Row>
-            <Row style={{marginBottom:8}}>
+            <Row style={{ marginBottom: 8 }}>
               <Col span={12}>
                 <Row>
                   <Col span={24} className='ts-detail-label'>
@@ -180,14 +179,16 @@ const InformationCard: FC<GatewayInformationProps> = ({ device, isLoading }) => 
                 </Row>
               </Col>
             </Row>
-            <Row>
+            <Row style={{ marginBottom: 8 }}>
               <Col span={12}>
                 <Row>
                   <Col span={24} className='ts-detail-label'>
-                    生产厂商
+                    最近一次采集时间
                   </Col>
                   <Col span={24}>
-                    {device.information.manufacturer ? device.information.manufacturer : '-'}
+                    {device.data && device.data.timestamp && device.data.timestamp > 0
+                      ? moment.unix(device.data.timestamp).local().format('YYYY-MM-DD HH:mm:ss')
+                      : '-'}
                   </Col>
                 </Row>
               </Col>
@@ -227,9 +228,7 @@ const InformationCard: FC<GatewayInformationProps> = ({ device, isLoading }) => 
               <Col span={6}>
                 <Space>
                   {device.name}
-                  {upgradeStatus && upgradeStatus.id === device.id && (
-                    <DeviceUpgradeSpin status={upgradeStatus.status} />
-                  )}
+                  {upgradeStatus && <DeviceUpgradeSpin status={upgradeStatus} />}
                 </Space>
               </Col>
               <Col span={3} className='ts-detail-label'>
@@ -271,19 +270,23 @@ const InformationCard: FC<GatewayInformationProps> = ({ device, isLoading }) => 
               <Col span={3} className='ts-detail-label'>
                 电池电压(mV)
               </Col>
-              <Col span={6}>{device.state ? device.state.batteryVoltage : '-'}</Col>
+              <Col span={6}>
+                {device.state && device.typeId !== DeviceType.Gateway
+                  ? device.state.batteryVoltage
+                  : '-'}
+              </Col>
+              <Col span={3} className='ts-detail-label'>
+                信号强度(dB)
+              </Col>
+              <Col span={6}>{device.state ? device.state.signalLevel : '-'}</Col>
+            </Row>
+            <Row justify={'start'}>
               <Col span={3} className='ts-detail-label'>
                 固件版本号
               </Col>
               <Col span={6}>
                 {device.information.firmware_version ? device.information.firmware_version : '-'}
               </Col>
-            </Row>
-            <Row justify={'start'}>
-              <Col span={3} className='ts-detail-label'>
-                信号强度(dB)
-              </Col>
-              <Col span={6}>{device.state ? device.state.signalLevel : '-'}</Col>
               <Col span={3} className='ts-detail-label'>
                 固件编译时间
               </Col>
@@ -311,10 +314,12 @@ const InformationCard: FC<GatewayInformationProps> = ({ device, isLoading }) => 
             </Row>
             <Row justify={'start'}>
               <Col span={3} className='ts-detail-label'>
-                生产厂商
+                最近一次采集时间
               </Col>
               <Col span={6}>
-                {device.information.manufacturer ? device.information.manufacturer : '-'}
+                {device.data && device.data.timestamp && device.data.timestamp > 0
+                  ? moment.unix(device.data.timestamp).local().format('YYYY-MM-DD HH:mm:ss')
+                  : '-'}
               </Col>
               <Col
                 span={3}

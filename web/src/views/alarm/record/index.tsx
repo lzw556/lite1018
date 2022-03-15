@@ -63,7 +63,7 @@ const AlarmRecordPage = () => {
             title: '报警级别',
             dataIndex: 'level',
             key: 'level',
-            width: '5%',
+            width: '8%',
             render: (level: number) => {
                 switch (level) {
                     case 1:
@@ -79,7 +79,7 @@ const AlarmRecordPage = () => {
             title: '报警源',
             dataIndex: 'sourceType',
             key: 'sourceType',
-            width: '5%',
+            width: '7%',
             render: (sourceType: any) => {
                 return sourceType.indexOf("device") > -1 ? "设备" : "资产"
             }

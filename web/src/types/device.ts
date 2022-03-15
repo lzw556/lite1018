@@ -12,8 +12,10 @@ export type Device = {
     settings: any[]
     state?: any
     upgradeStatus?: any
-    alertState?: AlertState
+    alertStates?: { rule: { id: number; level: number }; record: { id: number; value: number } }[];
     network?: Network
     information?: any
     properties: Property[]
+    dataTypes: number[]
+    data?: any
 }

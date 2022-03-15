@@ -31,16 +31,6 @@ func NewAlarm() Alarm {
 	}
 }
 
-func (factory Alarm) NewAlarmTemplateQuery(id uint) (*query.AlarmTemplateQuery, error) {
-	e, err := factory.alarmTemplateRepo.Get(context.TODO(), id)
-	if err != nil {
-		return nil, err
-	}
-	q := query.NewAlarmTemplateQuery()
-	q.AlarmTemplate = e
-	return &q, nil
-}
-
 func (factory Alarm) NewAlarmRuleCreateCmd(req request.AlarmRule) (*command.AlarmRuleCreateCmd, error) {
 	ctx := context.TODO()
 	e, err := factory.alarmRuleRepo.GetBySpecs(ctx, spec.NameEqSpec(req.Name))
@@ -85,13 +75,13 @@ func (factory Alarm) NewAlarmRuleUpdateCmd(id uint) (*command.AlarmRuleUpdateCmd
 	return &cmd, nil
 }
 
-func (factory Alarm) NewAlarmRuleQuery(filters ...request.Filter) (*query.AlarmRuleQuery, error) {
+func (factory Alarm) NewAlarmRuleQuery(filters request.Filters) (*query.AlarmRuleQuery, error) {
 	q := query.NewAlarmRuleQuery()
 	q.Specs = make([]spec.Specification, 0)
-	for _, filter := range filters {
-		switch filter.Name {
+	for name, v := range filters {
+		switch name {
 		case "project_id":
-			q.Specs = append(q.Specs, spec.ProjectEqSpec(cast.ToUint(filter.Value)))
+			q.Specs = append(q.Specs, spec.ProjectEqSpec(cast.ToUint(v)))
 		}
 	}
 	return &q, nil
@@ -108,16 +98,16 @@ func (factory Alarm) NewAlarmRuleDeleteCmd(id uint) (*command.AlarmRuleDeleteCmd
 	return &cmd, nil
 }
 
-func (factory Alarm) NewAlarmRecordQuery(filters ...request.Filter) (*query.AlarmRecordQuery, error) {
+func (factory Alarm) NewAlarmRecordQuery(filters request.Filters) (*query.AlarmRecordQuery, error) {
 	q := query.NewAlarmRecordQuery()
-	for _, filter := range filters {
-		switch filter.Name {
+	for name, v := range filters {
+		switch name {
 		case "project_id":
-			q.Specs = append(q.Specs, spec.ProjectEqSpec(cast.ToUint(filter.Value)))
+			q.Specs = append(q.Specs, spec.ProjectEqSpec(cast.ToUint(v)))
 		case "source_id":
-			q.Specs = append(q.Specs, spec.SourceEqSpec(cast.ToUint(filter.Value)))
+			q.Specs = append(q.Specs, spec.SourceEqSpec(cast.ToUint(v)))
 		case "levels":
-			levels := strings.Split(cast.ToString(filter.Value), ",")
+			levels := strings.Split(cast.ToString(v), ",")
 			levelsInSpec := make(spec.LevelInSpec, len(levels))
 			for i, level := range levels {
 				levelsInSpec[i] = cast.ToUint(level)

@@ -17,6 +17,7 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/project"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/property"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/role"
+	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/statistic"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/system"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/user"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/crontask"
@@ -81,12 +82,14 @@ func runIoTServer() {
 	adapter.IoT = iot.NewAdapter(conf)
 	adapter.IoT.RegisterDispatchers(
 		dispatcher.NewDeviceStatus(),
-		dispatcher.NewSensorData(),
-		dispatcher.NewLargeSensorData(),
 		dispatcher.NewLinkStatus(),
 		dispatcher.NewRestartStatus(),
+		dispatcher.NewSensorData(),
+		dispatcher.NewLargeSensorData(),
 		dispatcher.NewDeviceInformation(),
 		dispatcher.NewBye(),
+		dispatcher.NewEvent(),
+		dispatcher.NewCalibrationStatus(),
 	)
 	if err := adapter.IoT.Run(); err != nil {
 		xlog.Error("iot server start failed", err)
@@ -108,7 +111,7 @@ func runApiServer(mode string, dist embed.FS) {
 	adapter.Api.UseMiddleware(
 		middleware.NewJWT("/login", "/resources/*"),
 		middleware.NewCasbinRbac("/login", "/my/*", "/check/*", "/menus/*", "/permissions/*", "/resources/*", "/statistics/*", "/devices/defaultSettings"),
-		middleware.NewProjectChecker("/login", "/resources/*"),
+		middleware.NewProjectChecker("/login", "/resources/*", "/users/*", "/my/*"),
 	)
 	adapter.Api.RegisterRouters(
 		project.NewRouter(service.NewProject()),
@@ -122,6 +125,7 @@ func runApiServer(mode string, dist embed.FS) {
 		firmware.NewRouter(service.NewFirmware()),
 		network.NewRouter(service.NewNetwork()),
 		system.NewRouter(service.NewSystem()),
+		statistic.NewRouter(service.NewStatistic()),
 	)
 
 	go func() {

@@ -42,7 +42,13 @@ func (s Project) CreateProject(req request.Project) error {
 }
 
 func (s Project) GetProjectByID(id uint) (*vo.Project, error) {
-	panic("implement me")
+	ctx := context.TODO()
+	e, err := s.repository.Get(ctx, id)
+	if err != nil {
+		return nil, response.BusinessErr(errcode.ProjectNotFoundError, "")
+	}
+	result := vo.NewProject(e)
+	return &result, nil
 }
 
 func (s Project) FindProjectsByPaginate(page, size int, filters request.Filters) ([]vo.Project, int64, error) {
@@ -58,7 +64,7 @@ func (s Project) FindProjectsByPaginate(page, size int, filters request.Filters)
 }
 
 func (s Project) FindProjects(filters request.Filters) ([]vo.Project, error) {
-	query := s.factory.NewProjectQuery(filters...)
+	query := s.factory.NewProjectQuery(filters)
 	return query.List()
 }
 
@@ -74,7 +80,7 @@ func (s Project) UpdateProjectByID(id uint, req request.Project) error {
 }
 
 func (s Project) GetAllocUsersByID(id uint) ([]vo.AllocUser, error) {
-	query := s.factory.NewProjectQuery()
+	query := s.factory.NewProjectQuery(nil)
 	return query.GetAllocUsersByID(id)
 }
 
@@ -87,5 +93,9 @@ func (s Project) AllocUsersByID(id uint, req request.AllocUsers) error {
 }
 
 func (s Project) DeleteProjectByID(id uint) error {
-	panic("implement me")
+	cmd, err := s.factory.NewProjectDeleteCmd(id)
+	if err != nil {
+		return err
+	}
+	return cmd.Run()
 }

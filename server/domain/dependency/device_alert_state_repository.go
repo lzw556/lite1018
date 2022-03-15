@@ -7,4 +7,5 @@ type DeviceAlertStateRepository interface {
 	Get(mac string, id uint) (entity.DeviceAlertState, error)
 	Find(mac string) ([]entity.DeviceAlertState, error)
 	Delete(mac string, id uint) error
+	DeleteAll(mac string) error
 }

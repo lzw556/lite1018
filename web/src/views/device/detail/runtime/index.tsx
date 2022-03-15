@@ -1,6 +1,6 @@
 import {Device} from "../../../../types/device";
 import {FC, useCallback, useEffect, useState} from "react";
-import {GetDeviceRuntimeDataRequest} from "../../../../apis/device";
+import {GetDeviceRuntimeRequest} from "../../../../apis/device";
 import moment from "moment/moment";
 import {DefaultMonitorDataOption, LineChartStyles} from "../../../../constants/chart";
 import {Button, Card, Col, DatePicker, Empty, Row, Select, Space} from "antd";
@@ -20,7 +20,7 @@ const RuntimeData:FC<RuntimeDataProps> = ({device}) => {
     const [options, setOptions] = useState<any[]>([])
 
     const fetchRuntimeData = useCallback(() => {
-        GetDeviceRuntimeDataRequest(device.id, startDate.utc().unix(), endDate.utc().unix()).then(data => {
+        GetDeviceRuntimeRequest(device.id, startDate.utc().unix(), endDate.utc().unix()).then(data => {
             const batteryOption = {
                 ...DefaultMonitorDataOption,
                 title: {text: "电池电压"},

@@ -23,7 +23,7 @@ func (repo DeviceState) Create(mac string, e entity.DeviceState) error {
 		if err != nil {
 			return err
 		}
-		k := time.Unix(e.ConnectedAt, 0).UTC().Format("2006-01-02T15:04:05Z")
+		k := time.Unix(e.ConnectedAt, 0).UTC().Format("2006-01-02T15:00:00Z")
 		return dataBucket.Put([]byte(k), buf)
 	})
 }
@@ -49,8 +49,8 @@ func (repo DeviceState) Find(mac string, from, to time.Time) ([]entity.DeviceSta
 		if bucket != nil {
 			if dataBucket := bucket.Bucket([]byte(mac)); dataBucket != nil {
 				c := dataBucket.Cursor()
-				min := []byte(from.UTC().Format("2006-01-02T15:04:05Z"))
-				max := []byte(to.UTC().Format("2006-01-02T15:04:05Z"))
+				min := []byte(from.UTC().Format("2006-01-02T15:04:02Z"))
+				max := []byte(to.UTC().Format("2006-01-02T15:04:02Z"))
 				for k, v := c.Seek(min); k != nil && bytes.Compare(k, max) <= 0; k, v = c.Next() {
 					var e entity.DeviceState
 					if err := json.Unmarshal(v, &e); err != nil {

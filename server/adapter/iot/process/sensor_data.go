@@ -57,7 +57,7 @@ func (p *SensorData) Process(ctx *iot.Context, msg iot.Message) error {
 				SensorType: uint(m.SensorId),
 			}
 			if t := devicetype.Get(device.Type); t != nil {
-				e.Values = map[string]float32{}
+				e.Values = map[string]interface{}{}
 				for _, property := range t.Properties(e.SensorType) {
 					for _, field := range property.Fields {
 						if len(m.Values) > field.DataIndex {

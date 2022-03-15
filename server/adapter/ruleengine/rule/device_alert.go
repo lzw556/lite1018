@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/bilibili/gengine/engine"
 	"github.com/shopspring/decimal"
+	"github.com/spf13/cast"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
@@ -51,11 +52,11 @@ func (a *DeviceAlert) Value(source interface{}) float64 {
 					}
 				}
 			}
-			data, err := a.sensorDataRepo.Last(device.MacAddress)
+			data, err := a.sensorDataRepo.Last(device.MacAddress, t.SensorID())
 			if err != nil {
 				return 0
 			}
-			value, _ := decimal.NewFromFloat32(data.Values[field.Key]).Round(int32(property.Precision)).Float64()
+			value, _ := decimal.NewFromFloat32(cast.ToFloat32(data.Values[field.Key])).Round(int32(property.Precision)).Float64()
 			return value
 		}
 	}
