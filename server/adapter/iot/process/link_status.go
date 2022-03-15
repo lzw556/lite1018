@@ -55,7 +55,10 @@ func (p LinkStatus) Process(ctx *iot.Context, msg iot.Message) error {
 	if err != nil {
 		return fmt.Errorf("device [%s] not found: %v", linkStatus.Address, err)
 	}
-	isOnline := linkStatus.State == "online"
+
+	// 2 offline 4 reconnecting failed
+	isOnline := m.Code != 2 && m.Code != 4
+
 	isChanged := deviceState.IsOnline != isOnline
 	deviceState.IsOnline = isOnline
 	if deviceState.IsOnline {
@@ -68,12 +71,12 @@ func (p LinkStatus) Process(ctx *iot.Context, msg iot.Message) error {
 	if isChanged {
 		deviceState.Notify(linkStatus.Address)
 		device.State = deviceState
-		go p.addEvent(device, linkStatus.StateUpdateTime)
+		go p.addEvent(device, linkStatus.StateUpdateTime, m.Code)
 	}
 	return nil
 }
 
-func (p LinkStatus) addEvent(device entity.Device, timestamp int64) {
+func (p LinkStatus) addEvent(device entity.Device, timestamp int64, code int32) {
 	event := entity.Event{
 		Code:      entity.EventCodeStatus,
 		SourceID:  device.ID,
@@ -84,7 +87,7 @@ func (p LinkStatus) addEvent(device entity.Device, timestamp int64) {
 	if device.State.IsOnline {
 		event.Content = fmt.Sprintf(`{"code": %d}`, 1)
 	} else {
-		event.Content = fmt.Sprintf(`{"code": %d}`, 0)
+		event.Content = fmt.Sprintf(`{"code": %d}`, code)
 	}
 	_ = p.eventRepo.Create(context.TODO(), &event)
 }
