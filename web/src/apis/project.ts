@@ -8,6 +8,10 @@ export function PagingProjectsRequest(page: number, size: number) {
     return request.get<PageResult<Project[]>>('/projects', {page, size}).then(GetResponse)
 }
 
+export function GetProjectsRequest() {
+    return request.get<Project[]>('/projects').then(GetResponse)
+}
+
 export function CreateProjectRequest(params: any) {
     return request.post<any>('/projects', params).then(PostResponse)
 }
@@ -28,10 +32,10 @@ export function GetMyProjectsRequest() {
     return request.get<Project[]>('/my/projects').then(GetResponse)
 }
 
-export function DeleteProjectRequest(id:number) {
+export function DeleteProjectRequest(id: number) {
     return request.delete(`/projects/${id}`, null).then(DeleteResponse)
 }
 
-export function GetProjectRequest(id:number) {
+export function GetProjectRequest(id: number) {
     return request.get<Project>(`/projects/${id}`).then(GetResponse)
 }

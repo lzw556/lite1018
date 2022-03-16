@@ -1,4 +1,4 @@
-import {Button, Card, Col, DatePicker, Popconfirm, Row, Select, Space, Tag} from "antd";
+import {Button, Card, Col, DatePicker, Popconfirm, Row, Select, Space, Tag, Tree} from "antd";
 import {Content} from "antd/lib/layout/layout";
 import Label from "../../../components/label";
 import {useCallback, useEffect, useState} from "react";
@@ -30,13 +30,14 @@ const AlarmRecordPage = () => {
     const [refreshKey, setRefreshKey] = useState<number>(0)
     const [alarmRecord, setAlarmRecord] = useState<any>()
     const [acknowledge, setAcknowledge] = useState<any>()
-    const [status, setStatus] = useState<any>()
+    const [status, setStatus] = useState<any>([0,1,2])
 
     const fetchAlarmRecords = useCallback((current: number, size: number) => {
         const filters:any = {
-            levels: alertLevels.join(",")
+            levels: alertLevels.join(","),
+            status: "",
         }
-        if (status) {
+        if (status && status.length > 0) {
             filters.status = status.join(",")
         }
         PagingAlarmRecordRequest(current, size, startDate.utc().unix(), endDate.utc().unix(), filters).then(setDataSource)
@@ -60,6 +61,41 @@ const AlarmRecordPage = () => {
 
     const onViewAcknowledge = (id: number) => {
         GetAlarmRecordAcknowledgeRequest(id).then(setAcknowledge)
+    }
+
+    const renderFilterDropdown = ({ setSelectedKeys, selectedKeys, confirm, clearFilters }: any) => {
+        const data = {
+            title: "全选",
+            key: -1,
+            children: [
+                {
+                    title: "未处理",
+                    key: 0,
+                },
+                {
+                    title: "手动处理",
+                    key: 1,
+                },
+                {
+                    title: "系统自动处理",
+                    key: 2,
+                }
+            ]
+        }
+        return <div style={{padding: "4px 4px"}}>
+            <Row justify={"start"}>
+                <Col span={24}>
+                    <Tree treeData={[data]}
+                          selectable={false}
+                          checkable
+                          defaultExpandAll
+                          checkedKeys={status}
+                          showLine={false} showIcon={false} onCheck={(checkKeys: any, e: any) => {
+                              setStatus(checkKeys.filter((key:any) => key !== -1))
+                    }}/>
+                </Col>
+            </Row>
+        </div>
     }
 
     const columns: any = [
@@ -144,20 +180,7 @@ const AlarmRecordPage = () => {
             dataIndex: 'status',
             key: 'status',
             width: "5%",
-            filters: [
-                {
-                    text: '未处理',
-                    value: 0
-                },
-                {
-                    text: '手动处理',
-                    value: 1
-                },
-                {
-                    text: '系统自动处理',
-                    value: 2
-                }
-            ],
+            filterDropdown: renderFilterDropdown,
             render: (status: number) => {
                 switch (status) {
                     case 1:
@@ -234,10 +257,7 @@ const AlarmRecordPage = () => {
                             <TableLayout emptyText={"报警记录列表为空"}
                                          columns={columns}
                                          dataSource={dataSource}
-                                         onPageChange={fetchAlarmRecords}
-                                         onChange={(pagination, filters) => {
-                                                 setStatus(filters.status)
-                                         }}/>
+                                         onPageChange={fetchAlarmRecords}/>
                         </Col>
                     </Row>
                 </Card>
