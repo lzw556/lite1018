@@ -80,6 +80,7 @@ func initMenus(db *gorm.DB) error {
 			Icon:   "icon-device-monitor",
 			IsAuth: true,
 			Hidden: false,
+			View:   "DeviceMonitor",
 			Sort:   0,
 		},
 		{
