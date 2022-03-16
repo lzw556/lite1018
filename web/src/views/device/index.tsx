@@ -74,7 +74,6 @@ const DevicePage = () => {
   const [device, setDevice] = useState<Device>();
   const [editSettingVisible, setEditSettingVisible] = useState<boolean>(false);
   const [editBaseInfoVisible, setEditBaseInfoVisible] = useState<boolean>(false);
-  const [monitorVisible, setMonitorVisible] = useState<boolean>(false);
   const [upgradeVisible, setUpgradeVisible] = useState<boolean>(false);
   const [replaceVisible, setReplaceVisible] = useState<boolean>(false);
   const [executeDevice, setExecuteDevice] = useState<Device>();
@@ -114,14 +113,6 @@ const DevicePage = () => {
     fetchDevices(1, 10);
     GetDeviceStatisticsRequest(network ? { network_id: network } : {}).then(setCount);
   }, [fetchDevices]);
-
-  useEffect(() => {
-    document.onkeyup = (e) => {
-      if (e.keyCode === 27) {
-        setMonitorVisible(false);
-      }
-    };
-  }, []);
 
   const onRefresh = () => {
     setRefreshKey(refreshKey + 1);
@@ -199,13 +190,6 @@ const DevicePage = () => {
       setReplaceVisible(key === '0');
       setEditBaseInfoVisible(key === '1');
       setEditSettingVisible(key === '2');
-    });
-  };
-
-  const onMonitor = (id: number) => {
-    GetDeviceRequest(id).then((data) => {
-      setDevice(data);
-      setMonitorVisible(true);
     });
   };
 
@@ -299,11 +283,6 @@ const DevicePage = () => {
         const isUpgrading = record.upgradeStatus && IsUpgrading(record.upgradeStatus.code);
         return (
           <Space>
-            {record.typeId !== DeviceType.Router && record.typeId !== DeviceType.Gateway && (
-              <Button type={'text'} size={'small'} onClick={(_) => onMonitor(record.id)}>
-                <MonitorOutlined />
-              </Button>
-            )}
             <Dropdown overlay={renderEditMenus(record)}>
               <Button
                 type='text'
@@ -581,7 +560,6 @@ const DevicePage = () => {
           }}
         />
       )}
-      {device && <DeviceMonitorDrawer device={device} visible={monitorVisible} />}
     </Content>
   );
 };
