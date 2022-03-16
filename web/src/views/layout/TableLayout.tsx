@@ -3,7 +3,6 @@ import {FC} from "react";
 import zhCN from "antd/es/locale/zh_CN";
 import usePermission, {PermissionType} from "../../permission/permission";
 import {PageResult} from "../../types/page";
-import {TableProps} from "antd/es";
 
 export interface TableLayoutProps {
     columns: any
@@ -13,11 +12,12 @@ export interface TableLayoutProps {
     emptyText?: string | any;
     permissions?: PermissionType[];
     onPageChange?: (page: number, pageSize: number) => void;
+    onChange?: (pagination:any, filters:any) => void;
 }
 
 
 const TableLayout: FC<TableLayoutProps> = (props) => {
-    const {columns, permissions, rowSelection, dataSource, emptyText, onPageChange, expandable} = props;
+    const {columns, permissions, rowSelection, dataSource, emptyText, onPageChange, expandable, onChange} = props;
     const pagination: PaginationProps = {
         showSizeChanger: true,
         pageSizeOptions: ['10', '20', '30', '40', '50'],
@@ -55,6 +55,7 @@ const TableLayout: FC<TableLayoutProps> = (props) => {
                        rowSelection={rowSelection}
                        dataSource={renderDataSource()}
                        expandable={expandable}
+                       onChange={onChange}
                        pagination={false}/>
             </Col>
         </Row>

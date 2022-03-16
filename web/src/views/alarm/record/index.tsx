@@ -30,13 +30,17 @@ const AlarmRecordPage = () => {
     const [refreshKey, setRefreshKey] = useState<number>(0)
     const [alarmRecord, setAlarmRecord] = useState<any>()
     const [acknowledge, setAcknowledge] = useState<any>()
+    const [status, setStatus] = useState<any>()
 
     const fetchAlarmRecords = useCallback((current: number, size: number) => {
-        const filters = {
+        const filters:any = {
             levels: alertLevels.join(",")
         }
+        if (status) {
+            filters.status = status.join(",")
+        }
         PagingAlarmRecordRequest(current, size, startDate.utc().unix(), endDate.utc().unix(), filters).then(setDataSource)
-    }, [startDate, endDate, alertLevels, refreshKey])
+    }, [startDate, endDate, alertLevels, refreshKey, status])
 
     useEffect(() => {
         fetchAlarmRecords(1, 10)
@@ -154,7 +158,6 @@ const AlarmRecordPage = () => {
                     value: 2
                 }
             ],
-            onFilter: (value: number, record: any) => record.status === value,
             render: (status: number) => {
                 switch (status) {
                     case 1:
@@ -217,9 +220,9 @@ const AlarmRecordPage = () => {
                                     value={[startDate, endDate]}
                                     allowClear={false}
                                     onChange={(date, dateString) => {
-                                        if (dateString) {
-                                            setStartDate(moment(dateString[0]).startOf('day'))
-                                            setEndDate(moment(dateString[1]).endOf('day'))
+                                        if (date) {
+                                            setStartDate(moment(date[0]))
+                                            setEndDate(moment(date[1]))
                                         }
                                     }}/>
                             </Space>
@@ -231,7 +234,10 @@ const AlarmRecordPage = () => {
                             <TableLayout emptyText={"报警记录列表为空"}
                                          columns={columns}
                                          dataSource={dataSource}
-                                         onPageChange={fetchAlarmRecords}/>
+                                         onPageChange={fetchAlarmRecords}
+                                         onChange={(pagination, filters) => {
+                                                 setStatus(filters.status)
+                                         }}/>
                         </Col>
                     </Row>
                 </Card>

@@ -106,6 +106,13 @@ func (factory Alarm) NewAlarmRecordQuery(filters request.Filters) (*query.AlarmR
 			q.Specs = append(q.Specs, spec.ProjectEqSpec(cast.ToUint(v)))
 		case "source_id":
 			q.Specs = append(q.Specs, spec.SourceEqSpec(cast.ToUint(v)))
+		case "status":
+			status := strings.Split(cast.ToString(v), ",")
+			statusInSpec := make(spec.StatusInSpec, len(status))
+			for i, s := range status {
+				statusInSpec[i] = cast.ToUint(s)
+			}
+			q.Specs = append(q.Specs, statusInSpec)
 		case "levels":
 			levels := strings.Split(cast.ToString(v), ",")
 			levelsInSpec := make(spec.LevelInSpec, len(levels))
