@@ -20,13 +20,13 @@ func (r projectRouter) find(ctx *gin.Context) (interface{}, error) {
 	if _, ok := ctx.GetQuery("page"); ok {
 		page := cast.ToInt(ctx.Query("page"))
 		size := cast.ToInt(ctx.Query("size"))
-		result, total, err := r.service.FindProjectsByPaginate(page, size, filters)
+		result, total, err := r.service.PagingProjects(page, size, filters)
 		if err != nil {
 			return nil, err
 		}
 		return response.NewPageResult(page, size, total, result), nil
 	}
-	return nil, nil
+	return r.service.FindProjects(filters)
 }
 
 func (r projectRouter) getMyProjects(ctx *gin.Context) (interface{}, error) {

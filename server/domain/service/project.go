@@ -51,7 +51,7 @@ func (s Project) GetProjectByID(id uint) (*vo.Project, error) {
 	return &result, nil
 }
 
-func (s Project) FindProjectsByPaginate(page, size int, filters request.Filters) ([]vo.Project, int64, error) {
+func (s Project) PagingProjects(page, size int, filters request.Filters) ([]vo.Project, int64, error) {
 	es, total, err := s.repository.PagingBySpecs(context.TODO(), page, size)
 	if err != nil {
 		return nil, 0, err
