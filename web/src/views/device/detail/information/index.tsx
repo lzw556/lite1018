@@ -9,6 +9,7 @@ import '../../../../string-extension';
 import useSocket, { SocketTopic } from '../../../../socket';
 import DeviceUpgradeSpin from '../../spin/deviceUpgradeSpin';
 import { DeviceType } from '../../../../types/device_type';
+import { SingleDeviceStatus } from '../../SingleDeviceStatus';
 
 export interface GatewayInformationProps {
   device: Device;
@@ -79,16 +80,11 @@ const InformationCard: FC<GatewayInformationProps> = ({ device, isLoading }) => 
           </Col>
           <Col span={9}>
             <Row>
-              {' '}
               <Col span={8} className='ts-detail-label'>
                 状态
               </Col>
               <Col span={16}>
-                {device.state && device.state.isOnline ? (
-                  <Tag color={ColorHealth}>在线</Tag>
-                ) : (
-                  <Tag color={ColorWarn}>离线</Tag>
-                )}
+                <SingleDeviceStatus alertStates={device.alertStates} state={device.state} />
               </Col>
             </Row>
           </Col>
@@ -153,7 +149,7 @@ const InformationCard: FC<GatewayInformationProps> = ({ device, isLoading }) => 
               </Col>
             </Row>
           </Col>
-          {(device.typeId !== DeviceType.Gateway && device.typeId !== DeviceType.Router) && (
+          {device.typeId !== DeviceType.Gateway && device.typeId !== DeviceType.Router && (
             <Col span={9}>
               <Row>
                 <Col span={8} className='ts-detail-label'>
