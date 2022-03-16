@@ -74,6 +74,15 @@ func initMenus(db *gorm.DB) error {
 		//	Path:     "/asset-management",
 		//},
 		{
+			ID:     3100,
+			Title:  "设备主页",
+			Name:   "device-monitor",
+			Icon:   "icon-device-monitor",
+			IsAuth: true,
+			Hidden: false,
+			Sort:   0,
+		},
+		{
 			ID:     3000,
 			Title:  "设备管理",
 			Name:   "device-management",
