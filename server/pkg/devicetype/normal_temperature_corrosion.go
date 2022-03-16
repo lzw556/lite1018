@@ -94,7 +94,7 @@ func (NormalTemperatureCorrosion) Properties(sensorID uint) Properties {
 					{
 						Name:      "飞行时间",
 						Key:       "tof",
-						DataIndex: 3,
+						DataIndex: 2,
 					},
 				},
 			},
