@@ -1,47 +1,52 @@
-import {useCallback, useEffect, useState} from "react";
-import {useHistory, useLocation} from "react-router-dom";
-import {GetParamValue} from "../../../utils/path";
-import {Button, Col, Dropdown, Menu, message, Row, Space} from "antd";
-import {Device} from "../../../types/device";
-import {DeviceUpgradeRequest, GetDeviceRequest, SendDeviceCommandRequest} from "../../../apis/device";
-import {Content} from "antd/lib/layout/layout";
-import InformationCard from "./information";
-import ShadowCard from "../../../components/shadowCard";
-import {DownOutlined} from "@ant-design/icons";
-import {DeviceCommand} from "../../../types/device_command";
-import SettingPage from "./setting";
-import {DeviceType} from "../../../types/device_type";
-import MyBreadcrumb from "../../../components/myBreadcrumb";
-import HasPermission from "../../../permission";
-import userPermission, {Permission} from "../../../permission/permission";
-import HistoryDataPage from "./data";
-import WaveDataChart from "./waveData";
-import useSocket, {SocketTopic} from "../../../socket";
-import { DeviceMonitor } from "../DeviceMonitor";
-import { RuntimeChart } from "../RuntimeChart";
-import { IsUpgrading } from "../../../types/device_upgrade_status";
-import UpgradeModal from "../upgrade";
-import DeviceEvent from "./event";
+import { useCallback, useEffect, useState } from 'react';
+import { useHistory, useLocation } from 'react-router-dom';
+import { GetParamValue } from '../../../utils/path';
+import { Button, Col, Dropdown, Menu, message, Row, Space } from 'antd';
+import { Device } from '../../../types/device';
+import {
+  DeviceUpgradeRequest,
+  GetDeviceRequest,
+  SendDeviceCommandRequest
+} from '../../../apis/device';
+import { Content } from 'antd/lib/layout/layout';
+import InformationCard from './information';
+import ShadowCard from '../../../components/shadowCard';
+import { DownOutlined } from '@ant-design/icons';
+import { DeviceCommand } from '../../../types/device_command';
+import SettingPage from './setting';
+import { DeviceType } from '../../../types/device_type';
+import MyBreadcrumb from '../../../components/myBreadcrumb';
+import HasPermission from '../../../permission';
+import userPermission, { Permission } from '../../../permission/permission';
+import HistoryDataPage from './data';
+import WaveDataChart from './waveData';
+import useSocket, { SocketTopic } from '../../../socket';
+import { DeviceMonitor } from '../DeviceMonitor';
+import { RuntimeChart } from '../RuntimeChart';
+import { IsUpgrading } from '../../../types/device_upgrade_status';
+import UpgradeModal from '../upgrade';
+import DeviceEvent from './event';
 
-const tabList = [
-    {
-        key: "settings",
-        tab: "配置信息",
-    },
-    {
-        key: "ta",
-        tab: "TA(状态历史)",
-    }
-]
+let tabList = [
+  {
+    key: 'settings',
+    tab: '配置信息'
+  },
+  {
+    key: 'ta',
+    tab: '状态历史'
+  }
+];
 const tabTitleList = [
-    {
-        key: "monitor",
-        tab: "监控",
-    },
-    {
-        key: "historyData",
-        tab: "历史数据"
-    }]
+  {
+    key: 'monitor',
+    tab: '监控'
+  },
+  {
+    key: 'historyData',
+    tab: '历史数据'
+  }
+];
 
 const DeviceDetailPage = () => {
   const location = useLocation<any>();
@@ -54,30 +59,37 @@ const DeviceDetailPage = () => {
   const [upgradeVisible, setUpgradeVisible] = useState<boolean>(false);
   const [upgradeStatus, setUpgradeStatus] = useState<any>();
 
-    const contents = new Map<string, any>([
-        ["settings", device && <SettingPage device={device}/>],
-        ["historyData", device && <HistoryDataPage device={device}/>],
-        ["waveData", device && <WaveDataChart device={device}/>],
-        ['monitor',device && <DeviceMonitor device={device}/>],
-        ['ta',device && <RuntimeChart deviceId={device.id}/>],
-        ['events', device && <DeviceEvent device={device}/>]
-    ])
+  if (hasPermission(Permission.DeviceEventList) && !tabList.find((tab) => tab.key === 'events')) {
+    tabList.unshift({
+      key: 'events',
+      tab: '事件'
+    });
+  }
 
-    const fetchDevice = useCallback(() => {
-        const id = GetParamValue(location.search, "id")
-        if (id && !!Number(id)) {
-            setIsLoading(true)
-            GetDeviceRequest(Number(id))
-                .then(data => {
-                    setDevice(data)
-                    setIsLoading(false)
-                })
-                .catch(_ => window.location.hash = "/device-management?locale=devices")
-        } else {
-            message.error("设备不存在").then()
-            window.location.hash = "/device-management?locale=devices"
-        }
-    }, []);
+  const contents = new Map<string, any>([
+    ['settings', device && <SettingPage device={device} />],
+    ['historyData', device && <HistoryDataPage device={device} />],
+    ['waveData', device && <WaveDataChart device={device} />],
+    ['monitor', device && <DeviceMonitor device={device} />],
+    ['ta', device && <RuntimeChart deviceId={device.id} />],
+    ['events', device && <DeviceEvent device={device} />]
+  ]);
+
+  const fetchDevice = useCallback(() => {
+    const id = GetParamValue(location.search, 'id');
+    if (id && !!Number(id)) {
+      setIsLoading(true);
+      GetDeviceRequest(Number(id))
+        .then((data) => {
+          setDevice(data);
+          setIsLoading(false);
+        })
+        .catch((_) => (window.location.hash = '/device-management?locale=devices'));
+    } else {
+      message.error('设备不存在').then();
+      window.location.hash = '/device-management?locale=devices';
+    }
+  }, []);
 
   useEffect(() => {
     fetchDevice();
@@ -107,92 +119,56 @@ const DeviceDetailPage = () => {
     };
   }, [device]);
 
-    const renderTabList = () => {
-        if (device) {
-            switch (device.typeId) {
-                case DeviceType.VibrationTemperature3Axis:
-                    if (hasPermission(Permission.DeviceEventList)) {
-                        return [
-                            ...tabTitleList,
-                            {
-                                key: "waveData",
-                                tab: "波形数据"
-                            },
-                            ...tabList,
-                            {
-                                key: "events",
-                                tab: "事件"
-                            }
-                        ]
-                    }
-                    return [
-                        ...tabTitleList,
-                        {
-                            key: "waveData",
-                            tab: "波形数据"
-                        },
-                        ...tabList
-                    ]
-                case DeviceType.Gateway:
-                case DeviceType.Router:
-                    if (hasPermission(Permission.DeviceEventList)) {
-                        return [
-                            ...tabList,
-                            {
-                                key: "events",
-                                tab: "事件"
-                            }
-                        ]
-                    }
-                    return tabList
-                default:
-                    if (hasPermission(Permission.DeviceEventList)) {
-                        return [
-                            ...tabTitleList,
-                            ...tabList,
-                            {
-                                key: "events",
-                                tab: "事件",
-                            }
-                        ]
-                    }
-                    return [
-                        ...tabTitleList,
-                        ...tabList,
-                    ]
-            }
-        }
+  const renderTabList = () => {
+    if (device) {
+      switch (device.typeId) {
+        case DeviceType.VibrationTemperature3Axis:
+          return [
+            ...tabTitleList,
+            {
+              key: 'waveData',
+              tab: '波形数据'
+            },
+            ...tabList
+          ];
+        case DeviceType.Gateway:
+        case DeviceType.Router:
+          return tabList;
+        default:
+          return [...tabTitleList, ...tabList];
+      }
     }
+  };
 
-    const onCommand = ({key}: any) => {
-        if (device) {
-            switch (Number(key)) {
-                case DeviceCommand.Upgrade:
-                    setDevice(device)
-                    setUpgradeVisible(true)
-                    break
-                case DeviceCommand.CancelUpgrade:
-                    DeviceUpgradeRequest(device.id, {type: DeviceCommand.CancelUpgrade}).then(res => {
-                        if (res.code === 200) {
-                            message.success("取消升级成功").then()
-                        } else {
-                            message.error(`取消升级失败,${res.msg}`).then()
-                        }
-                    })
-                    break
-
-                default:
-                    SendDeviceCommandRequest(device.id, key, {}).then(res => {
-                        if (res.code === 200) {
-                            message.success("发送成功").then()
-                        } else {
-                            message.error("发送失败").then()
-                        }
-                    })
-                    break;
+  const onCommand = ({ key }: any) => {
+    if (device) {
+      switch (Number(key)) {
+        case DeviceCommand.Upgrade:
+          setDevice(device);
+          setUpgradeVisible(true);
+          break;
+        case DeviceCommand.CancelUpgrade:
+          DeviceUpgradeRequest(device.id, { type: DeviceCommand.CancelUpgrade }).then((res) => {
+            if (res.code === 200) {
+              message.success('取消升级成功').then();
+            } else {
+              message.error(`取消升级失败,${res.msg}`).then();
             }
-        }
+          });
+          break;
+
+        default:
+          SendDeviceCommandRequest(device.id, key, {}).then((res) => {
+            if (res.code === 200) {
+              message.success('发送成功').then();
+            } else {
+              message.error('发送失败').then();
+            }
+          });
+          break;
+      }
     }
+  };
 
   const renderCommandMenu = () => {
     const isOnline = device && device.state.isOnline;
@@ -227,7 +203,11 @@ const DeviceDetailPage = () => {
   return (
     <Content>
       <MyBreadcrumb
-        firstBreadState={location && location.search.indexOf('displayDevicesByCard') > -1 ? { displayDevicesByCard: true } : undefined}
+        firstBreadState={
+          location && location.search.indexOf('displayDevicesByCard') > -1
+            ? { displayDevicesByCard: true }
+            : undefined
+        }
       >
         <Space>
           <HasPermission value={Permission.DeviceCommand}>
