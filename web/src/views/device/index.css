@@ -56,6 +56,9 @@
     font-size: 18px;
     text-align: center;
 }
+.device-list > .device .ant-statistic .ant-typography {
+    color: rgba(0,0,0,.45);
+}
 @media (min-width: 576px) {
     .device-list > .device {
         flex: 0 0 100%;

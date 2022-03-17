@@ -1,5 +1,5 @@
 import { InfoCircleOutlined } from '@ant-design/icons';
-import { Col, Popover, Row, Statistic } from 'antd';
+import { Col, Popover, Row, Statistic, Typography } from 'antd';
 import * as React from 'react';
 import ShadowCard from '../../components/shadowCard';
 import { FIRST_CLASS_PROPERTIES } from '../../constants/field';
@@ -9,6 +9,8 @@ import { DeviceType } from '../../types/device_type';
 import { Property } from '../../types/property';
 import DeviceUpgradeSpin from './spin/deviceUpgradeSpin';
 import { SingleDeviceStatus } from './SingleDeviceStatus';
+
+const { Text } = Typography;
 
 export const SingleDeviceInfo: React.FC<{ device: Device; actions?: React.ReactNode[] }> = ({
   device,
@@ -47,15 +49,28 @@ export const SingleDeviceInfo: React.FC<{ device: Device; actions?: React.ReactN
       </>
     );
   };
-  
+
+  const getFirstClassProperties = (properties: Property[]) => {
+    const property = FIRST_CLASS_PROPERTIES.find((pro) => pro.typeId === typeId);
+    const keys = property ? property.properties : [];
+    return properties
+      .filter((pro) => pro.fields.find((field) => keys.find((key) => key === field.key)))
+      .map((pro) => {
+        return {
+          ...pro,
+          fields: pro.fields.map((field) => ({
+            ...field,
+            important: !!keys.find((key) => key === field.key)
+          }))
+        };
+      });
+  };
+
   const transformData = (values: any, properties: Property[]) => {
     const fields = Object.keys(values);
     if (fields.length === 0 || fields.map((field) => values[field]).every((val) => !val)) return [];
     let data: any = [];
-    const firstClassProperties = properties.filter((pro) => {
-      const property = FIRST_CLASS_PROPERTIES.find((pro) => pro.typeId === typeId);
-      return property ? property.properties.find((item) => item === pro.key) : false;
-    });
+    const firstClassProperties = getFirstClassProperties(properties);
     fields.forEach((field) => {
       const property = firstClassProperties.find((pro) =>
         pro.fields.find((subpro) => subpro.key === field)
@@ -79,13 +94,16 @@ export const SingleDeviceInfo: React.FC<{ device: Device; actions?: React.ReactN
       <Row justify='center'>
         {data.map((attr: any, index: number) => {
           if (index > 2) return null;
-          const field = attr.fields[0];
+          const field = attr.fields.find((field: any) => field.important);
           return (
             <Col span={7}>
               <Statistic
-                title={`${attr.name !== field.name ? `${attr.name}${field.name}` : field.name}${
-                  attr.unit ? `(${attr.unit})` : ''
-                }`}
+                title={
+                  <Text
+                    ellipsis={true}
+                    title={`${attr.name}${attr.unit ? `(${attr.unit})` : ''}`}
+                  >{`${attr.name}${attr.unit ? `(${attr.unit})` : ''}`}</Text>
+                }
                 value={
                   Number.isInteger(field.value) ? field.value : field.value.toFixed(attr.precision)
                 }

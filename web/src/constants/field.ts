@@ -66,9 +66,9 @@ export function GetFieldName(key:string) {
 export const FIRST_CLASS_PROPERTIES = [
     { typeId: DeviceType.BoltLoosening, properties:['loosening_angle', 'attitude', 'motion'] },
     { typeId: DeviceType.BoltElongation, properties:['preload', 'temperature', 'pressure'] },
-    { typeId: DeviceType.VibrationTemperature3Axis, properties:['fft_frequency'] },
-    { typeId: DeviceType.HighTemperatureCorrosion, properties:['thickness', 'temperature'] },
-    { typeId: DeviceType.NormalTemperatureCorrosion, properties:['thickness', 'temperature'] },
+    { typeId: DeviceType.VibrationTemperature3Axis, properties:['vibration_severity_y', 'enveloping_pk2pk_y', 'temperature'] },
+    { typeId: DeviceType.HighTemperatureCorrosion, properties:['thickness', 'temperature', 'annualized_corrosion_rate'] },
+    { typeId: DeviceType.NormalTemperatureCorrosion, properties:['thickness', 'temperature', 'annualized_corrosion_rate'] },
     { typeId: DeviceType.PressureTemperature, properties:['loosening_angle', 'attitude', 'motion'] },
-    { typeId: DeviceType.AngleDip, properties:['angle'] }
+    { typeId: DeviceType.AngleDip, properties:['inclination', 'pitch', 'roll'] }
 ]
