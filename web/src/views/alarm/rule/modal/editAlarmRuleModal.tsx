@@ -29,7 +29,8 @@ const EditAlarmRuleModal: FC<EditAlarmRuleModalProps> = (props) => {
 
     const onSave = () => {
         form.validateFields().then(values => {
-            UpdateAlarmRuleRequest(value.id, values).then(data => {
+            values.duration = Number(values.duration);
+            UpdateAlarmRuleRequest(value.id, values).then(_ => {
                 if (onSuccess) onSuccess();
             })
         })

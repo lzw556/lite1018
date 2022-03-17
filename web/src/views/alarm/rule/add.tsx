@@ -114,7 +114,7 @@ const AddAlarmRule = () => {
                 <Row justify={"space-between"}>
                     <Col span={24}>
                         <Form.Item label={"规则名称"} labelCol={{span: 2}} wrapperCol={{span: 8}} name={"name"} required
-                                   rules={[{validator: onNameValidator}]}>
+                                   rules={[Rules.range(4,16),{validator: onNameValidator}]}>
                             <Input placeholder={"请输入规则名称"}/>
                         </Form.Item>
                     </Col>

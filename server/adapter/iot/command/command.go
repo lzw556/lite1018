@@ -156,9 +156,9 @@ func SyncDeviceList(gateway entity.Device, devices []entity.Device, timeout time
 	return nil
 }
 
-func AddDevice(gateway entity.Device, device entity.Device, parent string) {
+func AddDevice(gateway entity.Device, device entity.Device, parent entity.Device) {
 	timeout := 3 * time.Second
-	cmd := newAddDeviceCmd(device.Name, device.MacAddress, parent, device.Type)
+	cmd := newAddDeviceCmd(device.Name, device.MacAddress, parent.MacAddress, device.Type)
 	if _, err := cmd.Execute(context.TODO(), gateway.MacAddress, gateway.MacAddress, timeout); err != nil {
 		xlog.Errorf("execute device command %s failed: %v => [%s]", cmd.Name(), err, gateway.MacAddress)
 		return

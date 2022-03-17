@@ -1,4 +1,4 @@
-import {Button, Col, Divider, Form, Input, Result, Row, Space} from "antd";
+import {Button, Col, Form, Input, Result, Row, Space} from "antd";
 import {Content} from "antd/es/layout/layout";
 import {useState} from "react";
 import "../index.css"
@@ -75,14 +75,17 @@ const AddDevicePage = () => {
                                 <Form  form={form} labelCol={{span: 8}} validateMessages={defaultValidateMessages}>
                                     <fieldset>
                                         <legend>基本信息</legend>
-                                        <Form.Item label="设备名称" name="name" rules={[Rules.required]}>
+                                        <Form.Item label="设备名称" name="name" rules={[Rules.range(4, 20)]}>
                                             <Input placeholder={"请输入设备名称"}/>
                                         </Form.Item>
-                                        <Form.Item label="设备MAC地址" normalize={Normalizes.macAddress} required name="mac_address" rules={[{validator: onMacValidator}]}>
+                                        <Form.Item label="设备MAC地址" normalize={Normalizes.macAddress} required name="mac_address" rules={[Rules.macAddress]}>
                                             <Input placeholder={`请输入设备MAC地址`} />
                                         </Form.Item>
                                         <Form.Item label={"所属网络"} name={"network"} rules={[Rules.required]}>
-                                            <NetworkSelect placeholder={"请选择设备所属网络"} onChange={setNetwork}/>
+                                            <NetworkSelect placeholder={"请选择设备所属网络"} onChange={value => {
+                                                setNetwork(value);
+                                                form.resetFields(["parent"])
+                                            }}/>
                                         </Form.Item>
                                         {
                                             network &&

@@ -8,7 +8,7 @@ type WSN struct {
 }
 
 type Network struct {
-	Name      string `json:"name"`
+	Name      string `json:"name" binding:"required,min=4,max=16"`
 	WSN       WSN    `json:"wsn"`
 	ProjectID uint   `json:"-"`
 }

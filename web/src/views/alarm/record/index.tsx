@@ -130,7 +130,10 @@ const AlarmRecordPage = () => {
             key: 'source',
             width: '10%',
             render: (source: any, record: any) => {
-                return source.name
+                if (source) {
+                    return source.name
+                }
+                return "未知资源"
             }
         },
         {
@@ -139,7 +142,10 @@ const AlarmRecordPage = () => {
             key: 'type',
             width: '10%',
             render: (source: any) => {
-                return DeviceType.toString(source.typeId)
+                if (source) {
+                    return DeviceType.toString(source.typeId)
+                }
+                return "未知类型"
             }
         },
         {
@@ -207,7 +213,7 @@ const AlarmRecordPage = () => {
                                     onClick={() => onViewAcknowledge(record.id)}>查看处理详情</Button>
                     }
                     <HasPermission value={Permission.AlarmRecordAcknowledge}>
-                        <Popconfirm placement="left" title="确认要删除该规则吗?" onConfirm={() => onDelete(record.id)}
+                        <Popconfirm placement="left" title="确认要删除该报警记录吗?" onConfirm={() => onDelete(record.id)}
                                     okText="删除" cancelText="取消">
                             <Button type="text" size="small" icon={<DeleteOutlined/>} danger/>
                         </Popconfirm>

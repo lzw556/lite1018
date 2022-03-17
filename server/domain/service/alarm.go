@@ -16,12 +16,14 @@ import (
 type Alarm struct {
 	factory factory.Alarm
 	rule    dependency.AlarmRuleRepository
+	record  dependency.AlarmRecordRepository
 }
 
 func NewAlarm() alarm.Service {
 	return &Alarm{
 		factory: factory.NewAlarm(),
 		rule:    repository.AlarmRule{},
+		record:  repository.AlarmRecord{},
 	}
 }
 
@@ -119,4 +121,8 @@ func (s Alarm) GetAlarmRecordAcknowledgeByID(id uint) (*vo.AlarmRecordAcknowledg
 		return nil, err
 	}
 	return query.GetAcknowledge(id)
+}
+
+func (s Alarm) DeleteAlarmRecordByID(id uint) error {
+	return s.record.Delete(context.TODO(), id)
 }

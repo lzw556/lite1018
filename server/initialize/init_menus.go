@@ -78,6 +78,7 @@ func initMenus(db *gorm.DB) error {
 			Title:  "设备主页",
 			Name:   "device-monitor",
 			Icon:   "icon-device-monitor",
+			Path:   "/device-monitor",
 			IsAuth: true,
 			Hidden: false,
 			View:   "DeviceMonitor",
