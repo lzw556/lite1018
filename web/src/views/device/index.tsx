@@ -50,6 +50,7 @@ import NetworkSelect from '../../components/select/networkSelect';
 import DeviceUpgradeSpin from './spin/deviceUpgradeSpin';
 import './index.css';
 import { SingleDeviceStatus } from './SingleDeviceStatus';
+import { getValueOfFirstClassProperty } from './util';
 
 const { Search } = Input;
 const { Option } = Select;
@@ -233,30 +234,28 @@ const DevicePage = () => {
       }
     },
     {
-      title: '设备类型',
-      dataIndex: 'typeId',
-      key: 'typeId',
-      render: (text: DeviceType) => {
-        return DeviceType.toString(text);
-      }
-    },
-    {
-      title: '电池电压(mV)',
-      dataIndex: 'state',
-      key: 'batteryVoltage',
-      render: (state: any, record: Device) => {
-        if (record.typeId === DeviceType.Gateway) {
-          return '-';
+      title: '数据',
+      key: 'data',
+      render: (text: any, device: Device) => {
+        const {
+          properties,
+          typeId,
+          data: { values }
+        } = device;
+        const data = getValueOfFirstClassProperty(values, properties, typeId);
+        if (typeId === DeviceType.Gateway || typeId === DeviceType.Router) return '-';
+        if (data && data.length > 0) {
+          return data
+            .map((attr: any, index: number) => {
+              if (index > 2) return null;
+              const field = attr.fields.find((field: any) => field.important);
+              return `${attr.name}: ${
+                Number.isInteger(field.value) ? field.value : field.value.toFixed(attr.precision)
+              }${attr.unit}`;
+            })
+            .join(', ');
         }
-        return state ? state.batteryVoltage : 0;
-      }
-    },
-    {
-      title: '信号强度(dB)',
-      dataIndex: 'state',
-      key: 'signalLevel',
-      render: (state: any) => {
-        return <div>{state ? state.signalLevel : 0}</div>;
+        return '暂无数据';
       }
     },
     {
