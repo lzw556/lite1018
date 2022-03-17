@@ -21,3 +21,8 @@ func (s Statistic) GetDeviceStatistics(filters request.Filters) ([]vo.DeviceStat
 	query := s.factory.NewStatisticQuery(filters)
 	return query.GetDeviceStatistics()
 }
+
+func (s Statistic) GetAlertStatistics(filters request.Filters) ([]vo.AlertStatistic, error) {
+	query := s.factory.NewStatisticQuery(filters)
+	return query.GetAlertStatistics()
+}

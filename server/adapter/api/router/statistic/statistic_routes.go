@@ -9,3 +9,8 @@ func (r statisticRouter) getDeviceStatistics(ctx *gin.Context) (interface{}, err
 	filters := request.NewFilters(ctx)
 	return r.service.GetDeviceStatistics(filters)
 }
+
+func (r statisticRouter) getAlertStatistics(ctx *gin.Context) (interface{}, error) {
+	filters := request.NewFilters(ctx)
+	return r.service.GetAlertStatistics(filters)
+}

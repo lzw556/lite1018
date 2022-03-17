@@ -1,6 +1,6 @@
 package request
 
-type Device struct {
+type CreateDevice struct {
 	Name       string                 `json:"name" binding:"max=20,min=2"`
 	MacAddress string                 `json:"mac_address" binding:"required,lowercase,len=12"`
 	TypeID     uint                   `json:"type" binding:"required"`
@@ -11,6 +11,10 @@ type Device struct {
 	Sensors    map[string]interface{} `json:"sensors,omitempty"`
 
 	ProjectID uint `json:"-"`
+}
+
+type UpdateDevice struct {
+	Name string `json:"name" binding:"max=20,min=2"`
 }
 
 type DeviceSearch struct {

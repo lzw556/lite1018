@@ -30,7 +30,7 @@ func NewDeviceUpdateCmd() DeviceUpdateCmd {
 	}
 }
 
-func (cmd DeviceUpdateCmd) UpdateBaseInfo(req request.Device) error {
+func (cmd DeviceUpdateCmd) UpdateBaseInfo(req request.UpdateDevice) error {
 	if cmd.Device.Name != req.Name {
 		ctx := context.TODO()
 		cmd.Device.Name = req.Name

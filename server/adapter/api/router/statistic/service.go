@@ -7,4 +7,5 @@ import (
 
 type Service interface {
 	GetDeviceStatistics(filters request.Filters) ([]vo.DeviceStatistic, error)
+	GetAlertStatistics(filters request.Filters) ([]vo.AlertStatistic, error)
 }

@@ -30,7 +30,7 @@ func NewDevice() Device {
 	}
 }
 
-func (factory Device) NewDeviceCreateCmd(req request.Device) (*command.DeviceCreateCmd, error) {
+func (factory Device) NewDeviceCreateCmd(req request.CreateDevice) (*command.DeviceCreateCmd, error) {
 	ctx := context.TODO()
 	e, err := factory.deviceRepo.GetBySpecs(ctx, spec.DeviceMacEqSpec(req.MacAddress))
 	if !errors.Is(err, gorm.ErrRecordNotFound) {
