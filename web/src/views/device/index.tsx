@@ -5,27 +5,20 @@ import {
   Input,
   Menu,
   message,
-  Pagination,
   Popconfirm,
   Row,
   Select,
   Space,
   Spin,
-  Statistic,
-  Tag,
-  Tooltip,
   Typography
 } from 'antd';
 import {
-  AppstoreOutlined,
   CaretDownOutlined,
   CodeOutlined,
   DeleteOutlined,
   EditOutlined,
   LoadingOutlined,
-  MonitorOutlined,
-  PlusOutlined,
-  TableOutlined
+  PlusOutlined
 } from '@ant-design/icons';
 import { Content } from 'antd/lib/layout/layout';
 import { useCallback, useEffect, useState } from 'react';
@@ -54,13 +47,8 @@ import usePermission, { Permission } from '../../permission/permission';
 import { PageResult } from '../../types/page';
 import DeviceTable from '../../components/table/deviceTable';
 import NetworkSelect from '../../components/select/networkSelect';
-import DeviceMonitorDrawer from './deviceMonitorDrawer';
 import DeviceUpgradeSpin from './spin/deviceUpgradeSpin';
 import './index.css';
-import { SingleDeviceInfo } from './SingleDeviceInfo';
-import { useLocation } from 'react-router-dom';
-import { GetDeviceStatisticsRequest } from '../../apis/statistic';
-import { GetAlarmLevelSkin, GetAlarmLevelString } from '../../constants/rule';
 import { SingleDeviceStatus } from './SingleDeviceStatus';
 
 const { Search } = Input;
@@ -80,11 +68,7 @@ const DevicePage = () => {
   const [dataSource, setDataSource] = useState<PageResult<any>>();
   const { hasPermission, hasPermissions } = usePermission();
   const [refreshKey, setRefreshKey] = useState<number>(0);
-  const { state } = useLocation<{ [propName: string]: any }>();
-  const [displayDevicesByCard, setDisplayDevicesByCard] = useState(
-    (state && state.displayDevicesByCard) || false
-  );
-  const [count, setCount] = useState<{ isOnline: boolean; alertLevel: number }[]>([]);
+
   const onSearch = (value: string) => {
     setSearchText(value);
   };
@@ -111,7 +95,6 @@ const DevicePage = () => {
 
   useEffect(() => {
     fetchDevices(1, 10);
-    GetDeviceStatisticsRequest(network ? { network_id: network } : {}).then(setCount);
   }, [fetchDevices]);
 
   const onRefresh = () => {
@@ -331,61 +314,6 @@ const DevicePage = () => {
     }
   ];
 
-  const renderStatistic = () => {
-    if (count.length === 0) return null;
-    const countOnline = count.filter((item) => item.isOnline).length;
-    const countOffline = count.filter((item) => !item.isOnline).length;
-    let groupedLevels: number[] = [];
-    count
-      .filter((item) => item.alertLevel > 0)
-      .forEach((item) => {
-        if (
-          groupedLevels.length === 0 ||
-          groupedLevels.find((level) => level === item.alertLevel) === undefined
-        ) {
-          groupedLevels.push(item.alertLevel);
-        }
-      });
-    const levels = groupedLevels.map((level) => ({
-      level,
-      sum: count.filter((item) => item.alertLevel === level).length
-    }));
-    return (
-      <>
-        <ShadowCard>
-          <Row>
-            <Col span={3}>
-              <Statistic title='总设备数' value={count.length} />
-            </Col>
-            <Col span={3}>
-              <Statistic title='在线' value={countOnline} />
-            </Col>
-            <Col span={3}>
-              <Statistic title='离线' value={countOffline} />
-            </Col>
-            {levels.length > 0 && (
-              <Col span={15}>
-                <div className='ant-statistic'>
-                  <div className='ant-statistic-title'>报警</div>
-                  <div className='ant-statistic-content'>
-                    {levels.map(({ level, sum }) => (
-                      <>
-                        <Tag key={level} color={GetAlarmLevelSkin(level)}>
-                          {GetAlarmLevelString(level)} {sum}
-                        </Tag>
-                      </>
-                    ))}
-                  </div>
-                </div>
-              </Col>
-            )}
-          </Row>
-        </ShadowCard>
-        <br />
-      </>
-    );
-  };
-
   return (
     <Content>
       <MyBreadcrumb>
@@ -394,23 +322,6 @@ const DevicePage = () => {
             添加设备
             <PlusOutlined />
           </Button>
-          {displayDevicesByCard ? (
-            <Tooltip title='表格'>
-              <Button
-                type='primary'
-                icon={<TableOutlined />}
-                onClick={() => setDisplayDevicesByCard(!displayDevicesByCard)}
-              />
-            </Tooltip>
-          ) : (
-            <Tooltip title='卡片'>
-              <Button
-                type='primary'
-                icon={<AppstoreOutlined />}
-                onClick={() => setDisplayDevicesByCard(!displayDevicesByCard)}
-              />
-            </Tooltip>
-          )}
         </Space>
       </MyBreadcrumb>
       <ShadowCard>
@@ -444,79 +355,21 @@ const DevicePage = () => {
           </Col>
         </Row>
         <br />
-        {displayDevicesByCard && (
-          <>
-            {renderStatistic()}
-            <Row className='device-list'>
-              {dataSource &&
-                dataSource.result.map((device: Device) => (
-                  <Col key={device.id} className='device'>
-                    <SingleDeviceInfo
-                      device={device}
-                      actions={[
-                        <Dropdown overlay={renderEditMenus(device)}>
-                          <EditOutlined />
-                        </Dropdown>,
-                        <Dropdown overlay={renderCommandMenus(device)}>
-                          <CodeOutlined />
-                        </Dropdown>,
-                        <HasPermission value={Permission.DeviceDelete}>
-                          <Popconfirm
-                            placement='left'
-                            title='确认要删除该设备吗?'
-                            onConfirm={() => onDelete(device.id)}
-                            okText='删除'
-                            cancelText='取消'
-                          >
-                            <Button
-                              type='text'
-                              size='small'
-                              icon={<DeleteOutlined />}
-                              danger
-                              disabled={false}
-                            />
-                          </Popconfirm>
-                        </HasPermission>
-                      ]}
-                    />
-                  </Col>
-                ))}
-            </Row>
-            <Row justify={'end'} style={{ textAlign: 'right' }}>
-              <Col span={24}>
-                {dataSource && !Array.isArray(dataSource) && (
-                  <Pagination
-                    {...{
-                      showSizeChanger: true,
-                      pageSizeOptions: ['10', '20', '30', '40', '50'],
-                      onChange: fetchDevices
-                    }}
-                    current={dataSource.page}
-                    total={dataSource.total}
-                    pageSize={dataSource.size}
-                  />
-                )}
-              </Col>
-            </Row>
-          </>
-        )}
-        {!displayDevicesByCard && (
-          <Row justify='center'>
-            <Col span={24}>
-              <DeviceTable
-                columns={columns}
-                permissions={[
-                  Permission.DeviceEdit,
-                  Permission.DeviceSettingsEdit,
-                  Permission.DeviceCommand,
-                  Permission.DeviceDelete
-                ]}
-                dataSource={dataSource}
-                onChange={fetchDevices}
-              />
-            </Col>
-          </Row>
-        )}
+        <Row justify='center'>
+          <Col span={24}>
+            <DeviceTable
+              columns={columns}
+              permissions={[
+                Permission.DeviceEdit,
+                Permission.DeviceSettingsEdit,
+                Permission.DeviceCommand,
+                Permission.DeviceDelete
+              ]}
+              dataSource={dataSource}
+              onChange={fetchDevices}
+            />
+          </Col>
+        </Row>
       </ShadowCard>
       <EditBaseInfoModel
         device={device}
