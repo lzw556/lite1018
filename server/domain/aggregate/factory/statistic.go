@@ -5,6 +5,7 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/request"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/aggregate/query"
 	spec "github.com/thetasensors/theta-cloud-lite/server/domain/specification"
+	"strings"
 )
 
 type Statistic struct {
@@ -23,6 +24,13 @@ func (factory Statistic) NewStatisticQuery(filters request.Filters) *query.Stati
 			q.Specs = append(q.Specs, spec.ProjectEqSpec(cast.ToUint(v)))
 		case "network_id":
 			q.Specs = append(q.Specs, spec.NetworkEqSpec(cast.ToUint(v)))
+		case "types":
+			types := strings.Split(cast.ToString(v), ",")
+			typeInSpec := make(spec.TypeInSpec, len(types))
+			for i, t := range types {
+				typeInSpec[i] = cast.ToUint(t)
+			}
+			q.Specs = append(q.Specs, typeInSpec)
 		}
 	}
 	return &q

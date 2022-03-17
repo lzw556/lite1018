@@ -32,6 +32,8 @@ axios.interceptors.response.use(<T>(response:AxiosResponse<T>) => {
         case 500:
             window.location.hash = '/500'
             break
+        case 400:
+            return Promise.reject(error.response.data)
         default:
             break
     }

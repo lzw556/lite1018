@@ -1,9 +1,9 @@
 package request
 
 type Device struct {
-	Name       string                 `json:"name"`
-	MacAddress string                 `json:"mac_address,omitempty"`
-	TypeID     uint                   `json:"type,omitempty"`
+	Name       string                 `json:"name" binding:"max=20,min=2"`
+	MacAddress string                 `json:"mac_address" binding:"required,lowercase,len=12"`
+	TypeID     uint                   `json:"type" binding:"required"`
 	NetworkID  uint                   `json:"network,omitempty"`
 	ParentID   uint                   `json:"parent,omitempty"`
 	IPN        map[string]interface{} `json:"ipn,omitempty"`

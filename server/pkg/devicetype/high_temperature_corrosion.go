@@ -81,6 +81,29 @@ func (HighTemperatureCorrosion) Properties(sensorID uint) Properties {
 						Key:       "temperature",
 						DataIndex: 1,
 					},
+					{
+						Name:      "环境温度",
+						Key:       "env_temperature",
+						DataIndex: 3,
+					},
+				},
+			},
+			{
+				Key:  "corrosion_rate",
+				Name: "腐蚀率",
+				Unit: "mm/a",
+				Sort: 3,
+				Fields: []Field{
+					{
+						Name:      "月腐蚀率",
+						Key:       "monthly_corrosion_rate",
+						DataIndex: 5,
+					},
+					{
+						Name:      "年腐蚀率",
+						Key:       "annualized_corrosion_rate",
+						DataIndex: 6,
+					},
 				},
 			},
 			{
@@ -88,12 +111,12 @@ func (HighTemperatureCorrosion) Properties(sensorID uint) Properties {
 				Name:      "飞行时间",
 				Unit:      "ns",
 				Precision: 3,
-				Sort:      3,
+				Sort:      4,
 				Fields: []Field{
 					{
 						Name:      "飞行时间",
 						Key:       "tof",
-						DataIndex: 3,
+						DataIndex: 2,
 					},
 				},
 			},
