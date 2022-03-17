@@ -21,7 +21,7 @@ import userPermission, { Permission } from '../../../permission/permission';
 import HistoryDataPage from './data';
 import WaveDataChart from './waveData';
 import useSocket, { SocketTopic } from '../../../socket';
-import { DeviceMonitor } from '../DeviceMonitor';
+import { RecentHistory } from '../RecentHistory';
 import { RuntimeChart } from '../RuntimeChart';
 import { IsUpgrading } from '../../../types/device_upgrade_status';
 import UpgradeModal from '../upgrade';
@@ -70,7 +70,7 @@ const DeviceDetailPage = () => {
     ['settings', device && <SettingPage device={device} />],
     ['historyData', device && <HistoryDataPage device={device} />],
     ['waveData', device && <WaveDataChart device={device} />],
-    ['monitor', device && <DeviceMonitor device={device} />],
+    ['monitor', device && <RecentHistory device={device} />],
     ['ta', device && <RuntimeChart deviceId={device.id} />],
     ['events', device && <DeviceEvent device={device} />]
   ]);

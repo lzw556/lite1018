@@ -1,7 +1,7 @@
 import {Col, Drawer, DrawerProps, Row, Typography} from "antd";
 import {Device} from "../../types/device";
 import {FC, useState} from "react";
-import { DeviceMonitor } from "./DeviceMonitor";
+import { RecentHistory } from "./RecentHistory";
 
 export interface DeviceMonitorDrawerProps extends DrawerProps {
     device: Device;
@@ -19,7 +19,7 @@ const DeviceMonitorDrawer: FC<DeviceMonitorDrawerProps> = (props) => {
             </Col>
         </Row>
         <br/>
-        <DeviceMonitor device={device}/>
+        <RecentHistory device={device}/>
     </Drawer>
 }
 

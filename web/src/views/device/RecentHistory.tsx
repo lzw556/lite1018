@@ -6,7 +6,7 @@ import { FindDeviceDataRequest } from '../../apis/device';
 import { DefaultMonitorDataOption, LineChartStyles } from '../../constants/chart';
 import { Device } from '../../types/device';
 
-export const DeviceMonitor: React.FC<{ device: Device }> = ({ device }) => {
+export const RecentHistory: React.FC<{ device: Device }> = ({ device }) => {
   const [historyOptions, setHistoryOptions] = React.useState<any>();
 
   React.useEffect(() => {
