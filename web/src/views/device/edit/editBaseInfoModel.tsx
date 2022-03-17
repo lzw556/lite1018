@@ -31,7 +31,7 @@ const EditBaseInfoModel = (props: any) => {
         }
     }, [device])
 
-    return <Modal width={420} visible={visible} title={"设备配置"} okText={"更新"} onOk={onSave} cancelText={"取消"}
+    return <Modal width={420} visible={visible} title={"设备信息"} okText={"更新"} onOk={onSave} cancelText={"取消"}
                   onCancel={onCancel} confirmLoading={isLoading}>
         <Form form={form} labelCol={{span: 8}}>
             <Form.Item label={"设备名称"} name="name">

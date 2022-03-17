@@ -1,11 +1,8 @@
 import {Form, Modal, ModalProps} from "antd";
 import {Device} from "../../../types/device";
 import {GetDeviceSettingRequest, UpdateDeviceSettingRequest} from "../../../apis/device";
-import {DeviceType} from "../../../types/device_type";
 import {useEffect, useState} from "react";
 import {defaultValidateMessages} from "../../../constants/validator";
-import DeviceSettingFormItem from "../../../components/formItems/deviceSettingFormItem";
-import {EmptyLayout} from "../../layout";
 import { DeviceSettingContent } from "../DeviceSettingContent";
 
 export interface EditSettingProps extends ModalProps {
