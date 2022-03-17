@@ -9,6 +9,7 @@ import { DeviceType } from '../../types/device_type';
 import { Property } from '../../types/property';
 import DeviceUpgradeSpin from './spin/deviceUpgradeSpin';
 import { SingleDeviceStatus } from './SingleDeviceStatus';
+import { getValueOfFirstClassProperty } from './util';
 
 const { Text } = Typography;
 
@@ -50,44 +51,9 @@ export const SingleDeviceInfo: React.FC<{ device: Device; actions?: React.ReactN
     );
   };
 
-  const getFirstClassProperties = (properties: Property[]) => {
-    const property = FIRST_CLASS_PROPERTIES.find((pro) => pro.typeId === typeId);
-    const keys = property ? property.properties : [];
-    return properties
-      .filter((pro) => pro.fields.find((field) => keys.find((key) => key === field.key)))
-      .map((pro) => {
-        return {
-          ...pro,
-          fields: pro.fields.map((field) => ({
-            ...field,
-            important: !!keys.find((key) => key === field.key)
-          }))
-        };
-      });
-  };
-
-  const transformData = (values: any, properties: Property[]) => {
-    const fields = Object.keys(values);
-    if (fields.length === 0 || fields.map((field) => values[field]).every((val) => !val)) return [];
-    let data: any = [];
-    const firstClassProperties = getFirstClassProperties(properties);
-    fields.forEach((field) => {
-      const property = firstClassProperties.find((pro) =>
-        pro.fields.find((subpro) => subpro.key === field)
-      );
-      if (property && !data.find((pro: any) => pro.key === property.key)) {
-        data.push({
-          ...property,
-          fields: property.fields.map((item) => ({ ...item, value: values[field] }))
-        });
-      }
-    });
-    if (data.length > 0) data = data.sort((pro1: any, pro2: any) => pro1.sort - pro2.sort);
-    return data;
-  };
   const renderStatistic = () => {
     if (typeId === DeviceType.Gateway || typeId === DeviceType.Router) return null;
-    const data = transformData(values, properties);
+    const data = getValueOfFirstClassProperty(values, properties, typeId);
     if (data.length === 0)
       return <p style={{ color: 'rgba(0,0,0,.45)', textAlign: 'center' }}>暂无数据</p>;
     return (
