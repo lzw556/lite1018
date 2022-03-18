@@ -8,6 +8,7 @@ import {DefaultGaugeOption} from "../../constants/chart";
 import {ColorHealth} from "../../constants/color";
 import {Content} from "antd/es/layout/layout";
 import MyBreadcrumb from "../../components/myBreadcrumb";
+import { isMobile } from "../../utils/deviceDetection";
 
 
 const SystemPage = () => {
@@ -49,7 +50,7 @@ const SystemPage = () => {
     return <Content>
         <MyBreadcrumb/>
         <Row justify={"space-between"}>
-            <Col span={12} style={{paddingRight: "4px"}}>
+            <Col span={isMobile ? 24: 12} style={{paddingRight: isMobile ? 0 : "4px", marginBottom: isMobile ? 8 : 0}}>
                 <ShadowCard title={"系统信息"} size={"small"} style={{height: "256px"}}>
                     <Form.Item label={"操作系统"} labelAlign={"left"} labelCol={{span: 12}} style={{marginBottom: "4px"}}>
                         {
@@ -76,7 +77,7 @@ const SystemPage = () => {
                     </Form.Item>
                 </ShadowCard>
             </Col>
-            <Col span={12} style={{paddingLeft: "4px"}}>
+            <Col span={isMobile ? 24: 12} style={{paddingLeft: isMobile ? 0 : "4px", marginBottom: isMobile ? 8 : 0}}>
                 <ShadowCard title={"硬盘状态"} size={"small"} style={{height: "256px"}}>
                     <Row justify={"start"}>
                         <Col span={6}>
@@ -98,7 +99,7 @@ const SystemPage = () => {
         </Row>
         <br/>
         <Row justify={"space-between"}>
-            <Col span={12} style={{paddingRight: "4px"}}>
+            <Col span={isMobile ? 24: 12} style={{paddingRight: isMobile ? 0 : "4px", marginBottom: isMobile ? 8 : 0}}>
                 <ShadowCard title={"CPU运行状态"} size={"small"} style={{height: "256px"}}>
                     <Form.Item label={"CPU核数"} labelAlign={"left"} labelCol={{span: 12}} style={{marginBottom: "2px"}}>
                         {
@@ -115,7 +116,7 @@ const SystemPage = () => {
                     }
                 </ShadowCard>
             </Col>
-            <Col span={12} style={{paddingLeft: "4px"}}>
+            <Col span={isMobile ? 24: 12} style={{paddingLeft: isMobile ? 0 : "4px", marginBottom: isMobile ? 8 : 0}}>
                 <ShadowCard title={"内存状态"} size={"small"} style={{height: "256px"}}>
                     <Row justify={"start"}>
                         <Col span={12}>
