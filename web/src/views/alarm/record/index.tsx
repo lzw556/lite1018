@@ -116,27 +116,6 @@ const AlarmRecordPage = () => {
             }
         },
         {
-            title: '报警源',
-            dataIndex: 'sourceType',
-            key: 'sourceType',
-            width: '7%',
-            render: (sourceType: any) => {
-                return sourceType.indexOf("device") > -1 ? "设备" : "资产"
-            }
-        },
-        {
-            title: '资源名称',
-            dataIndex: 'source',
-            key: 'source',
-            width: '10%',
-            render: (source: any, record: any) => {
-                if (source) {
-                    return source.name
-                }
-                return "未知资源"
-            }
-        },
-        {
             title: '资源类型',
             dataIndex: 'source',
             key: 'type',
@@ -146,6 +125,18 @@ const AlarmRecordPage = () => {
                     return DeviceType.toString(source.typeId)
                 }
                 return "未知类型"
+            }
+        },
+        {
+            title: '报警源',
+            dataIndex: 'source',
+            key: 'source',
+            width: '10%',
+            render: (source: any, record: any) => {
+                if (source) {
+                    return source.name
+                }
+                return "未知资源"
             }
         },
         {

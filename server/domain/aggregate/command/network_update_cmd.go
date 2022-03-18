@@ -154,6 +154,13 @@ func (cmd NetworkUpdateCmd) RemoveDevices(req request.RemoveDevices) error {
 	if err != nil {
 		return err
 	}
-	go command.SyncNetwork(cmd.Network, devices, 3*time.Second)
+	gateway, err := cmd.deviceRepo.Get(ctx, cmd.Network.GatewayID)
+	if err != nil {
+		return err
+	}
+	for i := range devices {
+		device := devices[i]
+		go command.DeleteDevice(gateway, device)
+	}
 	return nil
 }
