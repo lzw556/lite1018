@@ -212,7 +212,7 @@ const DeviceDetailPage = () => {
       >
         <Space>
           <HasPermission value={Permission.DeviceCommand}>
-            <Dropdown overlay={renderCommandMenu} trigger={isMobile ? ['click'] :undefined}>
+            <Dropdown overlay={renderCommandMenu} trigger={isMobile ? ['click'] : ['hover']}>
               <Button type={'primary'}>
                 设备命令
                 <DownOutlined />
