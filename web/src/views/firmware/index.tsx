@@ -11,6 +11,7 @@ import HasPermission from "../../permission";
 import {Permission} from "../../permission/permission";
 import {PageResult} from "../../types/page";
 import {Firmware} from "../../types/firmware";
+import { isMobile } from "../../utils/deviceDetection";
 
 
 const FirmwarePage = () => {
@@ -124,6 +125,8 @@ const FirmwarePage = () => {
                         permissions={[Permission.FirmwareDelete]}
                         dataSource={dataSource}
                         onPageChange={fetchFirmwares}
+                        simple={isMobile}
+                        scroll={isMobile ? {x: 900} : undefined}
                     />
                 </ShadowCard>
             </Col>
