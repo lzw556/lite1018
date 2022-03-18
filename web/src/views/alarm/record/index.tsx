@@ -18,6 +18,7 @@ import {Permission} from "../../../permission/permission";
 import {DeleteOutlined} from "@ant-design/icons";
 import AcknowledgeModal from "./acknowledgeModal";
 import AcknowledgeViewModal from "./acknowledgeViewModal";
+import { isMobile } from "../../../utils/deviceDetection";
 
 const {Option} = Select
 const {RangePicker} = DatePicker
@@ -202,7 +203,7 @@ const AlarmRecordPage = () => {
             title: '操作',
             key: 'action',
             width: 64,
-            fixed: 'right',
+            // fixed: 'right',
             render: (_: any, record: any) => {
                 return <Space>
                     {
@@ -230,7 +231,7 @@ const AlarmRecordPage = () => {
                 <Card>
                     <Row justify={"start"}>
                         <Col span={24}>
-                            <Space>
+                            <Space direction={isMobile ? 'vertical' : 'horizontal'}>
                                 <Label name={"报警级别"}>
                                     <Select bordered={false} mode={"multiple"} value={alertLevels}
                                             style={{width: "200px"}} onChange={value => {
@@ -263,7 +264,9 @@ const AlarmRecordPage = () => {
                             <TableLayout emptyText={"报警记录列表为空"}
                                          columns={columns}
                                          dataSource={dataSource}
-                                         onPageChange={fetchAlarmRecords}/>
+                                         onPageChange={fetchAlarmRecords}
+                                         simple={isMobile}
+                                         scroll={isMobile ? {x: 1200}: undefined}/>
                         </Col>
                     </Row>
                 </Card>
