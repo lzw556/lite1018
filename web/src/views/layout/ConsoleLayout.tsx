@@ -5,11 +5,14 @@ import {NavLink} from "react-router-dom";
 import RouterGuard from "../../routers/routerGuard";
 import {HeaderLayout} from "./index";
 import "../../assets/iconfont.css"
-import React from "react";
+import React, {useEffect} from "react";
 import {GetParamValue} from "../../utils/path";
 import {SecondaryRoutes} from "../../routers/routes";
 import AlertMessageNotification from "../../components/notification/alert";
 import {getProject} from "../../utils/session";
+import {GetCasbinRequest} from "../../apis/role";
+import {store} from "../../store";
+import {SET_PERMISSION} from "../../store/actions/types";
 
 const {SubMenu} = Menu
 
@@ -19,6 +22,15 @@ const ConsoleLayout = (props: any) => {
     const {menus, location} = props
     const {pathname} = location
     const locale = GetParamValue(location.search, "locale")
+
+    useEffect(() => {
+        GetCasbinRequest().then(data => {
+            store.dispatch({
+                type: SET_PERMISSION,
+                payload: data
+            })
+        })
+    }, [])
 
     const renderMenuItem = (children: []) => {
         return children.map((item: any) => {

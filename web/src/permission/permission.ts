@@ -1,5 +1,7 @@
 import {GetCasbinRequest} from "../apis/role";
 import {Enforcer, MemoryAdapter, newEnforcer, newModel} from "casbin.js";
+import {getPermission} from "../utils/session";
+import {store} from "../store";
 
 export type PermissionType = {
     path: string;
@@ -29,12 +31,12 @@ export const Permission = {
     NetworkExport: {path: "networks/:id/export", method: "GET"},
     NetworkEdit: {path: "networks/:id", method: "PUT"},
     NetworkDelete: {path: "networks/:id", method: "DELETE"},
-    AlarmAdd: {path: "alarms", method: "POST"},
-    AlarmEdit: {path: "alarms/:id", method: "PUT"},
-    AlarmDelete: {path: "alarms/:id", method: "DELETE"},
-    AlarmTemplateAdd: {path: "alarmTemplates", method: "POST"},
-    AlarmTemplateEdit: {path: "alarmTemplates/:id", method: "PUT"},
-    AlarmTemplateDelete: {path: "alarmTemplates/:id", method: "DELETE"},
+    AlarmRuleAdd: {path: "alarmRules", method: "POST"},
+    AlarmRuleEdit: {path: "alarmRules/:id", method: "PUT"},
+    AlarmRuleDelete: {path: "alarmRules/:id", method: "DELETE"},
+    AlarmRuleTemplateAdd: {path: "alarmRuleTemplates", method: "POST"},
+    AlarmRuleTemplateEdit: {path: "alarmRuleTemplates/:id", method: "PUT"},
+    AlarmRuleTemplateDelete: {path: "alarmRuleTemplates/:id", method: "DELETE"},
     AlarmRecordDelete: {path: "alarmRecords/:id", method: "DELETE"},
     AlarmRecordAcknowledge: {path: "alarmRecords/:id/acknowledge", method: "PATCH"},
     UserAdd: {path: "users", method: "POST"},
@@ -56,14 +58,16 @@ export const Permission = {
 let enforcer: Enforcer | null = null
 let subject: null = null
 
-GetCasbinRequest().then(data => {
+const data = getPermission()
+
+if (data) {
     const model = newModel(data.model);
     const adapter = new MemoryAdapter(data.rules);
     newEnforcer(model, adapter).then(value => {
         enforcer = value
         subject = data.subject
     });
-})
+}
 
 const usePermission = () => {
     return {

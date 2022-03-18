@@ -121,20 +121,20 @@ const AlarmRule = () => {
             width: 200,
             render: (_: any, record: any) => {
                 return <>
-                    <HasPermission value={Permission.AlarmEdit}>
+                    <HasPermission value={Permission.AlarmRuleEdit}>
                         {
                             record.enabled ?
                                 <a style={{color: ColorDanger}} onClick={() => onEditStatus(record.id, 0)}>停用</a> :
                                 <a style={{color: ColorHealth}} onClick={() => onEditStatus(record.id, 1)}>启用</a>
                         }
                     </HasPermission>
-                    <HasPermission value={Permission.AlarmEdit}>
+                    <HasPermission value={Permission.AlarmRuleEdit}>
                         <Divider type={"vertical"}/>
                         <Dropdown overlay={renderEditMenus(record)}>
                             <Button type="text" size="small" icon={<EditOutlined/>}/>
                         </Dropdown>
                     </HasPermission>
-                    <HasPermission value={Permission.AlarmDelete}>
+                    <HasPermission value={Permission.AlarmRuleDelete}>
                         <Divider type={"vertical"}/>
                         <Popconfirm placement="left" title="确认要删除该规则吗?" onConfirm={() => onDelete(record.id)}
                                     okText="删除" cancelText="取消">
@@ -237,7 +237,7 @@ const AlarmRule = () => {
             <Col span={24}>
                 <TableLayout emptyText={"报警规则列表为空"}
                              columns={columns}
-                             permissions={[Permission.AlarmEdit, Permission.AlarmDelete]}
+                             permissions={[Permission.AlarmRuleEdit, Permission.AlarmRuleDelete]}
                              expandable={{
                                  expandedRowRender: onExpandedRowRender,
                                  indentSize: 5,

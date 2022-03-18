@@ -8,6 +8,7 @@ export interface HasPermissionProps {
 
 const HasPermission: FC<HasPermissionProps> = ({value, children}) => {
     const {hasPermission} = userPermission();
+
     return <>
         {
             hasPermission(value) && children

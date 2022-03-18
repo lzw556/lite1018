@@ -26,7 +26,9 @@ func (s Kx122Decoder) Decode(data []byte) (map[string]interface{}, error) {
 		_ = binary.Read(bytes.NewBuffer(metaByte[4:8]), binary.LittleEndian, &m.Odr)
 		_ = binary.Read(bytes.NewBuffer(metaByte[8:12]), binary.LittleEndian, &m.Number)
 		_ = binary.Read(bytes.NewBuffer(metaByte[12:16]), binary.LittleEndian, &m.DataLength)
-		metadata[m.Axis] = m
+		if int(m.Axis) < len(metadata) {
+			metadata[m.Axis] = m
+		}
 	}
 
 	// decode raw data
