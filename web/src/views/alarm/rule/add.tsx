@@ -7,6 +7,7 @@ import ShadowCard from "../../../components/shadowCard";
 import SourceSelectModal from "./modal/sourceSelectModal";
 import {DeleteOutlined} from "@ant-design/icons";
 import {defaultValidateMessages, Normalizes, Rules} from "../../../constants/validator";
+import { isMobile } from "../../../utils/deviceDetection";
 
 const {Option} = Select;
 
@@ -182,11 +183,11 @@ const AddAlarmRule = () => {
                                 <Col span={24}>
                                     <Card>
                                         <Row justify={"space-between"}>
-                                            <Col span={3}>
+                                            <Col span={isMobile ? 24 :3}>
                                                 <Typography.Text strong>触发条件</Typography.Text>
                                             </Col>
-                                            <Col span={20}>
-                                                <Space>
+                                            <Col span={isMobile ? 24 :20}>
+                                                <Space direction={isMobile ? 'vertical' : 'horizontal'}>
                                                     <Typography.Text type={"secondary"}>
                                                         当<Typography.Text strong>监控对象</Typography.Text>连续
                                                     </Typography.Text>
