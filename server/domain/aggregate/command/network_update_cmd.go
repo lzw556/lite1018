@@ -83,7 +83,7 @@ func (cmd NetworkUpdateCmd) AddDevices(parentID uint, childrenID []uint) error {
 		return err
 	}
 	for _, child := range children {
-		go command.AddDevice(gateway, child, parent.MacAddress)
+		go command.AddDevice(gateway, child, parent)
 	}
 	return nil
 }

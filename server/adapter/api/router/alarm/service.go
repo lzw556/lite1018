@@ -19,4 +19,6 @@ type Service interface {
 	FindAlarmRecordByPaginate(page, size int, filters request.Filters) ([]vo.AlarmRecord, int64, error)
 	AcknowledgeAlarmRecordByID(id uint, req request.AcknowledgeAlarmRecord) error
 	GetAlarmRecordAcknowledgeByID(id uint) (*vo.AlarmRecordAcknowledge, error)
+
+	DeleteAlarmRecordByID(id uint) error
 }

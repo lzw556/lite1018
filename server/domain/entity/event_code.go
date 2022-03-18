@@ -36,6 +36,8 @@ func (e EventCode) String() string {
 		return "设备状态变化"
 	case EventCodeDataAcquisitionFailed:
 		return "数据采集失败"
+	case EventCodeCalibration:
+		return "设备校准"
 	default:
 		return "未知错误"
 	}

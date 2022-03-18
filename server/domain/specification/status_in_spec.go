@@ -12,6 +12,9 @@ func (s StatusInSpec) IsSpecifiedBy(v interface{}) bool {
 
 func (s StatusInSpec) Scope() func(db *gorm.DB) *gorm.DB {
 	return func(db *gorm.DB) *gorm.DB {
-		return db.Where("status IN ?", s)
+		if len(s) > 0 {
+			return db.Where("status IN (?)", s)
+		}
+		return db.Where("status IN (-1)")
 	}
 }

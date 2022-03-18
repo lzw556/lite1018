@@ -6,9 +6,9 @@ import (
 )
 
 type Service interface {
-	CreateDevice(req request.Device) error
+	CreateDevice(req request.CreateDevice) error
 	DeleteDeviceByID(id uint) error
-	UpdateDeviceByID(id uint, req request.Device) error
+	UpdateDeviceByID(id uint, req request.UpdateDevice) error
 
 	GetDeviceByID(id uint, filters request.Filters) (*vo.Device, error)
 	FindDevicesByPaginate(page, size int, filters request.Filters) ([]vo.Device, int64, error)

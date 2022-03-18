@@ -11,6 +11,7 @@ import GroupIntervalSelect from "../../../components/groupIntervalSelect";
 import MyBreadcrumb from "../../../components/myBreadcrumb";
 import G6 from "@antv/g6";
 import "../../../components/shape/shape"
+import {DeviceType} from "../../../types/device_type";
 
 const {Dragger} = Upload
 
@@ -45,6 +46,9 @@ const ImportNetworkPage = () => {
                     if (devices && devices.length) {
                         if (devices.reduce((acc: Map<string, any>, item: any) => acc.set(item.address, item), new Map()).size === devices.length) {
                             const nodes = devices.map((item: any) => {
+                                if (item.type === DeviceType.Gateway && item.settings === undefined) {
+                                    return {macAddress: item.address, name: item.name, type: item.type, settings: json.settings}
+                                }
                                 return {macAddress: item.address, name: item.name, type: item.type, settings: JSON.parse(item.settings)}
                             })
                             const edges = json.routingTable.map((item: any) => {
@@ -149,11 +153,6 @@ const ImportNetworkPage = () => {
                         }
                     }
                 });
-                console.log({
-                    id: network.nodes[0].macAddress,
-                    data: network.nodes[0],
-                    children: tree(network.nodes[0])
-                });
                 graph.data({
                     id: network.nodes[0].macAddress,
                     data: network.nodes[0],
@@ -164,6 +163,16 @@ const ImportNetworkPage = () => {
             }
         }
     }, [network])
+
+    const renderAction = () => {
+        if (network) {
+            return <a onClick={() => {
+                setNetwork(undefined);
+                form.resetFields();
+            }}>重置</a>
+        }
+        return <div/>
+    }
 
     return <Content>
         <MyBreadcrumb>
@@ -179,7 +188,7 @@ const ImportNetworkPage = () => {
                     !success ?
                         <Row justify="space-between">
                             <Col xl={16} xxl={18}>
-                                <Card type="inner" size={"small"} title={"预览"} style={{height: `${height}px`}}>
+                                <Card type="inner" size={"small"} title={"预览"} style={{height: `${height}px`}} extra={renderAction()}>
                                     <div className="graph" style={{height: `${height - 56}px`, width: "100%"}}>
                                         {
                                             network?.nodes.length ?

@@ -12,7 +12,7 @@ import (
 )
 
 func (r deviceRouter) create(ctx *gin.Context) (interface{}, error) {
-	var req request.Device
+	var req request.CreateDevice
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		return nil, response.InvalidParameterError(err.Error())
 	}
@@ -42,7 +42,7 @@ func (r deviceRouter) find(ctx *gin.Context) (interface{}, error) {
 
 func (r deviceRouter) update(ctx *gin.Context) (interface{}, error) {
 	id := cast.ToUint(ctx.Param("id"))
-	var req request.Device
+	var req request.UpdateDevice
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		return nil, response.InvalidParameterError(err.Error())
 	}

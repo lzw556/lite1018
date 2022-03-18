@@ -2,11 +2,13 @@ package command
 
 import (
 	"context"
+	"fmt"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/iot/command"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	spec "github.com/thetasensors/theta-cloud-lite/server/domain/specification"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/devicetype"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/transaction"
 	"time"
 )
@@ -21,6 +23,8 @@ type DeviceRemoveCmd struct {
 	deviceInformationRepo dependency.DeviceInformationRepository
 	networkRepo           dependency.NetworkRepository
 	eventRepo             dependency.EventRepository
+	alarmSourceReo        dependency.AlarmSourceRepository
+	alarmRuleRepo         dependency.AlarmRuleRepository
 }
 
 func NewDeviceRemoveCmd() DeviceRemoveCmd {
@@ -31,6 +35,8 @@ func NewDeviceRemoveCmd() DeviceRemoveCmd {
 		deviceInformationRepo: repository.DeviceInformation{},
 		networkRepo:           repository.Network{},
 		eventRepo:             repository.Event{},
+		alarmSourceReo:        repository.AlarmSource{},
+		alarmRuleRepo:         repository.AlarmRule{},
 	}
 }
 
@@ -45,7 +51,7 @@ func (cmd DeviceRemoveCmd) Run() error {
 			cmd.Network.RemoveDevice(cmd.Device)
 			return cmd.networkRepo.Save(txCtx, &cmd.Network)
 		}
-		return nil
+		return cmd.removeAlarmSource(txCtx)
 	})
 	if err != nil {
 		return err
@@ -60,7 +66,27 @@ func (cmd DeviceRemoveCmd) Run() error {
 	return nil
 }
 
+func (cmd DeviceRemoveCmd) removeAlarmSource(ctx context.Context) error {
+	alarmRules, err := cmd.alarmRuleRepo.FindBySpecs(ctx, spec.SourceTypeEqSpec(fmt.Sprintf("%s::%d", entity.AlarmSourceTypeDevice, cmd.Device.Type)))
+	if err != nil {
+		return err
+	}
+	if len(alarmRules) > 0 {
+		alarmRuleIDs := make([]uint, len(alarmRules))
+		for i, rule := range alarmRules {
+			alarmRuleIDs[i] = rule.ID
+		}
+		return cmd.alarmSourceReo.DeleteBySpecs(ctx, spec.AlarmRuleInSpec(alarmRuleIDs), spec.SourceEqSpec(cmd.Device.ID))
+	}
+	return nil
+}
+
 func (cmd DeviceRemoveCmd) RemoveData(sensorType uint, from, to time.Time) error {
+	if sensorType == 0 {
+		if t := devicetype.Get(cmd.Device.Type); t != nil {
+			sensorType = t.SensorID()
+		}
+	}
 	return cmd.deviceDataRepo.Delete(cmd.Device.MacAddress, sensorType, from, to)
 }
 

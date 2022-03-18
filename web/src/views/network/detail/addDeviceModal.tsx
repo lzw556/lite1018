@@ -35,7 +35,7 @@ const AddDeviceModal:FC<AddDeviceModalProps> = (props) => {
                 <Form.Item label={"设备名称"} name={"name"} rules={[Rules.required]}>
                     <Input placeholder={"请输入设备名称"}/>
                 </Form.Item>
-                <Form.Item label={"MAC地址"} name={"mac_address"} normalize={Normalizes.macAddress} rules={[Rules.required]}>
+                <Form.Item label={"MAC地址"} name={"mac_address"} normalize={Normalizes.macAddress} rules={[Rules.macAddress]}>
                     <Input placeholder={"请输入设备MAC地址"}/>
                 </Form.Item>
                 <Form.Item label={"设备类型"} name={"device_type"} rules={[Rules.required]}>

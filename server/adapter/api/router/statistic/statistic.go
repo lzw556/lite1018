@@ -19,6 +19,7 @@ func (r *statisticRouter) initRoutes() {
 	r.routes = []router.Route{
 		// GET
 		router.NewGetRoute("statistics/devices", r.getDeviceStatistics),
+		router.NewGetRoute("statistics/alerts", r.getAlertStatistics),
 	}
 }
 

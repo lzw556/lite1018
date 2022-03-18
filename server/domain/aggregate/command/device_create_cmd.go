@@ -3,6 +3,7 @@ package command
 import (
 	"context"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/response"
+	"github.com/thetasensors/theta-cloud-lite/server/adapter/iot/command"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
@@ -31,11 +32,20 @@ func (cmd DeviceCreateCmd) Run() error {
 	if err != nil {
 		return response.BusinessErr(errcode.NetworkNotFoundError, "")
 	}
-	return transaction.Execute(ctx, func(txCtx context.Context) error {
+	err = transaction.Execute(ctx, func(txCtx context.Context) error {
 		if err := cmd.deviceRepo.Create(txCtx, &cmd.Device); err != nil {
 			return err
 		}
 		network.AddDevices(cmd.Parent, cmd.Device)
 		return cmd.networkRepo.Save(txCtx, &network)
 	})
+	if err != nil {
+		return err
+	}
+	gateway, err := cmd.deviceRepo.Get(ctx, network.GatewayID)
+	if err != nil {
+		return err
+	}
+	go command.AddDevice(gateway, cmd.Device, cmd.Parent)
+	return nil
 }

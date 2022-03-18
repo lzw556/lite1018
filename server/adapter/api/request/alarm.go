@@ -10,7 +10,7 @@ type AlarmTemplate struct {
 }
 
 type AlarmRule struct {
-	Name        string `json:"name"`
+	Name        string `json:"name,omitempty" binding:"omitempty,max=16,min=4"`
 	Description string `json:"description"`
 	SourceIDs   []uint `json:"source_ids"`
 	SourceType  string `json:"source_type"`

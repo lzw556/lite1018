@@ -102,6 +102,11 @@ func (r alarmRouter) acknowledgeAlarmRecord(ctx *gin.Context) (interface{}, erro
 	return nil, r.service.AcknowledgeAlarmRecordByID(id, req)
 }
 
+func (r alarmRouter) deleteAlarmRecord(ctx *gin.Context) (interface{}, error) {
+	id := cast.ToUint(ctx.Param("id"))
+	return nil, r.service.DeleteAlarmRecordByID(id)
+}
+
 func (r alarmRouter) getAlarmRecordAcknowledge(ctx *gin.Context) (interface{}, error) {
 	id := cast.ToUint(ctx.Param("id"))
 	return r.service.GetAlarmRecordAcknowledgeByID(id)

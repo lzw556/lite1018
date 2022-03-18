@@ -44,7 +44,7 @@ func (p CalibrationStatus) Process(ctx *iot.Context, msg iot.Message) error {
 				SourceID:  device.ID,
 				ProjectID: device.ProjectID,
 				Timestamp: int64(m.Timestamp),
-				Content:   fmt.Sprintf(`{"code": %d`, m.Code),
+				Content:   fmt.Sprintf(`{"code": %d}`, m.Code),
 			}
 			if err := p.eventRepo.Create(context.TODO(), &event); err != nil {
 				return fmt.Errorf("create [CalibrationStatus] event failed： %v", err)

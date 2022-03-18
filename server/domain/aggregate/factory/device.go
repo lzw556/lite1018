@@ -15,6 +15,7 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/devicetype"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/errcode"
 	"gorm.io/gorm"
+	"strings"
 )
 
 type Device struct {
@@ -29,7 +30,7 @@ func NewDevice() Device {
 	}
 }
 
-func (factory Device) NewDeviceCreateCmd(req request.Device) (*command.DeviceCreateCmd, error) {
+func (factory Device) NewDeviceCreateCmd(req request.CreateDevice) (*command.DeviceCreateCmd, error) {
 	ctx := context.TODO()
 	e, err := factory.deviceRepo.GetBySpecs(ctx, spec.DeviceMacEqSpec(req.MacAddress))
 	if !errors.Is(err, gorm.ErrRecordNotFound) {
@@ -153,6 +154,13 @@ func (factory Device) buildSpecs(filters request.Filters) []spec.Specification {
 			specs = append(specs, spec.NetworkEqSpec(cast.ToUint(v)))
 		case "type":
 			specs = append(specs, spec.TypeEqSpec(cast.ToUint(v)))
+		case "types":
+			types := strings.Split(cast.ToString(v), ",")
+			typeInSpec := make(spec.TypeInSpec, len(types))
+			for i, t := range types {
+				typeInSpec[i] = cast.ToUint(t)
+			}
+			specs = append(specs, typeInSpec)
 		case "name":
 			specs = append(specs, spec.DeviceNameEqSpec(cast.ToString(v)))
 		case "mac_address":

@@ -29,7 +29,7 @@ func NewDevice() device.Service {
 	}
 }
 
-func (s Device) CreateDevice(req request.Device) error {
+func (s Device) CreateDevice(req request.CreateDevice) error {
 	cmd, err := s.factory.NewDeviceCreateCmd(req)
 	if err != nil {
 		return err
@@ -45,7 +45,7 @@ func (s Device) DeleteDeviceByID(id uint) error {
 	return cmd.Run()
 }
 
-func (s Device) UpdateDeviceByID(id uint, req request.Device) error {
+func (s Device) UpdateDeviceByID(id uint, req request.UpdateDevice) error {
 	cmd, err := s.factory.NewDeviceUpdateCmd(id)
 	if err != nil {
 		return err

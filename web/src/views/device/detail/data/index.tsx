@@ -118,7 +118,7 @@ const HistoryDataPage: FC<DeviceDataProps> = ({device}) => {
                 okText: "确定",
                 cancelText: "取消",
                 onOk: close => {
-                    RemoveDeviceDataRequest(device.id, startDate.utc().unix(), endDate.utc().unix()).then(_ => close)
+                    RemoveDeviceDataRequest(device.id, startDate.utc().unix(), endDate.utc().unix()).then(_ => close())
                 },
             })
         }
@@ -147,9 +147,9 @@ const HistoryDataPage: FC<DeviceDataProps> = ({device}) => {
                                 value={[startDate, endDate]}
                                 renderExtraFooter={renderExtraFooter}
                                 onChange={(date, dateString) => {
-                                    if (dateString) {
-                                        setStartDate(moment(dateString[0]).startOf('day'))
-                                        setEndDate(moment(dateString[1]).endOf('day'))
+                                    if (date) {
+                                        setStartDate(moment(date[0]))
+                                        setEndDate(moment(date[1]))
                                     }
                                 }}/>
                             <HasPermission value={Permission.DeviceDataDownload}>
