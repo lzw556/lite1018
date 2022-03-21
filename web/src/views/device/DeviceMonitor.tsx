@@ -84,7 +84,7 @@ const DeviceMonitor = () => {
     const countOffline = count.filter((item) => !item.isOnline).length;
     let groupedLevels: number[] = [];
     count
-      .filter((item) => item.alertLevel > 0)
+      // .filter((item) => item.alertLevel > 0)
       .forEach((item) => {
         if (
           groupedLevels.length === 0 ||
@@ -160,8 +160,8 @@ const DeviceMonitor = () => {
                       ...commonOptions.series[0],
                       data: levels.map(({ level, sum }) => ({
                         value: sum,
-                        name: `${GetAlarmLevelString(level)} ${sum}`,
-                        itemStyle: { color: GetAlarmLevelSkin(level) }
+                        name: `${GetAlarmLevelString(level) || '正常'} ${sum}`,
+                        itemStyle: { color: GetAlarmLevelSkin(level) || ColorHealth }
                       }))
                     }
                   ]
@@ -174,7 +174,7 @@ const DeviceMonitor = () => {
               <EChartsReact
                 option={{
                   ...DefaultMultiBarOption,
-                  title: { text: '一周报警趋势', left: '40%', top: '8%' },
+                  title: { text: '一周报警趋势', left: '42%', top: '8%' },
                   legend: {
                     orient: 'vertical',
                     left: 'left',
@@ -188,6 +188,7 @@ const DeviceMonitor = () => {
                       moment.unix(timestamp).local().format('MM/DD')
                     )
                   },
+                  yAxis: { minInterval: 1},
                   series: [
                     {
                       name: AlarmLevelInfo,
