@@ -39,7 +39,7 @@ const AddSourceModal:FC<AddSourceModalProps> = (props) => {
         })
     }
 
-    return <Modal {...props} title={"添加监控对象"} onOk={onAdd}>
+    return <Modal {...props} title={"添加监控对象"} onOk={onAdd} confirmLoading={isLoading}>
         <Form form={form} validateMessages={defaultValidateMessages}>
             <Form.Item label={"监控对象"} name={"ids"}>
                 <Select placeholder={"请选择监控对象"} mode={"multiple"} maxTagCount={4}>
