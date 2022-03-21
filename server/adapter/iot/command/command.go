@@ -163,6 +163,7 @@ func AddDevice(gateway entity.Device, device entity.Device, parent entity.Device
 		xlog.Errorf("execute device command %s failed: %v => [%s]", cmd.Name(), err, gateway.MacAddress)
 		return
 	}
+	SyncDeviceSettings(gateway, device)
 	return
 }
 

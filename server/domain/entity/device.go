@@ -3,6 +3,7 @@ package entity
 import (
 	"fmt"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/cache"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/devicetype"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/eventbus"
 	"gorm.io/gorm"
 )
@@ -107,6 +108,34 @@ func (d Device) AlertNotify(m AlarmRuleMetric, value float64, level uint8) {
 		"level":  level,
 		"value":  value,
 	})
+}
+
+func (d Device) IsGateway() bool {
+	return d.Type == devicetype.GatewayType
+}
+
+func (d Device) IsRouter() bool {
+	return d.Type == devicetype.RouterType
+}
+
+func (d Device) IsSVT() bool {
+	return d.Type == devicetype.VibrationTemperature3AxisType || d.Type == devicetype.VibrationTemperature1AxisType
+}
+
+func (d Device) IsSA() bool {
+	return d.Type == devicetype.BoltLooseningType
+}
+
+func (d Device) IsSAS() bool {
+	return d.Type == devicetype.BoltElongationType
+}
+
+func (d Device) IsDC() bool {
+	return d.Type == devicetype.NormalTemperatureCorrosionType || d.Type == devicetype.HighTemperatureCorrosionType
+}
+
+func (d Device) IsSQ() bool {
+	return d.Type == devicetype.AngleDipType
 }
 
 type Devices []Device

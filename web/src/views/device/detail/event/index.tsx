@@ -55,6 +55,7 @@ const DeviceEvent:FC<DeviceEventProps> = ({device}) => {
 
     const onBatchDelete = () => {
         BatchDeleteDeviceEventsRequest(device.id, selectedRowKeys).then(() => {
+            setSelectedRowKeys([])
             fetchDeviceEvents(1, 10)
         })
     }

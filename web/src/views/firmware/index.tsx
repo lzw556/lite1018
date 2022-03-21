@@ -52,7 +52,7 @@ const FirmwarePage = () => {
     }
 
     const onDelete = (id: number) => {
-        RemoveFirmwareRequest(id).then()
+        RemoveFirmwareRequest(id).then(_ => onRefresh())
     }
 
     const columns = [
@@ -87,7 +87,7 @@ const FirmwarePage = () => {
             key: 'action',
             render: (text: any, record: any) => {
                 return <Space>
-                    <Popconfirm placement="left" title="确认要删除该用户吗?" onConfirm={() => onDelete(record.id)}
+                    <Popconfirm placement="left" title={`确认要删除固件【${record.name}】吗?`} onConfirm={() => onDelete(record.id)}
                                 okText="删除" cancelText="取消">
                         <Button type="text" size="small" icon={<DeleteOutlined/>} danger/>
                     </Popconfirm>

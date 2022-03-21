@@ -5,16 +5,48 @@ import {NavLink} from "react-router-dom";
 import RouterGuard from "../../routers/routerGuard";
 import {HeaderLayout} from "./index";
 import "../../assets/iconfont.css"
-import React from "react";
+import React, {useEffect} from "react";
+import {GetParamValue} from "../../utils/path";
 import {SecondaryRoutes} from "../../routers/routes";
 import AlertMessageNotification from "../../components/notification/alert";
 import {getProject} from "../../utils/session";
+import {GetCasbinRequest} from "../../apis/role";
+import {store} from "../../store";
+import {SET_PERMISSION} from "../../store/actions/types";
 import { NavMenu } from "./NavMenu";
+const {SubMenu} = Menu
 
 const {Sider} = Layout
 
 const ConsoleLayout = (props: any) => {
-    const {menus} = props
+    const {menus, location} = props
+    const {pathname} = location
+    const locale = GetParamValue(location.search, "locale")
+
+    useEffect(() => {
+        GetCasbinRequest().then(data => {
+            store.dispatch({
+                type: SET_PERMISSION,
+                payload: data
+            })
+        })
+    }, [])
+
+    const renderMenuItem = (children: []) => {
+        return children.map((item: any) => {
+            if (!item.hidden) {
+                if (item.children && item.children.filter((item: any) => !item.hidden).length) {
+                    return <SubMenu key={item.name} title={item.title}>
+                        {renderMenuItem(item.children)}
+                    </SubMenu>
+                }
+                return <Menu.Item key={item.name}>
+                    <NavLink to={`${item.path}?locale=${item.name}`}>{item.title}</NavLink>
+                </Menu.Item>
+            }
+        })
+    }
+
     const flattenRoutes: any = (children: any) => {
         return children.reduce((acc: any, curr: any) => {
             acc.push(curr)

@@ -57,11 +57,11 @@ func (cmd DeviceRemoveCmd) Run() error {
 		return err
 	}
 	if cmd.Device.NetworkID > 0 {
-		devices, err := cmd.deviceRepo.FindBySpecs(context.TODO(), spec.NetworkEqSpec(cmd.Network.ID))
+		gateway, err := cmd.deviceRepo.Get(context.TODO(), cmd.Network.GatewayID)
 		if err != nil {
 			return err
 		}
-		return command.SyncNetwork(cmd.Network, devices, 3*time.Second)
+		command.DeleteDevice(gateway, cmd.Device)
 	}
 	return nil
 }

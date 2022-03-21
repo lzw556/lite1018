@@ -282,8 +282,10 @@ func (query DeviceQuery) DownloadCharacteristicData(id uint, pids []string, from
 				axis = axis + 1
 				_ = result.File.SetCellValue("Sheet1", fmt.Sprintf("%s1", string(rune(axis))), property.Name)
 				_ = result.File.MergeCell("Sheet1", fmt.Sprintf("%s1", string(rune(axis))), fmt.Sprintf("%s1", string(rune(axis+len(property.Fields)-1))))
-				for i, field := range property.Fields {
-					_ = result.File.SetCellValue("Sheet1", fmt.Sprintf("%s2", string(rune(axis+i))), field.Name)
+				if device.IsSVT() {
+					for i, field := range property.Fields {
+						_ = result.File.SetCellValue("Sheet1", fmt.Sprintf("%s2", string(rune(axis+i))), field.Name)
+					}
 				}
 				axis += len(property.Fields) - 1
 			}
@@ -296,14 +298,18 @@ func (query DeviceQuery) DownloadCharacteristicData(id uint, pids []string, from
 		}
 
 		// set cell value
+		cellOffset := 1
+		if device.IsSVT() {
+			cellOffset = 2
+		}
+
 		for i, data := range deviceData {
 			axis = 65
-			_ = result.File.SetCellValue("Sheet1", fmt.Sprintf("A%d", i+3), time.Unix(data.Timestamp, 0).In(location).Format("2006-01-02 15:04:05"))
+			_ = result.File.SetCellValue("Sheet1", fmt.Sprintf("A%d", i+cellOffset), time.Unix(data.Timestamp, 0).In(location).Format("2006-01-02 15:04:05"))
 			if properties, ok := data.Values.(vo.Properties); ok {
 				for _, property := range properties {
 					if _, ok := downloadKeys[property.Key]; ok {
 						for _, v := range property.Data {
-							fmt.Println(property.Data)
 							axis += 1
 							_ = result.File.SetCellValue("Sheet1", fmt.Sprintf("%s%d", string(rune(axis)), i+3), v)
 						}
