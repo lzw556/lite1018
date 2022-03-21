@@ -26,6 +26,7 @@ import { RuntimeChart } from '../RuntimeChart';
 import { IsUpgrading } from '../../../types/device_upgrade_status';
 import UpgradeModal from '../upgrade';
 import DeviceEvent from './event';
+import { isMobile } from '../../../utils/deviceDetection';
 
 let tabList = [
   {
@@ -211,7 +212,7 @@ const DeviceDetailPage = () => {
       >
         <Space>
           <HasPermission value={Permission.DeviceCommand}>
-            <Dropdown overlay={renderCommandMenu}>
+            <Dropdown overlay={renderCommandMenu} trigger={isMobile ? ['click'] : ['hover']}>
               <Button type={'primary'}>
                 设备命令
                 <DownOutlined />

@@ -3,6 +3,7 @@ import {FC, useEffect} from "react";
 import {AlarmRule} from "../../../../types/alarm_rule_template";
 import {defaultValidateMessages, Normalizes, Rules} from "../../../../constants/validator";
 import {UpdateAlarmRuleRequest} from "../../../../apis/alarm";
+import { isMobile } from "../../../../utils/deviceDetection";
 
 const {Option} = Select;
 
@@ -47,7 +48,7 @@ const EditAlarmRuleModal: FC<EditAlarmRuleModalProps> = (props) => {
                         <Card>
                             <Row justify={"space-between"}>
                                 <Col span={24}>
-                                    <Space>
+                                    <Space direction={isMobile ? 'vertical' : 'horizontal'}>
                                         <Typography.Text type={"secondary"}>
                                             当<Typography.Text strong>监控对象</Typography.Text>连续
                                         </Typography.Text>
@@ -71,7 +72,7 @@ const EditAlarmRuleModal: FC<EditAlarmRuleModalProps> = (props) => {
                             </Row>
                             <br/>
                             <Row justify={"space-between"}>
-                                <Col span={10}>
+                                <Col span={isMobile ? 24 : 10}>
                                     <Space>
                                         <Typography.Text type={"secondary"}>产生</Typography.Text>
                                         <Form.Item name={["level"]} noStyle>

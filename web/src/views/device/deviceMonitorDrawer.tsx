@@ -15,7 +15,7 @@ const DeviceMonitorDrawer: FC<DeviceMonitorDrawerProps> = (props) => {
         <Row justify={"start"}>
             <Col span={24}>
                 <Typography.Title level={4}>设备监控: {device.name}</Typography.Title>
-                <Typography.Text>提示: 当前窗口显示14天内的监控数据, 按<Typography.Text keyboard>ESC</Typography.Text>可以退出此窗口</Typography.Text>
+                {/* {!isMobile && <Typography.Text>提示: 当前窗口显示14天内的监控数据, 按<Typography.Text keyboard>ESC</Typography.Text>可以退出此窗口</Typography.Text>} */}
             </Col>
         </Row>
         <br/>

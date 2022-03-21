@@ -16,6 +16,7 @@ import {ColorDanger, ColorHealth, ColorInfo, ColorWarn} from "../../../constants
 import EditAlarmRuleModal from "./modal/editAlarmRuleModal";
 import {DeleteOutlined, EditOutlined} from "@ant-design/icons";
 import AddSourceModal from "./modal/addSourceModal";
+import { isMobile } from "../../../utils/deviceDetection";
 
 const AlarmRule = () => {
     const [dataSource, setDataSource] = useState<PageResult<any[]>>()
@@ -243,7 +244,9 @@ const AlarmRule = () => {
                                  indentSize: 5,
                              }}
                              dataSource={dataSource}
-                             onPageChange={fetchAlarmRules}/>
+                             onPageChange={fetchAlarmRules} 
+                             simple={isMobile} 
+                             scroll={isMobile ? {x:1000} : undefined}/>
             </Col>
         </Row>
         {

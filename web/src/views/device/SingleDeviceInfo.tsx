@@ -66,7 +66,7 @@ export const SingleDeviceInfo: React.FC<{ device: Device; actions?: React.ReactN
           if (index > 2) return null;
           const field = attr.fields.find((field: any) => field.important);
           return (
-            <Col span={7}>
+            <Col span={8}>
               <Statistic
                 title={
                   <Text

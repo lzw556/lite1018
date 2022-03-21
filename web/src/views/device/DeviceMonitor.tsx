@@ -25,6 +25,8 @@ import { Network } from '../../types/network';
 import { GetNetworksRequest } from '../../apis/network';
 import { number } from 'echarts';
 import moment from 'moment';
+import { isMobile } from '../../utils/deviceDetection';
+
 const { Option } = Select;
 
 const DeviceMonitor = () => {
@@ -102,7 +104,7 @@ const DeviceMonitor = () => {
 
     const commonOptions = {
       ...DefaultPieOption,
-      title: { text: '设备状态', left: '32%', top: '8%' },
+      title: { text: '设备状态', left: isMobile ? '50%' : '32%', top: isMobile ? 'auto' : '8%' },
       tooltip: {
         trigger: 'item',
         formatter: '{b}: {c} ({d}%)'
@@ -110,14 +112,14 @@ const DeviceMonitor = () => {
       legend: {
         orient: 'vertical',
         left: 'left',
-        bottom: '15%',
+        bottom: isMobile ? 'auto' : '15%',
         selectedMode: false
       },
       series: [
         {
           ...DefaultPieOption.series[0],
           radius: '50%',
-          center: ['40%', '50%']
+          center: [isMobile ? '50%' : '40%', '50%']
         }
       ]
     };
@@ -125,7 +127,7 @@ const DeviceMonitor = () => {
     return (
       <ShadowCard>
         <Row>
-          <Col span={8}>
+          <Col span={isMobile ? 24 : 8}>
             <EChartsReact
               option={{
                 ...commonOptions,
@@ -150,7 +152,7 @@ const DeviceMonitor = () => {
             />
           </Col>
           {levels.length > 0 && (
-            <Col span={8}>
+            <Col span={isMobile ? 24 : 8}>
               <EChartsReact
                 option={{
                   ...commonOptions,
@@ -170,15 +172,19 @@ const DeviceMonitor = () => {
             </Col>
           )}
           {countAlarm.length > 0 && (
-            <Col span={8}>
+            <Col span={isMobile ? 24 : 8}>
               <EChartsReact
                 option={{
                   ...DefaultMultiBarOption,
-                  title: { text: '一周报警趋势', left: '42%', top: '8%' },
+                  title: {
+                    text: '一周报警趋势',
+                    left: isMobile ? '50%' : '42%',
+                    top: isMobile ? 'auto' : '8%'
+                  },
                   legend: {
                     orient: 'vertical',
                     left: 'left',
-                    bottom: '15%',
+                    bottom: isMobile ? 'auto' : '15%',
                     selectedMode: false
                   },
                   grid: { left: '28%', top: '30%' },
@@ -224,7 +230,7 @@ const DeviceMonitor = () => {
         <MyBreadcrumb />
         <ShadowCard>
           <Row>
-            <Col span={4}>
+            <Col span={isMobile ? 18 : 4}>
               <Label name={'网络'}>
                 <Select
                   bordered={false}

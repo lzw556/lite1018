@@ -14,6 +14,7 @@ import PermissionDrawer from "./permissionDrawer";
 import HasPermission from "../../../permission";
 import usePermission, {Permission} from "../../../permission/permission";
 import {PageResult} from "../../../types/page";
+import { isMobile } from "../../../utils/deviceDetection";
 
 const RolePage = () => {
     const [addVisible, setAddVisible] = useState(false);
@@ -118,7 +119,9 @@ const RolePage = () => {
                 permissions={[Permission.RoleAllocMenus, Permission.RoleAllocPermissions, Permission.RoleDelete]}
                 columns={columns}
                 dataSource={dataSource}
-                onPageChange={fetchRoles}/>
+                onPageChange={fetchRoles}
+                simple={isMobile}
+                scroll={isMobile ? {x: 600} : undefined}/>
         </ShadowCard>
         <AddRoleModal visible={addVisible} onCancel={() => setAddVisible(false)} onSuccess={() => {
             setAddVisible(false)

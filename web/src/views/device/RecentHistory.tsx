@@ -5,6 +5,7 @@ import ReactECharts from 'echarts-for-react';
 import { FindDeviceDataRequest } from '../../apis/device';
 import { DefaultMonitorDataOption, LineChartStyles } from '../../constants/chart';
 import { Device } from '../../types/device';
+import { isMobile } from '../../utils/deviceDetection';
 
 export const RecentHistory: React.FC<{ device: Device }> = ({ device }) => {
   const [historyOptions, setHistoryOptions] = React.useState<any>();
@@ -82,7 +83,7 @@ export const RecentHistory: React.FC<{ device: Device }> = ({ device }) => {
     if (historyOptions && historyOptions.length) {
       return historyOptions.map((item: any, index: number) => {
         return (
-          <Card.Grid key={index} style={{ boxShadow: 'none', border: 'none', width: '25%' }}>
+          <Card.Grid key={index} style={{ boxShadow: 'none', border: 'none', width: isMobile ? '100%' : '25%' }}>
             <ReactECharts option={item} style={{ border: 'none', height: '256px' }} />
           </Card.Grid>
         );
