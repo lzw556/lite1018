@@ -3,6 +3,7 @@ import {FC, useEffect, useState} from "react";
 import useSocket, {SocketTopic} from "../../socket";
 import _ from "lodash";
 import {Device} from "../../types/device";
+import { isMobile } from "../../utils/deviceDetection";
 
 export interface DeviceTableProps {
     columns?: any
@@ -59,6 +60,8 @@ const DeviceTable: FC<DeviceTableProps> = ({columns, emptyText, dataSource, perm
         permissions={permissions}
         dataSource={data}
         onPageChange={onChange}
+        simple={isMobile}
+        scroll={isMobile?{x:1000}:undefined}
     />
 }
 

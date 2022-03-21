@@ -12,6 +12,7 @@ import Label from "../../../../components/label";
 import {DefaultHistoryDataOption, LineChartStyles} from "../../../../constants/chart";
 import ReactECharts from "echarts-for-react";
 import DownloadModal from "./modal/downloadModal";
+import { isMobile } from "../../../../utils/deviceDetection";
 
 const {Option} = Select
 const {RangePicker} = DatePicker
@@ -94,7 +95,7 @@ const HistoryDataPage: FC<DeviceDataProps> = ({device}) => {
                     }
                 },
                 title: {text: property.name},
-                legend: {data: legends},
+                legend: {data: legends, left: isMobile ? 'right':'center'},
                 series,
                 xAxis: {
                     type: 'category',
@@ -128,7 +129,7 @@ const HistoryDataPage: FC<DeviceDataProps> = ({device}) => {
             <Col span={24}>
                 <Row justify="end">
                     <Col span={24} style={{textAlign: "right"}}>
-                        <Space style={{textAlign: "center"}}>
+                        <Space style={{textAlign: "center"}} wrap={true}>
                             <Label name={"属性"}>
                                 <Select bordered={false} defaultValue={property.key} placeholder={"请选择属性"}
                                         style={{width: "120px"}} onChange={value => {

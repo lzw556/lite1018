@@ -51,6 +51,7 @@ import DeviceUpgradeSpin from './spin/deviceUpgradeSpin';
 import './index.css';
 import { SingleDeviceStatus } from './SingleDeviceStatus';
 import { getValueOfFirstClassProperty } from './util';
+import { isMobile } from '../../utils/deviceDetection';
 
 const { Search } = Input;
 const { Option } = Select;
@@ -265,7 +266,7 @@ const DevicePage = () => {
         const isUpgrading = record.upgradeStatus && IsUpgrading(record.upgradeStatus.code);
         return (
           <Space>
-            <Dropdown overlay={renderEditMenus(record)}>
+            <Dropdown overlay={renderEditMenus(record)} trigger={isMobile ? ['click'] : ['hover']}>
               <Button
                 type='text'
                 size='small'
@@ -278,7 +279,10 @@ const DevicePage = () => {
                 }
               />
             </Dropdown>
-            <Dropdown overlay={renderCommandMenus(record)}>
+            <Dropdown
+              overlay={renderCommandMenus(record)}
+              trigger={isMobile ? ['click'] : ['hover']}
+            >
               <Button
                 type='text'
                 icon={<CodeOutlined />}
@@ -326,7 +330,7 @@ const DevicePage = () => {
       <ShadowCard>
         <Row justify='center'>
           <Col span={24}>
-            <Space>
+            <Space direction={isMobile ? 'vertical' : 'horizontal'}>
               <Label name={'网络'}>
                 <NetworkSelect bordered={false} onChange={setNetwork} allowClear />
               </Label>
@@ -341,7 +345,7 @@ const DevicePage = () => {
                   <Option value={1}>MAC</Option>
                 </Select>
                 <Search
-                  style={{ width: '256px' }}
+                  style={{ width: isMobile ? 'calc(100% - 80px)' : '256px' }}
                   placeholder={
                     searchTarget === 0 ? '请输入设备名称进行查询' : '请输入设备MAC进行查询'
                   }

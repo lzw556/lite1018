@@ -12,6 +12,7 @@ import MyBreadcrumb from "../../components/myBreadcrumb";
 import HasPermission from "../../permission";
 import {Permission} from "../../permission/permission";
 import {PageResult} from "../../types/page";
+import { isMobile } from "../../utils/deviceDetection";
 
 const UserPage = () => {
     const [addUserVisible, setAddUserVisible] = useState<boolean>(false)
@@ -113,6 +114,8 @@ const UserPage = () => {
                         permissions={[Permission.UserDelete, Permission.UserEdit]}
                         dataSource={dataSource}
                         onPageChange={fetchUsers}
+                        simple={isMobile}
+                        scroll={isMobile ? {x: 600} : undefined}
                     />
                 </ShadowCard>
             </Col>

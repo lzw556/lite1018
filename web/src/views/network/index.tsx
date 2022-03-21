@@ -22,6 +22,7 @@ import {SendDeviceCommandRequest} from "../../apis/device";
 import {DeviceCommand} from "../../types/device_command";
 import usePermission, {Permission} from "../../permission/permission";
 import HasPermission from "../../permission";
+import { isMobile } from "../../utils/deviceDetection";
 
 const NetworkPage = () => {
     const {hasPermission} = usePermission();
@@ -197,7 +198,9 @@ const NetworkPage = () => {
                                  permissions={[Permission.NetworkEdit, Permission.NetworkExport, Permission.NetworkDelete]}
                                  columns={columns}
                                  dataSource={dataSource}
-                                 onPageChange={fetchNetworks}/>
+                                 onPageChange={fetchNetworks}
+                                 simple={isMobile}
+                                 scroll={isMobile ? {x: 800} : undefined}/>
                 </Col>
             </Row>
         </ShadowCard>

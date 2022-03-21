@@ -44,3 +44,30 @@
     border-radius: 1em;
     background-color: rgba(50, 50, 50, .1);
 }
+.ts-header .mobile{
+    display: none;
+}
+@media (max-width:576px){
+    .ts-header {
+        padding: 0 20px;
+        line-height: 60px;
+    }
+    .ts-header .pc{
+        display: none;
+    }
+    .ts-header .mobile{
+        display: flex;
+        align-items: center;
+    }
+    .ts-header .mobile span[role='img']{
+        color:#fff;
+        font-size: 18px;
+    }
+    .ts-header .mobile .logo{
+        flex-grow:1;
+        text-align: center;
+    }
+    .ts-console aside.sider{
+        display: none;
+    }
+}
