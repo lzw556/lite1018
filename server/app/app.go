@@ -110,7 +110,7 @@ func runApiServer(mode string, dist embed.FS) {
 	adapter.Api.StaticFS(dist)
 	adapter.Api.UseMiddleware(
 		middleware.NewJWT("/login", "/resources/*"),
-		middleware.NewCasbinRbac("/login", "/my/*", "/check/*", "/menus/*", "/permissions/*", "/resources/*", "/statistics/*", "/devices/defaultSettings"),
+		middleware.NewCasbinRbac("/login", "/my/*", "/check/*", "/menus/*", "/permissions/*", "/resources/*", "/statistics/*", "/devices/defaultSettings", "/properties"),
 		middleware.NewProjectChecker("/login", "/resources/*", "/users/*", "/my/*"),
 	)
 	adapter.Api.RegisterRouters(

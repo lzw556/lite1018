@@ -4,7 +4,6 @@ import { useState } from 'react';
 import '../index.css';
 import {
   AddDeviceRequest,
-  CheckMacAddressRequest,
   GetDefaultDeviceSettingsRequest
 } from '../../../apis/device';
 import ShadowCard from '../../../components/shadowCard';
@@ -22,23 +21,6 @@ const AddDevicePage = () => {
   const [network, setNetwork] = useState<number>();
   const [success, setSuccess] = useState<boolean>(false);
   const [form] = Form.useForm();
-
-  const onMacValidator = (rule: any, value: any) => {
-    return new Promise((resolve, reject) => {
-      if (!value) {
-        reject('请输入MAC地址');
-      }
-      if (value.length !== 12) {
-        reject('请输入正确的MAC地址');
-        return;
-      }
-      CheckMacAddressRequest(value)
-        .then(resolve)
-        .catch((_) => {
-          reject('MAC地址已存在');
-        });
-    });
-  };
 
   const fetchDeviceDefaultSettings = (type: any) => {
     GetDefaultDeviceSettingsRequest(type).then(setDeviceSettings);
@@ -105,23 +87,6 @@ const AddDevicePage = () => {
                       >
                         <Input placeholder={`请输入设备MAC地址`} />
                       </Form.Item>
-                      <Form.Item label={'所属网络'} name={'network'} rules={[Rules.required]}>
-                        <NetworkSelect
-                          placeholder={'请选择设备所属网络'}
-                          onChange={(value) => {
-                            setNetwork(value);
-                            form.resetFields(['parent']);
-                          }}
-                        />
-                      </Form.Item>
-                      {network && (
-                        <Form.Item label={'设备父节点'} name={'parent'} rules={[Rules.required]}>
-                          <DeviceSelect
-                            filters={{ network_id: network }}
-                            placeholder={'请选择设备所属父节点'}
-                          />
-                        </Form.Item>
-                      )}
                     </fieldset>
                     <fieldset>
                       <legend>设备类型</legend>
@@ -131,6 +96,23 @@ const AddDevicePage = () => {
                           onChange={fetchDeviceDefaultSettings}
                         />
                       </Form.Item>
+                      <Form.Item label={'所属网络'} name={'network'} rules={[Rules.required]}>
+                        <NetworkSelect
+                            placeholder={'请选择设备所属网络'}
+                            onChange={(value) => {
+                              setNetwork(value);
+                              form.resetFields(['parent']);
+                            }}
+                        />
+                      </Form.Item>
+                      {network && (
+                          <Form.Item label={'设备父节点'} name={'parent'} rules={[Rules.required]}>
+                            <DeviceSelect
+                                filters={{ network_id: network }}
+                                placeholder={'请选择设备所属父节点'}
+                            />
+                          </Form.Item>
+                      )}
                       {deviceSettings?.map((item) => (
                         <DeviceSettingFormItem value={item} editable={true} />
                       ))}
