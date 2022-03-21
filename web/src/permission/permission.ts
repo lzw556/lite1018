@@ -1,7 +1,5 @@
-import {GetCasbinRequest} from "../apis/role";
 import {Enforcer, MemoryAdapter, newEnforcer, newModel} from "casbin.js";
 import {getPermission} from "../utils/session";
-import {store} from "../store";
 
 export type PermissionType = {
     path: string;
@@ -9,6 +7,12 @@ export type PermissionType = {
 }
 
 export const Permission = {
+    ProjectAdd: {path: "projects", method: "POST"},
+    ProjectList: {path: "projects", method: "GET"},
+    ProjectAllocUser: {path: "projects/:id/users", method: "PATCH"},
+    ProjectAllocUserGet: {path: "projects/:id/users", method: "GET"},
+    ProjectEdit: {path: "projects/:id", method: "PUT"},
+    ProjectDelete: {path: "projects/:id", method: "DELETE"},
     DeviceCommand: {path: 'devices/:id/commands/:cmd', method: 'POST'},
     DeviceUpgrade: {path: "devices/:id/upgrade", method: "POST"},
     DeviceAdd: {path: "devices", method: "POST"},

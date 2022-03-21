@@ -38,6 +38,18 @@ func initPermissions(db *gorm.DB) error {
 			Group:       "项目模块",
 		},
 		{
+			Path:        "projects/:id/users",
+			Method:      "PATCH",
+			Description: "分配用户",
+			Group:       "项目模块",
+		},
+		{
+			Path:        "projects/:id/users",
+			Method:      "GET",
+			Description: "查看项目用户列表",
+			Group:       "项目模块",
+		},
+		{
 			Path:        "devices/:id",
 			Method:      "GET",
 			Description: "查看单个设备",
