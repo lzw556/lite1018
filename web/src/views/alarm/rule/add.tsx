@@ -11,15 +11,10 @@ import {defaultValidateMessages, Normalizes, Rules} from "../../../constants/val
 const {Option} = Select;
 
 const AddAlarmRule = () => {
-    const [selectedTemplates, setSelectedTemplates] = useState<number[]>([])
-    const [createType, setCreateType] = useState<number>(0)
     const [visible, setVisible] = useState<boolean>(false)
     const [selected, setSelected] = useState<any>()
     const [form] = Form.useForm()
     const [success, setSuccess] = useState<boolean>(false)
-
-    const fetchAlarmTemplates = useCallback((current: number, size: number) => {
-    }, [])
 
     useEffect(() => {
         form.setFieldsValue({
@@ -27,7 +22,7 @@ const AddAlarmRule = () => {
             operation: ">=",
             level: 3,
         })
-    }, [createType, fetchAlarmTemplates])
+    }, [])
 
 
     const onSave = () => {
@@ -60,21 +55,6 @@ const AddAlarmRule = () => {
                 }
             }).catch(_ => reject("该名称已存在"))
         })
-    }
-
-    const columns = [
-        {
-            title: '模板名称',
-            dataIndex: 'name',
-            key: 'name'
-        }
-    ]
-
-    const rowSelection = {
-        selectedTemplates,
-        onChange: (selectedRowKeys: any) => {
-            setSelectedTemplates(selectedRowKeys)
-        }
     }
 
     const onRemoveSource = (id: any) => {
