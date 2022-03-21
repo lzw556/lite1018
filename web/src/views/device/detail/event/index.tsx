@@ -10,7 +10,7 @@ import {
 } from "../../../../apis/device";
 import TableLayout from "../../../layout/TableLayout";
 import HasPermission from "../../../../permission";
-import {Permission} from "../../../../permission/permission";
+import usePermission, {Permission} from "../../../../permission/permission";
 
 const {RangePicker} = DatePicker;
 
@@ -23,6 +23,7 @@ const DeviceEvent:FC<DeviceEventProps> = ({device}) => {
     const [endDate, setEndDate] = useState<moment.Moment>(moment().endOf('day'))
     const [dataSource, setDataSource] = useState<any>()
     const [selectedRowKeys, setSelectedRowKeys] = useState<any[]>([])
+    const {hasPermission} = usePermission();
 
     const fetchDeviceEvents = useCallback((current:number, size:number) => {
         PagingDeviceEventsRequest(device.id, startDate.utc().unix(), endDate.utc().unix(), current, size).then(setDataSource)
@@ -99,7 +100,11 @@ const DeviceEvent:FC<DeviceEventProps> = ({device}) => {
         <br/>
         <Row justify={"start"}>
             <Col span={24}>
-                <TableLayout rowSelection={rowSelection}  columns={columns} dataSource={dataSource} onPageChange={fetchDeviceEvents}/>
+                <TableLayout rowSelection={() => {
+                    if (hasPermission(Permission.DeviceEventDelete)){
+                        return rowSelection
+                    }
+                }}  columns={columns} dataSource={dataSource} onPageChange={fetchDeviceEvents}/>
             </Col>
         </Row>
     </Content>
