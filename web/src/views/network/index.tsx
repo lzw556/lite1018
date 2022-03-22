@@ -5,7 +5,7 @@ import {
     ExportNetworkRequest,
     GetNetworkRequest,
     PagingNetworksRequest,
-    SyncNetworkRequest
+    NetworkSyncRequest, NetworkProvisionRequest
 } from "../../apis/network";
 import ShadowCard from "../../components/shadowCard";
 import "./index.css"
@@ -18,14 +18,12 @@ import {Network} from "../../types/network";
 import EditNetworkModal from "./modal/editNetworkModal";
 import moment from "moment";
 import {PageResult} from "../../types/page";
-import {SendDeviceCommandRequest} from "../../apis/device";
-import {DeviceCommand} from "../../types/device_command";
 import usePermission, {Permission} from "../../permission/permission";
 import HasPermission from "../../permission";
 import { isMobile } from "../../utils/deviceDetection";
 
 const NetworkPage = () => {
-    const {hasPermission} = usePermission();
+    const {hasPermission, hasPermissions} = usePermission();
     const [addVisible, setAddVisible] = useState<boolean>(false)
     const [editVisible, setEditVisible] = useState<boolean>(false)
     const [network, setNetwork] = useState<Network>()
@@ -54,7 +52,7 @@ const NetworkPage = () => {
     const onCommand = (record: Network, key: any) => {
         switch (key) {
             case "0":
-                SyncNetworkRequest(record.id).then(res => {
+                NetworkSyncRequest(record.id).then(res => {
                     if (res.code === 200) {
                         message.success("发送成功");
                     } else {
@@ -63,7 +61,7 @@ const NetworkPage = () => {
                 })
                 break
             case "1":
-                SendDeviceCommandRequest(record.gateway.id, DeviceCommand.Provision, {}).then(res => {
+                NetworkProvisionRequest(record.id).then(res => {
                     if (res.code === 200) {
                         message.success("发送成功");
                     } else {
@@ -92,9 +90,15 @@ const NetworkPage = () => {
         return <Menu onClick={(e) => {
             onCommand(record, e.key)
         }}>
-            <Menu.Item key={0}>同步网络</Menu.Item>
-            <Menu.Item key={1}>继续组网</Menu.Item>
-            <Menu.Item key={2}>导出网络</Menu.Item>
+            {
+                hasPermission(Permission.NetworkSync) && <Menu.Item key={0}>同步网络</Menu.Item>
+            }
+            {
+                hasPermission(Permission.NetworkProvision) && <Menu.Item key={1}>继续组网</Menu.Item>
+            }
+            {
+                hasPermission(Permission.NetworkExport) && <Menu.Item key={2}>导出网络</Menu.Item>
+            }
         </Menu>
     }
 
@@ -111,7 +115,10 @@ const NetworkPage = () => {
             dataIndex: 'name',
             key: 'name',
             render: (text: string, record: Network) => {
-                return <a href={`#/network-management?locale=networks/networkDetail&id=${record.id}`}>{text}</a>
+                if (hasPermission(Permission.NetworkDetail)) {
+                    return <a href={`#/network-management?locale=networks/networkDetail&id=${record.id}`}>{text}</a>
+                }
+                return text
             }
         },
         {
@@ -159,9 +166,8 @@ const NetworkPage = () => {
                         <Button type="text" size="small" icon={<EditOutlined/>} onClick={() => onEdit(record.id)}/>
                     }
                     {
-                        hasPermission(Permission.NetworkExport) &&
                         <Dropdown overlay={renderCommandMenus(record)}>
-                            <Button type="text" icon={<CodeOutlined/>}/>
+                            <Button type="text" icon={<CodeOutlined/>} hidden={!hasPermissions(Permission.NetworkProvision, Permission.NetworkExport, Permission.NetworkSync)}/>
                         </Dropdown>
                     }
                     {

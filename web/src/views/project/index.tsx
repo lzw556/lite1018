@@ -90,13 +90,16 @@ const ProjectPage = () => {
 
     return <Content>
         <MyBreadcrumb>
-            <Space>
-                <Button type={"primary"} onClick={() => setVisible(true)}>添加项目<PlusOutlined/></Button>
-            </Space>
+            <HasPermission value={Permission.ProjectAdd}>
+                <Space>
+                    <Button type={"primary"} onClick={() => setVisible(true)}>添加项目<PlusOutlined/></Button>
+                </Space>
+            </HasPermission>
         </MyBreadcrumb>
         <ShadowCard>
             <TableLayout
                 emptyText={"项目列表为空"}
+                permissions={[Permission.ProjectEdit, Permission.ProjectDelete, Permission.ProjectAllocUserGet, Permission.ProjectAllocUser]}
                 dataSource={dataSource}
                 onPageChange={fetchProjects}
                 columns={columns}/>

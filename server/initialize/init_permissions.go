@@ -320,6 +320,12 @@ func initPermissions(db *gorm.DB) error {
 			Group:       "网络模块",
 		},
 		{
+			Path:        "networks/:id/provision",
+			Method:      "PUT",
+			Description: "继续组网",
+			Group:       "网络模块",
+		},
+		{
 			Path:        "networks/:id/devices",
 			Method:      "PATCH",
 			Description: "接入设备",

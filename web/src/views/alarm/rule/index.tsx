@@ -8,7 +8,7 @@ import {
 } from "../../../apis/alarm";
 import {Button, Col, Divider, Dropdown, Menu, Popconfirm, Row, Space, Table, Tag, Typography} from "antd";
 import HasPermission from "../../../permission";
-import {Permission} from "../../../permission/permission";
+import usePermission, {Permission} from "../../../permission/permission";
 import {PageResult} from "../../../types/page";
 import moment from "moment";
 import "../../../string-extension"
@@ -24,6 +24,7 @@ const AlarmRule = () => {
     const [alarmRule, setAlarmRule] = useState<any>()
     const [editVisible, setEditVisible] = useState<boolean>(false)
     const [addVisible, setAddVisible] = useState<boolean>(false)
+    const {hasPermission} = usePermission();
 
     const onDelete = (id: number) => {
         RemoveAlarmRuleRequest(id).then(_ => onRefresh())
@@ -51,8 +52,12 @@ const AlarmRule = () => {
 
     const renderEditMenus = (record:any) => {
         return <Menu onClick={e => onEdit(e.key, record.id)}>
-            <Menu.Item key={"editCondition"}>更新报警条件</Menu.Item>
-            <Menu.Item key={"addMonitor"}>添加监控对象</Menu.Item>
+            <HasPermission value={Permission.AlarmRuleEdit}>
+                <Menu.Item key={"editCondition"}>更新报警条件</Menu.Item>
+            </HasPermission>
+            <HasPermission value={Permission.AlarmSourceAdd}>
+                <Menu.Item key={"addMonitor"}>添加监控对象</Menu.Item>
+            </HasPermission>
         </Menu>
     }
 
@@ -122,21 +127,19 @@ const AlarmRule = () => {
             width: 200,
             render: (_: any, record: any) => {
                 return <>
-                    <HasPermission value={Permission.AlarmRuleEdit}>
+                    <HasPermission value={Permission.AlarmRuleStatusEdit}>
                         {
                             record.enabled ?
                                 <a style={{color: ColorDanger}} onClick={() => onEditStatus(record.id, 0)}>停用</a> :
                                 <a style={{color: ColorHealth}} onClick={() => onEditStatus(record.id, 1)}>启用</a>
                         }
-                    </HasPermission>
-                    <HasPermission value={Permission.AlarmRuleEdit}>
                         <Divider type={"vertical"}/>
-                        <Dropdown overlay={renderEditMenus(record)}>
-                            <Button type="text" size="small" icon={<EditOutlined/>}/>
-                        </Dropdown>
                     </HasPermission>
+                    <Dropdown overlay={renderEditMenus(record)}>
+                        <Button type="text" size="small" icon={<EditOutlined/>} hidden={!(hasPermission(Permission.AlarmRuleEdit) || hasPermission(Permission.AlarmSourceAdd))}/>
+                    </Dropdown>
+                    <Divider type={"vertical"}/>
                     <HasPermission value={Permission.AlarmRuleDelete}>
-                        <Divider type={"vertical"}/>
                         <Popconfirm placement="left" title="确认要删除该规则吗?" onConfirm={() => onDelete(record.id)}
                                     okText="删除" cancelText="取消">
                             <Button type="text" size="small" danger><DeleteOutlined/></Button>
@@ -238,7 +241,7 @@ const AlarmRule = () => {
             <Col span={24}>
                 <TableLayout emptyText={"报警规则列表为空"}
                              columns={columns}
-                             permissions={[Permission.AlarmRuleEdit, Permission.AlarmRuleDelete]}
+                             permissions={[Permission.AlarmRuleStatusEdit, Permission.AlarmRuleEdit, Permission.AlarmRuleDelete]}
                              expandable={{
                                  expandedRowRender: onExpandedRowRender,
                                  indentSize: 5,

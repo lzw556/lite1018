@@ -32,6 +32,10 @@ export function GetMyProjectsRequest() {
     return request.get<Project[]>('/my/projects').then(GetResponse)
 }
 
+export function GetMyProjectRequest(id: number){
+    return request.get<Project>(`/my/projects/${id}`).then(GetResponse)
+}
+
 export function DeleteProjectRequest(id: number) {
     return request.delete(`/projects/${id}`, null).then(DeleteResponse)
 }

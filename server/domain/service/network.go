@@ -96,9 +96,17 @@ func (s Network) DeleteNetworkByID(networkID uint) error {
 }
 
 func (s Network) SyncNetworkByID(networkID uint) error {
-	cmd, err := s.factory.NewNetworkSyncCmd(networkID)
+	cmd, err := s.factory.NewNetworkCommandCmd(networkID)
 	if err != nil {
 		return err
 	}
-	return cmd.Run()
+	return cmd.Sync()
+}
+
+func (s Network) ProvisionNetworkByID(id uint) error {
+	cmd, err := s.factory.NewNetworkCommandCmd(id)
+	if err != nil {
+		return err
+	}
+	return cmd.Provision()
 }

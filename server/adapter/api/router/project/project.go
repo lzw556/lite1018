@@ -25,6 +25,7 @@ func (r *projectRouter) initRoutes() {
 		router.NewGetRoute("projects/:id", r.get),
 		router.NewGetRoute("projects/:id/users", r.getAllocUsers),
 		router.NewGetRoute("my/projects", r.getMyProjects),
+		router.NewGetRoute("my/projects/:id", r.getMyProject),
 
 		// PUT
 		router.NewPutRoute("projects/:id", r.update),

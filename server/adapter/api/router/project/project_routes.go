@@ -37,6 +37,11 @@ func (r projectRouter) getMyProjects(ctx *gin.Context) (interface{}, error) {
 	return r.service.FindProjects(filters)
 }
 
+func (r projectRouter) getMyProject(ctx *gin.Context) (interface{}, error) {
+	id := cast.ToUint(ctx.Param("id"))
+	return r.service.GetProjectByID(id)
+}
+
 func (r projectRouter) update(ctx *gin.Context) (interface{}, error) {
 	id := cast.ToUint(ctx.Param("id"))
 	var req request.Project
