@@ -167,7 +167,7 @@ const NetworkPage = () => {
                     }
                     {
                         <Dropdown overlay={renderCommandMenus(record)}>
-                            <Button type="text" icon={<CodeOutlined/>} hidden={!hasPermissions(Permission.NetworkProvision, Permission.NetworkExport, Permission.NetworkSync)}/>
+                            <Button type="text" icon={<CodeOutlined/>} hidden={!(hasPermission(Permission.NetworkExport) || hasPermissions(Permission.NetworkSync) || hasPermission(Permission.NetworkProvision))}/>
                         </Dropdown>
                     }
                     {
