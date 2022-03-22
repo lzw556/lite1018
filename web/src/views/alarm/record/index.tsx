@@ -117,7 +117,7 @@ const AlarmRecordPage = () => {
             }
         },
         {
-            title: '资源类型',
+            title: '资源指标',
             dataIndex: 'source',
             key: 'type',
             width: '10%',
@@ -125,7 +125,7 @@ const AlarmRecordPage = () => {
                 if (source) {
                     return DeviceType.toString(source.typeId)
                 }
-                return "未知类型"
+                return "未知指标"
             }
         },
         {
