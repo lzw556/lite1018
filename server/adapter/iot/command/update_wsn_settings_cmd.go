@@ -13,9 +13,9 @@ import (
 )
 
 type wsnSettings struct {
-	CommunicationPeriod     uint `json:"communication_period"`
-	JobPeriod               uint `json:"job_period"`
-	CommunicationTimeOffset uint `json:"communication_time_offset"`
+	CommunicationPeriod uint `json:"communication_period"`
+	JobPeriod           uint `json:"job_period"`
+	CommunicationOffset uint `json:"communication_offset"`
 }
 
 type updateWsnSettingsCmd struct {
@@ -29,9 +29,9 @@ func newUpdateWsnSettingsCmd(network entity.Network, isUpdateWsnOnly bool) updat
 	cmd := updateWsnSettingsCmd{
 		isUpdateWsnOnly: isUpdateWsnOnly,
 		settings: wsnSettings{
-			CommunicationTimeOffset: network.CommunicationTimeOffset,
-			CommunicationPeriod:     network.CommunicationPeriod,
-			JobPeriod:               network.CommunicationPeriod,
+			CommunicationOffset: network.CommunicationTimeOffset,
+			CommunicationPeriod: network.CommunicationPeriod,
+			JobPeriod:           network.CommunicationPeriod,
 		},
 		routingTable: network.RoutingTables,
 	}
