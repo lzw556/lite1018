@@ -50,7 +50,7 @@ import NetworkSelect from '../../components/select/networkSelect';
 import DeviceUpgradeSpin from './spin/deviceUpgradeSpin';
 import './index.css';
 import { SingleDeviceStatus } from './SingleDeviceStatus';
-import { getValueOfFirstClassProperty } from './util';
+import { getValueOfFirstClassProperty, generateDeviceTypeCollections } from './util';
 import { isMobile } from '../../utils/deviceDetection';
 
 const { Search } = Input;
@@ -70,6 +70,7 @@ const DevicePage = () => {
   const [dataSource, setDataSource] = useState<PageResult<any>>();
   const { hasPermission, hasPermissions } = usePermission();
   const [refreshKey, setRefreshKey] = useState<number>(0);
+  const [deviceTypeId, setDeviceTypeId] = useState<number>();
 
   const onSearch = (value: string) => {
     setSearchText(value);
@@ -90,9 +91,12 @@ const DevicePage = () => {
       if (network) {
         filter.network_id = network;
       }
+      if (deviceTypeId) {
+        filter.type = deviceTypeId;
+      }
       PagingDevicesRequest(current, size, filter).then(setDataSource);
     },
-    [network, searchText, refreshKey]
+    [network, searchText, searchTarget, deviceTypeId]
   );
 
   useEffect(() => {
@@ -235,6 +239,14 @@ const DevicePage = () => {
       }
     },
     {
+      title: '设备类型',
+      dataIndex: 'typeId',
+      key: 'typeId',
+      render: (text: DeviceType) => {
+        return DeviceType.toString(text);
+      }
+    },
+    {
       title: '数据',
       key: 'data',
       render: (text: any, device: Device) => {
@@ -333,6 +345,22 @@ const DevicePage = () => {
             <Space direction={isMobile ? 'vertical' : 'horizontal'}>
               <Label name={'网络'}>
                 <NetworkSelect bordered={false} onChange={setNetwork} allowClear />
+              </Label>
+              <Label name='设备类型'>
+                <Select
+                  placeholder='请选择设备类型'
+                  bordered={false}
+                  allowClear={true}
+                  onChange={(val) => {
+                    setDeviceTypeId(Number.isInteger(val) ? Number(val) : undefined);
+                  }}
+                >
+                  {generateDeviceTypeCollections().map(({ val, name }: any) => (
+                    <Select.Option key={val} value={val}>
+                      {name}
+                    </Select.Option>
+                  ))}
+                </Select>
               </Label>
               <Input.Group compact>
                 <Select

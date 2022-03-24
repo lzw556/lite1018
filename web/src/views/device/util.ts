@@ -1,7 +1,12 @@
-import { FIRST_CLASS_PROPERTIES } from "../../constants/field";
-import { Property } from "../../types/property";
+import { FIRST_CLASS_PROPERTIES } from '../../constants/field';
+import { DeviceType } from '../../types/device_type';
+import { Property } from '../../types/property';
 
-export const getValueOfFirstClassProperty = (values: any, properties: Property[], typeId:number) => {
+export const getValueOfFirstClassProperty = (
+  values: any,
+  properties: Property[],
+  typeId: number
+) => {
   const fields = Object.keys(values);
   if (fields.length === 0 || fields.map((field) => values[field]).every((val) => !val)) return [];
   let data: any = [];
@@ -21,7 +26,7 @@ export const getValueOfFirstClassProperty = (values: any, properties: Property[]
   return data;
 };
 
-const getFirstClassProperties = (typeId:number, properties: Property[]) => {
+const getFirstClassProperties = (typeId: number, properties: Property[]) => {
   const property = FIRST_CLASS_PROPERTIES.find((pro) => pro.typeId === typeId);
   const keys = property ? property.properties : [];
   return properties
@@ -35,4 +40,10 @@ const getFirstClassProperties = (typeId:number, properties: Property[]) => {
         }))
       };
     });
+};
+
+export const generateDeviceTypeCollections = () => {
+  const origin: any = Object.values(DeviceType);
+  const values: number[] = origin.filter((val: any) => Number.isInteger(Number(val)));
+  return values.map((val) => ({ val, name: DeviceType.toString(val) }));
 };
