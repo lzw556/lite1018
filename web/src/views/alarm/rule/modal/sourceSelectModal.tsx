@@ -16,7 +16,7 @@ import {
     Typography
 } from "antd";
 import {FC, useEffect, useState} from "react";
-import {defaultValidateMessages} from "../../../../constants/validator";
+import {defaultValidateMessages, Rules} from "../../../../constants/validator";
 import {DeviceType} from "../../../../types/device_type";
 import {GetPropertiesRequest} from "../../../../apis/property";
 import {PagingDevicesRequest} from "../../../../apis/device";
@@ -149,7 +149,7 @@ const SourceSelectModal: FC<SourceSelectModalProps> = (props) => {
 
     return <Modal {...props} title={"选择监控对象"} width={600} onOk={onOk}>
         <Form form={form} validateMessages={defaultValidateMessages} layout={"inline"}>
-            <Form.Item label={"指标名称"} name={"index"}>
+            <Form.Item label={"指标名称"} name={"index"} rules={[Rules.required]}>
                 <Cascader placeholder={"请选择指标名称"}
                           options={options}
                           loadData={onLoadData}
@@ -160,7 +160,8 @@ const SourceSelectModal: FC<SourceSelectModalProps> = (props) => {
                           }}/>
             </Form.Item>
             {
-                property && property.fields.length > 1 && <Form.Item label={"指标维度"} name={"dimension"}>
+                property && property.fields.length > 1 &&
+                <Form.Item label={"指标维度"} name={"dimension"} rules={[Rules.required]}>
                     <Select placeholder={"请选择指标维度"}>
                         {
                             property.fields.map((item: any) => {
