@@ -30,6 +30,15 @@ func NewAlarmRecordQuery() AlarmRecordQuery {
 	}
 }
 
+func (query AlarmRecordQuery) Get(id uint) (*vo.AlarmRecord, error) {
+	e, err := query.alarmRecordRepo.Get(context.TODO(), id)
+	if err != nil {
+		return nil, err
+	}
+	result := vo.NewAlarmRecord(e)
+	return &result, nil
+}
+
 func (query AlarmRecordQuery) Paging(page, size int, from, to time.Time) ([]vo.AlarmRecord, int64, error) {
 	ctx := context.TODO()
 	query.Specs = append(query.Specs, spec.CreatedAtRangeSpec{from, to})

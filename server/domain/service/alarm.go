@@ -108,6 +108,14 @@ func (s Alarm) FindAlarmRecordByPaginate(page, size int, from, to int64, filters
 	return query.Paging(page, size, time.Unix(from, 0), time.Unix(to, 0))
 }
 
+func (s Alarm) GetAlarmRecordByID(id uint) (*vo.AlarmRecord, error) {
+	query, err := s.factory.NewAlarmRecordQuery(nil)
+	if err != nil {
+		return nil, err
+	}
+	return query.Get(id)
+}
+
 func (s Alarm) AcknowledgeAlarmRecordByID(id uint, req request.AcknowledgeAlarmRecord) error {
 	cmd, err := s.factory.NewAlarmRecordUpdateCmd(id)
 	if err != nil {
