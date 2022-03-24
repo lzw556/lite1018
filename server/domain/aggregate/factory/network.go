@@ -158,19 +158,14 @@ func (factory Network) NewNetworkUpdateCmdByID(id uint) (*command.NetworkUpdateC
 	return &cmd, nil
 }
 
-func (factory Network) NewNetworkSyncCmd(networkID uint) (*command.NetworkSyncCommand, error) {
+func (factory Network) NewNetworkCommandCmd(id uint) (*command.NetworkCommandCmd, error) {
 	ctx := context.TODO()
-	network, err := factory.networkRepo.Get(ctx, networkID)
+	e, err := factory.networkRepo.Get(ctx, id)
 	if err != nil {
 		return nil, response.BusinessErr(errcode.NetworkNotFoundError, "")
 	}
-	devices, err := factory.deviceRepo.FindBySpecs(ctx, spec.NetworkEqSpec(network.ID))
-	if err != nil {
-		return nil, response.BusinessErr(errcode.DeviceNotFoundError, "")
-	}
-	cmd := command.NewNetworkSyncCommand()
-	cmd.Network = network
-	cmd.Devices = devices
+	cmd := command.NewNetworkCommandCmd()
+	cmd.Network = e
 	return &cmd, nil
 }
 

@@ -16,7 +16,7 @@ type Service interface {
 	AddSourcesToAlarmRule(id uint, sources []uint) error
 	RemoveSourcesFromAlarmRule(id uint, sources []uint) error
 
-	FindAlarmRecordByPaginate(page, size int, filters request.Filters) ([]vo.AlarmRecord, int64, error)
+	FindAlarmRecordByPaginate(page, size int, from, to int64, filters request.Filters) ([]vo.AlarmRecord, int64, error)
 	AcknowledgeAlarmRecordByID(id uint, req request.AcknowledgeAlarmRecord) error
 	GetAlarmRecordAcknowledgeByID(id uint) (*vo.AlarmRecordAcknowledge, error)
 

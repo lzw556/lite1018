@@ -65,7 +65,6 @@ const DevicePage = () => {
   const [editSettingVisible, setEditSettingVisible] = useState<boolean>(false);
   const [editBaseInfoVisible, setEditBaseInfoVisible] = useState<boolean>(false);
   const [upgradeVisible, setUpgradeVisible] = useState<boolean>(false);
-  const [replaceVisible, setReplaceVisible] = useState<boolean>(false);
   const [executeDevice, setExecuteDevice] = useState<Device>();
   const [dataSource, setDataSource] = useState<PageResult<any>>();
   const { hasPermission, hasPermissions } = usePermission();
@@ -176,7 +175,6 @@ const DevicePage = () => {
   const onEdit = (id: number, key: any) => {
     GetDeviceRequest(id).then((data) => {
       setDevice(data);
-      setReplaceVisible(key === '0');
       setEditBaseInfoVisible(key === '1');
       setEditSettingVisible(key === '2');
     });

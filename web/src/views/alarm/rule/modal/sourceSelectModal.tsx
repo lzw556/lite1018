@@ -132,7 +132,7 @@ const SourceSelectModal: FC<SourceSelectModalProps> = (props) => {
             }
         },
         {
-            title: '设备名称',
+            title: '资源名称',
             dataIndex: 'name',
             key: 'name',
         },

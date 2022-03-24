@@ -40,6 +40,11 @@ func (r networkRouter) sync(ctx *gin.Context) (interface{}, error) {
 	return nil, r.service.SyncNetworkByID(id)
 }
 
+func (r networkRouter) provision(ctx *gin.Context) (interface{}, error) {
+	id := cast.ToUint(ctx.Param("id"))
+	return nil, r.service.ProvisionNetworkByID(id)
+}
+
 func (r networkRouter) find(ctx *gin.Context) (interface{}, error) {
 	filters := request.NewFilters(ctx)
 	if _, ok := ctx.GetQuery("page"); ok {

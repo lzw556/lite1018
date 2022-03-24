@@ -38,6 +38,18 @@ func initPermissions(db *gorm.DB) error {
 			Group:       "项目模块",
 		},
 		{
+			Path:        "projects/:id/users",
+			Method:      "PATCH",
+			Description: "分配用户",
+			Group:       "项目模块",
+		},
+		{
+			Path:        "projects/:id/users",
+			Method:      "GET",
+			Description: "查看项目用户列表",
+			Group:       "项目模块",
+		},
+		{
 			Path:        "devices/:id",
 			Method:      "GET",
 			Description: "查看单个设备",
@@ -305,6 +317,12 @@ func initPermissions(db *gorm.DB) error {
 			Path:        "networks/:id/sync",
 			Method:      "PUT",
 			Description: "同步网络",
+			Group:       "网络模块",
+		},
+		{
+			Path:        "networks/:id/provision",
+			Method:      "PUT",
+			Description: "继续组网",
 			Group:       "网络模块",
 		},
 		{

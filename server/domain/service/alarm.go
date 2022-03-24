@@ -11,6 +11,7 @@ import (
 	spec "github.com/thetasensors/theta-cloud-lite/server/domain/specification"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/vo"
 	"gorm.io/gorm"
+	"time"
 )
 
 type Alarm struct {
@@ -99,12 +100,12 @@ func (s Alarm) CheckAlarmRuleName(name string) (bool, error) {
 	return false, err
 }
 
-func (s Alarm) FindAlarmRecordByPaginate(page, size int, filters request.Filters) ([]vo.AlarmRecord, int64, error) {
+func (s Alarm) FindAlarmRecordByPaginate(page, size int, from, to int64, filters request.Filters) ([]vo.AlarmRecord, int64, error) {
 	query, err := s.factory.NewAlarmRecordQuery(filters)
 	if err != nil {
 		return nil, 0, err
 	}
-	return query.Paging(page, size)
+	return query.Paging(page, size, time.Unix(from, 0), time.Unix(to, 0))
 }
 
 func (s Alarm) AcknowledgeAlarmRecordByID(id uint, req request.AcknowledgeAlarmRecord) error {

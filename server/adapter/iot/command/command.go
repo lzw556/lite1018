@@ -41,7 +41,7 @@ func Execute(gateway, device entity.Device, t Type) error {
 		xlog.Infof("execute command %s successful => [%s]", cmd.Name(), device.MacAddress)
 		return nil
 	}
-	return errcode.DeviceOfflineError
+	return response.BusinessErr(errcode.DeviceOfflineError, "")
 }
 
 func SyncDeviceSettings(gateway, device entity.Device) {
@@ -77,7 +77,7 @@ func SyncNetwork(network entity.Network, devices []entity.Device, timeout time.D
 		}
 		return nil
 	}
-	return errcode.DeviceOfflineError
+	return response.BusinessErr(errcode.DeviceOfflineError, "")
 }
 
 func SyncNetworkLinkStatus(network entity.Network, devices []entity.Device, timeout time.Duration) {
@@ -225,5 +225,5 @@ func Calibrate(gateway entity.Device, device entity.Device, param float32) error
 		}
 		return nil
 	}
-	return errcode.DeviceOfflineError
+	return response.BusinessErr(errcode.DeviceOfflineError, "")
 }

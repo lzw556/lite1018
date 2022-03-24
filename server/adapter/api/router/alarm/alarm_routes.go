@@ -83,7 +83,9 @@ func (r alarmRouter) findAlarmRecords(ctx *gin.Context) (interface{}, error) {
 	if _, ok := ctx.GetQuery("page"); ok {
 		page := cast.ToInt(ctx.Query("page"))
 		size := cast.ToInt(ctx.Query("size"))
-		result, total, err := r.service.FindAlarmRecordByPaginate(page, size, filters)
+		from := cast.ToInt64(ctx.Query("from"))
+		to := cast.ToInt64(ctx.Query("to"))
+		result, total, err := r.service.FindAlarmRecordByPaginate(page, size, from, to, filters)
 		if err != nil {
 			return nil, err
 		}

@@ -298,9 +298,9 @@ func (query DeviceQuery) DownloadCharacteristicData(id uint, pids []string, from
 		}
 
 		// set cell value
-		cellOffset := 1
+		cellOffset := 2
 		if device.IsSVT() {
-			cellOffset = 2
+			cellOffset = 3
 		}
 
 		for i, data := range deviceData {
@@ -311,7 +311,7 @@ func (query DeviceQuery) DownloadCharacteristicData(id uint, pids []string, from
 					if _, ok := downloadKeys[property.Key]; ok {
 						for _, v := range property.Data {
 							axis += 1
-							_ = result.File.SetCellValue("Sheet1", fmt.Sprintf("%s%d", string(rune(axis)), i+3), v)
+							_ = result.File.SetCellValue("Sheet1", fmt.Sprintf("%s%d", string(rune(axis)), i+cellOffset), v)
 						}
 					}
 				}

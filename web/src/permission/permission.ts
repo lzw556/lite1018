@@ -1,7 +1,5 @@
-import {GetCasbinRequest} from "../apis/role";
 import {Enforcer, MemoryAdapter, newEnforcer, newModel} from "casbin.js";
 import {getPermission} from "../utils/session";
-import {store} from "../store";
 
 export type PermissionType = {
     path: string;
@@ -9,6 +7,12 @@ export type PermissionType = {
 }
 
 export const Permission = {
+    ProjectAdd: {path: "projects", method: "POST"},
+    ProjectList: {path: "projects", method: "GET"},
+    ProjectAllocUser: {path: "projects/:id/users", method: "PATCH"},
+    ProjectAllocUserGet: {path: "projects/:id/users", method: "GET"},
+    ProjectEdit: {path: "projects/:id", method: "PUT"},
+    ProjectDelete: {path: "projects/:id", method: "DELETE"},
     DeviceCommand: {path: 'devices/:id/commands/:cmd', method: 'POST'},
     DeviceUpgrade: {path: "devices/:id/upgrade", method: "POST"},
     DeviceAdd: {path: "devices", method: "POST"},
@@ -20,10 +24,12 @@ export const Permission = {
     DeviceDetail: {path: "devices/:id", method: "GET"},
     DeviceDataDelete: {path: "devices/:id/data", method: "DELETE"},
     DeviceDataDownload: {path: "devices/:id/download/data", method: "GET"},
+    DeviceRawDataDownload: {path: "devices/:id/download/data/:timestamp", method: "GET"},
     DeviceFirmwares: {path: "devices/:id/firmwares", method: "GET"},
     DeviceData: {path: "devices/:id/data", method: "GET"},
     DeviceEventList: {path: "devices/:id/events", method: "GET"},
     DeviceEventDelete: {path: "devices/:id/events", method: "DELETE"},
+    DeviceRuntimeDataGet: {path: "devices/:id/runtime", method: "GET"},
     NetworkSettingEdit: {path: "networks/setting", method: "PUT"},
     NetworkRemoveDevices: {path: "networks/:id/devices", method: "DELETE"},
     NetworkAddDevices: {path: "networks/:id/devices", method: "PATCH"},
@@ -31,8 +37,13 @@ export const Permission = {
     NetworkExport: {path: "networks/:id/export", method: "GET"},
     NetworkEdit: {path: "networks/:id", method: "PUT"},
     NetworkDelete: {path: "networks/:id", method: "DELETE"},
+    NetworkDetail: {path: "networks/:id", method: "GET"},
+    NetworkSync: {path: "networks/:id/sync", method: "PUT"},
+    NetworkProvision: {path: "networks/:id/provision", method: "PUT"},
     AlarmRuleAdd: {path: "alarmRules", method: "POST"},
     AlarmRuleEdit: {path: "alarmRules/:id", method: "PUT"},
+    AlarmRuleStatusEdit: {path: "alarmRules/:id/status/:status", method: "PUT"},
+    AlarmSourceAdd: {path: "alarmRules/:id/sources", method: "POST"},
     AlarmRuleDelete: {path: "alarmRules/:id", method: "DELETE"},
     AlarmRuleTemplateAdd: {path: "alarmRuleTemplates", method: "POST"},
     AlarmRuleTemplateEdit: {path: "alarmRuleTemplates/:id", method: "PUT"},

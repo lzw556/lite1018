@@ -17,6 +17,7 @@ type Service interface {
 
 	ExportNetworkByID(id uint) (*vo.NetworkExportFile, error)
 	SyncNetworkByID(id uint) error
+	ProvisionNetworkByID(id uint) error
 
 	AddDevicesByID(id uint, req request.AddDevices) error
 	RemoveDevicesByID(id uint, req request.RemoveDevices) error

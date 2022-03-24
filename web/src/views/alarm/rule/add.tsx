@@ -12,15 +12,10 @@ import { isMobile } from "../../../utils/deviceDetection";
 const {Option} = Select;
 
 const AddAlarmRule = () => {
-    const [selectedTemplates, setSelectedTemplates] = useState<number[]>([])
-    const [createType, setCreateType] = useState<number>(0)
     const [visible, setVisible] = useState<boolean>(false)
     const [selected, setSelected] = useState<any>()
     const [form] = Form.useForm()
     const [success, setSuccess] = useState<boolean>(false)
-
-    const fetchAlarmTemplates = useCallback((current: number, size: number) => {
-    }, [])
 
     useEffect(() => {
         form.setFieldsValue({
@@ -28,20 +23,22 @@ const AddAlarmRule = () => {
             operation: ">=",
             level: 3,
         })
-    }, [createType, fetchAlarmTemplates])
+    }, [])
 
 
     const onSave = () => {
         form.validateFields().then(values => {
-            values.source_ids = selected.sources.map((item:any) => item.id)
-            values.source_type = selected.sourceType
-            values.metric = selected.metric
             values.threshold = parseFloat(values.threshold)
-            AddAlarmRuleRequest(values).then(data => {
-                setSuccess(true)
-            })
-        }).catch(err => {
-            message.error(err)
+            if (selected && selected.sources.length > 0) {
+                values.source_ids = selected.sources.map((item: any) => item.id)
+                values.source_type = selected.sourceType
+                values.metric = selected.metric
+                AddAlarmRuleRequest(values).then(data => {
+                    setSuccess(true)
+                })
+            } else {
+                message.error("请选择报警源")
+            }
         })
     }
 
@@ -54,26 +51,11 @@ const AddAlarmRule = () => {
             CheckAlarmRuleNameRequest(value).then(data => {
                 if (data) {
                     resolve()
-                }else {
+                } else {
                     reject("该名称已存在")
                 }
             }).catch(_ => reject("该名称已存在"))
         })
-    }
-
-    const columns = [
-        {
-            title: '模板名称',
-            dataIndex: 'name',
-            key: 'name'
-        }
-    ]
-
-    const rowSelection = {
-        selectedTemplates,
-        onChange: (selectedRowKeys: any) => {
-            setSelectedTemplates(selectedRowKeys)
-        }
     }
 
     const onRemoveSource = (id: any) => {
@@ -115,7 +97,7 @@ const AddAlarmRule = () => {
                 <Row justify={"space-between"}>
                     <Col span={24}>
                         <Form.Item label={"规则名称"} labelCol={{span: 2}} wrapperCol={{span: 8}} name={"name"} required
-                                   rules={[Rules.range(4,16),{validator: onNameValidator}]}>
+                                   rules={[Rules.range(4, 16), {validator: onNameValidator}]}>
                             <Input placeholder={"请输入规则名称"}/>
                         </Form.Item>
                     </Col>
@@ -132,7 +114,7 @@ const AddAlarmRule = () => {
             <ShadowCard>
                 <Row justify={"start"}>
                     <Col span={24}>
-                        <Form.Item label={"监控对象"} labelCol={{span: 2}}>
+                        <Form.Item label={"监控对象"} labelCol={{span: 2}} requiredMark={true}>
                             <Row justify={"start"}>
                                 <Col span={24}>
                                     <Card style={{border: "dashed 1px #ccc", backgroundColor: "#f4f4f4"}}>
@@ -191,9 +173,11 @@ const AddAlarmRule = () => {
                                                     <Typography.Text type={"secondary"}>
                                                         当<Typography.Text strong>监控对象</Typography.Text>连续
                                                     </Typography.Text>
-                                                    <Form.Item name={["duration"]} normalize={Normalizes.number} noStyle rules={[Rules.number]}>
+                                                    <Form.Item name={["duration"]} normalize={Normalizes.number} noStyle
+                                                               rules={[Rules.number]}>
                                                         <Input size={"small"} style={{width: "64px"}}/>
-                                                    </Form.Item><Typography.Text type={"secondary"}>个周期内</Typography.Text>
+                                                    </Form.Item><Typography.Text
+                                                    type={"secondary"}>个周期内</Typography.Text>
                                                     <Form.Item name={["operation"]} noStyle>
                                                         <Select size={"small"} style={{width: "64px"}}>
                                                             <Option key={">"} value={">"}>&gt;</Option>
@@ -203,8 +187,10 @@ const AddAlarmRule = () => {
                                                         </Select>
                                                     </Form.Item>
                                                     <Form.Item name={["threshold"]} rules={[Rules.number]} noStyle>
-                                                        <Input size={"small"} style={{width: "64px"}} suffix={selected?.metric?.unit}/>
-                                                    </Form.Item><Typography.Text type={"secondary"}>时, 产生</Typography.Text>
+                                                        <Input size={"small"} style={{width: "64px"}}
+                                                               suffix={selected?.metric?.unit}/>
+                                                    </Form.Item><Typography.Text type={"secondary"}>时,
+                                                    产生</Typography.Text>
                                                     <Form.Item name={["level"]} noStyle>
                                                         <Select size={"small"}
                                                                 style={{width: "88px"}}>
