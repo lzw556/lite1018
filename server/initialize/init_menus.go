@@ -155,7 +155,7 @@ func initMenus(db *gorm.DB) error {
 		},
 		{
 			ID:       5001,
-			Title:    "报警列表",
+			Title:    "报警记录",
 			Name:     "alerts",
 			ParentID: 5000,
 			Path:     "/alarm-management",
