@@ -223,7 +223,7 @@ const AlarmRecordPage = () => {
                     <Row justify={"start"}>
                         <Col span={24}>
                             <Space direction={isMobile ? 'vertical' : 'horizontal'}>
-                                <Label name={"报警级别"}>
+                                <Label name={"报警等级"}>
                                     <Select bordered={false} mode={"multiple"} value={alertLevels}
                                             style={{width: "200px"}} onChange={value => {
                                         if (value.length) {

@@ -8,6 +8,7 @@ import SourceSelectModal from "./modal/sourceSelectModal";
 import {DeleteOutlined} from "@ant-design/icons";
 import {defaultValidateMessages, Normalizes, Rules} from "../../../constants/validator";
 import { isMobile } from "../../../utils/deviceDetection";
+import _ from "lodash";
 
 const {Option} = Select;
 
@@ -59,7 +60,9 @@ const AddAlarmRule = () => {
     }
 
     const onRemoveSource = (id: any) => {
-        setSelected(selected.sources.filter((item: any) => item.id !== id))
+        const newSelected = _.cloneDeep(selected)
+        newSelected.sources = newSelected.sources.filter((item: any) => item.id !== id)
+        setSelected(newSelected)
     }
 
     const sourceColumns = [
@@ -138,7 +141,7 @@ const AddAlarmRule = () => {
                                 <Col span={24}>
                                     {
                                         selected && selected.sources && selected.sources.length > 0 &&
-                                        <Table columns={sourceColumns} size={"small"} dataSource={selected.sources}
+                                        <Table rowKey={(record) => record.id} columns={sourceColumns} size={"small"} dataSource={selected.sources}
                                                pagination={false}/>
                                     }
                                 </Col>
@@ -149,18 +152,6 @@ const AddAlarmRule = () => {
                 <Row justify={"space-between"}>
                     <Col span={24}>
                         <Form.Item label={"报警条件"} labelCol={{span: 2}}>
-                            {/*<Row justify={"start"}>*/}
-                            {/*    <Col span={24}>*/}
-                            {/*        <Radio.Group buttonStyle="solid" style={{width: "200px"}}*/}
-                            {/*                     defaultValue={createType}*/}
-                            {/*                     onChange={e => {*/}
-                            {/*                         setCreateType(e.target.value)*/}
-                            {/*                     }}>*/}
-                            {/*            <Radio.Button value={0}>自定义创建</Radio.Button>*/}
-                            {/*            <Radio.Button value={1}>模板导入</Radio.Button>*/}
-                            {/*        </Radio.Group>*/}
-                            {/*    </Col>*/}
-                            {/*</Row>*/}
                             <Row justify={"start"} style={{paddingTop: "8px"}}>
                                 <Col span={24}>
                                     <Card>

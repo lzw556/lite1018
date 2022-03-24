@@ -46,6 +46,9 @@ const SourceSelectModal: FC<SourceSelectModalProps> = (props) => {
 
     useEffect(() => {
         if (visible) {
+            form.resetFields();
+            setDataSource(undefined);
+            setSelectedRowKeys([]);
             setOptions(DeviceType.Sensors().map(item => {
                 return {value: item, label: DeviceType.toString(item), isLeaf: false}
             }))
@@ -169,7 +172,7 @@ const SourceSelectModal: FC<SourceSelectModalProps> = (props) => {
             }
         </Form>
         <br/>
-        <ConfigProvider renderEmpty={() => <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={"设备列表为空"}/>}
+        <ConfigProvider renderEmpty={() => <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={"资源列表为空"}/>}
                         locale={zhCN}>
             <Table rowKey={record => record.macAddress} rowSelection={rowSelection} scroll={{y: 256}} columns={columns}
                    dataSource={dataSource?.result} pagination={false} size={"small"}/>
@@ -187,7 +190,6 @@ const SourceSelectModal: FC<SourceSelectModalProps> = (props) => {
                                             current={pagination.current}
                                             pageSize={pagination.size}
                                             onChange={(page, pageSize) => {
-                                                console.log(selectedRowKeys);
                                                 setPagination({current: page, size: pageSize})
                                             }}/>
                             }
