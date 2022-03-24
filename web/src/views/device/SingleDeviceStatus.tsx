@@ -1,6 +1,6 @@
 import { Tag } from 'antd';
 import * as React from 'react';
-import { ColorDanger, ColorHealth, ColorInfo, ColorWarn } from '../../constants/color';
+import { ColorDanger, ColorHealth, ColorInfo, ColorOffline, ColorWarn } from '../../constants/color';
 import { Device } from '../../types/device';
 
 export const SingleDeviceStatus: React.FC<Pick<Device, 'alertStates' | 'state'>> = ({
@@ -27,6 +27,6 @@ export const SingleDeviceStatus: React.FC<Pick<Device, 'alertStates' | 'state'>>
       return <Tag color={ColorHealth}>正常</Tag>;
     }
   } else {
-    return <Tag color={ColorWarn}>离线</Tag>;
+    return <Tag color={ColorOffline} style={{color:'#000'}}>离线</Tag>;
   }
 };
