@@ -33,6 +33,7 @@ const AddAlarmRule = () => {
             if (selected && selected.sources.length > 0) {
                 values.source_ids = selected.sources.map((item: any) => item.id)
                 values.source_type = selected.sourceType
+                values.category = selected.category
                 values.metric = selected.metric
                 AddAlarmRuleRequest(values).then(data => {
                     setSuccess(true)

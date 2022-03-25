@@ -71,10 +71,10 @@ const AlarmRule = () => {
         },
         {
             title: '资源类型',
-            dataIndex: 'sourceType',
-            key: 'sourceType',
-            render: (text: string) => {
-                return text.indexOf("device") > -1 ? '设备' : '资产'
+            dataIndex: 'category',
+            key: 'category',
+            render: (category: number) => {
+                return category === 1 ? '设备' : '资产'
             }
         },
         {
@@ -166,7 +166,7 @@ const AlarmRule = () => {
 
     const onExpandedRowRender = (record: any) => {
         let columns;
-        if (record.sourceType.indexOf("device") > -1) {
+        if (record.category === 1) {
             columns = [
                 {
                     title: '设备名称',

@@ -90,7 +90,6 @@ func (a *DeviceAlert) Alert(source interface{}, value float64) {
 			if device.GetAlarmRuleState(a.alarmRule.ID).Duration == a.alarmRule.Duration {
 				record := entity.AlarmRecord{
 					AlarmRuleID: a.alarmRule.ID,
-					SourceType:  a.alarmRule.SourceType,
 					SourceID:    device.ID,
 					Metric:      a.alarmRule.Metric,
 					Level:       a.alarmRule.Level,
@@ -98,6 +97,7 @@ func (a *DeviceAlert) Alert(source interface{}, value float64) {
 					Threshold:   a.alarmRule.Threshold,
 					Value:       value,
 					ProjectID:   a.alarmRule.ProjectID,
+					Category:    a.alarmRule.Category,
 				}
 				if err := a.alarmRecordRepo.Create(context.TODO(), &record); err != nil {
 					xlog.Errorf("create alarm record failed: %v", err)

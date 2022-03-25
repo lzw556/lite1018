@@ -8,7 +8,6 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	spec "github.com/thetasensors/theta-cloud-lite/server/domain/specification"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/vo"
-	"strings"
 	"time"
 )
 
@@ -71,7 +70,7 @@ func (query StatisticQuery) GetAlertStatistics() ([]vo.AlertStatistic, error) {
 	}
 	records := make(map[string][]entity.AlarmRecord, 0)
 	for _, record := range alarmRecords {
-		if strings.HasPrefix(record.SourceType, entity.AlarmSourceTypeDevice) {
+		if record.Category == entity.AlarmRuleCategoryDevice {
 			timeStr := record.CreatedAt.Format("2006-01-02")
 			if _, ok := records[timeStr]; !ok {
 				records[timeStr] = make([]entity.AlarmRecord, 0)

@@ -47,6 +47,7 @@ func (factory Alarm) NewAlarmRuleCreateCmd(req request.AlarmRule) (*command.Alar
 	e.Operation = req.Operation
 	e.Threshold = req.Threshold
 	e.SourceType = req.SourceType
+	e.Category = entity.AlarmRuleCategory(req.Category)
 	e.Metric = entity.AlarmRuleMetric{
 		Key:  req.Metric.Key,
 		Name: req.Metric.Name,
@@ -82,6 +83,10 @@ func (factory Alarm) NewAlarmRuleQuery(filters request.Filters) (*query.AlarmRul
 		switch name {
 		case "project_id":
 			q.Specs = append(q.Specs, spec.ProjectEqSpec(cast.ToUint(v)))
+		case "source_type":
+			q.Specs = append(q.Specs, spec.SourceTypeEqSpec(cast.ToUint(v)))
+		case "category":
+			q.Specs = append(q.Specs, spec.CategoryEqSpec(cast.ToUint(v)))
 		}
 	}
 	return &q, nil

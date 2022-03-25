@@ -7,7 +7,6 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/ruleengine/rule"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
-	"strings"
 )
 
 var pool *engine.GenginePool
@@ -57,8 +56,8 @@ func ExecuteSelectedRules(sourceID uint, rules ...entity.AlarmRule) {
 	for _, r := range rules {
 		var alert Rule
 		if r.IsEnabled() {
-			switch {
-			case strings.HasPrefix(r.SourceType, entity.AlarmSourceTypeDevice):
+			switch r.Category {
+			case entity.AlarmRuleCategoryDevice:
 				alert = rule.NewDeviceAlert(sourceID, r)
 			}
 			if err := alert.Execute(pool); err != nil {

@@ -41,7 +41,7 @@ const SourceSelectModal: FC<SourceSelectModalProps> = (props) => {
     const [deviceType, setDeviceType] = useState<DeviceType>(0)
     const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([])
     const [pagination, setPagination] = useState<any>({current: 1, size: 8,})
-    const [sourceType, setSourceType] = useState<any>("device")
+    const [category, setCategory] = useState<any>("1")
     const [form] = Form.useForm();
 
     useEffect(() => {
@@ -56,8 +56,8 @@ const SourceSelectModal: FC<SourceSelectModalProps> = (props) => {
     }, [visible])
 
     const onDropdownRender = (options: any) => {
-        return <Tabs defaultActiveKey={"device"} style={{padding: "0 10px 0 10px"}} onChange={setSourceType}>
-            <TabPane tab={"设备"} key={"device"}>
+        return <Tabs defaultActiveKey={"1"} style={{padding: "0 10px 0 10px"}} onChange={setCategory}>
+            <TabPane tab={"设备"} key={"1"}>
                 {options}
             </TabPane>
         </Tabs>
@@ -115,7 +115,7 @@ const SourceSelectModal: FC<SourceSelectModalProps> = (props) => {
                     metric.name = `${property.name}(${field.name})`
                     metric.unit = property.unit
                 }
-                onSuccess({sources: selected, metric:metric, sourceType: `${sourceType}::${deviceType}`})
+                onSuccess({sources: selected, metric:metric, sourceType: deviceType, category: parseInt(category)})
             })
         }
     }

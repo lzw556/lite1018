@@ -7,7 +7,8 @@ import (
 
 type Service interface {
 	CreateAlarmRule(req request.AlarmRule) error
-	FindAlarmRuleByPaginate(page, size int, filters request.Filters) ([]vo.AlarmRule, int64, error)
+	PagingAlarmRules(page, size int, filters request.Filters) ([]vo.AlarmRule, int64, error)
+	FindAlarmRules(filters request.Filters) ([]vo.AlarmRule, error)
 	GetAlarmRuleByID(id uint) (*vo.AlarmRule, error)
 	UpdateAlarmRuleByID(id uint, req request.AlarmRule) error
 	UpdateAlarmRuleStatusByID(id uint, status uint8) error

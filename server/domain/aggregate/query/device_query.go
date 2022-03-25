@@ -30,6 +30,7 @@ type DeviceQuery struct {
 	deviceAlertStateRepo  dependency.DeviceAlertStateRepository
 	networkRepo           dependency.NetworkRepository
 	alarmRuleRepo         dependency.AlarmRuleRepository
+	alarmSourceRepo       dependency.AlarmSourceRepository
 	largeSensorDataRepo   dependency.LargeSensorDataRepository
 	eventRepo             dependency.EventRepository
 }
@@ -44,6 +45,8 @@ func NewDeviceQuery() DeviceQuery {
 		networkRepo:           repository.Network{},
 		largeSensorDataRepo:   repository.LargeSensorData{},
 		eventRepo:             repository.Event{},
+		alarmSourceRepo:       repository.AlarmSource{},
+		alarmRuleRepo:         repository.AlarmRule{},
 	}
 }
 
@@ -414,4 +417,29 @@ func (query DeviceQuery) PagingEventsByID(id uint, from, to int64, page int, siz
 		result[i] = vo.NewDeviceEvent(e)
 	}
 	return result, total, nil
+}
+
+func (query DeviceQuery) FindAlarmRulesByID(id uint) ([]vo.AlarmRule, error) {
+	device, err := query.check(id)
+	if err != nil {
+		return nil, err
+	}
+	ctx := context.TODO()
+	sources, err := query.alarmSourceRepo.FindBySpecs(ctx, spec.SourceEqSpec(device.ID))
+	if err != nil {
+		return nil, err
+	}
+	ruleIDs := make([]uint, len(sources))
+	for i, source := range sources {
+		ruleIDs[i] = source.AlarmRuleID
+	}
+	rules, err := query.alarmRuleRepo.FindBySpecs(ctx, spec.PrimaryKeyInSpec(ruleIDs), spec.SourceTypeEqSpec(device.Type), spec.CategoryEqSpec(uint(entity.AlarmRuleCategoryDevice)))
+	if err != nil {
+		return nil, err
+	}
+	result := make([]vo.AlarmRule, len(rules))
+	for i, rule := range rules {
+		result[i] = vo.NewAlarmRule(rule)
+	}
+	return result, nil
 }

@@ -180,3 +180,26 @@ func (r deviceRouter) removeEventsByID(ctx *gin.Context) (interface{}, error) {
 	}
 	return nil, r.service.RemoveDeviceEventsByID(id, events.IDs)
 }
+
+func (r deviceRouter) findAlarmRulesByID(ctx *gin.Context) (interface{}, error) {
+	id := cast.ToUint(ctx.Param("id"))
+	return r.service.FindDeviceAlarmRulesByID(id)
+}
+
+func (r deviceRouter) addAlarmRules(ctx *gin.Context) (interface{}, error) {
+	id := cast.ToUint(ctx.Param("id"))
+	var req request.DeviceAlarmRules
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		return nil, response.InvalidParameterError(err.Error())
+	}
+	return nil, r.service.AddDeviceAlarmRules(id, req)
+}
+
+func (r deviceRouter) removeAlarmRulesByID(ctx *gin.Context) (interface{}, error) {
+	id := cast.ToUint(ctx.Param("id"))
+	var req request.DeviceAlarmRules
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		return nil, response.InvalidParameterError(err.Error())
+	}
+	return nil, r.service.RemoveDeviceAlarmRulesByID(id, req)
+}

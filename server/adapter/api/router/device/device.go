@@ -23,6 +23,7 @@ func (r *deviceRouter) initRoutes() {
 		router.NewPostRoute("devices", r.create),
 		router.NewPostRoute("devices/:id/commands/:cmd", r.executeCommand),
 		router.NewPostRoute("devices/:id/upgrade", r.upgrade),
+		router.NewPostRoute("devices/:id/alarmRules", r.addAlarmRules),
 
 		// GET
 		router.NewGetRoute("devices", r.find),
@@ -33,6 +34,8 @@ func (r *deviceRouter) initRoutes() {
 		router.NewGetRoute("devices/:id/data/:timestamp", r.getDataByIDAndTimestamp),
 		router.NewGetRoute("devices/:id/download/data/:timestamp", r.downloadDataByIDAndTimestamp),
 		router.NewGetRoute("devices/:id/runtime", r.findRuntimeDataByID),
+		router.NewGetRoute("devices/:id/alarmRules", r.findAlarmRulesByID),
+
 		router.NewGetRoute("devices/defaultSettings", r.defaultSettings),
 		router.NewGetRoute("check/devices/:mac", r.checkMacAddress),
 
@@ -48,6 +51,7 @@ func (r *deviceRouter) initRoutes() {
 		router.NewDeleteRoute("devices/:id", r.delete),
 		router.NewDeleteRoute("devices/:id/data", r.removeDataByID),
 		router.NewDeleteRoute("devices/:id/events", r.removeEventsByID),
+		router.NewDeleteRoute("devices/:id/alarmRules", r.removeAlarmRulesByID),
 	}
 }
 

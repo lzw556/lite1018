@@ -36,3 +36,7 @@ type DeviceUpgrade struct {
 type DeviceCommand struct {
 	Param float32 `json:"param"`
 }
+
+type DeviceAlarmRules struct {
+	IDs []uint `json:"ids"`
+}

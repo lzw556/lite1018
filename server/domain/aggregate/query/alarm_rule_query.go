@@ -2,13 +2,11 @@ package query
 
 import (
 	"context"
-	"fmt"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	spec "github.com/thetasensors/theta-cloud-lite/server/domain/specification"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/vo"
-	"strings"
 )
 
 type AlarmRuleQuery struct {
@@ -30,7 +28,6 @@ func NewAlarmRuleQuery() AlarmRuleQuery {
 }
 
 func (query AlarmRuleQuery) Paging(page, size int) ([]vo.AlarmRule, int64, error) {
-	fmt.Println(query.Specs)
 	es, total, err := query.alarmRuleRepo.PagingBySpecs(context.TODO(), page, size, query.Specs...)
 	if err != nil {
 		return nil, 0, err
@@ -41,6 +38,18 @@ func (query AlarmRuleQuery) Paging(page, size int) ([]vo.AlarmRule, int64, error
 		query.setSources(&result[i])
 	}
 	return result, total, nil
+}
+
+func (query AlarmRuleQuery) List() ([]vo.AlarmRule, error) {
+	es, err := query.alarmRuleRepo.FindBySpecs(context.TODO(), query.Specs...)
+	if err != nil {
+		return nil, err
+	}
+	result := make([]vo.AlarmRule, len(es))
+	for i, e := range es {
+		result[i] = vo.NewAlarmRule(e)
+	}
+	return result, nil
 }
 
 func (query AlarmRuleQuery) Get(id uint) (*vo.AlarmRule, error) {
@@ -60,7 +69,7 @@ func (query AlarmRuleQuery) setSources(alarmRule *vo.AlarmRule) {
 			sourceIDs = append(sourceIDs, source.SourceID)
 		}
 	}
-	if strings.HasPrefix(alarmRule.SourceType, entity.AlarmSourceTypeDevice) {
+	if alarmRule.Category == uint8(entity.AlarmRuleCategoryDevice) {
 		es, err := query.deviceRepo.FindBySpecs(context.TODO(), spec.PrimaryKeyInSpec(sourceIDs))
 		if err != nil {
 			return
