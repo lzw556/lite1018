@@ -20,7 +20,7 @@ import './index.css';
 import { DeviceType } from '../../types/device_type';
 import EChartsReact from 'echarts-for-react';
 import { DefaultMultiBarOption, DefaultPieOption } from '../../constants/chart';
-import { ColorDanger, ColorHealth, ColorInfo, ColorWarn } from '../../constants/color';
+import { ColorDanger, ColorHealth, ColorInfo, ColorOffline, ColorWarn } from '../../constants/color';
 import { Network } from '../../types/network';
 import { GetNetworksRequest } from '../../apis/network';
 import { number } from 'echarts';
@@ -143,7 +143,7 @@ const DeviceMonitor = () => {
                       {
                         value: countOffline,
                         name: `离线 ${countOffline}`,
-                        itemStyle: { color: ColorWarn }
+                        itemStyle: { color: ColorOffline }
                       }
                     ]
                   }

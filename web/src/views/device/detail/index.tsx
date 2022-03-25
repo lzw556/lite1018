@@ -90,7 +90,7 @@ const DeviceDetailPage = () => {
             });
             const tabList = getDeviceTabs(device);
             setTabs(tabList);
-            if (tabList.length > 0) {
+            if (tabList.length > 0 && !currentKey) {
                 setCurrentKey(tabList[0].key);
             }
         }
