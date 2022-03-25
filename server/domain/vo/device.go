@@ -8,6 +8,7 @@ type Device struct {
 	ID         uint                   `json:"id"`
 	Name       string                 `json:"name"`
 	MacAddress string                 `json:"macAddress"`
+	Parent     string                 `json:"parent"`
 	TypeID     uint                   `json:"typeId"`
 	IPN        map[string]interface{} `json:"ipn,omitempty"`
 	Sensors    map[string]interface{} `json:"sensors,omitempty"`
@@ -29,6 +30,7 @@ func NewDevice(e entity.Device) Device {
 		ID:         e.ID,
 		Name:       e.Name,
 		MacAddress: e.MacAddress,
+		Parent:     e.Parent,
 		TypeID:     e.Type,
 	}
 	return d

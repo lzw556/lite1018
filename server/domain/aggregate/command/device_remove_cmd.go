@@ -47,7 +47,6 @@ func (cmd DeviceRemoveCmd) Run() error {
 		_ = cmd.deviceInformationRepo.Delete(cmd.Device.ID)
 		_ = cmd.deviceStatusRepo.Delete(cmd.Device.MacAddress)
 		if cmd.Device.NetworkID > 0 {
-			cmd.Network.RemoveDevice(cmd.Device)
 			return cmd.networkRepo.Save(txCtx, &cmd.Network)
 		}
 		return cmd.removeAlarmSource(txCtx)

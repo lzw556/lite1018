@@ -24,7 +24,6 @@ func NewNetwork(e entity.Network) Network {
 		CommunicationTimeOffset: e.CommunicationTimeOffset,
 		GroupSize:               e.GroupSize,
 		GroupInterval:           e.GroupInterval,
-		RoutingTables:           e.RoutingTables,
 	}
 }
 

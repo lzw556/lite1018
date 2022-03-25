@@ -33,7 +33,6 @@ func newUpdateWsnSettingsCmd(network entity.Network, isUpdateWsnOnly bool) updat
 			CommunicationPeriod: network.CommunicationPeriod,
 			JobPeriod:           network.CommunicationPeriod,
 		},
-		routingTable: network.RoutingTables,
 	}
 	cmd.request = newRequest()
 	return cmd

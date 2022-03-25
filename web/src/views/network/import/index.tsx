@@ -12,15 +12,17 @@ import MyBreadcrumb from "../../../components/myBreadcrumb";
 import G6 from "@antv/g6";
 import "../../../components/shape/shape"
 import {DeviceType} from "../../../types/device_type";
+import network from "../index";
 
 const {Dragger} = Upload
 
 export interface NetworkRequestForm {
-    communication_period: number
-    communication_time_offset: number
-    group_size: number
-    group_interval: number
-    routing_tables: [],
+    wsn: {
+        communication_period: number
+        communication_time_offset: number
+        group_size: number
+        group_interval: number
+    }
     devices: any
 }
 
@@ -32,7 +34,7 @@ const ImportNetworkPage = () => {
     let graph: any = null
 
     const checkJSONFormat = (source: any) => {
-        return source.hasOwnProperty("deviceList") && source.hasOwnProperty("settings") && source.hasOwnProperty("routingTable")
+        return source.hasOwnProperty("deviceList") && source.hasOwnProperty("wsn")
     }
 
     const onBeforeUpload = (file: any) => {
@@ -41,32 +43,9 @@ const ImportNetworkPage = () => {
         reader.onload = () => {
             if (typeof reader.result === "string") {
                 const json = JSON.parse(reader.result)
+                console.log(json)
                 if (checkJSONFormat(json)) {
-                    const devices = json.deviceList
-                    if (devices && devices.length) {
-                        if (devices.reduce((acc: Map<string, any>, item: any) => acc.set(item.address, item), new Map()).size === devices.length) {
-                            const nodes = devices.map((item: any) => {
-                                if (item.type === DeviceType.Gateway && item.settings === undefined) {
-                                    return {macAddress: item.address, name: item.name, type: item.type, settings: json.settings}
-                                }
-                                return {macAddress: item.address, name: item.name, type: item.type, settings: JSON.parse(item.settings)}
-                            })
-                            const edges = json.routingTable.map((item: any) => {
-                                return [item[0], item[1]]
-                            })
-                            setNetwork({nodes, edges})
-                            const wsn = json.settings.wsn
-                            form.setFieldsValue(
-                                {
-                                    communication_period: wsn.communication_period,
-                                    communication_time_offset: wsn.communication_time_offset,
-                                    group_size: wsn.group_size,
-                                    group_interval: wsn.group_interval
-                                })
-                        } else {
-                            message.error("设备MAC地址重复").then()
-                        }
-                    }
+                    setNetwork({wsn: json.wsn, devices: json.deviceList})
                 } else {
                     message.error("文件格式错误").then()
                 }
@@ -75,20 +54,34 @@ const ImportNetworkPage = () => {
         return false
     }
 
+    useEffect(() => {
+        if (network) {
+            form.setFieldsValue(
+                {
+                    communication_period: network.wsn.communication_period,
+                    communication_time_offset: network.wsn.communication_time_offset,
+                    group_size: network.wsn.group_size,
+                    group_interval: network.wsn.group_interval
+                })
+        }
+    }, [network])
+
     const onSave = () => {
-        const nodes = network.nodes
+        const nodes = network.devices
         if (nodes && nodes.length) {
             form.validateFields().then(values => {
                 const req: NetworkRequestForm = {
-                    communication_period: values.communication_period,
-                    communication_time_offset: values.communication_time_offset,
-                    group_size: values.group_size,
-                    group_interval: values.group_interval,
-                    routing_tables: network.edges,
+                    wsn: {
+                        communication_period: values.communication_period,
+                        communication_time_offset: values.communication_time_offset,
+                        group_size: values.group_size,
+                        group_interval: values.group_interval,
+                    },
                     devices: nodes.map((n: any) => {
                         return {
                             name: n.name,
-                            mac_address: n.macAddress,
+                            mac_address: n.address,
+                            parent_address: n.parentAddress,
                             type_id: n.type,
                             settings: n.settings,
                         }
@@ -102,10 +95,9 @@ const ImportNetworkPage = () => {
     }
 
     const tree: any = (root: any) => {
-        const children: string[] = network.edges.filter((item:any) => item[1] === root.macAddress).map((item:any) => item[0]);
-        return network.nodes.filter((node:any) => children.includes(node.macAddress)).map((item:any) => {
+        return network.devices.slice(1).filter((node:any) => node.parentAddress === root.address).map((item:any) => {
             return {
-                id: item.macAddress,
+                id: item.address,
                 data: item,
                 children: tree(item)
             }
@@ -113,7 +105,7 @@ const ImportNetworkPage = () => {
     }
 
     useEffect(() => {
-        if (network?.nodes && network?.nodes.length) {
+        if (network?.devices && network?.devices.length) {
             if (!graph){
                 graph = new G6.TreeGraph({
                     container: 'container',
@@ -154,9 +146,9 @@ const ImportNetworkPage = () => {
                     }
                 });
                 graph.data({
-                    id: network.nodes[0].macAddress,
-                    data: network.nodes[0],
-                    children: tree(network.nodes[0])
+                    id: network.devices[0].macAddress,
+                    data: network.devices[0],
+                    children: tree(network.devices[0])
                 });
                 graph.render();
                 graph.fitView();
@@ -191,7 +183,7 @@ const ImportNetworkPage = () => {
                                 <Card type="inner" size={"small"} title={"预览"} style={{height: `${height}px`}} extra={renderAction()}>
                                     <div className="graph" style={{height: `${height - 56}px`, width: "100%"}}>
                                         {
-                                            network?.nodes.length ?
+                                            network?.devices.length ?
                                                 <div id={"container"} style={{width: "100%", height: "100%"}}/>:
                                                 <Dragger accept={".json"} beforeUpload={onBeforeUpload}
                                                          showUploadList={false}>
@@ -240,7 +232,7 @@ const ImportNetworkPage = () => {
                                 </Button>,
                                 <Button key="add" onClick={() => {
                                     form.resetFields()
-                                    setNetwork({nodes: [], edges: []})
+                                    setNetwork({devices: [], wsn: {}})
                                     setSuccess(false)
                                 }}>继续导入网络</Button>,
                             ]}

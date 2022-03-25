@@ -28,16 +28,18 @@ type RemoveDevices struct {
 }
 
 type ImportNetwork struct {
-	CommunicationPeriod     uint        `json:"communication_period"`
-	CommunicationTimeOffset uint        `json:"communication_time_offset"`
-	GroupSize               uint        `json:"group_size"`
-	GroupInterval           uint        `json:"group_interval"`
-	RoutingTables           [][2]string `json:"routing_tables"`
-	Devices                 []struct {
-		Name       string                            `json:"name"`
-		MacAddress string                            `json:"mac_address"`
-		TypeID     uint                              `json:"type_id"`
-		Settings   map[string]map[string]interface{} `json:"settings,omitempty"`
+	Wsn struct {
+		CommunicationPeriod     uint `json:"communication_period"`
+		CommunicationTimeOffset uint `json:"communication_time_offset"`
+		GroupSize               uint `json:"group_size"`
+		GroupInterval           uint `json:"group_interval"`
+	} `json:"wsn"`
+	Devices []struct {
+		Name          string                            `json:"name"`
+		MacAddress    string                            `json:"mac_address"`
+		ParentAddress string                            `json:"parent_address"`
+		TypeID        uint                              `json:"type_id"`
+		Settings      map[string]map[string]interface{} `json:"settings,omitempty"`
 	} `json:"devices"`
 
 	ProjectID uint `json:"-"`

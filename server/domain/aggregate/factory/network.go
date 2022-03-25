@@ -50,7 +50,6 @@ func (factory Network) NewNetworkCreateCmd(req request.CreateNetwork) (*command.
 		CommunicationTimeOffset: req.WSN.CommunicationTimeOffset,
 		GroupSize:               req.WSN.GroupSize,
 		GroupInterval:           req.WSN.GroupInterval,
-		RoutingTables:           make(entity.RoutingTables, 0),
 	}
 	cmd.Network.Gateway = entity.Device{
 		MacAddress: req.Gateway.MacAddress,
@@ -64,20 +63,14 @@ func (factory Network) NewNetworkCreateCmd(req request.CreateNetwork) (*command.
 func (factory Network) NewNetworkImportCmd(req request.ImportNetwork) (*command.NetworkImportCmd, error) {
 	ctx := context.TODO()
 	cmd := command.NewNetworkImportCmd()
+	fmt.Println(req)
 	// 构建网络实体
 	cmd.Network = entity.Network{
-		CommunicationPeriod:     req.CommunicationPeriod,
-		CommunicationTimeOffset: req.CommunicationTimeOffset,
-		GroupSize:               req.GroupSize,
-		GroupInterval:           req.GroupInterval,
-		RoutingTables:           make(entity.RoutingTables, len(req.RoutingTables)),
+		CommunicationPeriod:     req.Wsn.CommunicationPeriod,
+		CommunicationTimeOffset: req.Wsn.CommunicationTimeOffset,
+		GroupSize:               req.Wsn.GroupSize,
+		GroupInterval:           req.Wsn.GroupInterval,
 		ProjectID:               req.ProjectID,
-	}
-	for i, table := range req.RoutingTables {
-		cmd.RoutingTables[i] = entity.RoutingTable{
-			table[0],
-			table[1],
-		}
 	}
 	// 构建网络中的设备实体
 	cmd.Devices = make([]entity.Device, len(req.Devices))
@@ -88,6 +81,7 @@ func (factory Network) NewNetworkImportCmd(req request.ImportNetwork) (*command.
 		}
 		e.Name = device.Name
 		e.MacAddress = device.MacAddress
+		e.Parent = device.ParentAddress
 		e.Type = device.TypeID
 		e.ProjectID = req.ProjectID
 		e.Settings = make(entity.DeviceSettings, 0)
@@ -111,7 +105,6 @@ func (factory Network) NewNetworkImportCmd(req request.ImportNetwork) (*command.
 		}
 		cmd.Devices[i] = e
 	}
-
 	return &cmd, nil
 }
 
