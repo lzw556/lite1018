@@ -5,14 +5,11 @@ import (
 	"github.com/gogo/protobuf/proto"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/iot"
 	pd "github.com/thetasensors/theta-cloud-lite/server/adapter/iot/proto"
-	"github.com/thetasensors/theta-cloud-lite/server/adapter/iot/sensor"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/cache"
-	"github.com/thetasensors/theta-cloud-lite/server/pkg/devicetype"
 	"sync"
-	"time"
 )
 
 type LargeSensorData struct {
@@ -52,20 +49,8 @@ func (p *LargeSensorData) Process(ctx *iot.Context, msg iot.Message) error {
 			defer p.mu.Unlock()
 			if p.receiver.SessionID == m.SessionId {
 				if p.receiver.Receive(m); p.receiver.IsCompleted() {
-					e := entity.SensorData{
-						Time:       time.UnixMilli(int64(p.receiver.Timestamp)),
-						SensorType: uint(p.receiver.SensorType),
-						MacAddress: device.MacAddress,
-					}
-					var decoder sensor.RawDataDecoder
-					switch p.receiver.SensorType {
-					case devicetype.KxSensor:
-						decoder = sensor.NewKx122Decoder()
-					case devicetype.DynamicLengthAttitudeSensor:
-						decoder = sensor.NewDynamicLengthAttitudeDecoder()
-					}
-					if data, err := decoder.Decode(p.receiver.Bytes()); err == nil {
-						e.Values = data
+					if e, err := p.receiver.SensorData(); err == nil {
+						e.MacAddress = device.MacAddress
 						if err := p.repository.Create(e); err != nil {
 							return fmt.Errorf("create large sensor data failed: %v", err)
 						}

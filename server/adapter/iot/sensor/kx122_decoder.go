@@ -16,10 +16,9 @@ func NewKx122Decoder() RawDataDecoder {
 func (s Kx122Decoder) Decode(data []byte) (map[string]interface{}, error) {
 	// decode metadata
 	metadata := [3]SvtMetadata{}
-	metaDataBytes := data[16:]
 	for i := range metadata {
 		m := SvtMetadata{}
-		metaByte := metaDataBytes[i*24 : (i+1)*24]
+		metaByte := data[i*24 : (i+1)*24]
 		_ = binary.Read(bytes.NewBuffer(metaByte[:1]), binary.LittleEndian, &m.DataType)
 		_ = binary.Read(bytes.NewBuffer(metaByte[1:2]), binary.LittleEndian, &m.Axis)
 		_ = binary.Read(bytes.NewBuffer(metaByte[2:3]), binary.LittleEndian, &m.Range)
