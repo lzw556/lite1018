@@ -43,41 +43,39 @@ func (p *LargeSensorData) Process(ctx *iot.Context, msg iot.Message) error {
 		if err := proto.Unmarshal(msg.Body.Payload, &m); err != nil {
 			return fmt.Errorf("unmarshal [LargeSensorData] message failed: %v", err)
 		}
-		if m.SeqId == 0 {
-			receiver := NewLargeSensorDataReceiver(m)
-			if err := cache.SetStruct(device.MacAddress, receiver); err != nil {
-				return fmt.Errorf("set cache failed: %v", err)
-			}
-		} else {
-			p.mu.Lock()
-			defer p.mu.Unlock()
-			var receiver LargeSensorDataReceiver
-			if err := cache.GetStruct(device.MacAddress, &receiver); err != nil {
-				return fmt.Errorf("get cache failed: %v", err)
-			}
-			if receiver.Receive(m.SeqId, m.Data); receiver.IsCompleted() {
-				e := entity.SensorData{
-					Time:       time.UnixMilli(int64(receiver.Timestamp)),
-					SensorType: uint(receiver.SensorType),
-					MacAddress: device.MacAddress,
-				}
-				var decoder sensor.RawDataDecoder
-				switch receiver.SensorType {
-				case devicetype.KxSensor:
-					decoder = sensor.NewKx122Decoder()
-				}
-				if data, err := decoder.Decode(receiver.Bytes()); err == nil {
-					e.Values = data
-					if err := p.repository.Create(e); err != nil {
-						return fmt.Errorf("create large sensor data failed: %v", err)
+
+		var receiver LargeSensorDataReceiver
+		if err := cache.GetStruct(device.MacAddress, &receiver); err != nil {
+			if receiver.SessionID == m.SessionId {
+				p.mu.Lock()
+				defer p.mu.Unlock()
+				if receiver.Receive(m.SeqId, m.Data); receiver.IsCompleted() {
+					e := entity.SensorData{
+						Time:       time.UnixMilli(int64(receiver.Timestamp)),
+						SensorType: uint(receiver.SensorType),
+						MacAddress: device.MacAddress,
 					}
-				} else {
-					return fmt.Errorf("decode large sensor data failed: %v", err)
+					var decoder sensor.RawDataDecoder
+					switch receiver.SensorType {
+					case devicetype.KxSensor:
+						decoder = sensor.NewKx122Decoder()
+					case devicetype.DynamicLengthAttitudeSensor:
+						decoder = sensor.NewDynamicLengthAttitudeDecoder()
+					}
+					if data, err := decoder.Decode(receiver.Bytes()); err == nil {
+						e.Values = data
+						if err := p.repository.Create(e); err != nil {
+							return fmt.Errorf("create large sensor data failed: %v", err)
+						}
+					} else {
+						return fmt.Errorf("decode large sensor data failed: %v", err)
+					}
 				}
 			} else {
-				if err := cache.SetStruct(device.MacAddress, receiver); err != nil {
-					return fmt.Errorf("set cache failed: %v", err)
-				}
+				receiver = NewLargeSensorDataReceiver(m)
+			}
+			if err := cache.SetStruct(device.MacAddress, receiver); err != nil {
+				return fmt.Errorf("set cache failed: %v", err)
 			}
 		}
 	}

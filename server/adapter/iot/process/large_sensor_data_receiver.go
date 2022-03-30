@@ -9,41 +9,56 @@ import (
 )
 
 type LargeSensorDataReceiver struct {
-	Timestamp     uint64  `json:"timestamp"`
-	SensorType    uint32  `json:"sensor_type"`
-	MetaLength    int32   `json:"meta_length"`
-	DataLength    uint32  `json:"data_length"`
-	Packets       Packets `json:"packets"`
-	ReceiveLength int     `json:"receive_length"`
+	SessionID     int32            `json:"session_id"`
+	Timestamp     uint64           `json:"timestamp"`
+	SensorType    uint32           `json:"sensor_type"`
+	MetaLength    int32            `json:"meta_length"`
+	DataLength    uint32           `json:"data_length"`
+	Packets       map[int32]Packet `json:"packets"`
+	ReceiveLength int              `json:"receive_length"`
 }
 
 func NewLargeSensorDataReceiver(m pd.LargeSensorDataMessage) LargeSensorDataReceiver {
 	r := LargeSensorDataReceiver{
-		MetaLength: m.MetaLength,
+		SessionID:     m.SessionId,
+		ReceiveLength: len(m.Data),
 	}
-	_ = binary.Read(bytes.NewBuffer(m.Data[:8]), binary.LittleEndian, &r.Timestamp)
-	_ = binary.Read(bytes.NewBuffer(m.Data[8:12]), binary.LittleEndian, &r.SensorType)
-	_ = binary.Read(bytes.NewBuffer(m.Data[12:16]), binary.LittleEndian, &r.DataLength)
-	r.Packets = Packets{
-		{
-			SeqID: 0,
+	r.Packets = map[int32]Packet{
+		m.SeqId: {
+			SeqID: m.SeqId,
 			Data:  m.Data,
 		},
 	}
-	r.ReceiveLength = len(m.Data)
-	xlog.Debugf("start receive large sensor data => [%d]", r.Timestamp)
+	//_ = binary.Read(bytes.NewBuffer(m.Data[:8]), binary.LittleEndian, &r.Timestamp)
+	//_ = binary.Read(bytes.NewBuffer(m.Data[8:12]), binary.LittleEndian, &r.SensorType)
+	//_ = binary.Read(bytes.NewBuffer(m.Data[12:16]), binary.LittleEndian, &r.DataLength)
+	//r.Packets = Packets{
+	//	{
+	//		SeqID: 0,
+	//		Data:  m.Data,
+	//	},
+	//}
+	//r.ReceiveLength = len(m.Data)
+	//xlog.Debugf("start receive large sensor data => [%d]", r.Timestamp)
 	return r
 }
 
-func (r *LargeSensorDataReceiver) Receive(seqID int32, data []byte) {
-	r.Packets = append(r.Packets, Packet{
-		SeqID: seqID,
-		Data:  data,
-	})
-	r.ReceiveLength += len(data)
+func (r *LargeSensorDataReceiver) Receive(m pd.LargeSensorDataMessage) {
+	r.Packets[m.SeqId] = Packet{
+		SeqID: m.SeqId,
+		Data:  m.Data,
+	}
+	r.ReceiveLength += len(m.Data)
+	if m.SeqId == 0 {
+		r.MetaLength = m.MetaLength
+		r.Timestamp = uint64(m.Timestamp)
+		_ = binary.Read(bytes.NewBuffer(m.Data[:8]), binary.LittleEndian, &r.Timestamp)
+		_ = binary.Read(bytes.NewBuffer(m.Data[8:12]), binary.LittleEndian, &r.SensorType)
+		_ = binary.Read(bytes.NewBuffer(m.Data[12:16]), binary.LittleEndian, &r.DataLength)
+	}
 	xlog.Debugf(
 		"receive large sensor data => [packet len = %d, receive len = %d, data len = %d, seqId= %d]",
-		len(data), r.ReceiveLength, r.DataLength, seqID)
+		m.DataLength, r.ReceiveLength, r.DataLength, m.SeqId)
 }
 
 func (r LargeSensorDataReceiver) IsCompleted() bool {
@@ -51,10 +66,14 @@ func (r LargeSensorDataReceiver) IsCompleted() bool {
 }
 
 func (r LargeSensorDataReceiver) Bytes() []byte {
-	sort.Sort(r.Packets)
+	packets := make(Packets, 0)
+	for _, packet := range r.Packets {
+		packets = append(packets, packet)
+	}
+	sort.Sort(packets)
 	data := make([]byte, 0)
-	for i := range r.Packets {
-		data = append(data, r.Packets[i].Data...)
+	for i := range packets {
+		data = append(data, packets[i].Data...)
 	}
 	return data
 }
