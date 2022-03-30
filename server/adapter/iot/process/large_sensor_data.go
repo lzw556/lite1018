@@ -17,13 +17,14 @@ import (
 
 type LargeSensorData struct {
 	repository dependency.SensorDataRepository
-
-	mu sync.RWMutex
+	receiver   LargeSensorDataReceiver
+	mu         sync.RWMutex
 }
 
 func NewLargeSensorData() Processor {
 	return newRoot(&LargeSensorData{
 		repository: repository.SensorData{},
+		receiver:   LargeSensorDataReceiver{},
 		mu:         sync.RWMutex{},
 	})
 }
@@ -43,26 +44,27 @@ func (p *LargeSensorData) Process(ctx *iot.Context, msg iot.Message) error {
 		if err := proto.Unmarshal(msg.Body.Payload, &m); err != nil {
 			return fmt.Errorf("unmarshal [LargeSensorData] message failed: %v", err)
 		}
-
-		var receiver LargeSensorDataReceiver
-		if err := cache.GetStruct(device.MacAddress, &receiver); err != nil {
-			if receiver.SessionID == m.SessionId {
-				p.mu.Lock()
-				defer p.mu.Unlock()
-				if receiver.Receive(m.SeqId, m.Data); receiver.IsCompleted() {
+		if err := cache.GetStruct(device.MacAddress, &p.receiver); err == nil {
+			if p.receiver.SessionID == 0 {
+				p.receiver = NewLargeSensorDataReceiver(m)
+			}
+			p.mu.Lock()
+			defer p.mu.Unlock()
+			if p.receiver.SessionID == m.SessionId {
+				if p.receiver.Receive(m); p.receiver.IsCompleted() {
 					e := entity.SensorData{
-						Time:       time.UnixMilli(int64(receiver.Timestamp)),
-						SensorType: uint(receiver.SensorType),
+						Time:       time.UnixMilli(int64(p.receiver.Timestamp)),
+						SensorType: uint(p.receiver.SensorType),
 						MacAddress: device.MacAddress,
 					}
 					var decoder sensor.RawDataDecoder
-					switch receiver.SensorType {
+					switch p.receiver.SensorType {
 					case devicetype.KxSensor:
 						decoder = sensor.NewKx122Decoder()
 					case devicetype.DynamicLengthAttitudeSensor:
 						decoder = sensor.NewDynamicLengthAttitudeDecoder()
 					}
-					if data, err := decoder.Decode(receiver.Bytes()); err == nil {
+					if data, err := decoder.Decode(p.receiver.Bytes()); err == nil {
 						e.Values = data
 						if err := p.repository.Create(e); err != nil {
 							return fmt.Errorf("create large sensor data failed: %v", err)
@@ -70,12 +72,13 @@ func (p *LargeSensorData) Process(ctx *iot.Context, msg iot.Message) error {
 					} else {
 						return fmt.Errorf("decode large sensor data failed: %v", err)
 					}
+				} else {
+					if err := cache.SetStruct(device.MacAddress, p.receiver); err != nil {
+						return fmt.Errorf("set cache failed: %v", err)
+					}
 				}
 			} else {
-				receiver = NewLargeSensorDataReceiver(m)
-			}
-			if err := cache.SetStruct(device.MacAddress, receiver); err != nil {
-				return fmt.Errorf("set cache failed: %v", err)
+				p.receiver.Reset()
 			}
 		}
 	}

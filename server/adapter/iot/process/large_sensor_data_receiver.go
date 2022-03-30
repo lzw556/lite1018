@@ -1,68 +1,54 @@
 package process
 
 import (
-	"bytes"
-	"encoding/binary"
 	pd "github.com/thetasensors/theta-cloud-lite/server/adapter/iot/proto"
+	"github.com/thetasensors/theta-cloud-lite/server/adapter/iot/sensor"
+	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/xlog"
 	"sort"
 )
 
 type LargeSensorDataReceiver struct {
-	SessionID     int32            `json:"session_id"`
-	Timestamp     uint64           `json:"timestamp"`
-	SensorType    uint32           `json:"sensor_type"`
-	MetaLength    int32            `json:"meta_length"`
-	DataLength    uint32           `json:"data_length"`
-	Packets       map[int32]Packet `json:"packets"`
-	ReceiveLength int              `json:"receive_length"`
+	SessionID    int32            `json:"session_id"`
+	Timestamp    uint64           `json:"timestamp"`
+	SensorType   uint32           `json:"sensor_type"`
+	MetaLength   int32            `json:"meta_length"`
+	DataLength   uint32           `json:"data_length"`
+	Packets      map[int32]Packet `json:"packets"`
+	NumOfPackets int32            `json:"num_of_packets"`
 }
 
 func NewLargeSensorDataReceiver(m pd.LargeSensorDataMessage) LargeSensorDataReceiver {
-	r := LargeSensorDataReceiver{
-		SessionID:     m.SessionId,
-		ReceiveLength: len(m.Data),
+	return LargeSensorDataReceiver{
+		SessionID:    m.SessionId,
+		Timestamp:    uint64(m.Timestamp),
+		MetaLength:   m.MetaLength,
+		DataLength:   uint32(m.DataLength),
+		NumOfPackets: m.NumSegments,
 	}
-	r.Packets = map[int32]Packet{
-		m.SeqId: {
-			SeqID: m.SeqId,
-			Data:  m.Data,
-		},
-	}
-	//_ = binary.Read(bytes.NewBuffer(m.Data[:8]), binary.LittleEndian, &r.Timestamp)
-	//_ = binary.Read(bytes.NewBuffer(m.Data[8:12]), binary.LittleEndian, &r.SensorType)
-	//_ = binary.Read(bytes.NewBuffer(m.Data[12:16]), binary.LittleEndian, &r.DataLength)
-	//r.Packets = Packets{
-	//	{
-	//		SeqID: 0,
-	//		Data:  m.Data,
-	//	},
-	//}
-	//r.ReceiveLength = len(m.Data)
-	//xlog.Debugf("start receive large sensor data => [%d]", r.Timestamp)
-	return r
+}
+
+func (r *LargeSensorDataReceiver) Reset() {
+	r.SessionID = 0
+	r.Packets = make(map[int32]Packet)
+	r.NumOfPackets = 0
 }
 
 func (r *LargeSensorDataReceiver) Receive(m pd.LargeSensorDataMessage) {
-	r.Packets[m.SeqId] = Packet{
-		SeqID: m.SeqId,
+	r.Packets[m.SegmentId] = Packet{
+		SeqID: m.SessionId,
 		Data:  m.Data,
 	}
-	r.ReceiveLength += len(m.Data)
-	if m.SeqId == 0 {
-		r.MetaLength = m.MetaLength
-		r.Timestamp = uint64(m.Timestamp)
-		_ = binary.Read(bytes.NewBuffer(m.Data[:8]), binary.LittleEndian, &r.Timestamp)
-		_ = binary.Read(bytes.NewBuffer(m.Data[8:12]), binary.LittleEndian, &r.SensorType)
-		_ = binary.Read(bytes.NewBuffer(m.Data[12:16]), binary.LittleEndian, &r.DataLength)
-	}
-	xlog.Debugf(
-		"receive large sensor data => [packet len = %d, receive len = %d, data len = %d, seqId= %d]",
-		m.DataLength, r.ReceiveLength, r.DataLength, m.SeqId)
+	xlog.Debugf("received large sensor data => [packet size = %d, total size = %d]", len(r.Packets), m.NumSegments)
 }
 
 func (r LargeSensorDataReceiver) IsCompleted() bool {
-	return r.DataLength == uint32(r.ReceiveLength-int(r.MetaLength))
+	return int(r.NumOfPackets) == len(r.Packets)
+}
+
+func (r LargeSensorDataReceiver) SensorData(decoder sensor.RawDataDecoder) entity.SensorData {
+	e := entity.SensorData{}
+	return e
 }
 
 func (r LargeSensorDataReceiver) Bytes() []byte {

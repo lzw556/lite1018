@@ -95,7 +95,7 @@ func SyncNetworkLinkStatus(network entity.Network, devices []entity.Device, time
 		xlog.Errorf("execute device command %s failed: %v => [%s]", cmd.Name(), err, gateway.MacAddress)
 		return
 	}
-	m := pd.AllLinkStatusMessage{}
+	m := pd.LinkStatesMessage{}
 	if err := proto.Unmarshal(payload, &m); err != nil {
 		xlog.Errorf("unmarshal [AllLinkStatus] message failed:%v", err)
 		return
@@ -104,7 +104,7 @@ func SyncNetworkLinkStatus(network entity.Network, devices []entity.Device, time
 		Mac   string `json:"mac"`
 		State int    `json:"state"`
 	}
-	if err := json.Unmarshal([]byte(m.AllStatus), &result); err != nil {
+	if err := json.Unmarshal([]byte(m.States), &result); err != nil {
 		xlog.Errorf("unmarshal [AllStatus] failed:%v", err)
 		return
 	}
