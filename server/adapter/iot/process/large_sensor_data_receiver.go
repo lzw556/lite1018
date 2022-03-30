@@ -51,7 +51,7 @@ func (r LargeSensorDataReceiver) IsCompleted() bool {
 }
 
 func (r LargeSensorDataReceiver) SensorData() (entity.SensorData, error) {
-	data := r.bytes()
+	data := r.flatPackets()
 	commonMetadata := struct {
 		timestamp  uint64
 		sensorType uint32
@@ -79,7 +79,7 @@ func (r LargeSensorDataReceiver) SensorData() (entity.SensorData, error) {
 	return e, err
 }
 
-func (r LargeSensorDataReceiver) bytes() []byte {
+func (r LargeSensorDataReceiver) flatPackets() []byte {
 	packets := make(Packets, 0)
 	for _, packet := range r.Packets {
 		packets = append(packets, packet)
