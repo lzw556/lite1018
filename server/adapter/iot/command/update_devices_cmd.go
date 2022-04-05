@@ -11,14 +11,14 @@ import (
 	"time"
 )
 
-type updateDeviceListCmd struct {
+type updateDevicesCmd struct {
 	request
 	gateway  entity.Device
 	children []entity.Device
 }
 
-func newUpdateDeviceListCmd(gateway entity.Device, children []entity.Device) updateDeviceListCmd {
-	cmd := updateDeviceListCmd{
+func newUpdateDeviceListCmd(gateway entity.Device, children []entity.Device) updateDevicesCmd {
+	cmd := updateDevicesCmd{
 		gateway:  gateway,
 		children: children,
 	}
@@ -26,23 +26,23 @@ func newUpdateDeviceListCmd(gateway entity.Device, children []entity.Device) upd
 	return cmd
 }
 
-func (updateDeviceListCmd) Name() string {
-	return "updateDeviceList"
+func (updateDevicesCmd) Name() string {
+	return "updateDevices"
 }
 
-func (cmd updateDeviceListCmd) Response() string {
-	return "updateDeviceListResponse"
+func (cmd updateDevicesCmd) Response() string {
+	return "updateDevicesResponse"
 }
 
-func (updateDeviceListCmd) Qos() byte {
+func (updateDevicesCmd) Qos() byte {
 	return 1
 }
 
-func (cmd updateDeviceListCmd) Payload() []byte {
-	m := pd.UpdateDeviceListCommand{
+func (cmd updateDevicesCmd) Payload() []byte {
+	m := pd.UpdateDevicesCommand{
 		Timestamp: int32(time.Now().Unix()),
 		ReqId:     cmd.reqID,
-		Items:     make([]*pd.DeviceListItem, 0),
+		Items:     make([]*pd.DeviceItem, 0),
 	}
 	m.Items = append(m.Items, toDeviceListItem(cmd.gateway))
 	for _, child := range cmd.children {
@@ -57,8 +57,8 @@ func (cmd updateDeviceListCmd) Payload() []byte {
 	return payload
 }
 
-func toDeviceListItem(e entity.Device) *pd.DeviceListItem {
-	item := &pd.DeviceListItem{
+func toDeviceListItem(e entity.Device) *pd.DeviceItem {
+	item := &pd.DeviceItem{
 		Type: int32(e.Type),
 		Mac:  utils.StringToBytes(binary.LittleEndian, e.MacAddress),
 		Name: utils.StringToBytes(binary.BigEndian, fmt.Sprintf("%x", e.Name)),
@@ -66,6 +66,6 @@ func toDeviceListItem(e entity.Device) *pd.DeviceListItem {
 	return item
 }
 
-func (cmd updateDeviceListCmd) Execute(ctx context.Context, gateway string, target string, timeout time.Duration) ([]byte, error) {
+func (cmd updateDevicesCmd) Execute(ctx context.Context, gateway string, target string, timeout time.Duration) ([]byte, error) {
 	return cmd.request.do(ctx, gateway, target, cmd, timeout)
 }

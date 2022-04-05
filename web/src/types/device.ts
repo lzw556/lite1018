@@ -7,6 +7,7 @@ export type Device = {
     id: number
     name: string
     macAddress: string
+    parent: string
     typeId: DeviceType
     asset: { id: number, name: string }
     settings: any[]

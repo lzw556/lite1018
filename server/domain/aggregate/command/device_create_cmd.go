@@ -36,7 +36,6 @@ func (cmd DeviceCreateCmd) Run() error {
 		if err := cmd.deviceRepo.Create(txCtx, &cmd.Device); err != nil {
 			return err
 		}
-		network.AddDevices(cmd.Parent, cmd.Device)
 		return cmd.networkRepo.Save(txCtx, &network)
 	})
 	if err != nil {

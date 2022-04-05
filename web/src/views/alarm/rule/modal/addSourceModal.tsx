@@ -21,8 +21,9 @@ const AddSourceModal:FC<AddSourceModalProps> = (props) => {
 
     useEffect(() => {
         if (visible) {
+            form.resetFields();
             const ids = value.sources.map((source) => source.id);
-            GetDevicesRequest({type: value.sourceType.split("::")[1]}).then(data => {
+            GetDevicesRequest({type: value.sourceType}).then(data => {
                 setSources(data.filter((item) => !ids.includes(item.id)))
             })
         }

@@ -8,7 +8,6 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	spec "github.com/thetasensors/theta-cloud-lite/server/domain/specification"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/vo"
-	"strings"
 	"time"
 )
 
@@ -30,6 +29,15 @@ func NewAlarmRecordQuery() AlarmRecordQuery {
 	}
 }
 
+func (query AlarmRecordQuery) Get(id uint) (*vo.AlarmRecord, error) {
+	e, err := query.alarmRecordRepo.Get(context.TODO(), id)
+	if err != nil {
+		return nil, err
+	}
+	result := vo.NewAlarmRecord(e)
+	return &result, nil
+}
+
 func (query AlarmRecordQuery) Paging(page, size int, from, to time.Time) ([]vo.AlarmRecord, int64, error) {
 	ctx := context.TODO()
 	query.Specs = append(query.Specs, spec.CreatedAtRangeSpec{from, to})
@@ -43,7 +51,7 @@ func (query AlarmRecordQuery) Paging(page, size int, from, to time.Time) ([]vo.A
 	for i, e := range es {
 		result[i] = vo.NewAlarmRecord(e)
 		if _, ok := alertSources[e.SourceID]; !ok {
-			if strings.HasPrefix(e.SourceType, entity.AlarmSourceTypeDevice) {
+			if e.Category == entity.AlarmRuleCategoryDevice {
 				if device, err := query.deviceRepo.Get(ctx, e.SourceID); err == nil {
 					alertSources[e.SourceID] = vo.NewDevice(device)
 				}

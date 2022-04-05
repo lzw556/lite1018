@@ -7,25 +7,26 @@ import (
 	"text/template"
 )
 
-type AlarmRuleType uint8
+type AlarmRuleCategory uint8
 
 const (
-	AlarmRuleTypeDevice AlarmRuleType = iota + 1
-	AlarmRuleTypeAsset
+	AlarmRuleCategoryDevice AlarmRuleCategory = iota + 1
+	AlarmRuleCategoryAsset
 )
 
 type AlarmRule struct {
 	gorm.Model
-	Name        string          `gorm:"type:varchar(30)"`
-	Description string          `gorm:"type:varchar(128)"`
-	SourceType  string          `gorm:"type:varchar(32)"`
+	Name        string `gorm:"type:varchar(30)"`
+	Description string `gorm:"type:varchar(128)"`
+	SourceType  uint
 	Metric      AlarmRuleMetric `gorm:"type:json"`
 	Duration    int
 	Threshold   float64
 	Operation   string `gorm:"type:varchar(8)"`
 	Level       uint8
 	Status      uint8 `gorm:"default:1;not null"`
-	ProjectID   uint  `gorm:"index"`
+	Category    AlarmRuleCategory
+	ProjectID   uint `gorm:"index"`
 }
 
 func (AlarmRule) TableName() string {

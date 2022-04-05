@@ -13,7 +13,7 @@ type AlarmRule struct {
 	Name        string `json:"name,omitempty" binding:"omitempty,max=16,min=4"`
 	Description string `json:"description"`
 	SourceIDs   []uint `json:"source_ids"`
-	SourceType  string `json:"source_type"`
+	SourceType  uint   `json:"source_type"`
 	Duration    int    `json:"duration"`
 	Metric      struct {
 		Key  string `json:"key"`
@@ -22,6 +22,7 @@ type AlarmRule struct {
 	} `json:"metric"`
 	Operation string  `json:"operation"`
 	Threshold float64 `json:"threshold"`
+	Category  uint8   `json:"category"`
 	Level     uint8   `json:"level"`
 
 	ProjectID uint `json:"-"`

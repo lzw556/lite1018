@@ -21,13 +21,13 @@ func (r alarmRouter) findAlarmRules(ctx *gin.Context) (interface{}, error) {
 	if _, ok := ctx.GetQuery("page"); ok {
 		page := cast.ToInt(ctx.Query("page"))
 		size := cast.ToInt(ctx.Query("size"))
-		result, total, err := r.service.FindAlarmRuleByPaginate(page, size, filters)
+		result, total, err := r.service.PagingAlarmRules(page, size, filters)
 		if err != nil {
 			return nil, err
 		}
 		return response.NewPageResult(page, size, total, result), nil
 	}
-	return nil, nil
+	return r.service.FindAlarmRules(filters)
 }
 
 func (r alarmRouter) getAlarmRule(ctx *gin.Context) (interface{}, error) {
@@ -92,6 +92,11 @@ func (r alarmRouter) findAlarmRecords(ctx *gin.Context) (interface{}, error) {
 		return response.NewPageResult(page, size, total, result), nil
 	}
 	return nil, nil
+}
+
+func (r alarmRouter) getAlarmRecord(ctx *gin.Context) (interface{}, error) {
+	id := cast.ToUint(ctx.Param("id"))
+	return r.service.GetAlarmRecordByID(id)
 }
 
 func (r alarmRouter) acknowledgeAlarmRecord(ctx *gin.Context) (interface{}, error) {

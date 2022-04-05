@@ -3,58 +3,91 @@ package process
 import (
 	"bytes"
 	"encoding/binary"
+	"fmt"
 	pd "github.com/thetasensors/theta-cloud-lite/server/adapter/iot/proto"
+	"github.com/thetasensors/theta-cloud-lite/server/adapter/iot/sensor"
+	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/devicetype"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/xlog"
 	"sort"
+	"time"
 )
 
 type LargeSensorDataReceiver struct {
-	Timestamp     uint64  `json:"timestamp"`
-	SensorType    uint32  `json:"sensor_type"`
-	MetaLength    int32   `json:"meta_length"`
-	DataLength    uint32  `json:"data_length"`
-	Packets       Packets `json:"packets"`
-	ReceiveLength int     `json:"receive_length"`
+	SessionID    int32            `json:"session_id"`
+	MetaLength   int32            `json:"meta_length"`
+	DataLength   uint32           `json:"data_length"`
+	Packets      map[int32]Packet `json:"packets"`
+	NumOfPackets int32            `json:"num_of_packets"`
 }
 
 func NewLargeSensorDataReceiver(m pd.LargeSensorDataMessage) LargeSensorDataReceiver {
-	r := LargeSensorDataReceiver{
-		MetaLength: m.MetaLength,
+	return LargeSensorDataReceiver{
+		SessionID:    m.SessionId,
+		MetaLength:   m.MetaLength,
+		DataLength:   uint32(m.DataLength),
+		NumOfPackets: m.NumSegments,
 	}
-	_ = binary.Read(bytes.NewBuffer(m.Data[:8]), binary.LittleEndian, &r.Timestamp)
-	_ = binary.Read(bytes.NewBuffer(m.Data[8:12]), binary.LittleEndian, &r.SensorType)
-	_ = binary.Read(bytes.NewBuffer(m.Data[12:16]), binary.LittleEndian, &r.DataLength)
-	r.Packets = Packets{
-		{
-			SeqID: 0,
-			Data:  m.Data,
-		},
-	}
-	r.ReceiveLength = len(m.Data)
-	xlog.Debugf("start receive large sensor data => [%d]", r.Timestamp)
-	return r
 }
 
-func (r *LargeSensorDataReceiver) Receive(seqID int32, data []byte) {
-	r.Packets = append(r.Packets, Packet{
-		SeqID: seqID,
-		Data:  data,
-	})
-	r.ReceiveLength += len(data)
-	xlog.Debugf(
-		"receive large sensor data => [packet len = %d, receive len = %d, data len = %d, seqId= %d]",
-		len(data), r.ReceiveLength, r.DataLength, seqID)
+func (r *LargeSensorDataReceiver) Reset() {
+	r.SessionID = 0
+	r.Packets = make(map[int32]Packet)
+	r.NumOfPackets = 0
+	r.MetaLength = 0
+	r.DataLength = 0
+}
+
+func (r *LargeSensorDataReceiver) Receive(m pd.LargeSensorDataMessage) {
+	r.Packets[m.SegmentId] = Packet{
+		SeqID: m.SessionId,
+		Data:  m.Data,
+	}
+	xlog.Debugf("received large sensor data => [packet size = %d, total size = %d]", len(r.Packets), m.NumSegments)
 }
 
 func (r LargeSensorDataReceiver) IsCompleted() bool {
-	return r.DataLength == uint32(r.ReceiveLength-int(r.MetaLength))
+	return int(r.NumOfPackets) == len(r.Packets)
 }
 
-func (r LargeSensorDataReceiver) Bytes() []byte {
-	sort.Sort(r.Packets)
+func (r LargeSensorDataReceiver) SensorData() (entity.SensorData, error) {
+	data := r.flatPackets()
+	commonMetadata := struct {
+		timestamp  uint64
+		sensorType uint32
+		dataLength uint32
+	}{}
+	_ = binary.Read(bytes.NewBuffer(data[:8]), binary.LittleEndian, &commonMetadata.timestamp)
+	_ = binary.Read(bytes.NewBuffer(data[8:12]), binary.LittleEndian, &commonMetadata.sensorType)
+	_ = binary.Read(bytes.NewBuffer(data[12:16]), binary.LittleEndian, &commonMetadata.dataLength)
+	e := entity.SensorData{
+		Time:       time.UnixMicro(int64(commonMetadata.timestamp)),
+		SensorType: uint(commonMetadata.sensorType),
+	}
+
+	var decoder sensor.RawDataDecoder
+	switch commonMetadata.sensorType {
+	case devicetype.KxSensor:
+		decoder = sensor.NewKx122Decoder()
+	case devicetype.DynamicLengthAttitudeSensor:
+		decoder = sensor.NewDynamicLengthAttitudeDecoder()
+	default:
+		return entity.SensorData{}, fmt.Errorf("raw data decoder is nil")
+	}
+	values, err := decoder.Decode(data[16:])
+	e.Values = values
+	return e, err
+}
+
+func (r LargeSensorDataReceiver) flatPackets() []byte {
+	packets := make(Packets, 0)
+	for _, packet := range r.Packets {
+		packets = append(packets, packet)
+	}
+	sort.Sort(packets)
 	data := make([]byte, 0)
-	for i := range r.Packets {
-		data = append(data, r.Packets[i].Data...)
+	for i := range packets {
+		data = append(data, packets[i].Data...)
 	}
 	return data
 }

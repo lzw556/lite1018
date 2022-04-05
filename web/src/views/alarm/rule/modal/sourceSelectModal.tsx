@@ -16,7 +16,7 @@ import {
     Typography
 } from "antd";
 import {FC, useEffect, useState} from "react";
-import {defaultValidateMessages} from "../../../../constants/validator";
+import {defaultValidateMessages, Rules} from "../../../../constants/validator";
 import {DeviceType} from "../../../../types/device_type";
 import {GetPropertiesRequest} from "../../../../apis/property";
 import {PagingDevicesRequest} from "../../../../apis/device";
@@ -41,11 +41,14 @@ const SourceSelectModal: FC<SourceSelectModalProps> = (props) => {
     const [deviceType, setDeviceType] = useState<DeviceType>(0)
     const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([])
     const [pagination, setPagination] = useState<any>({current: 1, size: 8,})
-    const [sourceType, setSourceType] = useState<any>("device")
+    const [category, setCategory] = useState<any>("1")
     const [form] = Form.useForm();
 
     useEffect(() => {
         if (visible) {
+            form.resetFields();
+            setDataSource(undefined);
+            setSelectedRowKeys([]);
             setOptions(DeviceType.Sensors().map(item => {
                 return {value: item, label: DeviceType.toString(item), isLeaf: false}
             }))
@@ -53,8 +56,8 @@ const SourceSelectModal: FC<SourceSelectModalProps> = (props) => {
     }, [visible])
 
     const onDropdownRender = (options: any) => {
-        return <Tabs defaultActiveKey={"device"} style={{padding: "0 10px 0 10px"}} onChange={setSourceType}>
-            <TabPane tab={"设备"} key={"device"}>
+        return <Tabs defaultActiveKey={"1"} style={{padding: "0 10px 0 10px"}} onChange={setCategory}>
+            <TabPane tab={"设备"} key={"1"}>
                 {options}
             </TabPane>
         </Tabs>
@@ -112,7 +115,7 @@ const SourceSelectModal: FC<SourceSelectModalProps> = (props) => {
                     metric.name = `${property.name}(${field.name})`
                     metric.unit = property.unit
                 }
-                onSuccess({sources: selected, metric:metric, sourceType: `${sourceType}::${deviceType}`})
+                onSuccess({sources: selected, metric:metric, sourceType: deviceType, category: parseInt(category)})
             })
         }
     }
@@ -146,7 +149,7 @@ const SourceSelectModal: FC<SourceSelectModalProps> = (props) => {
 
     return <Modal {...props} title={"选择监控对象"} width={600} onOk={onOk}>
         <Form form={form} validateMessages={defaultValidateMessages} layout={"inline"}>
-            <Form.Item label={"指标名称"} name={"index"}>
+            <Form.Item label={"指标名称"} name={"index"} rules={[Rules.required]}>
                 <Cascader placeholder={"请选择指标名称"}
                           options={options}
                           loadData={onLoadData}
@@ -157,7 +160,8 @@ const SourceSelectModal: FC<SourceSelectModalProps> = (props) => {
                           }}/>
             </Form.Item>
             {
-                property && property.fields.length > 1 && <Form.Item label={"指标维度"} name={"dimension"}>
+                property && property.fields.length > 1 &&
+                <Form.Item label={"指标维度"} name={"dimension"} rules={[Rules.required]}>
                     <Select placeholder={"请选择指标维度"}>
                         {
                             property.fields.map((item: any) => {
@@ -169,7 +173,7 @@ const SourceSelectModal: FC<SourceSelectModalProps> = (props) => {
             }
         </Form>
         <br/>
-        <ConfigProvider renderEmpty={() => <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={"设备列表为空"}/>}
+        <ConfigProvider renderEmpty={() => <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={"资源列表为空"}/>}
                         locale={zhCN}>
             <Table rowKey={record => record.macAddress} rowSelection={rowSelection} scroll={{y: 256}} columns={columns}
                    dataSource={dataSource?.result} pagination={false} size={"small"}/>
@@ -187,7 +191,6 @@ const SourceSelectModal: FC<SourceSelectModalProps> = (props) => {
                                             current={pagination.current}
                                             pageSize={pagination.size}
                                             onChange={(page, pageSize) => {
-                                                console.log(selectedRowKeys);
                                                 setPagination({current: page, size: pageSize})
                                             }}/>
                             }

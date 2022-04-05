@@ -15,6 +15,7 @@ type AlarmRecord struct {
 	Threshold    float64                `json:"threshold"`
 	Status       uint                   `json:"status"`
 	Acknowledged bool                   `json:"acknowledged"`
+	Category     uint8                  `json:"category"`
 	CreatedAt    int64                  `json:"createdAt"`
 	UpdatedAt    int64                  `json:"updatedAt"`
 }
@@ -22,7 +23,6 @@ type AlarmRecord struct {
 func NewAlarmRecord(e entity.AlarmRecord) AlarmRecord {
 	return AlarmRecord{
 		ID:           e.ID,
-		SourceType:   e.SourceType,
 		Metric:       e.Metric,
 		Level:        e.Level,
 		Value:        e.Value,
@@ -30,6 +30,7 @@ func NewAlarmRecord(e entity.AlarmRecord) AlarmRecord {
 		Operation:    e.Operation,
 		Status:       uint(e.Status),
 		Acknowledged: e.Acknowledged,
+		Category:     uint8(e.Category),
 		CreatedAt:    e.CreatedAt.UTC().Unix(),
 		UpdatedAt:    e.UpdatedAt.UTC().Unix(),
 	}

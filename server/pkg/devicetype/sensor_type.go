@@ -5,6 +5,7 @@ const (
 	ThicknessSensor                     = 1073872897
 	LengthSensor                        = 1073872898
 	LengthAttitudeAccelerationSensor    = 1073872899
+	DynamicLengthAttitudeSensor         = 1073872901
 	VibrationRmsFFTXYZTemperatureSensor = 1073807492
 	VibrationRmsFFTTemperatureSensor    = 1073807490
 	CurrentSensor                       = 50397185

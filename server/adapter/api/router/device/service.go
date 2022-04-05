@@ -32,4 +32,8 @@ type Service interface {
 	FindDeviceEventsByID(id uint, from, to int64) ([]vo.DeviceEvent, error)
 	PagingDeviceEventsByID(id uint, from, to int64, page, size int) ([]vo.DeviceEvent, int64, error)
 	RemoveDeviceEventsByID(id uint, eventIDs []uint) error
+
+	AddDeviceAlarmRules(id uint, req request.DeviceAlarmRules) error
+	FindDeviceAlarmRulesByID(id uint) ([]vo.AlarmRule, error)
+	RemoveDeviceAlarmRulesByID(id uint, req request.DeviceAlarmRules) error
 }

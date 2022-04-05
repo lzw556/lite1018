@@ -36,12 +36,20 @@ func (s Alarm) CreateAlarmRule(req request.AlarmRule) error {
 	return cmd.Run()
 }
 
-func (s Alarm) FindAlarmRuleByPaginate(page, size int, filters request.Filters) ([]vo.AlarmRule, int64, error) {
+func (s Alarm) PagingAlarmRules(page, size int, filters request.Filters) ([]vo.AlarmRule, int64, error) {
 	query, err := s.factory.NewAlarmRuleQuery(filters)
 	if err != nil {
 		return nil, 0, err
 	}
 	return query.Paging(page, size)
+}
+
+func (s Alarm) FindAlarmRules(filters request.Filters) ([]vo.AlarmRule, error) {
+	query, err := s.factory.NewAlarmRuleQuery(filters)
+	if err != nil {
+		return nil, err
+	}
+	return query.List()
 }
 
 func (s Alarm) GetAlarmRuleByID(id uint) (*vo.AlarmRule, error) {
@@ -106,6 +114,14 @@ func (s Alarm) FindAlarmRecordByPaginate(page, size int, from, to int64, filters
 		return nil, 0, err
 	}
 	return query.Paging(page, size, time.Unix(from, 0), time.Unix(to, 0))
+}
+
+func (s Alarm) GetAlarmRecordByID(id uint) (*vo.AlarmRecord, error) {
+	query, err := s.factory.NewAlarmRecordQuery(nil)
+	if err != nil {
+		return nil, err
+	}
+	return query.Get(id)
 }
 
 func (s Alarm) AcknowledgeAlarmRecordByID(id uint, req request.AcknowledgeAlarmRecord) error {

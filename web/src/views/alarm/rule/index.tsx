@@ -35,11 +35,11 @@ const AlarmRule = () => {
     }
 
     const onEdit = (key: any, id: number) => {
-        switch (key) {
-            case "editCondition":
+        switch (Number(key)) {
+            case 0:
                 setEditVisible(true)
                 break
-            case "addMonitor":
+            case 1:
                 setAddVisible(true)
                 break
         }
@@ -51,13 +51,15 @@ const AlarmRule = () => {
     }
 
     const renderEditMenus = (record:any) => {
-        return <Menu onClick={e => onEdit(e.key, record.id)}>
-            <HasPermission value={Permission.AlarmRuleEdit}>
-                <Menu.Item key={"editCondition"}>更新报警条件</Menu.Item>
-            </HasPermission>
-            <HasPermission value={Permission.AlarmSourceAdd}>
-                <Menu.Item key={"addMonitor"}>添加监控对象</Menu.Item>
-            </HasPermission>
+        return <Menu onClick={(e) => {
+            onEdit(e.key, record.id)
+        }}>
+            {
+                hasPermission(Permission.AlarmRuleEdit) && <Menu.Item key={0}>更新报警条件</Menu.Item>
+            }
+            {
+                hasPermission(Permission.AlarmSourceAdd) && <Menu.Item key={1}>添加监控源</Menu.Item>
+            }
         </Menu>
     }
 
@@ -69,10 +71,10 @@ const AlarmRule = () => {
         },
         {
             title: '资源类型',
-            dataIndex: 'sourceType',
-            key: 'sourceType',
-            render: (text: string) => {
-                return text.indexOf("device") > -1 ? '设备' : '资产'
+            dataIndex: 'category',
+            key: 'category',
+            render: (category: number) => {
+                return category === 1 ? '设备' : '资产'
             }
         },
         {
@@ -164,7 +166,7 @@ const AlarmRule = () => {
 
     const onExpandedRowRender = (record: any) => {
         let columns;
-        if (record.sourceType.indexOf("device") > -1) {
+        if (record.category === 1) {
             columns = [
                 {
                     title: '设备名称',

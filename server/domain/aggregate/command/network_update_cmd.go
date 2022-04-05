@@ -2,7 +2,6 @@ package command
 
 import (
 	"context"
-	"fmt"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/request"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/response"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/iot/command"
@@ -67,14 +66,13 @@ func (cmd NetworkUpdateCmd) AddDevices(parentID uint, childrenID []uint) error {
 	if err != nil {
 		return err
 	}
-	cmd.Network.AddDevices(parent, children...)
-	fmt.Println(children)
-	err = transaction.Execute(context.TODO(), func(txCtx context.Context) error {
-		if err := cmd.networkRepo.Save(txCtx, &cmd.Network); err != nil {
-			return err
-		}
-		return cmd.deviceRepo.UpdatesBySpecs(txCtx, map[string]interface{}{"network_id": cmd.Network.ID}, spec.PrimaryKeyInSpec(childrenID))
-	})
+	for i := range children {
+		children[i].Parent = parent.MacAddress
+		children[i].NetworkID = parent.NetworkID
+	}
+	if err := cmd.deviceRepo.BatchSave(ctx, children); err != nil {
+		return err
+	}
 	if err != nil {
 		return err
 	}
@@ -102,6 +100,7 @@ func (cmd NetworkUpdateCmd) AddNewDevices(req request.AddDevices) error {
 		device = entity.Device{
 			Name:       req.Name,
 			MacAddress: req.MacAddress,
+			Parent:     parent.MacAddress,
 			NetworkID:  cmd.Network.ID,
 			Type:       req.DeviceType,
 			ProjectID:  req.ProjectID,
@@ -114,13 +113,7 @@ func (cmd NetworkUpdateCmd) AddNewDevices(req request.AddDevices) error {
 				Category: string(setting.Category),
 			}
 		}
-		return transaction.Execute(ctx, func(txCtx context.Context) error {
-			if err := cmd.deviceRepo.Create(txCtx, &device); err != nil {
-				return err
-			}
-			cmd.Network.AddDevices(parent, device)
-			return cmd.networkRepo.Save(txCtx, &cmd.Network)
-		})
+		return cmd.deviceRepo.Create(ctx, &device)
 	}
 	return response.BusinessErr(errcode.UnknownDeviceTypeError, "")
 }
@@ -131,18 +124,22 @@ func (cmd NetworkUpdateCmd) RemoveDevices(req request.RemoveDevices) error {
 	if err != nil {
 		return err
 	}
-	for i, device := range devices {
-		cmd.Network.RemoveDevice(device)
+	for i := range devices {
 		devices[i].NetworkID = 0
+		devices[i].Parent = ""
+	}
+	gateway, err := cmd.deviceRepo.Get(ctx, cmd.Network.GatewayID)
+	if err != nil {
+		return err
 	}
 	err = transaction.Execute(ctx, func(txCtx context.Context) error {
-		if err := cmd.networkRepo.Save(txCtx, &cmd.Network); err != nil {
-			return err
-		}
 		for _, device := range devices {
 			if state, err := cmd.deviceStateRepo.Get(device.MacAddress); err == nil {
 				state.IsOnline = false
 				_ = cmd.deviceStateRepo.Create(device.MacAddress, state)
+			}
+			if err := cmd.deviceRepo.UpdatesBySpecs(txCtx, map[string]interface{}{"parent": gateway.MacAddress}, spec.ParentEqSpec(device.MacAddress)); err != nil {
+				return err
 			}
 		}
 		return cmd.deviceRepo.BatchSave(txCtx, devices)
@@ -151,10 +148,6 @@ func (cmd NetworkUpdateCmd) RemoveDevices(req request.RemoveDevices) error {
 		return err
 	}
 	devices, err = cmd.deviceRepo.FindBySpecs(ctx, spec.NetworkEqSpec(cmd.Network.ID))
-	if err != nil {
-		return err
-	}
-	gateway, err := cmd.deviceRepo.Get(ctx, cmd.Network.GatewayID)
 	if err != nil {
 		return err
 	}

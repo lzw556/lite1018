@@ -167,3 +167,24 @@ func (s Device) RemoveDeviceEventsByID(id uint, eventIDs []uint) error {
 	}
 	return cmd.RemoveEvents(eventIDs)
 }
+
+func (s Device) AddDeviceAlarmRules(id uint, req request.DeviceAlarmRules) error {
+	cmd, err := s.factory.NewDeviceUpdateCmd(id)
+	if err != nil {
+		return err
+	}
+	return cmd.AddAlarmRules(req)
+}
+
+func (s Device) FindDeviceAlarmRulesByID(id uint) ([]vo.AlarmRule, error) {
+	query := s.factory.NewDeviceQuery(nil)
+	return query.FindAlarmRulesByID(id)
+}
+
+func (s Device) RemoveDeviceAlarmRulesByID(id uint, req request.DeviceAlarmRules) error {
+	cmd, err := s.factory.NewDeviceRemoveCmd(id)
+	if err != nil {
+		return err
+	}
+	return cmd.RemoveAlarmRules(req.IDs)
+}

@@ -15,7 +15,7 @@ func (HighTemperatureCorrosion) Settings() Settings {
 	return []Setting{
 		{
 			Name:     "采集周期",
-			Key:      "schedule0_sample_period",
+			Key:      "sample_period",
 			Type:     Uint32ValueType,
 			Value:    1200000, // 20 minutes
 			Category: SensorsSettingCategory,

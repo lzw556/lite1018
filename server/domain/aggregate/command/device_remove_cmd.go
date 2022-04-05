@@ -2,7 +2,6 @@ package command
 
 import (
 	"context"
-	"fmt"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/iot/command"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
@@ -48,7 +47,6 @@ func (cmd DeviceRemoveCmd) Run() error {
 		_ = cmd.deviceInformationRepo.Delete(cmd.Device.ID)
 		_ = cmd.deviceStatusRepo.Delete(cmd.Device.MacAddress)
 		if cmd.Device.NetworkID > 0 {
-			cmd.Network.RemoveDevice(cmd.Device)
 			return cmd.networkRepo.Save(txCtx, &cmd.Network)
 		}
 		return cmd.removeAlarmSource(txCtx)
@@ -67,7 +65,7 @@ func (cmd DeviceRemoveCmd) Run() error {
 }
 
 func (cmd DeviceRemoveCmd) removeAlarmSource(ctx context.Context) error {
-	alarmRules, err := cmd.alarmRuleRepo.FindBySpecs(ctx, spec.SourceTypeEqSpec(fmt.Sprintf("%s::%d", entity.AlarmSourceTypeDevice, cmd.Device.Type)))
+	alarmRules, err := cmd.alarmRuleRepo.FindBySpecs(ctx, spec.SourceTypeEqSpec(cmd.Device.Type), spec.CategoryEqSpec(uint(entity.AlarmRuleCategoryDevice)))
 	if err != nil {
 		return err
 	}
@@ -92,4 +90,8 @@ func (cmd DeviceRemoveCmd) RemoveData(sensorType uint, from, to time.Time) error
 
 func (cmd DeviceRemoveCmd) RemoveEvents(ids []uint) error {
 	return cmd.eventRepo.DeleteBySpecs(context.TODO(), spec.SourceEqSpec(cmd.Device.ID), spec.PrimaryKeyInSpec(ids))
+}
+
+func (cmd DeviceRemoveCmd) RemoveAlarmRules(ids []uint) error {
+	return cmd.alarmSourceReo.DeleteBySpecs(context.TODO(), spec.SourceEqSpec(cmd.Device.ID), spec.AlarmRuleInSpec(ids))
 }

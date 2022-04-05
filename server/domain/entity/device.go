@@ -20,6 +20,7 @@ type Device struct {
 	gorm.Model
 	Name       string `gorm:"type:varchar(64)"`
 	MacAddress string `gorm:"type:varchar(12)"`
+	Parent     string `gorm:"type:varchar(12)"`
 	Type       uint
 	NetworkID  uint
 	ProjectID  uint

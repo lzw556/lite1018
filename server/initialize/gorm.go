@@ -25,7 +25,20 @@ func InitTables(db *gorm.DB) error {
 		&entity.AlarmRecordAcknowledge{},
 		&entity.Event{},
 	}
-	db.Migrator().DropTable(&entity.Menu{}, &entity.Permission{})
+
+	//var result []map[string]interface{}
+	//db.Table("ts_alarm_rule").Unscoped().Find(&result)
+	//for _, r := range result {
+	//	fmt.Println(r["id"])
+	//	v := cast.ToString(r["source_type"])
+	//	typeID := strings.Split(v, "::")[1]
+	//	db.Table("ts_alarm_rule").Unscoped().Where("id = ?", r["id"]).UpdateColumns(map[string]interface{}{
+	//		"source_type": typeID,
+	//		"category":    1,
+	//	})
+	//}
+
+	//db.Migrator().DropTable(&entity.Menu{}, &entity.Permission{}, &entity.AlarmRule{}, &entity.AlarmSource{})
 	for _, table := range tables {
 		if !db.Migrator().HasTable(table) {
 			if err := db.Migrator().CreateTable(table); err != nil {

@@ -7,7 +7,8 @@ import (
 
 type Service interface {
 	CreateAlarmRule(req request.AlarmRule) error
-	FindAlarmRuleByPaginate(page, size int, filters request.Filters) ([]vo.AlarmRule, int64, error)
+	PagingAlarmRules(page, size int, filters request.Filters) ([]vo.AlarmRule, int64, error)
+	FindAlarmRules(filters request.Filters) ([]vo.AlarmRule, error)
 	GetAlarmRuleByID(id uint) (*vo.AlarmRule, error)
 	UpdateAlarmRuleByID(id uint, req request.AlarmRule) error
 	UpdateAlarmRuleStatusByID(id uint, status uint8) error
@@ -17,6 +18,7 @@ type Service interface {
 	RemoveSourcesFromAlarmRule(id uint, sources []uint) error
 
 	FindAlarmRecordByPaginate(page, size int, from, to int64, filters request.Filters) ([]vo.AlarmRecord, int64, error)
+	GetAlarmRecordByID(id uint) (*vo.AlarmRecord, error)
 	AcknowledgeAlarmRecordByID(id uint, req request.AcknowledgeAlarmRecord) error
 	GetAlarmRecordAcknowledgeByID(id uint) (*vo.AlarmRecordAcknowledge, error)
 

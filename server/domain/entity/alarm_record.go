@@ -14,7 +14,6 @@ type AlarmRecord struct {
 	gorm.Model
 	AlarmRuleID  uint `gorm:"not null;index"`
 	SourceID     uint
-	SourceType   string          `gorm:"not null;type:varchar(32)"`
 	Metric       AlarmRuleMetric `gorm:"type:json"`
 	Value        float64
 	Level        uint8
@@ -22,7 +21,8 @@ type AlarmRecord struct {
 	Operation    string            `gorm:"type:varchar(8)"`
 	Status       AlarmRecordStatus `gorm:"default:0;not null;"`
 	ProjectID    uint              `gorm:"index"`
-	Acknowledged bool              `gorm:"default:false;not null;"`
+	Category     AlarmRuleCategory
+	Acknowledged bool `gorm:"default:false;not null;"`
 }
 
 func (AlarmRecord) TableName() string {

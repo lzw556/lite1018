@@ -37,7 +37,7 @@ G6.registerNode('gateway', {
                 x: 8,
                 y: 30,
                 fontSize: 8,
-                text: cfg.data.macAddress.toUpperCase().macSeparator(),
+                text: cfg.id.toUpperCase().macSeparator(),
                 textBaseline: "center",
                 fill: "#fff",
             }

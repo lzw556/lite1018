@@ -12,8 +12,8 @@ const TopologyView: FC<TopologyViewProps> = ({network}) => {
     let graph: any = null;
 
     const tree: any = (root: Device) => {
-        const children: string[] = network.routingTables.filter(item => item[1] === root.macAddress).map(item => item[0]);
-        return network.nodes.filter(device => children.includes(device.macAddress)).map(device => {
+        console.log(network.nodes);
+        return network.nodes.filter(device => device.macAddress !== device.parent).filter(device => device.parent === root.macAddress).map(device => {
             return {
                 id: device.macAddress,
                 data: device,

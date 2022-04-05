@@ -11,6 +11,7 @@ import (
 	spec "github.com/thetasensors/theta-cloud-lite/server/domain/specification"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/devicetype"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/errcode"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/transaction"
 	"time"
 )
 
@@ -20,6 +21,7 @@ type DeviceUpdateCmd struct {
 	deviceRepo      dependency.DeviceRepository
 	deviceStateRepo dependency.DeviceStateRepository
 	networkRepo     dependency.NetworkRepository
+	alarmSourceRepo dependency.AlarmSourceRepository
 }
 
 func NewDeviceUpdateCmd() DeviceUpdateCmd {
@@ -27,6 +29,7 @@ func NewDeviceUpdateCmd() DeviceUpdateCmd {
 		deviceRepo:      repository.Device{},
 		deviceStateRepo: repository.DeviceState{},
 		networkRepo:     repository.Network{},
+		alarmSourceRepo: repository.AlarmSource{},
 	}
 }
 
@@ -93,4 +96,20 @@ func (cmd DeviceUpdateCmd) UpdateSettings(req request.DeviceSetting) error {
 		}
 	}
 	return nil
+}
+
+func (cmd DeviceUpdateCmd) AddAlarmRules(req request.DeviceAlarmRules) error {
+	return transaction.Execute(context.TODO(), func(txCtx context.Context) error {
+		if err := cmd.alarmSourceRepo.DeleteBySpecs(txCtx, spec.SourceEqSpec(cmd.Device.ID), spec.AlarmRuleInSpec(req.IDs)); err != nil {
+			return err
+		}
+		sources := make([]entity.AlarmSource, len(req.IDs))
+		for i, id := range req.IDs {
+			sources[i] = entity.AlarmSource{
+				SourceID:    cmd.Device.ID,
+				AlarmRuleID: id,
+			}
+		}
+		return cmd.alarmSourceRepo.Create(txCtx, sources...)
+	})
 }

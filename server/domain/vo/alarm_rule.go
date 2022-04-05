@@ -12,10 +12,11 @@ type AlarmRule struct {
 	Threshold   float64                `json:"threshold"`
 	Level       uint8                  `json:"level"`
 	Sources     interface{}            `json:"sources,omitempty"`
-	SourceType  string                 `json:"sourceType"`
+	SourceType  uint                   `json:"sourceType"`
 	Metric      entity.AlarmRuleMetric `json:"metric"`
 	Description string                 `json:"description"`
 	Enabled     bool                   `json:"enabled"`
+	Category    uint8                  `json:"category"`
 	CreatedAt   int64                  `json:"createdAt"`
 }
 
@@ -31,6 +32,7 @@ func NewAlarmRule(e entity.AlarmRule) AlarmRule {
 		Metric:      e.Metric,
 		Level:       e.Level,
 		Enabled:     e.IsEnabled(),
+		Category:    uint8(e.Category),
 		CreatedAt:   e.CreatedAt.UTC().Unix(),
 	}
 }
