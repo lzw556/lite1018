@@ -66,8 +66,8 @@ export function RemoveAlarmRuleRequest(id: number) {
     return request.delete(`/alarmRules/${id}`).then(DeleteResponse)
 }
 
-export function PagingAlarmRecordRequest(page: number, size: number, from: number, to: number, filter: any) {
-    return request.get<PageResult<any>>("/alarmRecords", {page, size, from, to, ...filter}).then(GetResponse)
+export function PagingAlarmRecordRequest(page: number, size: number, from: number, to: number, filter: any, sourceId?:number) {
+    return request.get<PageResult<any>>(`${sourceId ? `/alarmRecords?source_id=${sourceId}` : `/alarmRecords`}`, {page, size, from, to, ...filter}).then(GetResponse)
 }
 
 export function AcknowledgeAlarmRecordRequest(id: number, params: any) {

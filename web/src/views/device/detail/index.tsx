@@ -23,6 +23,7 @@ import {IsUpgrading} from '../../../types/device_upgrade_status';
 import UpgradeModal from '../upgrade';
 import DeviceEvent from './event';
 import {isMobile} from '../../../utils/deviceDetection';
+import { FilterableAlarmRecordTable } from '../../../components/alarm/filterableAlarmRecordTable';
 
 const tabTitleList = [
     {
@@ -48,12 +49,15 @@ const DeviceDetailPage = () => {
     const [tabs, setTabs] = useState<any>([]);
 
     const contents = new Map<string, any>([
-        ['settings', device && <SettingPage device={device}/>],
+        ['settings', device && <SettingPage device={device} onUpdate={(name) => {
+          if(device) setDevice({...device,name})
+        }}/>],
         ['historyData', device && <HistoryDataPage device={device}/>],
         ['waveData', device && <WaveDataChart device={device}/>],
         ['monitor', device && <RecentHistory device={device}/>],
         ['ta', device && <RuntimeChart deviceId={device.id}/>],
-        ['events', device && <DeviceEvent device={device}/>]
+        ['events', device && <DeviceEvent device={device}/>],
+        ['alarm', device && <FilterableAlarmRecordTable sourceId={device.id}/>]
     ]);
 
     const fetchDevice = useCallback(() => {
@@ -111,10 +115,11 @@ const DeviceDetailPage = () => {
         if (hasPermission(Permission.DeviceRuntimeDataGet)) {
             tabs.push({key: 'ta', tab: '状态历史'})
         }
+        const title = {key: 'alarm', tab: '报警记录'};
         switch (device.typeId) {
             case DeviceType.VibrationTemperature3Axis:
                 if (hasPermission(Permission.DeviceData)) {
-                    tabs.unshift(...tabTitleList, {key: 'waveData', tab: '波形数据'});
+                    tabs.unshift(...tabTitleList, {key: 'waveData', tab: '波形数据'}, title);
                 }
                 break;
             case DeviceType.Gateway:
@@ -122,7 +127,7 @@ const DeviceDetailPage = () => {
                 return tabs;
             default:
                 if (hasPermission(Permission.DeviceData)) {
-                    tabs.unshift(...tabTitleList);
+                    tabs.unshift(...tabTitleList, title);
                 }
                 break;
         }
