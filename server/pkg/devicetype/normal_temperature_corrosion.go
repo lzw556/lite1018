@@ -14,7 +14,7 @@ func (NormalTemperatureCorrosion) Settings() Settings {
 	return []Setting{
 		{
 			Name:     "采集周期",
-			Key:      "sample_period",
+			Key:      "schedule0_sample_period",
 			Type:     Uint32ValueType,
 			Value:    1200000, // 20 minutes
 			Category: SensorsSettingCategory,
