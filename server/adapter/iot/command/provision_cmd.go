@@ -26,7 +26,7 @@ func (cmd provisionCmd) Qos() byte {
 func (cmd provisionCmd) Payload() []byte {
 	m := pd.ProvisionCommand{
 		Timestamp:  int32(time.Now().Unix()),
-		ReqId:      cmd.reqID,
+		ReqId:      cmd.id,
 		SubCommand: 2,
 	}
 	payload, err := proto.Marshal(&m)

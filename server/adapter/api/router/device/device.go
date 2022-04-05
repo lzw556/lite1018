@@ -23,7 +23,7 @@ func (r *deviceRouter) initRoutes() {
 		router.NewPostRoute("devices", r.create),
 		router.NewPostRoute("devices/:id/commands/:cmd", r.executeCommand),
 		router.NewPostRoute("devices/:id/upgrade", r.upgrade),
-		router.NewPostRoute("devices/:id/alarmRules", r.addAlarmRules),
+		router.NewPostRoute("devices/:id/alarmRules", r.addAlarmRulesByID),
 
 		// GET
 		router.NewGetRoute("devices", r.find),

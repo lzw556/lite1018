@@ -36,7 +36,7 @@ func (cmd deleteDeviceCmd) Qos() byte {
 func (cmd deleteDeviceCmd) Payload() []byte {
 	m := pd.DeleteDeviceCommand{
 		Timestamp: int32(time.Now().Unix()),
-		ReqId:     cmd.reqID,
+		ReqId:     cmd.request.id,
 		Mac:       utils.StringToBytes(binary.BigEndian, cmd.mac),
 	}
 	payload, err := proto.Marshal(&m)

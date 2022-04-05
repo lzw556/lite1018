@@ -36,7 +36,7 @@ func (cmd upgradeFirmwareCmd) Qos() byte {
 func (cmd upgradeFirmwareCmd) Payload() []byte {
 	m := pd.UpgradeFirmwareCommand{
 		Timestamp: int32(time.Now().Unix()),
-		ReqId:     cmd.reqID,
+		ReqId:     cmd.id,
 		Crc:       cmd.firmware.Crc,
 		Major:     int32(cmd.firmware.Major),
 		Minor:     int32(cmd.firmware.Minor),

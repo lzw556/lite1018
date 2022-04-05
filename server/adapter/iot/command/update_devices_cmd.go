@@ -17,7 +17,7 @@ type updateDevicesCmd struct {
 	children []entity.Device
 }
 
-func newUpdateDeviceListCmd(gateway entity.Device, children []entity.Device) updateDevicesCmd {
+func newUpdateDevicesCmd(gateway entity.Device, children []entity.Device) updateDevicesCmd {
 	cmd := updateDevicesCmd{
 		gateway:  gateway,
 		children: children,
@@ -41,13 +41,13 @@ func (updateDevicesCmd) Qos() byte {
 func (cmd updateDevicesCmd) Payload() []byte {
 	m := pd.UpdateDevicesCommand{
 		Timestamp: int32(time.Now().Unix()),
-		ReqId:     cmd.reqID,
+		ReqId:     cmd.id,
 		Items:     make([]*pd.DeviceItem, 0),
 	}
-	m.Items = append(m.Items, toDeviceListItem(cmd.gateway))
+	m.Items = append(m.Items, toDeviceItem(cmd.gateway))
 	for _, child := range cmd.children {
 		if cmd.gateway.MacAddress != child.MacAddress {
-			m.Items = append(m.Items, toDeviceListItem(child))
+			m.Items = append(m.Items, toDeviceItem(child))
 		}
 	}
 	payload, err := proto.Marshal(&m)
@@ -57,11 +57,12 @@ func (cmd updateDevicesCmd) Payload() []byte {
 	return payload
 }
 
-func toDeviceListItem(e entity.Device) *pd.DeviceItem {
+func toDeviceItem(e entity.Device) *pd.DeviceItem {
 	item := &pd.DeviceItem{
-		Type: int32(e.Type),
-		Mac:  utils.StringToBytes(binary.LittleEndian, e.MacAddress),
-		Name: utils.StringToBytes(binary.BigEndian, fmt.Sprintf("%x", e.Name)),
+		Type:      int32(e.Type),
+		Mac:       utils.StringToBytes(binary.BigEndian, e.MacAddress),
+		ParentMac: utils.StringToBytes(binary.BigEndian, e.Parent),
+		Name:      utils.StringToBytes(binary.BigEndian, fmt.Sprintf("%x", e.Name)),
 	}
 	return item
 }

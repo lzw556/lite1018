@@ -31,7 +31,7 @@ func (cmd resetCmd) Qos() byte {
 
 func (cmd resetCmd) Payload() []byte {
 	c := pd.ResetCommand{
-		ReqId:     cmd.reqID,
+		ReqId:     cmd.id,
 		Timestamp: int32(time.Now().UTC().Unix()),
 	}
 	bytes, err := proto.Marshal(&c)

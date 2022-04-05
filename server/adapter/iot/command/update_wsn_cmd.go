@@ -12,7 +12,9 @@ import (
 
 type wsnSettings struct {
 	CommunicationPeriod uint `json:"communication_period"`
-	CommunicationOffset uint `json:"communication_offset"`
+	CommunicationOffset uint `json:"communication_time_offset"`
+	GroupSize           uint `json:"group_size"`
+	GroupInterval       uint `json:"group_interval"`
 }
 
 type updateWsnCmd struct {
@@ -28,6 +30,8 @@ func newUpdateWsnSettingsCmd(network entity.Network, isUpdateWsnOnly bool) updat
 		settings: wsnSettings{
 			CommunicationOffset: network.CommunicationTimeOffset,
 			CommunicationPeriod: network.CommunicationPeriod,
+			GroupInterval:       network.GroupInterval,
+			GroupSize:           network.GroupSize,
 		},
 	}
 	cmd.request = newRequest()
@@ -35,7 +39,7 @@ func newUpdateWsnSettingsCmd(network entity.Network, isUpdateWsnOnly bool) updat
 }
 
 func (cmd updateWsnCmd) ID() string {
-	return cmd.reqID
+	return cmd.id
 }
 
 func (cmd updateWsnCmd) Name() string {
@@ -57,7 +61,7 @@ func (cmd updateWsnCmd) Payload() []byte {
 		return nil
 	}
 	m := pd.UpdateWsnCommand{
-		ReqId:          cmd.reqID,
+		ReqId:          cmd.id,
 		Timestamp:      int32(timestamp),
 		LastUpdateTime: int32(timestamp),
 		Settings:       fmt.Sprintf(`{"wsn": %s}`, string(settings)),

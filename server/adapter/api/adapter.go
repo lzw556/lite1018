@@ -1,8 +1,8 @@
 package api
 
 import (
+	"context"
 	"embed"
-	"github.com/fvbock/endless"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/gzip"
 	"github.com/gin-contrib/static"
@@ -13,17 +13,23 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/vo"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/xlog"
+	"golang.org/x/sync/errgroup"
+	"net/http"
 )
 
 type Adapter struct {
 	engine      *gin.Engine
 	routers     []router.Router
 	middlewares []middleware.Middleware
+	server      *http.Server
 }
 
 func NewAdapter() *Adapter {
 	a := Adapter{
 		engine: gin.New(),
+		server: &http.Server{
+			Addr: ":8290",
+		},
 	}
 	return &a
 }
@@ -62,12 +68,19 @@ func (a *Adapter) Run() error {
 			group.Handle(route.Method(), route.Path(), a.errorWrapper(route.Handler()))
 		}
 	}
-	s := endless.NewServer(":8290", a.engine)
-	return s.ListenAndServe()
+	a.server.Handler = a.engine
+	var eg errgroup.Group
+	eg.Go(func() error {
+		return a.server.ListenAndServe()
+	})
+	return eg.Wait()
 }
 
 func (a *Adapter) Close() {
 	xlog.Info("shutdown api server")
+	if err := a.server.Shutdown(context.Background()); err != nil {
+		xlog.Error("shutdown api server error", err)
+	}
 }
 
 func (a *Adapter) errorWrapper(handler middleware.ErrorWrapperHandler) gin.HandlerFunc {

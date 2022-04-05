@@ -41,7 +41,7 @@ func (cmd loadFirmwareCmd) Qos() byte {
 func (cmd loadFirmwareCmd) Payload() []byte {
 	m := pd.LoadFirmwareCommand{
 		Timestamp:  int32(time.Now().Unix()),
-		ReqId:      cmd.reqID,
+		ReqId:      cmd.id,
 		TaskId:     strconv.Itoa(int(cmd.firmwareID)),
 		SeqId:      int32(cmd.seqID),
 		Data:       cmd.data,

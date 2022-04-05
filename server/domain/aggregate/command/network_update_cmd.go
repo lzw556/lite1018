@@ -81,7 +81,7 @@ func (cmd NetworkUpdateCmd) AddDevices(parentID uint, childrenID []uint) error {
 		return err
 	}
 	for _, child := range children {
-		go command.AddDevice(gateway, child, parent)
+		go command.AddDevice(gateway, child)
 	}
 	return nil
 }
@@ -144,10 +144,6 @@ func (cmd NetworkUpdateCmd) RemoveDevices(req request.RemoveDevices) error {
 		}
 		return cmd.deviceRepo.BatchSave(txCtx, devices)
 	})
-	if err != nil {
-		return err
-	}
-	devices, err = cmd.deviceRepo.FindBySpecs(ctx, spec.NetworkEqSpec(cmd.Network.ID))
 	if err != nil {
 		return err
 	}

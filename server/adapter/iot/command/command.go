@@ -68,6 +68,9 @@ func SyncNetwork(network entity.Network, devices []entity.Device, timeout time.D
 		if err != nil {
 			return err
 		}
+		if err := ClearDevices(gateway); err != nil {
+			return err
+		}
 		if err := SyncDeviceList(gateway, devices, timeout); err != nil {
 			return err
 		}
@@ -89,7 +92,7 @@ func SyncNetworkLinkStatus(network entity.Network, devices []entity.Device, time
 		}
 	}
 	xlog.Infof("starting sync devices link status => [%s]", gateway.MacAddress)
-	cmd := newGetAllLinkStatusCmd()
+	cmd := newGetLinkStatesCmd()
 	payload, err := cmd.Execute(context.TODO(), gateway.MacAddress, gateway.MacAddress, timeout)
 	if err != nil {
 		xlog.Errorf("execute device command %s failed: %v => [%s]", cmd.Name(), err, gateway.MacAddress)
@@ -147,7 +150,7 @@ func SyncWsnSettings(network entity.Network, gateway entity.Device, isSyncWsnOnl
 
 func SyncDeviceList(gateway entity.Device, devices []entity.Device, timeout time.Duration) error {
 	xlog.Infof("starting sync device list => [%s]", gateway.MacAddress)
-	cmd := newUpdateDeviceListCmd(gateway, devices)
+	cmd := newUpdateDevicesCmd(gateway, devices)
 	if _, err := cmd.Execute(context.TODO(), gateway.MacAddress, gateway.MacAddress, timeout); err != nil {
 		xlog.Errorf("execute device command %s failed: %v => [%s]", cmd.Name(), err, gateway.MacAddress)
 		return err
@@ -156,15 +159,25 @@ func SyncDeviceList(gateway entity.Device, devices []entity.Device, timeout time
 	return nil
 }
 
-func AddDevice(gateway entity.Device, device entity.Device, parent entity.Device) {
+func AddDevice(gateway entity.Device, device entity.Device) {
 	timeout := 3 * time.Second
-	cmd := newAddDeviceCmd(device.Name, device.MacAddress, parent.MacAddress, device.Type)
+	cmd := newAddDeviceCmd(device)
 	if _, err := cmd.Execute(context.TODO(), gateway.MacAddress, gateway.MacAddress, timeout); err != nil {
 		xlog.Errorf("execute device command %s failed: %v => [%s]", cmd.Name(), err, gateway.MacAddress)
 		return
 	}
 	SyncDeviceSettings(gateway, device)
 	return
+}
+
+func ClearDevices(gateway entity.Device) error {
+	timeout := 3 * time.Second
+	cmd := newClearDevicesCmd()
+	if _, err := cmd.Execute(context.TODO(), gateway.MacAddress, gateway.MacAddress, timeout); err != nil {
+		xlog.Errorf("execute device command %s failed: %v => [%s]", cmd.Name(), err, gateway.MacAddress)
+		return err
+	}
+	return nil
 }
 
 func DeleteDevice(gateway entity.Device, device entity.Device) {

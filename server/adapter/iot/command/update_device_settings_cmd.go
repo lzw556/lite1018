@@ -58,7 +58,7 @@ func (cmd updateDeviceSettingsCmd) Qos() byte {
 func (cmd updateDeviceSettingsCmd) Payload() []byte {
 	timestamp := time.Now().UTC().Unix()
 	m := pd.UpdateDeviceSettingsCommand{
-		ReqId:          cmd.reqID,
+		ReqId:          cmd.id,
 		Timestamp:      int32(timestamp),
 		LastUpdateTime: int32(timestamp),
 	}

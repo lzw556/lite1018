@@ -32,7 +32,7 @@ func (cmd cancelFirmwareCmd) Qos() byte {
 func (cmd cancelFirmwareCmd) Payload() []byte {
 	m := pd.CancelFirmwareCommand{
 		Timestamp: int32(time.Now().Unix()),
-		ReqId:     cmd.reqID,
+		ReqId:     cmd.id,
 	}
 	payload, err := proto.Marshal(&m)
 	if err != nil {

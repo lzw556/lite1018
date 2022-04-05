@@ -31,7 +31,7 @@ func (cmd calibrateCmd) Qos() byte {
 func (cmd calibrateCmd) Payload() []byte {
 	m := pd.CalibrateCommand{
 		Timestamp: int32(time.Now().UTC().Unix()),
-		ReqId:     cmd.reqID,
+		ReqId:     cmd.id,
 		Type:      1073872896,
 		Param1:    cmd.param,
 	}

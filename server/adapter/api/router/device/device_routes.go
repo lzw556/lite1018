@@ -186,7 +186,7 @@ func (r deviceRouter) findAlarmRulesByID(ctx *gin.Context) (interface{}, error) 
 	return r.service.FindDeviceAlarmRulesByID(id)
 }
 
-func (r deviceRouter) addAlarmRules(ctx *gin.Context) (interface{}, error) {
+func (r deviceRouter) addAlarmRulesByID(ctx *gin.Context) (interface{}, error) {
 	id := cast.ToUint(ctx.Param("id"))
 	var req request.DeviceAlarmRules
 	if err := ctx.ShouldBindJSON(&req); err != nil {

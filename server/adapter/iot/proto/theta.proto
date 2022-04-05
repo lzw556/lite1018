@@ -271,7 +271,7 @@ message DeleteDeviceCommand {
   bytes mac = 4;
 }
 
-message ClearDevicesCommands {
+message ClearDevicesCommand {
   int32 timestamp = 1;
   string reqId = 2;
   int32 subCommand = 3;

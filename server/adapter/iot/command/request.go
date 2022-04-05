@@ -27,12 +27,12 @@ type Response struct {
 }
 
 type request struct {
-	reqID string
+	id string
 }
 
 func newRequest() request {
 	return request{
-		reqID: uuid.NewV1().String(),
+		id: uuid.NewV1().String(),
 	}
 }
 

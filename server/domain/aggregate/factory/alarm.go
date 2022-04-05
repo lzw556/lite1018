@@ -20,6 +20,7 @@ import (
 type Alarm struct {
 	alarmRecordRepo   dependency.AlarmRecordRepository
 	alarmRuleRepo     dependency.AlarmRuleRepository
+	alarmSourceRepo   dependency.AlarmSourceRepository
 	alarmTemplateRepo dependency.AlarmTemplateRepository
 }
 
@@ -27,6 +28,7 @@ func NewAlarm() Alarm {
 	return Alarm{
 		alarmRecordRepo:   repository.AlarmRecord{},
 		alarmRuleRepo:     repository.AlarmRule{},
+		alarmSourceRepo:   repository.AlarmSource{},
 		alarmTemplateRepo: repository.AlarmTemplate{},
 	}
 }
@@ -83,6 +85,15 @@ func (factory Alarm) NewAlarmRuleQuery(filters request.Filters) (*query.AlarmRul
 		switch name {
 		case "project_id":
 			q.Specs = append(q.Specs, spec.ProjectEqSpec(cast.ToUint(v)))
+		case "source_id":
+			sources, err := factory.alarmSourceRepo.FindBySpecs(context.TODO(), spec.SourceEqSpec(cast.ToUint(v)))
+			if err != nil {
+				return nil, err
+			}
+			rulesSpec := make(spec.AlarmRuleInSpec, 0)
+			for _, source := range sources {
+				rulesSpec = append(rulesSpec, source.AlarmRuleID)
+			}
 		case "source_type":
 			q.Specs = append(q.Specs, spec.SourceTypeEqSpec(cast.ToUint(v)))
 		case "category":

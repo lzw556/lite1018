@@ -36,15 +36,17 @@ func (factory Device) NewDeviceCreateCmd(req request.CreateDevice) (*command.Dev
 	if !errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, response.BusinessErr(errcode.DeviceMacExistsError, req.MacAddress)
 	}
+
 	e.Name = req.Name
 	e.MacAddress = req.MacAddress
 	e.Type = req.TypeID
 	e.ProjectID = req.ProjectID
 	e.NetworkID = req.NetworkID
 	parent, err := factory.deviceRepo.Get(ctx, req.ParentID)
-	if err != nil {
+	if err != nil || parent.NetworkID != req.NetworkID {
 		return nil, response.BusinessErr(errcode.DeviceNotFoundError, "")
 	}
+	e.Parent = parent.MacAddress
 	if t := devicetype.Get(req.TypeID); t != nil {
 		e.Settings = make(entity.DeviceSettings, len(t.Settings()))
 		for i, setting := range t.Settings() {
@@ -68,7 +70,6 @@ func (factory Device) NewDeviceCreateCmd(req request.CreateDevice) (*command.Dev
 		}
 		cmd := command.NewDeviceCreateCmd()
 		cmd.Device = e
-		cmd.Parent = parent
 		return &cmd, nil
 	}
 	return nil, response.BusinessErr(errcode.UnknownDeviceTypeError, "")
