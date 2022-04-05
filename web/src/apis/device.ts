@@ -2,6 +2,7 @@ import request from "../utils/request";
 import {PageResult} from "../types/page";
 import {Device} from "../types/device";
 import {DeleteResponse, GetResponse, PostResponse, PutResponse} from "../utils/response";
+import { AlarmRule } from "../types/alarm_rule_template";
 
 export function CheckMacAddressRequest(mac: string) {
     return request.get(`/check/devices/${mac}`).then(GetResponse)
@@ -89,4 +90,16 @@ export function PagingDeviceEventsRequest(id: number, from: number, to: number, 
 
 export function BatchDeleteDeviceEventsRequest(id: number, ids: number[]) {
     return request.delete(`/devices/${id}/events`, {ids}).then(DeleteResponse)
+}
+
+export function PagingAlarmRuleDeviceRequest(id: number, page: number, size: number) {
+  return request.get<PageResult<AlarmRule[]>>(`/devices/${id}/alarmRules`, { page, size }).then(GetResponse)
+}
+
+export function AddAlarmRuleToDeviceRequest(id: number, ids: number[]) {
+  return request.post<PageResult<AlarmRule[]>>(`/devices/${id}/alarmRules`, { ids }).then(GetResponse)
+}
+
+export function RemoveAlarmRuleFromDeviceRequest(id: number, ids: number[]) {
+  return request.delete<PageResult<AlarmRule[]>>(`/devices/${id}/alarmRules`, { ids }).then(GetResponse)
 }
