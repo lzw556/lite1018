@@ -37,7 +37,7 @@ func InitTables(db *gorm.DB) error {
 	//		"category":    1,
 	//	})
 	//}
-
+	//
 	//db.Migrator().DropTable(&entity.Menu{}, &entity.Permission{}, &entity.AlarmRule{}, &entity.AlarmSource{})
 	for _, table := range tables {
 		if !db.Migrator().HasTable(table) {

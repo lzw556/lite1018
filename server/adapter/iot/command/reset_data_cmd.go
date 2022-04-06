@@ -21,24 +21,20 @@ func (cmd resetDataCmd) Name() string {
 	return "resetData"
 }
 
+func (cmd resetDataCmd) Response() string {
+	return "resetDataResponse"
+}
+
 func (cmd resetDataCmd) Qos() byte {
 	return 1
 }
 
-func (cmd resetDataCmd) Payload() []byte {
+func (cmd resetDataCmd) Payload() ([]byte, error) {
 	m := pd.ResetDataCommand{
-		Timestamp: int32(time.Now().Unix()),
-		ReqId:     cmd.id,
+		Timestamp: int32(cmd.request.timestamp),
+		ReqId:     cmd.request.id,
 	}
-	payload, err := proto.Marshal(&m)
-	if err != nil {
-		return nil
-	}
-	return payload
-}
-
-func (cmd resetDataCmd) Response() string {
-	return "resetDataResponse"
+	return proto.Marshal(&m)
 }
 
 func (cmd resetDataCmd) Execute(ctx context.Context, gateway string, target string, timeout time.Duration) ([]byte, error) {

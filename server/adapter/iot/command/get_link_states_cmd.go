@@ -12,7 +12,9 @@ type getLinkStatesCmd struct {
 }
 
 func newGetLinkStatesCmd() getLinkStatesCmd {
-	return getLinkStatesCmd{}
+	return getLinkStatesCmd{
+		request: newRequest(),
+	}
 }
 
 func (cmd getLinkStatesCmd) Name() string {
@@ -27,16 +29,12 @@ func (cmd getLinkStatesCmd) Qos() byte {
 	return 1
 }
 
-func (cmd getLinkStatesCmd) Payload() []byte {
+func (cmd getLinkStatesCmd) Payload() ([]byte, error) {
 	m := pd.GetLinkStatesCommand{
 		Timestamp: int32(time.Now().Unix()),
-		ReqId:     cmd.id,
+		ReqId:     cmd.request.id,
 	}
-	payload, err := proto.Marshal(&m)
-	if err != nil {
-		return nil
-	}
-	return payload
+	return proto.Marshal(&m)
 }
 
 func (cmd getLinkStatesCmd) Execute(ctx context.Context, gateway string, target string, timeout time.Duration) ([]byte, error) {

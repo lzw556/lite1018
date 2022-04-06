@@ -91,7 +91,7 @@ func (cmd DeviceUpdateCmd) UpdateSettings(req request.DeviceSetting) error {
 	if network, err := cmd.networkRepo.Get(ctx, cmd.Device.NetworkID); err == nil {
 		if gateway, err := cmd.deviceRepo.Get(ctx, network.GatewayID); err == nil {
 			if state, err := cmd.deviceStateRepo.Get(gateway.MacAddress); err == nil && state.IsOnline {
-				command.SyncDeviceSettings(gateway, cmd.Device)
+				command.PushDeviceSettings(gateway, cmd.Device)
 			}
 		}
 	}

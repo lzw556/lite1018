@@ -44,14 +44,24 @@ func Execute(gateway, device entity.Device, t Type) error {
 	return response.BusinessErr(errcode.DeviceOfflineError, "")
 }
 
-func SyncDeviceSettings(gateway, device entity.Device) {
-	xlog.Infof("starting sync device settings => [%s]", device.MacAddress)
+func PushDeviceSettings(gateway, device entity.Device) {
+	xlog.Infof("starting push device settings => [%s]", device.MacAddress)
 	cmd := newUpdateDeviceSettingsCmd(device.Settings)
 	if _, err := cmd.Execute(context.TODO(), gateway.MacAddress, device.MacAddress, 3*time.Second); err != nil {
 		xlog.Errorf("execute device command %s failed: %v => [%s]", cmd.Name(), err, gateway.MacAddress)
 		return
 	}
-	xlog.Infof("sync device settings successful=> [%s]", device.MacAddress)
+	xlog.Infof("push device settings successful=> [%s]", device.MacAddress)
+}
+
+func PullDeviceSettings(gateway, device entity.Device) {
+	xlog.Infof("starting pull device settings => [%s]", device.MacAddress)
+	cmd := newGetDeviceSettingsCmd()
+	if _, err := cmd.Execute(context.TODO(), gateway.MacAddress, device.MacAddress, 3*time.Second); err != nil {
+		xlog.Errorf("execute device command %s failed: %v => [%s]", cmd.Name(), err, gateway.MacAddress)
+		return
+	}
+	xlog.Infof("pull device settings successful=> [%s]", device.MacAddress)
 }
 
 func SyncNetwork(network entity.Network, devices []entity.Device, timeout time.Duration) error {
@@ -64,7 +74,7 @@ func SyncNetwork(network entity.Network, devices []entity.Device, timeout time.D
 	}
 	gateway.State, _ = deviceStateRepo.Get(gateway.MacAddress)
 	if gateway.State.IsOnline {
-		err := SyncWsnSettings(network, gateway, false, timeout)
+		err := SyncWsnSettings(network, gateway, timeout)
 		if err != nil {
 			return err
 		}
@@ -76,7 +86,7 @@ func SyncNetwork(network entity.Network, devices []entity.Device, timeout time.D
 		}
 		for i := range devices {
 			device := devices[i]
-			go SyncDeviceSettings(gateway, device)
+			go PushDeviceSettings(gateway, device)
 		}
 		return nil
 	}
@@ -137,9 +147,9 @@ func SyncNetworkLinkStatus(network entity.Network, devices []entity.Device, time
 	xlog.Infof("sync devices link status successful=> [%s]", gateway.MacAddress)
 }
 
-func SyncWsnSettings(network entity.Network, gateway entity.Device, isSyncWsnOnly bool, timeout time.Duration) error {
+func SyncWsnSettings(network entity.Network, gateway entity.Device, timeout time.Duration) error {
 	xlog.Infof("starting sync wsn settings => [%s]", gateway.MacAddress)
-	cmd := newUpdateWsnSettingsCmd(network, isSyncWsnOnly)
+	cmd := newUpdateWsnSettingsCmd(network)
 	if _, err := cmd.Execute(context.TODO(), gateway.MacAddress, gateway.MacAddress, timeout); err != nil {
 		xlog.Errorf("execute device command %s failed: %v => [%s]", cmd.Name(), err, gateway.MacAddress)
 		return err
@@ -166,7 +176,7 @@ func AddDevice(gateway entity.Device, device entity.Device) {
 		xlog.Errorf("execute device command %s failed: %v => [%s]", cmd.Name(), err, gateway.MacAddress)
 		return
 	}
-	SyncDeviceSettings(gateway, device)
+	PushDeviceSettings(gateway, device)
 	return
 }
 

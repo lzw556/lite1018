@@ -24,26 +24,22 @@ func (cmd calibrateCmd) Name() string {
 	return "calibrate"
 }
 
+func (cmd calibrateCmd) Response() string {
+	return "calibrateResponse"
+}
+
 func (cmd calibrateCmd) Qos() byte {
 	return 1
 }
 
-func (cmd calibrateCmd) Payload() []byte {
+func (cmd calibrateCmd) Payload() ([]byte, error) {
 	m := pd.CalibrateCommand{
-		Timestamp: int32(time.Now().UTC().Unix()),
+		Timestamp: int32(cmd.request.timestamp),
 		ReqId:     cmd.id,
 		Type:      1073872896,
 		Param1:    cmd.param,
 	}
-	payload, err := proto.Marshal(&m)
-	if err != nil {
-		return nil
-	}
-	return payload
-}
-
-func (cmd calibrateCmd) Response() string {
-	return "calibrateResponse"
+	return proto.Marshal(&m)
 }
 
 func (cmd calibrateCmd) Execute(ctx context.Context, gateway string, target string, timeout time.Duration) ([]byte, error) {

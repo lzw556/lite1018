@@ -35,20 +35,16 @@ func (cmd addDeviceCmd) Qos() byte {
 	return 1
 }
 
-func (cmd addDeviceCmd) Payload() []byte {
+func (cmd addDeviceCmd) Payload() ([]byte, error) {
 	m := pd.AddDeviceCommand{
-		Timestamp: int32(time.Now().Unix()),
+		Timestamp: int32(cmd.request.timestamp),
 		ReqId:     cmd.id,
 		Type:      int32(cmd.device.Type),
 		Name:      utils.StringToBytes(binary.BigEndian, fmt.Sprintf("%x", cmd.device.Name)),
 		Mac:       utils.StringToBytes(binary.BigEndian, cmd.device.MacAddress),
 		ParentMac: utils.StringToBytes(binary.BigEndian, cmd.device.Parent),
 	}
-	payload, err := proto.Marshal(&m)
-	if err != nil {
-		return nil
-	}
-	return payload
+	return proto.Marshal(&m)
 }
 
 func (cmd addDeviceCmd) Execute(ctx context.Context, gateway string, target string, timeout time.Duration) ([]byte, error) {

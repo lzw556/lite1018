@@ -18,12 +18,11 @@ type updateDevicesCmd struct {
 }
 
 func newUpdateDevicesCmd(gateway entity.Device, children []entity.Device) updateDevicesCmd {
-	cmd := updateDevicesCmd{
+	return updateDevicesCmd{
+		request:  newRequest(),
 		gateway:  gateway,
 		children: children,
 	}
-	cmd.request = newRequest()
-	return cmd
 }
 
 func (updateDevicesCmd) Name() string {
@@ -38,10 +37,10 @@ func (updateDevicesCmd) Qos() byte {
 	return 1
 }
 
-func (cmd updateDevicesCmd) Payload() []byte {
+func (cmd updateDevicesCmd) Payload() ([]byte, error) {
 	m := pd.UpdateDevicesCommand{
-		Timestamp: int32(time.Now().Unix()),
-		ReqId:     cmd.id,
+		Timestamp: int32(cmd.request.timestamp),
+		ReqId:     cmd.request.id,
 		Items:     make([]*pd.DeviceItem, 0),
 	}
 	m.Items = append(m.Items, toDeviceItem(cmd.gateway))
@@ -50,11 +49,7 @@ func (cmd updateDevicesCmd) Payload() []byte {
 			m.Items = append(m.Items, toDeviceItem(child))
 		}
 	}
-	payload, err := proto.Marshal(&m)
-	if err != nil {
-		return nil
-	}
-	return payload
+	return proto.Marshal(&m)
 }
 
 func toDeviceItem(e entity.Device) *pd.DeviceItem {

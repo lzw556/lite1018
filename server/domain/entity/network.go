@@ -8,6 +8,13 @@ import (
 	"gorm.io/gorm"
 )
 
+type NetworkMode uint8
+
+const (
+	NetworkModePushing NetworkMode = iota + 1
+	NetworkModePulling
+)
+
 type Network struct {
 	gorm.Model
 	Name                    string `gorm:"type:varchar(64)"`
@@ -17,8 +24,8 @@ type Network struct {
 	CommunicationTimeOffset uint `gorm:"default:0;not null;"`
 	GroupSize               uint `gorm:"default:4;not null;"`
 	GroupInterval           uint
-
-	Gateway Device `gorm:"-"`
+	Mode                    NetworkMode `gorm:"default:1;not null;"`
+	Gateway                 Device      `gorm:"-"`
 }
 
 func (Network) TableName() string {

@@ -55,23 +55,18 @@ func (cmd updateDeviceSettingsCmd) Qos() byte {
 	return 1
 }
 
-func (cmd updateDeviceSettingsCmd) Payload() []byte {
-	timestamp := time.Now().UTC().Unix()
+func (cmd updateDeviceSettingsCmd) Payload() ([]byte, error) {
 	m := pd.UpdateDeviceSettingsCommand{
-		ReqId:          cmd.id,
-		Timestamp:      int32(timestamp),
-		LastUpdateTime: int32(timestamp),
+		ReqId:          cmd.request.id,
+		Timestamp:      int32(cmd.request.timestamp),
+		LastUpdateTime: int32(cmd.request.timestamp),
 	}
 	bytes, err := json.Marshal(cmd.settings)
 	if err != nil {
-		return nil
+		return nil, err
 	}
 	m.Settings = string(bytes)
-	payload, err := proto.Marshal(&m)
-	if err != nil {
-		return nil
-	}
-	return payload
+	return proto.Marshal(&m)
 }
 
 func (cmd updateDeviceSettingsCmd) Execute(ctx context.Context, gateway string, target string, timeout time.Duration) ([]byte, error) {

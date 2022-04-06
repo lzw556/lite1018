@@ -24,9 +24,9 @@ type updateWsnCmd struct {
 	isUpdateWsnOnly bool
 }
 
-func newUpdateWsnSettingsCmd(network entity.Network, isUpdateWsnOnly bool) updateWsnCmd {
-	cmd := updateWsnCmd{
-		isUpdateWsnOnly: isUpdateWsnOnly,
+func newUpdateWsnSettingsCmd(network entity.Network) updateWsnCmd {
+	return updateWsnCmd{
+		request: newRequest(),
 		settings: wsnSettings{
 			CommunicationOffset: network.CommunicationTimeOffset,
 			CommunicationPeriod: network.CommunicationPeriod,
@@ -34,8 +34,6 @@ func newUpdateWsnSettingsCmd(network entity.Network, isUpdateWsnOnly bool) updat
 			GroupSize:           network.GroupSize,
 		},
 	}
-	cmd.request = newRequest()
-	return cmd
 }
 
 func (cmd updateWsnCmd) ID() string {
@@ -54,28 +52,18 @@ func (cmd updateWsnCmd) Qos() byte {
 	return 1
 }
 
-func (cmd updateWsnCmd) Payload() []byte {
-	timestamp := time.Now().Unix()
+func (cmd updateWsnCmd) Payload() ([]byte, error) {
 	settings, err := json.Marshal(cmd.settings)
 	if err != nil {
-		return nil
+		return nil, err
 	}
 	m := pd.UpdateWsnCommand{
-		ReqId:          cmd.id,
-		Timestamp:      int32(timestamp),
-		LastUpdateTime: int32(timestamp),
+		ReqId:          cmd.request.id,
+		Timestamp:      int32(cmd.request.timestamp),
+		LastUpdateTime: int32(cmd.request.timestamp),
 		Settings:       fmt.Sprintf(`{"wsn": %s}`, string(settings)),
 	}
-	if cmd.isUpdateWsnOnly {
-		m.SubCommand = 1
-	} else {
-		m.SubCommand = 0
-	}
-	payload, err := proto.Marshal(&m)
-	if err != nil {
-		return nil
-	}
-	return payload
+	return proto.Marshal(&m)
 }
 
 func (cmd updateWsnCmd) Execute(ctx context.Context, gateway string, target string, timeout time.Duration) ([]byte, error) {

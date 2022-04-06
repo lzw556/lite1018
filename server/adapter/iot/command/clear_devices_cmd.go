@@ -29,16 +29,12 @@ func (cmd clearDevicesCmd) Qos() byte {
 	return 1
 }
 
-func (cmd clearDevicesCmd) Payload() []byte {
+func (cmd clearDevicesCmd) Payload() ([]byte, error) {
 	m := pd.ClearDevicesCommand{
 		Timestamp: int32(time.Now().UTC().Unix()),
 		ReqId:     cmd.request.id,
 	}
-	payload, err := proto.Marshal(&m)
-	if err != nil {
-		return nil
-	}
-	return payload
+	return proto.Marshal(&m)
 }
 
 func (cmd clearDevicesCmd) Execute(ctx context.Context, gateway string, target string, timeout time.Duration) ([]byte, error) {

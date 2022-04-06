@@ -12,9 +12,9 @@ type rebootCmd struct {
 }
 
 func newRebootCmd() rebootCmd {
-	cmd := rebootCmd{}
-	cmd.request = newRequest()
-	return cmd
+	return rebootCmd{
+		request: newRequest(),
+	}
 }
 
 func (cmd rebootCmd) Name() string {
@@ -29,16 +29,12 @@ func (cmd rebootCmd) Qos() byte {
 	return 1
 }
 
-func (cmd rebootCmd) Payload() []byte {
-	c := pd.RebootCommand{
-		ReqId:     cmd.id,
-		Timestamp: int32(time.Now().UTC().Unix()),
+func (cmd rebootCmd) Payload() ([]byte, error) {
+	m := pd.RebootCommand{
+		ReqId:     cmd.request.id,
+		Timestamp: int32(cmd.request.timestamp),
 	}
-	bytes, err := proto.Marshal(&c)
-	if err != nil {
-		return nil
-	}
-	return bytes
+	return proto.Marshal(&m)
 }
 
 func (cmd rebootCmd) Execute(ctx context.Context, gateway string, target string, timeout time.Duration) ([]byte, error) {
