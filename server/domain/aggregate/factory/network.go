@@ -47,7 +47,7 @@ func (factory Network) NewNetworkCreateCmd(req request.CreateNetwork) (*command.
 		Name:                    req.Name,
 		ProjectID:               req.ProjectID,
 		CommunicationPeriod:     req.WSN.CommunicationPeriod,
-		CommunicationTimeOffset: req.WSN.CommunicationTimeOffset,
+		CommunicationTimeOffset: req.WSN.CommunicationOffset,
 		GroupSize:               req.WSN.GroupSize,
 		GroupInterval:           req.WSN.GroupInterval,
 	}
@@ -67,7 +67,7 @@ func (factory Network) NewNetworkImportCmd(req request.ImportNetwork) (*command.
 	// 构建网络实体
 	cmd.Network = entity.Network{
 		CommunicationPeriod:     req.Wsn.CommunicationPeriod,
-		CommunicationTimeOffset: req.Wsn.CommunicationTimeOffset,
+		CommunicationTimeOffset: req.Wsn.CommunicationOffset,
 		GroupSize:               req.Wsn.GroupSize,
 		GroupInterval:           req.Wsn.GroupInterval,
 		ProjectID:               req.ProjectID,

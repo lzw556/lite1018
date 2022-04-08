@@ -8,13 +8,14 @@ import (
 	pd "github.com/thetasensors/theta-cloud-lite/server/adapter/iot/proto"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/utils"
+	"sort"
 	"time"
 )
 
 type updateDevicesCmd struct {
 	request
 	gateway  entity.Device
-	children []entity.Device
+	children entity.Devices
 }
 
 func newUpdateDevicesCmd(gateway entity.Device, children []entity.Device) updateDevicesCmd {
@@ -44,6 +45,7 @@ func (cmd updateDevicesCmd) Payload() ([]byte, error) {
 		Items:     make([]*pd.DeviceItem, 0),
 	}
 	m.Items = append(m.Items, toDeviceItem(cmd.gateway))
+	sort.Sort(cmd.children)
 	for _, child := range cmd.children {
 		if cmd.gateway.MacAddress != child.MacAddress {
 			m.Items = append(m.Items, toDeviceItem(child))

@@ -14,13 +14,13 @@ func (NormalTemperatureCorrosion) Settings() Settings {
 	return []Setting{
 		{
 			Name:     "采集周期",
-			Key:      "schedule0_sample_period",
+			Key:      "sample_period",
 			Type:     Uint32ValueType,
 			Value:    1200000, // 20 minutes
-			Category: SensorsSettingCategory,
 			Options:  samplePeriodOption1,
-			Sort:     0,
+			Category: SensorsSettingCategory,
 			Group:    SettingGroupGeneral,
+			Sort:     0,
 		},
 		{
 			Name:     "波速",
@@ -28,8 +28,28 @@ func (NormalTemperatureCorrosion) Settings() Settings {
 			Type:     FloatValueType,
 			Value:    6000,
 			Category: SensorsSettingCategory,
-			Sort:     1,
 			Group:    SettingGroupCorrosion,
+			Sort:     1,
+		},
+		{
+			Name:     "腐蚀率短周期",
+			Key:      "rate_period",
+			Type:     Uint16ValueType,
+			Value:    30,
+			Unit:     "天",
+			Category: SensorsSettingCategory,
+			Group:    SettingGroupCorrosion,
+			Sort:     2,
+		},
+		{
+			Name:     "腐蚀率长周期",
+			Key:      "rate_period_2",
+			Type:     Uint16ValueType,
+			Value:    365,
+			Unit:     "天",
+			Category: SensorsSettingCategory,
+			Group:    SettingGroupCorrosion,
+			Sort:     3,
 		},
 	}
 }

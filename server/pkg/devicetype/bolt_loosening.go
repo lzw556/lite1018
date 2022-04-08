@@ -13,14 +13,14 @@ func (BoltLoosening) SensorID() uint {
 func (BoltLoosening) Settings() Settings {
 	return []Setting{
 		{
-			Name:     "采集周期",
-			Key:      "schedule0_sample_period",
+			Name:     "采样周期",
+			Key:      "sample_period",
 			Type:     Uint32ValueType,
 			Value:    1200000, // 20 minutes
-			Category: SensorsSettingCategory,
 			Options:  samplePeriodOption1,
-			Sort:     0,
+			Category: SensorsSettingCategory,
 			Group:    SettingGroupGeneral,
+			Sort:     0,
 		},
 	}
 }
@@ -68,6 +68,20 @@ func (BoltLoosening) Properties(sensorID uint) Properties {
 						Name:      "移动指数",
 						Key:       "motion",
 						DataIndex: 5,
+					},
+				},
+			},
+			{
+				Key:       "temperature",
+				Name:      "温度",
+				Unit:      "°C",
+				Precision: 3,
+				Sort:      3,
+				Fields: []Field{
+					{
+						Name:      "温度",
+						Key:       "temperature",
+						DataIndex: 10,
 					},
 				},
 			},

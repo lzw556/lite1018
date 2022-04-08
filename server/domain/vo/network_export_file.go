@@ -4,7 +4,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/json"
-	"sort"
 )
 
 type ExportDevice struct {
@@ -41,10 +40,10 @@ func NewNetworkExportFile(e entity.Network) NetworkExportFile {
 	n := NetworkExportFile{
 		Name: e.Name,
 		Wsn: map[string]interface{}{
-			"communication_period":      e.CommunicationPeriod,
-			"communication_time_offset": e.CommunicationTimeOffset,
-			"group_interval":            e.GroupInterval,
-			"group_size":                e.GroupSize,
+			"communication_period": e.CommunicationPeriod,
+			"communication_offset": e.CommunicationTimeOffset,
+			"group_interval":       e.GroupInterval,
+			"group_size":           e.GroupSize,
 		},
 	}
 	return n
@@ -73,7 +72,6 @@ func (n *NetworkExportFile) AddDevices(es []entity.Device) {
 		}
 		n.DeviceList[i].Settings = settings
 	}
-	sort.Sort(n.DeviceList)
 }
 
 func (n NetworkExportFile) FileName() string {

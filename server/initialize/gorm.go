@@ -26,6 +26,22 @@ func InitTables(db *gorm.DB) error {
 		&entity.Event{},
 	}
 
+	//var devices []entity.Device
+	//if db.Find(&devices).Error == nil {
+	//	for _, device := range devices {
+	//		if t := devicetype.Get(device.Type); t != nil {
+	//			device.Settings = make([]entity.DeviceSetting, len(t.Settings()))
+	//			for i, setting := range t.Settings() {
+	//				device.Settings[i] = entity.DeviceSetting{
+	//					Key:      setting.Key,
+	//					Value:    setting.Value,
+	//					Category: string(setting.Category),
+	//				}
+	//			}
+	//			db.Save(&device)
+	//		}
+	//	}
+	//}
 	//var result []map[string]interface{}
 	//db.Table("ts_alarm_rule").Unscoped().Find(&result)
 	//for _, r := range result {

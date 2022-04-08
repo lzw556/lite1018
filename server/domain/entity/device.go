@@ -140,3 +140,15 @@ func (d Device) IsSQ() bool {
 }
 
 type Devices []Device
+
+func (ds Devices) Len() int {
+	return len(ds)
+}
+
+func (ds Devices) Less(i, j int) bool {
+	return ds[i].ID < ds[j].ID
+}
+
+func (ds Devices) Swap(i, j int) {
+	ds[i], ds[j] = ds[j], ds[i]
+}

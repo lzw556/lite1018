@@ -103,7 +103,7 @@ const NetworkDetail = () => {
                     通讯延时
                   </Col>
                   <Col span={24}>{`${moment
-                    .duration(network.communicationTimeOffset / 1000, 'seconds')
+                    .duration(network.communicationOffset / 1000, 'seconds')
                     .seconds()}秒`}</Col>
                 </Row>
               </Col>
@@ -153,7 +153,7 @@ const NetworkDetail = () => {
                 <Col span={6}>
                   <Space>
                     {`${moment
-                      .duration(network.communicationTimeOffset / 1000, 'seconds')
+                      .duration(network.communicationOffset / 1000, 'seconds')
                       .seconds()}秒`}
                   </Space>
                 </Col>

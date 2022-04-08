@@ -8,6 +8,7 @@ const (
 	BoltLooseningType              = 131073
 	BoltElongationType             = 196609
 	VibrationTemperature3AxisType  = 327938
+	VibrationTemperature3Axis2Type = 327940
 	VibrationTemperature1AxisType  = 327682
 	CurrentType                    = 458753
 	TemperatureType                = 393217
@@ -60,7 +61,6 @@ var samplePeriodOption1 = map[int]string{
 }
 
 var smaplePeriodOffsetOption1 = map[int]string{
-	0:                                    "无",
 	int(10 * time.Second.Milliseconds()): "10秒",
 	int(20 * time.Second.Milliseconds()): "20秒",
 	int(30 * time.Second.Milliseconds()): "30秒",

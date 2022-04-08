@@ -1,16 +1,16 @@
 package devicetype
 
-type VibrationTemperature3Axis struct{}
+type VibrationTemperature3Axis2 struct{}
 
-func (VibrationTemperature3Axis) ID() uint {
-	return VibrationTemperature3AxisType
+func (VibrationTemperature3Axis2) ID() uint {
+	return VibrationTemperature3Axis2Type
 }
 
-func (VibrationTemperature3Axis) SensorID() uint {
+func (v VibrationTemperature3Axis2) SensorID() uint {
 	return VibrationRmsFFTXYZTemperatureSensor
 }
 
-func (VibrationTemperature3Axis) Settings() Settings {
+func (v VibrationTemperature3Axis2) Settings() Settings {
 	return []Setting{
 		{
 			Name:     "采样周期",
@@ -50,7 +50,7 @@ func (VibrationTemperature3Axis) Settings() Settings {
 			Sort:     2,
 		},
 		{
-			Name:  "采样频率",
+			Name:  "采样频率(X、Z轴)",
 			Key:   "acc3_odr",
 			Type:  Uint8ValueType,
 			Value: 15,
@@ -65,7 +65,7 @@ func (VibrationTemperature3Axis) Settings() Settings {
 			Sort:     3,
 		},
 		{
-			Name:  "采样点数",
+			Name:  "采样点数(X、Z轴)",
 			Key:   "acc3_samples",
 			Type:  Uint32ValueType,
 			Value: 1024,
@@ -81,6 +81,36 @@ func (VibrationTemperature3Axis) Settings() Settings {
 			Sort:     4,
 		},
 		{
+			Name:  "采样频率(Y轴)",
+			Key:   "acc1_odr",
+			Type:  Uint8ValueType,
+			Value: 5,
+			Options: map[int]string{
+				0: "4kHz",
+				1: "8kHz",
+				2: "16kHz",
+				3: "25.6kHz",
+				4: "32kHz",
+				5: "64kHz",
+			},
+			Category: SensorsSettingCategory,
+			Group:    SettingGroupGeneral,
+			Sort:     5,
+		},
+		{
+			Name:  "采样点数(Y轴)",
+			Key:   "acc1_samples",
+			Type:  Uint32ValueType,
+			Value: 2048,
+			Options: map[int]string{
+				2048: "2048",
+				4096: "4096",
+			},
+			Category: SensorsSettingCategory,
+			Group:    SettingGroupGeneral,
+			Sort:     6,
+		},
+		{
 			Name:     "FFT运算基础频率",
 			Key:      "base_frequency",
 			Type:     FloatValueType,
@@ -88,7 +118,7 @@ func (VibrationTemperature3Axis) Settings() Settings {
 			Unit:     "Hz",
 			Category: SensorsSettingCategory,
 			Group:    SettingGroupGeneral,
-			Sort:     5,
+			Sort:     7,
 		},
 		{
 			Name:  "是否启用原始数据采样",
@@ -101,7 +131,7 @@ func (VibrationTemperature3Axis) Settings() Settings {
 			},
 			Category: SensorsSettingCategory,
 			Group:    SettingGroupAcceleration,
-			Sort:     6,
+			Sort:     8,
 		},
 		{
 			Name:     "原始数据采样周期",
@@ -114,7 +144,7 @@ func (VibrationTemperature3Axis) Settings() Settings {
 			Show:     32,
 			Category: SensorsSettingCategory,
 			Group:    SettingGroupAcceleration,
-			Sort:     7,
+			Sort:     9,
 		},
 		{
 			Name:     "原始数据采样延时",
@@ -126,10 +156,10 @@ func (VibrationTemperature3Axis) Settings() Settings {
 			Show:     32,
 			Category: SensorsSettingCategory,
 			Group:    SettingGroupAcceleration,
-			Sort:     8,
+			Sort:     10,
 		},
 		{
-			Name:  "原始数据采样量程",
+			Name:  "原始数据采样量程(X、Z轴)",
 			Key:   "acc3_range_2",
 			Type:  Uint8ValueType,
 			Value: 2,
@@ -142,10 +172,10 @@ func (VibrationTemperature3Axis) Settings() Settings {
 			Show:     32,
 			Category: SensorsSettingCategory,
 			Group:    SettingGroupAcceleration,
-			Sort:     9,
+			Sort:     11,
 		},
 		{
-			Name:  "原始数据采样频率",
+			Name:  "原始数据采样频率(X、Z轴)",
 			Key:   "acc3_odr_2",
 			Type:  Uint8ValueType,
 			Value: 12,
@@ -159,10 +189,10 @@ func (VibrationTemperature3Axis) Settings() Settings {
 			Show:     32,
 			Category: SensorsSettingCategory,
 			Group:    SettingGroupAcceleration,
-			Sort:     10,
+			Sort:     12,
 		},
 		{
-			Name:  "原始数据采样时间",
+			Name:  "原始数据采样时间(X、Z轴)",
 			Key:   "acc3_samples_2",
 			Type:  Uint32ValueType,
 			Value: 10000,
@@ -181,12 +211,53 @@ func (VibrationTemperature3Axis) Settings() Settings {
 			Show:     32,
 			Category: SensorsSettingCategory,
 			Group:    SettingGroupAcceleration,
-			Sort:     11,
+			Sort:     13,
+		},
+		{
+			Name:  "原始数据采样频率(Y轴)",
+			Key:   "acc1_odr_2",
+			Type:  Uint8ValueType,
+			Value: 5,
+			Options: map[int]string{
+				0: "4kHz",
+				1: "8kHz",
+				2: "16kHz",
+				3: "25.6kHz",
+				4: "32kHz",
+				5: "64kHz",
+			},
+			Parent:   "sensor_flags_2",
+			Show:     32,
+			Category: SensorsSettingCategory,
+			Group:    SettingGroupAcceleration,
+			Sort:     14,
+		},
+		{
+			Name:  "原始数据采样时间(Y轴)",
+			Key:   "acc1_samples_2",
+			Type:  Uint32ValueType,
+			Value: 10000,
+			Options: map[int]string{
+				100:    "0.1秒",
+				500:    "0.5秒",
+				1000:   "1秒",
+				5000:   "5秒",
+				10000:  "10秒",
+				20000:  "20秒",
+				30000:  "30秒",
+				60000:  "60秒",
+				120000: "2分钟",
+			},
+			Parent:   "sensor_flags_2",
+			Show:     32,
+			Category: SensorsSettingCategory,
+			Group:    SettingGroupAcceleration,
+			Sort:     15,
 		},
 	}
 }
 
-func (VibrationTemperature3Axis) Properties(sensorID uint) Properties {
+func (v VibrationTemperature3Axis2) Properties(sensorID uint) Properties {
 	switch sensorID {
 	case VibrationRmsFFTXYZTemperatureSensor:
 		return Properties{

@@ -2,11 +2,14 @@ package command
 
 import (
 	"context"
+	"github.com/thetasensors/theta-cloud-lite/server/adapter/iot/command"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/devicetype"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/transaction"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/xlog"
+	"time"
 )
 
 type NetworkImportCmd struct {
@@ -43,5 +46,13 @@ func (cmd NetworkImportCmd) Run() error {
 		}
 		return nil
 	})
+	if err == nil && cmd.Network.Mode == entity.NetworkModePushing {
+		go func() {
+			if err := command.SyncNetwork(cmd.Network, cmd.Devices, 3*time.Second); err != nil {
+				xlog.Errorf("sync network failed: %v", err)
+				return
+			}
+		}()
+	}
 	return err
 }

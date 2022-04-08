@@ -131,8 +131,8 @@ const NetworkPage = () => {
         },
         {
             title: '通讯延时',
-            dataIndex: 'communicationTimeOffset',
-            key: 'communicationTimeOffset',
+            dataIndex: 'communicationOffset',
+            key: 'communicationOffset',
             render: (text: number, record: Network) => {
                 if (text === 0) {
                     return '无'
@@ -156,6 +156,14 @@ const NetworkPage = () => {
                 return moment.duration(text / 1000, 'seconds').humanize()
             }
         },
+        // {
+        //     title: '模式',
+        //     dataIndex: 'mode',
+        //     key: 'mode',
+        //     render: (mode: number) => {
+        //         return mode === 1 ? '云端模式' : '本地模式'
+        //     }
+        // },
         {
             title: '操作',
             key: 'action',

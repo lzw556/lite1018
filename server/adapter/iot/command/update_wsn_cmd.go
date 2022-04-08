@@ -12,16 +12,15 @@ import (
 
 type wsnSettings struct {
 	CommunicationPeriod uint `json:"communication_period"`
-	CommunicationOffset uint `json:"communication_time_offset"`
+	CommunicationOffset uint `json:"communication_offset"`
 	GroupSize           uint `json:"group_size"`
 	GroupInterval       uint `json:"group_interval"`
 }
 
 type updateWsnCmd struct {
 	request
-	settings        wsnSettings
-	routingTable    entity.RoutingTables
-	isUpdateWsnOnly bool
+	settings     wsnSettings
+	routingTable entity.RoutingTables
 }
 
 func newUpdateWsnSettingsCmd(network entity.Network) updateWsnCmd {

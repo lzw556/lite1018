@@ -1,14 +1,15 @@
 package request
 
 type WSN struct {
-	CommunicationPeriod     uint `json:"communication_period"`
-	CommunicationTimeOffset uint `json:"communication_time_offset"`
-	GroupSize               uint `json:"group_size"`
-	GroupInterval           uint `json:"group_interval"`
+	CommunicationPeriod uint `json:"communication_period"`
+	CommunicationOffset uint `json:"communication_offset"`
+	GroupSize           uint `json:"group_size"`
+	GroupInterval       uint `json:"group_interval"`
 }
 
 type Network struct {
 	Name      string `json:"name" binding:"required,min=4,max=16"`
+	Mode      uint8  `json:"mode"`
 	WSN       WSN    `json:"wsn"`
 	ProjectID uint   `json:"-"`
 }
@@ -28,12 +29,7 @@ type RemoveDevices struct {
 }
 
 type ImportNetwork struct {
-	Wsn struct {
-		CommunicationPeriod     uint `json:"communication_period"`
-		CommunicationTimeOffset uint `json:"communication_time_offset"`
-		GroupSize               uint `json:"group_size"`
-		GroupInterval           uint `json:"group_interval"`
-	} `json:"wsn"`
+	Wsn     WSN `json:"wsn"`
 	Devices []struct {
 		Name          string                            `json:"name"`
 		MacAddress    string                            `json:"mac_address"`

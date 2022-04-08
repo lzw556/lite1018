@@ -2,7 +2,6 @@ package query
 
 import (
 	"context"
-	"fmt"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
@@ -41,7 +40,6 @@ func (query AlarmRecordQuery) Get(id uint) (*vo.AlarmRecord, error) {
 func (query AlarmRecordQuery) Paging(page, size int, from, to time.Time) ([]vo.AlarmRecord, int64, error) {
 	ctx := context.TODO()
 	query.Specs = append(query.Specs, spec.CreatedAtRangeSpec{from, to})
-	fmt.Println(query.Specs)
 	es, total, err := query.alarmRecordRepo.PagingBySpecs(ctx, page, size, query.Specs...)
 	if err != nil {
 		return nil, 0, err

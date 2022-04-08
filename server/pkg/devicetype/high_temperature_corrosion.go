@@ -14,14 +14,14 @@ func (HighTemperatureCorrosion) SensorID() uint {
 func (HighTemperatureCorrosion) Settings() Settings {
 	return []Setting{
 		{
-			Name:     "采集周期",
-			Key:      "schedule0_sample_period",
+			Name:     "采样周期",
+			Key:      "sample_period",
 			Type:     Uint32ValueType,
 			Value:    1200000, // 20 minutes
-			Category: SensorsSettingCategory,
 			Options:  samplePeriodOption1,
-			Sort:     0,
 			Group:    SettingGroupGeneral,
+			Category: SensorsSettingCategory,
+			Sort:     0,
 		},
 		{
 			Name:     "波速",
@@ -29,16 +29,14 @@ func (HighTemperatureCorrosion) Settings() Settings {
 			Type:     FloatValueType,
 			Value:    5920,
 			Category: SensorsSettingCategory,
-			Sort:     1,
 			Group:    SettingGroupCorrosion,
+			Sort:     1,
 		},
 		{
-			Name:     "导波杆长",
-			Key:      "length_rod",
-			Type:     FloatValueType,
-			Value:    400,
-			Category: SensorsSettingCategory,
-			Sort:     2,
+			Name:  "导波杆长",
+			Key:   "length_rod",
+			Type:  FloatValueType,
+			Value: 400,
 			Options: map[int]string{
 				124: "124mm",
 				125: "125mm",
@@ -46,7 +44,29 @@ func (HighTemperatureCorrosion) Settings() Settings {
 				300: "300mm",
 				400: "400mm",
 			},
-			Group: SettingGroupCorrosion,
+			Category: SensorsSettingCategory,
+			Group:    SettingGroupCorrosion,
+			Sort:     2,
+		},
+		{
+			Name:     "腐蚀率短周期",
+			Key:      "rate_period",
+			Type:     Uint16ValueType,
+			Value:    30,
+			Unit:     "天",
+			Category: SensorsSettingCategory,
+			Group:    SettingGroupCorrosion,
+			Sort:     2,
+		},
+		{
+			Name:     "腐蚀率长周期",
+			Key:      "rate_period_2",
+			Type:     Uint16ValueType,
+			Value:    365,
+			Unit:     "天",
+			Category: SensorsSettingCategory,
+			Group:    SettingGroupCorrosion,
+			Sort:     3,
 		},
 	}
 }

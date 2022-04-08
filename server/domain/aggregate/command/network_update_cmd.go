@@ -34,11 +34,12 @@ func NewNetworkUpdateCmd() NetworkUpdateCmd {
 
 func (cmd NetworkUpdateCmd) Update(req request.Network) (*vo.Network, error) {
 	cmd.Network.CommunicationPeriod = req.WSN.CommunicationPeriod
-	cmd.Network.CommunicationTimeOffset = req.WSN.CommunicationTimeOffset
+	cmd.Network.CommunicationTimeOffset = req.WSN.CommunicationOffset
 	cmd.Network.GroupInterval = req.WSN.GroupInterval
 	cmd.Network.GroupSize = req.WSN.GroupSize
 	cmd.Network.Name = req.Name
 	cmd.Network.ProjectID = req.ProjectID
+	cmd.Network.Mode = entity.NetworkMode(req.Mode)
 	err := transaction.Execute(context.TODO(), func(txCtx context.Context) error {
 		if err := cmd.networkRepo.Save(txCtx, &cmd.Network); err != nil {
 			return err
@@ -113,7 +114,13 @@ func (cmd NetworkUpdateCmd) AddNewDevices(req request.AddDevices) error {
 				Category: string(setting.Category),
 			}
 		}
-		return cmd.deviceRepo.Create(ctx, &device)
+		if err := cmd.deviceRepo.Save(ctx, &device); err != nil {
+			return err
+		}
+		if gateway, err := cmd.deviceRepo.Get(ctx, cmd.Network.GatewayID); err == nil {
+			go command.AddDevice(gateway, device)
+		}
+		return nil
 	}
 	return response.BusinessErr(errcode.UnknownDeviceTypeError, "")
 }

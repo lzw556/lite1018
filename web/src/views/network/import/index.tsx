@@ -11,15 +11,13 @@ import GroupIntervalSelect from "../../../components/groupIntervalSelect";
 import MyBreadcrumb from "../../../components/myBreadcrumb";
 import G6 from "@antv/g6";
 import "../../../components/shape/shape"
-import {DeviceType} from "../../../types/device_type";
-import network from "../index";
 
 const {Dragger} = Upload
 
 export interface NetworkRequestForm {
     wsn: {
         communication_period: number
-        communication_time_offset: number
+        communication_offset: number
         group_size: number
         group_interval: number
     }
@@ -43,7 +41,6 @@ const ImportNetworkPage = () => {
         reader.onload = () => {
             if (typeof reader.result === "string") {
                 const json = JSON.parse(reader.result)
-                console.log(json)
                 if (checkJSONFormat(json)) {
                     setNetwork({wsn: json.wsn, devices: json.deviceList})
                 } else {
@@ -59,7 +56,7 @@ const ImportNetworkPage = () => {
             form.setFieldsValue(
                 {
                     communication_period: network.wsn.communication_period,
-                    communication_time_offset: network.wsn.communication_time_offset,
+                    communication_offset: network.wsn.communication_offset,
                     group_size: network.wsn.group_size,
                     group_interval: network.wsn.group_interval
                 })
@@ -73,7 +70,7 @@ const ImportNetworkPage = () => {
                 const req: NetworkRequestForm = {
                     wsn: {
                         communication_period: values.communication_period,
-                        communication_time_offset: values.communication_time_offset,
+                        communication_offset: values.communication_offset,
                         group_size: values.group_size,
                         group_interval: values.group_interval,
                     },
@@ -205,7 +202,7 @@ const ImportNetworkPage = () => {
                                                rules={[{required: true, message: "请选择网络通讯周期"}]}>
                                         <CommunicationPeriodSelect placeholder={"请选择网络通讯周期"}/>
                                     </Form.Item>
-                                    <Form.Item label="通讯延时" name="communication_time_offset"
+                                    <Form.Item label="通讯延时" name="communication_offset"
                                                rules={[{required: true}]}>
                                         <CommunicationTimeOffsetSelect placeholder={"请选择网络通讯延时"}/>
                                     </Form.Item>

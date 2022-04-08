@@ -5,25 +5,27 @@ import (
 )
 
 type Network struct {
-	ID                      uint                 `json:"id"`
-	Name                    string               `json:"name"`
-	Gateway                 Device               `json:"gateway,omitempty"`
-	Nodes                   []Device             `json:"nodes"`
-	RoutingTables           entity.RoutingTables `json:"routingTables"`
-	CommunicationPeriod     uint                 `json:"communicationPeriod"`
-	CommunicationTimeOffset uint                 `json:"communicationTimeOffset"`
-	GroupSize               uint                 `json:"groupSize"`
-	GroupInterval           uint                 `json:"groupInterval"`
+	ID                  uint                 `json:"id"`
+	Name                string               `json:"name"`
+	Gateway             Device               `json:"gateway,omitempty"`
+	Nodes               []Device             `json:"nodes"`
+	RoutingTables       entity.RoutingTables `json:"routingTables"`
+	CommunicationPeriod uint                 `json:"communicationPeriod"`
+	CommunicationOffset uint                 `json:"communicationOffset"`
+	GroupSize           uint                 `json:"groupSize"`
+	GroupInterval       uint                 `json:"groupInterval"`
+	Mode                uint8                `json:"mode"`
 }
 
 func NewNetwork(e entity.Network) Network {
 	return Network{
-		ID:                      e.ID,
-		Name:                    e.Name,
-		CommunicationPeriod:     e.CommunicationPeriod,
-		CommunicationTimeOffset: e.CommunicationTimeOffset,
-		GroupSize:               e.GroupSize,
-		GroupInterval:           e.GroupInterval,
+		ID:                  e.ID,
+		Name:                e.Name,
+		CommunicationPeriod: e.CommunicationPeriod,
+		CommunicationOffset: e.CommunicationTimeOffset,
+		GroupSize:           e.GroupSize,
+		GroupInterval:       e.GroupInterval,
+		Mode:                uint8(e.Mode),
 	}
 }
 
