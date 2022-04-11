@@ -20,7 +20,6 @@ func InitTables(db *gorm.DB) error {
 		&entity.Firmware{},
 		&entity.AlarmRule{},
 		&entity.AlarmSource{},
-		&entity.AlarmTemplate{},
 		&entity.AlarmRecord{},
 		&entity.AlarmRecordAcknowledge{},
 		&entity.Event{},

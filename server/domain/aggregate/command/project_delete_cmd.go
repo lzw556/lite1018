@@ -61,40 +61,38 @@ func (cmd ProjectDeleteCmd) Run() error {
 }
 
 func (cmd ProjectDeleteCmd) removeAlarms(ctx context.Context) error {
-	var eg errgroup.Group
 
-	eg.Go(func() error {
-		alarmRules, err := cmd.alarmRuleRepo.FindBySpecs(ctx, spec.ProjectEqSpec(cmd.Project.ID))
-		if err != nil {
-			return err
-		}
-		ruleIDs := make([]uint, len(alarmRules))
-		for i, rule := range alarmRules {
-			ruleIDs[i] = rule.ID
-		}
-		if err := cmd.alarmSourceRepo.DeleteBySpecs(ctx, spec.AlarmRuleInSpec(ruleIDs)); err != nil {
-			return err
-		}
+	alarmRules, err := cmd.alarmRuleRepo.FindBySpecs(ctx, spec.ProjectEqSpec(cmd.Project.ID))
+	if err != nil {
+		return err
+	}
+	ruleIDs := make([]uint, len(alarmRules))
+	for i, rule := range alarmRules {
+		ruleIDs[i] = rule.ID
+	}
+	if err := cmd.alarmSourceRepo.DeleteBySpecs(ctx, spec.AlarmRuleInSpec(ruleIDs)); err != nil {
+		return err
+	}
+	if err := cmd.alarmRuleRepo.DeleteBySpecs(ctx, spec.ProjectEqSpec(cmd.Project.ID)); err != nil {
+		return err
+	}
 
-		return cmd.alarmRuleRepo.DeleteBySpecs(ctx, spec.ProjectEqSpec(cmd.Project.ID))
-	})
+	alarmRecords, err := cmd.alarmRecordRepo.FindBySpecs(ctx, spec.ProjectEqSpec(cmd.Project.ID))
+	if err != nil {
+		return err
+	}
+	recordIDs := make([]uint, len(alarmRecords))
+	for i, record := range alarmRecords {
+		recordIDs[i] = record.ID
+	}
+	if err := cmd.alarmRecordAcknowledgeRepo.DeleteBySpecs(ctx, spec.AlarmRecordInSpec(recordIDs)); err != nil {
+		return err
+	}
 
-	eg.Go(func() error {
-		alarmRecords, err := cmd.alarmRecordRepo.FindBySpecs(ctx, spec.ProjectEqSpec(cmd.Project.ID))
-		if err != nil {
-			return err
-		}
-		recordIDs := make([]uint, len(alarmRecords))
-		for i, record := range alarmRecords {
-			recordIDs[i] = record.ID
-		}
-		if err := cmd.alarmRecordAcknowledgeRepo.DeleteBySpecs(ctx, spec.AlarmRecordInSpec(recordIDs)); err != nil {
-			return err
-		}
-
-		return cmd.alarmRecordRepo.DeleteBySpecs(ctx, spec.ProjectEqSpec(cmd.Project.ID))
-	})
-	return eg.Wait()
+	if err := cmd.alarmRecordRepo.DeleteBySpecs(ctx, spec.ProjectEqSpec(cmd.Project.ID)); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (cmd ProjectDeleteCmd) removeDevices(ctx context.Context) error {
