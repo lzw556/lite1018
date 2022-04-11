@@ -57,13 +57,12 @@ func (p *LargeSensorData) Process(ctx *iot.Context, msg iot.Message) error {
 					} else {
 						return fmt.Errorf("decode large sensor data failed: %v", err)
 					}
-				} else {
-					if err := cache.SetStruct(device.MacAddress, p.receiver); err != nil {
-						return fmt.Errorf("set cache failed: %v", err)
-					}
 				}
 			} else {
 				p.receiver.Reset()
+			}
+			if err := cache.SetStruct(device.MacAddress, p.receiver); err != nil {
+				return fmt.Errorf("set cache failed: %v", err)
 			}
 		}
 	}
