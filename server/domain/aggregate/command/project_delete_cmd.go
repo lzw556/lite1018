@@ -60,7 +60,6 @@ func (cmd ProjectDeleteCmd) Run() error {
 }
 
 func (cmd ProjectDeleteCmd) removeAlarms(ctx context.Context) error {
-
 	alarmRules, err := cmd.alarmRuleRepo.FindBySpecs(ctx, spec.ProjectEqSpec(cmd.Project.ID))
 	if err != nil {
 		return err
