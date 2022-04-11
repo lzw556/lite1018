@@ -26,6 +26,7 @@ func InitTables(db *gorm.DB) error {
 		&entity.Event{},
 	}
 
+	//db.Migrator().DropTable("casbin_rule")
 	//var devices []entity.Device
 	//if db.Find(&devices).Error == nil {
 	//	for _, device := range devices {
