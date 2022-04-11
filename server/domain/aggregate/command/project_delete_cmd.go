@@ -7,7 +7,6 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	spec "github.com/thetasensors/theta-cloud-lite/server/domain/specification"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/transaction"
-	"golang.org/x/sync/errgroup"
 )
 
 type ProjectDeleteCmd struct {
@@ -96,28 +95,26 @@ func (cmd ProjectDeleteCmd) removeAlarms(ctx context.Context) error {
 }
 
 func (cmd ProjectDeleteCmd) removeDevices(ctx context.Context) error {
-	var eg errgroup.Group
-	eg.Go(func() error {
-		return cmd.networkRepo.DeleteBySpecs(ctx, spec.ProjectEqSpec(cmd.Project.ID))
-	})
+	if err := cmd.networkRepo.DeleteBySpecs(ctx, spec.ProjectEqSpec(cmd.Project.ID)); err != nil {
+		return err
+	}
 
-	eg.Go(func() error {
-		devices, err := cmd.deviceRepo.FindBySpecs(ctx, spec.ProjectEqSpec(cmd.Project.ID))
-		if err != nil {
+	devices, err := cmd.deviceRepo.FindBySpecs(ctx, spec.ProjectEqSpec(cmd.Project.ID))
+	if err != nil {
+		return err
+	}
+	for _, device := range devices {
+		if err := cmd.deviceStateRepo.Delete(device.MacAddress); err != nil {
 			return err
 		}
-		for _, device := range devices {
-			if err := cmd.deviceStateRepo.Delete(device.MacAddress); err != nil {
-				return err
-			}
-			if err := cmd.deviceAlertStateRepo.DeleteAll(device.MacAddress); err != nil {
-				return err
-			}
+		if err := cmd.deviceAlertStateRepo.DeleteAll(device.MacAddress); err != nil {
+			return err
 		}
-		return cmd.deviceRepo.DeleteBySpecs(ctx, spec.ProjectEqSpec(cmd.Project.ID))
-	})
-
-	return eg.Wait()
+	}
+	if err := cmd.deviceRepo.DeleteBySpecs(ctx, spec.ProjectEqSpec(cmd.Project.ID)); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (cmd ProjectDeleteCmd) removeEvents(ctx context.Context) error {
