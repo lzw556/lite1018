@@ -64,7 +64,7 @@ func (r LargeSensorDataReceiver) SensorData() (entity.SensorData, error) {
 	_ = binary.Read(bytes.NewBuffer(data[8:12]), binary.LittleEndian, &sensorType)
 	_ = binary.Read(bytes.NewBuffer(data[12:16]), binary.LittleEndian, &dataLength)
 	e := entity.SensorData{
-		Time:       time.UnixMicro(int64(timestamp)),
+		Time:       time.UnixMilli(int64(timestamp)),
 		SensorType: uint(sensorType),
 	}
 
@@ -80,6 +80,7 @@ func (r LargeSensorDataReceiver) SensorData() (entity.SensorData, error) {
 	}
 	values, err := decoder.Decode(data[16:])
 	e.Values = values
+	xlog.Debugf("received sensor data time: => [%v]", time.UnixMilli(int64(timestamp)))
 	return e, err
 }
 

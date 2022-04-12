@@ -166,6 +166,8 @@ func (query DeviceQuery) FindDataByID(id uint, sensorType uint, from, to time.Ti
 	switch sensorType {
 	case devicetype.KxSensor:
 		return query.findKxSensorData(device, from, to)
+	case devicetype.DynamicLengthAttitudeSensor:
+		return query.findSasRawData(device, from, to)
 	default:
 		return query.findCharacteristicData(device, from, to)
 	}
@@ -197,6 +199,19 @@ func (query DeviceQuery) findCharacteristicData(device entity.Device, from, to t
 
 func (query DeviceQuery) findKxSensorData(device entity.Device, from, to time.Time) ([]vo.DeviceData, error) {
 	times, err := query.sensorDataRepo.FindTimes(device.MacAddress, devicetype.KxSensor, from, to)
+	if err != nil {
+		return nil, err
+	}
+	result := make(vo.DeviceDataList, len(times))
+	for i, t := range times {
+		result[i] = vo.NewDeviceData(t)
+	}
+	sort.Sort(result)
+	return result, nil
+}
+
+func (query DeviceQuery) findSasRawData(device entity.Device, from, to time.Time) ([]vo.DeviceData, error) {
+	times, err := query.sensorDataRepo.FindTimes(device.MacAddress, devicetype.DynamicLengthAttitudeSensor, from, to)
 	if err != nil {
 		return nil, err
 	}
