@@ -80,13 +80,13 @@ func (r LargeSensorDataReceiver) SensorData() (entity.SensorData, error) {
 	}
 	values, err := decoder.Decode(data[16:])
 	e.Values = values
-	xlog.Debugf("received sensor data: %+v", e)
 	return e, err
 }
 
 func (r LargeSensorDataReceiver) flatPackets() []byte {
 	packets := make(Packets, 0)
 	for _, packet := range r.Packets {
+		xlog.Debugf("packet segmentId: %d", packet.SeqID)
 		packets = append(packets, packet)
 	}
 	sort.Sort(packets)
