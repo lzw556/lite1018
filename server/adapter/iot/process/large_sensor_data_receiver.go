@@ -75,6 +75,8 @@ func (r LargeSensorDataReceiver) SensorData() (entity.SensorData, error) {
 		decoder = sensor.NewKx122Decoder()
 	case devicetype.DynamicLengthAttitudeSensor:
 		decoder = sensor.NewDynamicLengthAttitudeDecoder()
+	case devicetype.DynamicSCL3300Sensor:
+		decoder = sensor.NewDynamicInclinationDecoder()
 	default:
 		return entity.SensorData{}, fmt.Errorf("raw data decoder is nil")
 	}

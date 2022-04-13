@@ -11,5 +11,6 @@ const (
 	CurrentSensor                       = 50397185
 	PressureTemperatureSensor           = 21037058
 	SCL3300Sensor                       = 16842755
+	DynamicSCL3300Sensor                = 16842756
 	KxSensor                            = 16842753
 )

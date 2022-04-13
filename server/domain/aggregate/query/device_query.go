@@ -164,10 +164,10 @@ func (query DeviceQuery) FindDataByID(id uint, sensorType uint, from, to time.Ti
 		return nil, err
 	}
 	switch sensorType {
-	case devicetype.KxSensor:
-		return query.findKxSensorData(device, from, to)
-	case devicetype.DynamicLengthAttitudeSensor:
-		return query.findSasRawData(device, from, to)
+	case devicetype.KxSensor,
+		devicetype.DynamicLengthAttitudeSensor,
+		devicetype.DynamicSCL3300Sensor:
+		return query.findRawData(device, from, to, sensorType)
 	default:
 		return query.findCharacteristicData(device, from, to)
 	}
@@ -197,21 +197,8 @@ func (query DeviceQuery) findCharacteristicData(device entity.Device, from, to t
 	return result, nil
 }
 
-func (query DeviceQuery) findKxSensorData(device entity.Device, from, to time.Time) ([]vo.DeviceData, error) {
-	times, err := query.sensorDataRepo.FindTimes(device.MacAddress, devicetype.KxSensor, from, to)
-	if err != nil {
-		return nil, err
-	}
-	result := make(vo.DeviceDataList, len(times))
-	for i, t := range times {
-		result[i] = vo.NewDeviceData(t)
-	}
-	sort.Sort(result)
-	return result, nil
-}
-
-func (query DeviceQuery) findSasRawData(device entity.Device, from, to time.Time) ([]vo.DeviceData, error) {
-	times, err := query.sensorDataRepo.FindTimes(device.MacAddress, devicetype.DynamicLengthAttitudeSensor, from, to)
+func (query DeviceQuery) findRawData(device entity.Device, from, to time.Time, sensorType uint) ([]vo.DeviceData, error) {
+	times, err := query.sensorDataRepo.FindTimes(device.MacAddress, sensorType, from, to)
 	if err != nil {
 		return nil, err
 	}
@@ -251,6 +238,12 @@ func (query DeviceQuery) GetDataByIDAndTimestamp(id uint, sensorType uint, time 
 		result.Values = getKxSensorData(e, cast.ToString(filters["calculate"]))
 	case devicetype.DynamicLengthAttitudeSensor:
 		var e entity.SasRawData
+		if err := mapstructure.Decode(data.Values, &e); err != nil {
+			return nil, err
+		}
+		result.Values = e
+	case devicetype.DynamicSCL3300Sensor:
+		var e entity.SqRawData
 		if err := mapstructure.Decode(data.Values, &e); err != nil {
 			return nil, err
 		}
