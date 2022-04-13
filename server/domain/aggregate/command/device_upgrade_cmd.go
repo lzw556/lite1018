@@ -29,7 +29,13 @@ func (cmd DeviceUpgradeCmd) Upgrade(req request.DeviceUpgrade) error {
 	if err != nil {
 		return response.BusinessErr(errcode.FirmwareNotFoundError, "")
 	}
-
+	upgradeStatus := cmd.Device.GetUpgradeStatus()
+	switch upgradeStatus.Code {
+	case entity.DeviceUpgradePending,
+		entity.DeviceUpgradeLoading,
+		entity.DeviceUpgradeUpgrading:
+		return response.BusinessErr(errcode.DeviceUpgradingError, "")
+	}
 	return command.DeviceUpgrade(cmd.Gateway, cmd.Device, firmware)
 }
 

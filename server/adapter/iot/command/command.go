@@ -324,7 +324,6 @@ func CancelDeviceUpgrade(gateway entity.Device, device entity.Device) error {
 		_, err := cmd.Execute(ctx, gateway.MacAddress, device.MacAddress, 3*time.Second)
 		if err != nil {
 			xlog.Errorf("execute device command %s failed: %v => [%s]", cmd.Name(), err, gateway.MacAddress)
-			return err
 		}
 		task := queue.GetTask(device)
 		if task != nil {

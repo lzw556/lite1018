@@ -37,6 +37,7 @@ const (
 	DeviceCommandCancelledError
 	UnknownDeviceCommandTypeError
 	DeviceOfflineError
+	DeviceUpgradingError
 )
 
 const (
@@ -89,6 +90,7 @@ var businessErrorMap = map[BusinessErrorCode]string{
 	DeviceCommandSendTimeoutError:       "命令发送超时",
 	DeviceCommandCancelledError:         "命令已取消",
 	DeviceOfflineError:                  "设备已离线",
+	DeviceUpgradingError:                "设备正在升级",
 	UnknownDeviceCommandTypeError:       "未知的设备命令",
 	NetworkNotFoundError:                "网络不存在",
 	FirmwareNotFoundError:               "固件不存在",
