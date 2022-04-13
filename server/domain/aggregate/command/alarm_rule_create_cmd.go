@@ -29,11 +29,13 @@ func (cmd AlarmRuleCreateCmd) Run() error {
 		if err := cmd.alarmRuleRepo.Create(txCtx, &cmd.AlarmRule); err != nil {
 			return err
 		}
-		for i := range cmd.AlarmSources {
-			cmd.AlarmSources[i].AlarmRuleID = cmd.AlarmRule.ID
-		}
-		if err := cmd.alarmSourceRepo.Create(txCtx, cmd.AlarmSources...); err != nil {
-			return err
+		if len(cmd.AlarmSources) > 0 {
+			for i := range cmd.AlarmSources {
+				cmd.AlarmSources[i].AlarmRuleID = cmd.AlarmRule.ID
+			}
+			if err := cmd.alarmSourceRepo.Create(txCtx, cmd.AlarmSources...); err != nil {
+				return err
+			}
 		}
 		return ruleengine.UpdateRules(cmd.AlarmRule)
 	})

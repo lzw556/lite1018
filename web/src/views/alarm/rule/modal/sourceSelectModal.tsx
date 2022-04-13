@@ -29,16 +29,13 @@ import zhCN from "antd/es/locale/zh_CN";
 const {TabPane} = Tabs;
 
 export interface SourceSelectModalProps extends ModalProps {
+    deviceType: number
     onSuccess?: (value:any) => void;
 }
 
 const SourceSelectModal: FC<SourceSelectModalProps> = (props) => {
-    const {visible, onSuccess} = props;
-    const [options, setOptions] = useState<any>([])
-    const [properties, setProperties] = useState<any[]>([])
-    const [property, setProperty] = useState<any>()
+    const {visible, deviceType, onSuccess} = props;
     const [dataSource, setDataSource] = useState<PageResult<Device[]>>()
-    const [deviceType, setDeviceType] = useState<DeviceType>(0)
     const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([])
     const [pagination, setPagination] = useState<any>({current: 1, size: 8,})
     const [category, setCategory] = useState<any>("1")
@@ -47,36 +44,9 @@ const SourceSelectModal: FC<SourceSelectModalProps> = (props) => {
     useEffect(() => {
         if (visible) {
             form.resetFields();
-            setDataSource(undefined);
             setSelectedRowKeys([]);
-            setOptions(DeviceType.Sensors().map(item => {
-                return {value: item, label: DeviceType.toString(item), isLeaf: false}
-            }))
         }
     }, [visible])
-
-    const onDropdownRender = (options: any) => {
-        return <Tabs defaultActiveKey={"1"} style={{padding: "0 10px 0 10px"}} onChange={setCategory}>
-            <TabPane tab={"设备"} key={"1"}>
-                {options}
-            </TabPane>
-        </Tabs>
-    }
-
-    const onLoadData = (selectedOptions: any) => {
-        const targetOption = selectedOptions[selectedOptions.length - 1];
-        targetOption.loading = true;
-        GetPropertiesRequest(targetOption.value).then(data => {
-            targetOption.loading = false;
-            targetOption.children = data.map(item => {
-                return {value: item.key, label: item.name}
-            })
-            setProperties(data);
-            setOptions([...options])
-        }).catch(_ => {
-            targetOption.loading = false;
-        })
-    }
 
     useEffect(() => {
         if (deviceType) {
@@ -100,22 +70,7 @@ const SourceSelectModal: FC<SourceSelectModalProps> = (props) => {
                         name: item.name,
                     }
                 })
-                let metric = {
-                    key: "",
-                    name: "",
-                    unit: "",
-                }
-                if (property && property.fields.length === 1) {
-                    metric.key = property.key + "." + property.fields[0].key;
-                    metric.name = property.name
-                    metric.unit = property.unit
-                }else {
-                    const field = property.fields.find((item:any) => item.key === values.dimension)
-                    metric.key = metric.key = property.key + "." + field.key;
-                    metric.name = `${property.name}(${field.name})`
-                    metric.unit = property.unit
-                }
-                onSuccess({sources: selected, metric:metric, sourceType: deviceType, category: parseInt(category)})
+                onSuccess({sources: selected})
             })
         }
     }
@@ -148,31 +103,6 @@ const SourceSelectModal: FC<SourceSelectModalProps> = (props) => {
     ]
 
     return <Modal {...props} title={"选择监控对象"} width={600} onOk={onOk}>
-        <Form form={form} validateMessages={defaultValidateMessages} layout={"inline"}>
-            <Form.Item label={"指标名称"} name={"index"} rules={[Rules.required]}>
-                <Cascader placeholder={"请选择指标名称"}
-                          options={options}
-                          loadData={onLoadData}
-                          dropdownRender={onDropdownRender}
-                          onChange={(values: any) => {
-                              setDeviceType(values[0])
-                              setProperty(properties.find((item: any) => item.key === values[values.length - 1]))
-                          }}/>
-            </Form.Item>
-            {
-                property && property.fields.length > 1 &&
-                <Form.Item label={"指标维度"} name={"dimension"} rules={[Rules.required]}>
-                    <Select placeholder={"请选择指标维度"}>
-                        {
-                            property.fields.map((item: any) => {
-                                return <Select.Option key={item.key} value={item.key}>{item.name}</Select.Option>
-                            })
-                        }
-                    </Select>
-                </Form.Item>
-            }
-        </Form>
-        <br/>
         <ConfigProvider renderEmpty={() => <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={"资源列表为空"}/>}
                         locale={zhCN}>
             <Table rowKey={record => record.macAddress} rowSelection={rowSelection} scroll={{y: 256}} columns={columns}

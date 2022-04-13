@@ -17,6 +17,7 @@ export type AlarmRule = {
     sourceType: string
     level: number
     sources: any[]
+    category: number
 }
 
 export function getRuleMethodString(method: string) {

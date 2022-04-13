@@ -1,20 +1,29 @@
-import {Button, Card, Col, Form, Input, message, Result, Row, Select, Space, Table, Typography} from "antd";
+import {Button, Card, Cascader, Col, Form, Input, Result, Row, Select, Space, Table, Tabs, Typography} from "antd";
 import {Content} from "antd/lib/layout/layout";
-import {useCallback, useEffect, useState} from "react";
+import {useEffect, useState} from "react";
 import {AddAlarmRuleRequest, CheckAlarmRuleNameRequest} from "../../../apis/alarm";
 import MyBreadcrumb from "../../../components/myBreadcrumb";
 import ShadowCard from "../../../components/shadowCard";
 import SourceSelectModal from "./modal/sourceSelectModal";
 import {DeleteOutlined} from "@ant-design/icons";
 import {defaultValidateMessages, Normalizes, Rules} from "../../../constants/validator";
-import { isMobile } from "../../../utils/deviceDetection";
+import {isMobile} from "../../../utils/deviceDetection";
 import _ from "lodash";
+import {GetPropertiesRequest} from "../../../apis/property";
+import {DeviceType} from "../../../types/device_type";
 
 const {Option} = Select;
+const {TabPane} = Tabs;
 
 const AddAlarmRule = () => {
     const [visible, setVisible] = useState<boolean>(false)
+    const [options, setOptions] = useState<any>([])
+    const [properties, setProperties] = useState<any[]>([])
     const [selected, setSelected] = useState<any>()
+    const [property, setProperty] = useState<any>()
+    const [deviceType, setDeviceType] = useState<DeviceType>(0)
+    const [metric, setMetric] = useState<any>()
+    const [category, setCategory] = useState<any>("1")
     const [form] = Form.useForm()
     const [success, setSuccess] = useState<boolean>(false)
 
@@ -24,6 +33,9 @@ const AddAlarmRule = () => {
             operation: ">=",
             level: 3,
         })
+        setOptions(DeviceType.Sensors().map(item => {
+            return {value: item, label: DeviceType.toString(item), isLeaf: false}
+        }))
     }, [])
 
 
@@ -32,15 +44,12 @@ const AddAlarmRule = () => {
             values.threshold = parseFloat(values.threshold)
             if (selected && selected.sources.length > 0) {
                 values.source_ids = selected.sources.map((item: any) => item.id)
-                values.source_type = selected.sourceType
-                values.category = selected.category
-                values.metric = selected.metric
-                AddAlarmRuleRequest(values).then(data => {
-                    setSuccess(true)
-                })
-            } else {
-                message.error("请选择报警源")
             }
+            values.source_type = deviceType
+            values.category = parseInt(category)
+            AddAlarmRuleRequest(values).then(data => {
+                setSuccess(true)
+            })
         })
     }
 
@@ -66,6 +75,21 @@ const AddAlarmRule = () => {
         setSelected(newSelected)
     }
 
+    const onLoadData = (selectedOptions: any) => {
+        const targetOption = selectedOptions[selectedOptions.length - 1];
+        targetOption.loading = true;
+        GetPropertiesRequest(targetOption.value).then(data => {
+            targetOption.loading = false;
+            targetOption.children = data.map(item => {
+                return {value: item.key, label: item.name}
+            })
+            setProperties(data);
+            setOptions([...options])
+        }).catch(_ => {
+            targetOption.loading = false;
+        })
+    }
+
     const sourceColumns = [
         {
             title: '资源名称',
@@ -79,7 +103,7 @@ const AddAlarmRule = () => {
             key: 'index',
             width: '40%',
             render: (text: any, record: any) => {
-                return selected.metric.name
+                return metric?.name
             }
         },
         {
@@ -94,6 +118,14 @@ const AddAlarmRule = () => {
             }
         }
     ]
+
+    const onDropdownRender = (options: any) => {
+        return <Tabs defaultActiveKey={"1"} style={{padding: "0 10px 0 10px"}} onChange={setCategory}>
+            <TabPane tab={"设备"} key={"1"}>
+                {options}
+            </TabPane>
+        </Tabs>
+    }
 
     const renderAlarmRuleForm = () => {
         return <Form form={form} validateMessages={defaultValidateMessages}>
@@ -116,6 +148,47 @@ const AddAlarmRule = () => {
                 </Row>
             </ShadowCard>
             <ShadowCard>
+                <Form.Item label={"指标名称"} name={"index"} labelCol={{span: 2}} wrapperCol={{span: 6}}
+                           rules={[Rules.required]}>
+                    <Cascader placeholder={"请选择指标名称"}
+                              options={options}
+                              loadData={onLoadData}
+                              dropdownRender={onDropdownRender}
+                              onChange={(values: any) => {
+                                  setDeviceType(values[0])
+                                  let prop = properties.find(item => item.key === values[values.length - 1])
+                                  setProperty(prop)
+                                  if (prop && prop.fields.length === 1) {
+                                      setMetric({
+                                          key: prop.key + "." + prop.fields[0].key,
+                                          name: prop.name,
+                                          unit: prop.unit
+                                      })
+                                  }
+                              }}/>
+                </Form.Item>
+                {
+                    property && property.fields.length > 1 &&
+                    <Form.Item label={"指标维度"} name={"dimension"} labelCol={{span: 2}} wrapperCol={{span: 6}}
+                               rules={[Rules.required]}>
+                        <Select placeholder={"请选择指标维度"} onChange={value => {
+                            let field = property.fields.find((item:any) => item.key === value)
+                            if (field) {
+                                setMetric({
+                                    key: property.key + "." + field.key,
+                                    name: `${property.name}(${field.name})`,
+                                    unit: property.unit
+                                })
+                            }
+                        }}>
+                            {
+                                property.fields.map((item: any) => {
+                                    return <Select.Option key={item.key} value={item.key}>{item.name}</Select.Option>
+                                })
+                            }
+                        </Select>
+                    </Form.Item>
+                }
                 <Row justify={"start"}>
                     <Col span={24}>
                         <Form.Item label={"监控对象"} labelCol={{span: 2}} requiredMark={true}>
@@ -142,7 +215,8 @@ const AddAlarmRule = () => {
                                 <Col span={24}>
                                     {
                                         selected && selected.sources && selected.sources.length > 0 &&
-                                        <Table rowKey={(record) => record.id} columns={sourceColumns} size={"small"} dataSource={selected.sources}
+                                        <Table rowKey={(record) => record.id} columns={sourceColumns} size={"small"}
+                                               dataSource={selected.sources}
                                                pagination={false}/>
                                     }
                                 </Col>
@@ -157,10 +231,10 @@ const AddAlarmRule = () => {
                                 <Col span={24}>
                                     <Card>
                                         <Row justify={"space-between"}>
-                                            <Col span={isMobile ? 24 :3}>
+                                            <Col span={isMobile ? 24 : 3}>
                                                 <Typography.Text strong>触发条件</Typography.Text>
                                             </Col>
-                                            <Col span={isMobile ? 24 :20}>
+                                            <Col span={isMobile ? 24 : 20}>
                                                 <Space direction={isMobile ? 'vertical' : 'horizontal'}>
                                                     <Typography.Text type={"secondary"}>
                                                         当<Typography.Text strong>监控对象</Typography.Text>连续
@@ -180,7 +254,7 @@ const AddAlarmRule = () => {
                                                     </Form.Item>
                                                     <Form.Item name={["threshold"]} rules={[Rules.number]} noStyle>
                                                         <Input size={"small"} style={{width: "64px"}}
-                                                               suffix={selected?.metric?.unit}/>
+                                                               suffix={metric?.unit}/>
                                                     </Form.Item><Typography.Text type={"secondary"}>时,
                                                     产生</Typography.Text>
                                                     <Form.Item name={["level"]} noStyle>
@@ -239,6 +313,7 @@ const AddAlarmRule = () => {
 
         }
         <SourceSelectModal visible={visible}
+                           deviceType={deviceType}
                            onCancel={() => setVisible(false)}
                            onSuccess={value => {
                                setSelected(value)
