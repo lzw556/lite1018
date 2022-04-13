@@ -24,6 +24,7 @@ import UpgradeModal from '../upgrade';
 import DeviceEvent from './event';
 import {isMobile} from '../../../utils/deviceDetection';
 import { FilterableAlarmRecordTable } from '../../../components/alarm/filterableAlarmRecordTable';
+import { DynamicData } from './dynamicData';
 
 const tabTitleList = [
     {
@@ -57,7 +58,8 @@ const DeviceDetailPage = () => {
         ['monitor', device && <RecentHistory device={device}/>],
         ['ta', device && <RuntimeChart deviceId={device.id}/>],
         ['events', device && <DeviceEvent device={device}/>],
-        ['alarm', device && <FilterableAlarmRecordTable sourceId={device.id}/>]
+        ['alarm', device && <FilterableAlarmRecordTable sourceId={device.id}/>],
+        ['dynamicData', device && <DynamicData {...device}/>]
     ]);
 
     const fetchDevice = useCallback(() => {
@@ -125,6 +127,12 @@ const DeviceDetailPage = () => {
             case DeviceType.Gateway:
             case DeviceType.Router:
                 return tabs;
+            case DeviceType.BoltElongation:
+            case DeviceType.AngleDip:
+                if (hasPermission(Permission.DeviceData)) {
+                    tabs.unshift(...tabTitleList, {key: 'dynamicData', tab: '动态数据'}, title);
+                }
+                break;
             default:
                 if (hasPermission(Permission.DeviceData)) {
                     tabs.unshift(...tabTitleList, title);
