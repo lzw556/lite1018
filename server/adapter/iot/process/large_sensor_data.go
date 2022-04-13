@@ -1,7 +1,9 @@
 package process
 
 import (
+	"errors"
 	"fmt"
+	"github.com/allegro/bigcache/v3"
 	"github.com/gogo/protobuf/proto"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/iot"
 	pd "github.com/thetasensors/theta-cloud-lite/server/adapter/iot/proto"
@@ -9,6 +11,7 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/cache"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/xlog"
 	"sync"
 )
 
@@ -41,30 +44,29 @@ func (p *LargeSensorData) Process(ctx *iot.Context, msg iot.Message) error {
 		if err := proto.Unmarshal(msg.Body.Payload, &m); err != nil {
 			return fmt.Errorf("unmarshal [LargeSensorData] message failed: %v", err)
 		}
-		if err := cache.GetStruct(device.MacAddress, &p.receiver); err == nil {
-			if p.receiver.SessionID == 0 {
-				p.receiver = NewLargeSensorDataReceiver(m)
-			}
-			p.mu.Lock()
-			defer p.mu.Unlock()
-			if p.receiver.SessionID == m.SessionId {
-				if p.receiver.Receive(m); p.receiver.IsCompleted() {
-					if e, err := p.receiver.SensorData(); err == nil {
-						e.MacAddress = device.MacAddress
-						if err := p.repository.Create(e); err != nil {
-							return fmt.Errorf("create large sensor data failed: %v", err)
-						}
-					} else {
-						return fmt.Errorf("decode large sensor data failed: %v", err)
+		err := cache.GetStruct(device.MacAddress, &p.receiver)
+		if errors.Is(bigcache.ErrEntryNotFound, err) {
+			p.receiver = NewLargeSensorDataReceiver(m)
+		}
+		p.mu.Lock()
+		defer p.mu.Unlock()
+		xlog.Debugf("p.receiver.SessionID: %v, pd.SessionId: %v", p.receiver.SessionID, m.SessionId)
+		if p.receiver.SessionID == m.SessionId {
+			if p.receiver.Receive(m); p.receiver.IsCompleted() {
+				if e, err := p.receiver.SensorData(); err == nil {
+					e.MacAddress = device.MacAddress
+					if err := p.repository.Create(e); err != nil {
+						return fmt.Errorf("create large sensor data failed: %v", err)
 					}
 				} else {
-					if err := cache.SetStruct(device.MacAddress, p.receiver); err != nil {
-						return fmt.Errorf("set cache failed: %v", err)
-					}
+					return fmt.Errorf("decode large sensor data failed: %v", err)
 				}
-			} else {
-				p.receiver.Reset()
 			}
+		} else {
+			p.receiver.Reset()
+		}
+		if err := cache.SetStruct(device.MacAddress, p.receiver); err != nil {
+			return fmt.Errorf("set cache failed: %v", err)
 		}
 	}
 	return nil

@@ -234,6 +234,12 @@ func (query DeviceQuery) GetDataByIDAndTimestamp(id uint, sensorType uint, time 
 			return nil, err
 		}
 		result.Values = getKxSensorData(e, cast.ToString(filters["calculate"]))
+	case devicetype.DynamicLengthAttitudeSensor:
+		var e entity.SasRawData
+		if err := mapstructure.Decode(data.Values, &e); err != nil {
+			return nil, err
+		}
+		result.Values = e
 	}
 	return &result, nil
 }

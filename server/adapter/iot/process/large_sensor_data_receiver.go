@@ -27,6 +27,7 @@ func NewLargeSensorDataReceiver(m pd.LargeSensorDataMessage) LargeSensorDataRece
 		MetaLength:   m.MetaLength,
 		DataLength:   uint32(m.DataLength),
 		NumOfPackets: m.NumSegments,
+		Packets:      map[int32]Packet{},
 	}
 }
 
@@ -40,7 +41,7 @@ func (r *LargeSensorDataReceiver) Reset() {
 
 func (r *LargeSensorDataReceiver) Receive(m pd.LargeSensorDataMessage) {
 	r.Packets[m.SegmentId] = Packet{
-		SeqID: m.SessionId,
+		SeqID: m.SegmentId,
 		Data:  m.Data,
 	}
 	xlog.Debugf("received large sensor data => [packet size = %d, total size = %d]", len(r.Packets), m.NumSegments)
@@ -51,22 +52,25 @@ func (r LargeSensorDataReceiver) IsCompleted() bool {
 }
 
 func (r LargeSensorDataReceiver) SensorData() (entity.SensorData, error) {
-	data := r.flatPackets()
-	commonMetadata := struct {
-		timestamp  uint64
+	var (
+		data = r.flatPackets()
+
 		sensorType uint32
+		timestamp  uint64
 		dataLength uint32
-	}{}
-	_ = binary.Read(bytes.NewBuffer(data[:8]), binary.LittleEndian, &commonMetadata.timestamp)
-	_ = binary.Read(bytes.NewBuffer(data[8:12]), binary.LittleEndian, &commonMetadata.sensorType)
-	_ = binary.Read(bytes.NewBuffer(data[12:16]), binary.LittleEndian, &commonMetadata.dataLength)
+	)
+
+	_ = binary.Read(bytes.NewBuffer(data[:8]), binary.LittleEndian, &timestamp)
+	_ = binary.Read(bytes.NewBuffer(data[8:12]), binary.LittleEndian, &sensorType)
+	_ = binary.Read(bytes.NewBuffer(data[12:16]), binary.LittleEndian, &dataLength)
 	e := entity.SensorData{
-		Time:       time.UnixMicro(int64(commonMetadata.timestamp)),
-		SensorType: uint(commonMetadata.sensorType),
+		Time:       time.UnixMicro(int64(timestamp)),
+		SensorType: uint(sensorType),
 	}
 
 	var decoder sensor.RawDataDecoder
-	switch commonMetadata.sensorType {
+	xlog.Debugf("sensor type: %d", sensorType)
+	switch sensorType {
 	case devicetype.KxSensor:
 		decoder = sensor.NewKx122Decoder()
 	case devicetype.DynamicLengthAttitudeSensor:
@@ -76,6 +80,7 @@ func (r LargeSensorDataReceiver) SensorData() (entity.SensorData, error) {
 	}
 	values, err := decoder.Decode(data[16:])
 	e.Values = values
+	xlog.Debugf("received sensor data: %+v", e)
 	return e, err
 }
 
