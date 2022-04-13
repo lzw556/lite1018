@@ -315,9 +315,6 @@ func CancelDeviceUpgrade(gateway entity.Device, device entity.Device) error {
 		return nil
 	}
 	switch device.GetUpgradeStatus().Code {
-	case entity.DeviceUpgradePending:
-		queue.Remove(device)
-		device.CancelUpgrade()
 	case entity.DeviceUpgradeLoading, entity.DeviceUpgradeUpgrading:
 		cmd := newCancelFirmwareCmd()
 		ctx := context.TODO()
@@ -329,6 +326,9 @@ func CancelDeviceUpgrade(gateway entity.Device, device entity.Device) error {
 		if task != nil {
 			task.Cancel()
 		}
+		device.CancelUpgrade()
+	default:
+		queue.Remove(device)
 		device.CancelUpgrade()
 	}
 	return nil
