@@ -12,7 +12,7 @@ WORKDIR /go/src/github.com/thetasensors/cloud-lite
 
 ENV GO11MODULE on
 ENV GOPRIVATE github.com/thetasensors
-ENV GOPROXY https://goproxy.cn
+#ENV GOPROXY https://goproxy.cn
 
 # Cache dependencies
 COPY ./server/go.mod .
