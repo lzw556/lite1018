@@ -88,4 +88,3 @@ p, 平台管理员, users/*, PUT
 p, 平台管理员, users/*, DELETE
 p, 平台管理员, roles, GET
 p, 平台管理员, roles/*, GET
-p, 平台管理员, roles/*/menus, PATCH
