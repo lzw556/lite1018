@@ -347,8 +347,64 @@ func (query DeviceQuery) DownloadLargeSensorData(id uint, sensorType uint, time 
 	switch sensorType {
 	case devicetype.KxSensor:
 		return query.downloadKxSensorData(device, time, cast.ToString(filters["calculate"]))
+	case devicetype.DynamicSCL3300Sensor:
+		return query.downloadSqRawData(device, time)
+	case devicetype.DynamicLengthAttitudeSensor:
+		return query.downloadSasRawData(device, time)
 	}
 	return nil, response.BusinessErr(errcode.UnknownBusinessError, "")
+}
+
+func (query DeviceQuery) downloadSasRawData(device entity.Device, time time.Time) (*vo.ExcelFile, error) {
+	data, err := query.sensorDataRepo.Get(device.MacAddress, devicetype.DynamicSCL3300Sensor, time)
+	if err != nil {
+		return nil, err
+	}
+	result := vo.ExcelFile{
+		Name: fmt.Sprintf("%s_%s.xlsx", device.MacAddress, time.Format("20060102")),
+		File: excelize.NewFile(),
+	}
+	col := 65
+	var e entity.SasRawData
+	if err := mapstructure.Decode(data.Values, &e); err != nil {
+		return nil, err
+	}
+	_ = result.File.SetCellValue("Sheet1", fmt.Sprintf("%s%d", string(rune(col)), 1), "dynamic length")
+	_ = result.File.SetCellValue("Sheet1", fmt.Sprintf("%s%d", string(rune(col+1)), 1), "dynamic preload")
+	_ = result.File.SetCellValue("Sheet1", fmt.Sprintf("%s%d", string(rune(col+2)), 1), "dynamic pressure")
+	_ = result.File.SetCellValue("Sheet1", fmt.Sprintf("%s%d", string(rune(col+3)), 1), "dynamic tof")
+	for i := 0; i < len(e.DynamicLength); i++ {
+		_ = result.File.SetCellValue("Sheet1", fmt.Sprintf("%s%d", string(rune(col)), i+2), e.DynamicLength[i])
+		_ = result.File.SetCellValue("Sheet1", fmt.Sprintf("%s%d", string(rune(col+1)), i+2), e.DynamicPreload[i])
+		_ = result.File.SetCellValue("Sheet1", fmt.Sprintf("%s%d", string(rune(col+2)), i+2), e.DynamicPressure[i])
+		_ = result.File.SetCellValue("Sheet1", fmt.Sprintf("%s%d", string(rune(col+3)), i+2), e.DynamicTof[i])
+	}
+	return &result, nil
+}
+
+func (query DeviceQuery) downloadSqRawData(device entity.Device, time time.Time) (*vo.ExcelFile, error) {
+	data, err := query.sensorDataRepo.Get(device.MacAddress, devicetype.DynamicSCL3300Sensor, time)
+	if err != nil {
+		return nil, err
+	}
+	result := vo.ExcelFile{
+		Name: fmt.Sprintf("%s_%s.xlsx", device.MacAddress, time.Format("20060102")),
+		File: excelize.NewFile(),
+	}
+	col := 65
+	var e entity.SqRawData
+	if err := mapstructure.Decode(data.Values, &e); err != nil {
+		return nil, err
+	}
+	_ = result.File.SetCellValue("Sheet1", fmt.Sprintf("%s1", string(rune(col))), "dynamic inclination")
+	_ = result.File.SetCellValue("Sheet1", fmt.Sprintf("%s1", string(rune(col+1))), "dynamic pitch")
+	_ = result.File.SetCellValue("Sheet1", fmt.Sprintf("%s1", string(rune(col+2))), "dynamic roll")
+	for i := 0; i < len(e.DynamicInclination); i++ {
+		_ = result.File.SetCellValue("Sheet1", fmt.Sprintf("%s%d", string(rune(col)), i+2), e.DynamicInclination[i])
+		_ = result.File.SetCellValue("Sheet1", fmt.Sprintf("%s%d", string(rune(col+1)), i+2), e.DynamicPitch[i])
+		_ = result.File.SetCellValue("Sheet1", fmt.Sprintf("%s%d", string(rune(col+2)), i+2), e.DynamicRoll[i])
+	}
+	return &result, nil
 }
 
 func (query DeviceQuery) downloadKxSensorData(device entity.Device, time time.Time, calculate string) (*vo.ExcelFile, error) {
