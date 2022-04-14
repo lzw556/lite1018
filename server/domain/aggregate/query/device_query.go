@@ -356,7 +356,7 @@ func (query DeviceQuery) DownloadLargeSensorData(id uint, sensorType uint, time 
 }
 
 func (query DeviceQuery) downloadSasRawData(device entity.Device, time time.Time) (*vo.ExcelFile, error) {
-	data, err := query.sensorDataRepo.Get(device.MacAddress, devicetype.DynamicSCL3300Sensor, time)
+	data, err := query.sensorDataRepo.Get(device.MacAddress, devicetype.DynamicLengthAttitudeSensor, time)
 	if err != nil {
 		return nil, err
 	}
