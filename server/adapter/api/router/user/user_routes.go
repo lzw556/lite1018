@@ -44,7 +44,7 @@ func (r userRouter) create(ctx *gin.Context) (interface{}, error) {
 
 func (r userRouter) updateByID(ctx *gin.Context) (interface{}, error) {
 	id := cast.ToUint(ctx.Param("id"))
-	var req request.User
+	var req request.UpdateUser
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		return nil, response.InvalidParameterError(err.Error())
 	}

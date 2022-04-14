@@ -8,7 +8,7 @@ import (
 type Service interface {
 	Login(req request.Login) (*vo.AccessToken, error)
 	CreateUser(req request.User) error
-	UpdateUserByID(id uint, req request.User) (*vo.User, error)
+	UpdateUserByID(id uint, req request.UpdateUser) (*vo.User, error)
 	UpdateProfileByUserID(userID uint, req request.Profile) (*vo.User, error)
 	UpdatePassByUserID(userID uint, req request.UserPass) error
 

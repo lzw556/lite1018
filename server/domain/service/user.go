@@ -53,7 +53,7 @@ func (s User) CreateUser(req request.User) error {
 	return cmd.Run(req.Projects)
 }
 
-func (s User) UpdateUserByID(userID uint, req request.User) (*vo.User, error) {
+func (s User) UpdateUserByID(userID uint, req request.UpdateUser) (*vo.User, error) {
 	ctx := context.TODO()
 	e, err := s.repository.Get(ctx, userID)
 	if err != nil {

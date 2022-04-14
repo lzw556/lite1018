@@ -14,6 +14,12 @@ type User struct {
 	Projects []uint `json:"projects"`
 }
 
+type UpdateUser struct {
+	Email string `json:"email,omitempty" binding:"omitempty,email"`
+	Phone string `json:"phone,omitempty" binding:"omitempty,len=11"`
+	Role  uint   `json:"role"`
+}
+
 type Profile map[string]string
 
 type UserPass struct {
