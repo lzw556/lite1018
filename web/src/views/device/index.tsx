@@ -245,6 +245,14 @@ const DevicePage = () => {
       }
     },
     {
+      title: '信号强度(dB)',
+      dataIndex: 'state',
+      key: 'signalLevel',
+      render: (state: any) => {
+        return <div>{state ? state.signalLevel : 0}</div>;
+      }
+    },
+    {
       title: '数据',
       key: 'data',
       render: (text: any, device: Device) => {
