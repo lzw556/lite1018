@@ -16,6 +16,9 @@ var dist embed.FS
 //go:embed rbac_model.conf
 var rbacModel string
 
+//go:embed rbac_policy.csv
+var rbacPolicy string
+
 func main() {
 	initialize.InitFolder()
 	global.Viper = core.Viper()
@@ -33,7 +36,7 @@ func main() {
 	if global.BoltDB != nil {
 		initialize.InitBuckets(global.BoltDB)
 	}
-	casbin.Init(rbacModel, global.DB)
+	casbin.Init(rbacModel, rbacPolicy)
 	svrConf := config.Server{}
 	if err := config.Scan("server", &svrConf); err != nil {
 		panic(err)

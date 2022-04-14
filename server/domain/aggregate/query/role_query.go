@@ -9,7 +9,6 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/domain/vo"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/casbin"
 	"math"
-	"strconv"
 )
 
 type RoleQuery struct {
@@ -32,20 +31,18 @@ func (query RoleQuery) Detail() (*vo.Role, error) {
 	}
 	result.SetMenus(es)
 
-	e := casbin.Enforcer()
-	rules := e.GetFilteredPolicy(0, strconv.Itoa(int(query.Role.ID)))
+	rules := casbin.GetFilteredPolicy(query.Role.Name)
 	result.SetPermissions(rules)
 	return &result, nil
 }
 
 func (query RoleQuery) Casbin() *vo.Casbin {
-	roleID := strconv.Itoa(int(query.Role.ID))
-	e := casbin.Enforcer()
-	rules := e.GetFilteredPolicy(0, roleID)
+	name := query.Role.Name
+	rules := casbin.GetFilteredPolicy(name)
 	if query.Role.ID == math.MaxInt {
-		roleID = "admin"
+		name = "admin"
 	}
-	result := vo.NewCasbin(roleID, casbin.Model())
+	result := vo.NewCasbin(name, "")
 	result.SetRules(rules)
 	return &result
 }

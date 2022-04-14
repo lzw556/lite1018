@@ -1,21 +1,27 @@
 package middleware
 
 import (
+	"context"
 	"errors"
+	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
+	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/casbin"
+
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/cast"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/response"
-	"github.com/thetasensors/theta-cloud-lite/server/pkg/casbin"
 	"strings"
 )
 
 type CasbinRbac struct {
-	exclusion []string
+	repository dependency.RoleRepository
+	exclusion  []string
 }
 
 func NewCasbinRbac(exclusion ...string) Middleware {
 	return CasbinRbac{
-		exclusion: exclusion,
+		repository: repository.Role{},
+		exclusion:  exclusion,
 	}
 }
 
@@ -29,11 +35,15 @@ func (m CasbinRbac) WrapHandler() gin.HandlerFunc {
 		}
 		path := strings.TrimPrefix(ctx.Request.URL.Path, "/api/")
 		method := ctx.Request.Method
-		roleID := ctx.GetString("role_id")
+		roleName := ""
 		if m.isSuperAdmin(ctx) {
-			roleID = "admin"
+			roleName = "admin"
+		} else {
+			if role, err := m.repository.Get(context.TODO(), cast.ToUint(ctx.GetString("role_id"))); err == nil {
+				roleName = role.Name
+			}
 		}
-		if ok, _ := casbin.Enforcer().Enforce(roleID, path, method); ok {
+		if ok, _ := casbin.Enforce(roleName, path, method); ok {
 			ctx.Next()
 			return
 		}

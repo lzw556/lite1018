@@ -15,5 +15,4 @@ type Service interface {
 	GetRoleByID(id uint) (*vo.Role, error)
 	GetCasbinByUserID(id uint) (*vo.Casbin, error)
 	AllocMenusByRoleID(id uint, req request.AllocMenus) error
-	AllocPermissionsByRoleID(id uint, req request.AllocPermissions) error
 }

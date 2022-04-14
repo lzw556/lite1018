@@ -25,6 +25,7 @@ func (r *alarmRouter) initRoutes() {
 		// GET
 		router.NewGetRoute("alarmRules", r.findAlarmRules),
 		router.NewGetRoute("alarmRules/:id", r.getAlarmRule),
+
 		router.NewGetRoute("alarmRecords", r.findAlarmRecords),
 		router.NewGetRoute("alarmRecords/:id", r.getAlarmRecord),
 		router.NewGetRoute("alarmRecords/:id/acknowledge", r.getAlarmRecordAcknowledge),

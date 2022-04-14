@@ -70,14 +70,6 @@ func (s Role) AllocMenusByRoleID(id uint, req request.AllocMenus) error {
 	return cmd.AllocMenus(req.IDs)
 }
 
-func (s Role) AllocPermissionsByRoleID(id uint, req request.AllocPermissions) error {
-	cmd, err := s.factory.NewRoleCmd(id)
-	if err != nil {
-		return err
-	}
-	return cmd.AllocPermissions(req.IDs)
-}
-
 func (s Role) GetRoleByID(id uint) (*vo.Role, error) {
 	query, err := s.factory.NewRoleQuery(id)
 	if err != nil {

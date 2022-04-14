@@ -68,11 +68,25 @@ export const Permission = {
 
 let enforcer: Enforcer | null = null
 let subject: null = null
+const model = newModel(`
+[request_definition]
+r = sub, obj, act
+
+[policy_definition]
+p = sub, obj, act
+
+[role_definition]
+g = _, _
+
+[policy_effect]
+e = some(where (p.eft == allow))
+
+[matchers]
+m = g(r.sub, p.sub) && keyMatch2(r.obj, p.obj) && r.act == p.act || r.sub == "admin"`)
 
 const data = getPermission()
 
 if (data) {
-    const model = newModel(data.model);
     const adapter = new MemoryAdapter(data.rules);
     newEnforcer(model, adapter).then(value => {
         enforcer = value
