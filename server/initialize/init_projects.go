@@ -14,20 +14,5 @@ func initProject(db *gorm.DB) error {
 	if err != nil {
 		return err
 	}
-	if project.ID > 0 {
-		var alarmTemplates []entity.AlarmTemplate
-		err = db.Find(&alarmTemplates, "project_id = 0 OR project_id IS NULL").Error
-		if err != nil {
-			return err
-		}
-		for i := range alarmTemplates {
-			alarmTemplates[i].ProjectID = project.ID
-		}
-		if len(alarmTemplates) > 0 {
-			if err := db.Save(&alarmTemplates).Error; err != nil {
-				return err
-			}
-		}
-	}
 	return nil
 }
