@@ -18,6 +18,7 @@ p, 操作员, alarmRecords/*, GET
 p, 操作员, networks, POST
 p, 操作员, networks/*, POST
 p, 操作员, networks/*, PUT
+p, 操作员, networks/*, PATCH
 p, 操作员, devices, POST
 p, 操作员, devices/:id, PUT
 p, 操作员, devices/*, PATCH
@@ -37,6 +38,7 @@ p, 项目管理员, alarmRecords/*, GET
 p, 项目管理员, networks, POST
 p, 项目管理员, networks/*, POST
 p, 项目管理员, networks/*, PUT
+p, 项目管理员, networks/*, PATCH
 p, 项目管理员, devices, POST
 p, 项目管理员, devices/:id, PUT
 p, 项目管理员, devices/*, PATCH
@@ -60,6 +62,7 @@ p, 平台管理员, alarmRecords/*, GET
 p, 平台管理员, networks, POST
 p, 平台管理员, networks/*, POST
 p, 平台管理员, networks/*, PUT
+p, 平台管理员, networks/*, PATCH
 p, 平台管理员, devices, POST
 p, 平台管理员, devices/:id, PUT
 p, 平台管理员, devices/*, PATCH
