@@ -216,7 +216,6 @@ func (query DeviceQuery) GetDataByIDAndTimestamp(id uint, sensorType uint, time 
 		return nil, err
 	}
 	data, err := query.sensorDataRepo.Get(device.MacAddress, sensorType, time)
-	fmt.Println(data)
 	if err != nil {
 		return nil, err
 	}
