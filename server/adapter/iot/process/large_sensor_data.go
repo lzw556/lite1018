@@ -63,6 +63,7 @@ func (p *LargeSensorData) Process(ctx *iot.Context, msg iot.Message) error {
 			}
 		} else {
 			receiver.Reset()
+			receiver = NewLargeSensorDataReceiver(m)
 		}
 		if err := cache.SetStruct(device.MacAddress, receiver); err != nil {
 			return fmt.Errorf("set cache failed: %v", err)
