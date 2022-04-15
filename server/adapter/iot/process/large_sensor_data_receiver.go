@@ -31,12 +31,12 @@ func NewLargeSensorDataReceiver(m pd.LargeSensorDataMessage) LargeSensorDataRece
 	}
 }
 
-func (r *LargeSensorDataReceiver) Reset() {
-	r.SessionID = 0
-	r.Packets = make(map[int32]Packet)
-	r.NumOfPackets = 0
-	r.MetaLength = 0
-	r.DataLength = 0
+func (r *LargeSensorDataReceiver) Reset(m pd.LargeSensorDataMessage) {
+	r.SessionID = m.SessionId
+	r.Packets = map[int32]Packet{}
+	r.NumOfPackets = m.NumSegments
+	r.MetaLength = m.MetaLength
+	r.DataLength = uint32(m.DataLength)
 }
 
 func (r *LargeSensorDataReceiver) Receive(m pd.LargeSensorDataMessage) {
