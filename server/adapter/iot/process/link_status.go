@@ -60,7 +60,7 @@ func (p LinkStatus) Process(ctx *iot.Context, msg iot.Message) error {
 	}
 
 	// 2 offline 4 reconnecting failed
-	isOnline := m.Code != 2 && m.Code != 4
+	isOnline := linkStatus.Param != 2 && linkStatus.Param != 4
 
 	isChanged := deviceState.IsOnline != isOnline
 	deviceState.IsOnline = isOnline

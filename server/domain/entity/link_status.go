@@ -1,6 +1,7 @@
 package entity
 
 type LinkStatus struct {
+	Param                  int    `json:"param"`
 	Address                string `json:"address"`
 	State                  string `json:"state"`
 	LastConnection         int64  `json:"lastConnection"`
