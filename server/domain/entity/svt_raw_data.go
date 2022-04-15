@@ -5,9 +5,9 @@ import (
 )
 
 type SvtRawData struct {
-	XAxis AxisSensorData `json:"xAxis"`
-	YAxis AxisSensorData `json:"yAxis"`
-	ZAxis AxisSensorData `json:"zAxis"`
+	XAxis AxisSensorData `json:"xAxis" mapstructure:"xAxis"`
+	YAxis AxisSensorData `json:"yAxis" mapstructure:"yAxis"`
+	ZAxis AxisSensorData `json:"zAxis" mapstructure:"zAxis"`
 }
 
 func (s *SvtRawData) SetMetadata(i int, r uint8, o uint32, n uint32) {

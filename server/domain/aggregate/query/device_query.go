@@ -216,26 +216,29 @@ func (query DeviceQuery) GetDataByIDAndTimestamp(id uint, sensorType uint, time 
 		return nil, err
 	}
 	data, err := query.sensorDataRepo.Get(device.MacAddress, sensorType, time)
+	fmt.Println(data)
 	if err != nil {
 		return nil, err
 	}
 	result := vo.NewDeviceData(data.Time)
 	switch sensorType {
 	case devicetype.KxSensor:
-		axis := "x"
-		switch cast.ToInt(filters["dimension"]) {
-		case 0:
-			axis = "x"
-		case 1:
-			axis = "y"
-		case 2:
-			axis = "z"
-		}
-		var e entity.AxisSensorData
-		if err := mapstructure.Decode(data.Values[axis], &e); err != nil {
+		var e entity.SvtRawData
+		if err := mapstructure.Decode(data.Values, &e); err != nil {
 			return nil, err
 		}
-		result.Values = getKxSensorData(e, cast.ToString(filters["calculate"]))
+		axis := entity.AxisSensorData{}
+		switch cast.ToInt(filters["dimension"]) {
+		case 0:
+			axis = e.XAxis
+		case 1:
+			axis = e.YAxis
+		case 2:
+			axis = e.ZAxis
+		default:
+			return nil, response.BusinessErr(errcode.DeviceDataInvalidError, "")
+		}
+		result.Values = getKxSensorData(axis, cast.ToString(filters["calculate"]))
 	case devicetype.DynamicLengthAttitudeSensor:
 		var e entity.SasRawData
 		if err := mapstructure.Decode(data.Values, &e); err != nil {

@@ -12,6 +12,7 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	spec "github.com/thetasensors/theta-cloud-lite/server/domain/specification"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/devicetype"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/xlog"
 	"sync"
 	"time"
 )
@@ -56,6 +57,7 @@ func (p *SensorData) Process(ctx *iot.Context, msg iot.Message) error {
 				MacAddress: device.MacAddress,
 				SensorType: uint(m.SensorId),
 			}
+			xlog.Debugf("received sensor data: %+v", e)
 			if t := devicetype.Get(device.Type); t != nil {
 				e.Values = map[string]interface{}{}
 				for _, property := range t.Properties(e.SensorType) {

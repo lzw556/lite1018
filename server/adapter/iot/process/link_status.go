@@ -11,6 +11,7 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	spec "github.com/thetasensors/theta-cloud-lite/server/domain/specification"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/json"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/xlog"
 	"time"
 )
 
@@ -41,10 +42,12 @@ func (p LinkStatus) Process(ctx *iot.Context, msg iot.Message) error {
 	if err := proto.Unmarshal(msg.Body.Payload, &m); err != nil {
 		return fmt.Errorf("unmarshal [LinkStatus] message failed: %v", err)
 	}
+
 	linkStatus := entity.LinkStatus{}
 	if err := json.Unmarshal([]byte(m.Status), &linkStatus); err != nil {
 		return err
 	}
+	xlog.Debugf("received [LinkStatus] message: %+v", linkStatus)
 
 	device, err := p.deviceRepo.GetBySpecs(context.TODO(), spec.DeviceMacEqSpec(linkStatus.Address))
 	if err != nil {

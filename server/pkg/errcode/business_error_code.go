@@ -38,6 +38,7 @@ const (
 	UnknownDeviceCommandTypeError
 	DeviceOfflineError
 	DeviceUpgradingError
+	DeviceDataInvalidError
 )
 
 const (
@@ -91,6 +92,7 @@ var businessErrorMap = map[BusinessErrorCode]string{
 	DeviceCommandCancelledError:         "命令已取消",
 	DeviceOfflineError:                  "设备已离线",
 	DeviceUpgradingError:                "设备正在升级",
+	DeviceDataInvalidError:              "设备数据无效",
 	UnknownDeviceCommandTypeError:       "未知的设备命令",
 	NetworkNotFoundError:                "网络不存在",
 	FirmwareNotFoundError:               "固件不存在",

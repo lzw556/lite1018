@@ -17,14 +17,12 @@ import (
 
 type LargeSensorData struct {
 	repository dependency.SensorDataRepository
-	receiver   LargeSensorDataReceiver
 	mu         sync.RWMutex
 }
 
 func NewLargeSensorData() Processor {
 	return newRoot(&LargeSensorData{
 		repository: repository.SensorData{},
-		receiver:   LargeSensorDataReceiver{},
 		mu:         sync.RWMutex{},
 	})
 }
@@ -44,16 +42,17 @@ func (p *LargeSensorData) Process(ctx *iot.Context, msg iot.Message) error {
 		if err := proto.Unmarshal(msg.Body.Payload, &m); err != nil {
 			return fmt.Errorf("unmarshal [LargeSensorData] message failed: %v", err)
 		}
-		err := cache.GetStruct(device.MacAddress, &p.receiver)
+		var receiver LargeSensorDataReceiver
+		err := cache.GetStruct(device.MacAddress, &receiver)
 		if errors.Is(bigcache.ErrEntryNotFound, err) {
-			p.receiver = NewLargeSensorDataReceiver(m)
+			receiver = NewLargeSensorDataReceiver(m)
 		}
 		p.mu.Lock()
 		defer p.mu.Unlock()
-		xlog.Debugf("p.receiver.SessionID: %v, pd.SessionId: %v", p.receiver.SessionID, m.SessionId)
-		if p.receiver.SessionID == m.SessionId {
-			if p.receiver.Receive(m); p.receiver.IsCompleted() {
-				if e, err := p.receiver.SensorData(); err == nil {
+		xlog.Debugf("p.receiver.SessionID: %v, pd.SessionId: %v", receiver.SessionID, m.SessionId)
+		if receiver.SessionID == m.SessionId {
+			if receiver.Receive(m); receiver.IsCompleted() {
+				if e, err := receiver.SensorData(); err == nil {
 					e.MacAddress = device.MacAddress
 					if err := p.repository.Create(e); err != nil {
 						return fmt.Errorf("create large sensor data failed: %v", err)
@@ -63,9 +62,9 @@ func (p *LargeSensorData) Process(ctx *iot.Context, msg iot.Message) error {
 				}
 			}
 		} else {
-			p.receiver.Reset()
+			receiver.Reset()
 		}
-		if err := cache.SetStruct(device.MacAddress, p.receiver); err != nil {
+		if err := cache.SetStruct(device.MacAddress, receiver); err != nil {
 			return fmt.Errorf("set cache failed: %v", err)
 		}
 	}
