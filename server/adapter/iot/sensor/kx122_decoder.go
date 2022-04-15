@@ -36,7 +36,7 @@ func (s Kx122Decoder) Decode(data []byte) (map[string]interface{}, error) {
 
 	// decode raw data
 	totalLength := int(metadata[0].dataLength + metadata[1].dataLength + metadata[2].dataLength)
-	valueBytes := data[88:]
+	valueBytes := data[72:]
 	if len(valueBytes) == totalLength {
 		svtRawData := entity.SvtRawData{}
 		rawDataOffset := 0 //metadata length
