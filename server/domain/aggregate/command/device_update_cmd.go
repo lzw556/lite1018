@@ -12,7 +12,6 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/devicetype"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/errcode"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/transaction"
-	"time"
 )
 
 type DeviceUpdateCmd struct {
@@ -34,24 +33,22 @@ func NewDeviceUpdateCmd() DeviceUpdateCmd {
 }
 
 func (cmd DeviceUpdateCmd) UpdateBaseInfo(req request.UpdateDevice) error {
-	if cmd.Device.Name != req.Name {
-		ctx := context.TODO()
-		cmd.Device.Name = req.Name
-		err := cmd.deviceRepo.Save(ctx, &cmd.Device)
-		if err != nil {
-			return err
-		}
-		devices, err := cmd.deviceRepo.FindBySpecs(ctx, spec.NetworkEqSpec(cmd.Device.NetworkID))
-		if err != nil {
-			return err
-		}
-		network, err := cmd.networkRepo.Get(ctx, cmd.Device.NetworkID)
-		if err != nil {
-			return err
-		}
-		if state, err := cmd.deviceStateRepo.Get(cmd.Device.MacAddress); err == nil && state.IsOnline {
-			command.SyncNetwork(network, devices, 3*time.Second)
-		}
+	ctx := context.TODO()
+	cmd.Device.Name = req.Name
+	parent, err := cmd.deviceRepo.GetBySpecs(ctx, spec.DeviceMacEqSpec(req.Parent))
+	if err != nil {
+		return response.BusinessErr(errcode.DeviceNotFoundError, req.Parent)
+	}
+	cmd.Parent = parent.MacAddress
+	if err := cmd.deviceRepo.Save(ctx, &cmd.Device); err != nil {
+		return err
+	}
+	network, err := cmd.networkRepo.Get(ctx, cmd.Device.NetworkID)
+	if err != nil {
+		return err
+	}
+	if gateway, err := cmd.deviceRepo.Get(ctx, network.GatewayID); err == nil {
+		go command.UpdateDevice(gateway, cmd.Device)
 	}
 	return nil
 }

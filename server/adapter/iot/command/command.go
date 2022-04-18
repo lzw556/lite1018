@@ -276,6 +276,16 @@ func AddDevice(gateway entity.Device, device entity.Device) {
 	return
 }
 
+func UpdateDevice(gateway entity.Device, device entity.Device) {
+	timeout := 3 * time.Second
+	cmd := newUpdateDeviceCmd(device)
+	if _, err := cmd.Execute(context.TODO(), gateway.MacAddress, gateway.MacAddress, timeout); err != nil {
+		xlog.Errorf("execute device command %s failed: %v => [%s]", cmd.Name(), err, gateway.MacAddress)
+		return
+	}
+	return
+}
+
 func ClearDevices(gateway entity.Device) error {
 	timeout := 3 * time.Second
 	cmd := newClearDevicesCmd()
