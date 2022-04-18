@@ -153,9 +153,21 @@ const DevicePage = () => {
             <Menu.Item key={DeviceCommand.Reboot} disabled={!disabled} hidden={isUpgrading}>
               重启
             </Menu.Item>
+            {record.typeId !== DeviceType.Gateway && record.typeId !== DeviceType.Router && (
+              <Menu.Item key={DeviceCommand.ResetData} disabled={!disabled} hidden={isUpgrading}>
+                重置数据
+              </Menu.Item>
+            )}
             <Menu.Item key={DeviceCommand.Reset} disabled={!disabled} hidden={isUpgrading}>
               恢复出厂设置
             </Menu.Item>
+            {(record.typeId === DeviceType.HighTemperatureCorrosion ||
+              record.typeId === DeviceType.NormalTemperatureCorrosion ||
+              record.typeId === DeviceType.BoltElongation) && (
+              <Menu.Item key={DeviceCommand.Calibrate} disabled={!disabled} hidden={isUpgrading}>
+                校准
+              </Menu.Item>
+            )}
           </>
         )}
         {hasPermissions(Permission.DeviceUpgrade, Permission.DeviceFirmwares) && (
