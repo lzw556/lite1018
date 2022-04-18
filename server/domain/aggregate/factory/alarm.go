@@ -152,3 +152,13 @@ func (factory Alarm) NewAlarmRecordUpdateCmd(id uint) (*command.AlarmRecordUpdat
 	cmd.AlarmRecord = e
 	return &cmd, nil
 }
+
+func (factory Alarm) NewAlarmRecordRemoveCmd(id uint) (*command.AlarmRecordRemoveCmd, error) {
+	e, err := factory.alarmRecordRepo.Get(context.TODO(), id)
+	if err != nil {
+		return nil, response.BusinessErr(errcode.AlarmRecordNotFoundError, "")
+	}
+	cmd := command.NewAlarmRecordRemoveCmd()
+	cmd.AlarmRecord = e
+	return &cmd, nil
+}

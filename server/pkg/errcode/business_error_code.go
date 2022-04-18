@@ -55,6 +55,7 @@ const (
 	AlarmRuleNameExists BusinessErrorCode = iota + 16001
 	AlarmRuleNotFoundError
 	AlarmRecordAlreadyAcknowledgedError
+	AlarmRecordNotFoundError
 )
 
 const (
@@ -101,6 +102,7 @@ var businessErrorMap = map[BusinessErrorCode]string{
 	AlarmRuleNameExists:                 "规则名称已经存在",
 	AlarmRuleNotFoundError:              "报警规则不存在",
 	AlarmRecordAlreadyAcknowledgedError: "报警已被处理",
+	AlarmRecordNotFoundError:            "报警记录不存在",
 	RoleExistsError:                     "角色已存在",
 	RoleNotFoundError:                   "角色不存在",
 	MeasurementNotFoundError:            "监测点不存在",

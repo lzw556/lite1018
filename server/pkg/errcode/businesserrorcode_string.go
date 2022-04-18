@@ -35,6 +35,7 @@ func _() {
 	_ = x[AlarmRuleNameExists-16001]
 	_ = x[AlarmRuleNotFoundError-16002]
 	_ = x[AlarmRecordAlreadyAcknowledgedError-16003]
+	_ = x[AlarmRecordNotFoundError-16004]
 	_ = x[RoleExistsError-17001]
 	_ = x[RoleNotFoundError-17002]
 	_ = x[MeasurementNotFoundError-18001]
@@ -52,7 +53,7 @@ const (
 	_BusinessErrorCode_name_3 = "DeviceNotFoundErrorDeviceMacExistsErrorUnknownDeviceTypeErrorDeviceCommandSendFailedErrorDeviceCommandSendTimeoutErrorDeviceCommandExecFailedErrorDeviceCommandCancelledErrorUnknownDeviceCommandTypeErrorDeviceOfflineErrorDeviceUpgradingErrorDeviceDataInvalidError"
 	_BusinessErrorCode_name_4 = "FirmwareNotFoundErrorFirmwareFormatErrorFirmwareExistsError"
 	_BusinessErrorCode_name_5 = "NetworkNotFoundError"
-	_BusinessErrorCode_name_6 = "AlarmRuleNameExistsAlarmRuleNotFoundErrorAlarmRecordAlreadyAcknowledgedError"
+	_BusinessErrorCode_name_6 = "AlarmRuleNameExistsAlarmRuleNotFoundErrorAlarmRecordAlreadyAcknowledgedErrorAlarmRecordNotFoundError"
 	_BusinessErrorCode_name_7 = "RoleExistsErrorRoleNotFoundError"
 	_BusinessErrorCode_name_8 = "MeasurementNotFoundErrorUnknownMeasurementTypeErrorMeasurementUnboundDeviceError"
 	_BusinessErrorCode_name_9 = "ProjectNotFoundErrorProjectExistsErrorProjectNotSelectedError"
@@ -64,7 +65,7 @@ var (
 	_BusinessErrorCode_index_2 = [...]uint8{0, 18, 45}
 	_BusinessErrorCode_index_3 = [...]uint16{0, 19, 39, 61, 89, 118, 146, 173, 202, 220, 240, 262}
 	_BusinessErrorCode_index_4 = [...]uint8{0, 21, 40, 59}
-	_BusinessErrorCode_index_6 = [...]uint8{0, 19, 41, 76}
+	_BusinessErrorCode_index_6 = [...]uint8{0, 19, 41, 76, 100}
 	_BusinessErrorCode_index_7 = [...]uint8{0, 15, 32}
 	_BusinessErrorCode_index_8 = [...]uint8{0, 24, 51, 80}
 	_BusinessErrorCode_index_9 = [...]uint8{0, 20, 38, 61}
@@ -89,7 +90,7 @@ func (i BusinessErrorCode) String() string {
 		return _BusinessErrorCode_name_4[_BusinessErrorCode_index_4[i]:_BusinessErrorCode_index_4[i+1]]
 	case i == 15001:
 		return _BusinessErrorCode_name_5
-	case 16001 <= i && i <= 16003:
+	case 16001 <= i && i <= 16004:
 		i -= 16001
 		return _BusinessErrorCode_name_6[_BusinessErrorCode_index_6[i]:_BusinessErrorCode_index_6[i+1]]
 	case 17001 <= i && i <= 17002:
