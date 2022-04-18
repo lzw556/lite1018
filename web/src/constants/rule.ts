@@ -12,7 +12,7 @@ export function OperationTranslate(op: string) {
     return ""
 }
 
-export const AlarmLevelInfo = "提示"
+export const AlarmLevelInfo = "次要"
 export const AlarmLevelWarn = "重要"
 export const AlarmLevelCritical = "紧急"
 

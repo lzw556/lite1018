@@ -98,7 +98,7 @@ const AlarmRule = () => {
             render: (level: any) => {
                 switch (level) {
                     case 1:
-                        return <Tag color={ColorInfo}>提示</Tag>
+                        return <Tag color={ColorInfo}>次要</Tag>
                     case 2:
                         return <Tag color={ColorWarn}>重要</Tag>
                     case 3:
@@ -191,7 +191,7 @@ const AlarmRule = () => {
                         if (state) {
                             switch (state.rule.level) {
                                 case 1:
-                                    return <Tag color={ColorInfo}>提示</Tag>
+                                    return <Tag color={ColorInfo}>次要</Tag>
                                 case 2:
                                     return <Tag color={ColorWarn}>重要</Tag>
                                 case 3:

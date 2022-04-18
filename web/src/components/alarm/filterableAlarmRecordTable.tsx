@@ -102,7 +102,7 @@ export const FilterableAlarmRecordTable: React.FC<{ sourceId?: number }> = ({ so
       render: (level: number) => {
         switch (level) {
           case 1:
-            return <Tag color={ColorInfo}>提示</Tag>
+            return <Tag color={ColorInfo}>次要</Tag>
           case 2:
             return <Tag color={ColorWarn}>重要</Tag>
           case 3:
@@ -222,7 +222,7 @@ export const FilterableAlarmRecordTable: React.FC<{ sourceId?: number }> = ({ so
                   setAlertLevels([1, 2, 3])
                 }
               }}>
-              <Option key={1} value={1}>提示</Option>
+              <Option key={1} value={1}>次要</Option>
               <Option key={2} value={2}>重要</Option>
               <Option key={3} value={3}>紧急</Option>
             </Select>

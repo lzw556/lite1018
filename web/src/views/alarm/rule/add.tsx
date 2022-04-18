@@ -260,7 +260,7 @@ const AddAlarmRule = () => {
                                                     <Form.Item name={["level"]} noStyle>
                                                         <Select size={"small"}
                                                                 style={{width: "88px"}}>
-                                                            <Option key={1} value={1}>提示</Option>
+                                                            <Option key={1} value={1}>次要</Option>
                                                             <Option key={2} value={2}>重要</Option>
                                                             <Option key={3} value={3}>紧急</Option>
                                                         </Select>

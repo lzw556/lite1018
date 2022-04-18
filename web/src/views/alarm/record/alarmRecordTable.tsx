@@ -69,7 +69,7 @@ const AlarmRecordTable: FC<AlarmRecordTableProps> = ({type, start, stop, asset, 
             render: (level: number) => {
                 switch (level) {
                     case 1:
-                        return <Tag color={ColorInfo}>提示</Tag>
+                        return <Tag color={ColorInfo}>次要</Tag>
                     case 2:
                         return <Tag color={ColorWarn}>重要</Tag>
                     case 3:
