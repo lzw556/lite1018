@@ -21,8 +21,13 @@ import {PageResult} from "../../types/page";
 import usePermission, {Permission} from "../../permission/permission";
 import HasPermission from "../../permission";
 import { isMobile } from "../../utils/deviceDetection";
+import { Link, useLocation } from "react-router-dom";
+import { PagedOption } from "../../types/props";
 
 const NetworkPage = () => {
+    const { state } = useLocation<{pagedOptions: PagedOption}>();
+    const pagedOptionsDefault = { index: 1, size: 10 };
+    const [pagedOptions, setPagedOptions] = useState(state ? state.pagedOptions : pagedOptionsDefault);
     const {hasPermission, hasPermissions} = usePermission();
     const [addVisible, setAddVisible] = useState<boolean>(false)
     const [editVisible, setEditVisible] = useState<boolean>(false)
@@ -30,14 +35,10 @@ const NetworkPage = () => {
     const [dataSource, setDataSource] = useState<PageResult<any>>()
     const [refreshKey, setRefreshKey] = useState<number>(0)
 
-    const fetchNetworks = useCallback((current: number, size: number) => {
-        const filter: any = {}
-        PagingNetworksRequest(filter, current, size).then(setDataSource)
-    }, [refreshKey])
-
     useEffect(() => {
-        fetchNetworks(1, 10)
-    }, [fetchNetworks])
+        const {index, size} = pagedOptions;
+        PagingNetworksRequest({}, index, size).then(setDataSource)
+    }, [pagedOptions, refreshKey])
 
     const onRefresh = () => {
         setRefreshKey(refreshKey + 1)
@@ -116,7 +117,7 @@ const NetworkPage = () => {
             key: 'name',
             render: (text: string, record: Network) => {
                 if (hasPermission(Permission.NetworkDetail)) {
-                    return <a href={`#/network-management?locale=networks/networkDetail&id=${record.id}`}>{text}</a>
+                    return <Link to={{pathname:`network-management`, search: `?locale=networks/networkDetail&id=${record.id}` ,state: {pagedOptions}}}>{text}</Link>
                 }
                 return text
             }
@@ -200,19 +201,12 @@ const NetworkPage = () => {
         </MyBreadcrumb>
         <ShadowCard>
             <Row justify={"start"}>
-                <Col span={12}>
-                    <Space>
-                    </Space>
-                </Col>
-            </Row>
-            <br/>
-            <Row justify={"start"}>
                 <Col span={24}>
                     <TableLayout emptyText={"网络列表为空"}
                                  permissions={[Permission.NetworkEdit, Permission.NetworkExport, Permission.NetworkDelete]}
                                  columns={columns}
                                  dataSource={dataSource}
-                                 onPageChange={fetchNetworks}
+                                 onPageChange={(index, size) => setPagedOptions({index, size})}
                                  simple={isMobile}
                                  scroll={isMobile ? {x: 800} : undefined}/>
                 </Col>
