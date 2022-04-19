@@ -31,7 +31,6 @@ type DeviceQuery struct {
 	networkRepo           dependency.NetworkRepository
 	alarmRuleRepo         dependency.AlarmRuleRepository
 	alarmSourceRepo       dependency.AlarmSourceRepository
-	largeSensorDataRepo   dependency.LargeSensorDataRepository
 	eventRepo             dependency.EventRepository
 }
 
@@ -43,7 +42,6 @@ func NewDeviceQuery() DeviceQuery {
 		deviceInformationRepo: repository.DeviceInformation{},
 		deviceAlertStateRepo:  repository.DeviceAlertState{},
 		networkRepo:           repository.Network{},
-		largeSensorDataRepo:   repository.LargeSensorData{},
 		eventRepo:             repository.Event{},
 		alarmSourceRepo:       repository.AlarmSource{},
 		alarmRuleRepo:         repository.AlarmRule{},
@@ -66,6 +64,7 @@ func (query DeviceQuery) Paging(page, size int) ([]vo.Device, int64, error) {
 	if err != nil {
 		return nil, 0, err
 	}
+	sort.Sort(es)
 	result := make([]vo.Device, len(es))
 	for i, device := range es {
 		result[i] = query.newDevice(device)

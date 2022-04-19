@@ -39,7 +39,7 @@ const AddAlarmRule = () => {
     }, [])
 
 
-    const onSave = () => {
+    const onAdd = () => {
         form.validateFields().then(values => {
             values.threshold = parseFloat(values.threshold)
             if (selected && selected.sources.length > 0) {
@@ -47,6 +47,7 @@ const AddAlarmRule = () => {
             }
             values.source_type = deviceType
             values.category = parseInt(category)
+            values.metric = metric
             AddAlarmRuleRequest(values).then(data => {
                 setSuccess(true)
             })
@@ -280,7 +281,7 @@ const AddAlarmRule = () => {
                             <Button onClick={() => {
                                 window.location.hash = "alarm-management?locale=alarmRules&tab=rules"
                             }}>取消</Button>
-                            <Button type={"primary"} onClick={onSave}>创建</Button>
+                            <Button type={"primary"} onClick={onAdd}>创建</Button>
                         </Space>
                     </Col>
                 </Row>
