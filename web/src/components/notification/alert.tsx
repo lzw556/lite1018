@@ -22,7 +22,7 @@ const AlertMessageNotification = () => {
             case 1:
                 api.info({
                     key: record.device.macAddress,
-                    message: `提示报警`,
+                    message: `次要报警`,
                     description: <div>{renderDescription(record)}</div>,
                 })
                 break

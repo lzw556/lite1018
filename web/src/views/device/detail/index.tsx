@@ -188,6 +188,13 @@ const DeviceDetailPage = () => {
                 <Menu.Item key={DeviceCommand.Reset} disabled={!isOnline} hidden={isUpgrading}>
                     恢复出厂设置
                 </Menu.Item>
+                {device && (device.typeId === DeviceType.HighTemperatureCorrosion ||
+                    device.typeId === DeviceType.NormalTemperatureCorrosion ||
+                    device.typeId === DeviceType.BoltElongation) && (
+                    <Menu.Item key={DeviceCommand.Calibrate} disabled={!isOnline} hidden={isUpgrading}>
+                        校准
+                    </Menu.Item>
+                )}
                 {hasPermissions(Permission.DeviceUpgrade, Permission.DeviceFirmwares) && (
                     <>
                         <Menu.Item key={DeviceCommand.Upgrade} disabled={!isOnline} hidden={isUpgrading}>
@@ -204,13 +211,7 @@ const DeviceDetailPage = () => {
 
     return (
         <Content>
-            <MyBreadcrumb
-                firstBreadState={
-                    location && location.search.indexOf('displayDevicesByCard') > -1
-                        ? {displayDevicesByCard: true}
-                        : undefined
-                }
-            >
+            <MyBreadcrumb firstBreadState={location.state}>
                 <Space>
                     <HasPermission value={Permission.DeviceCommand}>
                         <Dropdown overlay={renderCommandMenu} trigger={isMobile ? ['click'] : ['hover']}>

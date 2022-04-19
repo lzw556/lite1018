@@ -6,14 +6,17 @@ import { Device } from '../../types/device';
 import { DeviceType } from '../../types/device_type';
 import DeviceUpgradeSpin from './spin/deviceUpgradeSpin';
 import { SingleDeviceStatus } from './SingleDeviceStatus';
-import { getValueOfFirstClassProperty } from './util';
+import { Filters, getValueOfFirstClassProperty } from './util';
+import { Link } from 'react-router-dom';
+import { PagedOption } from '../../types/props';
 
 const { Text } = Typography;
 
-export const SingleDeviceInfo: React.FC<{ device: Device; actions?: React.ReactNode[] }> = ({
-  device,
-  actions
-}) => {
+export const SingleDeviceInfo: React.FC<{
+  device: Device;
+  actions?: React.ReactNode[];
+  rememberdState: { filters?: Filters; pagedOptions: PagedOption };
+}> = ({ device, actions, rememberdState }) => {
   const { hasPermission } = usePermission();
   const {
     state: { batteryVoltage, signalLevel },
@@ -30,9 +33,15 @@ export const SingleDeviceInfo: React.FC<{ device: Device; actions?: React.ReactN
     const deviceName = (
       <>
         {hasPermission(Permission.DeviceDetail) ? (
-          <a href={`#/device-management?locale=device-monitor/deviceDetail&id=${id}`}>
+          <Link
+            to={{
+              pathname: `device-management`,
+              search: `?locale=device-monitor/deviceDetail&id=${id}`,
+              state: rememberdState
+            }}
+          >
             {name}
-          </a>
+          </Link>
         ) : (
           name
         )}

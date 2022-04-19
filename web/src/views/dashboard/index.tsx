@@ -86,7 +86,7 @@ const DashboardPage = () => {
         const critical = 0
         const legend = new Map<string, number>([
             ['正常', total - info - warn - critical],
-            ['提示', info],
+            ['次要', info],
             ['重要', warn],
             ['紧急', critical],
         ]);
@@ -117,7 +117,7 @@ const DashboardPage = () => {
                         },
                         {
                             value: info,
-                            name: '提示',
+                            name: '次要',
                             itemStyle: {
                                 color: ColorInfo
                             },

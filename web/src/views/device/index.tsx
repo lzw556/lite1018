@@ -21,7 +21,7 @@ import {
   PlusOutlined
 } from '@ant-design/icons';
 import { Content } from 'antd/lib/layout/layout';
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { DeviceCommand } from '../../types/device_command';
 import {
   DeleteDeviceRequest,
@@ -50,17 +50,22 @@ import NetworkSelect from '../../components/select/networkSelect';
 import DeviceUpgradeSpin from './spin/deviceUpgradeSpin';
 import './index.css';
 import { SingleDeviceStatus } from './SingleDeviceStatus';
-import { getValueOfFirstClassProperty, generateDeviceTypeCollections } from './util';
+import { getValueOfFirstClassProperty, generateDeviceTypeCollections, omitSpecificKeys, Filters } from './util';
 import { isMobile } from '../../utils/deviceDetection';
+import { Link, useLocation } from 'react-router-dom';
+import { PagedOption } from '../../types/props';
 
 const { Search } = Input;
 const { Option } = Select;
 const { Text } = Typography;
+type RememberdState = {filters: Filters; pagedOptions: PagedOption; searchTarget: number;}
 
 const DevicePage = () => {
-  const [network, setNetwork] = useState<number>();
-  const [searchTarget, setSearchTarget] = useState<number>(0);
-  const [searchText, setSearchText] = useState<string>('');
+  const { state } = useLocation<RememberdState>();
+  const [searchTarget, setSearchTarget] = useState(state ? state.searchTarget :0);
+  const pagedOptionsDefault = { index: 1, size: 10 };
+  const [pagedOptions, setPagedOptions] = useState(state ? state.pagedOptions : pagedOptionsDefault);
+  const [filters, setFilters] = useState<Filters | undefined>(state ? state.filters: undefined);
   const [device, setDevice] = useState<Device>();
   const [editSettingVisible, setEditSettingVisible] = useState<boolean>(false);
   const [editBaseInfoVisible, setEditBaseInfoVisible] = useState<boolean>(false);
@@ -69,38 +74,11 @@ const DevicePage = () => {
   const [dataSource, setDataSource] = useState<PageResult<any>>();
   const { hasPermission, hasPermissions } = usePermission();
   const [refreshKey, setRefreshKey] = useState<number>(0);
-  const [deviceTypeId, setDeviceTypeId] = useState<number>();
-
-  const onSearch = (value: string) => {
-    setSearchText(value);
-  };
-
-  const onTargetChange = (value: number) => {
-    setSearchTarget(value);
-  };
-
-  const fetchDevices = useCallback(
-    (current: number, size: number) => {
-      const filter: any = {};
-      if (searchTarget === 0) {
-        filter.name = searchText;
-      } else if (searchTarget === 1) {
-        filter.mac_address = searchText;
-      }
-      if (network) {
-        filter.network_id = network;
-      }
-      if (deviceTypeId) {
-        filter.type = deviceTypeId;
-      }
-      PagingDevicesRequest(current, size, filter).then(setDataSource);
-    },
-    [network, searchText, searchTarget, deviceTypeId]
-  );
 
   useEffect(() => {
-    fetchDevices(1, 10);
-  }, [fetchDevices]);
+    const { index, size } = pagedOptions;
+    PagingDevicesRequest(index, size, omitSpecificKeys(filters ?? {}, [])).then(setDataSource);
+  }, [pagedOptions, filters, refreshKey]);
 
   const onRefresh = () => {
     setRefreshKey(refreshKey + 1);
@@ -153,9 +131,21 @@ const DevicePage = () => {
             <Menu.Item key={DeviceCommand.Reboot} disabled={!disabled} hidden={isUpgrading}>
               重启
             </Menu.Item>
+            {record.typeId !== DeviceType.Gateway && record.typeId !== DeviceType.Router && (
+              <Menu.Item key={DeviceCommand.ResetData} disabled={!disabled} hidden={isUpgrading}>
+                重置数据
+              </Menu.Item>
+            )}
             <Menu.Item key={DeviceCommand.Reset} disabled={!disabled} hidden={isUpgrading}>
               恢复出厂设置
             </Menu.Item>
+            {(record.typeId === DeviceType.HighTemperatureCorrosion ||
+              record.typeId === DeviceType.NormalTemperatureCorrosion ||
+              record.typeId === DeviceType.BoltElongation) && (
+              <Menu.Item key={DeviceCommand.Calibrate} disabled={!disabled} hidden={isUpgrading}>
+                校准
+              </Menu.Item>
+            )}
           </>
         )}
         {hasPermissions(Permission.DeviceUpgrade, Permission.DeviceFirmwares) && (
@@ -219,7 +209,15 @@ const DevicePage = () => {
               spinning={executeDevice ? executeDevice.id === record.id : false}
             />
             {hasPermission(Permission.DeviceDetail) ? (
-              <a href={`#/device-management?locale=devices/deviceDetail&id=${record.id}`}>{text}</a>
+              <Link
+                to={{
+                  pathname: `device-management`,
+                  search: `?locale=devices/deviceDetail&id=${record.id}`,
+                  state: {filters, pagedOptions, searchTarget}
+                }}
+              >
+                {text}
+              </Link>
             ) : (
               text
             )}
@@ -350,7 +348,10 @@ const DevicePage = () => {
           <Col span={24}>
             <Space direction={isMobile ? 'vertical' : 'horizontal'}>
               <Label name={'网络'}>
-                <NetworkSelect bordered={false} onChange={setNetwork} allowClear />
+                <NetworkSelect bordered={false} onChange={(network) => {
+                  setFilters(prev => ({...prev, network_id: network}));
+                  setPagedOptions(pagedOptionsDefault);
+                }} allowClear defaultValue={filters?.network_id}/>
               </Label>
               <Label name='设备类型'>
                 <Select
@@ -358,8 +359,10 @@ const DevicePage = () => {
                   bordered={false}
                   allowClear={true}
                   onChange={(val) => {
-                    setDeviceTypeId(Number.isInteger(val) ? Number(val) : undefined);
+                    setFilters(prev => ({...prev, type: Number.isInteger(val) ? Number(val) : undefined}));
+                    setPagedOptions(pagedOptionsDefault);
                   }}
+                  defaultValue={filters?.type}
                 >
                   {generateDeviceTypeCollections().map(({ val, name }: any) => (
                     <Select.Option key={val} value={val}>
@@ -372,7 +375,7 @@ const DevicePage = () => {
                 <Select
                   defaultValue={searchTarget}
                   style={{ width: '80px' }}
-                  onChange={onTargetChange}
+                  onChange={val => setSearchTarget(val)}
                   suffixIcon={<CaretDownOutlined />}
                 >
                   <Option value={0}>名称</Option>
@@ -383,9 +386,15 @@ const DevicePage = () => {
                   placeholder={
                     searchTarget === 0 ? '请输入设备名称进行查询' : '请输入设备MAC进行查询'
                   }
-                  onSearch={onSearch}
+                  onSearch={val => {
+                    setFilters(prev => {
+                      return searchTarget === 0 ? {...prev, name: val} : {...prev, mac_address: val}
+                    })
+                    setPagedOptions(pagedOptionsDefault);
+                  }}
                   allowClear
                   enterButton
+                  defaultValue={filters?.mac_address || filters?.name}
                 />
               </Input.Group>
             </Space>
@@ -403,7 +412,7 @@ const DevicePage = () => {
                 Permission.DeviceDelete
               ]}
               dataSource={dataSource}
-              onChange={fetchDevices}
+              onChange={(index: number, size: number) => setPagedOptions({ index, size })}
             />
           </Col>
         </Row>

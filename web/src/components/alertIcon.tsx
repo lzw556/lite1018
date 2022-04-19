@@ -30,7 +30,7 @@ const AlertIcon: FC<AlertIconProps> = ({state, popoverPlacement}) => {
                         data.level === 2 && <Tag color={ColorWarn}>重要</Tag>
                     }
                     {
-                        data.level === 1 && <Tag color={ColorInfo}>提示</Tag>
+                        data.level === 1 && <Tag color={ColorInfo}>次要</Tag>
                     }
                     <Text>{moment.unix(data.timestamp).local().format("YYYY-MM-DD HH:mm:ss")}</Text>
                     <Text>{`【${GetFieldName(data.rule.field)}】值${OperationTranslate(data.rule.operation)}设定的阈值${data.rule.threshold}${data.property.unit}`}</Text>

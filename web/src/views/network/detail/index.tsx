@@ -176,7 +176,7 @@ const NetworkDetail = () => {
 
   return (
     <Content>
-      <MyBreadcrumb>
+      <MyBreadcrumb firstBreadState={location.state as any}>
         <HasPermission value={Permission.NetworkAddDevices}>
           <Space>
             <Button type={'primary'} onClick={() => setAddDeviceVisible(true)}>
