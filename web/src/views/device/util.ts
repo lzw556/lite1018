@@ -47,3 +47,26 @@ export const generateDeviceTypeCollections = () => {
   const values: number[] = origin.filter((val: any) => Number.isInteger(Number(val)));
   return values.map((val) => ({ val, name: DeviceType.toString(val) }));
 };
+
+export const omitSpecificKeys = <T extends { [propName: string]: any }>(
+  obj: T,
+  keys: (keyof T)[],
+  skipEmpty = true
+) => {
+  const newObj = Object.assign({}, obj);
+  if (newObj) {
+    Object.keys(newObj)
+      .filter((key) => keys.find((_key) => _key === key))
+      .forEach((key) => {
+        delete newObj[key];
+      });
+    if (Object.keys(newObj).length > 0 && skipEmpty) {
+      Object.keys(newObj).forEach((key) => {
+        if (newObj[key] === undefined || newObj[key] === null || newObj[key] === '') {
+          delete newObj[key];
+        }
+      });
+    }
+  }
+  return newObj;
+};

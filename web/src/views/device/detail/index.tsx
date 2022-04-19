@@ -211,13 +211,7 @@ const DeviceDetailPage = () => {
 
     return (
         <Content>
-            <MyBreadcrumb
-                firstBreadState={
-                    location && location.search.indexOf('displayDevicesByCard') > -1
-                        ? {displayDevicesByCard: true}
-                        : undefined
-                }
-            >
+            <MyBreadcrumb firstBreadState={location.state}>
                 <Space>
                     <HasPermission value={Permission.DeviceCommand}>
                         <Dropdown overlay={renderCommandMenu} trigger={isMobile ? ['click'] : ['hover']}>
