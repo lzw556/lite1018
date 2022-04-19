@@ -26,6 +26,7 @@ p, 操作员, devices/*, PATCH
 p, 操作员, alarmRules/*/sources, POST
 p, 操作员, alarmRules/*, PUT
 p, 操作员, alarmRules/*, PATCH
+p, 操作员, alarmRecords/*, POST
 p, 操作员, alarmRecords/*, PUT
 
 p, 项目管理员, networks, GET
@@ -47,6 +48,7 @@ p, 项目管理员, devices/*, PATCH
 p, 项目管理员, alarmRules/*/sources, POST
 p, 项目管理员, alarmRules/*, PUT
 p, 项目管理员, alarmRules/*, PATCH
+p, 项目管理员, alarmRecords/*, POST
 p, 项目管理员, alarmRecords/*, PUT
 p, 项目管理员, networks/*, DELETE
 p, 项目管理员, devices/*, DELETE
@@ -72,6 +74,7 @@ p, 平台管理员, devices/*, PATCH
 p, 平台管理员, alarmRules/*/sources, POST
 p, 平台管理员, alarmRules/*, PUT
 p, 平台管理员, alarmRules/*, PATCH
+p, 平台管理员, alarmRecords/*, POST
 p, 平台管理员, alarmRecords/*, PUT
 p, 平台管理员, networks/*, DELETE
 p, 平台管理员, devices/*, DELETE
