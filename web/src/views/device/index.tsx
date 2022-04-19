@@ -79,7 +79,7 @@ const DevicePage = () => {
   useEffect(() => {
     const { index, size } = pagedOptions;
     PagingDevicesRequest(index, size, omitSpecificKeys(filters ?? {}, [])).then(setDataSource);
-  }, [pagedOptions, filters]);
+  }, [pagedOptions, filters, refreshKey]);
 
   const onRefresh = () => {
     setRefreshKey(refreshKey + 1);
