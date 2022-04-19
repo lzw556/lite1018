@@ -6,8 +6,9 @@ import { Device } from '../../types/device';
 import { DeviceType } from '../../types/device_type';
 import DeviceUpgradeSpin from './spin/deviceUpgradeSpin';
 import { SingleDeviceStatus } from './SingleDeviceStatus';
-import { Filters, getValueOfFirstClassProperty, PagedOption } from './util';
+import { Filters, getValueOfFirstClassProperty } from './util';
 import { Link } from 'react-router-dom';
+import { PagedOption } from '../../types/props';
 
 const { Text } = Typography;
 

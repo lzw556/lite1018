@@ -26,7 +26,8 @@ import { GetNetworksRequest } from '../../apis/network';
 import moment from 'moment';
 import { isMobile } from '../../utils/deviceDetection';
 import { useLocation } from 'react-router-dom';
-import { Filters, omitSpecificKeys, PagedOption } from './util';
+import { Filters, omitSpecificKeys } from './util';
+import { PagedOption } from '../../types/props';
 
 const { Option } = Select;
 

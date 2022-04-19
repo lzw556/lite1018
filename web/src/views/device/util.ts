@@ -72,4 +72,3 @@ export const omitSpecificKeys = <T extends { [propName: string]: any }>(
 };
 
 export type Filters = {name?:string; mac_address?:string; network_id?:number; type?:number; types?: string;};
-export type PagedOption = {index: number; size: number;};

@@ -50,9 +50,10 @@ import NetworkSelect from '../../components/select/networkSelect';
 import DeviceUpgradeSpin from './spin/deviceUpgradeSpin';
 import './index.css';
 import { SingleDeviceStatus } from './SingleDeviceStatus';
-import { getValueOfFirstClassProperty, generateDeviceTypeCollections, omitSpecificKeys, Filters, PagedOption } from './util';
+import { getValueOfFirstClassProperty, generateDeviceTypeCollections, omitSpecificKeys, Filters } from './util';
 import { isMobile } from '../../utils/deviceDetection';
 import { Link, useLocation } from 'react-router-dom';
+import { PagedOption } from '../../types/props';
 
 const { Search } = Input;
 const { Option } = Select;
