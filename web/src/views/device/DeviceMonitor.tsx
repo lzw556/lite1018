@@ -23,20 +23,14 @@ import { DefaultMultiBarOption, DefaultPieOption } from '../../constants/chart';
 import { ColorDanger, ColorHealth, ColorInfo, ColorOffline, ColorWarn } from '../../constants/color';
 import { Network } from '../../types/network';
 import { GetNetworksRequest } from '../../apis/network';
-import { number } from 'echarts';
 import moment from 'moment';
 import { isMobile } from '../../utils/deviceDetection';
+import { useLocation } from 'react-router-dom';
+import { Filters, omitSpecificKeys, PagedOption } from './util';
 
 const { Option } = Select;
 
 const DeviceMonitor = () => {
-  const [networks, setNetworks] = React.useState<Network[]>([]);
-  const [network, setNetwork] = React.useState<number>(0);
-  const [count, setCount] = React.useState<{ isOnline: boolean; alertLevel: number }[]>([]);
-  const [dataSource, setDataSource] = React.useState<PageResult<any>>();
-  const [countAlarm, setCountAlarm] = React.useState<
-    { timestamp: number; info: number; warn: number; critical: number }[]
-  >([]);
   const types = [
     DeviceType.BoltLoosening,
     DeviceType.BoltElongation,
@@ -46,39 +40,39 @@ const DeviceMonitor = () => {
     DeviceType.PressureTemperature,
     DeviceType.VibrationTemperature3Axis
   ].join(',');
-  const fetchDevices = React.useCallback(
-    (current: number, size: number) => {
-      const filter: any = { types };
-      if (network) {
-        filter.network_id = network;
-      }
-      if (network !== 0) PagingDevicesRequest(current, size, filter).then(setDataSource);
-    },
-    [network, types]
-  );
+  const [networks, setNetworks] = React.useState<Network[]>([]);
+  const { state } = useLocation<{filters: Filters; pagedOptions: PagedOption;}>();
+  const pagedOptionsDefault = { index: 1, size: 10 };
+  const [pagedOptions, setPagedOptions] = React.useState(state ? state.pagedOptions : pagedOptionsDefault);
+  const [filters, setFilters] = React.useState<Filters | undefined>(state ? {...state.filters, types}: {network_id: 0, types });
+  const [count, setCount] = React.useState<{ isOnline: boolean; alertLevel: number }[]>([]);
+  const [dataSource, setDataSource] = React.useState<PageResult<any>>();
+  const [countAlarm, setCountAlarm] = React.useState<
+    { timestamp: number; info: number; warn: number; critical: number }[]
+  >([]);
 
   React.useEffect(() => {
     GetNetworksRequest().then(setNetworks);
   }, []);
 
   React.useEffect(() => {
-    if (networks.length > 0) setNetwork(networks[0].id);
-  }, [networks]);
+    if (networks.length > 0 && filters?.network_id === 0) setFilters(prev => ({...prev, network_id: networks[0].id}));
+  }, [networks, filters]);
 
   React.useEffect(() => {
-    const filter: any = { types };
-    if (network) {
-      filter.network_id = network;
+    if(filters?.network_id !== 0) {
+      const _filters = omitSpecificKeys(filters ?? {}, []);
+      GetDeviceStatisticsRequest(_filters).then(setCount);
+      GetAlertStatisticsRequest(_filters).then(setCountAlarm);
     }
-    if (network !== 0) {
-      GetDeviceStatisticsRequest(filter).then(setCount);
-      GetAlertStatisticsRequest(filter).then(setCountAlarm);
-    }
-  }, [network, types]);
+  }, [filters]);
 
   React.useEffect(() => {
-    fetchDevices(1, 10);
-  }, [fetchDevices]);
+    const {index, size} = pagedOptions;
+    if(filters?.network_id !== 0){
+      PagingDevicesRequest(index, size, omitSpecificKeys(filters ?? {}, [])).then(setDataSource)
+    }
+  }, [filters, pagedOptions]);
 
   const renderStatistic = () => {
     if (count.length === 0) return null;
@@ -231,13 +225,16 @@ const DeviceMonitor = () => {
         <ShadowCard>
           <Row>
             <Col span={isMobile ? 18 : 4}>
-              <Label name={'网络'}>
+              {filters?.network_id !== 0 && <Label name={'网络'}>
                 <Select
                   bordered={false}
-                  onChange={(val) => setNetwork(Number(val))}
+                  onChange={(val) => {
+                    setFilters(prev => ({...prev, network_id: val}));
+                    setPagedOptions(pagedOptionsDefault);
+                  }}
                   allowClear
                   placeholder={'请选择网络'}
-                  defaultValue={networks[0].id}
+                  defaultValue={filters?.network_id}
                 >
                   {networks.map((network) => (
                     <Option key={network.id} value={network.id}>
@@ -245,7 +242,7 @@ const DeviceMonitor = () => {
                     </Option>
                   ))}
                 </Select>
-              </Label>
+              </Label>}
             </Col>
           </Row>
           <br />
@@ -255,7 +252,7 @@ const DeviceMonitor = () => {
             {dataSource &&
               dataSource.result.map((device: Device) => (
                 <Col key={device.id} className='device'>
-                  <SingleDeviceInfo device={device} />
+                  <SingleDeviceInfo device={device} rememberdState={{filters, pagedOptions}}/>
                 </Col>
               ))}
           </Row>
@@ -267,7 +264,7 @@ const DeviceMonitor = () => {
                     {...{
                       showSizeChanger: true,
                       pageSizeOptions: ['10', '20', '30', '40', '50'],
-                      onChange: fetchDevices
+                      onChange: (index, size) => setPagedOptions({index, size})
                     }}
                     current={dataSource.page}
                     total={dataSource.total}

@@ -50,15 +50,13 @@ import NetworkSelect from '../../components/select/networkSelect';
 import DeviceUpgradeSpin from './spin/deviceUpgradeSpin';
 import './index.css';
 import { SingleDeviceStatus } from './SingleDeviceStatus';
-import { getValueOfFirstClassProperty, generateDeviceTypeCollections, omitSpecificKeys } from './util';
+import { getValueOfFirstClassProperty, generateDeviceTypeCollections, omitSpecificKeys, Filters, PagedOption } from './util';
 import { isMobile } from '../../utils/deviceDetection';
 import { Link, useLocation } from 'react-router-dom';
 
 const { Search } = Input;
 const { Option } = Select;
 const { Text } = Typography;
-type Filters = {name?:string; mac_address?:string; network_id?:number; type?:number};
-type PagedOption = {index: number; size: number;};
 type RememberdState = {filters: Filters; pagedOptions: PagedOption; searchTarget: number;}
 
 const DevicePage = () => {
