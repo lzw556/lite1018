@@ -20,5 +20,5 @@ type DeviceRepository interface {
 	Find(ctx context.Context, ids ...uint) ([]entity.Device, error)
 	GetBySpecs(ctx context.Context, specs ...specification.Specification) (entity.Device, error)
 	FindBySpecs(ctx context.Context, specs ...specification.Specification) (entity.Devices, error)
-	PagingBySpecs(ctx context.Context, page, size int, specs ...specification.Specification) ([]entity.Device, int64, error)
+	PagingBySpecs(ctx context.Context, page, size int, specs ...specification.Specification) (entity.Devices, int64, error)
 }

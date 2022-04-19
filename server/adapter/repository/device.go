@@ -57,7 +57,7 @@ func (repo Device) GetBySpecs(ctx context.Context, specs ...specification.Specif
 	return e, err
 }
 
-func (repo Device) PagingBySpecs(ctx context.Context, page, size int, specs ...specification.Specification) ([]entity.Device, int64, error) {
+func (repo Device) PagingBySpecs(ctx context.Context, page, size int, specs ...specification.Specification) (entity.Devices, int64, error) {
 	db := repo.DB(ctx).Model(&entity.Device{}).Scopes(specification.Scopes(specs)...)
 	var total int64
 	if err := db.Count(&total).Error; err != nil {

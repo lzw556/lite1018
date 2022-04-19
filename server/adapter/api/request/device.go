@@ -14,7 +14,8 @@ type CreateDevice struct {
 }
 
 type UpdateDevice struct {
-	Name string `json:"name" binding:"max=20,min=2"`
+	Name   string `json:"name" binding:"max=20,min=2"`
+	Parent string `json:"parent"`
 }
 
 type DeviceSearch struct {

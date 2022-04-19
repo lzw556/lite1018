@@ -32,6 +32,7 @@ var types = []Typer{
 	BoltElongation{},
 	VibrationTemperature3Axis{},
 	NormalTemperatureCorrosion{},
+	HighTemperatureCorrosion{},
 	AngleDip{},
 }
 
