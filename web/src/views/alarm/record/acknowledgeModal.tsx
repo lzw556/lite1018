@@ -33,7 +33,7 @@ const AcknowledgeModal: FC<AcknowledgeModalProps> = (props) => {
             <Form.Item label={"报警详情"} name={["content"]}>
                 <Input disabled/>
             </Form.Item>
-            <Form.Item label={"处理意见"} name={"note"}>
+            <Form.Item label={"处理意见"} name={"note"} initialValue={""}>
                 <Input.TextArea placeholder={"请输入处理意见"} rows={4}/>
             </Form.Item>
         </Form>
