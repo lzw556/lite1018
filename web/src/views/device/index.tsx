@@ -54,6 +54,7 @@ import { getValueOfFirstClassProperty, generateDeviceTypeCollections, omitSpecif
 import { isMobile } from '../../utils/deviceDetection';
 import { Link, useLocation } from 'react-router-dom';
 import { PagedOption } from '../../types/props';
+import EditCalibrateParas from './edit/editCalibrateParas';
 
 const { Search } = Input;
 const { Option } = Select;
@@ -74,6 +75,7 @@ const DevicePage = () => {
   const [dataSource, setDataSource] = useState<PageResult<any>>();
   const { hasPermission, hasPermissions } = usePermission();
   const [refreshKey, setRefreshKey] = useState<number>(0);
+  const [visibleCalibrate, setVisibleCalibrate] = useState(false);
 
   useEffect(() => {
     const { index, size } = pagedOptions;
@@ -102,6 +104,10 @@ const DevicePage = () => {
             message.error(`取消升级失败,${res.msg}`).then();
           }
         });
+        break;
+      case DeviceCommand.Calibrate:
+        setDevice(device);
+        setVisibleCalibrate(true);
         break;
       default:
         setExecuteDevice(device);
@@ -456,6 +462,26 @@ const DevicePage = () => {
           onCancel={() => {
             setDevice(undefined);
             setUpgradeVisible(false);
+          }}
+        />
+      )}
+      {visibleCalibrate && device && (
+        <EditCalibrateParas
+          visible={visibleCalibrate}
+          setVisible={setVisibleCalibrate}
+          typeId={device?.typeId}
+          properties={device.properties}
+          onUpdate={(paras) => {
+            setDevice(undefined);
+            setVisibleCalibrate(false);
+            SendDeviceCommandRequest(device.id, DeviceCommand.Calibrate, paras).then((res) => {
+              setExecuteDevice(undefined);
+              if (res.code === 200) {
+                message.success('命令发送成功').then();
+              } else {
+                message.error(res.msg).then();
+              }
+            });
           }}
         />
       )}
