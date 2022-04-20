@@ -35,12 +35,42 @@ func NewDeviceUpdateCmd() DeviceUpdateCmd {
 func (cmd DeviceUpdateCmd) UpdateBaseInfo(req request.UpdateDevice) error {
 	ctx := context.TODO()
 	cmd.Device.Name = req.Name
-	parent, err := cmd.deviceRepo.GetBySpecs(ctx, spec.DeviceMacEqSpec(req.Parent))
+	err := transaction.Execute(ctx, func(txCtx context.Context) error {
+		isNetworkChanged := cmd.Device.NetworkID != req.NetworkID
+		if isNetworkChanged {
+			network, err := cmd.networkRepo.Get(txCtx, req.NetworkID)
+			if err != nil {
+				return response.BusinessErr(errcode.NetworkNotFoundError, "")
+			}
+			cmd.Device.NetworkID = req.NetworkID
+			if gateway, err := cmd.deviceRepo.Get(txCtx, network.GatewayID); err == nil {
+				go command.DeleteDevice(gateway, cmd.Device)
+			}
+		}
+
+		isMacAddressChanged := req.MacAddress != cmd.Device.MacAddress
+		if isMacAddressChanged {
+			if _, err := cmd.deviceRepo.GetBySpecs(txCtx, spec.DeviceMacEqSpec(req.MacAddress)); err == nil {
+				return response.BusinessErr(errcode.DeviceMacExistsError, req.MacAddress)
+			}
+			if err := cmd.deviceRepo.UpdatesBySpecs(txCtx, map[string]interface{}{"parent": req.MacAddress}, spec.ParentEqSpec(cmd.Device.MacAddress)); err != nil {
+				return err
+			}
+			cmd.Device.MacAddress = req.MacAddress
+		}
+
+		isParentChanged := cmd.Device.Parent != req.Parent
+		if isParentChanged {
+			if parent, _ := cmd.deviceRepo.GetBySpecs(txCtx, spec.DeviceMacEqSpec(req.Parent)); parent.ID == 0 {
+				return response.BusinessErr(errcode.DeviceNotFoundError, "")
+			}
+			cmd.Device.Parent = req.Parent
+		}
+
+		return cmd.deviceRepo.Save(txCtx, &cmd.Device)
+	})
+
 	if err != nil {
-		return response.BusinessErr(errcode.DeviceNotFoundError, req.Parent)
-	}
-	cmd.Parent = parent.MacAddress
-	if err := cmd.deviceRepo.Save(ctx, &cmd.Device); err != nil {
 		return err
 	}
 	network, err := cmd.networkRepo.Get(ctx, cmd.Device.NetworkID)
