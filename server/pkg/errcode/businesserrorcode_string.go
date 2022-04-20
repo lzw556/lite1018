@@ -28,6 +28,7 @@ func _() {
 	_ = x[DeviceOfflineError-13009]
 	_ = x[DeviceUpgradingError-13010]
 	_ = x[DeviceDataInvalidError-13011]
+	_ = x[DeviceHasChildrenError-13012]
 	_ = x[FirmwareNotFoundError-14001]
 	_ = x[FirmwareFormatError-14002]
 	_ = x[FirmwareExistsError-14003]
@@ -50,7 +51,7 @@ const (
 	_BusinessErrorCode_name_0 = "UnknownBusinessErrorSystemNotReadyError"
 	_BusinessErrorCode_name_1 = "UserNotFoundErrorInvalidUsernameOrPasswordErrorInvalidOldPasswordErrorUserExistsErrorInvalidTokenError"
 	_BusinessErrorCode_name_2 = "AssetNotFoundErrorAssetImageSizeTooLargeError"
-	_BusinessErrorCode_name_3 = "DeviceNotFoundErrorDeviceMacExistsErrorUnknownDeviceTypeErrorDeviceCommandSendFailedErrorDeviceCommandSendTimeoutErrorDeviceCommandExecFailedErrorDeviceCommandCancelledErrorUnknownDeviceCommandTypeErrorDeviceOfflineErrorDeviceUpgradingErrorDeviceDataInvalidError"
+	_BusinessErrorCode_name_3 = "DeviceNotFoundErrorDeviceMacExistsErrorUnknownDeviceTypeErrorDeviceCommandSendFailedErrorDeviceCommandSendTimeoutErrorDeviceCommandExecFailedErrorDeviceCommandCancelledErrorUnknownDeviceCommandTypeErrorDeviceOfflineErrorDeviceUpgradingErrorDeviceDataInvalidErrorDeviceHasChildrenError"
 	_BusinessErrorCode_name_4 = "FirmwareNotFoundErrorFirmwareFormatErrorFirmwareExistsError"
 	_BusinessErrorCode_name_5 = "NetworkNotFoundError"
 	_BusinessErrorCode_name_6 = "AlarmRuleNameExistsAlarmRuleNotFoundErrorAlarmRecordAlreadyAcknowledgedErrorAlarmRecordNotFoundError"
@@ -63,7 +64,7 @@ var (
 	_BusinessErrorCode_index_0 = [...]uint8{0, 20, 39}
 	_BusinessErrorCode_index_1 = [...]uint8{0, 17, 47, 70, 85, 102}
 	_BusinessErrorCode_index_2 = [...]uint8{0, 18, 45}
-	_BusinessErrorCode_index_3 = [...]uint16{0, 19, 39, 61, 89, 118, 146, 173, 202, 220, 240, 262}
+	_BusinessErrorCode_index_3 = [...]uint16{0, 19, 39, 61, 89, 118, 146, 173, 202, 220, 240, 262, 284}
 	_BusinessErrorCode_index_4 = [...]uint8{0, 21, 40, 59}
 	_BusinessErrorCode_index_6 = [...]uint8{0, 19, 41, 76, 100}
 	_BusinessErrorCode_index_7 = [...]uint8{0, 15, 32}
@@ -82,7 +83,7 @@ func (i BusinessErrorCode) String() string {
 	case 12001 <= i && i <= 12002:
 		i -= 12001
 		return _BusinessErrorCode_name_2[_BusinessErrorCode_index_2[i]:_BusinessErrorCode_index_2[i+1]]
-	case 13001 <= i && i <= 13011:
+	case 13001 <= i && i <= 13012:
 		i -= 13001
 		return _BusinessErrorCode_name_3[_BusinessErrorCode_index_3[i]:_BusinessErrorCode_index_3[i+1]]
 	case 14001 <= i && i <= 14003:

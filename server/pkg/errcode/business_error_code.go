@@ -39,6 +39,7 @@ const (
 	DeviceOfflineError
 	DeviceUpgradingError
 	DeviceDataInvalidError
+	DeviceHasChildrenError
 )
 
 const (
@@ -94,6 +95,7 @@ var businessErrorMap = map[BusinessErrorCode]string{
 	DeviceOfflineError:                  "设备已离线",
 	DeviceUpgradingError:                "设备正在升级",
 	DeviceDataInvalidError:              "设备数据无效",
+	DeviceHasChildrenError:              "设备含有子设备，不能删除",
 	UnknownDeviceCommandTypeError:       "未知的设备命令",
 	NetworkNotFoundError:                "网络不存在",
 	FirmwareNotFoundError:               "固件不存在",
