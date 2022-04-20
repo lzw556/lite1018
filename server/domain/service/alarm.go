@@ -141,5 +141,9 @@ func (s Alarm) GetAlarmRecordAcknowledgeByID(id uint) (*vo.AlarmRecordAcknowledg
 }
 
 func (s Alarm) DeleteAlarmRecordByID(id uint) error {
-	return s.record.Delete(context.TODO(), id)
+	cmd, err := s.factory.NewAlarmRecordRemoveCmd(id)
+	if err != nil {
+		return err
+	}
+	return cmd.Run()
 }
