@@ -25,6 +25,7 @@ import DeviceEvent from './event';
 import {isMobile} from '../../../utils/deviceDetection';
 import { FilterableAlarmRecordTable } from '../../../components/alarm/filterableAlarmRecordTable';
 import { DynamicData } from './dynamicData';
+import EditCalibrateParas from '../edit/editCalibrateParas';
 
 const tabTitleList = [
     {
@@ -48,6 +49,7 @@ const DeviceDetailPage = () => {
     const [upgradeVisible, setUpgradeVisible] = useState<boolean>(false);
     const [upgradeStatus, setUpgradeStatus] = useState<any>();
     const [tabs, setTabs] = useState<any>([]);
+    const [visibleCalibrate, setVisibleCalibrate] = useState(false);
 
     const contents = new Map<string, any>([
         ['settings', device && <SettingPage device={device} onUpdate={() => {
@@ -158,7 +160,10 @@ const DeviceDetailPage = () => {
                         }
                     });
                     break;
-
+                case DeviceCommand.Calibrate:
+                    setDevice(device);
+                    setVisibleCalibrate(true);
+                    break;    
                 default:
                     SendDeviceCommandRequest(device.id, key, {}).then((res) => {
                         if (res.code === 200) {
@@ -249,6 +254,25 @@ const DeviceDetailPage = () => {
                     }}
                     onCancel={() => {
                         setUpgradeVisible(false);
+                    }}
+                />
+            )}
+            {visibleCalibrate && device && (
+                <EditCalibrateParas
+                    visible={visibleCalibrate}
+                    setVisible={setVisibleCalibrate}
+                    typeId={device?.typeId}
+                    properties={device.properties}
+                    onUpdate={(paras) => {
+                        setDevice(undefined);
+                        setVisibleCalibrate(false);
+                        SendDeviceCommandRequest(device.id, DeviceCommand.Calibrate, paras).then((res) => {
+                        if (res.code === 200) {
+                            message.success('命令发送成功').then();
+                        } else {
+                            message.error(res.msg).then();
+                        }
+                        });
                     }}
                 />
             )}
