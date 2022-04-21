@@ -36,8 +36,9 @@ func (cmd DeviceUpdateCmd) UpdateBaseInfo(req request.UpdateDevice) error {
 	ctx := context.TODO()
 	cmd.Device.Name = req.Name
 	err := transaction.Execute(ctx, func(txCtx context.Context) error {
+
 		isNetworkChanged := cmd.Device.NetworkID != req.NetworkID
-		if isNetworkChanged {
+		if req.NetworkID > 0 && isNetworkChanged {
 			network, err := cmd.networkRepo.Get(txCtx, req.NetworkID)
 			if err != nil {
 				return response.BusinessErr(errcode.NetworkNotFoundError, "")
@@ -49,7 +50,7 @@ func (cmd DeviceUpdateCmd) UpdateBaseInfo(req request.UpdateDevice) error {
 		}
 
 		isMacAddressChanged := req.MacAddress != cmd.Device.MacAddress
-		if isMacAddressChanged {
+		if len(req.MacAddress) > 0 && isMacAddressChanged {
 			if _, err := cmd.deviceRepo.GetBySpecs(txCtx, spec.DeviceMacEqSpec(req.MacAddress)); err == nil {
 				return response.BusinessErr(errcode.DeviceMacExistsError, req.MacAddress)
 			}
@@ -60,7 +61,7 @@ func (cmd DeviceUpdateCmd) UpdateBaseInfo(req request.UpdateDevice) error {
 		}
 
 		isParentChanged := cmd.Device.Parent != req.Parent
-		if isParentChanged {
+		if len(req.Parent) > 0 && isParentChanged {
 			if parent, _ := cmd.deviceRepo.GetBySpecs(txCtx, spec.DeviceMacEqSpec(req.Parent)); parent.ID == 0 {
 				return response.BusinessErr(errcode.DeviceNotFoundError, "")
 			}
