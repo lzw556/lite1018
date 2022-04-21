@@ -88,7 +88,7 @@ func (a *Adapter) errorWrapper(handler middleware.ErrorWrapperHandler) gin.Handl
 		data, err := handler(ctx)
 		switch err := err.(type) {
 		case response.InvalidParameterError:
-			response.BadRequest(ctx, err)
+			response.BadRequest(ctx, "无效的参数", err)
 		case response.BusinessError:
 			response.SuccessWithBusinessError(ctx, err)
 		default:
@@ -102,7 +102,7 @@ func (a *Adapter) errorWrapper(handler middleware.ErrorWrapperHandler) gin.Handl
 					response.WriteFile(ctx, writer)
 					return
 				}
-				response.BadRequest(ctx, response.UnknownBusinessErr(nil))
+				response.BadRequest(ctx, "无效的返回类型", nil)
 			default:
 				response.Success(ctx, data)
 			}
