@@ -54,8 +54,7 @@ func InitTables(db *gorm.DB) error {
 	//	})
 	//}
 	//
-	//db.Migrator().DropTable(&entity.Menu{}, &entity.Permission{}, &entity.AlarmRule{}, &entity.AlarmSource{})
-	db.Migrator().DropTable(&entity.Role{}, &entity.Permission{})
+	db.Migrator().DropTable(&entity.Menu{}, &entity.RoleMenuRelation{})
 	for _, table := range tables {
 		if !db.Migrator().HasTable(table) {
 			if err := db.Migrator().CreateTable(table); err != nil {
@@ -85,6 +84,9 @@ func InitTables(db *gorm.DB) error {
 		return err
 	}
 	if err := initRoles(db); err != nil {
+		return err
+	}
+	if err := initRoleMenuRelations(db); err != nil {
 		return err
 	}
 	if err := initProject(db); err != nil {

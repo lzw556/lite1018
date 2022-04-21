@@ -158,6 +158,29 @@ func initMenus(db *gorm.DB) error {
 			View:     "Device",
 			IsAuth:   true,
 			Hidden:   false,
+			Sort:     1,
+		},
+		{
+			ID:       4001,
+			Title:    "网络列表",
+			Name:     "networks",
+			ParentID: 3000,
+			Path:     "/network-management",
+			View:     "Network",
+			IsAuth:   true,
+			Hidden:   false,
+			Sort:     2,
+		},
+		{
+			ID:       4002,
+			Title:    "导入网络",
+			Name:     "importNetwork",
+			ParentID: 3000,
+			Path:     "/network-management",
+			View:     "ImportNetwork",
+			IsAuth:   true,
+			Hidden:   false,
+			Sort:     3,
 		},
 		{
 			ID:       3002,
@@ -168,37 +191,38 @@ func initMenus(db *gorm.DB) error {
 			View:     "Firmware",
 			IsAuth:   true,
 			Hidden:   false,
+			Sort:     4,
 		},
-		{
-			ID:       4000,
-			Title:    "网络管理",
-			Name:     "network-management",
-			ParentID: 0,
-			Icon:     "icon-network-management",
-			IsAuth:   true,
-			Hidden:   false,
-			Sort:     2,
-		},
-		{
-			ID:       4001,
-			Title:    "网络列表",
-			Name:     "networks",
-			ParentID: 4000,
-			Path:     "/network-management",
-			View:     "Network",
-			IsAuth:   true,
-			Hidden:   false,
-		},
-		{
-			ID:       4002,
-			Title:    "导入网络",
-			Name:     "importNetwork",
-			ParentID: 4000,
-			Path:     "/network-management",
-			View:     "ImportNetwork",
-			IsAuth:   true,
-			Hidden:   false,
-		},
+		//{
+		//	ID:       4000,
+		//	Title:    "网络管理",
+		//	Name:     "network-management",
+		//	ParentID: 0,
+		//	Icon:     "icon-network-management",
+		//	IsAuth:   true,
+		//	Hidden:   false,
+		//	Sort:     2,
+		//},
+		//{
+		//	ID:       4001,
+		//	Title:    "网络列表",
+		//	Name:     "networks",
+		//	ParentID: 4000,
+		//	Path:     "/network-management",
+		//	View:     "Network",
+		//	IsAuth:   true,
+		//	Hidden:   false,
+		//},
+		//{
+		//	ID:       4002,
+		//	Title:    "导入网络",
+		//	Name:     "importNetwork",
+		//	ParentID: 4000,
+		//	Path:     "/network-management",
+		//	View:     "ImportNetwork",
+		//	IsAuth:   true,
+		//	Hidden:   false,
+		//},
 		{
 			ID:       5000,
 			Title:    "报警管理",
@@ -270,6 +294,27 @@ func initMenus(db *gorm.DB) error {
 		err := db.FirstOrCreate(&menu, map[string]interface{}{"id": menu.ID}).Error
 		if err != nil {
 			return err
+		}
+	}
+	return nil
+}
+
+func initRoleMenuRelations(db *gorm.DB) error {
+	relations := map[uint][]uint{
+		1: {3000, 3001, 3002, 3100, 4000, 4001, 4002, 5000, 5001, 5002, 6000, 7000, 8000},
+		2: {3000, 3001, 3100, 4000, 4001, 4002, 5000, 5001, 5002, 7000},
+		3: {3000, 3001, 3100, 4000, 4001, 4002, 5000, 5001, 5002, 7000},
+		4: {3000, 3001, 3100, 4000, 4001, 5000, 5001, 5002, 7000},
+	}
+
+	for roleID, menuIDs := range relations {
+		for _, menuID := range menuIDs {
+			if err := db.FirstOrCreate(&entity.RoleMenuRelation{
+				RoleID: roleID,
+				MenuID: menuID,
+			}, map[string]interface{}{"role_id": roleID, "menu_id": menuID}).Error; err != nil {
+				return err
+			}
 		}
 	}
 	return nil
