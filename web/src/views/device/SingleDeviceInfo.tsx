@@ -35,7 +35,7 @@ export const SingleDeviceInfo: React.FC<{
         {hasPermission(Permission.DeviceDetail) ? (
           <Link
             to={{
-              pathname: `device-management`,
+              pathname: `device-monitor`,
               search: `?locale=device-monitor/deviceDetail&id=${id}`,
               state: rememberdState
             }}
