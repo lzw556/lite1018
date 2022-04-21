@@ -9,7 +9,7 @@ import { AlarmRuleSettings } from './alarmRuleSettings';
 
 export interface SettingPageProps {
   device: Device;
-  onUpdate: (name: string) => void;
+  onUpdate: () => void;
 }
 
 const SettingPage: React.FC<SettingPageProps> = ({ device, onUpdate }) => {

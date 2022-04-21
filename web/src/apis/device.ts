@@ -28,8 +28,8 @@ export function GetDeviceRequest(id: number) {
     return request.get<Device>(`/devices/${id}`).then(GetResponse)
 }
 
-export function UpdateDeviceRequest(id: number, name: string) {
-    return request.put(`/devices/${id}`, {name}).then(PutResponse)
+export function UpdateDeviceRequest(id: number, device: {name:string; parent:string; network?:number; mac_address?:string;}) {
+    return request.put(`/devices/${id}`, device).then(PutResponse)
 }
 
 export function DeleteDeviceRequest(id: number) {

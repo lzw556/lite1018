@@ -50,8 +50,8 @@ const DeviceDetailPage = () => {
     const [tabs, setTabs] = useState<any>([]);
 
     const contents = new Map<string, any>([
-        ['settings', device && <SettingPage device={device} onUpdate={(name) => {
-          if(device) setDevice({...device,name})
+        ['settings', device && <SettingPage device={device} onUpdate={() => {
+          if(device) fetchDevice()
         }}/>],
         ['historyData', device && <HistoryDataPage device={device}/>],
         ['waveData', device && <WaveDataChart device={device}/>],
