@@ -31,6 +31,7 @@ func (e ExportDevices) Swap(i, j int) {
 }
 
 type NetworkExportFile struct {
+	GatewayID  uint                   `json:"-"`
 	Name       string                 `json:"-"`
 	Wsn        map[string]interface{} `json:"wsn"`
 	DeviceList ExportDevices          `json:"deviceList"`
@@ -38,7 +39,8 @@ type NetworkExportFile struct {
 
 func NewNetworkExportFile(e entity.Network) NetworkExportFile {
 	n := NetworkExportFile{
-		Name: e.Name,
+		GatewayID: e.GatewayID,
+		Name:      e.Name,
 		Wsn: map[string]interface{}{
 			"communication_period": e.CommunicationPeriod,
 			"communication_offset": e.CommunicationTimeOffset,
@@ -50,9 +52,9 @@ func NewNetworkExportFile(e entity.Network) NetworkExportFile {
 }
 
 func (n *NetworkExportFile) AddDevices(es []entity.Device) {
-	n.DeviceList = make(ExportDevices, len(es))
+	n.DeviceList = make(ExportDevices, 0)
 	for i, e := range es {
-		n.DeviceList[i] = ExportDevice{
+		export := ExportDevice{
 			ID:            uint(i),
 			Name:          e.Name,
 			Address:       e.MacAddress,
@@ -60,17 +62,21 @@ func (n *NetworkExportFile) AddDevices(es []entity.Device) {
 			Modbus:        0,
 			Type:          e.Type,
 		}
-		settings := map[string]map[string]interface{}{}
+		export.Settings = map[string]map[string]interface{}{}
 		for _, setting := range e.Settings {
-			if _, ok := settings[setting.Category]; ok {
-				settings[setting.Category][setting.Key] = setting.Value
+			if _, ok := export.Settings[setting.Category]; ok {
+				export.Settings[setting.Category][setting.Key] = setting.Value
 			} else {
-				settings[setting.Category] = map[string]interface{}{
+				export.Settings[setting.Category] = map[string]interface{}{
 					setting.Key: setting.Value,
 				}
 			}
 		}
-		n.DeviceList[i].Settings = settings
+		if n.GatewayID == e.ID {
+			n.DeviceList = append([]ExportDevice{export}, n.DeviceList...)
+		} else {
+			n.DeviceList = append(n.DeviceList, export)
+		}
 	}
 }
 

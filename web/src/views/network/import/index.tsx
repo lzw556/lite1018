@@ -42,6 +42,7 @@ const ImportNetworkPage = () => {
             if (typeof reader.result === "string") {
                 const json = JSON.parse(reader.result)
                 if (checkJSONFormat(json)) {
+                    console.log(json.deviceList)
                     setNetwork({wsn: json.wsn, devices: json.deviceList})
                 } else {
                     message.error("文件格式错误").then()
@@ -93,6 +94,7 @@ const ImportNetworkPage = () => {
 
     const tree: any = (root: any) => {
         return network.devices.slice(1).filter((node:any) => node.parentAddress === root.address).map((item:any) => {
+            console.log(item.address)
             return {
                 id: item.address,
                 data: item,
@@ -143,7 +145,7 @@ const ImportNetworkPage = () => {
                     }
                 });
                 graph.data({
-                    id: network.devices[0].macAddress,
+                    id: network.devices[0].address,
                     data: network.devices[0],
                     children: tree(network.devices[0])
                 });

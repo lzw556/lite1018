@@ -2,7 +2,6 @@ package command
 
 import (
 	"context"
-	"fmt"
 	"github.com/golang/protobuf/proto"
 	"github.com/spf13/cast"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/response"
@@ -77,7 +76,6 @@ func SyncNetworkLinkStatus(network entity.Network, devices []entity.Device, time
 		xlog.Errorf("unmarshal [AllLinkStatus] message failed:%v", err)
 		return
 	}
-	fmt.Println(m)
 	var result []struct {
 		Mac   string `json:"mac"`
 		State int    `json:"state"`

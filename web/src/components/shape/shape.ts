@@ -10,6 +10,7 @@ G6.registerNode('gateway', {
         if (cfg.data.state) {
             hexColor = cfg.data.state.isOnline ? ColorHealth : ColorWarn;
         }
+        console.log(cfg)
         const rect = group.addShape('rect', {
             attrs: {
                 x: 0,
