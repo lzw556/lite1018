@@ -10,14 +10,15 @@ export function GetParamValue(search: string, key:string) {
     }
 }
 
-type SubPath = {pathname:string; para:string};
-export function getSubPathsFromSearch(search: string): SubPath[]{
-    const paths: SubPath[] = [];
-    search.replace('?locale=', '').split('/').forEach(para=>{
-        const paras = para.split('&')
-        paths.push({pathname:paras[0] ?? '', para:paras[1] ?? ''})
-    })
-    return paths;
+export function getViewNameFromLocation(location: any): string{
+    let name = location.pathname;
+    const paths = location.search.replace('?locale=', '').split('/');
+    if(paths.length > 0) {
+      const path = paths[paths.length - 1];
+      const paras = path.split('&');
+      if(paras.length > 0) name = paras[0]
+    }
+    return name;
 }
 
 export function pickPathsFromLocation(search: string) {
@@ -28,6 +29,8 @@ export function pickPathsFromLocation(search: string) {
       name = path.split('&')[0];
     } else if (path.indexOf('=') > -1) {
       name = path.split('=')[1];
+    } else {
+      name = path;
     }
     const prev = paths.length > 0 ? paths[index - 1].search + '/' : '';
     paths.push({ name, search: `${prev}${path}` });
