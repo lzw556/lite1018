@@ -1,6 +1,7 @@
 import axios, {AxiosRequestConfig, AxiosResponse, Method} from "axios";
 import {ResponseResult} from "../types/response";
 import {getProject, getToken, isLogin} from "./session";
+import {message} from "antd";
 import moment from "moment-timezone"
 
 axios.defaults.timeout =  30 * 1000
@@ -33,7 +34,8 @@ axios.interceptors.response.use(<T>(response:AxiosResponse<T>) => {
             window.location.hash = '/500'
             break
         case 400:
-            return Promise.reject(error.response.data)
+            message.error(`${error.response.data.msg}`)
+            break
         default:
             break
     }

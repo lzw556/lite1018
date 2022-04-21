@@ -74,7 +74,7 @@ const DeviceEvent:FC<DeviceEventProps> = ({device}) => {
                 <Row justify={"start"}>
                     <Col span={6}>
                         <HasPermission value={Permission.DeviceEventDelete}>
-                            <Button disabled={!selectedRowKeys.length} onClick={() => onBatchDelete()}>批量删除</Button>
+                            <Button disabled={selectedRowKeys.length === 0} onClick={() => onBatchDelete()}>批量删除</Button>
                         </HasPermission>
                     </Col>
                 </Row>
@@ -100,11 +100,7 @@ const DeviceEvent:FC<DeviceEventProps> = ({device}) => {
         <br/>
         <Row justify={"start"}>
             <Col span={24}>
-                <TableLayout rowSelection={() => {
-                    if (hasPermission(Permission.DeviceEventDelete)){
-                        return rowSelection
-                    }
-                }}  columns={columns} dataSource={dataSource} onPageChange={fetchDeviceEvents}/>
+                <TableLayout rowSelection={hasPermission(Permission.DeviceEventDelete) && rowSelection}  columns={columns} dataSource={dataSource} onPageChange={fetchDeviceEvents}/>
             </Col>
         </Row>
     </Content>

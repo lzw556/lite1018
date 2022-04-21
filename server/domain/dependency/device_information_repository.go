@@ -5,7 +5,7 @@ import (
 )
 
 type DeviceInformationRepository interface {
-	Create(id uint, e entity.DeviceInformation) error
-	Get(id uint) (entity.DeviceInformation, error)
-	Delete(id uint) error
+	Create(mac string, e entity.DeviceInformation) error
+	Get(mac string) (entity.DeviceInformation, error)
+	Delete(mac string) error
 }

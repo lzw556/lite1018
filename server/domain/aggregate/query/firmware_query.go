@@ -14,19 +14,25 @@ type FirmwareQuery struct {
 	Specs []spec.Specification
 
 	firmwareRepo          dependency.FirmwareRepository
+	deviceRepo            dependency.DeviceRepository
 	deviceInformationRepo dependency.DeviceInformationRepository
 }
 
 func NewFirmwareQuery() FirmwareQuery {
 	return FirmwareQuery{
 		firmwareRepo:          repository.Firmware{},
+		deviceRepo:            repository.Device{},
 		deviceInformationRepo: repository.DeviceInformation{},
 	}
 }
 
 func (query FirmwareQuery) FindByDeviceID(id uint) (vo.Firmwares, error) {
 	ctx := context.TODO()
-	info, err := query.deviceInformationRepo.Get(id)
+	device, err := query.deviceRepo.Get(ctx, id)
+	if err != nil {
+		return nil, response.BusinessErr(errcode.DeviceNotFoundError, "")
+	}
+	info, err := query.deviceInformationRepo.Get(device.MacAddress)
 	if err != nil {
 		return nil, err
 	}
