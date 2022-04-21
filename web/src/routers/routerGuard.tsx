@@ -1,6 +1,7 @@
 import {Redirect, Route} from "react-router-dom";
 import {isLogin} from "../utils/session";
-import {GetParamValue} from "../utils/path";
+import {getViewNameFromLocation} from "../utils/path";
+import { findMenu } from "./helper";
 
 const views = require("../views");
 
@@ -11,22 +12,10 @@ const RouterGuard = (props: any) => {
     if (pathname === "/") {
         return <Redirect to={"/device-management?locale=devices"}/>
     }
-
-    const decodeLocation = () => {
-        const locale = GetParamValue(location.search, "locale")
-        if (locale) {
-            const paths = locale.split("/")
-            return paths[paths.length - 1]
-        }
-        return location.pathname
-    }
-
     if (routes.length === 0) {
         return <Redirect to={"/403"}/>
     }
-
-    const target = routes.find((item: any) => item.name === decodeLocation())
-    console.log(target)
+    const target = findMenu(routes, getViewNameFromLocation(location), pathname)
     if (target && views[target.view]) {
         const component = views[target.view]
         if (!target.isAuth) {

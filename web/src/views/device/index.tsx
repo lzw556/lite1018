@@ -5,6 +5,7 @@ import {
   Input,
   Menu,
   message,
+  Modal,
   Popconfirm,
   Row,
   Select,
@@ -54,6 +55,8 @@ import { getValueOfFirstClassProperty, generateDeviceTypeCollections, omitSpecif
 import { isMobile } from '../../utils/deviceDetection';
 import { Link, useLocation } from 'react-router-dom';
 import { PagedOption } from '../../types/props';
+import EditCalibrateParas from './edit/editCalibrateParas';
+import { AlarmRuleSettings } from './detail/setting/alarmRuleSettings';
 
 const { Search } = Input;
 const { Option } = Select;
@@ -74,6 +77,8 @@ const DevicePage = () => {
   const [dataSource, setDataSource] = useState<PageResult<any>>();
   const { hasPermission, hasPermissions } = usePermission();
   const [refreshKey, setRefreshKey] = useState<number>(0);
+  const [visibleCalibrate, setVisibleCalibrate] = useState(false);
+  const [visibleAlarmRules, setVisibleAlarmRules] = useState(false);
 
   useEffect(() => {
     const { index, size } = pagedOptions;
@@ -102,6 +107,10 @@ const DevicePage = () => {
             message.error(`取消升级失败,${res.msg}`).then();
           }
         });
+        break;
+      case DeviceCommand.Calibrate:
+        setDevice(device);
+        setVisibleCalibrate(true);
         break;
       default:
         setExecuteDevice(device);
@@ -167,6 +176,7 @@ const DevicePage = () => {
       setDevice(data);
       setEditBaseInfoVisible(key === '1');
       setEditSettingVisible(key === '2');
+      setVisibleAlarmRules(key === '3');
     });
   };
 
@@ -183,6 +193,7 @@ const DevicePage = () => {
         {hasPermission(Permission.DeviceSettingsEdit) && record.typeId !== DeviceType.Router && (
           <Menu.Item key={2}>更新设备配置</Menu.Item>
         )}
+        {record.typeId !== DeviceType.Gateway && record.typeId !== DeviceType.Router && <Menu.Item key={3}>编辑报警规则</Menu.Item>}
       </Menu>
     );
   };
@@ -458,6 +469,39 @@ const DevicePage = () => {
             setUpgradeVisible(false);
           }}
         />
+      )}
+      {visibleCalibrate && device && (
+        <EditCalibrateParas
+          visible={visibleCalibrate}
+          setVisible={setVisibleCalibrate}
+          typeId={device?.typeId}
+          properties={device.properties}
+          onUpdate={(paras) => {
+            setDevice(undefined);
+            setVisibleCalibrate(false);
+            SendDeviceCommandRequest(device.id, DeviceCommand.Calibrate, paras).then((res) => {
+              setExecuteDevice(undefined);
+              if (res.code === 200) {
+                message.success('命令发送成功').then();
+              } else {
+                message.error(res.msg).then();
+              }
+            });
+          }}
+        />
+      )}
+     {visibleAlarmRules && device && (
+        <Modal
+          title='报警规则'
+          visible={visibleAlarmRules}
+          onCancel={() => {
+            setVisibleAlarmRules(false);
+            setDevice(undefined);
+          }}
+          footer={null}
+        >
+          <AlarmRuleSettings device={device} />
+        </Modal>
       )}
     </Content>
   );

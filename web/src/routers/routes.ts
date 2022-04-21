@@ -113,7 +113,18 @@ const SecondaryRoutes: Menu[] = [
         hidden: true,
         isAuth: true,
         children: [],
-    }
+    },
+    {
+        id: 107,
+        name: "deviceDetail",
+        path: "/device-monitor",
+        title: "设备详情",
+        view: "DeviceDetail",
+        icon: "",
+        hidden: true,
+        isAuth: true,
+        children: [],
+    },
 ]
 
 export {

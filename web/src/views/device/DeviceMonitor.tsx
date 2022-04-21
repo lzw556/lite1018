@@ -28,6 +28,7 @@ import { isMobile } from '../../utils/deviceDetection';
 import { useLocation } from 'react-router-dom';
 import { Filters, omitSpecificKeys } from './util';
 import { PagedOption } from '../../types/props';
+import { EmptyLayout } from '../layout';
 
 const { Option } = Select;
 
@@ -75,8 +76,9 @@ const DeviceMonitor = () => {
     }
   }, [filters, pagedOptions]);
 
+  const emptyTips = <ShadowCard><EmptyLayout description='没有设备'/></ShadowCard>
   const renderStatistic = () => {
-    if (count.length === 0) return null;
+    if (count.length === 0) return emptyTips;
     const countOnline = count.filter((item) => item.isOnline).length;
     const countOffline = count.filter((item) => !item.isOnline).length;
     let groupedLevels: number[] = [];
@@ -279,7 +281,7 @@ const DeviceMonitor = () => {
       </Content>
     );
   } else {
-    return <p>没有网络</p>;
+    return emptyTips;
   }
 };
 

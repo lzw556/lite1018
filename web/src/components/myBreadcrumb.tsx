@@ -1,11 +1,12 @@
 import { Breadcrumb, Col, Row } from 'antd';
-import { FC, useEffect, useState } from 'react';
-import { useHistory, useLocation, Link } from 'react-router-dom';
-import { GetParamValue } from '../utils/path';
+import { FC } from 'react';
+import { useLocation, Link } from 'react-router-dom';
+import { pickPathsFromLocation } from '../utils/path';
 import { getMenus } from '../utils/session';
 import { SecondaryRoutes } from '../routers/routes';
 import { isMobile } from '../utils/deviceDetection';
 import { ArrowLeftOutlined } from '@ant-design/icons';
+import { findMenu } from '../routers/helper';
 
 export interface MyBreadcrumbProps {
   children?: any;
@@ -24,27 +25,22 @@ const routes = flattenRoutes(getMenus()).concat(SecondaryRoutes);
 
 const MyBreadcrumb: FC<MyBreadcrumbProps> = ({ children, label, firstBreadState }) => {
   const location = useLocation();
-  const history = useHistory();
-  const locale = GetParamValue(location.search, 'locale');
-  const [items, setItems] = useState([]);
-
-  useEffect(() => {
-    setItems(routes.filter((route: any) => locale?.split('/').includes(route.name)));
-  }, []);
+  const paths = pickPathsFromLocation(location.search);
 
   return (
     <Row justify={'space-between'} style={{ paddingBottom: '8px' }}>
       <Col span={children ? 12 : 24}>
         <Breadcrumb style={{ fontSize: '16pt', fontWeight: 'bold' }}>
-          {items.map((route: any, index: number) => {
-            if (items.length - 1 === index) {
-              return <Breadcrumb.Item key={index}>{label ? label : route.title}</Breadcrumb.Item>;
+          {paths.map(({ search, name }, index: number) => {
+            const menu = findMenu(routes, name, location.pathname)
+            if (paths.length - 1 === index) {
+              return <Breadcrumb.Item key={index}>{label ? label : menu?.title}</Breadcrumb.Item>;
             }
             return (
               <Link
                 to={{
-                  pathname: route.path,
-                  search: `locale=${route.name}`,
+                  pathname: menu?.path,
+                  search,
                   state: firstBreadState
                 }}
                 key={index}
@@ -52,7 +48,7 @@ const MyBreadcrumb: FC<MyBreadcrumbProps> = ({ children, label, firstBreadState 
                 {isMobile ? (
                   <ArrowLeftOutlined style={{ paddingRight: 8, fontSize: '16pt' }} />
                 ) : (
-                  <Breadcrumb.Item>{route.title}</Breadcrumb.Item>
+                  <Breadcrumb.Item>{menu?.title}</Breadcrumb.Item>
                 )}
               </Link>
             );
