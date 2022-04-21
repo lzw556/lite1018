@@ -36,6 +36,9 @@ func (r root) Next() Processor {
 
 func (r root) Process(ctx *iot.Context, msg iot.Message) error {
 	c := context.TODO()
+	if msg.Body.Device == "000000000000" {
+		return fmt.Errorf("invalid device mac address => [%s]", msg.Body.Device)
+	}
 	device, err := r.deviceRepo.GetBySpecs(c, spec.DeviceMacEqSpec(msg.Body.Device))
 	if err != nil {
 		return fmt.Errorf("device %s not found: %v", msg.Body.Device, err)
