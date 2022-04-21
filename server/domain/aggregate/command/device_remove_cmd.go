@@ -55,7 +55,7 @@ func (cmd DeviceRemoveCmd) Run() error {
 		if err := cmd.deviceRepo.Delete(txCtx, cmd.Device.ID); err != nil {
 			return err
 		}
-		_ = cmd.deviceInformationRepo.Delete(cmd.Device.ID)
+		_ = cmd.deviceInformationRepo.Delete(cmd.Device.MacAddress)
 		_ = cmd.deviceStatusRepo.Delete(cmd.Device.MacAddress)
 		_ = cmd.deviceAlertStateRepo.DeleteAll(cmd.Device.MacAddress)
 		return cmd.removeAlarmSource(txCtx)

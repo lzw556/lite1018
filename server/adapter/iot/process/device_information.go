@@ -41,7 +41,7 @@ func (p DeviceInformation) Process(ctx *iot.Context, msg iot.Message) error {
 				return fmt.Errorf("unmarshal device %s information %s failed: %v", device.MacAddress, m.Information, err)
 			}
 			e.Timestamp = int64(m.Timestamp)
-			if err := p.repository.Create(device.ID, e); err != nil {
+			if err := p.repository.Create(device.MacAddress, e); err != nil {
 				return fmt.Errorf("save device information failed: %v", err)
 			}
 		}

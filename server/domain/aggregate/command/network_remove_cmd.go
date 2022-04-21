@@ -45,6 +45,6 @@ func (cmd NetworkRemoveCmd) Run() error {
 
 func (cmd NetworkRemoveCmd) removeDeviceCache(device entity.Device) {
 	_ = cmd.deviceStateRepo.Delete(device.MacAddress)
-	_ = cmd.deviceInformationRepo.Delete(device.ID)
+	_ = cmd.deviceInformationRepo.Delete(device.MacAddress)
 	_ = cmd.deviceAlertStateRepo.DeleteAll(device.MacAddress)
 }

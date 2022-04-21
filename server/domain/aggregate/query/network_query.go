@@ -47,7 +47,7 @@ func (query NetworkQuery) Get(id uint) (*vo.Network, error) {
 	result := vo.NewNetwork(network)
 	if gateway, err := query.deviceRepo.Get(ctx, network.GatewayID); err == nil {
 		result.AddGateway(gateway)
-		result.Gateway.Information, _ = query.deviceInformationRepo.Get(gateway.ID)
+		result.Gateway.Information, _ = query.deviceInformationRepo.Get(gateway.MacAddress)
 		result.Gateway.State, _ = query.deviceStateRepo.Get(gateway.MacAddress)
 	}
 

@@ -108,7 +108,7 @@ func (query DeviceQuery) newDevice(device entity.Device) vo.Device {
 	result := vo.NewDevice(device)
 	result.SetUpgradeState(device)
 	result.State, _ = query.deviceStateRepo.Get(device.MacAddress)
-	result.Information, _ = query.deviceInformationRepo.Get(device.ID)
+	result.Information, _ = query.deviceInformationRepo.Get(device.MacAddress)
 	if states, err := query.deviceAlertStateRepo.Find(device.MacAddress); err == nil {
 		result.SetAlertStates(states)
 	}
