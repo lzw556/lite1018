@@ -4,17 +4,20 @@ import (
 	"context"
 	"github.com/gogo/protobuf/proto"
 	pd "github.com/thetasensors/theta-cloud-lite/server/adapter/iot/proto"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/xlog"
 	"time"
 )
 
 type calibrateCmd struct {
 	request
-	param float32
+	param      float32
+	sensorType int32
 }
 
-func newCalibrateCmd(param float32) calibrateCmd {
+func newCalibrateCmd(sensorType uint, param float32) calibrateCmd {
 	cmd := calibrateCmd{
-		param: param,
+		param:      param,
+		sensorType: int32(sensorType),
 	}
 	cmd.request = newRequest()
 	return cmd
@@ -35,10 +38,11 @@ func (cmd calibrateCmd) Qos() byte {
 func (cmd calibrateCmd) Payload() ([]byte, error) {
 	m := pd.CalibrateCommand{
 		Timestamp: int32(cmd.request.timestamp),
-		ReqId:     cmd.id,
-		Type:      1073872896,
+		ReqId:     cmd.request.id,
+		Type:      cmd.sensorType,
 		Param1:    cmd.param,
 	}
+	xlog.Debugf("calibrate sensor type: %d, param: %f", cmd.sensorType, cmd.param)
 	return proto.Marshal(&m)
 }
 
