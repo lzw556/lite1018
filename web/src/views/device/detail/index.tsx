@@ -264,7 +264,6 @@ const DeviceDetailPage = () => {
                     typeId={device?.typeId}
                     properties={device.properties}
                     onUpdate={(paras) => {
-                        setDevice(undefined);
                         setVisibleCalibrate(false);
                         SendDeviceCommandRequest(device.id, DeviceCommand.Calibrate, paras).then((res) => {
                         if (res.code === 200) {
