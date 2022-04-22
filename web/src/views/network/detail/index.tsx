@@ -1,7 +1,7 @@
 import MyBreadcrumb from '../../../components/myBreadcrumb';
 import { Content } from 'antd/es/layout/layout';
 import ShadowCard from '../../../components/shadowCard';
-import { Button, Col, message, Row, Space } from 'antd';
+import { Button, Col, Form, Input, message, Row, Space } from 'antd';
 import { useEffect, useState } from 'react';
 import { Network } from '../../../types/network';
 import { useHistory, useLocation } from 'react-router-dom';
@@ -10,19 +10,19 @@ import {
   ExportNetworkRequest,
   GetNetworkRequest,
   NetworkProvisionRequest,
-  NetworkSyncRequest
+  NetworkSyncRequest,
+  UpdateNetworkRequest
 } from '../../../apis/network';
 import '../../../string-extension';
-import moment from 'moment';
 import TopologyView from './topologyView';
 import { PlusOutlined } from '@ant-design/icons';
 import AddDeviceModal from './addDeviceModal';
 import '../index.css';
 import usePermission, { Permission } from '../../../permission/permission';
 import HasPermission from '../../../permission';
-import { SingleDeviceDetail } from '../../device/detail/information/SingleDeviceDetail';
-import { isMobile } from '../../../utils/deviceDetection';
 import ButtonGroup from 'antd/lib/button/button-group';
+import { defaultValidateMessages, Rules } from '../../../constants/validator';
+import WsnFormItem from '../../../components/formItems/wsnFormItem';
 
 const NetworkDetail = () => {
   const { hasPermission } = usePermission();
@@ -31,6 +31,7 @@ const NetworkDetail = () => {
   const [network, setNetwork] = useState<Network>();
   const [addDeviceVisible, setAddDeviceVisible] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [form] = Form.useForm();
 
   const onRefresh = () => {
     setRefreshKey(refreshKey + 1);
@@ -41,6 +42,15 @@ const NetworkDetail = () => {
     if (id) {
       GetNetworkRequest(Number(id))
         .then((data) => {
+          form.setFieldsValue({
+            name: data.name,
+            wsn: {
+              communication_period: data.communicationPeriod,
+              communication_offset: data.communicationOffset,
+              group_size: data.groupSize,
+              group_interval: data.groupInterval
+            }
+          });
           setNetwork(data);
         })
         .catch((_) => {
@@ -97,48 +107,38 @@ const NetworkDetail = () => {
           </Col>
           <Col xl={8} xxl={6}>
             <ShadowCard style={{ marginLeft: 10, height: '100%' }}>
-              <Row>
-                <Col span={8} className='ts-detail-label'>
-                  网络名称
-                </Col>
-                <Col span={16}>
-                  <Space>{network.name}</Space>
-                </Col>
-              </Row>
-              <Row>
-                <Col span={8} className='ts-detail-label'>
-                  通讯周期
-                </Col>
-                <Col span={16}>
-                  <Space>
-                    {moment.duration(network.communicationPeriod / 1000, 'seconds').humanize()}
-                  </Space>
-                </Col>
-              </Row>
-              <Row>
-                <Col span={8} className='ts-detail-label'>
-                  每组设备数
-                </Col>
-                <Col span={16}>{network.groupSize}</Col>
-              </Row>
-              <Row>
-                <Col span={8} className='ts-detail-label'>
-                  通讯延时
-                </Col>
-                <Col span={16}>{`${moment
-                  .duration(network.communicationOffset / 1000, 'seconds')
-                  .seconds()}秒`}</Col>
-              </Row>
-              <Row>
-                <Col span={8} className='ts-detail-label'>
-                  每组通讯间隔
-                </Col>
-                <Col span={16}>
-                  {moment.duration(network.groupInterval / 1000, 'seconds').humanize()}
-                </Col>
-              </Row>
-              <br />
-              <Row>
+              <Form form={form} labelCol={{ span: 8 }} validateMessages={defaultValidateMessages}>
+                <Form.Item label={'名称'} name={'name'} rules={[Rules.range(4, 16)]}>
+                  <Input placeholder={'请输入网络名称'} />
+                </Form.Item>
+                <WsnFormItem/>
+                <Form.Item wrapperCol={{ offset: 12, span: 12 }}>
+                  <Row justify='end'>
+                    <Col>
+                      <ButtonGroup>
+                        {hasPermission(Permission.NetworkExport) && (
+                          <Button type='primary' onClick={() => sendCommand(network, '2')}>
+                            导出网络
+                          </Button>
+                        )}
+                        <Button
+                          type='primary'
+                          onClick={() => {
+                            form.validateFields().then((values) => {
+                              UpdateNetworkRequest(network.id, values).then(res => {
+                                if(res.code === 200) message.success('保存成功')
+                              });
+                            });
+                          }}
+                        >
+                          保存网络
+                        </Button>
+                      </ButtonGroup>
+                    </Col>
+                  </Row>
+                </Form.Item>
+              </Form>
+              <Row justify='end'>
                 <Col>
                   <ButtonGroup>
                     {hasPermission(Permission.NetworkSync) && (
@@ -149,11 +149,6 @@ const NetworkDetail = () => {
                     {hasPermission(Permission.NetworkProvision) && (
                       <Button type='primary' onClick={() => sendCommand(network, '1')}>
                         继续组网
-                      </Button>
-                    )}
-                    {hasPermission(Permission.NetworkExport) && (
-                      <Button type='primary' onClick={() => sendCommand(network, '2')}>
-                        导出网络
                       </Button>
                     )}
                   </ButtonGroup>
