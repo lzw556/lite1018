@@ -22,13 +22,19 @@ func NewDeviceEvent(e entity.Event) DeviceEvent {
 		Timestamp: e.Timestamp,
 	}
 	content := struct {
-		Code int `json:"code"`
+		Code int         `json:"code"`
+		Data interface{} `json:"data"`
 	}{}
 	if err := json.Unmarshal([]byte(e.Content), &content); err != nil {
 		return event
 	}
 	if message, ok := eventMessage[e.Code][content.Code]; ok {
-		event.Message = message
+		if content.Data != nil {
+			data, _ := json.Marshal(content.Data)
+			event.Message = fmt.Sprintf("%s: %s", message, string(data))
+		} else {
+			event.Message = message
+		}
 	} else {
 		event.Message = fmt.Sprintf("%s(错误码: %d)", e.Code.String(), content.Code)
 	}

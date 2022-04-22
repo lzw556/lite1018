@@ -81,7 +81,6 @@ func (factory Network) NewNetworkImportCmd(req request.ImportNetwork) (*command.
 		}
 		e.Name = device.Name
 		e.MacAddress = device.MacAddress
-		e.Parent = device.ParentAddress
 		e.Type = device.TypeID
 		e.ProjectID = req.ProjectID
 		e.Settings = make(entity.DeviceSettings, 0)
@@ -102,6 +101,8 @@ func (factory Network) NewNetworkImportCmd(req request.ImportNetwork) (*command.
 		}
 		if e.Type == devicetype.GatewayType {
 			cmd.Network.Name = device.Name
+		} else {
+			e.Parent = device.ParentAddress
 		}
 		cmd.Devices[i] = e
 	}

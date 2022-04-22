@@ -2,7 +2,6 @@ package command
 
 import (
 	"context"
-	"fmt"
 	"github.com/golang/protobuf/proto"
 	"github.com/spf13/cast"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/response"
@@ -10,6 +9,7 @@ import (
 	pd "github.com/thetasensors/theta-cloud-lite/server/adapter/iot/proto"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/devicetype"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/errcode"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/json"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/xlog"
@@ -77,7 +77,6 @@ func SyncNetworkLinkStatus(network entity.Network, devices []entity.Device, time
 		xlog.Errorf("unmarshal [AllLinkStatus] message failed:%v", err)
 		return
 	}
-	fmt.Println(m)
 	var result []struct {
 		Mac   string `json:"mac"`
 		State int    `json:"state"`
@@ -346,12 +345,16 @@ func CancelDeviceUpgrade(gateway entity.Device, device entity.Device) error {
 
 func Calibrate(gateway entity.Device, device entity.Device, param float32) error {
 	if isOnline(gateway.MacAddress) {
-		cmd := newCalibrateCmd(param)
-		if _, err := cmd.Execute(context.TODO(), gateway.MacAddress, device.MacAddress, 3*time.Second); err != nil {
-			xlog.Errorf("execute device command %s failed: %v => [%s]", cmd.Name(), err, gateway.MacAddress)
-			return err
+		if t := devicetype.Get(device.Type); t != nil {
+			cmd := newCalibrateCmd(t.SensorID(), param)
+			if _, err := cmd.Execute(context.TODO(), gateway.MacAddress, device.MacAddress, 3*time.Second); err != nil {
+				xlog.Errorf("execute device command %s failed: %v => [%s]", cmd.Name(), err, gateway.MacAddress)
+				return err
+			}
+			return nil
+		} else {
+			return response.BusinessErr(errcode.UnknownDeviceTypeError, "")
 		}
-		return nil
 	} else {
 		xlog.Errorf("calibrate failed: gateway offline => [%s]", gateway.MacAddress)
 		return response.BusinessErr(errcode.DeviceOfflineError, "")
