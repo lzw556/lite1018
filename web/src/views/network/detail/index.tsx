@@ -112,7 +112,7 @@ const NetworkDetail = () => {
                   <Input placeholder={'请输入网络名称'} />
                 </Form.Item>
                 <WsnFormItem/>
-                <Form.Item wrapperCol={{ offset: 12, span: 12 }}>
+                <Form.Item wrapperCol={{ offset: 6, span: 18 }}>
                   <Row justify='end'>
                     <Col>
                       <ButtonGroup>
