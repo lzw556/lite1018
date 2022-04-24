@@ -63,6 +63,11 @@ func (a *Adapter) startMQTTServer() error {
 }
 
 func (a *Adapter) Subscribe(topic string, qos byte, handler func(c mqtt.Client, msg mqtt.Message)) error {
+	if !a.client.IsConnected() {
+		if t := a.client.Connect(); t.Wait() && t.Error() != nil {
+			return t.Error()
+		}
+	}
 	t := a.client.Subscribe(topic, qos, handler)
 	if t.Wait() && t.Error() != nil {
 		return t.Error()
