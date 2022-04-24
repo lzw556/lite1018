@@ -44,7 +44,7 @@ const DeviceMonitor = () => {
   ].join(',');
   const [networks, setNetworks] = React.useState<Network[]>([]);
   const { state } = useLocation<{filters: Filters; pagedOptions: PagedOption;}>();
-  const pagedOptionsDefault = { index: 1, size: 10 };
+  const pagedOptionsDefault = { index: 1, size: 12 };
   const [pagedOptions, setPagedOptions] = React.useState(state ? state.pagedOptions : pagedOptionsDefault);
   const [filters, setFilters] = React.useState<Filters | undefined>(state ? {...state.filters, types}: {network_id: 0, types });
   const [count, setCount] = React.useState<{ isOnline: boolean; alertLevel: number }[]>([]);
@@ -266,7 +266,7 @@ const DeviceMonitor = () => {
                   <Pagination
                     {...{
                       showSizeChanger: true,
-                      pageSizeOptions: ['10', '20', '30', '40', '50'],
+                      pageSizeOptions: ['12', '24', '36', '48', '60'],
                       onChange: (index, size) => setPagedOptions({index, size})
                     }}
                     current={dataSource.page}
