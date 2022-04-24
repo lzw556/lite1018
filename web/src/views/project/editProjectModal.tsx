@@ -61,7 +61,7 @@ const EditProjectModal:FC<EditProjectModalProps> = (props) => {
                   onOk={project ? onSave : onAdd}
                   confirmLoading={isLoading}>
         <Form form={form} labelCol={{span: 4}} validateMessages={defaultValidateMessages}>
-            <Form.Item label={"名称"} name={"name"} rules={[Rules.range(4, 16)]}>
+            <Form.Item label={"名称"} name={"name"} rules={[Rules.range(4, 32)]}>
                 <Input placeholder={"请输入项目名称"}/>
             </Form.Item>
             <Form.Item label={"描述"} name={"description"}>
