@@ -58,9 +58,6 @@ func (r root) Process(ctx *iot.Context, msg iot.Message) error {
 			state.IsOnline = true
 			state.ConnectedAt = time.Now().UTC().Unix()
 			state.Notify(device.MacAddress)
-			if device.IsGateway() {
-				ctx.Set("sync_network_link_states", true)
-			}
 		} else {
 			state.ConnectedAt = time.Now().UTC().Unix()
 		}

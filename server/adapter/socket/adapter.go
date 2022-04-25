@@ -45,13 +45,13 @@ func (a *Adapter) RegisterEvents(events ...event.Event) {
 
 func (a *Adapter) Run() error {
 	a.socket.OnConnect("/", func(c socketio.Conn) error {
-		xlog.Info(fmt.Sprintf("socket id %s connected", c.ID()))
+		xlog.Debug(fmt.Sprintf("socket id %s connected", c.ID()))
 		c.Emit("ready", fmt.Sprintf("socket connected: %s", c.ID()))
 		return nil
 	})
 
 	a.socket.OnDisconnect("/", func(c socketio.Conn, s string) {
-		xlog.Info(fmt.Sprintf("socket id %s disconnect", c.ID()))
+		xlog.Debug(fmt.Sprintf("socket id %s disconnect", c.ID()))
 		if err := c.Close(); err != nil {
 			xlog.Error("socket connection close failed.", err)
 		}

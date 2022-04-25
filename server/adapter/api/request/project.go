@@ -1,7 +1,7 @@
 package request
 
 type Project struct {
-	Name        string `json:"name" binding:"required,max=16,min=4"`
+	Name        string `json:"name" binding:"required,max=32,min=4"`
 	Description string `json:"description"`
 }
 

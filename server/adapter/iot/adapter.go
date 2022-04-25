@@ -63,6 +63,11 @@ func (a *Adapter) startMQTTServer() error {
 }
 
 func (a *Adapter) Subscribe(topic string, qos byte, handler func(c mqtt.Client, msg mqtt.Message)) error {
+	if !a.client.IsConnected() {
+		if t := a.client.Connect(); t.Wait() && t.Error() != nil {
+			return t.Error()
+		}
+	}
 	t := a.client.Subscribe(topic, qos, handler)
 	if t.Wait() && t.Error() != nil {
 		return t.Error()
@@ -91,7 +96,7 @@ func (a *Adapter) Run() error {
 	if t := a.client.Connect(); t.Wait() && t.Error() != nil {
 		return t.Error()
 	}
-	t := a.client.Subscribe("iot/v2/gw/+/dev/+/msg/+/", 2, func(c mqtt.Client, message mqtt.Message) {
+	t := a.client.Subscribe("iot/v2/gw/+/dev/+/msg/+/", 1, func(c mqtt.Client, message mqtt.Message) {
 		msg := parse(message)
 		if dispatcher, ok := a.dispatchers[msg.Header.Type]; ok {
 			xlog.Debugf("receive %s message => [%s]", dispatcher.Name(), msg.Body.Device)
