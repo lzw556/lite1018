@@ -17,12 +17,16 @@ type SasRawData struct {
 		MaxTof               float32 `json:"max_tof" mapstructure:"max_tof"`
 		MaxPreload           float32 `json:"max_preload" mapstructure:"max_preload"`
 		MaxIntensityPressure float32 `json:"max_intensity_pressure" mapstructure:"max_intensity_pressure"`
-		AccelerationX        float32 `json:"acceleration_x" mapstructure:"acceleration_x"`
-		AccelerationY        float32 `json:"acceleration_y" mapstructure:"acceleration_y"`
-		AccelerationZ        float32 `json:"acceleration_z" mapstructure:"acceleration_z"`
 	} `json:"metadata" mapstructure:"metadata"`
-	DynamicLength   []float32 `json:"dynamic_length" mapstructure:"dynamic_length"`
-	DynamicTof      []float32 `json:"dynamic_tof" mapstructure:"dynamic_tof"`
-	DynamicPreload  []float32 `json:"dynamic_preload" mapstructure:"dynamic_preload"`
-	DynamicPressure []float32 `json:"dynamic_pressure" mapstructure:"dynamic_pressure"`
+	DynamicLength       []float32             `json:"dynamic_length" mapstructure:"dynamic_length"`
+	DynamicTof          []float32             `json:"dynamic_tof" mapstructure:"dynamic_tof"`
+	DynamicPreload      []float32             `json:"dynamic_preload" mapstructure:"dynamic_preload"`
+	DynamicPressure     []float32             `json:"dynamic_pressure" mapstructure:"dynamic_pressure"`
+	DynamicAcceleration []DynamicAcceleration `json:"dynamic_acceleration" mapstructure:"dynamic_acceleration"`
+}
+
+type DynamicAcceleration struct {
+	XAxis float32 `json:"XAxis" mapstructure:"XAxis"`
+	YAxis float32 `json:"YAxis" mapstructure:"YAxis"`
+	ZAxis float32 `json:"ZAxis" mapstructure:"ZAxis"`
 }
