@@ -58,10 +58,6 @@ func (p RestartStatus) Process(ctx *iot.Context, msg iot.Message) error {
 					return fmt.Errorf("find device list failed: %v", err)
 				}
 				eg.Go(func() error {
-					command.SyncNetworkLinkStatus(network, devices, 3*time.Second)
-					return nil
-				})
-				eg.Go(func() error {
 					return command.SyncNetwork(network, devices, 3*time.Second)
 				})
 			}

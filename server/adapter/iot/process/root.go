@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/iot"
+	"github.com/thetasensors/theta-cloud-lite/server/adapter/iot/command"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
 	spec "github.com/thetasensors/theta-cloud-lite/server/domain/specification"
@@ -58,6 +59,11 @@ func (r root) Process(ctx *iot.Context, msg iot.Message) error {
 			state.IsOnline = true
 			state.ConnectedAt = time.Now().UTC().Unix()
 			state.Notify(device.MacAddress)
+			if device.IsGateway() {
+				if network, err := r.networkRepo.Get(c, device.NetworkID); err == nil {
+					go command.SyncNetworkLinkStates(network, 3*time.Second)
+				}
+			}
 		} else {
 			state.ConnectedAt = time.Now().UTC().Unix()
 		}

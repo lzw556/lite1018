@@ -9,6 +9,7 @@ import (
 	pd "github.com/thetasensors/theta-cloud-lite/server/adapter/iot/proto"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
+	spec "github.com/thetasensors/theta-cloud-lite/server/domain/specification"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/devicetype"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/errcode"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/json"
@@ -57,7 +58,12 @@ func Execute(gateway, device entity.Device, t Type) error {
 	return response.BusinessErr(errcode.DeviceOfflineError, "")
 }
 
-func SyncNetworkLinkStatus(network entity.Network, devices []entity.Device, timeout time.Duration) {
+func SyncNetworkLinkStates(network entity.Network, timeout time.Duration) {
+	devices, err := deviceRepo.FindBySpecs(context.TODO(), spec.NetworkEqSpec(network.ID))
+	if err != nil {
+		xlog.Errorf("sync network link states failed: %v", err)
+		return
+	}
 	var gateway entity.Device
 	for _, device := range devices {
 		if network.GatewayID == device.ID {
