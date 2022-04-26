@@ -27,7 +27,7 @@ const TopologyView: FC<TopologyViewProps> = ({network}) => {
             graph = new G6.TreeGraph({
                 container: 'container',
                 width: document.querySelector("#container")?.clientWidth,
-                height: 500,
+                height: document.querySelector("#container")?.clientHeight,
                 modes: {
                     default: [{type: 'collapse-expand'}, 'drag-canvas', 'zoom-canvas']
                 },
@@ -72,7 +72,7 @@ const TopologyView: FC<TopologyViewProps> = ({network}) => {
         }
     }, [])
 
-    return <div id={"container"} style={{width: "100%", height: "500px"}}/>
+    return <div id={"container"} style={{width: "100%", height: "100%"}}/>
 }
 
 export default TopologyView;
