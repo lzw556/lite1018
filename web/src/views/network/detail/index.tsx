@@ -99,9 +99,9 @@ const NetworkDetail = () => {
   const renderInformation = () => {
     if (network) {
       return (
-        <Row>
+        <Row style={{flexGrow:1}}>
           <Col xl={16} xxl={18}>
-            <ShadowCard>
+            <ShadowCard style={{height: '100%'}} bodyStyle={{height:'100%'}}>
               <TopologyView network={network} />
             </ShadowCard>
           </Col>
@@ -112,7 +112,7 @@ const NetworkDetail = () => {
                   <Input placeholder={'请输入网络名称'} />
                 </Form.Item>
                 <WsnFormItem/>
-                <Form.Item wrapperCol={{ offset: 12, span: 12 }}>
+                <Form.Item wrapperCol={{ offset: 6, span: 18 }}>
                   <Row justify='end'>
                     <Col>
                       <ButtonGroup>
@@ -162,7 +162,7 @@ const NetworkDetail = () => {
   };
 
   return (
-    <Content>
+    <Content style={{display:'flex',flexDirection:'column'}}>
       <MyBreadcrumb firstBreadState={location.state as any}>
         <HasPermission value={Permission.NetworkAddDevices}>
           <Space>
