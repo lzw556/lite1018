@@ -4,9 +4,16 @@ export const DYNAMIC_DATA_BOLTELONGATION = {
     { label: '长度', value: 'dynamic_length', unit: 'mm' },
     { label: '预警力', value: 'dynamic_preload', unit: 'kN' },
     { label: '压强', value: 'dynamic_pressure', unit: 'MPa' },
-    { label: '飞行时间', value: 'dynamic_tof', unit: 'ns' }
+    { label: '飞行时间', value: 'dynamic_tof', unit: 'ns' },
+    { label: '加速度', value: 'dynamic_acceleration', unit: 'g' }
   ] as const
 };
+
+export const AXIS_THREE = [
+  { label: 'x轴', value: 'xAxis' },
+  { label: 'y轴', value: 'yAxis' },
+  { label: 'z轴', value: 'zAxis' }
+] as const;
 
 export const DYNAMIC_DATA_ANGLEDIP = {
   data_type: 16842756,
