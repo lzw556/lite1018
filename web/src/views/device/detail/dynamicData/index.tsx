@@ -168,7 +168,7 @@ export const DynamicData: React.FC<Device> = ({ id, typeId }) => {
                   <Col span={isMobile ? 24 : 8} className='ts-detail-label'>
                     {item.label}
                   </Col>
-                  <Col span={isMobile ? 24 : 16}>
+                  <Col span={isMobile ? 24 : 16} className='ts-detail-content'>
                     {meta[item.value] !== null && meta[item.value] !== undefined
                       ? `${meta[item.value] !== 0 ? meta[item.value].toFixed(3) : 0}${item.unit}`
                       : '-'}
@@ -187,7 +187,7 @@ export const DynamicData: React.FC<Device> = ({ id, typeId }) => {
                   <Col span={isMobile ? 24 : 8} className='ts-detail-label'>
                     {item.label}
                   </Col>
-                  <Col span={isMobile ? 24 : 16}>
+                  <Col span={isMobile ? 24 : 16} className='ts-detail-content'>
                     {meta[item.value] !== null && meta[item.value] !== undefined
                       ? `${meta[item.value] !== 0 ? meta[item.value].toFixed(3) : 0}${item.unit}`
                       : '-'}
@@ -293,7 +293,7 @@ export const DynamicData: React.FC<Device> = ({ id, typeId }) => {
               <ConfigProvider renderEmpty={() => <EmptyLayout description={'动态数据列表为空'} />}>
                 <Table
                   size={'middle'}
-                  scroll={{ y: 500 }}
+                  scroll={{ y: 600 }}
                   showHeader={false}
                   columns={[
                     {
