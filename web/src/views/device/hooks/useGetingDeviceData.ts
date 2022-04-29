@@ -8,14 +8,15 @@ import {
 
 export type Fields_be = typeof DYNAMIC_DATA_BOLTELONGATION.fields[number]['value'];
 export const fields_be_hasAxis = 'dynamic_acceleration';
-type Fields_be_hasAxis = typeof fields_be_hasAxis;
-type Fields_be_noHasAxis = Exclude<Fields_be, Fields_be_hasAxis>;
 export type Fields_be_axis = Record<typeof AXIS_THREE[number]['value'], number>;
-export type Values_be = Record<Fields_be_noHasAxis, number[]> & {
+export type Values_be = Record<Exclude<Fields_be, typeof fields_be_hasAxis>, number[]> & {
   [fields_be_hasAxis]: Fields_be_axis[];
+  metadata: Record<typeof DYNAMIC_DATA_BOLTELONGATION.metaData[number]['value'], number>;
 };
 export type Fields_ad = typeof DYNAMIC_DATA_ANGLEDIP.fields[number]['value'];
-export type Values_ad = Record<Fields_ad, number[]>;
+export type Values_ad = Record<Fields_ad, number[]> & {
+  metadata: Record<typeof DYNAMIC_DATA_ANGLEDIP.metaData[number]['value'], number>;
+};
 export const useGetingDeviceData = <T>(): [
   boolean,
   { timestamp: number; values: T } | null,

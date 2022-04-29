@@ -14,6 +14,7 @@ import { LineChartStyles } from '../../../../constants/chart';
 import { DownloadDeviceDataByTimestampRequest } from '../../../../apis/device';
 import { DeviceType } from '../../../../types/device_type';
 import { AXIS_THREE, DYNAMIC_DATA_ANGLEDIP, DYNAMIC_DATA_BOLTELONGATION } from './constants';
+import ShadowCard from '../../../../components/shadowCard';
 
 export const DynamicData: React.FC<Device> = ({ id, typeId }) => {
   const { fields, data_type } =
@@ -153,6 +154,53 @@ export const DynamicData: React.FC<Device> = ({ id, typeId }) => {
     }
   };
 
+  const renderMeta = () => {
+    if (timestamp === 0 || !data || !data.values || !data.values.metadata) {
+      return null;
+    } else {
+      const meta = data.values.metadata;
+      if ('min_preload' in meta) {
+        return (
+          <Row>
+            {DYNAMIC_DATA_BOLTELONGATION.metaData.map((item) => (
+              <Col span={isMobile ? 12: 8}>
+                <Row>
+                  <Col span={isMobile ? 24 : 8} className='ts-detail-label'>
+                    {item.label}
+                  </Col>
+                  <Col span={isMobile ? 24 : 16}>
+                    {meta[item.value] !== null && meta[item.value] !== undefined
+                      ? `${meta[item.value] !== 0 ? meta[item.value].toFixed(3) : 0}${item.unit}`
+                      : '-'}
+                  </Col>
+                </Row>
+              </Col>
+            ))}
+          </Row>
+        );
+      } else {
+        return (
+          <Row>
+            {DYNAMIC_DATA_ANGLEDIP.metaData.map((item) => (
+              <Col span={isMobile ? 12: 8}>
+                <Row>
+                  <Col span={isMobile ? 24 : 8} className='ts-detail-label'>
+                    {item.label}
+                  </Col>
+                  <Col span={isMobile ? 24 : 16}>
+                    {meta[item.value] !== null && meta[item.value] !== undefined
+                      ? `${meta[item.value] !== 0 ? meta[item.value].toFixed(3) : 0}${item.unit}`
+                      : '-'}
+                  </Col>
+                </Row>
+              </Col>
+            ))}
+          </Row>
+        );
+      }
+    }
+  };
+
   if (isLoading) return <p>loading...</p>;
   if (isMobile) {
     if (timestamps.length === 0) {
@@ -196,6 +244,7 @@ export const DynamicData: React.FC<Device> = ({ id, typeId }) => {
             <DownloadOutlined onClick={() => onDownload(timestamp)} />
           </Col>
         </Row>
+        {timestamp !== 0 && <ShadowCard style={{marginBottom: 10}}>{renderMeta()}</ShadowCard>}
         <Row>
           <Col span={20}>
             <Label name={'属性'}>
@@ -288,31 +337,34 @@ export const DynamicData: React.FC<Device> = ({ id, typeId }) => {
             </Col>
           </Row>
         </Col>
-        <Col xl={18} xxl={20}>
-          <Row justify='end'>
-            <Col>
-              <Label name={'属性'}>
-                <Select
-                  bordered={false}
-                  defaultValue={fields[0].value}
-                  placeholder={'请选择属性'}
-                  style={{ width: '120px' }}
-                  onChange={(value, option: any) =>
-                    setField({ label: option.children, value: option.key, unit: option.props['data-unit']} as any)
-                  }
-                >
-                  {fields.map(({ label, value, unit }) => (
-                    <Select.Option key={value} value={value} data-unit={unit}>
-                      {label}
-                    </Select.Option>
-                  ))}
-                </Select>
-              </Label>
-            </Col>
-          </Row>
-          <Row justify={'start'}>
-            <Col span={24}>{renderChart()}</Col>
-          </Row>
+        <Col xl={18} xxl={20} style={{backgroundColor:'#f0f2f5'}}>
+          {timestamp !== 0 && <ShadowCard style={{marginBottom: 10}}>{renderMeta()}</ShadowCard>}
+          <ShadowCard>
+            <Row justify='end'>
+              <Col>
+                <Label name={'属性'}>
+                  <Select
+                    bordered={false}
+                    defaultValue={fields[0].value}
+                    placeholder={'请选择属性'}
+                    style={{ width: '120px' }}
+                    onChange={(value, option: any) =>
+                      setField({ label: option.children, value: option.key, unit: option.props['data-unit']} as any)
+                    }
+                  >
+                    {fields.map(({ label, value, unit }) => (
+                      <Select.Option key={value} value={value} data-unit={unit}>
+                        {label}
+                      </Select.Option>
+                    ))}
+                  </Select>
+                </Label>
+              </Col>
+            </Row>
+            <Row justify={'start'}>
+              <Col span={24}>{renderChart()}</Col>
+            </Row>  
+          </ShadowCard>
         </Col>
       </Row>
     );
