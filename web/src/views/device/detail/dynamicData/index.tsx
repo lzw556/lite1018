@@ -8,13 +8,13 @@ import { EmptyLayout } from '../../../layout';
 import { useFindingDeviceData } from '../../hooks/useFindingDeviceData';
 import usePermission, { Permission } from '../../../../permission/permission';
 import EChartsReact from 'echarts-for-react';
-import { useGetingDeviceData, Values, Values_ad, Values_be } from '../../hooks/useGetingDeviceData';
+import { Fields_ad, Fields_be, Fields_be_axis, fields_be_hasAxis, useGetingDeviceData, Values_ad, Values_be } from '../../hooks/useGetingDeviceData';
 import Label from '../../../../components/label';
 import { LineChartStyles } from '../../../../constants/chart';
 import { DownloadDeviceDataByTimestampRequest } from '../../../../apis/device';
 import { DeviceType } from '../../../../types/device_type';
-import { DYNAMIC_DATA_ANGLEDIP, DYNAMIC_DATA_BOLTELONGATION } from './constants';
-import { values } from 'lodash';
+import { AXIS_THREE, DYNAMIC_DATA_ANGLEDIP, DYNAMIC_DATA_BOLTELONGATION } from './constants';
+import ShadowCard from '../../../../components/shadowCard';
 
 export const DynamicData: React.FC<Device> = ({ id, typeId }) => {
   const { fields, data_type } =
@@ -35,7 +35,7 @@ export const DynamicData: React.FC<Device> = ({ id, typeId }) => {
     if (timestamps.length > 0) setTimestamp(timestamps[0].timestamp);
   }, [timestamps]);
 
-  const [isLoading2, data, fetchData] = useGetingDeviceData();
+  const [isLoading2, data, fetchData] = useGetingDeviceData<Values_be | Values_ad>();
 
   React.useEffect(() => {
     if (timestamp > 0) {
@@ -84,12 +84,38 @@ export const DynamicData: React.FC<Device> = ({ id, typeId }) => {
         }
       ]
     };
-    if (timestamp === 0 || !data) {
+    if (timestamp === 0 || !data || !data.values) {
       return <EmptyLayout description='数据不足' />;
     } else {
-      const series: number[] = data?.values[field.value as keyof Values].map((item: number) =>
-        item.toFixed(3)
-      );
+      let series: any = [];
+      const values = data?.values;
+      let items: number[] | Fields_be_axis[] = [];
+      if (fields_be_hasAxis in values) {
+        items = (values as Values_be)[field.value as Fields_be];
+      } else {
+        items = (values as Values_ad)[field.value as Fields_ad];
+      }
+      if (!items || items.length === 0) return <EmptyLayout description='数据不足' />;
+      const isAcceleration = Number.isNaN(Number(items[0]));
+      if (!isAcceleration) {
+        series = [
+          {
+            type: 'line',
+            name: field.label,
+            data: (items as number[]).map((item) => item.toFixed(3)),
+            itemStyle: { color: LineChartStyles[0].itemStyle.normal.color }
+          }
+        ];
+      } else {
+        series = AXIS_THREE.map((axis, index) => ({
+          type: 'line',
+          name: axis.label,
+          data: (items as Fields_be_axis[])
+            .map((item) => item[axis.value])
+            .map((item) => item.toFixed(3)),
+          itemStyle: { color: LineChartStyles[index].itemStyle.normal.color }
+        }));
+      }
       return (
         <EChartsReact
           loadingOption={{ text: '正在加载数据, 请稍等...' }}
@@ -97,10 +123,7 @@ export const DynamicData: React.FC<Device> = ({ id, typeId }) => {
           style={{ height: 500 }}
           option={{
             legend: {
-              data: [field.label],
-              itemStyle: {
-                color: LineChartStyles[0].itemStyle.normal.color
-              }
+              data: !isAcceleration ? [field.label] : AXIS_THREE.map((item) => item.label)
             },
             title: { text: field.label, top: 0 },
             tooltip: {
@@ -109,27 +132,72 @@ export const DynamicData: React.FC<Device> = ({ id, typeId }) => {
                 return `<p>
                 ${paras[0].dataIndex}
                 <br />
-                ${paras[0].marker} <strong>${paras[0].data}</strong> ${field.unit}
+                ${paras
+                  .map(
+                    (para: any) =>
+                      `${para.marker}${para.seriesName} <strong>${para.data}</strong>${field.unit}`
+                  )
+                  .join('&nbsp;&nbsp;')}
               </p>`;
               }
             },
             xAxis: {
               type: 'category',
-              data: series.map((item, index) => index)
+              data: series[0].data.map((item: any, index: number) => index)
             },
-            series: {
-              data: series,
-              type: 'line',
-              name: field.label,
-              itemStyle: {
-                color: LineChartStyles[0].itemStyle.normal.color
-              }
-            },
+            series,
             ...defaultChartOption
           }}
           notMerge={true}
         />
       );
+    }
+  };
+
+  const renderMeta = () => {
+    if (timestamp === 0 || !data || !data.values || !data.values.metadata) {
+      return null;
+    } else {
+      const meta = data.values.metadata;
+      if ('min_preload' in meta) {
+        return (
+          <Row>
+            {DYNAMIC_DATA_BOLTELONGATION.metaData.map((item) => (
+              <Col span={isMobile ? 12: 8}>
+                <Row>
+                  <Col span={isMobile ? 24 : 8} className='ts-detail-label'>
+                    {item.label}
+                  </Col>
+                  <Col span={isMobile ? 24 : 16} className='ts-detail-content'>
+                    {meta[item.value] !== null && meta[item.value] !== undefined
+                      ? `${meta[item.value] !== 0 ? meta[item.value].toFixed(3) : 0}${item.unit}`
+                      : '-'}
+                  </Col>
+                </Row>
+              </Col>
+            ))}
+          </Row>
+        );
+      } else {
+        return (
+          <Row>
+            {DYNAMIC_DATA_ANGLEDIP.metaData.map((item) => (
+              <Col span={isMobile ? 12: 8}>
+                <Row>
+                  <Col span={isMobile ? 24 : 8} className='ts-detail-label'>
+                    {item.label}
+                  </Col>
+                  <Col span={isMobile ? 24 : 16} className='ts-detail-content'>
+                    {meta[item.value] !== null && meta[item.value] !== undefined
+                      ? `${meta[item.value] !== 0 ? meta[item.value].toFixed(3) : 0}${item.unit}`
+                      : '-'}
+                  </Col>
+                </Row>
+              </Col>
+            ))}
+          </Row>
+        );
+      }
     }
   };
 
@@ -176,6 +244,7 @@ export const DynamicData: React.FC<Device> = ({ id, typeId }) => {
             <DownloadOutlined onClick={() => onDownload(timestamp)} />
           </Col>
         </Row>
+        {timestamp !== 0 && <ShadowCard style={{marginBottom: 10}}>{renderMeta()}</ShadowCard>}
         <Row>
           <Col span={20}>
             <Label name={'属性'}>
@@ -224,7 +293,7 @@ export const DynamicData: React.FC<Device> = ({ id, typeId }) => {
               <ConfigProvider renderEmpty={() => <EmptyLayout description={'动态数据列表为空'} />}>
                 <Table
                   size={'middle'}
-                  scroll={{ y: 500 }}
+                  scroll={{ y: 600 }}
                   showHeader={false}
                   columns={[
                     {
@@ -268,31 +337,34 @@ export const DynamicData: React.FC<Device> = ({ id, typeId }) => {
             </Col>
           </Row>
         </Col>
-        <Col xl={18} xxl={20}>
-          <Row justify='end'>
-            <Col>
-              <Label name={'属性'}>
-                <Select
-                  bordered={false}
-                  defaultValue={fields[0].value}
-                  placeholder={'请选择属性'}
-                  style={{ width: '120px' }}
-                  onChange={(value, option: any) =>
-                    setField({ label: option.children, value: option.key, unit: option.props['data-unit']} as any)
-                  }
-                >
-                  {fields.map(({ label, value, unit }) => (
-                    <Select.Option key={value} value={value} data-unit={unit}>
-                      {label}
-                    </Select.Option>
-                  ))}
-                </Select>
-              </Label>
-            </Col>
-          </Row>
-          <Row justify={'start'}>
-            <Col span={24}>{renderChart()}</Col>
-          </Row>
+        <Col xl={18} xxl={20} style={{backgroundColor:'#f0f2f5'}}>
+          {timestamp !== 0 && <ShadowCard style={{marginBottom: 10}}>{renderMeta()}</ShadowCard>}
+          <ShadowCard>
+            <Row justify='end'>
+              <Col>
+                <Label name={'属性'}>
+                  <Select
+                    bordered={false}
+                    defaultValue={fields[0].value}
+                    placeholder={'请选择属性'}
+                    style={{ width: '120px' }}
+                    onChange={(value, option: any) =>
+                      setField({ label: option.children, value: option.key, unit: option.props['data-unit']} as any)
+                    }
+                  >
+                    {fields.map(({ label, value, unit }) => (
+                      <Select.Option key={value} value={value} data-unit={unit}>
+                        {label}
+                      </Select.Option>
+                    ))}
+                  </Select>
+                </Label>
+              </Col>
+            </Row>
+            <Row justify={'start'}>
+              <Col span={24}>{renderChart()}</Col>
+            </Row>  
+          </ShadowCard>
         </Col>
       </Row>
     );

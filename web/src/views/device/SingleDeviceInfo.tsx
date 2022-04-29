@@ -74,6 +74,13 @@ export const SingleDeviceInfo: React.FC<{
         {data.map((attr: any, index: number) => {
           if (index > 2) return null;
           const field = attr.fields.find((field: any) => field.important);
+          if(!field) return null;
+          let value = field.value;
+          if(!value) {
+            value = '-'
+          }else if(!Number.isInteger(field.value)){
+            value = field.value.toFixed(attr.precision)
+          }
           return (
             <Col span={8}>
               <Statistic
@@ -83,9 +90,7 @@ export const SingleDeviceInfo: React.FC<{
                     title={`${attr.name}${attr.unit ? `(${attr.unit})` : ''}`}
                   >{`${attr.name}${attr.unit ? `(${attr.unit})` : ''}`}</Text>
                 }
-                value={
-                  Number.isInteger(field.value) ? field.value : field.value.toFixed(attr.precision)
-                }
+                value={value}
               />
             </Col>
           );

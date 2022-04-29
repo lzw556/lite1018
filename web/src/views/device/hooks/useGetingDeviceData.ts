@@ -1,18 +1,25 @@
 import * as React from 'react';
 import { GetDeviceDataRequest } from '../../../apis/device';
 import {
+  AXIS_THREE,
   DYNAMIC_DATA_ANGLEDIP,
   DYNAMIC_DATA_BOLTELONGATION
 } from '../detail/dynamicData/constants';
 
-export type Values_be = typeof DYNAMIC_DATA_BOLTELONGATION.fields[number]['value'];
-export type Values_ad = typeof DYNAMIC_DATA_ANGLEDIP.fields[number]['value'];
-
-export type Values = (Record<Values_be, number[]> | Record<Values_ad, number[]>) & { metadata: any };
-
-export const useGetingDeviceData = (): [
+export type Fields_be = typeof DYNAMIC_DATA_BOLTELONGATION.fields[number]['value'];
+export const fields_be_hasAxis = 'dynamic_acceleration';
+export type Fields_be_axis = Record<typeof AXIS_THREE[number]['value'], number>;
+export type Values_be = Record<Exclude<Fields_be, typeof fields_be_hasAxis>, number[]> & {
+  [fields_be_hasAxis]: Fields_be_axis[];
+  metadata: Record<typeof DYNAMIC_DATA_BOLTELONGATION.metaData[number]['value'], number>;
+};
+export type Fields_ad = typeof DYNAMIC_DATA_ANGLEDIP.fields[number]['value'];
+export type Values_ad = Record<Fields_ad, number[]> & {
+  metadata: Record<typeof DYNAMIC_DATA_ANGLEDIP.metaData[number]['value'], number>;
+};
+export const useGetingDeviceData = <T>(): [
   boolean,
-  { timestamp: number; values: Values } | null,
+  { timestamp: number; values: T } | null,
   (id: number, timestamp: number, filters: any) => void
 ] => {
   const [isLoading, setIsLoading] = React.useState(false);

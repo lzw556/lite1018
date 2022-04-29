@@ -277,9 +277,15 @@ const DevicePage = () => {
             .map((attr: any, index: number) => {
               if (index > 2) return null;
               const field = attr.fields.find((field: any) => field.important);
-              return `${attr.name}: ${
-                Number.isInteger(field.value) ? field.value : field.value.toFixed(attr.precision)
-              }${attr.unit}`;
+              if(!field) return null;
+              let value = field.value;
+              if(!value) {
+                value = '-'
+              }else if(!Number.isInteger(field.value)){
+                value = field.value.toFixed(attr.precision)
+              }
+              if(value !== '-') value = `${value}${attr.unit}`
+              return `${attr.name}: ${value}`;
             })
             .join(', ');
         }
