@@ -248,6 +248,34 @@ func (BoltElongation) Properties(sensorID uint) Properties {
 					},
 				},
 			},
+			{
+				Key:       "value",
+				Name:      "信号强度",
+				Unit:      "",
+				Precision: 3,
+				Sort:      5,
+				Fields: []Field{
+					{
+						Name:      "信号强度",
+						Key:       "value",
+						DataIndex: 4,
+					},
+				},
+			},
+			{
+				Key:       "dataCount",
+				Name:      "采集数量",
+				Unit:      "",
+				Precision: 3,
+				Sort:      6,
+				Fields: []Field{
+					{
+						Name:      "采集数量",
+						Key:       "dataCount",
+						DataIndex: 7,
+					},
+				},
+			},
 		}
 	}
 	return nil
