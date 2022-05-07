@@ -76,6 +76,14 @@ const (
 	ProjectNotSelectedError
 )
 
+const (
+	AssetTypeUnknownError BusinessErrorCode = iota + 20001
+)
+
+const (
+	MonitoringPointTypeUnknownError BusinessErrorCode = iota + 21001
+)
+
 var businessErrorMap = map[BusinessErrorCode]string{
 	UnknownBusinessError:                "未知错误",
 	SystemNotReadyError:                 "系统未初始化完成",
@@ -114,6 +122,8 @@ var businessErrorMap = map[BusinessErrorCode]string{
 	ProjectNotFoundError:                "项目不存在",
 	ProjectExistsError:                  "项目已存在",
 	ProjectNotSelectedError:             "请先选择项目",
+	AssetTypeUnknownError:               "未知的资产类型",
+	MonitoringPointTypeUnknownError:     "未知的监测点类型",
 }
 
 func GetErrMessage(code BusinessErrorCode) string {

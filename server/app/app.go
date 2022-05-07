@@ -4,14 +4,23 @@ import (
 	"context"
 	"embed"
 	"fmt"
+	"net/http"
+	"os"
+	"os/exec"
+	"os/signal"
+	"runtime"
+	"syscall"
+
 	"github.com/gin-gonic/gin"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/middleware"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/alarm"
+	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/asset"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/device"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/firmware"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/menu"
+	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/monitoringpoint"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/network"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/permission"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/project"
@@ -30,12 +39,6 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/cache"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/utils"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/xlog"
-	"net/http"
-	"os"
-	"os/exec"
-	"os/signal"
-	"runtime"
-	"syscall"
 )
 
 func Start(mode string, dist embed.FS) {
@@ -126,6 +129,8 @@ func runApiServer(mode string, dist embed.FS) {
 		network.NewRouter(service.NewNetwork()),
 		system.NewRouter(service.NewSystem()),
 		statistic.NewRouter(service.NewStatistic()),
+		asset.NewRouter(service.NewAsset()),
+		monitoringpoint.NewRouter(service.NewMonitoringPoint()),
 	)
 
 	go func() {

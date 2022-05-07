@@ -23,6 +23,8 @@ func InitTables(db *gorm.DB) error {
 		&entity.AlarmRecord{},
 		&entity.AlarmRecordAcknowledge{},
 		&entity.Event{},
+		&entity.Asset{},
+		&entity.MonitoringPoint{},
 	}
 
 	//db.Migrator().DropTable("casbin_rule")
