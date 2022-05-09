@@ -267,6 +267,7 @@ func (v VibrationTemperature3Axis2) Properties(sensorID uint) Properties {
 				Unit:      "mm/s",
 				Precision: 3,
 				Sort:      0,
+				IsShow:    true,
 				Fields: []Field{
 					{
 						Name:      "X轴",
@@ -291,6 +292,7 @@ func (v VibrationTemperature3Axis2) Properties(sensorID uint) Properties {
 				Unit:      "gE",
 				Precision: 3,
 				Sort:      1,
+				IsShow:    true,
 				Fields: []Field{
 					{
 						Name:      "X轴",
@@ -315,6 +317,7 @@ func (v VibrationTemperature3Axis2) Properties(sensorID uint) Properties {
 				Unit:      "m/s²",
 				Precision: 3,
 				Sort:      2,
+				IsShow:    true,
 				Fields: []Field{
 					{
 						Name:      "X轴",
@@ -339,6 +342,7 @@ func (v VibrationTemperature3Axis2) Properties(sensorID uint) Properties {
 				Unit:      "°C",
 				Precision: 3,
 				Sort:      3,
+				IsShow:    true,
 				Fields: []Field{
 					{
 						Name:      "温度",
@@ -353,6 +357,7 @@ func (v VibrationTemperature3Axis2) Properties(sensorID uint) Properties {
 				Unit:      "Hz",
 				Precision: 3,
 				Sort:      4,
+				IsShow:    true,
 				Fields: []Field{
 					{
 						Name:      "X轴",
@@ -377,6 +382,7 @@ func (v VibrationTemperature3Axis2) Properties(sensorID uint) Properties {
 				Unit:      "",
 				Precision: 3,
 				Sort:      5,
+				IsShow:    true,
 				Fields: []Field{
 					{
 						Name:      "X轴",
@@ -401,6 +407,7 @@ func (v VibrationTemperature3Axis2) Properties(sensorID uint) Properties {
 				Unit:      "m/s²",
 				Precision: 3,
 				Sort:      6,
+				IsShow:    true,
 				Fields: []Field{
 					{
 						Name:      "X轴",
@@ -425,6 +432,7 @@ func (v VibrationTemperature3Axis2) Properties(sensorID uint) Properties {
 				Unit:      "",
 				Precision: 3,
 				Sort:      7,
+				IsShow:    true,
 				Fields: []Field{
 					{
 						Name:      "X轴",
@@ -449,6 +457,7 @@ func (v VibrationTemperature3Axis2) Properties(sensorID uint) Properties {
 				Unit:      "",
 				Precision: 3,
 				Sort:      8,
+				IsShow:    true,
 				Fields: []Field{
 					{
 						Name:      "X轴",
@@ -473,6 +482,7 @@ func (v VibrationTemperature3Axis2) Properties(sensorID uint) Properties {
 				Unit:      "",
 				Precision: 3,
 				Sort:      9,
+				IsShow:    true,
 				Fields: []Field{
 					{
 						Name:      "X轴",
@@ -497,6 +507,7 @@ func (v VibrationTemperature3Axis2) Properties(sensorID uint) Properties {
 				Unit:      "",
 				Precision: 3,
 				Sort:      10,
+				IsShow:    true,
 				Fields: []Field{
 					{
 						Name:      "X轴",
@@ -521,6 +532,7 @@ func (v VibrationTemperature3Axis2) Properties(sensorID uint) Properties {
 				Unit:      "",
 				Precision: 3,
 				Sort:      11,
+				IsShow:    true,
 				Fields: []Field{
 					{
 						Name:      "X轴",
@@ -545,6 +557,7 @@ func (v VibrationTemperature3Axis2) Properties(sensorID uint) Properties {
 				Unit:      "",
 				Precision: 3,
 				Sort:      12,
+				IsShow:    true,
 				Fields: []Field{
 					{
 						Name:      "X轴",
@@ -569,6 +582,7 @@ func (v VibrationTemperature3Axis2) Properties(sensorID uint) Properties {
 				Unit:      "",
 				Precision: 3,
 				Sort:      13,
+				IsShow:    true,
 				Fields: []Field{
 					{
 						Name:      "X轴",
@@ -593,6 +607,7 @@ func (v VibrationTemperature3Axis2) Properties(sensorID uint) Properties {
 				Unit:      "",
 				Precision: 3,
 				Sort:      14,
+				IsShow:    true,
 				Fields: []Field{
 					{
 						Name:      "X轴",
@@ -617,6 +632,7 @@ func (v VibrationTemperature3Axis2) Properties(sensorID uint) Properties {
 				Unit:      "",
 				Precision: 3,
 				Sort:      14,
+				IsShow:    true,
 				Fields: []Field{
 					{
 						Name:      "X轴",
@@ -641,6 +657,7 @@ func (v VibrationTemperature3Axis2) Properties(sensorID uint) Properties {
 				Unit:      "",
 				Precision: 3,
 				Sort:      15,
+				IsShow:    true,
 				Fields: []Field{
 					{
 						Name:      "X轴",
@@ -665,6 +682,7 @@ func (v VibrationTemperature3Axis2) Properties(sensorID uint) Properties {
 				Unit:      "",
 				Precision: 3,
 				Sort:      16,
+				IsShow:    true,
 				Fields: []Field{
 					{
 						Name:      "X轴",
@@ -689,6 +707,7 @@ func (v VibrationTemperature3Axis2) Properties(sensorID uint) Properties {
 				Unit:      "",
 				Precision: 3,
 				Sort:      17,
+				IsShow:    true,
 				Fields: []Field{
 					{
 						Name:      "X轴",
@@ -713,6 +732,7 @@ func (v VibrationTemperature3Axis2) Properties(sensorID uint) Properties {
 				Unit:      "",
 				Precision: 3,
 				Sort:      18,
+				IsShow:    true,
 				Fields: []Field{
 					{
 						Name:      "X轴",
@@ -737,6 +757,7 @@ func (v VibrationTemperature3Axis2) Properties(sensorID uint) Properties {
 				Unit:      "",
 				Precision: 3,
 				Sort:      19,
+				IsShow:    true,
 				Fields: []Field{
 					{
 						Name:      "X轴",
@@ -757,15 +778,44 @@ func (v VibrationTemperature3Axis2) Properties(sensorID uint) Properties {
 			},
 			{
 				Key:       "inclination",
-				Name:      "倾角",
+				Name:      "倾斜角",
 				Unit:      "°",
 				Precision: 3,
 				Sort:      20,
+				IsShow:    true,
 				Fields: []Field{
 					{
-						Name:      "倾角",
+						Name:      "倾斜角",
 						Key:       "inclination",
 						DataIndex: 1,
+					},
+				},
+			},
+			{
+				Name:      "俯仰角",
+				Key:       "pitch",
+				Unit:      "°",
+				Precision: 3,
+				Sort:      21,
+				Fields: []Field{
+					{
+						Name:      "俯仰角",
+						Key:       "pitch",
+						DataIndex: 2,
+					},
+				},
+			},
+			{
+				Name:      "翻滚角",
+				Key:       "roll",
+				Unit:      "°",
+				Precision: 3,
+				Sort:      22,
+				Fields: []Field{
+					{
+						Name:      "翻滚角",
+						Key:       "roll",
+						DataIndex: 3,
 					},
 				},
 			},

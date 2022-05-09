@@ -81,6 +81,7 @@ func (HighTemperatureCorrosion) Properties(sensorID uint) Properties {
 				Unit:      "mm",
 				Precision: 3,
 				Sort:      0,
+				IsShow:    true,
 				Fields: []Field{
 					{
 						Name:      "厚度",
@@ -90,11 +91,31 @@ func (HighTemperatureCorrosion) Properties(sensorID uint) Properties {
 				},
 			},
 			{
+				Key:    "corrosion_rate",
+				Name:   "腐蚀率",
+				Unit:   "mm/a",
+				Sort:   1,
+				IsShow: true,
+				Fields: []Field{
+					{
+						Name:      "短周期腐蚀率",
+						Key:       "short_corrosion_rate",
+						DataIndex: 5,
+					},
+					{
+						Name:      "长周期腐蚀率",
+						Key:       "long_corrosion_rate",
+						DataIndex: 6,
+					},
+				},
+			},
+			{
 				Key:       "temperature",
 				Name:      "温度",
 				Unit:      "°C",
 				Precision: 3,
 				Sort:      2,
+				IsShow:    true,
 				Fields: []Field{
 					{
 						Name:      "温度",
@@ -109,29 +130,12 @@ func (HighTemperatureCorrosion) Properties(sensorID uint) Properties {
 				},
 			},
 			{
-				Key:  "corrosion_rate",
-				Name: "腐蚀率",
-				Unit: "mm/a",
-				Sort: 3,
-				Fields: []Field{
-					{
-						Name:      "月腐蚀率",
-						Key:       "monthly_corrosion_rate",
-						DataIndex: 5,
-					},
-					{
-						Name:      "年腐蚀率",
-						Key:       "annualized_corrosion_rate",
-						DataIndex: 6,
-					},
-				},
-			},
-			{
 				Key:       "tof",
 				Name:      "飞行时间",
 				Unit:      "ns",
 				Precision: 3,
 				Sort:      4,
+				IsShow:    true,
 				Fields: []Field{
 					{
 						Name:      "飞行时间",
@@ -141,7 +145,7 @@ func (HighTemperatureCorrosion) Properties(sensorID uint) Properties {
 				},
 			},
 			{
-				Key:       "value",
+				Key:       "signal_strength",
 				Name:      "信号强度",
 				Unit:      "",
 				Precision: 3,
@@ -149,21 +153,21 @@ func (HighTemperatureCorrosion) Properties(sensorID uint) Properties {
 				Fields: []Field{
 					{
 						Name:      "信号强度",
-						Key:       "value",
+						Key:       "signal_strength",
 						DataIndex: 4,
 					},
 				},
 			},
 			{
-				Key:       "dataCount",
-				Name:      "采集数量",
+				Key:       "signal_quality",
+				Name:      "信号质量",
 				Unit:      "",
 				Precision: 3,
 				Sort:      6,
 				Fields: []Field{
 					{
-						Name:      "采集数量",
-						Key:       "dataCount",
+						Name:      "信号质量",
+						Key:       "signal_quality",
 						DataIndex: 7,
 					},
 				},
