@@ -1,7 +1,6 @@
 package monitoringpoint
 
 import (
-	"fmt"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router"
 )
 
