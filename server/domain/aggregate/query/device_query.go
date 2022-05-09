@@ -115,7 +115,9 @@ func (query DeviceQuery) newDevice(device entity.Device) vo.Device {
 	if t := devicetype.Get(device.Type); t != nil {
 		result.Properties = make(vo.Properties, 0)
 		for _, property := range t.Properties(t.SensorID()) {
-			result.Properties = append(result.Properties, vo.NewProperty(property))
+			if property.IsShow {
+				result.Properties = append(result.Properties, vo.NewProperty(property))
+			}
 		}
 		sort.Sort(result.Properties)
 
