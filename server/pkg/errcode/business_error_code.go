@@ -24,6 +24,7 @@ const (
 
 const (
 	AssetNotFoundError BusinessErrorCode = iota + 12001
+	AssetTypeUnknownError
 	AssetImageSizeTooLargeError
 )
 
@@ -77,11 +78,8 @@ const (
 )
 
 const (
-	AssetTypeUnknownError BusinessErrorCode = iota + 20001
-)
-
-const (
-	MonitoringPointTypeUnknownError BusinessErrorCode = iota + 21001
+	MonitoringPointNotFoundError BusinessErrorCode = iota + 20001
+	MonitoringPointTypeUnknownError
 )
 
 var businessErrorMap = map[BusinessErrorCode]string{
@@ -93,6 +91,7 @@ var businessErrorMap = map[BusinessErrorCode]string{
 	UserExistsError:                     "用户已存在",
 	InvalidTokenError:                   "无效的登录凭证",
 	AssetNotFoundError:                  "资产不存在",
+	AssetTypeUnknownError:               "未知的资产类型",
 	DeviceNotFoundError:                 "设备不存在",
 	DeviceMacExistsError:                "设备MAC地址已经存在",
 	UnknownDeviceTypeError:              "未知的设备类型",
@@ -122,7 +121,7 @@ var businessErrorMap = map[BusinessErrorCode]string{
 	ProjectNotFoundError:                "项目不存在",
 	ProjectExistsError:                  "项目已存在",
 	ProjectNotSelectedError:             "请先选择项目",
-	AssetTypeUnknownError:               "未知的资产类型",
+	MonitoringPointNotFoundError:        "监测点不存在",
 	MonitoringPointTypeUnknownError:     "未知的监测点类型",
 }
 

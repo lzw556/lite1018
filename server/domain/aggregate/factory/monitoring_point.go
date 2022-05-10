@@ -40,3 +40,31 @@ func (factory MonitoringPoint) NewMonitoringPointCreateCmd(req request.CreateMon
 	cmd.MonitoringPoint = e
 	return &cmd, nil
 }
+
+func (factory MonitoringPoint) NewMonitoringPointUpdateCmd(monitoringPointID uint, req request.UpdateMonitoringPoint) (*command.MonitoringPointUpdateCmd, error) {
+	ctx := context.TODO()
+	e, err := factory.monitoringPointRepo.Get(ctx, monitoringPointID)
+	if err != nil {
+		return nil, response.BusinessErr(errcode.MonitoringPointNotFoundError, "Invalid monitoringPoint ID")
+	}
+
+	e.Name = req.Name
+	e.Type = req.Type
+	e.AssetID = req.AssetID
+
+	cmd := command.NewMonitoringPointUpdateCmd()
+	cmd.MonitoringPoint = e
+	return &cmd, nil
+}
+
+func (factory MonitoringPoint) NewMonitoringPointRemoveCmd(monitoringPointID uint) (*command.MonitoringPointRemoveCmd, error) {
+	ctx := context.TODO()
+	e, err := factory.monitoringPointRepo.Get(ctx, monitoringPointID)
+	if err != nil {
+		return nil, response.BusinessErr(errcode.MonitoringPointNotFoundError, "Invalid monitoringPoint ID")
+	}
+
+	cmd := command.NewMonitoringPointRemoveCmd()
+	cmd.MonitoringPoint = e
+	return &cmd, nil
+}

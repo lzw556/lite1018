@@ -23,8 +23,6 @@ func NewAsset() Asset {
 }
 
 func (factory Asset) NewAssetCreateCmd(req request.CreateAsset) (*command.AssetCreateCmd, error) {
-	_ = context.TODO()
-
 	if req.Type >= entity.AssetTypeUnknown {
 		return nil, response.BusinessErr(errcode.AssetTypeUnknownError, "Unkown asset type.")
 	}
@@ -37,6 +35,34 @@ func (factory Asset) NewAssetCreateCmd(req request.CreateAsset) (*command.AssetC
 	e.ProjectID = req.ProjectID
 
 	cmd := command.NewAssetCreateCmd()
+	cmd.Asset = e
+	return &cmd, nil
+}
+
+func (factory Asset) NewAssetUpdateCmd(assetID uint, req request.UpdateAsset) (*command.AssetUpdateCmd, error) {
+	ctx := context.TODO()
+	e, err := factory.assetRepo.Get(ctx, assetID)
+	if err != nil {
+		return nil, response.BusinessErr(errcode.AssetNotFoundError, "Invalid asset ID")
+	}
+
+	e.Name = req.Name
+	e.Type = req.Type
+	e.ParentID = req.ParentID
+
+	cmd := command.NewAssetUpdateCmd()
+	cmd.Asset = e
+	return &cmd, nil
+}
+
+func (factory Asset) NewAssetRemoveCmd(assetID uint) (*command.AssetRemoveCmd, error) {
+	ctx := context.TODO()
+	e, err := factory.assetRepo.Get(ctx, assetID)
+	if err != nil {
+		return nil, response.BusinessErr(errcode.AssetNotFoundError, "Invalid asset ID")
+	}
+
+	cmd := command.NewAssetRemoveCmd()
 	cmd.Asset = e
 	return &cmd, nil
 }

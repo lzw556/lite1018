@@ -1,11 +1,14 @@
 package service
 
 import (
+	"context"
+
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/request"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/monitoringpoint"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/aggregate/factory"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
+	"github.com/thetasensors/theta-cloud-lite/server/domain/vo"
 )
 
 type MonitoringPoint struct {
@@ -26,5 +29,33 @@ func (s MonitoringPoint) CreateMonitoringPoint(req request.CreateMonitoringPoint
 		return err
 	}
 
+	return cmd.Run()
+}
+
+func (s MonitoringPoint) GetMonitoringPointByID(id uint) (*vo.MonitoringPoint, error) {
+	ctx := context.TODO()
+	monitoringPoint, err := s.repository.Get(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	voMonitoringPoint := vo.NewMonitoringPoint(monitoringPoint)
+	return &voMonitoringPoint, nil
+}
+
+func (s MonitoringPoint) UpdateMonitoringPointByID(id uint, req request.UpdateMonitoringPoint) error {
+	cmd, err := s.factory.NewMonitoringPointUpdateCmd(id, req)
+	if err != nil {
+		return err
+	}
+
+	return cmd.Run()
+}
+
+func (s MonitoringPoint) DeleteMonitoringPointByID(id uint) error {
+	cmd, err := s.factory.NewMonitoringPointRemoveCmd(id)
+	if err != nil {
+		return err
+	}
 	return cmd.Run()
 }

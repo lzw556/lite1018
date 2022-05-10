@@ -16,3 +16,23 @@ func (r assetRouter) create(ctx *gin.Context) (interface{}, error) {
 	req.ProjectID = cast.ToUint(ctx.MustGet("project_id"))
 	return nil, r.service.CreateAsset(req)
 }
+
+func (r assetRouter) get(ctx *gin.Context) (interface{}, error) {
+	id := cast.ToUint(ctx.Param("id"))
+	return r.service.GetAssetByID(id)
+}
+
+func (r assetRouter) update(ctx *gin.Context) (interface{}, error) {
+	id := cast.ToUint(ctx.Param("id"))
+	var req request.UpdateAsset
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		return nil, response.InvalidParameterError(err.Error())
+	}
+
+	return nil, r.service.UpdateAssetByID(id, req)
+}
+
+func (r assetRouter) delete(ctx *gin.Context) (interface{}, error) {
+	id := cast.ToUint(ctx.Param("id"))
+	return nil, r.service.DeleteAssetByID(id)
+}
