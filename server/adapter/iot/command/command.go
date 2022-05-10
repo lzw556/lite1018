@@ -14,7 +14,6 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/errcode"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/json"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/xlog"
-	"golang.org/x/sync/errgroup"
 	"time"
 )
 
@@ -97,22 +96,17 @@ func SyncNetworkLinkStates(network entity.Network, timeout time.Duration) {
 			statusMap[r.Mac] = r.State == 3
 		}
 	}
-	var eg errgroup.Group
-	for i := range devices {
-		device := devices[i]
-		eg.Go(func() error {
-			if state, err := deviceStateRepo.Get(device.MacAddress); err == nil {
-				if isOnline, ok := statusMap[device.MacAddress]; ok {
-					state.IsOnline = isOnline
-					state.Notify(device.MacAddress)
+	for _, device := range devices {
+		if state, err := deviceStateRepo.Get(device.MacAddress); err == nil {
+			if isOnline, ok := statusMap[device.MacAddress]; ok {
+				state.IsOnline = isOnline
+				state.Notify(device.MacAddress)
+				if err := deviceStateRepo.Create(device.MacAddress, state); err != nil {
+					xlog.Errorf("save device state failed: %v", err)
+					return
 				}
 			}
-			return nil
-		})
-	}
-	if err := eg.Wait(); err != nil {
-		xlog.Errorf("sync devices link status failed:%v => [%s]", gateway.MacAddress)
-		return
+		}
 	}
 	xlog.Infof("sync devices link status successful=> [%s]", gateway.MacAddress)
 }
