@@ -13,3 +13,9 @@ type UpdateMonitoringPoint struct {
 	Type    uint   `json:"type" binding:"required"`
 	AssetID uint   `json:"asset_id" binding:"required"`
 }
+
+type BindDevice struct {
+	DeviceID    uint                   `json:"device_id" binding:"required"`
+	AlgorihtmID uint                   `json:"algorithm_id" binding:"required"`
+	Parameters  map[string]interface{} `json:"parameters"`
+}

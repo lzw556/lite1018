@@ -10,4 +10,5 @@ type Service interface {
 	GetMonitoringPointByID(id uint) (*vo.MonitoringPoint, error)
 	UpdateMonitoringPointByID(id uint, req request.UpdateMonitoringPoint) error
 	DeleteMonitoringPointByID(id uint) error
+	BindDevice(id uint, req request.BindDevice) error
 }

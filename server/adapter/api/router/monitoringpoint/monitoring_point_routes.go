@@ -36,3 +36,13 @@ func (r monitoringPointRouter) delete(ctx *gin.Context) (interface{}, error) {
 	id := cast.ToUint(ctx.Param("id"))
 	return nil, r.service.DeleteMonitoringPointByID(id)
 }
+
+func (r monitoringPointRouter) bindDevice(ctx *gin.Context) (interface{}, error) {
+	id := cast.ToUint(ctx.Param("id"))
+	var req request.BindDevice
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		return nil, response.InvalidParameterError(err.Error())
+	}
+
+	return nil, r.service.BindDevice(id, req)
+}

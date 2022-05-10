@@ -57,5 +57,15 @@ func (s MonitoringPoint) DeleteMonitoringPointByID(id uint) error {
 	if err != nil {
 		return err
 	}
+
 	return cmd.Run()
+}
+
+func (s MonitoringPoint) BindDevice(id uint, req request.BindDevice) error {
+	cmd, err := s.factory.NewMonitoringPointBindDeviceCmd(id)
+	if err != nil {
+		return err
+	}
+
+	return cmd.BindDevice(req)
 }

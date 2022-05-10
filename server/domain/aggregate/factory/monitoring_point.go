@@ -68,3 +68,15 @@ func (factory MonitoringPoint) NewMonitoringPointRemoveCmd(monitoringPointID uin
 	cmd.MonitoringPoint = e
 	return &cmd, nil
 }
+
+func (factory MonitoringPoint) NewMonitoringPointBindDeviceCmd(MonitoringPointID uint) (*command.MonitoringPointBindDeviceCmd, error) {
+	ctx := context.TODO()
+	e, err := factory.monitoringPointRepo.Get(ctx, MonitoringPointID)
+	if err != nil {
+		return nil, response.BusinessErr(errcode.MonitoringPointNotFoundError, "Invalid monitoringPoint ID")
+	}
+
+	cmd := command.NewMonitoringPointBindDeviceCmd()
+	cmd.MonitoringPoint = e
+	return &cmd, nil
+}
