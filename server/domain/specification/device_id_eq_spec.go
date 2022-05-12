@@ -1,7 +1,6 @@
 package specification
 
 import (
-  "fmt"
   "gorm.io/gorm"
 )
 
