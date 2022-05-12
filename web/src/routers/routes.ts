@@ -125,6 +125,28 @@ const SecondaryRoutes: Menu[] = [
         isAuth: true,
         children: [],
     },
+    {
+        id: 108,
+        name: "asset-overview",
+        path: "/project-overview",
+        title: "资产",
+        view: "AssetOverview",
+        icon: "",
+        hidden: true,
+        isAuth: true,
+        children: [],
+    },
+    {
+        id: 109,
+        name: "measurement-overview",
+        path: "/project-overview",
+        title: "监测点",
+        view: "MeasurementOverview",
+        icon: "",
+        hidden: true,
+        isAuth: true,
+        children: [],
+    },
 ]
 
 export {

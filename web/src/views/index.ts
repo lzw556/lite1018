@@ -23,6 +23,11 @@ export const Permission = lazy(() => import('./system/permission'));
 export const System = lazy(() => import('./system'));
 export const Project = lazy(() => import('./project'));
 export const DeviceMonitor = lazy(() => import('./device/DeviceMonitor'));
+export const ProjectOverview = lazy(() => import('./home'));
+export const AssetManagement = lazy(() => import('./home/asset'));
+export const AssetOverview = lazy(() => import('./home/asset/overview'));
+export const MeasurementOverview = lazy(() => import('./home/measurement/overview'));
+export const MeasurementManagement = lazy(() => import('./home/measurement'));
 
 export const Unauthorized = lazy(() => import('./403'));
 export const NotFound = lazy(() => import('./404'));

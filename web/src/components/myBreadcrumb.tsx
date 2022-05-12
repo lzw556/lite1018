@@ -7,6 +7,7 @@ import { SecondaryRoutes } from '../routers/routes';
 import { isMobile } from '../utils/deviceDetection';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import { findMenu } from '../routers/helper';
+import { menus_fake } from '../views/home/menus';
 
 export interface MyBreadcrumbProps {
   children?: any;
@@ -21,7 +22,7 @@ const flattenRoutes: any = (children: any) => {
   }, []);
 };
 
-const routes = flattenRoutes(getMenus()).concat(SecondaryRoutes);
+const routes = flattenRoutes([...menus_fake,...getMenus()]).concat(SecondaryRoutes);
 
 const MyBreadcrumb: FC<MyBreadcrumbProps> = ({ children, label, firstBreadState }) => {
   const location = useLocation();

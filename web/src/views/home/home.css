@@ -1,0 +1,86 @@
+.chart-container {
+  position: relative;
+}
+.chart-container .chart-title {
+  position: absolute;
+  width: 100%;
+  text-align: center;
+}
+
+.introduction {
+  position: relative;
+  padding: 24px;
+  padding-left: 84px;
+  background-color: #fff;
+}
+.introduction .introduction-title {
+  margin-top: -3px;
+  margin-bottom: 16px;
+}
+.introduction .introduction-title h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.6);
+}
+dl.introduction-content {
+  margin: 0;
+}
+.introduction .name-value {
+  display: flex;
+  line-height: 30px;
+}
+.introduction .name-value dt {
+  flex: 0 0 55%;
+  color: #8a8e99;
+}
+.introduction .name-value dd {
+  flex: 0 0 45%;
+  margin: 0;
+}
+.introduction .introduction-icon {
+  position: absolute;
+  top: 24px;
+  left: 24px;
+  height: 36px;
+  width: 36px;
+  border-radius: 24px;
+}
+
+.introduction.normal .introduction-icon {
+  background-color: rgba(24, 144, 255, 0.6);
+}
+.introduction.info .introduction-icon {
+  background-color: #526ecc;
+}
+.introduction.warn .introduction-icon {
+  background-color: #ffc107;
+}
+.introduction.danger .introduction-icon {
+  background-color: #dc3545;
+}
+.introduction .introduction-icon .icon-svg {
+  height: 36px;
+  width: 36px;
+}
+.introduction .introduction-icon.small .icon-svg {
+  position: relative;
+  top: 3px;
+  left: 3px;
+  width: 30px;
+  height: 30px;
+}
+.introduction.normal.focus .introduction-icon {
+  background-color: #fff;
+}
+.introduction.normal.focus .introduction-icon .icon-svg {
+  fill: rgba(24, 144, 255, 0.6);
+}
+.introduction.info.focus .introduction-icon .icon-svg {
+  fill: #526ecc;
+}
+.introduction.warn.focus .introduction-icon .icon-svg {
+  fill: #ffc107;
+}
+.introduction.danger.focus .introduction-icon .icon-svg {
+  fill: #dc3545;
+}
