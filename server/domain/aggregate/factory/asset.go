@@ -2,13 +2,15 @@ package factory
 
 import (
 	"context"
-
+	"github.com/spf13/cast"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/request"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/response"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/aggregate/command"
+	"github.com/thetasensors/theta-cloud-lite/server/domain/aggregate/query"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
+	spec "github.com/thetasensors/theta-cloud-lite/server/domain/specification"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/errcode"
 )
 
@@ -36,6 +38,7 @@ func (factory Asset) NewAssetCreateCmd(req request.CreateAsset) (*command.AssetC
 
 	cmd := command.NewAssetCreateCmd()
 	cmd.Asset = e
+
 	return &cmd, nil
 }
 
@@ -52,6 +55,7 @@ func (factory Asset) NewAssetUpdateCmd(assetID uint, req request.UpdateAsset) (*
 
 	cmd := command.NewAssetUpdateCmd()
 	cmd.Asset = e
+
 	return &cmd, nil
 }
 
@@ -64,5 +68,28 @@ func (factory Asset) NewAssetRemoveCmd(assetID uint) (*command.AssetRemoveCmd, e
 
 	cmd := command.NewAssetRemoveCmd()
 	cmd.Asset = e
+
 	return &cmd, nil
+}
+
+func (factory Asset) NewAssetQuery(filters request.Filters) *query.AssetQuery {
+	q := query.NewAssetQuery()
+	q.Specs = factory.buildSpecs(filters)
+
+	return &q
+}
+
+func (factory Asset) buildSpecs(filters request.Filters) []spec.Specification {
+	specs := make([]spec.Specification, 0)
+	for name, v := range filters {
+		switch name {
+		case "project_id":
+			specs = append(specs, spec.ProjectEqSpec(cast.ToUint(v)))
+		case "type":
+			specs = append(specs, spec.TypeEqSpec(cast.ToUint(v)))
+		case "name":
+			specs = append(specs, spec.NameEqSpec(cast.ToString(v)))
+		}
+	}
+	return specs
 }

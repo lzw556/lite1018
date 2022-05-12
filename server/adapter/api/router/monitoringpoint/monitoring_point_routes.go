@@ -46,3 +46,17 @@ func (r monitoringPointRouter) bindDevice(ctx *gin.Context) (interface{}, error)
 
 	return nil, r.service.BindDevice(id, req)
 }
+
+func (r monitoringPointRouter) find(ctx *gin.Context) (interface{}, error) {
+	filters := request.NewFilters(ctx)
+	if _, ok := ctx.GetQuery("page"); ok {
+		page := cast.ToInt(ctx.Query("page"))
+		size := cast.ToInt(ctx.Query("size"))
+		result, total, err := r.service.FindMonitoringPointsByPaginate(page, size, filters)
+		if err != nil {
+			return nil, err
+		}
+		return response.NewPageResult(page, size, total, result), nil
+	}
+	return r.service.FindMonitoringPoints(filters)
+}

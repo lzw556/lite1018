@@ -5,6 +5,7 @@ import (
 
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
+	"github.com/thetasensors/theta-cloud-lite/server/domain/specification"
 )
 
 type Asset struct {
@@ -33,4 +34,21 @@ func (repo Asset) Get(ctx context.Context, id uint) (entity.Asset, error) {
 
 func (repo Asset) Delete(ctx context.Context, id uint) error {
 	return repo.DB(ctx).Delete(&entity.Asset{}, id).Error
+}
+
+func (repo Asset) PagingBySpecs(ctx context.Context, page, size int, specs ...specification.Specification) (entity.Assets, int64, error) {
+	db := repo.DB(ctx).Model(&entity.Asset{}).Scopes(specification.Scopes(specs)...)
+	var total int64
+	if err := db.Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+	var es []entity.Asset
+	err := db.Scopes(repo.paginate(page, size)).Find(&es).Error
+	return es, total, err
+}
+
+func (repo Asset) FindBySpecs(ctx context.Context, specs ...specification.Specification) (entity.Assets, error) {
+	var es []entity.Asset
+	err := repo.DB(ctx).Scopes(specification.Scopes(specs)...).Find(&es).Error
+	return es, err
 }

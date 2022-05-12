@@ -11,4 +11,7 @@ type Service interface {
 	UpdateMonitoringPointByID(id uint, req request.UpdateMonitoringPoint) error
 	DeleteMonitoringPointByID(id uint) error
 	BindDevice(id uint, req request.BindDevice) error
+
+	FindMonitoringPointsByPaginate(page, size int, filters request.Filters) ([]vo.MonitoringPoint, int64, error)
+	FindMonitoringPoints(filters request.Filters) ([]vo.MonitoringPoint, error)
 }

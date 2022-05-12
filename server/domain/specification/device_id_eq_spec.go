@@ -1,6 +1,7 @@
 package specification
 
 import (
+  "fmt"
   "gorm.io/gorm"
 )
 
@@ -12,6 +13,7 @@ func (s DeviceIDEqSpec) IsSpecifiedBy(v interface{}) bool {
 
 func (s DeviceIDEqSpec) Scope() func(db *gorm.DB) *gorm.DB {
   return func(db *gorm.DB) *gorm.DB {
+    fmt.Println(fmt.Sprintf("##### device_id=%d", s))
     if uint(s) == 0 {
       return db
     }

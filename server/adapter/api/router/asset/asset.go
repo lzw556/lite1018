@@ -21,6 +21,7 @@ func (r *assetRouter) initRoutes() {
 	r.routes = []router.Route{
 		router.NewPostRoute("assets", r.create),
 
+		router.NewGetRoute("assets", r.find),
 		router.NewGetRoute("assets/:id", r.get),
 
 		router.NewPutRoute("assets/:id", r.update),

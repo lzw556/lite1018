@@ -59,3 +59,13 @@ func (s Asset) DeleteAssetByID(id uint) error {
 	}
 	return cmd.Run()
 }
+
+func (s Asset) FindAssetsByPaginate(page, size int, filters request.Filters) ([]vo.Asset, int64, error) {
+	query := s.factory.NewAssetQuery(filters)
+	return query.Paging(page, size)
+}
+
+func (s Asset) FindAssets(filters request.Filters) ([]vo.Asset, error) {
+	query := s.factory.NewAssetQuery(filters)
+	return query.List()
+}
