@@ -6,7 +6,7 @@ type DeviceState struct {
 	BatteryLevel         float32 `json:"batteryLevel"`
 	SignalLevel          float32 `json:"signalLevel"`
 	BatteryVoltage       int     `json:"batteryVoltage"`
-	IsAcquisitionEnabled bool    `json:"isAcquisitionEnabled"`
+	AcquisitionIsEnabled bool    `json:"acquisitionIsEnabled"`
 	IsOnline             bool    `json:"isOnline"`
 	ConnectedAt          int64   `json:"connectedAt"`
 }

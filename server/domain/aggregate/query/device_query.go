@@ -115,7 +115,9 @@ func (query DeviceQuery) newDevice(device entity.Device) vo.Device {
 	if t := devicetype.Get(device.Type); t != nil {
 		result.Properties = make(vo.Properties, 0)
 		for _, property := range t.Properties(t.SensorID()) {
-			result.Properties = append(result.Properties, vo.NewProperty(property))
+			if property.IsShow {
+				result.Properties = append(result.Properties, vo.NewProperty(property))
+			}
 		}
 		sort.Sort(result.Properties)
 
@@ -182,11 +184,13 @@ func (query DeviceQuery) findCharacteristicData(device entity.Device, from, to t
 		for i := range data {
 			properties := make(vo.Properties, 0)
 			for _, p := range t.Properties(t.SensorID()) {
-				property := vo.NewProperty(p)
-				for _, field := range p.Fields {
-					property.SetData(field.Name, data[i].Values[field.Key])
+				if p.IsShow {
+					property := vo.NewProperty(p)
+					for _, field := range p.Fields {
+						property.SetData(field.Name, data[i].Values[field.Key])
+					}
+					properties = append(properties, property)
 				}
-				properties = append(properties, property)
 			}
 			r := vo.NewDeviceData(data[i].Time)
 			r.Values = properties

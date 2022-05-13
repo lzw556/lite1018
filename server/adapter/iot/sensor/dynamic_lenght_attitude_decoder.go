@@ -32,33 +32,40 @@ func (s DynamicLengthAttitudeDecoder) Decode(data []byte) (map[string]interface{
 	_ = binary.Read(bytes.NewBuffer(data[36:40]), binary.LittleEndian, &result.Metadata.MinTof)
 	_ = binary.Read(bytes.NewBuffer(data[40:44]), binary.LittleEndian, &result.Metadata.MinPreload)
 	_ = binary.Read(bytes.NewBuffer(data[44:48]), binary.LittleEndian, &result.Metadata.MinIntensityPressure)
-	_ = binary.Read(bytes.NewBuffer(data[48:52]), binary.LittleEndian, &result.Metadata.MaxLength)
-	_ = binary.Read(bytes.NewBuffer(data[52:56]), binary.LittleEndian, &result.Metadata.MaxTof)
-	_ = binary.Read(bytes.NewBuffer(data[56:60]), binary.LittleEndian, &result.Metadata.MaxPreload)
-	_ = binary.Read(bytes.NewBuffer(data[60:64]), binary.LittleEndian, &result.Metadata.MaxIntensityPressure)
+	_ = binary.Read(bytes.NewBuffer(data[48:52]), binary.LittleEndian, &result.Metadata.MinAcceleration.XAxis)
+	_ = binary.Read(bytes.NewBuffer(data[52:56]), binary.LittleEndian, &result.Metadata.MinAcceleration.YAxis)
+	_ = binary.Read(bytes.NewBuffer(data[56:60]), binary.LittleEndian, &result.Metadata.MinAcceleration.ZAxis)
+	_ = binary.Read(bytes.NewBuffer(data[60:64]), binary.LittleEndian, &result.Metadata.MaxLength)
+	_ = binary.Read(bytes.NewBuffer(data[64:68]), binary.LittleEndian, &result.Metadata.MaxTof)
+	_ = binary.Read(bytes.NewBuffer(data[68:72]), binary.LittleEndian, &result.Metadata.MaxPreload)
+	_ = binary.Read(bytes.NewBuffer(data[72:76]), binary.LittleEndian, &result.Metadata.MaxIntensityPressure)
+	_ = binary.Read(bytes.NewBuffer(data[76:80]), binary.LittleEndian, &result.Metadata.MaxAcceleration.XAxis)
+	_ = binary.Read(bytes.NewBuffer(data[80:84]), binary.LittleEndian, &result.Metadata.MaxAcceleration.YAxis)
+	_ = binary.Read(bytes.NewBuffer(data[84:88]), binary.LittleEndian, &result.Metadata.MaxAcceleration.ZAxis)
 
-	_ = binary.Read(bytes.NewBuffer(data[76:80]), binary.LittleEndian, &result.Metadata.AccelerationX)
-	_ = binary.Read(bytes.NewBuffer(data[80:84]), binary.LittleEndian, &result.Metadata.AccelerationY)
-	_ = binary.Read(bytes.NewBuffer(data[84:88]), binary.LittleEndian, &result.Metadata.AccelerationZ)
-
-	valueBytes := data[88:]
+	valueBytes := data[112:]
 	if int(dataLength) == len(valueBytes) {
-		for i := 0; i < len(valueBytes); i += 16 {
-			b := valueBytes[i : i+16]
+		for i := 0; i < len(valueBytes); i += 28 {
+			b := valueBytes[i : i+28]
 			var (
-				length   float32
-				tof      float32
-				preload  float32
-				pressure float32
+				length       float32
+				tof          float32
+				preload      float32
+				pressure     float32
+				acceleration entity.Acceleration
 			)
 			_ = binary.Read(bytes.NewBuffer(b[0:4]), binary.LittleEndian, &length)
 			_ = binary.Read(bytes.NewBuffer(b[4:8]), binary.LittleEndian, &tof)
 			_ = binary.Read(bytes.NewBuffer(b[8:12]), binary.LittleEndian, &preload)
 			_ = binary.Read(bytes.NewBuffer(b[12:16]), binary.LittleEndian, &pressure)
+			_ = binary.Read(bytes.NewBuffer(b[16:20]), binary.LittleEndian, &acceleration.XAxis)
+			_ = binary.Read(bytes.NewBuffer(b[20:24]), binary.LittleEndian, &acceleration.YAxis)
+			_ = binary.Read(bytes.NewBuffer(b[24:28]), binary.LittleEndian, &acceleration.ZAxis)
 			result.DynamicLength = append(result.DynamicLength, length)
 			result.DynamicTof = append(result.DynamicTof, tof)
 			result.DynamicPreload = append(result.DynamicPreload, preload)
 			result.DynamicPressure = append(result.DynamicPressure, pressure)
+			result.DynamicAcceleration = append(result.DynamicAcceleration, acceleration)
 		}
 		d := map[string]interface{}{}
 		if err := mapstructure.Decode(result, &d); err != nil {
