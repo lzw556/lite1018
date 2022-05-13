@@ -32,7 +32,7 @@ const TableLayout: FC<TableLayoutProps> = (props) => {
   } = props;
   const pagination: PaginationProps = {
     showSizeChanger: true,
-    pageSizeOptions: ['10', '20', '30', '40', '50'],
+    pageSizeOptions: ['10', '20', '30', '40', '50', '100'],
     onChange: onPageChange
   };
   const { hasPermission } = usePermission();
