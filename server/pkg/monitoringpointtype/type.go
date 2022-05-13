@@ -1,14 +1,14 @@
 package monitoringpointtype
 
 const (
-	MonitoringPointTypeGeneral = iota + 1
+	MonitoringPointTypeGeneral = 1
 
-	MonitoringPointTypeBoltAngle = iota + 10001
+	MonitoringPointTypeBoltAngle = 10001
 
-	MonitoringPointTypePreload = iota + 10101
-	MonitoringPointTypeDynamicPreload
+	MonitoringPointTypePreload        = 10101
+	MonitoringPointTypeDynamicPreload = 10102
 
-	MonitoringPointTypeUnknown = iota + 99999
+	MonitoringPointTypeUnknown = 99999
 )
 
 var types = []Typer{
