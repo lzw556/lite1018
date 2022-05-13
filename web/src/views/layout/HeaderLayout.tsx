@@ -34,6 +34,7 @@ const HeaderLayout = (props: any) => {
 
     const onProjectChange = (value: any) => {
         GetMyProjectRequest(value).then(data => {
+            localStorage.removeItem('deviceListFilters');
             store.dispatch({
                 type: "SET_PROJECT",
                 payload: data.id
