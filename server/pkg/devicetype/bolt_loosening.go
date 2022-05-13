@@ -75,31 +75,6 @@ func (BoltLoosening) Properties(sensorID uint) Properties {
 				},
 			},
 			{
-				Key:       "attitude_abs",
-				Name:      "姿态指数绝对值",
-				Unit:      "",
-				Precision: 3,
-				Sort:      3,
-				IsShow:    true,
-				Fields: []Field{
-					{
-						Key:       "attitude_abs_x",
-						Name:      "X轴",
-						DataIndex: 6,
-					},
-					{
-						Key:       "attitude_abs_y",
-						Name:      "Y轴",
-						DataIndex: 7,
-					},
-					{
-						Key:       "attitude_abs_z",
-						Name:      "Z轴",
-						DataIndex: 9,
-					},
-				},
-			},
-			{
 				Key:       "motion",
 				Name:      "移动指数",
 				Unit:      "",
@@ -115,27 +90,17 @@ func (BoltLoosening) Properties(sensorID uint) Properties {
 				},
 			},
 			{
-				Key:       "motion_abs",
-				Name:      "移动指数绝对值",
+				Key:       "measurement_index",
+				Name:      "测量指数",
 				Unit:      "",
 				Precision: 3,
 				Sort:      5,
 				IsShow:    true,
 				Fields: []Field{
 					{
-						Key:       "motion_abs_x",
-						Name:      "X轴",
-						DataIndex: 2,
-					},
-					{
-						Key:       "motion_abs_y",
-						Name:      "Y轴",
-						DataIndex: 3,
-					},
-					{
-						Key:       "motion_abs_z",
-						Name:      "Z轴",
-						DataIndex: 4,
+						Name:      "测量指数",
+						Key:       "measurement_index",
+						DataIndex: 6,
 					},
 				},
 			},
