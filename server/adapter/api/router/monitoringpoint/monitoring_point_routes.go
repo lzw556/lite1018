@@ -60,3 +60,10 @@ func (r monitoringPointRouter) find(ctx *gin.Context) (interface{}, error) {
 	}
 	return r.service.FindMonitoringPoints(filters)
 }
+
+func (r monitoringPointRouter) findDataByID(ctx *gin.Context) (interface{}, error) {
+	id := cast.ToUint(ctx.Param("id"))
+	from := cast.ToInt64(ctx.Query("from"))
+	to := cast.ToInt64(ctx.Query("to"))
+	return r.service.FindMonitoringPointDataByID(id, from, to)
+}

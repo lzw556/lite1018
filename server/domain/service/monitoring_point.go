@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"time"
 
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/request"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/monitoringpoint"
@@ -78,4 +79,9 @@ func (s MonitoringPoint) FindMonitoringPointsByPaginate(page, size int, filters 
 func (s MonitoringPoint) FindMonitoringPoints(filters request.Filters) ([]vo.MonitoringPoint, error) {
 	query := s.factory.NewMonitoringPointQuery(filters)
 	return query.List()
+}
+
+func (s MonitoringPoint) FindMonitoringPointDataByID(id uint, from, to int64) ([]vo.MonitoringPointData, error) {
+	query := s.factory.NewMonitoringPointQuery(nil)
+	return query.FindMonitoringPointDataByID(id, time.Unix(from, 0), time.Unix(to, 0))
 }
