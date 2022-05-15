@@ -50,7 +50,7 @@ func (BoltLoosening) Properties(sensorID uint) Properties {
 				Unit:      "°",
 				Precision: 3,
 				Sort:      1,
-				IsShow:    true,
+				IsShow:    false,
 				Fields: []Field{
 					{
 						Name:      "绝对角度",
