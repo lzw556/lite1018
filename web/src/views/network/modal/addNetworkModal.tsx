@@ -1,10 +1,10 @@
-import {Divider, Form, Input, Modal, ModalProps} from "antd";
+import {Form, Input, Modal, ModalProps} from "antd";
 import {FC, useEffect, useState} from "react";
 import IpnFormItem from "../../../components/formItems/ipnFormItem";
 import WsnFormItem from "../../../components/formItems/wsnFormItem";
 import {DEFAULT_WSN_SETTING} from "../../../types/wsn_setting";
 import {DEFAULT_IPN_SETTING} from "../../../types/ipn_setting";
-import {defaultValidateMessages, Rules} from "../../../constants/validator";
+import {defaultValidateMessages, Normalizes, Rules} from "../../../constants/validator";
 import {CreateNetworkRequest} from "../../../apis/network";
 
 export interface AddNetworkModalProps extends ModalProps{
@@ -41,16 +41,20 @@ const AddNetworkModal:FC<AddNetworkModalProps> = (props) => {
 
     return <Modal {...props} width={420} title={"网络添加"} okText={"确定"} onOk={onAdd} cancelText={"取消"} confirmLoading={isLoading}>
         <Form form={form} labelCol={{span: 7}} validateMessages={defaultValidateMessages}>
-            <Divider orientation={"left"} plain>基本信息</Divider>
-            <Form.Item label={"名称"} name={"name"} rules={[Rules.required]}>
-                <Input placeholder={"请输入网络名称"}/>
-            </Form.Item>
-            <WsnFormItem/>
-            <Divider orientation={"left"} plain>网关信息</Divider>
-            <Form.Item label={"MAC地址"} name={["gateway", "mac_address"]} rules={[Rules.required]}>
-                <Input placeholder={"请输入网关MAC地址"}/>
-            </Form.Item>
-            <IpnFormItem ipn={DEFAULT_IPN_SETTING}/>
+            <fieldset>
+                <legend>基本信息</legend>
+                <Form.Item label={"名称"} name={"name"} rules={[Rules.range(4,16)]}>
+                    <Input placeholder={"请输入网络名称"}/>
+                </Form.Item>
+                <WsnFormItem/>
+            </fieldset>
+            <fieldset>
+                <legend>网关信息</legend>
+                <Form.Item label={"MAC地址"} name={["gateway", "mac_address"]} normalize={Normalizes.macAddress} rules={[Rules.macAddress]}>
+                    <Input placeholder={"请输入网关MAC地址"}/>
+                </Form.Item>
+                <IpnFormItem ipn={DEFAULT_IPN_SETTING}/>
+            </fieldset>
         </Form>
     </Modal>
 }

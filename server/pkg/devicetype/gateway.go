@@ -23,6 +23,7 @@ func (Gateway) Settings() Settings {
 			},
 			Category: IpnSettingCategory,
 			Sort:     0,
+			Group:    SettingGroupNetwork,
 		},
 		{
 			Name:     "IP地址",
@@ -33,6 +34,7 @@ func (Gateway) Settings() Settings {
 			Sort:     1,
 			Parent:   "ip_mode",
 			Show:     1,
+			Group:    SettingGroupNetwork,
 		},
 		{
 			Name:     "子网掩码",
@@ -43,6 +45,7 @@ func (Gateway) Settings() Settings {
 			Sort:     2,
 			Show:     1,
 			Parent:   "ip_mode",
+			Group:    SettingGroupNetwork,
 		},
 		{
 			Name:     "网关地址",
@@ -53,22 +56,7 @@ func (Gateway) Settings() Settings {
 			Sort:     3,
 			Show:     1,
 			Parent:   "ip_mode",
-		},
-		{
-			Name:     "首选DNS",
-			Key:      "primary_dns",
-			Type:     StringValueType,
-			Value:    "114.114.114.114",
-			Category: IpnSettingCategory,
-			Sort:     4,
-		},
-		{
-			Name:     "备用DNS",
-			Key:      "secondary_dns",
-			Type:     StringValueType,
-			Value:    "8.8.8.8",
-			Category: IpnSettingCategory,
-			Sort:     5,
+			Group:    SettingGroupNetwork,
 		},
 		{
 			Name:     "是否启用NTP",
@@ -77,6 +65,7 @@ func (Gateway) Settings() Settings {
 			Value:    true, // 0: Disable 1: Enable
 			Category: IpnSettingCategory,
 			Sort:     6,
+			Group:    SettingGroupNetwork,
 		},
 		{
 			Name:     "NTP服务器地址",
@@ -87,6 +76,7 @@ func (Gateway) Settings() Settings {
 			Sort:     7,
 			Parent:   "ntp_is_enabled",
 			Show:     true,
+			Group:    SettingGroupNetwork,
 		},
 	}
 }

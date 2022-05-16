@@ -17,7 +17,7 @@ const AcknowledgeViewModal: FC<AcknowledgeViewModalProps> = (props) => {
             <Input.TextArea disabled rows={4} value={acknowledge.note}/>
         </Form.Item>
         <Form.Item label={"处理时间"} labelCol={{span: 5}}>
-            <Input disabled value={moment.unix(acknowledge.timestamp).local().format("YYYY-MM-DD hh:mm:ss")}/>
+            <Input disabled value={moment.unix(acknowledge.timestamp).local().format("YYYY-MM-DD HH:mm:ss")}/>
         </Form.Item>
     </Modal>
 }

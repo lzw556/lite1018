@@ -1,20 +1,19 @@
 package vo
 
-import (
-	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
-)
+import "github.com/thetasensors/theta-cloud-lite/server/pkg/devicetype"
 
 type Field struct {
-	Index  uint      `json:"index"`
-	Name   string    `json:"name"`
-	Unit   string    `json:"unit"`
-	Values []float32 `json:"values,omitempty"`
+	Name      string `json:"name"`
+	Key       string `json:"key"`
+	DataIndex int    `json:"dataIndex"`
+}
+
+func NewField(e devicetype.Field) Field {
+	return Field{
+		Name:      e.Name,
+		Key:       e.Key,
+		DataIndex: e.DataIndex,
+	}
 }
 
 type Fields []Field
-
-func (fs Fields) SetData(e entity.SensorData) {
-	for _, f := range fs {
-		f.Values = append(f.Values, e.Values[f.Index])
-	}
-}

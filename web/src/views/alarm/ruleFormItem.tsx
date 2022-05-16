@@ -17,7 +17,6 @@ const RuleFormItem: FC<RuleFormItemProps> = ({fields, defaultValue}) => {
 
     useEffect(() => {
         if (defaultValue) {
-            setField(fields?.find(f => f.name === defaultValue?.field));
         }
     }, [fields]);
 

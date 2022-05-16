@@ -6,9 +6,6 @@ import (
 )
 
 type Service interface {
-	StatisticalMeasurements(filters request.Filters) ([]vo.MeasurementStatistic, error)
-	StatisticalMeasurementDataByID(id uint) (*vo.MeasurementDataStatistic, error)
-	StatisticalMeasurementAlertByID(id uint) (*vo.MeasurementAlertStatistic, error)
-	StatisticalDevices(filters request.Filters) ([]vo.DeviceStatistic, error)
-	StatisticalAlarmRecords(from, to int64, filters request.Filters) (*vo.AlarmRecordStatistics, error)
+	GetDeviceStatistics(filters request.Filters) ([]vo.DeviceStatistic, error)
+	GetAlertStatistics(filters request.Filters) ([]vo.AlertStatistic, error)
 }

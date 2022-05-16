@@ -5,7 +5,7 @@ import {
     ExportNetworkRequest,
     GetNetworkRequest,
     PagingNetworksRequest,
-    SyncNetworkRequest
+    NetworkSyncRequest, NetworkProvisionRequest
 } from "../../apis/network";
 import ShadowCard from "../../components/shadowCard";
 import "./index.css"
@@ -18,27 +18,27 @@ import {Network} from "../../types/network";
 import EditNetworkModal from "./modal/editNetworkModal";
 import moment from "moment";
 import {PageResult} from "../../types/page";
-import {SendDeviceCommandRequest} from "../../apis/device";
-import {DeviceCommand} from "../../types/device_command";
 import usePermission, {Permission} from "../../permission/permission";
 import HasPermission from "../../permission";
+import { isMobile } from "../../utils/deviceDetection";
+import { Link, useLocation } from "react-router-dom";
+import { PagedOption } from "../../types/props";
 
 const NetworkPage = () => {
-    const {hasPermission} = usePermission();
+    const { state } = useLocation<{pagedOptions: PagedOption}>();
+    const pagedOptionsDefault = { index: 1, size: 10 };
+    const [pagedOptions, setPagedOptions] = useState(state ? state.pagedOptions : pagedOptionsDefault);
+    const {hasPermission, hasPermissions} = usePermission();
     const [addVisible, setAddVisible] = useState<boolean>(false)
     const [editVisible, setEditVisible] = useState<boolean>(false)
     const [network, setNetwork] = useState<Network>()
     const [dataSource, setDataSource] = useState<PageResult<any>>()
     const [refreshKey, setRefreshKey] = useState<number>(0)
 
-    const fetchNetworks = useCallback((current: number, size: number) => {
-        const filter: any = {}
-        PagingNetworksRequest(filter, current, size).then(setDataSource)
-    }, [refreshKey])
-
     useEffect(() => {
-        fetchNetworks(1, 10)
-    }, [fetchNetworks])
+        const {index, size} = pagedOptions;
+        PagingNetworksRequest({}, index, size).then(setDataSource)
+    }, [pagedOptions, refreshKey])
 
     const onRefresh = () => {
         setRefreshKey(refreshKey + 1)
@@ -53,20 +53,20 @@ const NetworkPage = () => {
     const onCommand = (record: Network, key: any) => {
         switch (key) {
             case "0":
-                SyncNetworkRequest(record.id).then(res => {
+                NetworkSyncRequest(record.id).then(res => {
                     if (res.code === 200) {
-                        message.success("发送成功")
+                        message.success("发送成功");
                     } else {
-                        message.error(`发送失败: ${res.msg}`)
+                        message.error(`发送失败: ${res.msg}`);
                     }
                 })
                 break
             case "1":
-                SendDeviceCommandRequest(record.gateway.id, DeviceCommand.Provision).then(res => {
+                NetworkProvisionRequest(record.id).then(res => {
                     if (res.code === 200) {
-                        message.success("发送成功")
+                        message.success("发送成功");
                     } else {
-                        message.error(`发送失败: ${res.msg}`)
+                        message.error(`发送失败: ${res.msg}`);
                     }
                 })
                 break
@@ -91,9 +91,15 @@ const NetworkPage = () => {
         return <Menu onClick={(e) => {
             onCommand(record, e.key)
         }}>
-            <Menu.Item key={0}>同步网络</Menu.Item>
-            <Menu.Item key={1}>继续组网</Menu.Item>
-            <Menu.Item key={2}>导出网络</Menu.Item>
+            {
+                hasPermission(Permission.NetworkSync) && <Menu.Item key={0}>同步网络</Menu.Item>
+            }
+            {
+                hasPermission(Permission.NetworkProvision) && <Menu.Item key={1}>继续组网</Menu.Item>
+            }
+            {
+                hasPermission(Permission.NetworkExport) && <Menu.Item key={2}>导出网络</Menu.Item>
+            }
         </Menu>
     }
 
@@ -110,7 +116,10 @@ const NetworkPage = () => {
             dataIndex: 'name',
             key: 'name',
             render: (text: string, record: Network) => {
-                return <a href={`#/network-management?locale=networks/networkDetail&id=${record.id}`}>{text}</a>
+                if (hasPermission(Permission.NetworkDetail)) {
+                    return <Link to={{pathname:`network-management`, search: `?locale=networks/networkDetail&id=${record.id}` ,state: {pagedOptions}}}>{text}</Link>
+                }
+                return text
             }
         },
         {
@@ -123,8 +132,8 @@ const NetworkPage = () => {
         },
         {
             title: '通讯延时',
-            dataIndex: 'communicationTimeOffset',
-            key: 'communicationTimeOffset',
+            dataIndex: 'communicationOffset',
+            key: 'communicationOffset',
             render: (text: number, record: Network) => {
                 if (text === 0) {
                     return '无'
@@ -148,6 +157,14 @@ const NetworkPage = () => {
                 return moment.duration(text / 1000, 'seconds').humanize()
             }
         },
+        // {
+        //     title: '模式',
+        //     dataIndex: 'mode',
+        //     key: 'mode',
+        //     render: (mode: number) => {
+        //         return mode === 1 ? '云端模式' : '本地模式'
+        //     }
+        // },
         {
             title: '操作',
             key: 'action',
@@ -158,9 +175,8 @@ const NetworkPage = () => {
                         <Button type="text" size="small" icon={<EditOutlined/>} onClick={() => onEdit(record.id)}/>
                     }
                     {
-                        hasPermission(Permission.NetworkExport) &&
                         <Dropdown overlay={renderCommandMenus(record)}>
-                            <Button type="text" icon={<CodeOutlined/>}/>
+                            <Button type="text" icon={<CodeOutlined/>} hidden={!(hasPermission(Permission.NetworkExport) || hasPermissions(Permission.NetworkSync) || hasPermission(Permission.NetworkProvision))}/>
                         </Dropdown>
                     }
                     {
@@ -185,19 +201,14 @@ const NetworkPage = () => {
         </MyBreadcrumb>
         <ShadowCard>
             <Row justify={"start"}>
-                <Col span={12}>
-                    <Space>
-                    </Space>
-                </Col>
-            </Row>
-            <br/>
-            <Row justify={"start"}>
                 <Col span={24}>
                     <TableLayout emptyText={"网络列表为空"}
                                  permissions={[Permission.NetworkEdit, Permission.NetworkExport, Permission.NetworkDelete]}
                                  columns={columns}
                                  dataSource={dataSource}
-                                 onPageChange={fetchNetworks}/>
+                                 onPageChange={(index, size) => setPagedOptions({index, size})}
+                                 simple={isMobile}
+                                 scroll={isMobile ? {x: 800} : undefined}/>
                 </Col>
             </Row>
         </ShadowCard>

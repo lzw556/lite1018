@@ -2,28 +2,27 @@ package vo
 
 import (
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
-	"github.com/thetasensors/theta-cloud-lite/server/domain/po"
-	"github.com/thetasensors/theta-cloud-lite/server/pkg/devicetype"
 )
 
 type Device struct {
 	ID         uint                   `json:"id"`
 	Name       string                 `json:"name"`
 	MacAddress string                 `json:"macAddress"`
+	Parent     string                 `json:"parent"`
 	TypeID     uint                   `json:"typeId"`
 	IPN        map[string]interface{} `json:"ipn,omitempty"`
 	Sensors    map[string]interface{} `json:"sensors,omitempty"`
 	System     map[string]interface{} `json:"system,omitempty"`
-	WSN        map[string]interface{} `json:"wsn,omitempty"`
 	Category   uint                   `json:"category"`
+	DataTypes  []uint                 `json:"dataTypes"`
 
-	Network      *Network                   `json:"network,omitempty"`
-	Information  DeviceInformation          `json:"information"`
-	State        DeviceState                `json:"state"`
-	Properties   devicetype.Properties      `json:"properties,omitempty"`
-	UpgradeState *entity.DeviceUpgradeState `json:"upgradeState,omitempty"`
-	Binding      uint                       `json:"binding"`
-	Data         DeviceData                 `json:"data"`
+	Network       *Network                    `json:"network,omitempty"`
+	Information   entity.DeviceInformation    `json:"information"`
+	State         entity.DeviceState          `json:"state"`
+	Properties    Properties                  `json:"properties,omitempty"`
+	UpgradeStatus *entity.DeviceUpgradeStatus `json:"upgradeStatus,omitempty"`
+	AlertStates   []AlertState                `json:"alertStates,omitempty"`
+	Data          *DeviceData                 `json:"data,omitempty"`
 }
 
 func NewDevice(e entity.Device) Device {
@@ -31,11 +30,9 @@ func NewDevice(e entity.Device) Device {
 		ID:         e.ID,
 		Name:       e.Name,
 		MacAddress: e.MacAddress,
+		Parent:     e.Parent,
 		TypeID:     e.Type,
-		Category:   uint(e.Category),
-		State:      DeviceState{},
 	}
-	d.State.DeviceConnectionState = e.GetConnectionState()
 	return d
 }
 
@@ -46,31 +43,24 @@ func (d *Device) SetNetwork(e entity.Network) {
 	}
 }
 
-func (d *Device) SetWSN(e entity.Network) {
-	d.WSN = map[string]interface{}{
-		"communication_period":      e.CommunicationPeriod,
-		"communication_time_offset": e.CommunicationTimeOffset,
-		"group_size":                e.GroupSize,
-		"group_interval":            e.GroupInterval,
-	}
-}
-
-func (d *Device) SetProperties() {
-
-}
-
 func (d *Device) SetUpgradeState(e entity.Device) {
-	upgradeState := e.GetUpgradeState()
-	switch upgradeState.Status {
-	case entity.DeviceUpgradeStatusError, entity.DeviceUpgradeStatusPending:
-		d.UpgradeState = &upgradeState
+	status := e.GetUpgradeStatus()
+	switch status.Code {
+	case entity.DeviceUpgradeError, entity.DeviceUpgradePending:
+		d.UpgradeStatus = &status
 	}
 }
 
-func (d *Device) SetBinding(e po.MeasurementDeviceBinding) {
-	d.Binding = e.MeasurementID
+func (d *Device) SetAlertStates(es []entity.DeviceAlertState) {
+	d.AlertStates = make([]AlertState, len(es))
+	for i, e := range es {
+		d.AlertStates[i].Rule.Level = e.Rule.Level
+		d.AlertStates[i].Rule.ID = e.Rule.ID
+		d.AlertStates[i].Record.ID = e.Record.ID
+		d.AlertStates[i].Record.Value = e.Record.Value
+	}
 }
 
-func (d *Device) SetData(e entity.SensorData) {
-	d.Data = NewDeviceData(e)
+func (d *Device) SetDataTypes(t uint) {
+	d.DataTypes = []uint{t}
 }

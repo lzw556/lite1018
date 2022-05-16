@@ -17,28 +17,29 @@ func (r projectRouter) create(ctx *gin.Context) (interface{}, error) {
 
 func (r projectRouter) find(ctx *gin.Context) (interface{}, error) {
 	filters := request.NewFilters(ctx)
-	switch ctx.Query("method") {
-	case "paging":
+	if _, ok := ctx.GetQuery("page"); ok {
 		page := cast.ToInt(ctx.Query("page"))
 		size := cast.ToInt(ctx.Query("size"))
-		result, total, err := r.service.FindProjectsByPaginate(page, size, filters)
+		result, total, err := r.service.PagingProjects(page, size, filters)
 		if err != nil {
 			return nil, err
 		}
 		return response.NewPageResult(page, size, total, result), nil
 	}
-	return nil, nil
+	return r.service.FindProjects(filters)
 }
 
 func (r projectRouter) getMyProjects(ctx *gin.Context) (interface{}, error) {
 	userID := cast.ToUint(ctx.MustGet("user_id"))
 	filters := request.Filters{
-		{
-			Name:  "user_id",
-			Value: userID,
-		},
+		"user_id": userID,
 	}
-	return r.service.FilterProjects(filters)
+	return r.service.FindProjects(filters)
+}
+
+func (r projectRouter) getMyProject(ctx *gin.Context) (interface{}, error) {
+	id := cast.ToUint(ctx.Param("id"))
+	return r.service.GetProjectByID(id)
 }
 
 func (r projectRouter) update(ctx *gin.Context) (interface{}, error) {

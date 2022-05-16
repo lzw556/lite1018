@@ -1,3 +1,4 @@
+import {DeviceType} from "../types/device_type";
 
 export function GetFieldName(key:string) {
     switch (key) {
@@ -61,3 +62,13 @@ export function GetFieldName(key:string) {
             return "未知属性"
     }
 }
+
+export const FIRST_CLASS_PROPERTIES = [
+    { typeId: DeviceType.BoltLoosening, properties:['loosening_angle', 'attitude', 'motion'] },
+    { typeId: DeviceType.BoltElongation, properties:['preload', 'temperature', 'pressure'] },
+    { typeId: DeviceType.VibrationTemperature3Axis, properties:['vibration_severity_y', 'enveloping_pk2pk_y', 'temperature'] },
+    { typeId: DeviceType.HighTemperatureCorrosion, properties:['thickness', 'temperature', 'annualized_corrosion_rate'] },
+    { typeId: DeviceType.NormalTemperatureCorrosion, properties:['thickness', 'temperature', 'annualized_corrosion_rate'] },
+    { typeId: DeviceType.PressureTemperature, properties:['loosening_angle', 'attitude', 'motion'] },
+    { typeId: DeviceType.AngleDip, properties:['inclination', 'pitch', 'roll'] }
+]

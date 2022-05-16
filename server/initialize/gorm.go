@@ -1,32 +1,60 @@
 package initialize
 
 import (
-	"github.com/thetasensors/theta-cloud-lite/server/domain/po"
+	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	"gorm.io/gorm"
 	"reflect"
 )
 
 func InitTables(db *gorm.DB) error {
 	tables := []interface{}{
-		&po.User{},
-		&po.Project{},
-		&po.Role{},
-		&po.Menu{},
-		&po.RoleMenuRelation{},
-		&po.UserProjectRelation{},
-		&po.Permission{},
-		&po.Asset{},
-		&po.Device{},
-		&po.Network{},
-		&po.Firmware{},
-		&po.Alarm{},
-		&po.AlarmTemplate{},
-		&po.AlarmRecord{},
-		&po.AlarmRecordAcknowledge{},
-		&po.Measurement{},
-		&po.MeasurementDeviceBinding{},
+		&entity.User{},
+		&entity.Project{},
+		&entity.Role{},
+		&entity.Menu{},
+		&entity.RoleMenuRelation{},
+		&entity.UserProjectRelation{},
+		&entity.Permission{},
+		&entity.Device{},
+		&entity.Network{},
+		&entity.Firmware{},
+		&entity.AlarmRule{},
+		&entity.AlarmSource{},
+		&entity.AlarmRecord{},
+		&entity.AlarmRecordAcknowledge{},
+		&entity.Event{},
 	}
-	db.Migrator().DropTable(&po.Menu{}, &po.Permission{})
+
+	//db.Migrator().DropTable("casbin_rule")
+	//var devices []entity.Device
+	//if db.Find(&devices).Error == nil {
+	//	for _, device := range devices {
+	//		if t := devicetype.Get(device.Type); t != nil {
+	//			device.Settings = make([]entity.DeviceSetting, len(t.Settings()))
+	//			for i, setting := range t.Settings() {
+	//				device.Settings[i] = entity.DeviceSetting{
+	//					Key:      setting.Key,
+	//					Value:    setting.Value,
+	//					Category: string(setting.Category),
+	//				}
+	//			}
+	//			db.Save(&device)
+	//		}
+	//	}
+	//}
+	//var result []map[string]interface{}
+	//db.Table("ts_alarm_rule").Unscoped().Find(&result)
+	//for _, r := range result {
+	//	fmt.Println(r["id"])
+	//	v := cast.ToString(r["source_type"])
+	//	typeID := strings.Split(v, "::")[1]
+	//	db.Table("ts_alarm_rule").Unscoped().Where("id = ?", r["id"]).UpdateColumns(map[string]interface{}{
+	//		"source_type": typeID,
+	//		"category":    1,
+	//	})
+	//}
+	//
+	db.Migrator().DropTable(&entity.Menu{}, &entity.RoleMenuRelation{})
 	for _, table := range tables {
 		if !db.Migrator().HasTable(table) {
 			if err := db.Migrator().CreateTable(table); err != nil {
@@ -55,7 +83,10 @@ func InitTables(db *gorm.DB) error {
 	if err := initMenus(db); err != nil {
 		return err
 	}
-	if err := initPermissions(db); err != nil {
+	if err := initRoles(db); err != nil {
+		return err
+	}
+	if err := initRoleMenuRelations(db); err != nil {
 		return err
 	}
 	if err := initProject(db); err != nil {

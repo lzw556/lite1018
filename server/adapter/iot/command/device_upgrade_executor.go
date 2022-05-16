@@ -8,21 +8,23 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/adapter"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/iot/background"
 	pd "github.com/thetasensors/theta-cloud-lite/server/adapter/iot/proto"
+	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
+	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
-	"github.com/thetasensors/theta-cloud-lite/server/domain/po"
-	"github.com/thetasensors/theta-cloud-lite/server/pkg/errcode"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/global"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/xlog"
 	"time"
 )
 
 type DeviceUpgradeExecutor struct {
-	firmware po.Firmware
+	firmware  entity.Firmware
+	eventRepo dependency.EventRepository
 }
 
-func NewDeviceUpgradeExecutor(firmware po.Firmware) background.Executor {
+func NewDeviceUpgradeExecutor(firmware entity.Firmware) background.Executor {
 	return DeviceUpgradeExecutor{
-		firmware: firmware,
+		firmware:  firmware,
+		eventRepo: repository.Event{},
 	}
 }
 
@@ -45,18 +47,32 @@ func (e DeviceUpgradeExecutor) Execute(ctx context.Context, gateway, device enti
 			return err
 		}
 	}
-	err = e.upgrade(ctx, gateway.MacAddress, device)
-	if err != nil {
+	code := e.upgrade(ctx, gateway.MacAddress, device)
+	e.addEvent(device, code)
+	if code != 0 {
 		return err
 	}
+
 	if device.MacAddress == gateway.MacAddress {
 		if queue := background.GetTaskQueue(gateway.MacAddress); queue != nil {
 			queue.Stop()
 		}
 	}
-	device.UpdateUpgradeState(entity.DeviceUpgradeStatusSuccess, 100)
+	device.UpdateDeviceUpgradeStatus(entity.DeviceUpgradeSuccess, 100)
 	xlog.Infof("device upgrade successful => [%s]", device.MacAddress)
 	return nil
+}
+
+func (e DeviceUpgradeExecutor) addEvent(device entity.Device, code int) {
+	event := entity.Event{
+		Code:      entity.EventCodeUpgrade,
+		Category:  entity.EventCategoryDevice,
+		SourceID:  device.ID,
+		Timestamp: time.Now().UTC().Unix(),
+		ProjectID: device.ProjectID,
+		Content:   fmt.Sprintf(`{"code":%d}`, code),
+	}
+	_ = e.eventRepo.Create(context.TODO(), &event)
 }
 
 func (e DeviceUpgradeExecutor) loadFirmware(ctx context.Context, gateway string, device entity.Device) error {
@@ -79,7 +95,7 @@ func (e DeviceUpgradeExecutor) loadFirmware(ctx context.Context, gateway string,
 		if err != nil {
 			return err
 		}
-		device.UpdateUpgradeState(entity.DeviceUpgradeStatusLoading, m.Progress)
+		device.UpdateDeviceUpgradeStatus(entity.DeviceUpgradeLoading, m.Progress)
 		seqID = int(m.SeqId + 1)
 	}
 	xlog.Infof("load firmware data complete => [%s]", device.MacAddress)
@@ -99,7 +115,7 @@ func (e DeviceUpgradeExecutor) sendFirmwareData(ctx context.Context, gateway str
 	return &m, nil
 }
 
-func (e DeviceUpgradeExecutor) upgrade(ctx context.Context, gateway string, device entity.Device) error {
+func (e DeviceUpgradeExecutor) upgrade(ctx context.Context, gateway string, device entity.Device) int {
 	xlog.Infof("start upgrade device => [%s]", device.MacAddress)
 	ch := make(chan int32)
 	topic := fmt.Sprintf("iot/v2/gw/%s/dev/%s/msg/firmwareUpgradeStatus/", gateway, device.MacAddress)
@@ -109,10 +125,10 @@ func (e DeviceUpgradeExecutor) upgrade(ctx context.Context, gateway string, devi
 			return
 		}
 		if m.Code != 0 {
-			device.UpdateUpgradeState(entity.DeviceUpgradeStatusError, m.Progress)
+			device.UpdateDeviceUpgradeStatus(entity.DeviceUpgradeError, m.Progress)
 			ch <- m.Code
 		} else {
-			device.UpdateUpgradeState(entity.DeviceUpgradeStatusUpgrading, m.Progress)
+			device.UpdateDeviceUpgradeStatus(entity.DeviceUpgradeUpgrading, m.Progress)
 		}
 		if m.Progress == 100 {
 			ch <- m.Code
@@ -126,11 +142,8 @@ func (e DeviceUpgradeExecutor) upgrade(ctx context.Context, gateway string, devi
 	}()
 	select {
 	case code := <-ch:
-		if code == 0 {
-			return nil
-		}
-		return fmt.Errorf("upgrade error code = %d", code)
+		return int(code)
 	case <-ctx.Done():
-		return errcode.DeviceCommandCancelledError
+		return 1
 	}
 }

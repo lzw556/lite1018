@@ -46,28 +46,18 @@ func (s Network) ExportNetworkByID(networkID uint) (*vo.NetworkExportFile, error
 }
 
 func (s Network) GetNetworkByID(networkID uint) (*vo.Network, error) {
-	query, err := s.factory.NewNetworkQuery(networkID)
-	if err != nil {
-		return nil, err
-	}
-	return query.Detail()
+	query := s.factory.NewNetworkQuery(nil)
+	return query.Get(networkID)
 }
 
 func (s Network) FindNetworksByPaginate(filters request.Filters, page, size int) ([]vo.Network, int64, error) {
-	query, err := s.factory.NewNetworkPagingQuery(filters, page, size)
-	if err != nil {
-		return nil, 0, err
-	}
-	result, total := query.Paging()
-	return result, total, nil
+	query := s.factory.NewNetworkQuery(filters)
+	return query.Paging(page, size)
 }
 
-func (s Network) FilterNetworks(filters request.Filters) ([]vo.Network, error) {
-	query, err := s.factory.NewNetworkFilterQuery(filters)
-	if err != nil {
-		return nil, err
-	}
-	return query.Run()
+func (s Network) FindNetworks(filters request.Filters) ([]vo.Network, error) {
+	query := s.factory.NewNetworkQuery(filters)
+	return query.List()
 }
 
 func (s Network) AddDevicesByID(networkID uint, req request.AddDevices) error {
@@ -76,9 +66,9 @@ func (s Network) AddDevicesByID(networkID uint, req request.AddDevices) error {
 		return err
 	}
 	if req.IsNew {
-		return cmd.AccessNewDevice(req)
+		return cmd.AddNewDevices(req)
 	}
-	return cmd.AccessDevices(req.ParentID, req.Devices)
+	return cmd.AddDevices(req.ParentID, req.Devices)
 }
 
 func (s Network) RemoveDevicesByID(networkID uint, req request.RemoveDevices) error {
@@ -106,9 +96,17 @@ func (s Network) DeleteNetworkByID(networkID uint) error {
 }
 
 func (s Network) SyncNetworkByID(networkID uint) error {
-	cmd, err := s.factory.NewNetworkSyncCmd(networkID)
+	cmd, err := s.factory.NewNetworkCommandCmd(networkID)
 	if err != nil {
 		return err
 	}
-	return cmd.Run()
+	return cmd.Sync()
+}
+
+func (s Network) ProvisionNetworkByID(id uint) error {
+	cmd, err := s.factory.NewNetworkCommandCmd(id)
+	if err != nil {
+		return err
+	}
+	return cmd.Provision()
 }

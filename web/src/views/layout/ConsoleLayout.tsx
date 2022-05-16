@@ -5,12 +5,15 @@ import {NavLink} from "react-router-dom";
 import RouterGuard from "../../routers/routerGuard";
 import {HeaderLayout} from "./index";
 import "../../assets/iconfont.css"
-import React from "react";
+import React, {useEffect} from "react";
 import {GetParamValue} from "../../utils/path";
 import {SecondaryRoutes} from "../../routers/routes";
 import AlertMessageNotification from "../../components/notification/alert";
 import {getProject} from "../../utils/session";
-
+import {GetCasbinRequest} from "../../apis/role";
+import {store} from "../../store";
+import {SET_PERMISSION} from "../../store/actions/types";
+import { NavMenu } from "./NavMenu";
 const {SubMenu} = Menu
 
 const {Sider} = Layout
@@ -19,6 +22,15 @@ const ConsoleLayout = (props: any) => {
     const {menus, location} = props
     const {pathname} = location
     const locale = GetParamValue(location.search, "locale")
+
+    useEffect(() => {
+        GetCasbinRequest().then(data => {
+            store.dispatch({
+                type: SET_PERMISSION,
+                payload: data
+            })
+        })
+    }, [])
 
     const renderMenuItem = (children: []) => {
         return children.map((item: any) => {
@@ -47,36 +59,13 @@ const ConsoleLayout = (props: any) => {
         if (project) {
             return <>
                 <Layout>
-                    <Sider width={200} style={{
+                    <Sider className="sider" width={200} style={{
                         background: "white",
                         height: "100%",
                         overflowY: "scroll",
                         boxShadow: "0 2px 10px 0 rgba(0,0,0, 0.08)"
                     }}>
-                        {
-                            menus && menus.length &&
-                            <Menu mode="inline" className="ts-menu" defaultSelectedKeys={["devices"]}
-                                  selectedKeys={locale ? locale.split("/") : []} defaultOpenKeys={[pathname.replace("/", "")]}>
-                                {
-                                    menus && menus.map((item: any) => {
-                                        if (!item.hidden) {
-                                            if (item.children && item.children.filter((item: any) => !item.hidden).length) {
-                                                return <SubMenu key={item.name} title={item.title}
-                                                                icon={item.icon &&
-                                                                <span className={`iconfont ${item.icon}`}/>}>
-                                                    {renderMenuItem(item.children)}
-                                                </SubMenu>
-                                            }
-                                            return <Menu.Item key={item.name}
-                                                              icon={item.icon &&
-                                                              <span className={`iconfont ${item.icon}`}/>}>
-                                                <NavLink to={`${item.path}?locale=${item.name}`}>{item.title}</NavLink>
-                                            </Menu.Item>
-                                        }
-                                    })
-                                }
-                            </Menu>
-                        }
+                        <NavMenu menus={menus}/>
                     </Sider>
                     <Layout style={{padding: "15px", background: "#eef0f5", overflowY: "scroll"}}>
                         {
@@ -99,7 +88,7 @@ const ConsoleLayout = (props: any) => {
     }
 
     return <Layout className="ts-console">
-        <HeaderLayout hideConsole={true}/>
+        <HeaderLayout hideConsole={true} menus={menus}/>
         {
             renderChildren()
         }

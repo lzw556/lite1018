@@ -38,21 +38,17 @@ func (cmd loadFirmwareCmd) Qos() byte {
 	return 1
 }
 
-func (cmd loadFirmwareCmd) Payload() []byte {
+func (cmd loadFirmwareCmd) Payload() ([]byte, error) {
 	m := pd.LoadFirmwareCommand{
-		Timestamp:  int32(time.Now().Unix()),
-		ReqId:      cmd.reqID,
+		Timestamp:  int32(cmd.request.timestamp),
+		ReqId:      cmd.request.id,
 		TaskId:     strconv.Itoa(int(cmd.firmwareID)),
 		SeqId:      int32(cmd.seqID),
 		Data:       cmd.data,
 		DataLength: int32(len(cmd.data)),
 		Size_:      int32(cmd.total),
 	}
-	payload, err := proto.Marshal(&m)
-	if err != nil {
-		return nil
-	}
-	return payload
+	return proto.Marshal(&m)
 }
 
 func (cmd loadFirmwareCmd) Execute(ctx context.Context, gateway string, target string, timeout time.Duration) ([]byte, error) {

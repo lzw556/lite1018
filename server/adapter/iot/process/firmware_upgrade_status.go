@@ -5,15 +5,19 @@ import (
 	"github.com/gogo/protobuf/proto"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/iot"
 	pd "github.com/thetasensors/theta-cloud-lite/server/adapter/iot/proto"
+	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
+	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
-	"github.com/thetasensors/theta-cloud-lite/server/pkg/eventbus"
 )
 
 type FirmwareUpgradeStatus struct {
+	eventRepo dependency.EventRepository
 }
 
 func NewFirmwareUpgradeStatus() Processor {
-	return newRoot(&FirmwareUpgradeStatus{})
+	return newRoot(&FirmwareUpgradeStatus{
+		eventRepo: repository.Event{},
+	})
 }
 
 func (p FirmwareUpgradeStatus) Name() string {
@@ -32,11 +36,10 @@ func (p FirmwareUpgradeStatus) Process(ctx *iot.Context, msg iot.Message) error 
 				return fmt.Errorf("unmarshal [FirmwareUpgradeStatus] message failed: %v", err)
 			}
 			if m.Code != 0 {
-				device.UpdateUpgradeState(entity.DeviceUpgradeStatusError, m.Progress)
+				device.UpdateDeviceUpgradeStatus(entity.DeviceUpgradeError, m.Progress)
 				return fmt.Errorf("loading firmware failed: error_code = %d", m.Code)
 			} else {
-				device.UpdateUpgradeState(entity.DeviceUpgradeStatusUpgrading, m.Progress)
-				eventbus.Publish(eventbus.DeviceUpgradeStatus, m)
+				device.UpdateDeviceUpgradeStatus(entity.DeviceUpgradeUpgrading, m.Progress)
 			}
 		}
 	}

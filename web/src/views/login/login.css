@@ -31,9 +31,51 @@
 
 #login-page .ts-login-form {
     padding-top: 18%;
+    text-align: start;
 }
 
 #login-page Form Button {
     width: 100%;
     font-weight: bold;
+}
+#login-page .ant-form{
+    display: flex;
+    justify-content: space-between;
+    margin: auto;
+    width: 840px;
+}
+#login-page .ant-form .ant-form-item{
+    width: 30%;
+}
+@media (max-width:840px){
+    #login-page .ant-form{
+        display: inherit;
+        justify-content: initial;
+        width: auto;
+        padding: 30px;
+    }
+    #login-page .ant-form .ant-form-item{
+        width: 100%;
+    }
+    #login-page .logo {
+        margin-top:50px;
+    }
+    #login-page .logo .ant-space {
+        gap: 0 !important;
+    }
+    #login-page .logo img[alt='ThetaSensors'] {
+        height: 70px;
+    }
+    #login-page .logo .split-line {
+        display: none;
+    }
+    #login-page .logo img[alt='Theta'] {
+       display: none;
+    }
+    #login-page .title {
+        display: none;
+    }
+    #login-page .ts-login-form{
+        padding-top: 0;
+    }
 }

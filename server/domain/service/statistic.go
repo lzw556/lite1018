@@ -12,47 +12,17 @@ type Statistic struct {
 }
 
 func NewStatistic() statistic.Service {
-	return Statistic{
+	return &Statistic{
 		factory: factory.NewStatistic(),
 	}
 }
 
-func (s Statistic) StatisticalMeasurements(filters request.Filters) ([]vo.MeasurementStatistic, error) {
-	query, err := s.factory.NewStatisticalMeasurementsQuery(filters)
-	if err != nil {
-		return nil, err
-	}
-	return query.Run(), nil
+func (s Statistic) GetDeviceStatistics(filters request.Filters) ([]vo.DeviceStatistic, error) {
+	query := s.factory.NewStatisticQuery(filters)
+	return query.GetDeviceStatistics()
 }
 
-func (s Statistic) StatisticalMeasurementDataByID(id uint) (*vo.MeasurementDataStatistic, error) {
-	query, err := s.factory.NewStatisticalMeasurementDataQuery(id)
-	if err != nil {
-		return nil, err
-	}
-	return query.Run(), nil
-}
-
-func (s Statistic) StatisticalMeasurementAlertByID(id uint) (*vo.MeasurementAlertStatistic, error) {
-	query, err := s.factory.NewStatisticalMeasurementAlertQuery(id)
-	if err != nil {
-		return nil, err
-	}
-	return query.Run(), nil
-}
-
-func (s Statistic) StatisticalDevices(filters request.Filters) ([]vo.DeviceStatistic, error) {
-	query, err := s.factory.NewStatisticalDevicesQuery(filters)
-	if err != nil {
-		return nil, err
-	}
-	return query.Run(), nil
-}
-
-func (s Statistic) StatisticalAlarmRecords(from, to int64, filters request.Filters) (*vo.AlarmRecordStatistics, error) {
-	query, err := s.factory.NewStatisticalAlarmRecordsQuery(from, to, filters)
-	if err != nil {
-		return nil, err
-	}
-	return query.Run(), nil
+func (s Statistic) GetAlertStatistics(filters request.Filters) ([]vo.AlertStatistic, error) {
+	query := s.factory.NewStatisticQuery(filters)
+	return query.GetAlertStatistics()
 }

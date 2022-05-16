@@ -12,9 +12,9 @@ type resetCmd struct {
 }
 
 func newResetCmd() resetCmd {
-	cmd := resetCmd{}
-	cmd.request = newRequest()
-	return cmd
+	return resetCmd{
+		request: newRequest(),
+	}
 }
 
 func (cmd resetCmd) Name() string {
@@ -29,16 +29,12 @@ func (cmd resetCmd) Qos() byte {
 	return 1
 }
 
-func (cmd resetCmd) Payload() []byte {
-	c := pd.ResetCommand{
-		ReqId:     cmd.reqID,
-		Timestamp: int32(time.Now().UTC().Unix()),
+func (cmd resetCmd) Payload() ([]byte, error) {
+	m := pd.ResetCommand{
+		ReqId:     cmd.request.id,
+		Timestamp: int32(cmd.request.timestamp),
 	}
-	bytes, err := proto.Marshal(&c)
-	if err != nil {
-		return nil
-	}
-	return bytes
+	return proto.Marshal(&m)
 }
 
 func (cmd resetCmd) Execute(ctx context.Context, gateway string, target string, timeout time.Duration) ([]byte, error) {

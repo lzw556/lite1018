@@ -9,7 +9,7 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/aggregate/factory"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
-	"github.com/thetasensors/theta-cloud-lite/server/domain/po"
+	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	spec "github.com/thetasensors/theta-cloud-lite/server/domain/specification"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/vo"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/errcode"
@@ -34,7 +34,7 @@ func (s Project) CreateProject(req request.Project) error {
 	if !errors.Is(err, gorm.ErrRecordNotFound) {
 		return response.BusinessErr(errcode.ProjectExistsError, "")
 	}
-	e = po.Project{
+	e = entity.Project{
 		Name:        req.Name,
 		Description: req.Description,
 	}
@@ -42,10 +42,16 @@ func (s Project) CreateProject(req request.Project) error {
 }
 
 func (s Project) GetProjectByID(id uint) (*vo.Project, error) {
-	panic("implement me")
+	ctx := context.TODO()
+	e, err := s.repository.Get(ctx, id)
+	if err != nil {
+		return nil, response.BusinessErr(errcode.ProjectNotFoundError, "")
+	}
+	result := vo.NewProject(e)
+	return &result, nil
 }
 
-func (s Project) FindProjectsByPaginate(page, size int, filters request.Filters) ([]vo.Project, int64, error) {
+func (s Project) PagingProjects(page, size int, filters request.Filters) ([]vo.Project, int64, error) {
 	es, total, err := s.repository.PagingBySpecs(context.TODO(), page, size)
 	if err != nil {
 		return nil, 0, err
@@ -57,12 +63,9 @@ func (s Project) FindProjectsByPaginate(page, size int, filters request.Filters)
 	return result, total, nil
 }
 
-func (s Project) FilterProjects(filters request.Filters) ([]vo.Project, error) {
-	query, err := s.factory.NewProjectFilterQuery(filters)
-	if err != nil {
-		return nil, err
-	}
-	return query.Run(), nil
+func (s Project) FindProjects(filters request.Filters) ([]vo.Project, error) {
+	query := s.factory.NewProjectQuery(filters)
+	return query.List()
 }
 
 func (s Project) UpdateProjectByID(id uint, req request.Project) error {
@@ -77,11 +80,8 @@ func (s Project) UpdateProjectByID(id uint, req request.Project) error {
 }
 
 func (s Project) GetAllocUsersByID(id uint) ([]vo.AllocUser, error) {
-	query, err := s.factory.NewProjectQuery(id)
-	if err != nil {
-		return nil, err
-	}
-	return query.GetAllocUsers()
+	query := s.factory.NewProjectQuery(nil)
+	return query.GetAllocUsersByID(id)
 }
 
 func (s Project) AllocUsersByID(id uint, req request.AllocUsers) error {
@@ -93,5 +93,9 @@ func (s Project) AllocUsersByID(id uint, req request.AllocUsers) error {
 }
 
 func (s Project) DeleteProjectByID(id uint) error {
-	panic("implement me")
+	cmd, err := s.factory.NewProjectDeleteCmd(id)
+	if err != nil {
+		return err
+	}
+	return cmd.Run()
 }

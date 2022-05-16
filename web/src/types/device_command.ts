@@ -5,4 +5,5 @@ export enum DeviceCommand {
     ResetData,
     Reboot,
     Provision,
+    Calibrate,
 }

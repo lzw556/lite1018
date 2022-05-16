@@ -11,7 +11,7 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/domain/aggregate/command"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/aggregate/query"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
-	"github.com/thetasensors/theta-cloud-lite/server/domain/po"
+	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	spec "github.com/thetasensors/theta-cloud-lite/server/domain/specification"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/devicetype"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/errcode"
@@ -19,40 +19,21 @@ import (
 )
 
 type Network struct {
-	assetRepo   dependency.AssetRepository
 	deviceRepo  dependency.DeviceRepository
 	networkRepo dependency.NetworkRepository
 }
 
 func NewNetwork() Network {
 	return Network{
-		assetRepo:   repository.Asset{},
 		deviceRepo:  repository.Device{},
 		networkRepo: repository.Network{},
 	}
 }
 
-func (factory Network) NewNetworkQuery(networkID uint) (*query.NetworkQuery, error) {
-	ctx := context.TODO()
-	e, err := factory.networkRepo.Get(ctx, networkID)
-	if err != nil {
-		return nil, response.BusinessErr(errcode.NetworkNotFoundError, "")
-	}
+func (factory Network) NewNetworkQuery(filters request.Filters) *query.NetworkQuery {
 	q := query.NewNetworkQuery()
-	q.Network = e
-	return &q, nil
-}
-
-func (factory Network) NewNetworkPagingQuery(filters request.Filters, page, size int) (*query.NetworkPagingQuery, error) {
-	ctx := context.TODO()
-	specs := factory.buildSpecs(filters)
-	es, total, err := factory.networkRepo.PagingBySpecs(ctx, page, size, specs...)
-	if err != nil {
-		return nil, err
-	}
-	q := query.NewNetworkPagingQuery(total)
-	q.Networks = es
-	return &q, nil
+	q.Specs = factory.buildSpecs(filters)
+	return &q
 }
 
 func (factory Network) NewNetworkCreateCmd(req request.CreateNetwork) (*command.NetworkCreateCmd, error) {
@@ -62,16 +43,15 @@ func (factory Network) NewNetworkCreateCmd(req request.CreateNetwork) (*command.
 		return nil, response.BusinessErr(errcode.DeviceMacExistsError, "")
 	}
 	cmd := command.NewNetworkCreateCmd()
-	cmd.Network.Network = po.Network{
+	cmd.Network = entity.Network{
 		Name:                    req.Name,
 		ProjectID:               req.ProjectID,
 		CommunicationPeriod:     req.WSN.CommunicationPeriod,
-		CommunicationTimeOffset: req.WSN.CommunicationTimeOffset,
+		CommunicationTimeOffset: req.WSN.CommunicationOffset,
 		GroupSize:               req.WSN.GroupSize,
 		GroupInterval:           req.WSN.GroupInterval,
-		RoutingTables:           make(po.RoutingTables, 0),
 	}
-	cmd.Network.Gateway.Device = po.Device{
+	cmd.Network.Gateway = entity.Device{
 		MacAddress: req.Gateway.MacAddress,
 		Name:       fmt.Sprintf("%s-网关", req.Name),
 		Type:       devicetype.GatewayType,
@@ -83,23 +63,17 @@ func (factory Network) NewNetworkCreateCmd(req request.CreateNetwork) (*command.
 func (factory Network) NewNetworkImportCmd(req request.ImportNetwork) (*command.NetworkImportCmd, error) {
 	ctx := context.TODO()
 	cmd := command.NewNetworkImportCmd()
+	fmt.Println(req)
 	// 构建网络实体
-	cmd.Network = po.Network{
-		CommunicationPeriod:     req.CommunicationPeriod,
-		CommunicationTimeOffset: req.CommunicationTimeOffset,
-		GroupSize:               req.GroupSize,
-		GroupInterval:           req.GroupInterval,
-		RoutingTables:           make(po.RoutingTables, len(req.RoutingTables)),
+	cmd.Network = entity.Network{
+		CommunicationPeriod:     req.Wsn.CommunicationPeriod,
+		CommunicationTimeOffset: req.Wsn.CommunicationOffset,
+		GroupSize:               req.Wsn.GroupSize,
+		GroupInterval:           req.Wsn.GroupInterval,
 		ProjectID:               req.ProjectID,
 	}
-	for i, table := range req.RoutingTables {
-		cmd.RoutingTables[i] = po.RoutingTable{
-			table[0],
-			table[1],
-		}
-	}
 	// 构建网络中的设备实体
-	cmd.Devices = make([]po.Device, len(req.Devices))
+	cmd.Devices = make([]entity.Device, len(req.Devices))
 	for i, device := range req.Devices {
 		e, err := factory.deviceRepo.GetBySpecs(ctx, spec.DeviceMacEqSpec(device.MacAddress))
 		if !errors.Is(err, gorm.ErrRecordNotFound) {
@@ -109,18 +83,29 @@ func (factory Network) NewNetworkImportCmd(req request.ImportNetwork) (*command.
 		e.MacAddress = device.MacAddress
 		e.Type = device.TypeID
 		e.ProjectID = req.ProjectID
-		switch e.Type {
-		case devicetype.GatewayType:
-			cmd.Network.Name = device.Name
-			e.Category = po.GatewayCategory
-		case devicetype.RouterType:
-			e.Category = po.SensorCategory
-		default:
-			e.Category = po.SensorCategory
+		e.Settings = make(entity.DeviceSettings, 0)
+		if t := devicetype.Get(device.TypeID); t != nil {
+			for _, setting := range t.Settings() {
+				for k, v := range device.Settings[string(setting.Category)] {
+					if k == setting.Key {
+						e.Settings = append(e.Settings, entity.DeviceSetting{
+							Category: string(setting.Category),
+							Key:      setting.Key,
+							Value:    v,
+						})
+					}
+				}
+			}
+		} else {
+			return nil, response.BusinessErr(errcode.UnknownDeviceTypeError, "")
 		}
-		cmd.Devices[i] = e.Device
+		if e.Type == devicetype.GatewayType {
+			cmd.Network.Name = device.Name
+		} else {
+			e.Parent = device.ParentAddress
+		}
+		cmd.Devices[i] = e
 	}
-
 	return &cmd, nil
 }
 
@@ -167,19 +152,14 @@ func (factory Network) NewNetworkUpdateCmdByID(id uint) (*command.NetworkUpdateC
 	return &cmd, nil
 }
 
-func (factory Network) NewNetworkSyncCmd(networkID uint) (*command.NetworkSyncCommand, error) {
+func (factory Network) NewNetworkCommandCmd(id uint) (*command.NetworkCommandCmd, error) {
 	ctx := context.TODO()
-	network, err := factory.networkRepo.Get(ctx, networkID)
+	e, err := factory.networkRepo.Get(ctx, id)
 	if err != nil {
 		return nil, response.BusinessErr(errcode.NetworkNotFoundError, "")
 	}
-	devices, err := factory.deviceRepo.FindBySpecs(ctx, spec.NetworkEqSpec(network.ID))
-	if err != nil {
-		return nil, response.BusinessErr(errcode.DeviceNotFoundError, "")
-	}
-	cmd := command.NewNetworkSyncCommand()
-	cmd.Network = network
-	cmd.Devices = devices
+	cmd := command.NewNetworkCommandCmd()
+	cmd.Network = e
 	return &cmd, nil
 }
 
@@ -194,24 +174,12 @@ func (factory Network) NewNetworkRemoveCmd(networkID uint) (*command.NetworkRemo
 	return &cmd, nil
 }
 
-func (factory Network) NewNetworkFilterQuery(filters request.Filters) (*query.NetworkFilterQuery, error) {
-	ctx := context.TODO()
-	specs := factory.buildSpecs(filters)
-	es, err := factory.networkRepo.FindBySpecs(ctx, specs...)
-	if err != nil {
-		return nil, err
-	}
-	q := query.NewNetworkFilterQuery()
-	q.Networks = es
-	return &q, nil
-}
-
 func (factory Network) buildSpecs(filters request.Filters) []spec.Specification {
 	specs := make([]spec.Specification, 0)
-	for _, filter := range filters {
-		switch filter.Name {
+	for name, v := range filters {
+		switch name {
 		case "project_id":
-			specs = append(specs, spec.ProjectEqSpec(cast.ToUint(filter.Value)))
+			specs = append(specs, spec.ProjectEqSpec(cast.ToUint(v)))
 		}
 	}
 	return specs

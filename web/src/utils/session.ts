@@ -17,3 +17,7 @@ export const getMenus = (): Menu[] => {
 export const getProject = () => {
     return store.getState().project.data
 }
+
+export const getPermission = () => {
+    return store.getState().permission.data
+}

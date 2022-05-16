@@ -55,23 +55,15 @@ const LoginPage: FC = () => {
         </div>
         <div className={"ts-login-form"}>
             <Form onFinish={login}>
-                <Row justify="center">
-                    <Col offset={1} span={4}>
-                        <Form.Item name="username" rules={[{required: true, message: '请输入用户名'}]}>
-                            <Input prefix={<UserOutlined />} placeholder="用户名"/>
-                        </Form.Item>
-                    </Col>
-                    <Col offset={1} span={4}>
-                        <Form.Item name="password" rules={[{required: true, message: '请输入密码'}]}>
-                            <Input prefix={<KeyOutlined />} placeholder="密码" type="password"/>
-                        </Form.Item>
-                    </Col>
-                    <Col offset={1} span={4}>
-                        <Form.Item>
-                            <Button type="primary" htmlType="submit" loading={isLoading}>登 录</Button>
-                        </Form.Item>
-                    </Col>
-                </Row>
+            <Form.Item name="username" rules={[{required: true, message: '请输入用户名'}]}>
+                <Input prefix={<UserOutlined />} placeholder="用户名"/>
+            </Form.Item>
+            <Form.Item name="password" rules={[{required: true, message: '请输入密码'}]}>
+                <Input prefix={<KeyOutlined />} placeholder="密码" type="password"/>
+            </Form.Item>
+            <Form.Item>
+                <Button type="primary" htmlType="submit" loading={isLoading}>登 录</Button>
+            </Form.Item>
             </Form>
         </div>
     </div>

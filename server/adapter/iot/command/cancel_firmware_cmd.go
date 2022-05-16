@@ -29,16 +29,12 @@ func (cmd cancelFirmwareCmd) Qos() byte {
 	return 1
 }
 
-func (cmd cancelFirmwareCmd) Payload() []byte {
+func (cmd cancelFirmwareCmd) Payload() ([]byte, error) {
 	m := pd.CancelFirmwareCommand{
-		Timestamp: int32(time.Now().Unix()),
-		ReqId:     cmd.reqID,
+		Timestamp: int32(cmd.request.timestamp),
+		ReqId:     cmd.request.id,
 	}
-	payload, err := proto.Marshal(&m)
-	if err != nil {
-		return nil
-	}
-	return payload
+	return proto.Marshal(&m)
 }
 
 func (cmd cancelFirmwareCmd) Execute(ctx context.Context, gateway string, target string, timeout time.Duration) ([]byte, error) {

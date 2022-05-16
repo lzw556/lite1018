@@ -7,15 +7,16 @@ message ByeMessage {
 
 message LinkStatusMessage {
   int32 timestamp = 1;
+  string reqId = 2;
   int32 code = 3;
   string status = 4;
 }
 
-message AllLinkStatusMessage {
+message LinkStatesMessage {
   int32 timestamp = 1;
   string reqId = 2;
   int32 code = 3;
-  string allStatus = 4;
+  string states = 4;
 }
 
 message GeneralStatusMessage {
@@ -98,8 +99,8 @@ message LargeSensorDataMessage {
   string reqId = 2;
   int32 code = 3;
   int32 sessionId = 4;
-  int32 seqId = 5;
-  int32 isContinued = 6;
+  int32 segmentId = 5;
+  int32 numSegments = 6;
   int32 metaLength = 7;
   int32 dataLength = 8;
   bytes data = 9;
@@ -186,6 +187,12 @@ message GetDeviceInformationCommand {
   int32 subCommand = 3;
 }
 
+message GetWsnCommand {
+  int32 timestamp = 1;
+  string reqId = 2;
+  int32 subCommand = 3;
+}
+
 message GetDeviceStatusCommand {
   int32 timestamp = 1;
   string reqId = 2;
@@ -198,7 +205,13 @@ message GetDeviceSettingsCommand {
   int32 subCommand = 3;
 }
 
-message GetAllLinkStatusCommand {
+message GetLinkStatusCommand {
+  int32 timestamp = 1;
+  string reqId = 2;
+  int32 subCommand = 3;
+}
+
+message GetLinkStatesCommand {
   int32 timestamp = 1;
   string reqId = 2;
   int32 subCommand = 3;
@@ -212,29 +225,27 @@ message UpdateDeviceSettingsCommand {
   int32 lastUpdateTime = 5;
 }
 
-message UpdateWsnSettingsCommand {
+message UpdateWsnCommand {
   int32 timestamp = 1;
   string reqId = 2;
   int32 subCommand = 3;
-  int32 routingTableLength = 4;
-  bytes routingTable = 5;
-  string wsnSettings = 6;
-  int32 lastUpdateTime = 7;
+  string settings = 4;
+  int32 lastUpdateTime = 5;
 }
 
-message DeviceListItem {
+message DeviceItem {
   bytes mac = 1;
-  bytes name = 2;
-  int32 type = 3;
-  string model = 4;
+  bytes parentMac = 2;
+  bytes name = 3;
+  int32 type = 4;
   int32 modbusId = 5;
 }
 
-message UpdateDeviceListCommand {
+message UpdateDevicesCommand {
   int32 timestamp = 1;
   string reqId = 2;
   int32 subCommand = 3;
-  repeated DeviceListItem items = 10;
+  repeated DeviceItem items = 10;
 }
 
 message AddDeviceCommand {
@@ -243,10 +254,20 @@ message AddDeviceCommand {
   int32 subCommand = 3;
   bytes mac = 4;
   bytes parentMac = 5;
-  bytes name = 6;
+  bytes name = 6; 
   int32 type = 7;
-  string model = 8;
-  int32 modbusId = 9;
+  int32 modbusId = 8;
+}
+
+message UpdateDeviceCommand {
+  int32 timestamp = 1;
+  string reqId = 2;
+  int32 subCommand = 3;
+  bytes mac = 4;
+  bytes parentMac = 5;
+  bytes name = 6; 
+  int32 type = 7;
+  int32 modbusId = 8;
 }
 
 message DeleteDeviceCommand {
@@ -254,6 +275,12 @@ message DeleteDeviceCommand {
   string reqId = 2;
   int32 subCommand = 3;
   bytes mac = 4;
+}
+
+message ClearDevicesCommand {
+  int32 timestamp = 1;
+  string reqId = 2;
+  int32 subCommand = 3;
 }
 
 message SetTimeCommand {

@@ -12,32 +12,30 @@ type provisionCmd struct {
 }
 
 func newProvisionCmd() provisionCmd {
-	return provisionCmd{}
+	return provisionCmd{
+		request: newRequest(),
+	}
 }
 
 func (cmd provisionCmd) Name() string {
 	return "provision"
 }
 
+func (cmd provisionCmd) Response() string {
+	return "provisionResponse"
+}
+
 func (cmd provisionCmd) Qos() byte {
 	return 1
 }
 
-func (cmd provisionCmd) Payload() []byte {
+func (cmd provisionCmd) Payload() ([]byte, error) {
 	m := pd.ProvisionCommand{
 		Timestamp:  int32(time.Now().Unix()),
-		ReqId:      cmd.reqID,
+		ReqId:      cmd.id,
 		SubCommand: 2,
 	}
-	payload, err := proto.Marshal(&m)
-	if err != nil {
-		return nil
-	}
-	return payload
-}
-
-func (cmd provisionCmd) Response() string {
-	return "provisionResponse"
+	return proto.Marshal(&m)
 }
 
 func (cmd provisionCmd) Execute(ctx context.Context, gateway string, target string, timeout time.Duration) ([]byte, error) {

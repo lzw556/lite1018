@@ -7,6 +7,7 @@ import {GetMyProfile, UpdateMyProfile} from "../../apis/profile";
 import {User} from "../../types/user";
 import ShadowCard from "../../components/shadowCard";
 import MyBreadcrumb from "../../components/myBreadcrumb";
+import { isMobile } from "../../utils/deviceDetection";
 
 const MePage = () => {
     const [isPhoneEdit, setIsPhoneEdit] = useState<boolean>(false)
@@ -75,30 +76,30 @@ const MePage = () => {
                         <Form form={form}>
                             <p>
                                 <Row justify={"start"}>
-                                    <Col span={2} className="ts-label">
+                                    <Col span={isMobile ? 5 : 2} className="ts-label">
                                         账号名
                                     </Col>
-                                    <Col span={5}>
+                                    <Col span={isMobile ? 15 : 5}>
                                         {
                                             user?.username
                                         }
                                     </Col>
-                                    <Col span={2}>
+                                    {!isMobile && <Col span={2}>
 
-                                    </Col>
+                                    </Col>}
                                 </Row>
                             </p>
                             <p>
                                 <Row justify={"start"}>
-                                    <Col span={2} className="ts-label">
+                                    <Col span={isMobile ? 5 : 2} className="ts-label">
                                         手机号
                                     </Col>
-                                    <Col span={5}>
+                                    <Col span={isMobile ? 15 : 5}>
                                         {
                                             renderPhone()
                                         }
                                     </Col>
-                                    <Col span={2} offset={1}>
+                                    <Col span={isMobile ? 3 : 2} offset={1}>
                                         {
                                             isPhoneEdit ? (<a onClick={onSavePhone}>保存</a>) : (
                                                 <a onClick={() => setIsPhoneEdit(true)}>修改</a>)
@@ -108,15 +109,15 @@ const MePage = () => {
                             </p>
                             <p>
                                 <Row justify={"start"}>
-                                    <Col span={2} className="ts-label">
+                                    <Col span={isMobile ? 5 : 2} className="ts-label">
                                         邮箱地址
                                     </Col>
-                                    <Col span={5}>
+                                    <Col span={isMobile ? 15 : 5}>
                                         {
                                             renderEmail()
                                         }
                                     </Col>
-                                    <Col span={2} offset={1}>
+                                    <Col span={isMobile ? 3 : 2} offset={1}>
                                         {
                                             isEmailEdit ? (<a onClick={onSaveEmail}>保存</a>) : (
                                                 <a onClick={() => setIsEmailEdit(true)}>修改</a>)
@@ -129,13 +130,13 @@ const MePage = () => {
                     <br/>
                     <ShadowCard title="账号安全" bordered={false}>
                         <Row justify={"start"}>
-                            <Col span={2} className="ts-label">
+                            <Col span={isMobile ? 5 : 2} className="ts-label">
                                 密码
                             </Col>
-                            <Col span={5}>
+                            <Col span={isMobile ? 15 : 5}>
                                 ****************
                             </Col>
-                            <Col span={2} offset={1}>
+                            <Col span={isMobile ? 3 : 2} offset={1}>
                                 <a onClick={() => setIsPassEdit(true)}>修改</a>
                             </Col>
                         </Row>

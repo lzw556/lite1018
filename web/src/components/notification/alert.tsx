@@ -1,60 +1,49 @@
 import useSocket, {SocketTopic} from "../../socket";
-import {Button, notification, Space} from "antd";
+import {notification, Space} from "antd";
 import {useEffect} from "react";
-import {getRuleMethodString} from "../../types/alarm_rule_template";
 
 const AlertMessageNotification = () => {
     const {PubSub} = useSocket()
     const [api, contextHolder] = notification.useNotification();
 
-    const onAcknowledge = (id: number) => {
-
-    }
-
     useEffect(() => {
-        PubSub.subscribe(SocketTopic.alert, (msg: string, data: any) => {
+        PubSub.subscribe(SocketTopic.deviceAlert, (msg: string, data: any) => {
             console.log(data)
-            renderNotification(data.alarmRecord)
+            renderNotification(data)
         })
         return () => {
-            PubSub.unsubscribe(SocketTopic.alert)
+            PubSub.unsubscribe(SocketTopic.deviceAlert)
         }
     }, [])
 
-    const renderButtons = (id: number) => {
-        return <Space>
-            <Button type={"link"} size={"small"} onClick={() => onAcknowledge(id)}>标记为已处理</Button>
-            <Button type={"text"} size={"small"} onClick={() => notification.close(String(id))}>忽略</Button>
-        </Space>
-    }
-
     const renderNotification = (record: any) => {
+        console.log(`notification ${record.device}`)
         switch (record.level) {
             case 1:
                 api.info({
-                    key: String(record.id),
-                    message: `${record.measurement.name}报警`,
+                    key: record.device.macAddress,
+                    message: `次要报警`,
                     description: <div>{renderDescription(record)}</div>,
                 })
                 break
             case 2:
                 api.warning({
-                    key: String(record.id),
-                    message: `${record.measurement.name}报警`,
+                    key: record.device.macAddress,
+                    message: `重要报警`,
                     description: <div>{renderDescription(record)}</div>,
                 })
                 break
             case 3:
                 api.error({
-                    key: String(record.id),
-                    message: `${record.measurement.name}报警`,
+                    key: record.device.macAddress,
+                    message: `紧急报警`,
                     description: <div>{renderDescription(record)}</div>,
                 })
                 break
             default:
                 api.success({
-                    key: String(record.id),
-                    message: `${record.measurement.name}报警`,
+                    key: record.device.macAddress,
+                    message: `恢复正常`,
                     description: <div>{renderDescription(record)}</div>,
                 })
                 break
@@ -63,9 +52,9 @@ const AlertMessageNotification = () => {
 
     const renderDescription = (record:any) => {
         return <>
-            <p>{`报警属性: ${record.field.title}`}</p>
-            <p>{`统计方式: ${getRuleMethodString(record.rule.method)}`}</p>
-            <p>{`条件: ${record.rule.operation} ${record.value.toFixed(record.field.precision)}${record.field.unit}`}</p>
+            <p>{`报警设备: ${record.device.name}`}</p>
+            <p>{`报警属性: ${record.metric.name}`}</p>
+            <p>{`报警值: ${record.value}`}</p>
         </>
     }
 

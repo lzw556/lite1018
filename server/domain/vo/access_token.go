@@ -1,6 +1,8 @@
 package vo
 
-import "github.com/thetasensors/theta-cloud-lite/server/domain/po"
+import (
+	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
+)
 
 type AccessToken struct {
 	User  User   `json:"user"`
@@ -13,6 +15,6 @@ func NewAccessToken(token string) AccessToken {
 	}
 }
 
-func (a *AccessToken) SetUser(e po.User) {
+func (a *AccessToken) SetUser(e entity.User) {
 	a.User = NewUser(e)
 }

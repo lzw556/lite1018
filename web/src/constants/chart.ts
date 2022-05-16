@@ -153,7 +153,7 @@ export const DefaultMultiBarOption = {
         }
     },
     legend: {
-        data: ["提示", "重要", "紧急"]
+        data: ["次要", "重要", "紧急"]
     },
     grid: {
         left: '8%',

@@ -8,7 +8,7 @@ import (
 type Service interface {
 	GetNetworkByID(id uint) (*vo.Network, error)
 	FindNetworksByPaginate(filters request.Filters, page, size int) ([]vo.Network, int64, error)
-	FilterNetworks(filters request.Filters) ([]vo.Network, error)
+	FindNetworks(filters request.Filters) ([]vo.Network, error)
 	ImportNetwork(req request.ImportNetwork) error
 	CreateNetwork(req request.CreateNetwork) error
 
@@ -17,6 +17,7 @@ type Service interface {
 
 	ExportNetworkByID(id uint) (*vo.NetworkExportFile, error)
 	SyncNetworkByID(id uint) error
+	ProvisionNetworkByID(id uint) error
 
 	AddDevicesByID(id uint, req request.AddDevices) error
 	RemoveDevicesByID(id uint, req request.RemoveDevices) error

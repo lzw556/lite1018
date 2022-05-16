@@ -8,23 +8,26 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
-	"github.com/thetasensors/theta-cloud-lite/server/domain/po"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/json"
 	"time"
 )
 
 type DeviceStatus struct {
-	repository dependency.DeviceStatusRepository
+	repository  dependency.DeviceStateRepository
+	networkRepo dependency.NetworkRepository
+	deviceRepo  dependency.DeviceRepository
 }
 
 func NewDeviceStatus() Processor {
 	return newRoot(DeviceStatus{
-		repository: repository.DeviceStatus{},
+		repository:  repository.DeviceState{},
+		networkRepo: repository.Network{},
+		deviceRepo:  repository.Device{},
 	})
 }
 
 func (p DeviceStatus) Name() string {
-	return "DeviceStatus"
+	return "DeviceState"
 }
 
 func (DeviceStatus) Next() Processor {
@@ -36,13 +39,14 @@ func (p DeviceStatus) Process(ctx *iot.Context, msg iot.Message) error {
 		if device, ok := value.(entity.Device); ok {
 			m := pd.DeviceStatusMessage{}
 			if err := proto.Unmarshal(msg.Body.Payload, &m); err != nil {
-				return fmt.Errorf("unmarshal [DeviceStatus] message failed： %v", err)
+				return fmt.Errorf("unmarshal [DeviceState] message failed： %v", err)
 			}
-			var e po.DeviceStatus
+			var e entity.DeviceState
 			if err := json.Unmarshal([]byte(m.Status), &e); err != nil {
 				return fmt.Errorf("unmarshal device %s status %s failed: %v", device.MacAddress, m.Status, err)
 			}
-			e.Time = time.Now()
+			e.IsOnline = true
+			e.ConnectedAt = time.Now().UTC().Unix()
 			if err := p.repository.Create(device.MacAddress, e); err != nil {
 				return fmt.Errorf("save device status failed: %v", err)
 			}

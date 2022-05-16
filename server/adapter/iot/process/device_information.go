@@ -8,7 +8,6 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
-	"github.com/thetasensors/theta-cloud-lite/server/domain/po"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/json"
 )
 
@@ -37,12 +36,12 @@ func (p DeviceInformation) Process(ctx *iot.Context, msg iot.Message) error {
 			if err := proto.Unmarshal(msg.Body.Payload, &m); err != nil {
 				return fmt.Errorf("unmarshal [DeviceInformation] message failed: %v", err)
 			}
-			var e po.DeviceInformation
+			var e entity.DeviceInformation
 			if err := json.Unmarshal([]byte(m.Information), &e); err != nil {
 				return fmt.Errorf("unmarshal device %s information %s failed: %v", device.MacAddress, m.Information, err)
 			}
 			e.Timestamp = int64(m.Timestamp)
-			if err := p.repository.Create(device.ID, e); err != nil {
+			if err := p.repository.Create(device.MacAddress, e); err != nil {
 				return fmt.Errorf("save device information failed: %v", err)
 			}
 		}

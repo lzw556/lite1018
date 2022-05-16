@@ -45,13 +45,13 @@ func (a *Adapter) RegisterEvents(events ...event.Event) {
 
 func (a *Adapter) Run() error {
 	a.socket.OnConnect("/", func(c socketio.Conn) error {
-		xlog.Info(fmt.Sprintf("socket id %s connected", c.ID()))
+		xlog.Debug(fmt.Sprintf("socket id %s connected", c.ID()))
 		c.Emit("ready", fmt.Sprintf("socket connected: %s", c.ID()))
 		return nil
 	})
 
 	a.socket.OnDisconnect("/", func(c socketio.Conn, s string) {
-		xlog.Info(fmt.Sprintf("socket id %s disconnect", c.ID()))
+		xlog.Debug(fmt.Sprintf("socket id %s disconnect", c.ID()))
 		if err := c.Close(); err != nil {
 			xlog.Error("socket connection close failed.", err)
 		}
@@ -79,12 +79,10 @@ func (a *Adapter) Run() error {
 			log.Fatalln(err)
 		}
 	}()
-	http.Handle("/socket.io/", a.socket)
-	return http.ListenAndServe(":8291", nil)
+	return nil
 }
 
 func (a *Adapter) emit(event string, data interface{}) {
-	fmt.Println(data)
 	a.socket.BroadcastToNamespace("/", event, response.SuccessResponse(data))
 }
 
@@ -93,6 +91,10 @@ func (a *Adapter) Close() {
 	if err := a.socket.Close(); err != nil && err != io.EOF {
 		xlog.Errorf("socket server close failed: %s", err.Error())
 	}
+}
+
+func (a *Adapter) Server() *socketio.Server {
+	return a.socket
 }
 
 func (a *Adapter) NewID() string {

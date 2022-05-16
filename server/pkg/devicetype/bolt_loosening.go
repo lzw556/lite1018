@@ -13,12 +13,13 @@ func (BoltLoosening) SensorID() uint {
 func (BoltLoosening) Settings() Settings {
 	return []Setting{
 		{
-			Name:     "采集周期",
-			Key:      "schedule0_sample_period",
+			Name:     "采样周期",
+			Key:      "sample_period",
 			Type:     Uint32ValueType,
 			Value:    1200000, // 20 minutes
-			Category: SensorsSettingCategory,
 			Options:  samplePeriodOption1,
+			Category: SensorsSettingCategory,
+			Group:    SettingGroupGeneral,
 			Sort:     0,
 		},
 	}
@@ -29,31 +30,94 @@ func (BoltLoosening) Properties(sensorID uint) Properties {
 	case BoltAngleSensor:
 		return Properties{
 			{
-				Key:         "loosening_angle",
-				Name:        "松动角度",
-				Unit:        "°",
-				Precision:   3,
-				Type:        FloatPropertyType,
-				Sort:        0,
-				DataIndexes: []uint{0},
+				Key:       "loosening_angle",
+				Name:      "松动角度",
+				Unit:      "°",
+				Precision: 3,
+				Sort:      0,
+				IsShow:    true,
+				Fields: []Field{
+					{
+						Name:      "松动角度",
+						Key:       "loosening_angle",
+						DataIndex: 0,
+					},
+				},
 			},
 			{
-				Key:         "attitude",
-				Name:        "姿态指数",
-				Unit:        "",
-				Type:        FloatPropertyType,
-				Precision:   3,
-				Sort:        1,
-				DataIndexes: []uint{8},
+				Key:       "absolute_angle",
+				Name:      "绝对角度",
+				Unit:      "°",
+				Precision: 3,
+				Sort:      1,
+				IsShow:    false,
+				Fields: []Field{
+					{
+						Name:      "绝对角度",
+						Key:       "absolute_angle",
+						DataIndex: 1,
+					},
+				},
 			},
 			{
-				Key:         "motion",
-				Name:        "移动指数",
-				Unit:        "",
-				Type:        FloatPropertyType,
-				Precision:   3,
-				Sort:        2,
-				DataIndexes: []uint{5},
+				Key:       "attitude",
+				Name:      "姿态指数",
+				Unit:      "",
+				Precision: 3,
+				Sort:      2,
+				IsShow:    true,
+				Fields: []Field{
+					{
+						Name:      "姿态指数",
+						Key:       "attitude",
+						DataIndex: 8,
+					},
+				},
+			},
+			{
+				Key:       "motion",
+				Name:      "移动指数",
+				Unit:      "",
+				Precision: 3,
+				Sort:      4,
+				IsShow:    true,
+				Fields: []Field{
+					{
+						Name:      "移动指数",
+						Key:       "motion",
+						DataIndex: 5,
+					},
+				},
+			},
+			{
+				Key:       "measurement_index",
+				Name:      "测量指数",
+				Unit:      "",
+				Precision: 3,
+				Sort:      5,
+				IsShow:    true,
+				Fields: []Field{
+					{
+						Name:      "测量指数",
+						Key:       "measurement_index",
+						DataIndex: 6,
+					},
+				},
+			},
+			{
+				Key:       "temperature",
+				Name:      "温度",
+				Unit:      "°C",
+				Precision: 3,
+				Sort:      3,
+				IsShow:    true,
+				Fields: []Field{
+					{
+						Name:      "温度",
+						Key:       "temperature",
+						DataIndex: 10,
+					},
+				},
 			},
 		}
 	}

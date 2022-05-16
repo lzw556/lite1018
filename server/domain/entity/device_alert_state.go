@@ -1,86 +1,30 @@
 package entity
 
-import "github.com/thetasensors/theta-cloud-lite/server/domain/po"
-
 type DeviceAlertState struct {
-	States []DeviceAlarmState `json:"states"`
+	Rule struct {
+		ID     uint            `json:"id"`
+		Name   string          `json:"name"`
+		Metric AlarmRuleMetric `json:"metric"`
+		Level  uint8           `json:"level"`
+	} `json:"rule"`
+	Record struct {
+		ID    uint        `json:"id"`
+		Value interface{} `json:"value"`
+	} `json:"record"`
 }
 
 func (DeviceAlertState) BucketName() string {
 	return "ts_device_alert_state"
 }
 
-func (d *DeviceAlertState) UpdateAlarmState(alarmID uint, record po.AlarmRecord) {
-	for i, state := range d.States {
-		if state.AlarmID == alarmID {
-			state.Record.ID = record.ID
-			state.Record.Level = record.Level
-			state.Record.Timestamp = record.CreatedAt.Unix()
-			d.States[i] = state
-			return
-		}
-	}
-	state := DeviceAlarmState{
-		AlarmID: alarmID,
-	}
-	state.Record.ID = record.ID
-	state.Record.Level = record.Level
-	state.Record.Timestamp = record.CreatedAt.Unix()
-	d.States = append(d.States, state)
+func (state *DeviceAlertState) SetRule(e AlarmRule) {
+	state.Rule.ID = e.ID
+	state.Rule.Name = e.Name
+	state.Rule.Metric = e.Metric
+	state.Rule.Level = e.Level
 }
 
-func (d DeviceAlertState) GetAlarmState(alarmID uint) DeviceAlarmState {
-	for _, state := range d.States {
-		if state.AlarmID == alarmID {
-			return state
-		}
-	}
-	return DeviceAlarmState{}
-}
-
-func (d DeviceAlertState) GetRecentlyHighLevelAlarmState() DeviceAlarmState {
-	result := DeviceAlarmState{}
-	for _, state := range d.States {
-		if result.Record.Level < state.Record.Level {
-			result = state
-		} else if result.Record.Level == state.Record.Level && result.Record.Timestamp < state.Record.Timestamp {
-			result = state
-		}
-	}
-	return result
-}
-
-func (d *DeviceAlertState) RemoveAlarmState(alarmID uint) {
-	idx := 0
-	for i, state := range d.States {
-		if state.AlarmID == alarmID {
-			idx = i
-			break
-		}
-	}
-	d.States = append(d.States[:idx], d.States[idx+1:]...)
-}
-
-func (d *DeviceAlertState) Acknowledged(recordID uint) {
-	idx := 0
-	for i, state := range d.States {
-		if state.Record.ID == recordID {
-			idx = i
-			break
-		}
-	}
-	d.States = append(d.States[:idx], d.States[idx+1:]...)
-}
-
-func (d DeviceAlertState) GetLevel() uint {
-	level := uint(0)
-	for _, state := range d.States {
-		if state.Record.Level > level {
-			level = state.Record.Level
-		}
-		if level > 3 {
-			break
-		}
-	}
-	return level
+func (state *DeviceAlertState) SetRecord(e AlarmRecord) {
+	state.Record.ID = e.ID
+	state.Record.Value = e.Value
 }

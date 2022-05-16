@@ -1,6 +1,8 @@
 package vo
 
-import "github.com/thetasensors/theta-cloud-lite/server/domain/po"
+import (
+	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
+)
 
 type Permission struct {
 	ID          uint   `json:"id"`
@@ -10,7 +12,7 @@ type Permission struct {
 	Group       string `json:"group"`
 }
 
-func NewPermission(e po.Permission) Permission {
+func NewPermission(e entity.Permission) Permission {
 	return Permission{
 		ID:          e.ID,
 		Path:        e.Path,

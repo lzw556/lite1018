@@ -28,7 +28,6 @@ const EditAlarmRuleTemplate = () => {
                     measurement_type: data.measurementType,
                     rule: {
                         ...data.rule,
-                        field: data.rule.field,
                     },
                     description: data.description,
                     level: data.level,
@@ -98,7 +97,7 @@ const EditAlarmRuleTemplate = () => {
                                     <Select defaultActiveFirstOption={true}
                                             placeholder={"请选择报警级别"}
                                             style={{width: "200px"}}>
-                                        <Option key={1} value={1}>提示</Option>
+                                        <Option key={1} value={1}>次要</Option>
                                         <Option key={2} value={2}>重要</Option>
                                         <Option key={3} value={3}>紧急</Option>
                                     </Select>

@@ -44,9 +44,10 @@ func Redirect(ctx *gin.Context, err BusinessError) {
 	})
 }
 
-func BadRequest(ctx *gin.Context, err error) {
+func BadRequest(ctx *gin.Context, msg string, err error) {
 	ctx.JSON(http.StatusBadRequest, Result{
 		Code: http.StatusBadRequest,
+		Msg:  msg,
 		Data: err,
 	})
 }
@@ -87,7 +88,7 @@ func WriteFile(ctx *gin.Context, writer FileWriter) {
 	ctx.Header("Content-Disposition", "attachment; filename="+url.QueryEscape(writer.FileName()))
 	ctx.Header("Content-Transfer-Encoding", "binary")
 	if err := writer.Write(ctx.Writer); err != nil {
-		BadRequest(ctx, err)
+		BadRequest(ctx, "操作失败", err)
 	}
 }
 
@@ -96,6 +97,6 @@ func WriteBytes(ctx *gin.Context, filename string, bytes []byte) {
 	ctx.Header("Content-Disposition", "attachment; filename="+url.QueryEscape(filename))
 	ctx.Header("Content-Transfer-Encoding", "binary")
 	if _, err := ctx.Writer.Write(bytes); err != nil {
-		BadRequest(ctx, err)
+		BadRequest(ctx, "操作失败", err)
 	}
 }

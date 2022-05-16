@@ -2,27 +2,28 @@ package service
 
 import (
 	"context"
-	"errors"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/request"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/response"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/user"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
+	"github.com/thetasensors/theta-cloud-lite/server/domain/aggregate/factory"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
 	spec "github.com/thetasensors/theta-cloud-lite/server/domain/specification"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/vo"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/errcode"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/jwt"
 	"golang.org/x/crypto/bcrypt"
-	"gorm.io/gorm"
 )
 
 type User struct {
 	repository dependency.UserRepository
+	factory    factory.User
 }
 
 func NewUser() user.Service {
 	return User{
 		repository: repository.User{},
+		factory:    factory.NewUser(),
 	}
 }
 
@@ -45,20 +46,14 @@ func (s User) Login(req request.Login) (*vo.AccessToken, error) {
 }
 
 func (s User) CreateUser(req request.User) error {
-	ctx := context.TODO()
-	e, err := s.repository.GetBySpecs(ctx, spec.UsernameEqSpec(req.Username))
-	if !errors.Is(err, gorm.ErrRecordNotFound) {
-		return response.BusinessErr(errcode.UserExistsError, "")
+	cmd, err := s.factory.NewUserCreateCmd(req)
+	if err != nil {
+		return err
 	}
-	e.Username = req.Username
-	e.Password = req.Password
-	e.Email = req.Email
-	e.Phone = req.Phone
-	e.RoleID = req.Role
-	return s.repository.Create(ctx, &e)
+	return cmd.Run(req.Projects)
 }
 
-func (s User) UpdateUserByID(userID uint, req request.User) (*vo.User, error) {
+func (s User) UpdateUserByID(userID uint, req request.UpdateUser) (*vo.User, error) {
 	ctx := context.TODO()
 	e, err := s.repository.Get(ctx, userID)
 	if err != nil {
@@ -83,7 +78,7 @@ func (s User) GetUserByID(userID uint) (*vo.User, error) {
 	return &result, nil
 }
 
-func (s User) FindUsersByPaginate(page, size int) ([]vo.User, int64, error) {
+func (s User) PagingUsers(page, size int) ([]vo.User, int64, error) {
 	es, total, err := s.repository.Paging(context.TODO(), page, size)
 	if err != nil {
 		return nil, 0, err
@@ -96,12 +91,11 @@ func (s User) FindUsersByPaginate(page, size int) ([]vo.User, int64, error) {
 }
 
 func (s User) DeleteUserByID(userID uint) error {
-	ctx := context.TODO()
-	e, err := s.repository.Get(ctx, userID)
+	cmd, err := s.factory.NewUserDeleteCmd(userID)
 	if err != nil {
-		return response.BusinessErr(errcode.UserNotFoundError, "")
+		return err
 	}
-	return s.repository.Delete(ctx, e.ID)
+	return cmd.Run()
 }
 
 func (s User) UpdateProfileByUserID(userID uint, req request.Profile) (*vo.User, error) {
@@ -138,6 +132,6 @@ func (s User) UpdatePassByUserID(userID uint, req request.UserPass) error {
 	return s.repository.Save(ctx, &e)
 }
 
-func (s User) FilterUsers(filters request.Filters) ([]vo.User, error) {
+func (s User) FindUsers(filters request.Filters) ([]vo.User, error) {
 	return nil, nil
 }

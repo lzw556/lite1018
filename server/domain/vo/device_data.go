@@ -1,17 +1,28 @@
 package vo
 
-import (
-	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
-)
+import "time"
 
 type DeviceData struct {
-	Timestamp int64     `json:"timestamp"`
-	Values    []float32 `json:"values"`
+	Timestamp int64       `json:"timestamp"`
+	Values    interface{} `json:"values,omitempty"`
 }
 
-func NewDeviceData(e entity.SensorData) DeviceData {
+func NewDeviceData(time time.Time) DeviceData {
 	return DeviceData{
-		Timestamp: e.Time.UTC().Unix(),
-		Values:    e.Values,
+		Timestamp: time.UTC().Unix(),
 	}
+}
+
+type DeviceDataList []DeviceData
+
+func (list DeviceDataList) Len() int {
+	return len(list)
+}
+
+func (list DeviceDataList) Less(i, j int) bool {
+	return list[i].Timestamp > list[j].Timestamp
+}
+
+func (list DeviceDataList) Swap(i, j int) {
+	list[i], list[j] = list[j], list[i]
 }

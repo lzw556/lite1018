@@ -18,11 +18,7 @@ const AssetDashboardCard:FC<AssetDashboardCardProps> = ({values}) => {
     const renderAssetStatisticCard = (statistic: AssetStatistic) => {
         const total = statistic.devices.length
         const online = statistic.devices.filter((device: Device) => device.state.isOnline).length
-        const alert = statistic.devices.filter((device: Device) => device.alertState && device.alertState.level > 0).length
         return <Row justify={"start"}>
-            <Col span={12}>
-                <Statistic title={"报警设备"} value={alert} suffix={`/ ${total}`}/>
-            </Col>
             <Col span={12}>
                 <Statistic title={"在线设备"} value={online} suffix={`/ ${total}`}/>
             </Col>

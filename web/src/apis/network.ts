@@ -12,7 +12,7 @@ export function GetNetworksRequest() {
 }
 
 export function PagingNetworksRequest(filter: any, page: number, size: number) {
-    return request.get<PageResult<Network[]>>(`/networks?method=paging`, {...filter, page, size}).then(GetResponse)
+    return request.get<PageResult<Network[]>>(`/networks`, {...filter, page, size}).then(GetResponse)
 }
 
 export function AccessDevicesRequest(networkId: number, params: any) {
@@ -47,8 +47,12 @@ export function UpdateNetworkRequest(id: number, params: any) {
     return request.put<Network>(`/networks/${id}`, params).then(res => res.data)
 }
 
-export function SyncNetworkRequest(id: number) {
+export function NetworkSyncRequest(id: number) {
     return request.put(`/networks/${id}/sync`, null).then(res => res.data)
+}
+
+export function NetworkProvisionRequest(id: number) {
+    return request.put(`/networks/${id}/provision`, null).then(res => res.data)
 }
 
 export function DeleteNetworkRequest(id: number) {

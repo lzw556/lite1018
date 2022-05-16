@@ -1,5 +1,4 @@
 import {DeviceType} from "./device_type";
-import {WsnSetting} from "./wsn_setting";
 import {Property} from "./property";
 import {AlertState} from "./alert_state";
 import {Network} from "./network";
@@ -8,19 +7,16 @@ export type Device = {
     id: number
     name: string
     macAddress: string
+    parent: string
     typeId: DeviceType
     asset: { id: number, name: string }
-    ipn: Map<string, any>
-    system: Map<string, any>
-    sensors: Map<string, any>
-    wsn?: WsnSetting
+    settings: any[]
     state?: any
-    upgradeState?: any
-    alertState?: AlertState
-    accessState: number
+    upgradeStatus?: any
+    alertStates?: { rule: { id: number; level: number }; record: { id: number; value: number } }[];
     network?: Network
     information?: any
-    category: number
     properties: Property[]
-    binding: any
+    dataTypes: number[]
+    data?: any
 }

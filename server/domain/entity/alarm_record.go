@@ -1,14 +1,37 @@
 package entity
 
-import "github.com/thetasensors/theta-cloud-lite/server/domain/po"
+import "gorm.io/gorm"
+
+type AlarmRecordStatus uint
+
+const (
+	AlarmRecordStatusUntreated AlarmRecordStatus = iota
+	AlarmRecordStatusResolved
+	AlarmRecordStatusRecovered
+)
 
 type AlarmRecord struct {
-	po.AlarmRecord
+	gorm.Model
+	AlarmRuleID  uint `gorm:"not null;index"`
+	SourceID     uint
+	Metric       AlarmRuleMetric `gorm:"type:json"`
+	Value        float64
+	Level        uint8
+	Threshold    float64
+	Operation    string            `gorm:"type:varchar(8)"`
+	Status       AlarmRecordStatus `gorm:"default:0;not null;"`
+	ProjectID    uint              `gorm:"index"`
+	Category     AlarmRuleCategory
+	Acknowledged bool `gorm:"default:false;not null;"`
 }
 
-func (r *AlarmRecord) Acknowledge() {
-	r.Acknowledged = true
-	r.Status = po.AlarmRecordStatusResolved
+func (AlarmRecord) TableName() string {
+	return "ts_alarm_record"
+}
+
+func (a *AlarmRecord) Acknowledge() {
+	a.Acknowledged = true
+	a.Status = AlarmRecordStatusResolved
 }
 
 type AlarmRecords []AlarmRecord

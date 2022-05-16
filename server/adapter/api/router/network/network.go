@@ -29,6 +29,7 @@ func (r *networkRouter) initRoutes() {
 		// PUT
 		router.NewPutRoute("networks/:id", r.update),
 		router.NewPutRoute("networks/:id/sync", r.sync),
+		router.NewPutRoute("networks/:id/provision", r.provision),
 
 		// PATCH
 		router.NewPatchRoute("networks/:id/devices", r.addDevices),

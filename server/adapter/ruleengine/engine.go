@@ -5,8 +5,8 @@ import (
 	"context"
 	"github.com/bilibili/gengine/engine"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
-	"github.com/thetasensors/theta-cloud-lite/server/domain/po"
-	"github.com/thetasensors/theta-cloud-lite/server/pkg/xlog"
+	"github.com/thetasensors/theta-cloud-lite/server/adapter/ruleengine/rule"
+	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 )
 
 var pool *engine.GenginePool
@@ -26,22 +26,24 @@ func Init() {
 }
 
 func initRules() {
-	alarmRepo := repository.Alarm{}
-	alarms, err := alarmRepo.FindBySpecs(context.TODO())
+	alarmRuleRepo := repository.AlarmRule{}
+	alarmRules, err := alarmRuleRepo.FindBySpecs(context.TODO())
 	if err != nil {
 		panic(err)
 	}
-	if len(alarms) > 0 {
-		if err := UpdateRules(alarms...); err != nil {
+	if len(alarmRules) > 0 {
+		if err := UpdateRules(alarmRules...); err != nil {
 			panic(err)
 		}
 	}
 }
 
-func UpdateRules(alarms ...po.Alarm) error {
+func UpdateRules(alarmRules ...entity.AlarmRule) error {
 	buf := bytes.Buffer{}
-	for _, a := range alarms {
-		buf.WriteString(a.RuleSpec())
+	for _, r := range alarmRules {
+		if s := r.RuleSpec(); len(s) > 0 {
+			buf.WriteString(s)
+		}
 	}
 	return pool.UpdatePooledRulesIncremental(buf.String())
 }
@@ -50,15 +52,17 @@ func RemoveRules(names ...string) error {
 	return pool.RemoveRules(names)
 }
 
-func ExecuteSelectedRules(m po.Measurement, alarms []po.Alarm) {
-	for _, alarm := range alarms {
-		s := NewMeasurementAlert(m, alarm)
-		data := map[string]interface{}{}
-		data["scene"] = s
-		err, _ := pool.ExecuteSelectedRules(data, []string{alarm.Name})
-		if err != nil {
-			xlog.Errorf("rule %s execute failed: %v", alarm.Name, err)
-			return
+func ExecuteSelectedRules(sourceID uint, rules ...entity.AlarmRule) {
+	for _, r := range rules {
+		var alert Rule
+		if r.IsEnabled() {
+			switch r.Category {
+			case entity.AlarmRuleCategoryDevice:
+				alert = rule.NewDeviceAlert(sourceID, r)
+			}
+			if err := alert.Execute(pool); err != nil {
+				return
+			}
 		}
 	}
 }

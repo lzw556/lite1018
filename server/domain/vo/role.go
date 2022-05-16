@@ -1,6 +1,8 @@
 package vo
 
-import "github.com/thetasensors/theta-cloud-lite/server/domain/po"
+import (
+	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
+)
 
 type Role struct {
 	ID          uint        `json:"id"`
@@ -10,7 +12,7 @@ type Role struct {
 	Permissions [][2]string `json:"permissions"`
 }
 
-func NewRole(e po.Role) Role {
+func NewRole(e entity.Role) Role {
 	return Role{
 		ID:          e.ID,
 		Name:        e.Name,
@@ -18,7 +20,7 @@ func NewRole(e po.Role) Role {
 	}
 }
 
-func (r *Role) SetMenus(es []po.RoleMenuRelation) {
+func (r *Role) SetMenus(es []entity.RoleMenuRelation) {
 	r.Menus = make([]uint, len(es))
 	for i, e := range es {
 		r.Menus[i] = e.MenuID

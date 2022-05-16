@@ -9,15 +9,15 @@ let socket: any = null
 
 export const SocketTopic = {
     connectionState: "connectionState",
-    upgradeState: "upgradeState",
-    alert: "alert"
+    upgradeStatus: "upgradeStatus",
+    deviceAlert: "deviceAlert",
 }
 
 const useSocket = () => {
 
     if (isLogin()) {
         if (!socket) {
-            socket = io.connect(":8291/", {
+            socket = io.connect("/", {
                 transports: ["websocket"]
             })
         }
@@ -28,27 +28,32 @@ const useSocket = () => {
             socket.on("ready", (data: any) => {
                 console.log(data)
             })
-            socket.on('socket::deviceConnectionStateChanged', (res: ResponseResult<any>) => {
+            socket.on('socket::deviceStateChangedEvent', (res: ResponseResult<any>) => {
                 if (res.code === 200) {
                     PubSub.publish(SocketTopic.connectionState, {
-                        id: res.data.id,
-                        isOnline: res.data.connectionState.isOnline,
-                        connectAt: res.data.connectionState.connectAt
+                        macAddress: res.data.macAddress,
+                        isOnline: res.data.state.isOnline,
+                        connectAt: res.data.state.connectedAt
                     })
                 }
             })
-            socket.on('socket::deviceUpgradeStateChanged', (res: ResponseResult<any>) => {
+            socket.on('socket::deviceUpgradeStatusChangedEvent', (res: ResponseResult<any>) => {
                 if (res.code === 200) {
-                    PubSub.publish(SocketTopic.upgradeState, {
-                        id: res.data.id,
-                        status: res.data.upgradeState.status,
-                        progress: res.data.upgradeState.progress,
+                    PubSub.publish(SocketTopic.upgradeStatus, {
+                        macAddress: res.data.macAddress,
+                        code: res.data.code,
+                        progress: res.data.progress,
                     })
                 }
             })
-            socket.on("socket::measurementAlertMessage", (res: ResponseResult<any>) => {
+            socket.on("socket::deviceAlertStateEvent", (res: ResponseResult<any>) => {
                 if (res.code === 200) {
-                    PubSub.publish(SocketTopic.alert, res.data)
+                    PubSub.publish(SocketTopic.deviceAlert, {
+                        device: res.data.device,
+                        metric: res.data.metric,
+                        value: res.data.value,
+                        level: res.data.level,
+                    })
                 }
             })
         }

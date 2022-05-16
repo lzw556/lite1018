@@ -6,7 +6,7 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/permission"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
-	"github.com/thetasensors/theta-cloud-lite/server/domain/po"
+	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/vo"
 )
 
@@ -21,7 +21,7 @@ func NewPermission() permission.Service {
 }
 
 func (s Permission) CreatePermission(req request.Permission) error {
-	e := po.Permission{
+	e := entity.Permission{
 		Path:        req.Path,
 		Method:      req.Method,
 		Description: req.Description,

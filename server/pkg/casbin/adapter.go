@@ -3,46 +3,39 @@ package casbin
 import (
 	"github.com/casbin/casbin/v2"
 	"github.com/casbin/casbin/v2/model"
-	gormadapter "github.com/casbin/gorm-adapter/v3"
-	"gorm.io/gorm"
+	scas "github.com/qiangmzsx/string-adapter/v2"
 	"sync"
 )
 
 var (
-	syncedEnforcer *casbin.SyncedEnforcer
-	once           sync.Once
+	enforcer *casbin.Enforcer
+	once     sync.Once
+	policies string
 )
 
-type adapter struct {
-	model string
-	db    *gorm.DB
-}
-
-var a *adapter
-
-func Init(model string, db *gorm.DB) {
-	a = &adapter{
-		model: model,
-		db:    db,
-	}
-}
-
-func Clear(v int, p ...string) bool {
-	e := Enforcer()
-	success, _ := e.RemoveFilteredPolicy(v, p...)
-	return success
-}
-
-func Enforcer() *casbin.SyncedEnforcer {
+func Init(rbacModel string, rbacPolicies string) {
 	once.Do(func() {
-		dbAdapter, _ := gormadapter.NewAdapterByDB(a.db)
-		m, _ := model.NewModelFromString(a.model)
-		syncedEnforcer, _ = casbin.NewSyncedEnforcer(m, dbAdapter)
+		policies = rbacPolicies
+		m, err := model.NewModelFromString(rbacModel)
+		if err != nil {
+			panic(err)
+		}
+		a := scas.NewAdapter(rbacPolicies)
+		enforcer, err = casbin.NewEnforcer(m, a)
+		if err != nil {
+			panic(err)
+		}
 	})
-	_ = syncedEnforcer.LoadPolicy()
-	return syncedEnforcer
 }
 
-func Model() string {
-	return a.model
+func Enforce(role string, path string, method string) (bool, error) {
+	return enforcer.Enforce(role, path, method)
+}
+
+func GetFilteredPolicy(role string) [][]string {
+	return enforcer.GetFilteredPolicy(0, role)
+}
+
+func Policies() string {
+	return policies
 }

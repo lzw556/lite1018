@@ -3,19 +3,17 @@ package vo
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
-	"github.com/thetasensors/theta-cloud-lite/server/domain/po"
-	"github.com/thetasensors/theta-cloud-lite/server/pkg/devicetype"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/json"
-	"sort"
 )
 
 type ExportDevice struct {
-	ID       uint   `json:"id"`
-	Name     string `json:"name"`
-	Address  string `json:"address"`
-	Type     uint   `json:"type"`
-	Settings string `json:"settings"`
-	Modbus   int    `json:"modbus"`
+	ID            uint                              `json:"id"`
+	Name          string                            `json:"name"`
+	Address       string                            `json:"address"`
+	ParentAddress string                            `json:"parentAddress"`
+	Type          uint                              `json:"type"`
+	Settings      map[string]map[string]interface{} `json:"settings"`
+	Modbus        int                               `json:"modbus"`
 }
 
 type ExportDevices []ExportDevice
@@ -33,61 +31,53 @@ func (e ExportDevices) Swap(i, j int) {
 }
 
 type NetworkExportFile struct {
-	Name         string                 `json:"-"`
-	Settings     map[string]interface{} `json:"settings"`
-	RoutingTable po.RoutingTables       `json:"routingTable"`
-	DeviceList   ExportDevices          `json:"deviceList"`
+	GatewayID  uint                   `json:"-"`
+	Name       string                 `json:"-"`
+	Wsn        map[string]interface{} `json:"wsn"`
+	DeviceList ExportDevices          `json:"deviceList"`
 }
 
 func NewNetworkExportFile(e entity.Network) NetworkExportFile {
 	n := NetworkExportFile{
-		Name: e.Name,
-		Settings: map[string]interface{}{
-			"wsn": map[string]interface{}{
-				"communication_period":      e.CommunicationPeriod,
-				"communication_time_offset": e.CommunicationTimeOffset,
-				"group_interval":            e.GroupInterval,
-				"group_size":                e.GroupSize,
-			},
+		GatewayID: e.GatewayID,
+		Name:      e.Name,
+		Wsn: map[string]interface{}{
+			"communication_period": e.CommunicationPeriod,
+			"communication_offset": e.CommunicationTimeOffset,
+			"group_interval":       e.GroupInterval,
+			"group_size":           e.GroupSize,
 		},
-		RoutingTable: e.RoutingTables,
 	}
 	return n
 }
 
 func (n *NetworkExportFile) AddDevices(es []entity.Device) {
-	n.DeviceList = make(ExportDevices, len(es))
+	n.DeviceList = make(ExportDevices, 0)
 	for i, e := range es {
-		n.DeviceList[i] = ExportDevice{
-			ID:      uint(i),
-			Name:    e.Name,
-			Address: e.MacAddress,
-			Modbus:  0,
-			Type:    e.Type,
+		export := ExportDevice{
+			ID:            uint(i),
+			Name:          e.Name,
+			Address:       e.MacAddress,
+			ParentAddress: e.Parent,
+			Modbus:        0,
+			Type:          e.Type,
 		}
-		var exportSettings struct {
-			Ipn     map[string]interface{} `json:"ipn"`
-			Sensors map[string]interface{} `json:"sensors"`
-			System  map[string]interface{} `json:"system"`
-		}
+		export.Settings = map[string]map[string]interface{}{}
 		for _, setting := range e.Settings {
-			switch devicetype.SettingCategory(setting.Category) {
-			case devicetype.IpnSettingCategory:
-				exportSettings.Ipn[setting.Key] = setting.Value
-			case devicetype.SensorsSettingCategory:
-				exportSettings.Sensors[setting.Key] = setting.Value
-			case devicetype.SystemSettingCategory:
-				exportSettings.System[setting.Key] = setting.Value
+			if _, ok := export.Settings[setting.Category]; ok {
+				export.Settings[setting.Category][setting.Key] = setting.Value
+			} else {
+				export.Settings[setting.Category] = map[string]interface{}{
+					setting.Key: setting.Value,
+				}
 			}
 		}
-		bytes, err := json.Marshal(exportSettings)
-		if err != nil {
-			n.DeviceList[i].Settings = "{}"
+		if n.GatewayID == e.ID {
+			n.DeviceList = append([]ExportDevice{export}, n.DeviceList...)
 		} else {
-			n.DeviceList[i].Settings = string(bytes)
+			n.DeviceList = append(n.DeviceList, export)
 		}
 	}
-	sort.Sort(n.DeviceList)
 }
 
 func (n NetworkExportFile) FileName() string {

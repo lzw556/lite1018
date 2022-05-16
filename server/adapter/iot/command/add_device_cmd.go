@@ -6,26 +6,20 @@ import (
 	"fmt"
 	"github.com/gogo/protobuf/proto"
 	pd "github.com/thetasensors/theta-cloud-lite/server/adapter/iot/proto"
+	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/utils"
 	"time"
 )
 
 type addDeviceCmd struct {
-	request request
-	reqID   string
-	mac     string
-	parent  string
-	name    string
-	typeID  uint
+	request
+	device entity.Device
 }
 
-func newAddDeviceCmd(name, mac, parent string, typeID uint) addDeviceCmd {
+func newAddDeviceCmd(device entity.Device) addDeviceCmd {
 	return addDeviceCmd{
 		request: newRequest(),
-		name:    name,
-		mac:     mac,
-		parent:  parent,
-		typeID:  typeID,
+		device:  device,
 	}
 }
 
@@ -41,20 +35,16 @@ func (cmd addDeviceCmd) Qos() byte {
 	return 1
 }
 
-func (cmd addDeviceCmd) Payload() []byte {
+func (cmd addDeviceCmd) Payload() ([]byte, error) {
 	m := pd.AddDeviceCommand{
-		Timestamp: int32(time.Now().Unix()),
-		ReqId:     cmd.reqID,
-		Type:      int32(cmd.typeID),
-		Name:      utils.StringToBytes(binary.BigEndian, fmt.Sprintf("%x", cmd.name)),
-		Mac:       utils.StringToBytes(binary.BigEndian, cmd.mac),
-		ParentMac: utils.StringToBytes(binary.BigEndian, cmd.parent),
+		Timestamp: int32(cmd.request.timestamp),
+		ReqId:     cmd.id,
+		Type:      int32(cmd.device.Type),
+		Name:      utils.StringToBytes(binary.BigEndian, fmt.Sprintf("%x", cmd.device.Name)),
+		Mac:       utils.StringToBytes(binary.BigEndian, cmd.device.MacAddress),
+		ParentMac: utils.StringToBytes(binary.BigEndian, cmd.device.Parent),
 	}
-	payload, err := proto.Marshal(&m)
-	if err != nil {
-		return nil
-	}
-	return payload
+	return proto.Marshal(&m)
 }
 
 func (cmd addDeviceCmd) Execute(ctx context.Context, gateway string, target string, timeout time.Duration) ([]byte, error) {

@@ -3,9 +3,8 @@ package crontask
 import (
 	"context"
 	"github.com/robfig/cron/v3"
+	"github.com/thetasensors/theta-cloud-lite/server/adapter/crontask/job"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
-	"github.com/thetasensors/theta-cloud-lite/server/domain/po"
-	spec "github.com/thetasensors/theta-cloud-lite/server/domain/specification"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/xlog"
 	"sync"
 )
@@ -23,28 +22,24 @@ func NewAdapter() *Adapter {
 		entityIDs: make(map[string]cron.EntryID),
 		mu:        sync.RWMutex{},
 	}
-	a.initMeasurementJobs()
+	//a.initJobs()
 	return a
-
 }
 
-func (a *Adapter) initMeasurementJobs() {
-	repo := repository.Measurement{}
-	es, err := repo.FindBySpecs(context.TODO(), spec.ModeEqSpec(po.PollingAcquisitionMode))
-	if err != nil {
-		xlog.Error("init measurement jobs", err)
-		return
+func (a *Adapter) initJobs() {
+	networkRepo := repository.Network{}
+	if networks, err := networkRepo.Find(context.TODO()); err == nil {
+		jobs := make([]Job, len(networks))
+		for i, network := range networks {
+			jobs[i] = job.NewNetwork(network)
+		}
+		a.AddJobs(jobs...)
 	}
-	jobs := make([]Job, len(es))
-	for i, e := range es {
-		jobs[i] = NewMeasurementDataJob(e)
-	}
-	a.AddJobs(jobs...)
 }
 
 func (a *Adapter) AddJobs(jobs ...Job) {
 	for _, j := range jobs {
-		xlog.Infof("add job [%s] to cron task", j.ID())
+		xlog.Infof("add job to cron task => [%s]", j.ID())
 		if _, ok := a.getEntity(j.ID()); !ok {
 			entityID := a.cron.Schedule(j.Schedule(), j)
 			a.setEntity(j, entityID)
@@ -71,9 +66,8 @@ func (a *Adapter) getEntity(id string) (cron.EntryID, bool) {
 	return value, ok
 }
 
-func (a *Adapter) Run() error {
+func (a *Adapter) Run() {
 	a.cron.Run()
-	return nil
 }
 
 func (a *Adapter) Stop() {

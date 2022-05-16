@@ -6,17 +6,21 @@ import {Button, Popconfirm, Space} from "antd";
 import {DeleteOutlined, EditOutlined, PlusOutlined} from "@ant-design/icons";
 import {useCallback, useEffect, useState} from "react";
 import {PageResult} from "../../types/page";
-import {PagingProjectsRequest} from "../../apis/project";
+import {DeleteProjectRequest, PagingProjectsRequest} from "../../apis/project";
 import EditProjectModal from "./editProjectModal";
 import {Project} from "../../types/project";
 import AllocUserDrawer from "./allocUserDrawer";
+import {store} from "../../store";
+import HasPermission from "../../permission";
+import usePermission, {Permission} from "../../permission/permission";
 
 const ProjectPage = () => {
     const [visible, setVisible] = useState(false);
     const [allocVisible, setAllocVisible] = useState(false);
     const [dataSource, setDataSource] = useState<PageResult<any>>();
     const [refreshKey, setRefreshKey] = useState(0);
-    const [project, setProject] = useState<Project>()
+    const [project, setProject] = useState<Project>();
+    const {hasPermissions} = usePermission();
 
     const fetchProjects = useCallback((current: number, size: number) => {
         PagingProjectsRequest(current, size).then(setDataSource);
@@ -41,7 +45,13 @@ const ProjectPage = () => {
     };
 
     const onDelete = (id: number) => {
-
+        DeleteProjectRequest(id).then(() => {
+            store.dispatch({
+                type: "SET_PROJECT",
+                payload: 0
+            });
+            window.location.reload();
+        });
     };
 
     const columns = [
@@ -58,13 +68,21 @@ const ProjectPage = () => {
         {
             title: '操作',
             key: 'action',
+            width: "20%",
             render: (_: any, record: any) => {
                 return <Space>
-                    <Button type={"link"} size={"small"} onClick={() => onAllocUser(record)}>分配用户</Button>
-                    <Button type={"text"} size={"small"} onClick={() => onEdit(record)}><EditOutlined/></Button>
-                    <Popconfirm title={"确定要删除该项目吗?"} onConfirm={() => onDelete(record.id)}>
-                        <Button type={"text"} size={"small"} danger><DeleteOutlined/></Button>
-                    </Popconfirm>
+                    {
+                        hasPermissions(Permission.ProjectAllocUser, Permission.ProjectAllocUserGet) &&
+                        <Button type={"link"} size={"small"} onClick={() => onAllocUser(record)}>分配用户</Button>
+                    }
+                    <HasPermission value={Permission.ProjectEdit}>
+                        <Button type={"text"} size={"small"} onClick={() => onEdit(record)}><EditOutlined/></Button>
+                    </HasPermission>
+                    <HasPermission value={Permission.ProjectDelete}>
+                        <Popconfirm title={"确定要删除该项目吗?"} onConfirm={() => onDelete(record.id)}>
+                            <Button type={"text"} size={"small"} danger><DeleteOutlined/></Button>
+                        </Popconfirm>
+                    </HasPermission>
                 </Space>
             }
         }
@@ -72,13 +90,16 @@ const ProjectPage = () => {
 
     return <Content>
         <MyBreadcrumb>
-            <Space>
-                <Button type={"primary"} onClick={() => setVisible(true)}>添加项目<PlusOutlined/></Button>
-            </Space>
+            <HasPermission value={Permission.ProjectAdd}>
+                <Space>
+                    <Button type={"primary"} onClick={() => setVisible(true)}>添加项目<PlusOutlined/></Button>
+                </Space>
+            </HasPermission>
         </MyBreadcrumb>
         <ShadowCard>
             <TableLayout
                 emptyText={"项目列表为空"}
+                permissions={[Permission.ProjectEdit, Permission.ProjectDelete, Permission.ProjectAllocUserGet, Permission.ProjectAllocUser]}
                 dataSource={dataSource}
                 onPageChange={fetchProjects}
                 columns={columns}/>

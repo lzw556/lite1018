@@ -1,28 +1,35 @@
 package api
 
 import (
+	"context"
 	"embed"
-	"github.com/fvbock/endless"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/gzip"
 	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
+	socketio "github.com/googollee/go-socket.io"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/middleware"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/response"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/vo"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/xlog"
+	"golang.org/x/sync/errgroup"
+	"net/http"
 )
 
 type Adapter struct {
 	engine      *gin.Engine
 	routers     []router.Router
 	middlewares []middleware.Middleware
+	server      *http.Server
 }
 
 func NewAdapter() *Adapter {
 	a := Adapter{
 		engine: gin.New(),
+		server: &http.Server{
+			Addr: ":8290",
+		},
 	}
 	return &a
 }
@@ -37,6 +44,11 @@ func (a *Adapter) StaticFS(dist embed.FS) {
 
 func (a *Adapter) UseMiddleware(middlewares ...middleware.Middleware) {
 	a.middlewares = append(a.middlewares, middlewares...)
+}
+
+func (a Adapter) Socket(server *socketio.Server) {
+	a.engine.GET("/socket.io/*any", gin.WrapH(server))
+	a.engine.POST("/socket.io/*any", gin.WrapH(server))
 }
 
 func (a *Adapter) Run() error {
@@ -56,12 +68,19 @@ func (a *Adapter) Run() error {
 			group.Handle(route.Method(), route.Path(), a.errorWrapper(route.Handler()))
 		}
 	}
-	s := endless.NewServer(":8290", a.engine)
-	return s.ListenAndServe()
+	a.server.Handler = a.engine
+	var eg errgroup.Group
+	eg.Go(func() error {
+		return a.server.ListenAndServe()
+	})
+	return eg.Wait()
 }
 
 func (a *Adapter) Close() {
 	xlog.Info("shutdown api server")
+	if err := a.server.Shutdown(context.Background()); err != nil {
+		xlog.Error("shutdown api server error", err)
+	}
 }
 
 func (a *Adapter) errorWrapper(handler middleware.ErrorWrapperHandler) gin.HandlerFunc {
@@ -69,7 +88,7 @@ func (a *Adapter) errorWrapper(handler middleware.ErrorWrapperHandler) gin.Handl
 		data, err := handler(ctx)
 		switch err := err.(type) {
 		case response.InvalidParameterError:
-			response.BadRequest(ctx, err)
+			response.BadRequest(ctx, "无效的参数", err)
 		case response.BusinessError:
 			response.SuccessWithBusinessError(ctx, err)
 		default:
@@ -83,7 +102,7 @@ func (a *Adapter) errorWrapper(handler middleware.ErrorWrapperHandler) gin.Handl
 					response.WriteFile(ctx, writer)
 					return
 				}
-				response.BadRequest(ctx, response.UnknownBusinessErr(nil))
+				response.BadRequest(ctx, "无效的返回类型", nil)
 			default:
 				response.Success(ctx, data)
 			}

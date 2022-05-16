@@ -1,6 +1,8 @@
 package vo
 
-import "github.com/thetasensors/theta-cloud-lite/server/domain/po"
+import (
+	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
+)
 
 type Project struct {
 	ID          uint   `json:"id"`
@@ -8,7 +10,7 @@ type Project struct {
 	Description string `json:"description"`
 }
 
-func NewProject(e po.Project) Project {
+func NewProject(e entity.Project) Project {
 	return Project{
 		ID:          e.ID,
 		Name:        e.Name,

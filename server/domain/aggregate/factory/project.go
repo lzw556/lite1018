@@ -25,25 +25,10 @@ func NewProject() Project {
 	}
 }
 
-func (factory Project) NewProjectQuery(id uint) (*query.ProjectQuery, error) {
-	e, err := factory.projectRepo.Get(context.TODO(), id)
-	if err != nil {
-		return nil, response.BusinessErr(errcode.ProjectNotFoundError, "")
-	}
+func (factory Project) NewProjectQuery(filters request.Filters) *query.ProjectQuery {
 	q := query.NewProjectQuery()
-	q.Project = e
-	return &q, nil
-}
-
-func (factory Project) NewProjectFilterQuery(filters request.Filters) (*query.ProjectFilterQuery, error) {
-	specs := factory.buildSpecs(filters)
-	es, err := factory.projectRepo.FindBySpecs(context.TODO(), specs...)
-	if err != nil {
-		return nil, err
-	}
-	q := query.NewProjectFilterQuery()
-	q.Projects = es
-	return &q, nil
+	q.Specs = factory.buildSpecs(filters)
+	return &q
 }
 
 func (factory Project) NewProjectUpdateCmd(id uint) (*command.ProjectUpdateCmd, error) {
@@ -56,13 +41,23 @@ func (factory Project) NewProjectUpdateCmd(id uint) (*command.ProjectUpdateCmd, 
 	return &cmd, nil
 }
 
+func (factory Project) NewProjectDeleteCmd(id uint) (*command.ProjectDeleteCmd, error) {
+	e, err := factory.projectRepo.Get(context.TODO(), id)
+	if err != nil {
+		return nil, response.BusinessErr(errcode.ProjectNotFoundError, "")
+	}
+	cmd := command.NewProjectDeleteCmd()
+	cmd.Project = e
+	return &cmd, nil
+}
+
 func (factory Project) buildSpecs(filters request.Filters) []spec.Specification {
 	specs := make([]spec.Specification, 0)
-	for _, filter := range filters {
-		switch filter.Name {
+	for name, v := range filters {
+		switch name {
 		case "user_id":
-			if cast.ToUint(filter.Value) != 1 {
-				if relations, err := factory.userProjectRelationRepo.FindBySpecs(context.TODO(), spec.UserEqSpec(cast.ToUint(filter.Value))); err == nil {
+			if cast.ToUint(v) != 1 {
+				if relations, err := factory.userProjectRelationRepo.FindBySpecs(context.TODO(), spec.UserEqSpec(cast.ToUint(v))); err == nil {
 					primaryKeyInSpec := make(spec.PrimaryKeyInSpec, len(relations))
 					for i, relation := range relations {
 						primaryKeyInSpec[i] = relation.ProjectID

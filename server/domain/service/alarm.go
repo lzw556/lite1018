@@ -2,220 +2,148 @@ package service
 
 import (
 	"context"
-	"github.com/spf13/cast"
+	"errors"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/request"
-	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/response"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/alarm"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
-	"github.com/thetasensors/theta-cloud-lite/server/adapter/ruleengine"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/aggregate/factory"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
-	"github.com/thetasensors/theta-cloud-lite/server/domain/po"
 	spec "github.com/thetasensors/theta-cloud-lite/server/domain/specification"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/vo"
-	"github.com/thetasensors/theta-cloud-lite/server/pkg/errcode"
-	"github.com/thetasensors/theta-cloud-lite/server/pkg/transaction"
+	"gorm.io/gorm"
+	"time"
 )
 
 type Alarm struct {
-	template   dependency.AlarmTemplateRepository
-	repository dependency.AlarmRepository
-	record     dependency.AlarmRecordRepository
-	factory    factory.Alarm
+	factory factory.Alarm
+	rule    dependency.AlarmRuleRepository
+	record  dependency.AlarmRecordRepository
 }
 
 func NewAlarm() alarm.Service {
-	return Alarm{
-		template:   repository.AlarmTemplate{},
-		repository: repository.Alarm{},
-		record:     repository.AlarmRecord{},
-		factory:    factory.NewAlarm(),
+	return &Alarm{
+		factory: factory.NewAlarm(),
+		rule:    repository.AlarmRule{},
+		record:  repository.AlarmRecord{},
 	}
 }
 
-func (s Alarm) CreateAlarmTemplate(req request.AlarmTemplate) error {
-	e := po.AlarmTemplate{
-		Name:            req.Name,
-		MeasurementType: req.MeasurementType,
-		Description:     req.Description,
-		Level:           req.Level,
-		ProjectID:       req.ProjectID,
-	}
-	e.Rule = po.AlarmRule{
-		Field:     req.Rule.Field,
-		Method:    req.Rule.Method,
-		Operation: req.Rule.Operation,
-		Threshold: req.Rule.Threshold,
-	}
-	return s.template.Create(context.TODO(), &e)
-}
-
-func (s Alarm) FindAlarmTemplatesByPaginate(filters request.Filters, page, size int) ([]vo.AlarmTemplate, int64, error) {
-	specs := make([]spec.Specification, 0)
-	for _, filter := range filters {
-		switch filter.Name {
-		case "measurement_type":
-			specs = append(specs, spec.MeasurementTypeEqSpec(cast.ToUint(filter.Value)))
-		case "project_id":
-			specs = append(specs, spec.ProjectEqSpec(cast.ToUint(filter.Value)))
-		}
-	}
-	es, total, err := s.template.PagingBySpecs(context.TODO(), page, size, specs...)
-	if err != nil {
-		return nil, 0, err
-	}
-	result := make([]vo.AlarmTemplate, len(es))
-	for i, e := range es {
-		result[i] = vo.NewAlarmTemplate(e)
-	}
-	return result, total, nil
-}
-
-func (s Alarm) GetAlarmTemplate(id uint) (*vo.AlarmTemplate, error) {
-	query, err := s.factory.NewAlarmTemplateQuery(id)
-	if err != nil {
-		return nil, err
-	}
-	return query.Detail()
-}
-
-func (s Alarm) UpdateAlarmTemplate(id uint, req request.AlarmTemplate) (*vo.AlarmTemplate, error) {
-	ctx := context.TODO()
-	e, err := s.template.Get(ctx, id)
-	if err != nil {
-		return nil, err
-	}
-	e.Name = req.Name
-	e.Description = req.Description
-	e.ProjectID = req.ProjectID
-	e.Level = req.Level
-	e.Rule = po.AlarmRule{
-		Field:     req.Rule.Field,
-		Method:    req.Rule.Method,
-		Operation: req.Rule.Operation,
-		Threshold: req.Rule.Threshold,
-	}
-	if err := s.template.Save(ctx, &e); err != nil {
-		return nil, err
-	}
-	result := vo.NewAlarmTemplate(e)
-	return &result, nil
-}
-
-func (s Alarm) RemoveAlarmTemplate(id uint) error {
-	return s.template.Delete(context.TODO(), id)
-}
-
-func (s Alarm) CheckAlarm(name string) error {
-	es, err := s.repository.FindBySpecs(context.TODO(), spec.NameLikeSpec(name))
-	if err != nil {
-		return err
-	}
-	if len(es) > 0 {
-		return response.BusinessErr(errcode.AlarmRuleNameExists, "")
-	}
-	return nil
-}
-
-func (s Alarm) CreateAlarm(req request.CreateAlarm) error {
-	cmd, err := s.factory.NewAlarmCustomCreateCmd(req)
+func (s Alarm) CreateAlarmRule(req request.AlarmRule) error {
+	cmd, err := s.factory.NewAlarmRuleCreateCmd(req)
 	if err != nil {
 		return err
 	}
 	return cmd.Run()
 }
 
-func (s Alarm) CreateAlarmFromTemplate(req request.CreateAlarmFromTemplate) error {
-	cmd, err := s.factory.NewAlarmTemplateCreateCmd(req)
+func (s Alarm) PagingAlarmRules(page, size int, filters request.Filters) ([]vo.AlarmRule, int64, error) {
+	query, err := s.factory.NewAlarmRuleQuery(filters)
+	if err != nil {
+		return nil, 0, err
+	}
+	return query.Paging(page, size)
+}
+
+func (s Alarm) FindAlarmRules(filters request.Filters) ([]vo.AlarmRule, error) {
+	query, err := s.factory.NewAlarmRuleQuery(filters)
+	if err != nil {
+		return nil, err
+	}
+	return query.List()
+}
+
+func (s Alarm) GetAlarmRuleByID(id uint) (*vo.AlarmRule, error) {
+	query, err := s.factory.NewAlarmRuleQuery(nil)
+	if err != nil {
+		return nil, err
+	}
+	return query.Get(id)
+}
+
+func (s Alarm) UpdateAlarmRuleByID(id uint, req request.AlarmRule) error {
+	cmd, err := s.factory.NewAlarmRuleUpdateCmd(id)
 	if err != nil {
 		return err
 	}
-	return cmd.Run()
+	return cmd.Update(req)
 }
 
-func (s Alarm) FindAlarmsByPaginate(filters request.Filters, page, size int) ([]vo.Alarm, int64, error) {
-	query, err := s.factory.NewAlarmPagingQuery(filters, page, size)
+func (s Alarm) UpdateAlarmRuleStatusByID(id uint, status uint8) error {
+	cmd, err := s.factory.NewAlarmRuleUpdateCmd(id)
+	if err != nil {
+		return err
+	}
+	return cmd.UpdateStatus(status)
+}
+
+func (s Alarm) AddSourcesToAlarmRule(id uint, sources []uint) error {
+	cmd, err := s.factory.NewAlarmRuleUpdateCmd(id)
+	if err != nil {
+		return err
+	}
+	return cmd.AddSources(sources)
+}
+
+func (s Alarm) RemoveSourcesFromAlarmRule(id uint, sources []uint) error {
+	cmd, err := s.factory.NewAlarmRuleUpdateCmd(id)
+	if err != nil {
+		return err
+	}
+	return cmd.RemoveSources(sources)
+}
+
+func (s Alarm) DeleteAlarmRuleByID(id uint) error {
+	cmd, err := s.factory.NewAlarmRuleDeleteCmd(id)
+	if err != nil {
+		return err
+	}
+	return cmd.Delete()
+}
+
+func (s Alarm) CheckAlarmRuleName(name string) (bool, error) {
+	_, err := s.rule.GetBySpecs(context.TODO(), spec.NameEqSpec(name))
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return true, nil
+	}
+	return false, err
+}
+
+func (s Alarm) FindAlarmRecordByPaginate(page, size int, from, to int64, filters request.Filters) ([]vo.AlarmRecord, int64, error) {
+	query, err := s.factory.NewAlarmRecordQuery(filters)
 	if err != nil {
 		return nil, 0, err
 	}
-	result, total := query.Query()
-	return result, total, nil
+	return query.Paging(page, size, time.Unix(from, 0), time.Unix(to, 0))
 }
 
-func (s Alarm) GetAlarmByID(id uint) (*vo.Alarm, error) {
-	query, err := s.factory.NewAlarmQuery(id)
+func (s Alarm) GetAlarmRecordByID(id uint) (*vo.AlarmRecord, error) {
+	query, err := s.factory.NewAlarmRecordQuery(nil)
 	if err != nil {
 		return nil, err
 	}
-	return query.Detail(), nil
+	return query.Get(id)
 }
 
-func (s Alarm) UpdateAlarmByID(id uint, req request.UpdateAlarm) error {
-	ctx := context.TODO()
-	e, err := s.repository.Get(ctx, id)
-	if err != nil {
-		return response.BusinessErr(errcode.AlarmRuleNotFoundError, "")
-	}
-	e.Level = req.Level
-	e.Rule.Threshold = req.Rule.Threshold
-	e.Rule.Operation = req.Rule.Operation
-	return transaction.Execute(ctx, func(txCtx context.Context) error {
-		if err := s.repository.Save(txCtx, &e); err != nil {
-			return err
-		}
-		return ruleengine.UpdateRules(e)
-	})
-}
-
-func (s Alarm) DeleteAlarmByID(id uint) error {
-	e, err := s.repository.Get(context.TODO(), id)
-	if err != nil {
-		return response.BusinessErr(errcode.AlarmRuleNotFoundError, "")
-	}
-	return transaction.Execute(context.TODO(), func(txCtx context.Context) error {
-		if err := s.repository.Delete(txCtx, e.ID); err != nil {
-			return err
-		}
-		if err := s.record.UpdateBySpecs(txCtx, map[string]interface{}{"status": 0}, spec.AlarmRuleEqSpec(e.ID)); err != nil {
-			return err
-		}
-		return ruleengine.RemoveRules(e.Name)
-	})
-}
-
-func (s Alarm) FindAlarmRecordsByPaginate(filters request.Filters, from, to int64, page, size int) ([]vo.AlarmRecord, int64, error) {
-	query, err := s.factory.NewAlarmRecordPagingQuery(filters, from, to, page, size)
-	if err != nil {
-		return nil, 0, err
-	}
-	result, total := query.Paging()
-	return result, total, nil
-}
-
-func (s Alarm) GetAlarmRecordByID(recordID uint) (*vo.AlarmRecord, error) {
-	query, err := s.factory.NewAlarmRecordQuery(recordID)
-	if err != nil {
-		return nil, err
-	}
-	return query.Detail()
-}
-
-func (s Alarm) AcknowledgeAlarmRecordByID(recordID uint, req request.AcknowledgeAlarmRecord) error {
-	cmd, err := s.factory.NewAlarmRecordCmd(recordID)
+func (s Alarm) AcknowledgeAlarmRecordByID(id uint, req request.AcknowledgeAlarmRecord) error {
+	cmd, err := s.factory.NewAlarmRecordUpdateCmd(id)
 	if err != nil {
 		return err
 	}
 	return cmd.AcknowledgeBy(req)
 }
 
-func (s Alarm) GetAlarmRecordAcknowledgeByID(recordID uint) (*vo.AlarmRecordAcknowledge, error) {
-	query, err := s.factory.NewAlarmRecordQuery(recordID)
+func (s Alarm) GetAlarmRecordAcknowledgeByID(id uint) (*vo.AlarmRecordAcknowledge, error) {
+	query, err := s.factory.NewAlarmRecordQuery(nil)
 	if err != nil {
 		return nil, err
 	}
-	return query.GetAcknowledge()
+	return query.GetAcknowledge(id)
 }
 
-func (s Alarm) DeleteAlarmRecordByID(recordID uint) error {
-	return s.record.Delete(context.TODO(), recordID)
+func (s Alarm) DeleteAlarmRecordByID(id uint) error {
+	cmd, err := s.factory.NewAlarmRecordRemoveCmd(id)
+	if err != nil {
+		return err
+	}
+	return cmd.Run()
 }

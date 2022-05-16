@@ -3,6 +3,7 @@ import {FC, useEffect, useState} from "react";
 import useSocket, {SocketTopic} from "../../socket";
 import _ from "lodash";
 import {Device} from "../../types/device";
+import { isMobile } from "../../utils/deviceDetection";
 
 export interface DeviceTableProps {
     columns?: any
@@ -10,9 +11,10 @@ export interface DeviceTableProps {
     permissions?: any
     emptyText?: any
     onChange?: any
+    rowSelection?: any
 }
 
-const DeviceTable:FC<DeviceTableProps> = ({columns, emptyText, dataSource, permissions, onChange}) => {
+const DeviceTable: FC<DeviceTableProps> = ({columns, emptyText, dataSource, permissions, rowSelection, onChange}) => {
     const {PubSub} = useSocket()
     const [data, setData] = useState<any>(dataSource)
 
@@ -22,41 +24,44 @@ const DeviceTable:FC<DeviceTableProps> = ({columns, emptyText, dataSource, permi
 
     useEffect(() => {
         PubSub.subscribe(SocketTopic.connectionState, (msg: string, state: any) => {
-            if (state && data && data.result) {
-                const newData = _.cloneDeep(data)
-                newData.result.forEach((item: Device) => {
-                    if (item.id === state.id) {
-                        item.state.isOnline = state.isOnline
-                    }
-                })
-                setData(newData)
-            }
-        })
-        PubSub.subscribe(SocketTopic.upgradeState, (msg: string, state: any) => {
-            console.log(state)
             if (state && data) {
                 const newData = _.cloneDeep(data)
-                newData.result.forEach((item: Device) => {
-                    if (item.id === state.id) {
-                        item.upgradeState = state
+                const index = newData.result.findIndex((item: Device) => item.macAddress === state.macAddress)
+                if (index > -1) {
+                    newData.result[index].state.isOnline = state.isOnline
+                    setData(newData)
+                }
+            }
+        })
+        PubSub.subscribe(SocketTopic.upgradeStatus, (msg: string, status: any) => {
+            if (status && data) {
+                const newData = _.cloneDeep(data)
+                const index = newData.result.findIndex((item: Device) => item.macAddress === status.macAddress)
+                if (index > -1) {
+                    newData.result[index].upgradeStatus = {
+                        code: status.code,
+                        progress: status.progress,
                     }
-                })
-                setData(newData)
+                    setData(newData)
+                }
             }
         })
 
         return () => {
             PubSub.unsubscribe(SocketTopic.connectionState)
-            PubSub.unsubscribe(SocketTopic.upgradeState)
+            PubSub.unsubscribe(SocketTopic.upgradeStatus)
         }
     }, [data])
 
     return <TableLayout
+        rowSelection={rowSelection}
         emptyText={emptyText ? emptyText : "设备列表为空"}
         columns={columns}
         permissions={permissions}
         dataSource={data}
         onPageChange={onChange}
+        simple={isMobile}
+        scroll={isMobile?{x:1000}:undefined}
     />
 }
 

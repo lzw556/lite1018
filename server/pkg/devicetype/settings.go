@@ -21,6 +21,14 @@ const (
 	SystemSettingCategory  SettingCategory = "system"
 )
 
+const (
+	SettingGroupGeneral      = "general"
+	SettingGroupNetwork      = "network"
+	SettingGroupPreload      = "preload"
+	SettingGroupCorrosion    = "corrosion"
+	SettingGroupAcceleration = "acceleration"
+)
+
 type Setting struct {
 	Name     string          `json:"name"`
 	Key      string          `json:"key"`

@@ -36,7 +36,10 @@ const (
 	DeviceCommandExecFailedError
 	DeviceCommandCancelledError
 	UnknownDeviceCommandTypeError
-	DeviceAlreadyBindingError
+	DeviceOfflineError
+	DeviceUpgradingError
+	DeviceDataInvalidError
+	DeviceHasChildrenError
 )
 
 const (
@@ -53,6 +56,7 @@ const (
 	AlarmRuleNameExists BusinessErrorCode = iota + 16001
 	AlarmRuleNotFoundError
 	AlarmRecordAlreadyAcknowledgedError
+	AlarmRecordNotFoundError
 )
 
 const (
@@ -88,7 +92,10 @@ var businessErrorMap = map[BusinessErrorCode]string{
 	DeviceCommandExecFailedError:        "命令执行失败",
 	DeviceCommandSendTimeoutError:       "命令发送超时",
 	DeviceCommandCancelledError:         "命令已取消",
-	DeviceAlreadyBindingError:           "设备已被绑定",
+	DeviceOfflineError:                  "设备已离线",
+	DeviceUpgradingError:                "设备正在升级",
+	DeviceDataInvalidError:              "设备数据无效",
+	DeviceHasChildrenError:              "设备含有子设备，不能删除",
 	UnknownDeviceCommandTypeError:       "未知的设备命令",
 	NetworkNotFoundError:                "网络不存在",
 	FirmwareNotFoundError:               "固件不存在",
@@ -97,6 +104,7 @@ var businessErrorMap = map[BusinessErrorCode]string{
 	AlarmRuleNameExists:                 "规则名称已经存在",
 	AlarmRuleNotFoundError:              "报警规则不存在",
 	AlarmRecordAlreadyAcknowledgedError: "报警已被处理",
+	AlarmRecordNotFoundError:            "报警记录不存在",
 	RoleExistsError:                     "角色已存在",
 	RoleNotFoundError:                   "角色不存在",
 	MeasurementNotFoundError:            "监测点不存在",

@@ -2,9 +2,8 @@ import {Device} from "../../../../types/device";
 import {FC, useEffect, useState} from "react";
 import {Button, Card, Col, DatePicker, Empty, Row, Select, Space} from "antd";
 import {DeviceType} from "../../../../types/device_type";
-import {GetChildrenRequest, GetDeviceDataRequest} from "../../../../apis/device";
+import {FindDeviceDataRequest} from "../../../../apis/device";
 import moment from "moment";
-import {DefaultMonitorDataOption, LineChartStyles} from "../../../../constants/chart";
 import ReactECharts from "echarts-for-react";
 import Label from "../../../../components/label";
 import {ReloadOutlined} from "@ant-design/icons";
@@ -26,13 +25,7 @@ const MonitorPage: FC<MonitorPageProps> = ({device}) => {
     useEffect(() => {
         if (device) {
             if (device.typeId === DeviceType.Gateway || device.typeId === DeviceType.Router) {
-                GetChildrenRequest(device.id).then(data => {
-                    const result = data.filter(item => DeviceType.Sensors().includes(item.typeId))
-                    setDevices(result)
-                    if (result.length > 0) {
-                        fetchDeviceData(result[0].id)
-                    }
-                })
+
             } else {
                 fetchDeviceData(device.id)
             }
@@ -45,59 +38,7 @@ const MonitorPage: FC<MonitorPageProps> = ({device}) => {
 
     const fetchDeviceData = (id: number) => {
         setSelectedDevice(id)
-        GetDeviceDataRequest(id, "", startDate.utc().unix(), endDate.utc().unix()).then(data => {
-            setOptions(device.properties.map(property => {
-                const key = property.key
-                let series: any[]
-                let legends: string[]
-                switch (property.type) {
-                    case 'axis':
-                        legends = ["X轴", "Y轴", "Z轴"]
-                        series = legends.map((item, index) => {
-                            return {
-                                ...LineChartStyles[index],
-                                name: item,
-                                type: 'line',
-                                data: data[key].map((item:any) => item.value[index]),
-                                showSymbol: false
-                            }
-                        })
-                        break;
-                    default:
-                        legends = [property.name]
-                        series = [
-                            {
-                                ...LineChartStyles[0],
-                                name: property.name,
-                                type: 'line',
-                                data: data[key].map((item:any) => item.value),
-                                showSymbol: false
-                            }
-                        ]
-                        break;
-                }
-                return {
-                    ...DefaultMonitorDataOption,
-                    tooltip: {
-                        trigger: 'axis',
-                        formatter: function (params: any) {
-                            let relVal = params[0].name;
-                            for (let i = 0; i < params.length; i++) {
-                                let value = Number(params[i].value).toFixed(3)
-                                relVal += `<br/> ${params[i].marker} ${params[i].seriesName}: ${value}${property.unit}`
-                            }
-                            return relVal;
-                        }
-                    },
-                    title: {text: property.name},
-                    series,
-                    xAxis: {
-                        type: 'category',
-                        boundaryGap: false,
-                        data: data[key].map((item:any) => moment.unix(item.timestamp).local().format("YYYY-MM-DD HH:mm:ss"))
-                    }
-                }
-            }))
+        FindDeviceDataRequest(id, startDate.utc().unix(), endDate.utc().unix(), {}).then(data => {
         })
     }
 

@@ -4,6 +4,7 @@ import storage from "redux-persist/lib/storage";
 import {persistReducer} from "redux-persist";
 import getMenus from "./menu";
 import setProject from "./project";
+import setPermission from "./permission";
 
 export interface State<T> {
     data: T
@@ -24,8 +25,14 @@ const projectPersistConfig = {
     storage: storage,
 }
 
+const permissionPersistConfig = {
+    key: 'permission',
+    storage: storage,
+}
+
 export default combineReducers({
     auth: persistReducer(authPersistConfig, userLogin),
     menu: persistReducer(menuPersistConfig, getMenus),
     project: persistReducer(projectPersistConfig, setProject),
+    permission: persistReducer(permissionPersistConfig, setPermission),
 })

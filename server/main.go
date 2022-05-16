@@ -2,12 +2,14 @@ package main
 
 import (
 	"embed"
+	"fmt"
 	"github.com/thetasensors/theta-cloud-lite/server/app"
 	"github.com/thetasensors/theta-cloud-lite/server/config"
 	"github.com/thetasensors/theta-cloud-lite/server/core"
 	"github.com/thetasensors/theta-cloud-lite/server/initialize"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/casbin"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/global"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/license"
 )
 
 //go:embed static
@@ -16,7 +18,15 @@ var dist embed.FS
 //go:embed rbac_model.conf
 var rbacModel string
 
+//go:embed rbac_policy.csv
+var rbacPolicy string
+
 func main() {
+	key := "thetasensorskeyaesfitbitsencrypt"
+	if !license.ValidateKeyFile([]byte(key), "key.data") {
+		fmt.Println("Invalid key file")
+		return
+	}
 	initialize.InitFolder()
 	global.Viper = core.Viper()
 	dbConf := config.Database{}
@@ -33,6 +43,10 @@ func main() {
 	if global.BoltDB != nil {
 		initialize.InitBuckets(global.BoltDB)
 	}
-	casbin.Init(rbacModel, global.DB)
-	app.Start("release", dist)
+	casbin.Init(rbacModel, rbacPolicy)
+	svrConf := config.Server{}
+	if err := config.Scan("server", &svrConf); err != nil {
+		panic(err)
+	}
+	app.Start(svrConf.Mode, dist)
 }

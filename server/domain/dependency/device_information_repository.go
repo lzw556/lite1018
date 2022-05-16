@@ -1,9 +1,11 @@
 package dependency
 
-import "github.com/thetasensors/theta-cloud-lite/server/domain/po"
+import (
+	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
+)
 
 type DeviceInformationRepository interface {
-	Create(id uint, e po.DeviceInformation) error
-	Get(id uint) (po.DeviceInformation, error)
-	Delete(id uint) error
+	Create(mac string, e entity.DeviceInformation) error
+	Get(mac string) (entity.DeviceInformation, error)
+	Delete(mac string) error
 }

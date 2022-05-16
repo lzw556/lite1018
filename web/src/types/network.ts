@@ -9,8 +9,8 @@ export type Network = {
     routingTables: []
     nodes: Device[]
     communicationPeriod: number
-    communicationTimeOffset: number
+    communicationOffset: number
     groupSize: number
     groupInterval: number
-
+    mode: number
 }

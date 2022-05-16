@@ -1,5 +1,5 @@
-import {GetCasbinRequest} from "../apis/role";
 import {Enforcer, MemoryAdapter, newEnforcer, newModel} from "casbin.js";
+import {getPermission} from "../utils/session";
 
 export type PermissionType = {
     path: string;
@@ -7,6 +7,12 @@ export type PermissionType = {
 }
 
 export const Permission = {
+    ProjectAdd: {path: "projects", method: "POST"},
+    ProjectList: {path: "projects", method: "GET"},
+    ProjectAllocUser: {path: "projects/:id/users", method: "PATCH"},
+    ProjectAllocUserGet: {path: "projects/:id/users", method: "GET"},
+    ProjectEdit: {path: "projects/:id", method: "PUT"},
+    ProjectDelete: {path: "projects/:id", method: "DELETE"},
     DeviceCommand: {path: 'devices/:id/commands/:cmd', method: 'POST'},
     DeviceUpgrade: {path: "devices/:id/upgrade", method: "POST"},
     DeviceAdd: {path: "devices", method: "POST"},
@@ -18,8 +24,12 @@ export const Permission = {
     DeviceDetail: {path: "devices/:id", method: "GET"},
     DeviceDataDelete: {path: "devices/:id/data", method: "DELETE"},
     DeviceDataDownload: {path: "devices/:id/download/data", method: "GET"},
+    DeviceRawDataDownload: {path: "devices/:id/download/data/:timestamp", method: "GET"},
     DeviceFirmwares: {path: "devices/:id/firmwares", method: "GET"},
     DeviceData: {path: "devices/:id/data", method: "GET"},
+    DeviceEventList: {path: "devices/:id/events", method: "GET"},
+    DeviceEventDelete: {path: "devices/:id/events", method: "DELETE"},
+    DeviceRuntimeDataGet: {path: "devices/:id/runtime", method: "GET"},
     NetworkSettingEdit: {path: "networks/setting", method: "PUT"},
     NetworkRemoveDevices: {path: "networks/:id/devices", method: "DELETE"},
     NetworkAddDevices: {path: "networks/:id/devices", method: "PATCH"},
@@ -27,23 +37,21 @@ export const Permission = {
     NetworkExport: {path: "networks/:id/export", method: "GET"},
     NetworkEdit: {path: "networks/:id", method: "PUT"},
     NetworkDelete: {path: "networks/:id", method: "DELETE"},
-    AlarmAdd: {path: "alarms", method: "POST"},
-    AlarmEdit: {path: "alarms/:id", method: "PUT"},
-    AlarmDelete: {path: "alarms/:id", method: "DELETE"},
-    AlarmTemplateAdd: {path: "alarmTemplates", method: "POST"},
-    AlarmTemplateEdit: {path: "alarmTemplates/:id", method: "PUT"},
-    AlarmTemplateDelete: {path: "alarmTemplates/:id", method: "DELETE"},
+    NetworkDetail: {path: "networks/:id", method: "GET"},
+    NetworkSync: {path: "networks/:id/sync", method: "PUT"},
+    NetworkProvision: {path: "networks/:id/provision", method: "PUT"},
+    AlarmRuleAdd: {path: "alarmRules", method: "POST"},
+    AlarmRuleEdit: {path: "alarmRules/:id", method: "PUT"},
+    AlarmRuleStatusEdit: {path: "alarmRules/:id/status/:status", method: "PUT"},
+    AlarmSourceAdd: {path: "alarmRules/:id/sources", method: "POST"},
+    AlarmRuleDelete: {path: "alarmRules/:id", method: "DELETE"},
+    AlarmRuleTemplateAdd: {path: "alarmRuleTemplates", method: "POST"},
+    AlarmRuleTemplateEdit: {path: "alarmRuleTemplates/:id", method: "PUT"},
+    AlarmRuleTemplateDelete: {path: "alarmRuleTemplates/:id", method: "DELETE"},
     AlarmRecordDelete: {path: "alarmRecords/:id", method: "DELETE"},
-    AlarmRecordAcknowledge: {path: "alarmRecords/:id/acknowledge", method: "PATCH"},
-    AssetAdd: {path: "assets", method: "POST"},
-    AssetEdit: {path: "assets/:id", method: "PUT"},
-    AssetDelete: {path: "assets/:id", method: "DELETE"},
-    AssetChildren: {path: "assets/:id/children", method: "GET"},
-    MeasurementList: {path: "measurements", method: "GET"},
-    MeasurementStatistics: {path: "measurements/statistics", method: "GET"},
-    MeasurementDetail: {path: "measurements/:id", method: "GET"},
-    MeasurementEdit: {path: "measurements/:id", method: "PUT"},
-    MeasurementDelete: {path: "measurements/:id", method: "DELETE"},
+    AlarmRecordAcknowledge: {path: "alarmRecords/:id/acknowledge", method: "POST"},
+    AlarmRecordAcknowledgeGet: {path: "alarmRecords/:id/acknowledge", method: "GET"},
+    AlarmRecordGet: {path: "alarmRecords/:id", method: "GET"},
     UserAdd: {path: "users", method: "POST"},
     UserEdit: {path: "users/:id", method: "PUT"},
     UserDelete: {path: "users/:id", method: "DELETE"},
@@ -62,15 +70,31 @@ export const Permission = {
 
 let enforcer: Enforcer | null = null
 let subject: null = null
+const model = newModel(`
+[request_definition]
+r = sub, obj, act
 
-GetCasbinRequest().then(data => {
-    const model = newModel(data.model);
+[policy_definition]
+p = sub, obj, act
+
+[role_definition]
+g = _, _
+
+[policy_effect]
+e = some(where (p.eft == allow))
+
+[matchers]
+m = g(r.sub, p.sub) && keyMatch2(r.obj, p.obj) && r.act == p.act || r.sub == "admin"`)
+
+const data = getPermission()
+
+if (data) {
     const adapter = new MemoryAdapter(data.rules);
     newEnforcer(model, adapter).then(value => {
         enforcer = value
         subject = data.subject
     });
-})
+}
 
 const usePermission = () => {
     return {

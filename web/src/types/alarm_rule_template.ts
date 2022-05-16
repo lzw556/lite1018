@@ -8,10 +8,16 @@ export type AlarmRuleTemplate = {
 }
 
 export type AlarmRule = {
-    field: string
-    method: string
-    operation: string
+    id: number
+    name: string
+    description: string
+    duration: number
     threshold: number
+    operation: string
+    sourceType: string
+    level: number
+    sources: any[]
+    category: number
 }
 
 export function getRuleMethodString(method: string) {
@@ -32,20 +38,4 @@ export function getRuleMethodString(method: string) {
             return "Z轴";
     }
     return "";
-}
-
-export const InitializeRule: AlarmRule = {
-    field: "",
-    method: "current",
-    operation: ">",
-    threshold: 0,
-}
-
-export const InitializeAlarmRuleTemplate: AlarmRuleTemplate = {
-    id: 0,
-    name: "",
-    measurementType: 0,
-    rule: InitializeRule,
-    level: 1,
-    description: ""
 }

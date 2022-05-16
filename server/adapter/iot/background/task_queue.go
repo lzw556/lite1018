@@ -33,7 +33,7 @@ func (q *TaskQueue) Append(task *Task) {
 		}
 		prev.next = task
 	}
-	task.Device.UpdateUpgradeState(entity.DeviceUpgradeStatusPending, 0)
+	task.Device.UpdateDeviceUpgradeStatus(entity.DeviceUpgradePending, 0)
 	q.mu.Unlock()
 }
 

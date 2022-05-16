@@ -17,6 +17,7 @@ const AddRoleModal: FC<AddRoleModalProps> = (props) => {
     useEffect(() => {
         if (visible) {
             form.resetFields()
+            form.setFieldsValue({description: ''})
         }
     }, [visible])
 

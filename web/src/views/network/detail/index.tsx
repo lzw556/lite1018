@@ -1,261 +1,191 @@
-import MyBreadcrumb from "../../../components/myBreadcrumb";
-import {Content} from "antd/es/layout/layout";
-import ShadowCard from "../../../components/shadowCard";
-import {Button, Col, Row, Space, Typography} from "antd";
-import {useEffect, useState} from "react";
-import {Network} from "../../../types/network";
-import {useHistory, useLocation} from "react-router-dom";
-import {GetParamValue} from "../../../utils/path";
-import {GetNetworkRequest} from "../../../apis/network";
-import "../../../string-extension";
-import moment from "moment";
-import DeviceList from "./deviceList";
-import TopologyView from "./topologyView";
-import {PlusOutlined} from "@ant-design/icons";
-import AddDeviceModal from "./addDeviceModal";
-import "../index.css";
-import {Permission} from "../../../permission/permission";
-import HasPermission from "../../../permission";
-
-const tabList = [
-    {
-        key: "devices",
-        tab: "设备列表",
-    },
-    {
-        key: "graph",
-        tab: "拓扑图",
-    },
-]
+import MyBreadcrumb from '../../../components/myBreadcrumb';
+import { Content } from 'antd/es/layout/layout';
+import ShadowCard from '../../../components/shadowCard';
+import { Button, Col, Form, Input, message, Row, Space } from 'antd';
+import { useEffect, useState } from 'react';
+import { Network } from '../../../types/network';
+import { useHistory, useLocation } from 'react-router-dom';
+import { GetParamValue } from '../../../utils/path';
+import {
+  ExportNetworkRequest,
+  GetNetworkRequest,
+  NetworkProvisionRequest,
+  NetworkSyncRequest,
+  UpdateNetworkRequest
+} from '../../../apis/network';
+import '../../../string-extension';
+import TopologyView from './topologyView';
+import { PlusOutlined } from '@ant-design/icons';
+import AddDeviceModal from './addDeviceModal';
+import '../index.css';
+import usePermission, { Permission } from '../../../permission/permission';
+import HasPermission from '../../../permission';
+import ButtonGroup from 'antd/lib/button/button-group';
+import { defaultValidateMessages, Rules } from '../../../constants/validator';
+import WsnFormItem from '../../../components/formItems/wsnFormItem';
 
 const NetworkDetail = () => {
-    const location = useLocation()
-    const history = useHistory()
-    const [network, setNetwork] = useState<Network>()
-    const [addDeviceVisible, setAddDeviceVisible] = useState(false)
-    const [currentKey, setCurrentKey] = useState<string>("devices");
-    const [refreshKey, setRefreshKey] = useState(0)
+  const { hasPermission } = usePermission();
+  const location = useLocation();
+  const history = useHistory();
+  const [network, setNetwork] = useState<Network>();
+  const [addDeviceVisible, setAddDeviceVisible] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
+  const [form] = Form.useForm();
 
-    const onRefresh = () => {
-        setRefreshKey(refreshKey + 1)
+  const onRefresh = () => {
+    setRefreshKey(refreshKey + 1);
+  };
+
+  useEffect(() => {
+    const id = GetParamValue(location.search, 'id');
+    if (id) {
+      GetNetworkRequest(Number(id))
+        .then((data) => {
+          form.setFieldsValue({
+            name: data.name,
+            wsn: {
+              communication_period: data.communicationPeriod,
+              communication_offset: data.communicationOffset,
+              group_size: data.groupSize,
+              group_interval: data.groupInterval
+            }
+          });
+          setNetwork(data);
+        })
+        .catch((_) => {
+          history.goBack();
+        });
     }
+  }, []);
 
-    const contents = new Map<string, any>([
-        ["devices", network && <DeviceList network={network} onRefresh={() => refreshKey}/>],
-        ["graph", network && <TopologyView network={network}/>],
-    ])
+  const sendCommand = (network: Network, key: string) => {
+    switch (key) {
+      case '0':
+        NetworkSyncRequest(network.id).then((res) => {
+          if (res.code === 200) {
+            message.success('发送成功');
+          } else {
+            message.error(`发送失败: ${res.msg}`);
+          }
+        });
+        break;
+      case '1':
+        NetworkProvisionRequest(network.id).then((res) => {
+          if (res.code === 200) {
+            message.success('发送成功');
+          } else {
+            message.error(`发送失败: ${res.msg}`);
+          }
+        });
+        break;
+      case '2':
+        exportNetwork(network);
+        break;
+    }
+  };
 
-    useEffect(() => {
-        const id = GetParamValue(location.search, "id")
-        if (id) {
-            GetNetworkRequest(Number(id)).then(data => {
-                setNetwork(data)
-            }).catch(_ => {
-                history.goBack()
-            })
-        }
-    }, [])
+  const exportNetwork = (n: Network) => {
+    ExportNetworkRequest(n.id).then((res) => {
+      const url = window.URL.createObjectURL(new Blob([res.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `${n.name}.json`);
+      document.body.appendChild(link);
+      link.click();
+    });
+  };
 
-    const renderInformation = () => {
-        if (network) {
-            return <ShadowCard>
-                <Typography.Title level={5}>网络信息</Typography.Title>
-                <Row justify={"start"}>
-                    <Col span={3} className="ts-detail-label">
-                        网络名称
-                    </Col>
-                    <Col span={6}>
-                        <Space>
-                            {
-                                network.name
-                            }
-                        </Space>
-                    </Col>
-                    <Col span={3} className="ts-detail-label">
-                    </Col>
-                    <Col span={6}>
-
-                    </Col>
-                </Row>
-                <br/>
-                <Row justify={"start"}>
-                    <Col span={3} className="ts-detail-label">
-                        通讯周期
-                    </Col>
-                    <Col span={6}>
-                        <Space>
-                            {
-                                moment.duration(network.communicationPeriod / 1000, "seconds").humanize()
-                            }
-                        </Space>
-                    </Col>
-                    <Col span={3} className="ts-detail-label">
-                        每组设备数
-                    </Col>
-                    <Col span={6}>
-                        {
-                            network.groupSize
-                        }
-                    </Col>
-                </Row>
-                <br/>
-                <Row justify={"start"}>
-                    <Col span={3} className="ts-detail-label">
-                        通讯延时
-                    </Col>
-                    <Col span={6}>
-                        <Space>
-                            {
-                                `${moment.duration(network.communicationTimeOffset / 1000, 'seconds').seconds()}秒`
-                            }
-                        </Space>
-                    </Col>
-                    <Col span={3} className="ts-detail-label">
-                        每组通讯间隔
-                    </Col>
-                    <Col span={6}>
-                        {
-                            moment.duration(network.groupInterval / 1000, "seconds").humanize()
-                        }
-                    </Col>
-                </Row>
-                <br/>
-                <Typography.Title level={5}>网关信息</Typography.Title>
-                <Row justify={"start"}>
-                    <Col span={3} className="ts-detail-label">
-                        设备名称
-                    </Col>
-                    <Col span={6}>
-                        <Space>
-                            {
-                                network.gateway.name
-                            }
-                        </Space>
-                    </Col>
-                    <Col span={3} className="ts-detail-label">
-                        类型
-                    </Col>
-                    <Col span={6}>
-                        网关
-                    </Col>
-                </Row>
-                <br/>
-                <Row justify={"start"}>
-                    <Col span={3} className="ts-detail-label">
-                        MAC地址
-                    </Col>
-                    <Col span={6}>
-                        <Typography.Text copyable={{text: network.gateway.macAddress, tooltips: ["复制", "复制成功"]}}>
-                            {
-                                network.gateway.macAddress.toUpperCase().macSeparator()
-                            }
-                        </Typography.Text>
-                    </Col>
-                    <Col span={3} className="ts-detail-label">
-                        型号
-                    </Col>
-                    <Col span={6}>
-                        {
-                            network.gateway.information.model ? network.gateway.information.model : "-"
-                        }
-                    </Col>
-                </Row>
-                <br/>
-                <Row justify={"start"}>
-                    <Col span={3} className="ts-detail-label">
-                        固件版本号
-                    </Col>
-                    <Col span={6}>
-                        {
-                            network.gateway.information.firmware_version ? network.gateway.information.firmware_version : "-"
-                        }
-                    </Col>
-                    <Col span={3} className="ts-detail-label">
-                        固件编译时间
-                    </Col>
-                    <Col span={6}>
-                        {
-                            network.gateway.information.firmware_build_time ? moment(network.gateway.information.firmware_build_time).format("YYYY-MM-DD HH:mm:ss") : "-"
-                        }
-                    </Col>
-                </Row>
-                <br/>
-                <Row justify={"start"}>
-                    <Col span={3} className="ts-detail-label">
-                        最近连接时间
-                    </Col>
-                    <Col span={6}>
-                        {
-                            network.gateway.state.connectedAt ? moment(network.gateway.state.connectedAt * 1000).format("YYYY-MM-DD HH:mm:ss") : "-"
-                        }
-                    </Col>
-                    <Col span={3} className="ts-detail-label">
-                        硬件版本
-                    </Col>
-                    <Col span={6}>
-                        {
-                            network.gateway.information.product_id ? network.gateway.information.product_id : "-"
-                        }
-                    </Col>
-                </Row>
-                <br/>
-                <Row justify={"start"}>
-                    <Col span={3} className="ts-detail-label">
-                        生产厂商
-                    </Col>
-                    <Col span={6}>
-                        {
-                            network.gateway.information.manufacturer ? network.gateway.information.manufacturer : "-"
-                        }
-                    </Col>
-                    <Col span={3} className="ts-detail-label">
-                        IP地址
-                    </Col>
-                    <Col span={6}>
-                        {
-                            network.gateway.information.ip_address ?
-                                (<Space>{network.gateway.information.ip_address} <a
-                                    href={`http://${network.gateway.information.ip_address}`}
-                                    target={"_blank"}
-                                    style={{fontSize: "10pt"}}>访问管理界面</a></Space>) :
-                                "-"
-                        }
-                    </Col>
-                </Row>
+  const renderInformation = () => {
+    if (network) {
+      return (
+        <Row style={{flexGrow:1}}>
+          <Col xl={16} xxl={18}>
+            <ShadowCard style={{height: '100%'}} bodyStyle={{height:'100%'}}>
+              <TopologyView network={network} />
             </ShadowCard>
-        }
+          </Col>
+          <Col xl={8} xxl={6}>
+            <ShadowCard style={{ marginLeft: 10, height: '100%' }}>
+              <Form form={form} labelCol={{ span: 8 }} validateMessages={defaultValidateMessages}>
+                <Form.Item label={'名称'} name={'name'} rules={[Rules.range(4, 16)]}>
+                  <Input placeholder={'请输入网络名称'} />
+                </Form.Item>
+                <WsnFormItem/>
+                <Form.Item wrapperCol={{ offset: 6, span: 18 }}>
+                  <Row justify='end'>
+                    <Col>
+                      <ButtonGroup>
+                        {hasPermission(Permission.NetworkExport) && (
+                          <Button type='primary' onClick={() => sendCommand(network, '2')}>
+                            导出网络
+                          </Button>
+                        )}
+                        <Button
+                          type='primary'
+                          onClick={() => {
+                            form.validateFields().then((values) => {
+                              UpdateNetworkRequest(network.id, values).then(res => {
+                                if(res.code === 200) message.success('保存成功')
+                              });
+                            });
+                          }}
+                        >
+                          保存网络
+                        </Button>
+                      </ButtonGroup>
+                    </Col>
+                  </Row>
+                </Form.Item>
+              </Form>
+              <Row justify='end'>
+                <Col>
+                  <ButtonGroup>
+                    {hasPermission(Permission.NetworkSync) && (
+                      <Button type='primary' onClick={() => sendCommand(network, '0')}>
+                        同步网络
+                      </Button>
+                    )}
+                    {hasPermission(Permission.NetworkProvision) && (
+                      <Button type='primary' onClick={() => sendCommand(network, '1')}>
+                        继续组网
+                      </Button>
+                    )}
+                  </ButtonGroup>
+                </Col>
+              </Row>
+            </ShadowCard>
+          </Col>
+        </Row>
+      );
     }
+  };
 
-    return <Content>
-        <MyBreadcrumb>
-            <HasPermission value={Permission.NetworkAddDevices}>
-                <Space>
-                    <Button type={"primary"} onClick={() => setAddDeviceVisible(true)}>接入设备 <PlusOutlined/></Button>
-                </Space>
-            </HasPermission>
-        </MyBreadcrumb>
-        {
-            renderInformation()
-        }
-        <br/>
-        <ShadowCard size={"small"} tabList={tabList} onTabChange={key => {
-            setCurrentKey(key)
-        }}>
-            {contents.get(currentKey)}
-        </ShadowCard>
-        {
-            network &&
-            <AddDeviceModal
-                network={network}
-                visible={addDeviceVisible}
-                onCancel={() => setAddDeviceVisible(false)}
-                onSuccess={() => {
-                    onRefresh()
-                    setAddDeviceVisible(false)
-                }}
-            />
-        }
+  return (
+    <Content style={{display:'flex',flexDirection:'column'}}>
+      <MyBreadcrumb firstBreadState={location.state as any}>
+        <HasPermission value={Permission.NetworkAddDevices}>
+          <Space>
+            <Button type={'primary'} onClick={() => setAddDeviceVisible(true)}>
+              接入设备 <PlusOutlined />
+            </Button>
+          </Space>
+        </HasPermission>
+      </MyBreadcrumb>
+      {renderInformation()}
+      {network && (
+        <AddDeviceModal
+          network={network}
+          visible={addDeviceVisible}
+          onCancel={() => setAddDeviceVisible(false)}
+          onSuccess={() => {
+            onRefresh();
+            setAddDeviceVisible(false);
+          }}
+        />
+      )}
     </Content>
-}
+  );
+};
 
-export default NetworkDetail
+export default NetworkDetail;

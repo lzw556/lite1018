@@ -18,14 +18,11 @@ func NewRouter(s Service) router.Router {
 func (r *statisticRouter) initRoutes() {
 	r.routes = []router.Route{
 		// GET
-		router.NewGetRoute("statistics/measurements", r.statisticalMeasurements),
-		router.NewGetRoute("statistics/measurements/:id/data", r.statisticalMeasurementData),
-		router.NewGetRoute("statistics/measurements/:id/alert", r.statisticalMeasurementAlert),
-		router.NewGetRoute("statistics/devices", r.statisticalDevices),
-		router.NewGetRoute("statistics/alarmRecords", r.statisticalAlarmRecords),
+		router.NewGetRoute("statistics/devices", r.getDeviceStatistics),
+		router.NewGetRoute("statistics/alerts", r.getAlertStatistics),
 	}
 }
 
-func (r statisticRouter) Routes() []router.Route {
+func (r *statisticRouter) Routes() []router.Route {
 	return r.routes
 }

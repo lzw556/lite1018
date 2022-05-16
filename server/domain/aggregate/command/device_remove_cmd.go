@@ -2,12 +2,14 @@ package command
 
 import (
 	"context"
+	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/response"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/iot/command"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	spec "github.com/thetasensors/theta-cloud-lite/server/domain/specification"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/devicetype"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/errcode"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/transaction"
 	"time"
 )
@@ -18,57 +20,87 @@ type DeviceRemoveCmd struct {
 
 	deviceDataRepo        dependency.SensorDataRepository
 	deviceRepo            dependency.DeviceRepository
-	deviceStatusRepo      dependency.DeviceStatusRepository
+	deviceStatusRepo      dependency.DeviceStateRepository
 	deviceInformationRepo dependency.DeviceInformationRepository
+	deviceAlertStateRepo  dependency.DeviceAlertStateRepository
 	networkRepo           dependency.NetworkRepository
-	bindingRepo           dependency.MeasurementDeviceBindingRepository
+	eventRepo             dependency.EventRepository
+	alarmSourceReo        dependency.AlarmSourceRepository
+	alarmRuleRepo         dependency.AlarmRuleRepository
 }
 
 func NewDeviceRemoveCmd() DeviceRemoveCmd {
 	return DeviceRemoveCmd{
 		deviceRepo:            repository.Device{},
 		deviceDataRepo:        repository.SensorData{},
-		deviceStatusRepo:      repository.DeviceStatus{},
+		deviceStatusRepo:      repository.DeviceState{},
 		deviceInformationRepo: repository.DeviceInformation{},
+		deviceAlertStateRepo:  repository.DeviceAlertState{},
 		networkRepo:           repository.Network{},
-		bindingRepo:           repository.MeasurementDeviceBinding{},
+		eventRepo:             repository.Event{},
+		alarmSourceReo:        repository.AlarmSource{},
+		alarmRuleRepo:         repository.AlarmRule{},
 	}
 }
 
 func (cmd DeviceRemoveCmd) Run() error {
-	err := transaction.Execute(context.TODO(), func(txCtx context.Context) error {
+	children, err := cmd.deviceRepo.FindBySpecs(context.TODO(), spec.ParentEqSpec(cmd.Device.MacAddress))
+	if err != nil {
+		return err
+	}
+	if len(children) > 0 {
+		return response.BusinessErr(errcode.DeviceHasChildrenError, "")
+	}
+	err = transaction.Execute(context.TODO(), func(txCtx context.Context) error {
 		if err := cmd.deviceRepo.Delete(txCtx, cmd.Device.ID); err != nil {
 			return err
 		}
-		switch cmd.Device.Type {
-		case devicetype.GatewayType, devicetype.RouterType:
-		default:
-			if err := cmd.deviceInformationRepo.Delete(cmd.Device.ID); err != nil {
-				return err
-			}
-			if err := cmd.deviceStatusRepo.Delete(cmd.Device.MacAddress); err != nil {
-				return err
-			}
-		}
-		if cmd.Device.NetworkID > 0 {
-			cmd.Network.RemoveDevice(cmd.Device)
-			return cmd.networkRepo.Save(txCtx, &cmd.Network.Network)
-		}
-		return cmd.bindingRepo.DeleteBySpecs(txCtx, spec.DeviceMacEqSpec(cmd.Device.MacAddress))
+		_ = cmd.deviceInformationRepo.Delete(cmd.Device.MacAddress)
+		_ = cmd.deviceStatusRepo.Delete(cmd.Device.MacAddress)
+		_ = cmd.deviceAlertStateRepo.DeleteAll(cmd.Device.MacAddress)
+		return cmd.removeAlarmSource(txCtx)
 	})
 	if err != nil {
 		return err
 	}
 	if cmd.Device.NetworkID > 0 {
-		devices, err := cmd.deviceRepo.FindBySpecs(context.TODO(), spec.NetworkEqSpec(cmd.Network.ID))
+		gateway, err := cmd.deviceRepo.Get(context.TODO(), cmd.Network.GatewayID)
 		if err != nil {
 			return err
 		}
-		return command.SyncNetwork(cmd.Network, devices, 3*time.Second)
+		command.DeleteDevice(gateway, cmd.Device)
 	}
 	return nil
 }
 
-func (cmd DeviceRemoveCmd) RemoveData(from, to time.Time) error {
-	return cmd.deviceDataRepo.Delete(cmd.Device.MacAddress, from, to)
+func (cmd DeviceRemoveCmd) removeAlarmSource(ctx context.Context) error {
+	alarmRules, err := cmd.alarmRuleRepo.FindBySpecs(ctx, spec.SourceTypeEqSpec(cmd.Device.Type), spec.CategoryEqSpec(uint(entity.AlarmRuleCategoryDevice)))
+	if err != nil {
+		return err
+	}
+	if len(alarmRules) > 0 {
+		alarmRuleIDs := make([]uint, len(alarmRules))
+		for i, rule := range alarmRules {
+			alarmRuleIDs[i] = rule.ID
+		}
+		return cmd.alarmSourceReo.DeleteBySpecs(ctx, spec.AlarmRuleInSpec(alarmRuleIDs), spec.SourceEqSpec(cmd.Device.ID))
+	}
+	return nil
+}
+
+func (cmd DeviceRemoveCmd) RemoveData(sensorType uint, from, to time.Time) error {
+	if sensorType == 0 {
+		if t := devicetype.Get(cmd.Device.Type); t != nil {
+			sensorType = t.SensorID()
+		}
+	}
+	return cmd.deviceDataRepo.Delete(cmd.Device.MacAddress, sensorType, from, to)
+}
+
+func (cmd DeviceRemoveCmd) RemoveEvents(ids []uint) error {
+	return cmd.eventRepo.DeleteBySpecs(context.TODO(), spec.SourceEqSpec(cmd.Device.ID), spec.PrimaryKeyInSpec(ids))
+}
+
+func (cmd DeviceRemoveCmd) RemoveAlarmRules(ids []uint) error {
+	return cmd.alarmSourceReo.DeleteBySpecs(context.TODO(), spec.SourceEqSpec(cmd.Device.ID), spec.AlarmRuleInSpec(ids))
 }

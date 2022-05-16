@@ -4,22 +4,26 @@ import (
 	"context"
 	"fmt"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/iot"
+	"github.com/thetasensors/theta-cloud-lite/server/adapter/iot/command"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
 	spec "github.com/thetasensors/theta-cloud-lite/server/domain/specification"
+	"time"
 )
 
 type root struct {
-	deviceRepo  dependency.DeviceRepository
-	networkRepo dependency.NetworkRepository
-	next        Processor
+	deviceRepo      dependency.DeviceRepository
+	deviceStateRepo dependency.DeviceStateRepository
+	networkRepo     dependency.NetworkRepository
+	next            Processor
 }
 
 func newRoot(p Processor) Processor {
 	return root{
-		deviceRepo:  repository.Device{},
-		networkRepo: repository.Network{},
-		next:        p,
+		deviceRepo:      repository.Device{},
+		deviceStateRepo: repository.DeviceState{},
+		networkRepo:     repository.Network{},
+		next:            p,
 	}
 }
 
@@ -33,6 +37,9 @@ func (r root) Next() Processor {
 
 func (r root) Process(ctx *iot.Context, msg iot.Message) error {
 	c := context.TODO()
+	if msg.Body.Device == "000000000000" {
+		return fmt.Errorf("invalid device mac address => [%s]", msg.Body.Device)
+	}
 	device, err := r.deviceRepo.GetBySpecs(c, spec.DeviceMacEqSpec(msg.Body.Device))
 	if err != nil {
 		return fmt.Errorf("device %s not found: %v", msg.Body.Device, err)
@@ -47,7 +54,21 @@ func (r root) Process(ctx *iot.Context, msg iot.Message) error {
 	if gateway.NetworkID != device.NetworkID {
 		return fmt.Errorf("device %s is not in gateway %s", device.MacAddress, gateway.MacAddress)
 	}
-	device.UpdateConnectionState(true)
+	if state, err := r.deviceStateRepo.Get(device.MacAddress); err == nil {
+		if !state.IsOnline {
+			state.IsOnline = true
+			state.ConnectedAt = time.Now().UTC().Unix()
+			state.Notify(device.MacAddress)
+			if device.IsGateway() {
+				if network, err := r.networkRepo.Get(c, device.NetworkID); err == nil {
+					go command.SyncNetworkLinkStates(network, 3*time.Second)
+				}
+			}
+		} else {
+			state.ConnectedAt = time.Now().UTC().Unix()
+		}
+		_ = r.deviceStateRepo.Create(device.MacAddress, state)
+	}
 	ctx.Set(device.MacAddress, device)
 	ctx.Set(gateway.MacAddress, gateway)
 	return nil

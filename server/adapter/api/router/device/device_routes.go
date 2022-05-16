@@ -12,7 +12,7 @@ import (
 )
 
 func (r deviceRouter) create(ctx *gin.Context) (interface{}, error) {
-	var req request.Device
+	var req request.CreateDevice
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		return nil, response.InvalidParameterError(err.Error())
 	}
@@ -22,13 +22,13 @@ func (r deviceRouter) create(ctx *gin.Context) (interface{}, error) {
 
 func (r deviceRouter) get(ctx *gin.Context) (interface{}, error) {
 	id := cast.ToUint(ctx.Param("id"))
-	return r.service.GetDeviceByID(id)
+	filters := request.NewFilters(ctx)
+	return r.service.GetDeviceByID(id, filters)
 }
 
 func (r deviceRouter) find(ctx *gin.Context) (interface{}, error) {
 	filters := request.NewFilters(ctx)
-	switch ctx.Query("method") {
-	case "paging":
+	if _, ok := ctx.GetQuery("page"); ok {
 		page := cast.ToInt(ctx.Query("page"))
 		size := cast.ToInt(ctx.Query("size"))
 		result, total, err := r.service.FindDevicesByPaginate(page, size, filters)
@@ -36,14 +36,13 @@ func (r deviceRouter) find(ctx *gin.Context) (interface{}, error) {
 			return nil, err
 		}
 		return response.NewPageResult(page, size, total, result), nil
-	default:
-		return r.service.FilterDevices(filters)
 	}
+	return r.service.FindDevices(filters)
 }
 
 func (r deviceRouter) update(ctx *gin.Context) (interface{}, error) {
 	id := cast.ToUint(ctx.Param("id"))
-	var req request.Device
+	var req request.UpdateDevice
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		return nil, response.InvalidParameterError(err.Error())
 	}
@@ -53,7 +52,11 @@ func (r deviceRouter) update(ctx *gin.Context) (interface{}, error) {
 func (r deviceRouter) executeCommand(ctx *gin.Context) (interface{}, error) {
 	id := cast.ToUint(ctx.Param("id"))
 	cmd := cast.ToUint(ctx.Param("cmd"))
-	return nil, r.service.ExecuteCommandByID(id, cmd)
+	var req request.DeviceCommand
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		return nil, response.InvalidParameterError(err.Error())
+	}
+	return nil, r.service.ExecuteCommandByID(id, cmd, req)
 }
 
 func (r deviceRouter) getSettingByID(ctx *gin.Context) (interface{}, error) {
@@ -84,12 +87,6 @@ func (r deviceRouter) checkMacAddress(ctx *gin.Context) (interface{}, error) {
 	return nil, r.service.CheckDeviceMacAddress(mac)
 }
 
-func (r deviceRouter) replaceByID(ctx *gin.Context) (interface{}, error) {
-	id := cast.ToUint(ctx.Param("id"))
-	mac := ctx.Param("mac")
-	return nil, r.service.ReplaceDeviceByID(id, mac)
-}
-
 func (r deviceRouter) delete(ctx *gin.Context) (interface{}, error) {
 	id := cast.ToUint(ctx.Param("id"))
 	return nil, r.service.DeleteDeviceByID(id)
@@ -97,13 +94,18 @@ func (r deviceRouter) delete(ctx *gin.Context) (interface{}, error) {
 
 func (r deviceRouter) findDataByID(ctx *gin.Context) (interface{}, error) {
 	id := cast.ToUint(ctx.Param("id"))
-	pid := ctx.Query("pid")
 	from := cast.ToInt64(ctx.Query("from"))
 	to := cast.ToInt64(ctx.Query("to"))
-	if pid == "" {
-		return r.service.FindDeviceDataByID(id, from, to)
-	}
-	return r.service.GetPropertyDataByID(id, pid, from, to)
+	sensorType := cast.ToUint(ctx.Query("data_type"))
+	return r.service.FindDeviceDataByID(id, sensorType, from, to)
+}
+
+func (r deviceRouter) getDataByIDAndTimestamp(ctx *gin.Context) (interface{}, error) {
+	id := cast.ToUint(ctx.Param("id"))
+	timestamp := cast.ToInt64(ctx.Param("timestamp"))
+	sensorType := cast.ToUint(ctx.Query("data_type"))
+	filters := request.NewFilters(ctx)
+	return r.service.GetDeviceDataByIDAndTimestamp(id, sensorType, timestamp, filters)
 }
 
 func (r deviceRouter) findRuntimeDataByID(ctx *gin.Context) (interface{}, error) {
@@ -121,19 +123,23 @@ func (r deviceRouter) downloadDataByID(ctx *gin.Context) (interface{}, error) {
 	if err := json.Unmarshal([]byte(ctx.Query("pids")), &pids); err != nil {
 		return nil, err
 	}
-	return r.service.DownloadPropertiesDataByID(id, pids, from, to)
+	return r.service.DownloadDeviceDataByID(id, pids, from, to, ctx.GetHeader("Timezone"))
+}
+
+func (r deviceRouter) downloadDataByIDAndTimestamp(ctx *gin.Context) (interface{}, error) {
+	id := cast.ToUint(ctx.Param("id"))
+	timestamp := cast.ToInt64(ctx.Param("timestamp"))
+	sensorType := cast.ToUint(ctx.Query("data_type"))
+	filters := request.NewFilters(ctx)
+	return r.service.DownloadDeviceDataByIDAndTimestamp(id, sensorType, timestamp, filters)
 }
 
 func (r deviceRouter) removeDataByID(ctx *gin.Context) (interface{}, error) {
 	id := cast.ToUint(ctx.Param("id"))
 	from := cast.ToInt64(ctx.Query("from"))
 	to := cast.ToInt64(ctx.Query("to"))
-	return nil, r.service.RemoveDataByID(id, from, to)
-}
-
-func (r deviceRouter) getChildren(ctx *gin.Context) (interface{}, error) {
-	id := cast.ToUint(ctx.Param("id"))
-	return r.service.GetChildren(id)
+	sensorType := cast.ToUint(ctx.Query("data_type"))
+	return nil, r.service.RemoveDataByID(id, sensorType, from, to)
 }
 
 func (r deviceRouter) upgrade(ctx *gin.Context) (interface{}, error) {
@@ -146,4 +152,54 @@ func (r deviceRouter) upgrade(ctx *gin.Context) (interface{}, error) {
 		return nil, r.service.ExecuteDeviceUpgradeByID(id, req)
 	}
 	return nil, r.service.ExecuteDeviceCancelUpgradeByID(id)
+}
+
+func (r deviceRouter) findEventsByID(ctx *gin.Context) (interface{}, error) {
+	id := cast.ToUint(ctx.Param("id"))
+	from := cast.ToInt64(ctx.Query("from"))
+	to := cast.ToInt64(ctx.Query("to"))
+	if _, ok := ctx.GetQuery("page"); ok {
+		page := cast.ToInt(ctx.Query("page"))
+		size := cast.ToInt(ctx.Query("size"))
+		result, total, err := r.service.PagingDeviceEventsByID(id, from, to, page, size)
+		if err != nil {
+			return nil, err
+		}
+		return response.NewPageResult(page, size, total, result), nil
+	}
+	return r.service.FindDeviceEventsByID(id, from, to)
+}
+
+func (r deviceRouter) removeEventsByID(ctx *gin.Context) (interface{}, error) {
+	id := cast.ToUint(ctx.Param("id"))
+	events := struct {
+		IDs []uint `json:"ids"`
+	}{}
+	if err := ctx.ShouldBindJSON(&events); err != nil {
+		return nil, response.InvalidParameterError(err.Error())
+	}
+	return nil, r.service.RemoveDeviceEventsByID(id, events.IDs)
+}
+
+func (r deviceRouter) findAlarmRulesByID(ctx *gin.Context) (interface{}, error) {
+	id := cast.ToUint(ctx.Param("id"))
+	return r.service.FindDeviceAlarmRulesByID(id)
+}
+
+func (r deviceRouter) addAlarmRulesByID(ctx *gin.Context) (interface{}, error) {
+	id := cast.ToUint(ctx.Param("id"))
+	var req request.DeviceAlarmRules
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		return nil, response.InvalidParameterError(err.Error())
+	}
+	return nil, r.service.AddDeviceAlarmRules(id, req)
+}
+
+func (r deviceRouter) removeAlarmRulesByID(ctx *gin.Context) (interface{}, error) {
+	id := cast.ToUint(ctx.Param("id"))
+	var req request.DeviceAlarmRules
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		return nil, response.InvalidParameterError(err.Error())
+	}
+	return nil, r.service.RemoveDeviceAlarmRulesByID(id, req)
 }

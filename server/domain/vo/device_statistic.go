@@ -1,22 +1,20 @@
 package vo
 
-import (
-	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
-)
+import "github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 
 type DeviceStatistic struct {
-	Device Device `json:"device"`
-	Status uint   `json:"status"`
+	IsOnline   bool `json:"isOnline"`
+	AlertLevel int  `json:"alertLevel"`
 }
 
-func NewDeviceStatistic(e entity.Device) DeviceStatistic {
-	s := DeviceStatistic{
-		Device: NewDevice(e),
+func (s *DeviceStatistic) SetAlertState(states []entity.DeviceAlertState) {
+	s.AlertLevel = 0
+	for _, state := range states {
+		if int(state.Rule.Level) > s.AlertLevel {
+			s.AlertLevel = int(state.Rule.Level)
+			if s.AlertLevel >= 3 {
+				break
+			}
+		}
 	}
-	if e.GetConnectionState().IsOnline {
-		s.Status = 1
-	} else {
-		s.Status = 0
-	}
-	return s
 }

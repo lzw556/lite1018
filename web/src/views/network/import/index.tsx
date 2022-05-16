@@ -1,40 +1,38 @@
 import {Button, Card, Col, Form, message, Result, Row, Space, Upload} from "antd";
 import {Content} from "antd/lib/layout/layout";
 import {useEffect, useState} from "react";
-import {Canvas, Edge, Node, NodeProps, Remove} from "reaflow";
 import {ImportOutlined, InboxOutlined} from "@ant-design/icons";
-import {DeviceType} from "../../../types/device_type";
 import {ImportNetworkRequest} from "../../../apis/network";
 import ShadowCard from "../../../components/shadowCard";
-import AddNodeModal from "../modal/addNode";
 import CommunicationTimeOffsetSelect from "../../../components/communicationTimeOffsetSelect";
 import CommunicationPeriodSelect from "../../../components/communicationPeriodSelect";
 import GroupSizeSelect from "../../../components/groupSizeSelect";
 import GroupIntervalSelect from "../../../components/groupIntervalSelect";
 import MyBreadcrumb from "../../../components/myBreadcrumb";
+import G6 from "@antv/g6";
+import "../../../components/shape/shape"
 
 const {Dragger} = Upload
 
 export interface NetworkRequestForm {
-    communication_period: number
-    communication_time_offset: number
-    group_size: number
-    group_interval: number
-    routing_tables: [],
+    wsn: {
+        communication_period: number
+        communication_offset: number
+        group_size: number
+        group_interval: number
+    }
     devices: any
 }
 
 const ImportNetworkPage = () => {
     const [height] = useState<number>(window.innerHeight - 190)
-    const [edges, setEdges] = useState<any>([])
-    const [nodes, setNodes] = useState<any>([])
-    const [current, setCurrent] = useState<number>(0)
+    const [network, setNetwork] = useState<any>()
     const [success, setSuccess] = useState<boolean>(false)
-    const [addNodeVisible, setAddNodeVisible] = useState<boolean>(false)
     const [form] = Form.useForm()
+    let graph: any = null
 
     const checkJSONFormat = (source: any) => {
-        return source.hasOwnProperty("deviceList") && source.hasOwnProperty("settings") && source.hasOwnProperty("routingTable")
+        return source.hasOwnProperty("deviceList") && source.hasOwnProperty("wsn")
     }
 
     const onBeforeUpload = (file: any) => {
@@ -44,27 +42,8 @@ const ImportNetworkPage = () => {
             if (typeof reader.result === "string") {
                 const json = JSON.parse(reader.result)
                 if (checkJSONFormat(json)) {
-                    const devices = json.deviceList
-                    if (devices && devices.length) {
-                        if (devices.reduce((acc: Map<string, any>, item: any) => acc.set(item.address, item), new Map()).size === devices.length) {
-                            setNodes(devices.map((item: any) => {
-                                return {id: item.address, text: item.name, data: item}
-                            }))
-                            setEdges(json.routingTable.map((item: any) => {
-                                return {id: `${item[0]}`, from: item[1], to: item[0]}
-                            }))
-                            const wsn = json.settings.wsn
-                            form.setFieldsValue(
-                                {
-                                    communication_period: wsn.communication_period,
-                                    communication_time_offset: wsn.communication_time_offset,
-                                    group_size: wsn.group_size,
-                                    group_interval: wsn.group_interval
-                                })
-                        } else {
-                            message.error("设备MAC地址重复").then()
-                        }
-                    }
+                    console.log(json.deviceList)
+                    setNetwork({wsn: json.wsn, devices: json.deviceList})
                 } else {
                     message.error("文件格式错误").then()
                 }
@@ -73,25 +52,39 @@ const ImportNetworkPage = () => {
         return false
     }
 
+    useEffect(() => {
+        if (network) {
+            form.setFieldsValue(
+                {
+                    communication_period: network.wsn.communication_period,
+                    communication_offset: network.wsn.communication_offset,
+                    group_size: network.wsn.group_size,
+                    group_interval: network.wsn.group_interval
+                })
+        }
+    }, [network])
+
     const onSave = () => {
+        const nodes = network.devices
         if (nodes && nodes.length) {
             form.validateFields().then(values => {
                 const req: NetworkRequestForm = {
-                    communication_period: values.communication_period,
-                    communication_time_offset: values.communication_time_offset,
-                    group_size: values.group_size,
-                    group_interval: values.group_interval,
-                    routing_tables: edges.map((e: any) => [e.to, e.from]),
+                    wsn: {
+                        communication_period: values.communication_period,
+                        communication_offset: values.communication_offset,
+                        group_size: values.group_size,
+                        group_interval: values.group_interval,
+                    },
                     devices: nodes.map((n: any) => {
                         return {
-                            name: n.data.name,
-                            mac_address: n.data.address,
-                            type_id: n.data.type,
-                            ...JSON.parse(n.data.settings)
+                            name: n.name,
+                            mac_address: n.address,
+                            parent_address: n.parentAddress,
+                            type_id: n.type,
+                            settings: n.settings,
                         }
                     })
                 }
-                console.log(req)
                 ImportNetworkRequest(req).then(_ => setSuccess(true))
             })
         } else {
@@ -99,41 +92,78 @@ const ImportNetworkPage = () => {
         }
     }
 
-    const onRemove = (node: any) => {
-        const newNodes = nodes.filter((n: any) => n.id !== node.id)
-        const newEdges = edges.filter((e: any) => e.from !== node.id && e.to !== node.id)
-        const parents = edges.filter((e: any) => e.to === node.id)
-        const children = edges.filter((e: any) => e.from === node.id)
-        parents.forEach((parent: any) => {
-            children.forEach((child: any) => {
-                const parentNode = nodes.find((n: any) => n.id === parent.from)
-                const childNode = nodes.find((n: any) => n.id === child.to)
-                if (parentNode && childNode) {
-                    newEdges.push({id: childNode.id, from: parentNode.id, to: childNode.id})
-                }
-            })
-        })
-        setNodes(newNodes)
-        setEdges(newEdges)
-        setCurrent(0)
-    }
-
-    const renderActionButton = () => {
-        if (nodes && nodes.length) {
-            return <Space>
-                <a onClick={() => setAddNodeVisible(true)}>添加设备</a>
-            </Space>
-        }
+    const tree: any = (root: any) => {
+        return network.devices.slice(1).filter((node:any) => node.parentAddress === root.address).map((item:any) => {
+            console.log(item.address)
+            return {
+                id: item.address,
+                data: item,
+                children: tree(item)
+            }
+        });
     }
 
     useEffect(() => {
-        if (nodes[current]) {
-            form.setFieldsValue({
-                name: nodes[current].data.name,
-                mac_address: nodes[current].data.address
-            })
+        if (network?.devices && network?.devices.length) {
+            if (!graph){
+                graph = new G6.TreeGraph({
+                    container: 'container',
+                    width: document.querySelector("#container")?.clientWidth,
+                    height: document.querySelector("#container")?.clientHeight,
+                    modes: {
+                        default: [{type: 'collapse-expand'}, 'drag-canvas', 'zoom-canvas']
+                    },
+                    defaultNode: {
+                        type: 'gateway',
+                        size: [120, 40],
+                        anchorPoints: [[0, 0.5], [1, 0.5]]
+                    },
+                    defaultEdge: {
+                        type: 'cubic-horizontal',
+                        style: {
+                            stroke: '#A3B1BF',
+                        }
+                    },
+                    layout: {
+                        type: 'compactBox',
+                        direction: 'LR',
+                        getId: function getId(d: any) {
+                            return d.id;
+                        },
+                        getHeight: function getHeight() {
+                            return 16;
+                        },
+                        getWidth: function getWidth() {
+                            return 16;
+                        },
+                        getVGap: function getVGap() {
+                            return 20;
+                        },
+                        getHGap: function getHGap() {
+                            return 80;
+                        }
+                    }
+                });
+                graph.data({
+                    id: network.devices[0].address,
+                    data: network.devices[0],
+                    children: tree(network.devices[0])
+                });
+                graph.render();
+                graph.fitView();
+            }
         }
-    }, [current])
+    }, [network])
+
+    const renderAction = () => {
+        if (network) {
+            return <a onClick={() => {
+                setNetwork(undefined);
+                form.resetFields();
+            }}>重置</a>
+        }
+        return <div/>
+    }
 
     return <Content>
         <MyBreadcrumb>
@@ -149,46 +179,11 @@ const ImportNetworkPage = () => {
                     !success ?
                         <Row justify="space-between">
                             <Col xl={16} xxl={18}>
-                                <Card type="inner" size={"small"} title={"预览"} style={{height: `${height}px`}}
-                                      extra={renderActionButton()}>
-                                    <div className="graph" style={{height: `${height - 56}px`}}>
+                                <Card type="inner" size={"small"} title={"预览"} style={{height: `${height}px`}} extra={renderAction()}>
+                                    <div className="graph" style={{height: `${height - 56}px`, width: "100%"}}>
                                         {
-                                            nodes.length ?
-                                                <Canvas
-                                                    selections={nodes[current] ? [nodes[current].data.address] : []}
-                                                    nodes={nodes} edges={edges}
-                                                    direction="DOWN"
-                                                    onNodeLink={(event, from, to) => {
-                                                        setEdges([
-                                                            ...edges,
-                                                            {
-                                                                id: to.id,
-                                                                from: from.id,
-                                                                to: to.id
-                                                            }
-                                                        ])
-                                                    }}
-                                                    node={(props: NodeProps) => (
-                                                        <Node
-                                                            onClick={(event, node) => {
-                                                                const index = nodes.map((item: any) => item.id).indexOf(node.id)
-                                                                setCurrent(index)
-                                                            }}
-                                                            remove={<Remove
-                                                                hidden={props.properties.data.type === DeviceType.Gateway}/>}
-                                                            onRemove={(event, node) => {
-                                                                onRemove(node)
-                                                            }}
-                                                        />
-                                                    )}
-                                                    edge={
-                                                        <Edge onRemove={(event, edge) => {
-                                                            const newEdges = edges.filter((item: any) => item.id !== edge.id)
-                                                            setEdges(newEdges)
-                                                            console.log(edge)
-                                                        }}/>
-                                                    }
-                                                /> :
+                                            network?.devices.length ?
+                                                <div id={"container"} style={{width: "100%", height: "100%"}}/>:
                                                 <Dragger accept={".json"} beforeUpload={onBeforeUpload}
                                                          showUploadList={false}>
                                                     <p className="ant-upload-drag-icon">
@@ -209,7 +204,7 @@ const ImportNetworkPage = () => {
                                                rules={[{required: true, message: "请选择网络通讯周期"}]}>
                                         <CommunicationPeriodSelect placeholder={"请选择网络通讯周期"}/>
                                     </Form.Item>
-                                    <Form.Item label="通讯延时" name="communication_time_offset"
+                                    <Form.Item label="通讯延时" name="communication_offset"
                                                rules={[{required: true}]}>
                                         <CommunicationTimeOffsetSelect placeholder={"请选择网络通讯延时"}/>
                                     </Form.Item>
@@ -236,9 +231,7 @@ const ImportNetworkPage = () => {
                                 </Button>,
                                 <Button key="add" onClick={() => {
                                     form.resetFields()
-                                    setNodes([])
-                                    setEdges([])
-                                    setCurrent(0)
+                                    setNetwork({devices: [], wsn: {}})
                                     setSuccess(false)
                                 }}>继续导入网络</Button>,
                             ]}
@@ -246,13 +239,6 @@ const ImportNetworkPage = () => {
                 }
             </Form>
         </ShadowCard>
-        <AddNodeModal visible={addNodeVisible} onCancel={() => setAddNodeVisible(false)} onSuccess={node => {
-            setNodes([
-                ...nodes,
-                node
-            ])
-            setAddNodeVisible(false)
-        }}/>
     </Content>
 }
 

@@ -1,6 +1,8 @@
 import axios, {AxiosRequestConfig, AxiosResponse, Method} from "axios";
 import {ResponseResult} from "../types/response";
 import {getProject, getToken, isLogin} from "./session";
+import {message} from "antd";
+import moment from "moment-timezone"
 
 axios.defaults.timeout =  30 * 1000
 axios.defaults.baseURL = "/api"
@@ -9,6 +11,7 @@ axios.interceptors.request.use((config:AxiosRequestConfig) => {
     if (isLogin()) {
         config.headers.Authorization = `Bearer ${getToken()}`
         config.headers.Project = getProject()
+        config.headers.Timezone = moment.tz.guess();
     }
     return config
 })
@@ -19,15 +22,21 @@ axios.interceptors.response.use(<T>(response:AxiosResponse<T>) => {
     }
     return response
 }, error => {
-    switch (error.response.status) {
+    const {status} = error.response
+    switch (status) {
         case 403:
             window.location.hash = '/403'
             break
         case 404:
             window.location.hash = '/404'
             break
-        default:
+        case 500:
             window.location.hash = '/500'
+            break
+        case 400:
+            message.error(`${error.response.data.msg}`)
+            break
+        default:
             break
     }
     return Promise.reject(error)

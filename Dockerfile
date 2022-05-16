@@ -1,4 +1,4 @@
-FROM golang:1.17.2-alpine as builder
+FROM golang:1.18-alpine as builder
 
 RUN apk add --no-cache \
     git \
@@ -12,11 +12,13 @@ WORKDIR /go/src/github.com/thetasensors/cloud-lite
 
 ENV GO11MODULE on
 ENV GOPRIVATE github.com/thetasensors
-ENV GOPROXY https://goproxy.cn
+#ENV GOPROXY https://goproxy.cn
 
 # Cache dependencies
 COPY ./server/go.mod .
 COPY ./server/go.sum .
+
+RUN go mod tidy
 
 RUN go mod download
 

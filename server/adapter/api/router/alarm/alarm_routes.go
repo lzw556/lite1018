@@ -7,147 +7,114 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/response"
 )
 
-func (r alarmRouter) createTemplate(ctx *gin.Context) (interface{}, error) {
-	var req request.AlarmTemplate
+func (r alarmRouter) createAlarmRule(ctx *gin.Context) (interface{}, error) {
+	var req request.AlarmRule
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		return nil, response.InvalidParameterError(err.Error())
 	}
 	req.ProjectID = cast.ToUint(ctx.MustGet("project_id"))
-	return nil, r.service.CreateAlarmTemplate(req)
+	return nil, r.service.CreateAlarmRule(req)
 }
 
-func (r alarmRouter) findTemplates(ctx *gin.Context) (interface{}, error) {
+func (r alarmRouter) findAlarmRules(ctx *gin.Context) (interface{}, error) {
 	filters := request.NewFilters(ctx)
-	switch ctx.Query("method") {
-	case "paging":
+	if _, ok := ctx.GetQuery("page"); ok {
 		page := cast.ToInt(ctx.Query("page"))
 		size := cast.ToInt(ctx.Query("size"))
-		result, total, err := r.service.FindAlarmTemplatesByPaginate(filters, page, size)
+		result, total, err := r.service.PagingAlarmRules(page, size, filters)
 		if err != nil {
 			return nil, err
 		}
 		return response.NewPageResult(page, size, total, result), nil
-	default:
-		return nil, nil
 	}
+	return r.service.FindAlarmRules(filters)
 }
 
-func (r alarmRouter) getTemplate(ctx *gin.Context) (interface{}, error) {
+func (r alarmRouter) getAlarmRule(ctx *gin.Context) (interface{}, error) {
 	id := cast.ToUint(ctx.Param("id"))
-	return r.service.GetAlarmTemplate(id)
+	return r.service.GetAlarmRuleByID(id)
 }
 
-func (r alarmRouter) updateTemplate(ctx *gin.Context) (interface{}, error) {
-	id := cast.ToUint(ctx.Param("id"))
-	var req request.AlarmTemplate
-	if err := ctx.ShouldBindJSON(&req); err != nil {
-		return nil, response.InvalidParameterError(err.Error())
-	}
-	return r.service.UpdateAlarmTemplate(id, req)
-}
-
-func (r alarmRouter) deleteTemplate(ctx *gin.Context) (interface{}, error) {
-	id := cast.ToUint(ctx.Param("id"))
-	return nil, r.service.RemoveAlarmTemplate(id)
-}
-
-func (r alarmRouter) checkAlarm(ctx *gin.Context) (interface{}, error) {
+func (r alarmRouter) checkAlarmRuleName(ctx *gin.Context) (interface{}, error) {
 	name := ctx.Param("name")
-	return nil, r.service.CheckAlarm(name)
+	return r.service.CheckAlarmRuleName(name)
 }
 
-func (r alarmRouter) createAlarm(ctx *gin.Context) (interface{}, error) {
-	createType := cast.ToUint(ctx.Query("create_type"))
-	switch createType {
-	case 1:
-		var req request.CreateAlarmFromTemplate
-		if err := ctx.ShouldBindJSON(&req); err != nil {
-			return nil, response.InvalidParameterError(err.Error())
-		}
-		return nil, r.service.CreateAlarmFromTemplate(req)
-	default:
-		var req request.CreateAlarm
-		if err := ctx.ShouldBindJSON(&req); err != nil {
-			return nil, response.InvalidParameterError(err.Error())
-		}
-		return nil, r.service.CreateAlarm(req)
-	}
-}
-
-func (r alarmRouter) findAlarms(ctx *gin.Context) (interface{}, error) {
-	filters := request.NewFilters(ctx)
-	switch ctx.Query("method") {
-	case "paging":
-		page := cast.ToInt(ctx.Query("page"))
-		size := cast.ToInt(ctx.Query("size"))
-		result, total, err := r.service.FindAlarmsByPaginate(filters, page, size)
-		if err != nil {
-			return nil, err
-		}
-		return response.NewPageResult(page, size, total, result), nil
-	default:
-		return nil, nil
-	}
-}
-
-func (r alarmRouter) getAlarms(ctx *gin.Context) (interface{}, error) {
+func (r alarmRouter) updateAlarmRule(ctx *gin.Context) (interface{}, error) {
 	id := cast.ToUint(ctx.Param("id"))
-	return r.service.GetAlarmByID(id)
-}
-
-func (r alarmRouter) updateAlarm(ctx *gin.Context) (interface{}, error) {
-	id := cast.ToUint(ctx.Param("id"))
-	var req request.UpdateAlarm
+	var req request.AlarmRule
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		return nil, response.InvalidParameterError(err.Error())
 	}
-	return nil, r.service.UpdateAlarmByID(id, req)
+	return nil, r.service.UpdateAlarmRuleByID(id, req)
 }
 
-func (r alarmRouter) deleteAlarm(ctx *gin.Context) (interface{}, error) {
+func (r alarmRouter) addSourcesToAlarmRule(ctx *gin.Context) (interface{}, error) {
 	id := cast.ToUint(ctx.Param("id"))
-	return nil, r.service.DeleteAlarmByID(id)
+	var req request.AlarmSources
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		return nil, response.InvalidParameterError(err.Error())
+	}
+	return nil, r.service.AddSourcesToAlarmRule(id, req.IDs)
 }
 
-func (r alarmRouter) findRecords(ctx *gin.Context) (interface{}, error) {
+func (r alarmRouter) removeSourcesFromAlarmRule(ctx *gin.Context) (interface{}, error) {
+	id := cast.ToUint(ctx.Param("id"))
+	var req request.AlarmSources
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		return nil, response.InvalidParameterError(err.Error())
+	}
+	return nil, r.service.RemoveSourcesFromAlarmRule(id, req.IDs)
+}
+
+func (r alarmRouter) updateAlarmRuleStatus(ctx *gin.Context) (interface{}, error) {
+	id := cast.ToUint(ctx.Param("id"))
+	status := cast.ToUint8(ctx.Param("status"))
+	return nil, r.service.UpdateAlarmRuleStatusByID(id, status)
+}
+
+func (r alarmRouter) deleteAlarmRule(ctx *gin.Context) (interface{}, error) {
+	id := cast.ToUint(ctx.Param("id"))
+	return nil, r.service.DeleteAlarmRuleByID(id)
+}
+
+func (r alarmRouter) findAlarmRecords(ctx *gin.Context) (interface{}, error) {
 	filters := request.NewFilters(ctx)
-	switch ctx.Query("method") {
-	case "paging":
+	if _, ok := ctx.GetQuery("page"); ok {
 		page := cast.ToInt(ctx.Query("page"))
 		size := cast.ToInt(ctx.Query("size"))
 		from := cast.ToInt64(ctx.Query("from"))
 		to := cast.ToInt64(ctx.Query("to"))
-		result, total, err := r.service.FindAlarmRecordsByPaginate(filters, from, to, page, size)
+		result, total, err := r.service.FindAlarmRecordByPaginate(page, size, from, to, filters)
 		if err != nil {
 			return nil, err
 		}
 		return response.NewPageResult(page, size, total, result), nil
-	default:
-		return nil, nil
 	}
+	return nil, nil
 }
 
-func (r alarmRouter) getRecord(ctx *gin.Context) (interface{}, error) {
+func (r alarmRouter) getAlarmRecord(ctx *gin.Context) (interface{}, error) {
 	id := cast.ToUint(ctx.Param("id"))
 	return r.service.GetAlarmRecordByID(id)
 }
 
-func (r alarmRouter) getRecordAcknowledge(ctx *gin.Context) (interface{}, error) {
-	id := cast.ToUint(ctx.Param("id"))
-	return r.service.GetAlarmRecordAcknowledgeByID(id)
-}
-
-func (r alarmRouter) deleteRecord(ctx *gin.Context) (interface{}, error) {
-	id := cast.ToUint(ctx.Param("id"))
-	return nil, r.service.DeleteAlarmRecordByID(id)
-}
-
-func (r alarmRouter) acknowledgeRecord(ctx *gin.Context) (interface{}, error) {
+func (r alarmRouter) acknowledgeAlarmRecord(ctx *gin.Context) (interface{}, error) {
 	id := cast.ToUint(ctx.Param("id"))
 	var req request.AcknowledgeAlarmRecord
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		return nil, response.InvalidParameterError(err.Error())
 	}
-	req.UserID = ctx.GetUint("user_id")
+	req.UserID = cast.ToUint(ctx.MustGet("user_id"))
 	return nil, r.service.AcknowledgeAlarmRecordByID(id, req)
+}
+
+func (r alarmRouter) deleteAlarmRecord(ctx *gin.Context) (interface{}, error) {
+	id := cast.ToUint(ctx.Param("id"))
+	return nil, r.service.DeleteAlarmRecordByID(id)
+}
+
+func (r alarmRouter) getAlarmRecordAcknowledge(ctx *gin.Context) (interface{}, error) {
+	id := cast.ToUint(ctx.Param("id"))
+	return r.service.GetAlarmRecordAcknowledgeByID(id)
 }
