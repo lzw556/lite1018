@@ -26,7 +26,9 @@ func NewAdapter(conf config.IoT) *Adapter {
 	opts.Password = conf.Password
 	opts.ClientID = "iot"
 	opts.CleanSession = false
+	opts.AutoReconnect = true
 	opts.AddBroker(conf.Broker)
+	opts.OnConnectionLost = lostConnection
 	return &Adapter{
 		client:        mqtt.NewClient(opts),
 		username:      conf.Username,
@@ -96,7 +98,7 @@ func (a *Adapter) Run() error {
 	if t := a.client.Connect(); t.Wait() && t.Error() != nil {
 		return t.Error()
 	}
-	t := a.client.Subscribe("iot/v2/gw/+/dev/+/msg/+/", 1, func(c mqtt.Client, message mqtt.Message) {
+	t := a.client.Subscribe("iot/v2/gw/+/dev/+/msg/+/", 0, func(c mqtt.Client, message mqtt.Message) {
 		msg := parse(message)
 		if dispatcher, ok := a.dispatchers[msg.Header.Type]; ok {
 			xlog.Debugf("receive %s message => [%s]", dispatcher.Name(), msg.Body.Device)
@@ -108,6 +110,10 @@ func (a *Adapter) Run() error {
 	}
 	xlog.Info("iot server start successful")
 	return nil
+}
+
+func lostConnection(c mqtt.Client, err error) {
+	xlog.Errorf("lost connection to mqtt broker: %s", err.Error())
 }
 
 func (a *Adapter) Close() {
