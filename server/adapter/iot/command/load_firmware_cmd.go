@@ -26,12 +26,16 @@ func newLoadFirmwareCmd(id uint, seqID int, data []byte, total int) loadFirmware
 	}
 }
 
+func (cmd loadFirmwareCmd) ID() string {
+	return cmd.request.id
+}
+
 func (cmd loadFirmwareCmd) Name() string {
 	return "loadFirmware"
 }
 
-func (cmd loadFirmwareCmd) Response() string {
-	return "loadFirmwareResponse"
+func (cmd loadFirmwareCmd) Response() chan Response {
+	return cmd.response
 }
 
 func (cmd loadFirmwareCmd) Qos() byte {
@@ -51,6 +55,6 @@ func (cmd loadFirmwareCmd) Payload() ([]byte, error) {
 	return proto.Marshal(&m)
 }
 
-func (cmd loadFirmwareCmd) Execute(ctx context.Context, gateway string, target string, timeout time.Duration) ([]byte, error) {
+func (cmd loadFirmwareCmd) Execute(ctx context.Context, gateway string, target string, timeout time.Duration) (*Response, error) {
 	return cmd.request.do(ctx, gateway, target, cmd, timeout)
 }

@@ -23,12 +23,16 @@ func newCalibrateCmd(sensorType uint, param float32) calibrateCmd {
 	return cmd
 }
 
+func (cmd calibrateCmd) ID() string {
+	return cmd.request.id
+}
+
 func (cmd calibrateCmd) Name() string {
 	return "calibrate"
 }
 
-func (cmd calibrateCmd) Response() string {
-	return "calibrateResponse"
+func (cmd calibrateCmd) Response() chan Response {
+	return cmd.response
 }
 
 func (cmd calibrateCmd) Qos() byte {
@@ -46,6 +50,6 @@ func (cmd calibrateCmd) Payload() ([]byte, error) {
 	return proto.Marshal(&m)
 }
 
-func (cmd calibrateCmd) Execute(ctx context.Context, gateway string, target string, timeout time.Duration) ([]byte, error) {
+func (cmd calibrateCmd) Execute(ctx context.Context, gateway string, target string, timeout time.Duration) (*Response, error) {
 	return cmd.request.do(ctx, gateway, target, cmd, timeout)
 }

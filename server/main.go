@@ -2,14 +2,12 @@ package main
 
 import (
 	"embed"
-	"fmt"
 	"github.com/thetasensors/theta-cloud-lite/server/app"
 	"github.com/thetasensors/theta-cloud-lite/server/config"
 	"github.com/thetasensors/theta-cloud-lite/server/core"
 	"github.com/thetasensors/theta-cloud-lite/server/initialize"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/casbin"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/global"
-	"github.com/thetasensors/theta-cloud-lite/server/pkg/license"
 )
 
 //go:embed static
@@ -22,11 +20,11 @@ var rbacModel string
 var rbacPolicy string
 
 func main() {
-	key := "thetasensorskeyaesfitbitsencrypt"
-	if !license.ValidateKeyFile([]byte(key), "license.data") {
-		fmt.Println("Invalid key file")
-		return
-	}
+	//key := "thetasensorskeyaesfitbitsencrypt"
+	//if !license.ValidateKeyFile([]byte(key), "license.data") {
+	//	fmt.Println("Invalid key file")
+	//	return
+	//}
 	initialize.InitFolder()
 	global.Viper = core.Viper()
 	dbConf := config.Database{}

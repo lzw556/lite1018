@@ -21,12 +21,16 @@ func newDeleteDeviceCmd(mac string) deleteDeviceCmd {
 	}
 }
 
+func (cmd deleteDeviceCmd) ID() string {
+	return cmd.request.id
+}
+
 func (cmd deleteDeviceCmd) Name() string {
 	return "deleteDevice"
 }
 
-func (cmd deleteDeviceCmd) Response() string {
-	return "deleteDeviceResponse"
+func (cmd deleteDeviceCmd) Response() chan Response {
+	return cmd.response
 }
 
 func (cmd deleteDeviceCmd) Qos() byte {
@@ -42,6 +46,6 @@ func (cmd deleteDeviceCmd) Payload() ([]byte, error) {
 	return proto.Marshal(&m)
 }
 
-func (cmd deleteDeviceCmd) Execute(ctx context.Context, gateway string, target string, timeout time.Duration) ([]byte, error) {
+func (cmd deleteDeviceCmd) Execute(ctx context.Context, gateway string, target string, timeout time.Duration) (*Response, error) {
 	return cmd.do(ctx, gateway, target, cmd, timeout)
 }

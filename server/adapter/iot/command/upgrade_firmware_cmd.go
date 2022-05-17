@@ -21,12 +21,16 @@ func newUpgradeFirmwareCmd(firmware entity.Firmware) upgradeFirmwareCmd {
 	}
 }
 
+func (cmd upgradeFirmwareCmd) ID() string {
+	return cmd.request.id
+}
+
 func (cmd upgradeFirmwareCmd) Name() string {
 	return "upgradeFirmware"
 }
 
-func (cmd upgradeFirmwareCmd) Response() string {
-	return "upgradeFirmwareResponse"
+func (cmd upgradeFirmwareCmd) Response() chan Response {
+	return cmd.response
 }
 
 func (cmd upgradeFirmwareCmd) Qos() byte {
@@ -47,6 +51,6 @@ func (cmd upgradeFirmwareCmd) Payload() ([]byte, error) {
 	return proto.Marshal(&m)
 }
 
-func (cmd upgradeFirmwareCmd) Execute(ctx context.Context, gateway string, target string, timeout time.Duration) ([]byte, error) {
+func (cmd upgradeFirmwareCmd) Execute(ctx context.Context, gateway string, target string, timeout time.Duration) (*Response, error) {
 	return cmd.request.do(ctx, gateway, target, cmd, timeout)
 }

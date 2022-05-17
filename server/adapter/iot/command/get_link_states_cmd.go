@@ -17,12 +17,16 @@ func newGetLinkStatesCmd() getLinkStatesCmd {
 	}
 }
 
+func (cmd getLinkStatesCmd) ID() string {
+	return cmd.request.id
+}
+
 func (cmd getLinkStatesCmd) Name() string {
 	return "getLinkStates"
 }
 
-func (cmd getLinkStatesCmd) Response() string {
-	return "getLinkStatesResponse"
+func (cmd getLinkStatesCmd) Response() chan Response {
+	return cmd.response
 }
 
 func (cmd getLinkStatesCmd) Qos() byte {
@@ -37,6 +41,6 @@ func (cmd getLinkStatesCmd) Payload() ([]byte, error) {
 	return proto.Marshal(&m)
 }
 
-func (cmd getLinkStatesCmd) Execute(ctx context.Context, gateway string, target string, timeout time.Duration) ([]byte, error) {
+func (cmd getLinkStatesCmd) Execute(ctx context.Context, gateway string, target string, timeout time.Duration) (*Response, error) {
 	return cmd.request.do(ctx, gateway, target, cmd, timeout)
 }

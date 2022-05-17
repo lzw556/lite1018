@@ -43,12 +43,16 @@ func newUpdateDeviceSettingsCmd(settings entity.DeviceSettings) updateDeviceSett
 	return cmd
 }
 
+func (cmd updateDeviceSettingsCmd) ID() string {
+	return cmd.request.id
+}
+
 func (cmd updateDeviceSettingsCmd) Name() string {
 	return "updateDeviceSettings"
 }
 
-func (cmd updateDeviceSettingsCmd) Response() string {
-	return "updateDeviceSettingsResponse"
+func (cmd updateDeviceSettingsCmd) Response() chan Response {
+	return cmd.response
 }
 
 func (cmd updateDeviceSettingsCmd) Qos() byte {
@@ -69,6 +73,6 @@ func (cmd updateDeviceSettingsCmd) Payload() ([]byte, error) {
 	return proto.Marshal(&m)
 }
 
-func (cmd updateDeviceSettingsCmd) Execute(ctx context.Context, gateway string, target string, timeout time.Duration) ([]byte, error) {
+func (cmd updateDeviceSettingsCmd) Execute(ctx context.Context, gateway string, target string, timeout time.Duration) (*Response, error) {
 	return cmd.request.do(ctx, gateway, target, cmd, timeout)
 }

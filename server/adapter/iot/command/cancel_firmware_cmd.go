@@ -17,12 +17,16 @@ func newCancelFirmwareCmd() cancelFirmwareCmd {
 	}
 }
 
+func (cmd cancelFirmwareCmd) ID() string {
+	return cmd.request.id
+}
+
 func (cmd cancelFirmwareCmd) Name() string {
 	return "cancelFirmware"
 }
 
-func (cmd cancelFirmwareCmd) Response() string {
-	return "cancelFirmwareResponse"
+func (cmd cancelFirmwareCmd) Response() chan Response {
+	return cmd.response
 }
 
 func (cmd cancelFirmwareCmd) Qos() byte {
@@ -37,6 +41,6 @@ func (cmd cancelFirmwareCmd) Payload() ([]byte, error) {
 	return proto.Marshal(&m)
 }
 
-func (cmd cancelFirmwareCmd) Execute(ctx context.Context, gateway string, target string, timeout time.Duration) ([]byte, error) {
+func (cmd cancelFirmwareCmd) Execute(ctx context.Context, gateway string, target string, timeout time.Duration) (*Response, error) {
 	return cmd.request.do(ctx, gateway, target, cmd, timeout)
 }
