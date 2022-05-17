@@ -14,7 +14,7 @@ const AcknowledgeModal: FC<AcknowledgeModalProps> = (props) => {
     useEffect(() => {
         form.setFieldsValue({
             source: record.source,
-            content: `${record.metric.name} ${record.operation} ${record.value} ${record.metric.unit}`
+            content: `${record.metric.name} ${record.operation} ${record.threshold}${record.metric.unit} 报警值: ${record.value}${record.metric.unit}`
         });
     }, [record]);
 
