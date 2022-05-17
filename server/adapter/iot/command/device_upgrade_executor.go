@@ -5,6 +5,7 @@ import (
 	"fmt"
 	mqtt2 "github.com/eclipse/paho.mqtt.golang"
 	"github.com/gogo/protobuf/proto"
+	"github.com/spf13/cast"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/iot/background"
 	pd "github.com/thetasensors/theta-cloud-lite/server/adapter/iot/proto"
@@ -12,6 +13,7 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/global"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/json"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/xlog"
 	"time"
 )
@@ -30,19 +32,12 @@ func NewDeviceUpgradeExecutor(firmware entity.Firmware) background.Executor {
 
 func (e DeviceUpgradeExecutor) Execute(ctx context.Context, gateway, device entity.Device) error {
 	cmd := newUpgradeFirmwareCmd(e.firmware)
-	payload, err := cmd.Execute(ctx, gateway.MacAddress, device.MacAddress, 3*time.Second)
+	resp, err := cmd.Execute(ctx, gateway.MacAddress, device.MacAddress, 3*time.Second)
 	if err != nil {
-		return err
-	}
-	if err != nil {
-		return err
-	}
-	m := pd.FirmwareUpgradeResponseMessage{}
-	if err := proto.Unmarshal(payload, &m); err != nil {
 		return err
 	}
 	xlog.Infof("start device upgrade job => [%s]", device.MacAddress)
-	if m.Code == 1 {
+	if resp.Code == 1 {
 		if err := e.loadFirmware(ctx, gateway.MacAddress, device); err != nil {
 			return err
 		}
@@ -91,28 +86,31 @@ func (e DeviceUpgradeExecutor) loadFirmware(ctx context.Context, gateway string,
 		}
 	}
 	for seqID := 0; seqID < len(firmwareData); {
-		m, err := e.sendFirmwareData(ctx, gateway, device, seqID, firmwareData[seqID])
+		seqId, progress, err := e.sendFirmwareData(ctx, gateway, device, seqID, firmwareData[seqID])
 		if err != nil {
 			return err
 		}
-		device.UpdateDeviceUpgradeStatus(entity.DeviceUpgradeLoading, m.Progress)
-		seqID = int(m.SeqId + 1)
+		device.UpdateDeviceUpgradeStatus(entity.DeviceUpgradeLoading, progress)
+		seqID = seqId + 1
 	}
 	xlog.Infof("load firmware data complete => [%s]", device.MacAddress)
 	return nil
 }
 
-func (e DeviceUpgradeExecutor) sendFirmwareData(ctx context.Context, gateway string, device entity.Device, seqID int, data []byte) (*pd.FirmwareLoadStatusMessage, error) {
+func (e DeviceUpgradeExecutor) sendFirmwareData(ctx context.Context, gateway string, device entity.Device, seqID int, data []byte) (int, float32, error) {
 	cmd := newLoadFirmwareCmd(e.firmware.ID, seqID, data, int(e.firmware.Size))
-	payload, err := cmd.Execute(ctx, gateway, device.MacAddress, 3*time.Second)
+	resp, err := cmd.Execute(ctx, gateway, device.MacAddress, 3*time.Second)
 	if err != nil {
-		return nil, err
+		return 0, 0, err
 	}
-	m := pd.FirmwareLoadStatusMessage{}
-	if err := proto.Unmarshal(payload, &m); err != nil {
-		return nil, err
+	if resp.Code == 0 {
+		status := map[string]interface{}{}
+		if err := json.Unmarshal(resp.Payload, &status); err != nil {
+			return 0, 0, err
+		}
+		return cast.ToInt(status["seqId"]), cast.ToFloat32(status["progress"]), nil
 	}
-	return &m, nil
+	return 0, 0, fmt.Errorf("device [%s] upgrade failed: %s", device.MacAddress, resp.Code)
 }
 
 func (e DeviceUpgradeExecutor) upgrade(ctx context.Context, gateway string, device entity.Device) int {

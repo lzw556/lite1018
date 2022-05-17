@@ -22,6 +22,7 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/user"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/crontask"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/iot"
+	"github.com/thetasensors/theta-cloud-lite/server/adapter/iot/command"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/iot/dispatcher"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/ruleengine"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/socket"
@@ -90,6 +91,24 @@ func runIoTServer() {
 		dispatcher.NewBye(),
 		dispatcher.NewEvent(),
 		dispatcher.NewCalibrationStatus(),
+		command.NewAddDeviceResponse(),
+		command.NewCalibrateResponse(),
+		command.NewCancelFirmwareResponse(),
+		command.NewClearDevicesResponse(),
+		command.NewDeleteDeviceResponse(),
+		command.NewGetDeviceSettingsResponse(),
+		command.NewGetLinkStatesResponse(),
+		command.NewGetWsnResponse(),
+		command.NewLoadFirmwareResponse(),
+		command.NewProvisionResponse(),
+		command.NewRebootResponse(),
+		command.NewResetResponse(),
+		command.NewResetDataResponse(),
+		command.NewUpdateDeviceSettingsResponse(),
+		command.NewUpdateDeviceResponse(),
+		command.NewUpdateDevicesResponse(),
+		command.NewUpdateWsnResponse(),
+		command.NewUpgradeFirmwareResponse(),
 	)
 	if err := adapter.IoT.Run(); err != nil {
 		xlog.Error("iot server start failed", err)

@@ -17,12 +17,16 @@ func newResetCmd() resetCmd {
 	}
 }
 
+func (cmd resetCmd) ID() string {
+	return cmd.request.id
+}
+
 func (cmd resetCmd) Name() string {
 	return "resetDeviceSettings"
 }
 
-func (cmd resetCmd) Response() string {
-	return "resetDeviceSettingsResponse"
+func (cmd resetCmd) Response() chan Response {
+	return cmd.response
 }
 
 func (cmd resetCmd) Qos() byte {
@@ -37,6 +41,6 @@ func (cmd resetCmd) Payload() ([]byte, error) {
 	return proto.Marshal(&m)
 }
 
-func (cmd resetCmd) Execute(ctx context.Context, gateway string, target string, timeout time.Duration) ([]byte, error) {
+func (cmd resetCmd) Execute(ctx context.Context, gateway string, target string, timeout time.Duration) (*Response, error) {
 	return cmd.request.do(ctx, gateway, target, cmd, timeout)
 }

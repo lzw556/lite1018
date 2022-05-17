@@ -17,12 +17,16 @@ func newProvisionCmd() provisionCmd {
 	}
 }
 
+func (cmd provisionCmd) ID() string {
+	return cmd.request.id
+}
+
 func (cmd provisionCmd) Name() string {
 	return "provision"
 }
 
-func (cmd provisionCmd) Response() string {
-	return "provisionResponse"
+func (cmd provisionCmd) Response() chan Response {
+	return cmd.response
 }
 
 func (cmd provisionCmd) Qos() byte {
@@ -38,6 +42,6 @@ func (cmd provisionCmd) Payload() ([]byte, error) {
 	return proto.Marshal(&m)
 }
 
-func (cmd provisionCmd) Execute(ctx context.Context, gateway string, target string, timeout time.Duration) ([]byte, error) {
+func (cmd provisionCmd) Execute(ctx context.Context, gateway string, target string, timeout time.Duration) (*Response, error) {
 	return cmd.request.do(ctx, gateway, target, cmd, timeout)
 }

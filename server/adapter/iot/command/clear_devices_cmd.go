@@ -17,12 +17,16 @@ func newClearDevicesCmd() clearDevicesCmd {
 	}
 }
 
+func (cmd clearDevicesCmd) ID() string {
+	return cmd.request.id
+}
+
 func (cmd clearDevicesCmd) Name() string {
 	return "clearDevices"
 }
 
-func (cmd clearDevicesCmd) Response() string {
-	return "clearDevicesResponse"
+func (cmd clearDevicesCmd) Response() chan Response {
+	return cmd.response
 }
 
 func (cmd clearDevicesCmd) Qos() byte {
@@ -37,6 +41,6 @@ func (cmd clearDevicesCmd) Payload() ([]byte, error) {
 	return proto.Marshal(&m)
 }
 
-func (cmd clearDevicesCmd) Execute(ctx context.Context, gateway string, target string, timeout time.Duration) ([]byte, error) {
+func (cmd clearDevicesCmd) Execute(ctx context.Context, gateway string, target string, timeout time.Duration) (*Response, error) {
 	return cmd.request.do(ctx, gateway, target, cmd, timeout)
 }

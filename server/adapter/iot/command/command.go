@@ -2,11 +2,10 @@ package command
 
 import (
 	"context"
-	"github.com/golang/protobuf/proto"
+	"fmt"
 	"github.com/spf13/cast"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/response"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/iot/background"
-	pd "github.com/thetasensors/theta-cloud-lite/server/adapter/iot/proto"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	spec "github.com/thetasensors/theta-cloud-lite/server/domain/specification"
@@ -72,21 +71,16 @@ func SyncNetworkLinkStates(network entity.Network, timeout time.Duration) {
 	}
 	xlog.Infof("starting sync devices link status => [%s]", gateway.MacAddress)
 	cmd := newGetLinkStatesCmd()
-	payload, err := cmd.Execute(context.TODO(), gateway.MacAddress, gateway.MacAddress, timeout)
+	resp, err := cmd.Execute(context.TODO(), gateway.MacAddress, gateway.MacAddress, timeout)
 	if err != nil {
 		xlog.Errorf("execute command %s failed: %v => [%s]", cmd.Name(), err, gateway.MacAddress)
-		return
-	}
-	m := pd.LinkStatesMessage{}
-	if err := proto.Unmarshal(payload, &m); err != nil {
-		xlog.Errorf("unmarshal [AllLinkStatus] message failed:%v", err)
 		return
 	}
 	var result []struct {
 		Mac   string `json:"mac"`
 		State int    `json:"state"`
 	}
-	if err := json.Unmarshal([]byte(m.States), &result); err != nil {
+	if err := json.Unmarshal(resp.Payload, &result); err != nil {
 		xlog.Errorf("unmarshal [AllStatus] failed:%v", err)
 		return
 	}
@@ -147,6 +141,7 @@ func UpdateDeviceSettings(gateway, device entity.Device) {
 	xlog.Infof("starting update device settings => [%s]", device.MacAddress)
 	cmd := newUpdateDeviceSettingsCmd(device.Settings)
 	if _, err := cmd.Execute(context.TODO(), gateway.MacAddress, device.MacAddress, 3*time.Second); err != nil {
+		fmt.Println(err)
 		xlog.Errorf("execute command %s failed: %v => [%s]", cmd.Name(), err, gateway.MacAddress)
 		return
 	}
@@ -156,19 +151,14 @@ func UpdateDeviceSettings(gateway, device entity.Device) {
 func GetDeviceSettings(gateway, device entity.Device) {
 	xlog.Infof("starting get device settings => [%s]", device.MacAddress)
 	cmd := newGetDeviceSettingsCmd()
-	payload, err := cmd.Execute(context.TODO(), gateway.MacAddress, device.MacAddress, 3*time.Second)
+	resp, err := cmd.Execute(context.TODO(), gateway.MacAddress, device.MacAddress, 3*time.Second)
 	if err != nil {
 		xlog.Errorf("execute command %s failed: %v => [%s]", cmd.Name(), err, gateway.MacAddress)
 		return
 	}
-	m := pd.DeviceSettingsMessage{}
-	if err := proto.Unmarshal(payload, &m); err != nil {
-		xlog.Errorf("unmarshal device settings failed: %v => [%s]", err, gateway.MacAddress)
-		return
-	}
-	if m.Code == 0 {
+	if resp.Code == 0 {
 		settings := map[string]map[string]interface{}{}
-		if err := json.Unmarshal([]byte(m.Settings), &settings); err != nil {
+		if err := json.Unmarshal(resp.Payload, &settings); err != nil {
 			xlog.Errorf("unmarshal device settings failed: %v => [%s]", err, gateway.MacAddress)
 			return
 		}
@@ -183,7 +173,7 @@ func GetDeviceSettings(gateway, device entity.Device) {
 		xlog.Infof("get device settings successful=> [%s]", device.MacAddress)
 		return
 	}
-	xlog.Errorf("get device settings failed: %d => [%s]", m.Code, gateway.MacAddress)
+	xlog.Errorf("get device settings failed: %d => [%s]", resp.Code, gateway.MacAddress)
 }
 
 func SyncWsnSettings(network entity.Network, gateway entity.Device, timeout time.Duration) {
@@ -197,19 +187,14 @@ func SyncWsnSettings(network entity.Network, gateway entity.Device, timeout time
 func GetWsnSettings(network entity.Network, gateway entity.Device, timeout time.Duration) {
 	xlog.Infof("starting get wsn settings => [%s]", gateway.MacAddress)
 	cmd := newGetWsnCmd()
-	payload, err := cmd.Execute(context.TODO(), gateway.MacAddress, gateway.MacAddress, timeout)
+	resp, err := cmd.Execute(context.TODO(), gateway.MacAddress, gateway.MacAddress, timeout)
 	if err != nil {
 		xlog.Errorf("execute command %s failed: %v => [%s]", cmd.Name(), err, gateway.MacAddress)
 		return
 	}
-	m := pd.DeviceSettingsMessage{}
-	if err := proto.Unmarshal(payload, &m); err != nil {
-		xlog.Errorf("unmarshal wsn settings failed: %v => [%s]", err, gateway.MacAddress)
-		return
-	}
-	if m.Code == 0 {
+	if resp.Code == 0 {
 		settings := map[string]map[string]interface{}{}
-		if err := json.Unmarshal([]byte(m.Settings), &settings); err != nil {
+		if err := json.Unmarshal(resp.Payload, &settings); err != nil {
 			xlog.Errorf("unmarshal wsn settings failed: %v => [%s]", err, gateway.MacAddress)
 			return
 		}
@@ -227,7 +212,7 @@ func GetWsnSettings(network entity.Network, gateway entity.Device, timeout time.
 		}
 		xlog.Infof("get wsn settings successful=> [%s]", gateway.MacAddress)
 	} else {
-		xlog.Errorf("get wsn settings failed: %d => [%s]", m.Code, gateway.MacAddress)
+		xlog.Errorf("get wsn settings failed: %d => [%s]", resp.Code, gateway.MacAddress)
 	}
 }
 

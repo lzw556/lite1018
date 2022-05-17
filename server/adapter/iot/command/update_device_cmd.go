@@ -23,12 +23,16 @@ func newUpdateDeviceCmd(device entity.Device) updateDeviceCmd {
 	}
 }
 
+func (cmd updateDeviceCmd) ID() string {
+	return cmd.request.id
+}
+
 func (cmd updateDeviceCmd) Name() string {
 	return "updateDevice"
 }
 
-func (cmd updateDeviceCmd) Response() string {
-	return "updateDeviceResponse"
+func (cmd updateDeviceCmd) Response() chan Response {
+	return cmd.response
 }
 
 func (cmd updateDeviceCmd) Qos() byte {
@@ -47,6 +51,6 @@ func (cmd updateDeviceCmd) Payload() ([]byte, error) {
 	return proto.Marshal(&m)
 }
 
-func (cmd updateDeviceCmd) Execute(ctx context.Context, gateway string, target string, timeout time.Duration) ([]byte, error) {
+func (cmd updateDeviceCmd) Execute(ctx context.Context, gateway string, target string, timeout time.Duration) (*Response, error) {
 	return cmd.request.do(ctx, gateway, target, cmd, timeout)
 }

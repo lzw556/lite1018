@@ -26,12 +26,16 @@ func newUpdateDevicesCmd(gateway entity.Device, children []entity.Device) update
 	}
 }
 
+func (cmd updateDevicesCmd) ID() string {
+	return cmd.request.id
+}
+
 func (updateDevicesCmd) Name() string {
 	return "updateDevices"
 }
 
-func (cmd updateDevicesCmd) Response() string {
-	return "updateDevicesResponse"
+func (cmd updateDevicesCmd) Response() chan Response {
+	return cmd.response
 }
 
 func (updateDevicesCmd) Qos() byte {
@@ -64,6 +68,6 @@ func toDeviceItem(e entity.Device) *pd.DeviceItem {
 	return item
 }
 
-func (cmd updateDevicesCmd) Execute(ctx context.Context, gateway string, target string, timeout time.Duration) ([]byte, error) {
+func (cmd updateDevicesCmd) Execute(ctx context.Context, gateway string, target string, timeout time.Duration) (*Response, error) {
 	return cmd.request.do(ctx, gateway, target, cmd, timeout)
 }

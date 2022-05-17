@@ -17,12 +17,16 @@ func newGetWsnCmd() getWsnCmd {
 	}
 }
 
+func (cmd getWsnCmd) ID() string {
+	return cmd.request.id
+}
+
 func (cmd getWsnCmd) Name() string {
 	return "getWsn"
 }
 
-func (cmd getWsnCmd) Response() string {
-	return "getWsnResponse"
+func (cmd getWsnCmd) Response() chan Response {
+	return cmd.response
 }
 
 func (cmd getWsnCmd) Qos() byte {
@@ -37,6 +41,6 @@ func (cmd getWsnCmd) Payload() ([]byte, error) {
 	return proto.Marshal(&m)
 }
 
-func (cmd getWsnCmd) Execute(ctx context.Context, gateway string, target string, timeout time.Duration) ([]byte, error) {
+func (cmd getWsnCmd) Execute(ctx context.Context, gateway string, target string, timeout time.Duration) (*Response, error) {
 	return cmd.request.do(ctx, gateway, target, cmd, timeout)
 }

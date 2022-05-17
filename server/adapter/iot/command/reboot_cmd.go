@@ -17,12 +17,16 @@ func newRebootCmd() rebootCmd {
 	}
 }
 
+func (cmd rebootCmd) ID() string {
+	return cmd.request.id
+}
+
 func (cmd rebootCmd) Name() string {
 	return "reboot"
 }
 
-func (cmd rebootCmd) Response() string {
-	return "rebootResponse"
+func (cmd rebootCmd) Response() chan Response {
+	return cmd.response
 }
 
 func (cmd rebootCmd) Qos() byte {
@@ -37,6 +41,6 @@ func (cmd rebootCmd) Payload() ([]byte, error) {
 	return proto.Marshal(&m)
 }
 
-func (cmd rebootCmd) Execute(ctx context.Context, gateway string, target string, timeout time.Duration) ([]byte, error) {
+func (cmd rebootCmd) Execute(ctx context.Context, gateway string, target string, timeout time.Duration) (*Response, error) {
 	return cmd.request.do(ctx, gateway, target, cmd, timeout)
 }
