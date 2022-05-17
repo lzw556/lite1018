@@ -29,7 +29,6 @@ const NetworkDetail = () => {
   const location = useLocation();
   const history = useHistory();
   const [network, setNetwork] = useState<Network>();
-  const [addDeviceVisible, setAddDeviceVisible] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
   const [form] = Form.useForm();
 
@@ -164,26 +163,8 @@ const NetworkDetail = () => {
   return (
     <Content style={{display:'flex',flexDirection:'column'}}>
       <MyBreadcrumb firstBreadState={location.state as any}>
-        <HasPermission value={Permission.NetworkAddDevices}>
-          <Space>
-            <Button type={'primary'} onClick={() => setAddDeviceVisible(true)}>
-              接入设备 <PlusOutlined />
-            </Button>
-          </Space>
-        </HasPermission>
       </MyBreadcrumb>
       {renderInformation()}
-      {network && (
-        <AddDeviceModal
-          network={network}
-          visible={addDeviceVisible}
-          onCancel={() => setAddDeviceVisible(false)}
-          onSuccess={() => {
-            onRefresh();
-            setAddDeviceVisible(false);
-          }}
-        />
-      )}
     </Content>
   );
 };
