@@ -82,10 +82,17 @@ func (a *Adapter) Unsubscribe(topic string) {
 }
 
 func (a *Adapter) Publish(topic string, qos byte, payload []byte) error {
-	t := a.client.Publish(topic, qos, false, payload)
-	if t.Wait() && t.Error() != nil {
-		return t.Error()
+	if !a.client.IsConnected() {
+		if t := a.client.Connect(); t.Wait() && t.Error() != nil {
+			return t.Error()
+		}
 	}
+	go func() {
+		t := a.client.Publish(topic, qos, false, payload)
+		if t.Wait() && t.Error() != nil {
+			xlog.Errorf("publish message error: %s", t.Error())
+		}
+	}()
 	return nil
 }
 
