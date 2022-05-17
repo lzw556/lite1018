@@ -23,7 +23,7 @@ var rbacPolicy string
 
 func main() {
 	key := "thetasensorskeyaesfitbitsencrypt"
-	if !license.ValidateKeyFile([]byte(key), "key.data") {
+	if !license.ValidateKeyFile([]byte(key), "license.dat") {
 		fmt.Println("Invalid key file")
 		return
 	}
