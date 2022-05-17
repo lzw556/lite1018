@@ -1,10 +1,10 @@
-import { Button, Col, Form, Input, Row, Space, Table } from 'antd';
+import { Button, Col, Form, Row, Space, Table } from 'antd';
 import * as React from 'react';
 import MyBreadcrumb from '../../components/myBreadcrumb';
 import ShadowCard from '../../components/shadowCard';
 import { SearchResult } from './props';
 
-export const SearchResultPage = (props: SearchResult) => {
+export const SearchResultPage: React.FC<SearchResult> = (props) => {
   const { actions, filters, result } = props;
   return (
     <>
@@ -35,6 +35,7 @@ export const SearchResultPage = (props: SearchResult) => {
           </Col>
         </Row>
       </ShadowCard>
+      {props.children}
     </>
   );
 };
