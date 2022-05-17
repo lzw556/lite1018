@@ -8,7 +8,6 @@ import (
 	uuid "github.com/satori/go.uuid"
 	"github.com/thetasensors/theta-cloud-lite/server/config"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/xlog"
-	"time"
 )
 
 type Adapter struct {
@@ -25,11 +24,9 @@ func NewAdapter(conf config.IoT) *Adapter {
 	opts := mqtt.NewClientOptions()
 	opts.Username = conf.Username
 	opts.Password = conf.Password
-	opts.ClientID = "iot"
+	opts.ClientID = fmt.Sprintf("iot-%s", uuid.NewV1().String())
 	opts.CleanSession = false
 	opts.AutoReconnect = true
-	opts.WriteTimeout = 60 * time.Second
-	opts.KeepAlive = 60
 	opts.AddBroker(conf.Broker)
 	opts.OnConnectionLost = lostConnection
 	return &Adapter{
