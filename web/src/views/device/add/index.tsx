@@ -65,7 +65,7 @@ const AddDevicePage = () => {
             />
           )}
           <Row justify='space-between' hidden={success}>
-            <Col span={isMobile ? 24 : 12}>
+            <Col span={isMobile ? 24 : 16}>
               <Row>
                 <Col span={isMobile ? 24 : 20}>
                   <Form

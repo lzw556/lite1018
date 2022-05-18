@@ -284,8 +284,7 @@ const DevicePage = () => {
               if(!field) return null;
               let value = field.value;
               if(!value) {
-                value = '-';
-                if(value === 0) value = 0;
+                value = value === 0 ? value : '-';
               }else if(!Number.isInteger(field.value)){
                 value = field.value.toFixed(attr.precision)
               }
