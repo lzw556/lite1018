@@ -57,6 +57,14 @@ func (p Bye) Process(ctx *iot.Context, msg iot.Message) error {
 							xlog.Errorf("update device state failed: %v => [%s]", err, e.MacAddress)
 						}
 						state.Notify(e.MacAddress)
+						event := entity.Event{
+							Code:      entity.EventCodeStatus,
+							Category:  entity.EventCategoryDevice,
+							SourceID:  e.ID,
+							Timestamp: time.Now().Unix(),
+							ProjectID: e.ProjectID,
+						}
+						event.Content = fmt.Sprintf(`{"code": %d}`, 2)
 					}
 					return nil
 				}
@@ -66,7 +74,6 @@ func (p Bye) Process(ctx *iot.Context, msg iot.Message) error {
 				Category:  entity.EventCategoryDevice,
 				SourceID:  device.ID,
 				Timestamp: time.Now().Unix(),
-				Type:      1,
 				ProjectID: device.ProjectID,
 			}
 			event.Content = fmt.Sprintf(`{"code": %d}`, 2)

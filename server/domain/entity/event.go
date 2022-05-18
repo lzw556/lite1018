@@ -15,8 +15,7 @@ type Event struct {
 	SourceID  uint          `gorm:"not null;index"`
 	Content   string        `gorm:"type:text;"`
 	Timestamp int64         `gorm:"not null;"`
-	Type      uint
-	ProjectID uint `gorm:"index;"`
+	ProjectID uint          `gorm:"index;"`
 }
 
 func (Event) TableName() string {

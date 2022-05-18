@@ -19,6 +19,7 @@ import (
 var deviceStateRepo = repository.DeviceState{}
 var deviceRepo = repository.Device{}
 var networkRepo = repository.Network{}
+var eventRepo = repository.Event{}
 
 func isOnline(mac string) bool {
 	if state, err := deviceStateRepo.Get(mac); err == nil {
@@ -98,6 +99,21 @@ func SyncNetworkLinkStates(network entity.Network, timeout time.Duration) {
 				if err := deviceStateRepo.Create(device.MacAddress, state); err != nil {
 					xlog.Errorf("save device state failed: %v", err)
 					return
+				}
+				event := entity.Event{
+					Code:      entity.EventCodeStatus,
+					Category:  entity.EventCategoryDevice,
+					SourceID:  device.ID,
+					Timestamp: time.Now().Unix(),
+					ProjectID: device.ProjectID,
+				}
+				code := 0
+				if !state.IsOnline {
+					code = 2
+				}
+				event.Content = fmt.Sprintf(`{"code": %d}`, code)
+				if err := eventRepo.Create(context.TODO(), &event); err != nil {
+					xlog.Errorf("create event failed: %v", err)
 				}
 			}
 		}

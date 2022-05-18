@@ -37,7 +37,6 @@ func (p Event) Process(ctx *iot.Context, msg iot.Message) error {
 				return fmt.Errorf("unmarshal [Event] message failed: %v", err)
 			}
 			event := entity.Event{
-				Type:      uint(m.Type),
 				Code:      entity.EventCodeDataAcquisitionFailed,
 				Category:  entity.EventCategoryDevice,
 				SourceID:  device.ID,
