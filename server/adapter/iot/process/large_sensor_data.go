@@ -21,10 +21,10 @@ type LargeSensorData struct {
 }
 
 func NewLargeSensorData() Processor {
-	return newRoot(&LargeSensorData{
+	return &LargeSensorData{
 		repository: repository.SensorData{},
 		mu:         sync.RWMutex{},
-	})
+	}
 }
 
 func (p *LargeSensorData) Name() string {

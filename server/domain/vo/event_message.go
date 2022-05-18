@@ -15,8 +15,10 @@ var eventMessage = map[entity.EventCode]map[int]string{
 		1: "设备升级取消",
 	},
 	entity.EventCodeStatus: {
-		1: "设备上线",
+		0: "设备上线",
+		1: "设备丢失",
 		2: "设备离线",
+		3: "设备丢失状态下重连失败",
 		4: "设备离线状态下重连失败",
 	},
 	entity.EventCodeDataAcquisitionFailed: {
