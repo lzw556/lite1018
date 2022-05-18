@@ -24,13 +24,13 @@ const MeasurementManagement: React.FC = () => {
   const [result, setResult] = React.useState<TableProps<any>>({
     rowKey: 'ID',
     columns: [
-      { title: '名称', dataIndex: 'Name', key: 'name', width: '50%' },
+      { title: '名称', dataIndex: 'name', key: 'name', width: '50%' },
       {
         title: '类型',
         key: 'type',
         width: 120,
         render: (row: MeasurementRow) => {
-          const type = Object.values(MeasurementTypes).find((type) => type.type === row.Type);
+          const type = Object.values(MeasurementTypes).find((type) => type.type === row.type);
           return type ? type.label : '-';
         }
       },
@@ -45,7 +45,7 @@ const MeasurementManagement: React.FC = () => {
             <Popconfirm
               title={'确定要删除该监测点吗?'}
               onConfirm={() => {
-                deleteMeasurement(row.ID).then(() => {
+                deleteMeasurement(row.id).then(() => {
                   fetchMeasurements();
                 });
               }}

@@ -1,4 +1,3 @@
-import { Response } from '../../../types/props';
 import request from '../../../utils/request';
 import { DeleteResponse, GetResponse, PostResponse, PutResponse } from '../../../utils/response';
 import { Measurement, MeasurementRow } from './props';
@@ -9,13 +8,18 @@ export function getMeasurements() {
 }
 
 export function addMeasurement(measurement: Measurement) {
-  return request.post<Response>('/monitoringPoints', measurement).then(PostResponse);
+  // return request.post<MeasurementRow>('/monitoringPoints', measurement).then(PostResponse);
+  return request.post<MeasurementRow>('/monitoringPoints', measurement);
 }
 
 export function updateMeasurement(id: Measurement['id'], measurement: Measurement) {
-  return request.put<Response>(`/monitoringPoints/${id}`, measurement).then(PutResponse);
+  return request.put(`/monitoringPoints/${id}`, measurement).then(PutResponse);
 }
 
 export function deleteMeasurement(id: Measurement['id']) {
-  return request.delete<Response>(`/monitoringPoints/${id}`).then(DeleteResponse);
+  return request.delete(`/monitoringPoints/${id}`).then(DeleteResponse);
+}
+
+export function bindDevice(id: Measurement['id'], device_id: number) {
+  return request.post(`/monitoringPoints/${id}/bindDevice`, { device_id });
 }

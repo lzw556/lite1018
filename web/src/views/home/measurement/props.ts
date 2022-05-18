@@ -6,13 +6,13 @@ export type Measurement = {
 };
 
 export type MeasurementRow = {
-  ID: number;
-  Name: string;
-  Type: number;
-  AssetID: number;
+  id: number;
+  name: string;
+  type: number;
+  assetId: number;
 };
 
 export function convertRow(values?: MeasurementRow): Measurement | null {
   if (!values) return null;
-  return { id: values.ID, name: values.Name, type: values.Type, asset_id: values.AssetID };
+  return { id: values.id, name: values.name, type: values.type, asset_id: values.assetId };
 }
