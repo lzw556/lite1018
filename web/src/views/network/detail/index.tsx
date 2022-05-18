@@ -106,7 +106,7 @@ const NetworkDetail = () => {
           </Col>
           <Col xl={8} xxl={6}>
             <ShadowCard style={{ marginLeft: 10, height: '100%' }}>
-              <Form form={form} labelCol={{ span: 8 }} validateMessages={defaultValidateMessages}>
+              <Form form={form} labelCol={{ span: 9 }} validateMessages={defaultValidateMessages}>
                 <Form.Item label={'名称'} name={'name'} rules={[Rules.range(4, 16)]}>
                   <Input placeholder={'请输入网络名称'} />
                 </Form.Item>

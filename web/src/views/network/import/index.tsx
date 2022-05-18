@@ -174,7 +174,7 @@ const ImportNetworkPage = () => {
             </Space>
         </MyBreadcrumb>
         <ShadowCard>
-            <Form form={form} labelCol={{span: 8}}>
+            <Form form={form} labelCol={{span: 9}}>
                 {
                     !success ?
                         <Row justify="space-between">

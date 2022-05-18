@@ -25,8 +25,8 @@ const AcknowledgeModal: FC<AcknowledgeModalProps> = (props) => {
         });
     }
 
-    return <Modal {...props} width={420} title={"报警处理"} onOk={onSave}>
-        <Form form={form}>
+    return <Modal {...props} width={400} title={"报警处理"} onOk={onSave}>
+        <Form form={form} labelCol={{span: 6}}>
             <Form.Item label={"报警源"} name={["source", "name"]}>
                 <Input disabled/>
             </Form.Item>

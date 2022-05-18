@@ -24,7 +24,7 @@ const EditPassModal: FC<EditPassProps> = ({visible, onSuccess, onCancel}) => {
         })
     }
 
-    return <Modal width={400} visible={visible} title={"修改密码"} okText={"确定"} onOk={onSave} cancelText={"取消"}
+    return <Modal width={420} visible={visible} title={"修改密码"} okText={"确定"} onOk={onSave} cancelText={"取消"}
                   onCancel={onCancel} confirmLoading={isLoading}>
         <Form form={form} labelCol={{span: 6}}>
             <Form.Item label={"原密码"} name="pwd" rules={[{required: true, message: "请输入原密码"}]}>
