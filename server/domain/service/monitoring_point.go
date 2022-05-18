@@ -24,13 +24,18 @@ func NewMonitoringPoint() monitoringpoint.Service {
 	}
 }
 
-func (s MonitoringPoint) CreateMonitoringPoint(req request.CreateMonitoringPoint) error {
+func (s MonitoringPoint) CreateMonitoringPoint(req request.CreateMonitoringPoint) (vo.MonitoringPoint, error) {
 	cmd, err := s.factory.NewMonitoringPointCreateCmd(req)
 	if err != nil {
-		return err
+		return vo.MonitoringPoint{}, err
 	}
 
-	return cmd.Run()
+	e, err := cmd.Run()
+	if err != nil {
+		return vo.MonitoringPoint{}, err
+	}
+
+	return vo.NewMonitoringPoint(e), nil
 }
 
 func (s MonitoringPoint) GetMonitoringPointByID(id uint) (*vo.MonitoringPoint, error) {

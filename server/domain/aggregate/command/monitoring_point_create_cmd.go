@@ -20,11 +20,11 @@ func NewMonitoringPointCreateCmd() MonitoringPointCreateCmd {
 	}
 }
 
-func (cmd MonitoringPointCreateCmd) Run() error {
+func (cmd MonitoringPointCreateCmd) Run() (entity.MonitoringPoint, error) {
 	ctx := context.TODO()
 	if err := cmd.monitoringPointRepo.Create(ctx, &cmd.MonitoringPoint); err != nil {
-		return err
+		return entity.MonitoringPoint{}, err
 	}
 
-	return nil
+	return cmd.MonitoringPoint, nil
 }

@@ -6,7 +6,7 @@ import (
 )
 
 type Service interface {
-	CreateMonitoringPoint(req request.CreateMonitoringPoint) error
+	CreateMonitoringPoint(req request.CreateMonitoringPoint) (vo.MonitoringPoint, error)
 	GetMonitoringPointByID(id uint) (*vo.MonitoringPoint, error)
 	UpdateMonitoringPointByID(id uint, req request.UpdateMonitoringPoint) error
 	DeleteMonitoringPointByID(id uint) error

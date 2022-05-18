@@ -5,10 +5,10 @@ import (
 )
 
 type MonitoringPoint struct {
-	ID      uint
-	Name    string
-	Type    uint
-	AssetID uint
+	ID      uint   `json:"id"`
+	Name    string `json:"name"`
+	Type    uint   `json:"type"`
+	AssetID uint   `json:"assetId"`
 }
 
 func NewMonitoringPoint(e entity.MonitoringPoint) MonitoringPoint {

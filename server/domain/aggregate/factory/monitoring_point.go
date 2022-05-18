@@ -12,6 +12,7 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	spec "github.com/thetasensors/theta-cloud-lite/server/domain/specification"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/errcode"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/monitoringpointtype"
 )
 
 type MonitoringPoint struct {
@@ -27,7 +28,7 @@ func NewMonitoringPoint() MonitoringPoint {
 func (factory MonitoringPoint) NewMonitoringPointCreateCmd(req request.CreateMonitoringPoint) (*command.MonitoringPointCreateCmd, error) {
 	_ = context.TODO()
 
-	if req.Type >= entity.MonitoringPointTypeUnknown {
+	if req.Type >= monitoringpointtype.MonitoringPointTypeUnknown {
 		return nil, response.BusinessErr(errcode.MonitoringPointTypeUnknownError, "Unkown monitoringPoint type.")
 	}
 

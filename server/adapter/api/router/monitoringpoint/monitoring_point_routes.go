@@ -1,6 +1,7 @@
 package monitoringpoint
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/cast"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/request"
@@ -14,7 +15,7 @@ func (r monitoringPointRouter) create(ctx *gin.Context) (interface{}, error) {
 	}
 
 	req.ProjectID = cast.ToUint(ctx.MustGet("project_id"))
-	return nil, r.service.CreateMonitoringPoint(req)
+	return r.service.CreateMonitoringPoint(req)
 }
 
 func (r monitoringPointRouter) get(ctx *gin.Context) (interface{}, error) {

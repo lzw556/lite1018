@@ -4,14 +4,6 @@ import (
 	"gorm.io/gorm"
 )
 
-const (
-	MonitoringPointTypeGeneral = iota + 1
-	MonitoringPointTypeBoltAngle
-	MonitoringPointTypePreload
-	MonitoringPointTypeDynamicPreload
-	MonitoringPointTypeUnknown
-)
-
 type MonitoringPoint struct {
 	gorm.Model
 	Name      string `gorm:"type:varchar(64)"`
