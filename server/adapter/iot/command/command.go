@@ -308,7 +308,9 @@ func CancelDeviceUpgrade(gateway entity.Device, device entity.Device) error {
 	if queue == nil {
 		return nil
 	}
-	switch device.GetUpgradeStatus().Code {
+	status := device.GetUpgradeStatus()
+	xlog.Infof("device upgrade code: %d => [%s]", status.Code, device.MacAddress)
+	switch status.Code {
 	case entity.DeviceUpgradeLoading, entity.DeviceUpgradeUpgrading:
 		cmd := newCancelFirmwareCmd()
 		ctx := context.TODO()
