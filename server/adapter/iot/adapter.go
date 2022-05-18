@@ -8,6 +8,8 @@ import (
 	uuid "github.com/satori/go.uuid"
 	"github.com/thetasensors/theta-cloud-lite/server/config"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/xlog"
+	"log"
+	"os"
 )
 
 type Adapter struct {
@@ -21,6 +23,7 @@ type Adapter struct {
 }
 
 func NewAdapter(conf config.IoT) *Adapter {
+	mqtt.DEBUG = log.New(os.Stdout, "[MQTT DEBUG]", 0)
 	opts := mqtt.NewClientOptions()
 	opts.Username = conf.Username
 	opts.Password = conf.Password
@@ -87,9 +90,10 @@ func (a *Adapter) Publish(topic string, qos byte, payload []byte) error {
 			return t.Error()
 		}
 	}
+	t := a.client.Publish(topic, qos, false, payload)
 	go func() {
-		t := a.client.Publish(topic, qos, false, payload)
-		if t.Wait() && t.Error() != nil {
+		_ = t.Wait()
+		if t.Error() != nil {
 			xlog.Errorf("publish message error: %s", t.Error())
 		}
 	}()
