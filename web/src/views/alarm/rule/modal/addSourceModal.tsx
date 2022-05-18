@@ -57,8 +57,8 @@ const AddSourceModal: FC<AddSourceModalProps> = (props) => {
         }
     }
 
-    return <Modal {...props} title={"添加监控对象"} onOk={onAdd} confirmLoading={isLoading}>
-        <Form form={form} labelCol={{span: 4}} validateMessages={defaultValidateMessages}>
+    return <Modal {...props} width={400} title={"添加监控对象"} onOk={onAdd} confirmLoading={isLoading}>
+        <Form form={form} labelCol={{span: 6}} validateMessages={defaultValidateMessages}>
             {
                 value.category === 1 &&
                 <Form.Item label={"请选择网络"}>

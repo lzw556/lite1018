@@ -33,7 +33,7 @@ const EditSettingModal = (props: EditSettingProps) => {
         })
     }
 
-    return <Modal width={480} visible={visible} title={"设备配置"} okText={"更新"} onOk={onSave} cancelText={"取消"}
+    return <Modal width={520} visible={visible} title={"设备配置"} okText={"更新"} onOk={onSave} cancelText={"取消"}
                   onCancel={onCancel} confirmLoading={isLoading}>
         <Form form={form} labelCol={{span: 8}} validateMessages={defaultValidateMessages}>
             <DeviceSettingContent deviceType={device.typeId} settings={settings}/>
