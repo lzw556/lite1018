@@ -23,7 +23,7 @@ type Adapter struct {
 }
 
 func NewAdapter(conf config.IoT) *Adapter {
-	mqtt.DEBUG = log.New(os.Stdout, "[MQTT DEBUG]", 0)
+	mqtt.DEBUG = log.New(os.Stdout, "[MQTT DEBUG] ", 0)
 	opts := mqtt.NewClientOptions()
 	opts.Username = conf.Username
 	opts.Password = conf.Password
