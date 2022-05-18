@@ -2,6 +2,7 @@ package process
 
 import (
 	"context"
+	"fmt"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/iot"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
@@ -15,12 +16,14 @@ import (
 type Bye struct {
 	deviceRepo      dependency.DeviceRepository
 	deviceStateRepo dependency.DeviceStateRepository
+	eventResp       dependency.EventRepository
 }
 
 func NewBye() Processor {
 	return newRoot(&Bye{
 		deviceRepo:      repository.Device{},
 		deviceStateRepo: repository.DeviceState{},
+		eventResp:       repository.Event{},
 	})
 }
 
@@ -57,6 +60,18 @@ func (p Bye) Process(ctx *iot.Context, msg iot.Message) error {
 					}
 					return nil
 				}
+			}
+			event := entity.Event{
+				Code:      entity.EventCodeStatus,
+				Category:  entity.EventCategoryDevice,
+				SourceID:  device.ID,
+				Timestamp: time.Now().Unix(),
+				Type:      1,
+				ProjectID: device.ProjectID,
+			}
+			event.Content = fmt.Sprintf(`{"code": %d}`, 2)
+			if err := p.eventResp.Create(context.TODO(), &event); err != nil {
+				xlog.Errorf("create event failed: %v => [%s]", err, device.MacAddress)
 			}
 		}
 	}
