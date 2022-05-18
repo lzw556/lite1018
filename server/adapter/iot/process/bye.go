@@ -2,6 +2,7 @@ package process
 
 import (
 	"context"
+	"fmt"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/iot"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
@@ -9,19 +10,20 @@ import (
 	spec "github.com/thetasensors/theta-cloud-lite/server/domain/specification"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/devicetype"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/xlog"
-	"golang.org/x/sync/errgroup"
 	"time"
 )
 
 type Bye struct {
 	deviceRepo      dependency.DeviceRepository
 	deviceStateRepo dependency.DeviceStateRepository
+	eventResp       dependency.EventRepository
 }
 
 func NewBye() Processor {
 	return newRoot(&Bye{
 		deviceRepo:      repository.Device{},
 		deviceStateRepo: repository.DeviceState{},
+		eventResp:       repository.Event{},
 	})
 }
 
@@ -46,24 +48,37 @@ func (p Bye) Process(ctx *iot.Context, msg iot.Message) error {
 			}
 			if device.Type == devicetype.GatewayType {
 				devices, _ := p.deviceRepo.FindBySpecs(context.TODO(), spec.NetworkEqSpec(device.NetworkID))
-				var eg errgroup.Group
 				for i := range devices {
 					e := devices[i]
-					eg.Go(func() error {
-						if state, err := p.deviceStateRepo.Get(e.MacAddress); err == nil {
-							state.IsOnline = false
-							state.ConnectedAt = time.Now().UTC().Unix()
-							if err := p.deviceStateRepo.Create(e.MacAddress, state); err != nil {
-								xlog.Errorf("update device state failed: %v => [%s]", err, e.MacAddress)
-							}
-							state.Notify(e.MacAddress)
+					if state, err := p.deviceStateRepo.Get(e.MacAddress); err == nil {
+						state.IsOnline = false
+						state.ConnectedAt = time.Now().UTC().Unix()
+						if err := p.deviceStateRepo.Create(e.MacAddress, state); err != nil {
+							xlog.Errorf("update device state failed: %v => [%s]", err, e.MacAddress)
 						}
-						return nil
-					})
+						state.Notify(e.MacAddress)
+						event := entity.Event{
+							Code:      entity.EventCodeStatus,
+							Category:  entity.EventCategoryDevice,
+							SourceID:  e.ID,
+							Timestamp: time.Now().Unix(),
+							ProjectID: e.ProjectID,
+						}
+						event.Content = fmt.Sprintf(`{"code": %d}`, 2)
+					}
+					return nil
 				}
-				if err := eg.Wait(); err != nil {
-					xlog.Errorf("update device state failed: %v", err)
-				}
+			}
+			event := entity.Event{
+				Code:      entity.EventCodeStatus,
+				Category:  entity.EventCategoryDevice,
+				SourceID:  device.ID,
+				Timestamp: time.Now().Unix(),
+				ProjectID: device.ProjectID,
+			}
+			event.Content = fmt.Sprintf(`{"code": %d}`, 2)
+			if err := p.eventResp.Create(context.TODO(), &event); err != nil {
+				xlog.Errorf("create event failed: %v => [%s]", err, device.MacAddress)
 			}
 		}
 	}

@@ -20,11 +20,6 @@ var rbacModel string
 var rbacPolicy string
 
 func main() {
-	//key := "thetasensorskeyaesfitbitsencrypt"
-	//if !license.ValidateKeyFile([]byte(key), "license.data") {
-	//	fmt.Println("Invalid key file")
-	//	return
-	//}
 	initialize.InitFolder()
 	global.Viper = core.Viper()
 	dbConf := config.Database{}

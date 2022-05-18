@@ -19,6 +19,7 @@ import (
 var deviceStateRepo = repository.DeviceState{}
 var deviceRepo = repository.Device{}
 var networkRepo = repository.Network{}
+var eventRepo = repository.Event{}
 
 func isOnline(mac string) bool {
 	if state, err := deviceStateRepo.Get(mac); err == nil {
@@ -98,6 +99,21 @@ func SyncNetworkLinkStates(network entity.Network, timeout time.Duration) {
 				if err := deviceStateRepo.Create(device.MacAddress, state); err != nil {
 					xlog.Errorf("save device state failed: %v", err)
 					return
+				}
+				event := entity.Event{
+					Code:      entity.EventCodeStatus,
+					Category:  entity.EventCategoryDevice,
+					SourceID:  device.ID,
+					Timestamp: time.Now().Unix(),
+					ProjectID: device.ProjectID,
+				}
+				code := 0
+				if !state.IsOnline {
+					code = 2
+				}
+				event.Content = fmt.Sprintf(`{"code": %d}`, code)
+				if err := eventRepo.Create(context.TODO(), &event); err != nil {
+					xlog.Errorf("create event failed: %v", err)
 				}
 			}
 		}
@@ -308,7 +324,9 @@ func CancelDeviceUpgrade(gateway entity.Device, device entity.Device) error {
 	if queue == nil {
 		return nil
 	}
-	switch device.GetUpgradeStatus().Code {
+	status := device.GetUpgradeStatus()
+	xlog.Infof("device upgrade code: %d => [%s]", status.Code, device.MacAddress)
+	switch status.Code {
 	case entity.DeviceUpgradeLoading, entity.DeviceUpgradeUpgrading:
 		cmd := newCancelFirmwareCmd()
 		ctx := context.TODO()
@@ -320,6 +338,7 @@ func CancelDeviceUpgrade(gateway entity.Device, device entity.Device) error {
 		if task != nil {
 			task.Cancel()
 		}
+		queue.Remove(device)
 		device.CancelUpgrade()
 	default:
 		queue.Remove(device)

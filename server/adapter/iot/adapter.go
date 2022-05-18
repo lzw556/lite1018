@@ -8,7 +8,6 @@ import (
 	uuid "github.com/satori/go.uuid"
 	"github.com/thetasensors/theta-cloud-lite/server/config"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/xlog"
-	"time"
 )
 
 type Adapter struct {
@@ -25,11 +24,9 @@ func NewAdapter(conf config.IoT) *Adapter {
 	opts := mqtt.NewClientOptions()
 	opts.Username = conf.Username
 	opts.Password = conf.Password
-	opts.ClientID = "iot"
+	opts.ClientID = fmt.Sprintf("iot-%s", uuid.NewV1().String())
 	opts.CleanSession = false
 	opts.AutoReconnect = true
-	opts.WriteTimeout = 60 * time.Second
-	opts.KeepAlive = 60
 	opts.AddBroker(conf.Broker)
 	opts.OnConnectionLost = lostConnection
 	return &Adapter{
@@ -85,10 +82,17 @@ func (a *Adapter) Unsubscribe(topic string) {
 }
 
 func (a *Adapter) Publish(topic string, qos byte, payload []byte) error {
-	t := a.client.Publish(topic, qos, false, payload)
-	if t.Wait() && t.Error() != nil {
-		return t.Error()
+	if !a.client.IsConnected() {
+		if t := a.client.Connect(); t.Wait() && t.Error() != nil {
+			return t.Error()
+		}
 	}
+	go func() {
+		t := a.client.Publish(topic, qos, false, payload)
+		if t.Wait() && t.Error() != nil {
+			xlog.Errorf("publish message error: %s", t.Error())
+		}
+	}()
 	return nil
 }
 

@@ -41,14 +41,17 @@ func (q *TaskQueue) Remove(device entity.Device) {
 	q.mu.Lock()
 	prev := q.tasks
 	found := false
-	for {
+	for prev != nil {
+		xlog.Debugf("check task %s", prev.Device.MacAddress)
 		if prev.next == nil {
 			break
 		} else if prev.next.MacAddress == device.MacAddress {
+			xlog.Infof("remove device %s from task queue", device.MacAddress)
 			found = true
 			break
+		} else {
+			prev = prev.next
 		}
-		prev.next = prev
 	}
 	if found {
 		prev.next = prev.next.next

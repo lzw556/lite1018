@@ -74,8 +74,8 @@ func (p LinkStatus) Process(ctx *iot.Context, msg iot.Message) error {
 	if isChanged {
 		deviceState.Notify(linkStatus.Address)
 		device.State = deviceState
-		go p.addEvent(device, linkStatus.StateUpdateTime, m.Code)
 	}
+	p.addEvent(device, linkStatus.StateUpdateTime, int32(linkStatus.Param))
 	return nil
 }
 
