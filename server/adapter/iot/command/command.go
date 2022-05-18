@@ -322,6 +322,7 @@ func CancelDeviceUpgrade(gateway entity.Device, device entity.Device) error {
 		if task != nil {
 			task.Cancel()
 		}
+		queue.Remove(device)
 		device.CancelUpgrade()
 	default:
 		queue.Remove(device)
