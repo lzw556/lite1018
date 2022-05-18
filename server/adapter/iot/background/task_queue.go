@@ -47,8 +47,9 @@ func (q *TaskQueue) Remove(device entity.Device) {
 		} else if prev.next.MacAddress == device.MacAddress {
 			found = true
 			break
+		} else {
+			prev = prev.next
 		}
-		prev.next = prev
 	}
 	if found {
 		prev.next = prev.next.next
