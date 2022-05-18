@@ -22,7 +22,7 @@ func (MonitoringPoint) TableName() string {
 }
 
 func (mp *MonitoringPoint) UpdateAlarmRuleState(e AlarmRule) {
-	_ = cache.GetStruct(fmt.Sprintf("monitoringPoint_alarm_rule_state_%d", mp.ID), &mp.AlarmRuleStates)
+	_ = cache.GetStruct(fmt.Sprintf("monitoring_point_alarm_rule_state_%d", mp.ID), &mp.AlarmRuleStates)
 	if mp.AlarmRuleStates == nil {
 		mp.AlarmRuleStates = make(map[uint]AlarmRuleState)
 	}
@@ -39,17 +39,17 @@ func (mp *MonitoringPoint) UpdateAlarmRuleState(e AlarmRule) {
 			Duration: 1,
 		}
 	}
-	_ = cache.SetStruct(fmt.Sprintf("monitoringPoint_alarm_rule_state_%d", mp.ID), mp.AlarmRuleStates)
+	_ = cache.SetStruct(fmt.Sprintf("monitoring_point_alarm_rule_state_%d", mp.ID), mp.AlarmRuleStates)
 }
 
 func (mp *MonitoringPoint) RemoveAlarmRuleState(id uint) {
-	_ = cache.GetStruct(fmt.Sprintf("monitoringPoint_alarm_rule_state_%d", mp.ID), &mp.AlarmRuleStates)
+	_ = cache.GetStruct(fmt.Sprintf("monitoring_point_alarm_rule_state_%d", mp.ID), &mp.AlarmRuleStates)
 	delete(mp.AlarmRuleStates, id)
-	_ = cache.SetStruct(fmt.Sprintf("monitoringPoint_alarm_rule_state_%d", mp.ID), mp.AlarmRuleStates)
+	_ = cache.SetStruct(fmt.Sprintf("monitoring_point_alarm_rule_state_%d", mp.ID), mp.AlarmRuleStates)
 }
 
 func (mp *MonitoringPoint) GetAlarmRuleState(id uint) AlarmRuleState {
-	_ = cache.GetStruct(fmt.Sprintf("monitoringPoint_alarm_rule_state_%d", mp.ID), &mp.AlarmRuleStates)
+	_ = cache.GetStruct(fmt.Sprintf("monitoring_point_alarm_rule_state_%d", mp.ID), &mp.AlarmRuleStates)
 	if mp.AlarmRuleStates == nil {
 		return AlarmRuleState{}
 	}
