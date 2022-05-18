@@ -61,7 +61,7 @@ func (r root) Process(ctx *iot.Context, msg iot.Message) error {
 			state.Notify(device.MacAddress)
 			if device.IsGateway() {
 				if network, err := r.networkRepo.Get(c, device.NetworkID); err == nil {
-					go command.SyncNetworkLinkStates(network, 3*time.Second)
+					command.SyncNetworkLinkStates(network, 3*time.Second)
 				}
 			}
 		} else {

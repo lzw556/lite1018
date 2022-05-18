@@ -12,7 +12,6 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	spec "github.com/thetasensors/theta-cloud-lite/server/domain/specification"
-	"golang.org/x/sync/errgroup"
 	"time"
 )
 
@@ -50,32 +49,28 @@ func (p RestartStatus) Process(ctx *iot.Context, msg iot.Message) error {
 			if err != nil {
 				return fmt.Errorf("network not found: %v", err)
 			}
-			var eg errgroup.Group
 
 			if network.GatewayID == device.ID {
 				devices, err := p.deviceRepo.FindBySpecs(c, spec.NetworkEqSpec(network.ID))
 				if err != nil {
 					return fmt.Errorf("find device list failed: %v", err)
 				}
-				eg.Go(func() error {
-					return command.SyncNetwork(network, devices, 3*time.Second)
-				})
+				if err := command.SyncNetwork(network, devices, 3*time.Second); err != nil {
+					return fmt.Errorf("sync network failed: %v", err)
+				}
 			}
 
 			// save event
-			eg.Go(func() error {
-				event := entity.Event{
-					Code:      entity.EventCodeReboot,
-					SourceID:  device.ID,
-					Category:  entity.EventCategoryDevice,
-					Timestamp: int64(m.Timestamp),
-					Content:   fmt.Sprintf(`{"code":%d}`, m.Code),
-					ProjectID: device.ProjectID,
-				}
-				return p.eventRepo.Create(context.TODO(), &event)
-			})
-			if err := eg.Wait(); err != nil {
-				return fmt.Errorf("syncing network failed: %v", err)
+			event := entity.Event{
+				Code:      entity.EventCodeReboot,
+				SourceID:  device.ID,
+				Category:  entity.EventCategoryDevice,
+				Timestamp: int64(m.Timestamp),
+				Content:   fmt.Sprintf(`{"code":%d}`, m.Code),
+				ProjectID: device.ProjectID,
+			}
+			if err := p.eventRepo.Create(context.TODO(), &event); err != nil {
+				return fmt.Errorf("create event failed: %v", err)
 			}
 			if queue := background.GetTaskQueue(device.MacAddress); queue != nil && !queue.IsRunning() {
 				queue.Run()

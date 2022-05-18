@@ -5,6 +5,7 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/cache"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/devicetype"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/eventbus"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/xlog"
 	"gorm.io/gorm"
 )
 
@@ -36,7 +37,9 @@ func (Device) TableName() string {
 
 func (d Device) GetUpgradeStatus() DeviceUpgradeStatus {
 	status := DeviceUpgradeStatus{}
-	_ = cache.GetStruct(fmt.Sprintf("device_upgrade_status_%d", d.ID), &status)
+	if err := cache.GetStruct(fmt.Sprintf("device_upgrade_status_%d", d.ID), &status); err != nil {
+		xlog.Errorf("failed to get device upgrade status: %v", err)
+	}
 	return status
 }
 
@@ -46,14 +49,18 @@ func (d Device) UpdateDeviceUpgradeStatus(code DeviceUpgradeCode, progress float
 		Progress: progress,
 	}
 	d.UpgradeNotify(status)
-	_ = cache.SetStruct(fmt.Sprintf("device_upgrade_status_%d", d.ID), status)
+	if err := cache.SetStruct(fmt.Sprintf("device_upgrade_status_%d", d.ID), status); err != nil {
+		xlog.Errorf("failed to update device upgrade status: %v => [%s]", err, d.MacAddress)
+	}
 }
 
 func (d Device) CancelUpgrade() {
 	status := d.GetUpgradeStatus()
 	status.Code = DeviceUpgradeCancelled
 	d.UpgradeNotify(status)
-	_ = cache.SetStruct(fmt.Sprintf("device_upgrade_status_%d", d.ID), status)
+	if err := cache.SetStruct(fmt.Sprintf("device_upgrade_status_%d", d.ID), status); err != nil {
+		xlog.Errorf("failed to set device upgrade status: %v => [%s]", err, d.MacAddress)
+	}
 }
 
 func (d Device) UpgradeNotify(status DeviceUpgradeStatus) {
