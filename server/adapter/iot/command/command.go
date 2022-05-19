@@ -13,6 +13,7 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/errcode"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/json"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/xlog"
+	"golang.org/x/sync/errgroup"
 	"time"
 )
 
@@ -249,6 +250,21 @@ func UpdateWsnSettings(network entity.Network, gateway entity.Device, timeout ti
 func SyncDeviceList(gateway entity.Device, devices []entity.Device, timeout time.Duration) error {
 	if err := ClearDevices(gateway); err != nil {
 		return err
+	}
+
+	var eg errgroup.Group
+	for i := range devices {
+		eg.Go(func() error {
+			state, _ := deviceStateRepo.Get(devices[i].MacAddress)
+			state.IsOnline = false
+			if err := deviceStateRepo.Create(devices[i].MacAddress, state); err != nil {
+				xlog.Errorf("update device state failed: %v => [%s]", err, gateway.MacAddress)
+			}
+			return nil
+		})
+	}
+	if err := eg.Wait(); err != nil {
+		xlog.Errorf("error group failed: %v => [%s]", err, gateway.MacAddress)
 	}
 
 	xlog.Infof("starting sync device list => [%s]", gateway.MacAddress)
