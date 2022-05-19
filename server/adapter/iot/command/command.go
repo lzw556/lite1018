@@ -343,7 +343,7 @@ func CancelDeviceUpgrade(gateway entity.Device, device entity.Device) error {
 	status := device.GetUpgradeStatus()
 	xlog.Infof("device upgrade code: %d => [%s]", status.Code, device.MacAddress)
 	switch status.Code {
-	case entity.DeviceUpgradeLoading, entity.DeviceUpgradeUpgrading:
+	case entity.DeviceUpgradeLoading, entity.DeviceUpgradeUpgrading, entity.DeviceUpgradePending:
 		cmd := newCancelFirmwareCmd()
 		ctx := context.TODO()
 		_, err := cmd.Execute(ctx, gateway.MacAddress, device.MacAddress, 3*time.Second)
