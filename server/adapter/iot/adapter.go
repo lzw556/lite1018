@@ -43,6 +43,7 @@ func NewAdapter(conf config.IoT) *Adapter {
 	opts.ConnectRetry = true
 	opts.AddBroker(conf.Broker)
 	opts.OnConnect = a.onConnect
+	opts.ConnectTimeout = 0 // 0 means no timeout
 	opts.OnConnectionLost = func(client mqtt.Client, err error) {
 		xlog.Errorf("connection lost to MQTT broker: %v", err)
 	}
