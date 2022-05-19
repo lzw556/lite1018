@@ -8,8 +8,6 @@ import (
 	uuid "github.com/satori/go.uuid"
 	"github.com/thetasensors/theta-cloud-lite/server/config"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/xlog"
-	"log"
-	"os"
 )
 
 type Adapter struct {
@@ -30,10 +28,6 @@ func NewAdapter(conf config.IoT) *Adapter {
 		serverEnabled: conf.Server.Enabled,
 		dispatchers:   map[string]Dispatcher{},
 	}
-	mqtt.DEBUG = log.New(os.Stdout, "[MQTT DEBUG] ", 0)
-	mqtt.ERROR = log.New(os.Stdout, "[MQTT ERROR] ", 0)
-	mqtt.CRITICAL = log.New(os.Stdout, "[MQTT CRITICAL] ", 0)
-	mqtt.WARN = log.New(os.Stdout, "[MQTT WARN] ", 0)
 	opts := mqtt.NewClientOptions()
 	opts.SetUsername(conf.Username).
 		SetPassword(conf.Password).
