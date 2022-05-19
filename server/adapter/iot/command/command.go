@@ -13,7 +13,6 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/errcode"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/json"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/xlog"
-	"golang.org/x/sync/errgroup"
 	"time"
 )
 
@@ -252,21 +251,6 @@ func SyncDeviceList(gateway entity.Device, devices []entity.Device, timeout time
 		return err
 	}
 
-	var eg errgroup.Group
-	for i := range devices {
-		eg.Go(func() error {
-			state, _ := deviceStateRepo.Get(devices[i].MacAddress)
-			state.IsOnline = false
-			if err := deviceStateRepo.Create(devices[i].MacAddress, state); err != nil {
-				xlog.Errorf("update device state failed: %v => [%s]", err, gateway.MacAddress)
-			}
-			return nil
-		})
-	}
-	if err := eg.Wait(); err != nil {
-		xlog.Errorf("error group failed: %v => [%s]", err, gateway.MacAddress)
-	}
-
 	xlog.Infof("starting sync device list => [%s]", gateway.MacAddress)
 	if isOnline(gateway.MacAddress) {
 		cmd := newUpdateDevicesCmd(gateway, devices)
@@ -307,6 +291,11 @@ func ClearDevices(gateway entity.Device) error {
 	cmd := newClearDevicesCmd()
 	if _, err := cmd.Execute(context.TODO(), gateway.MacAddress, gateway.MacAddress, timeout); err != nil {
 		xlog.Errorf("execute device command %s failed: %v => [%s]", cmd.Name(), err, gateway.MacAddress)
+		return err
+	}
+	state, _ := deviceStateRepo.Get(gateway.MacAddress)
+	state.IsOnline = false
+	if err := deviceStateRepo.Create(gateway.MacAddress, state); err != nil {
 		return err
 	}
 	return nil
