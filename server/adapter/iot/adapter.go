@@ -24,6 +24,13 @@ type Adapter struct {
 }
 
 func NewAdapter(conf config.IoT) *Adapter {
+	a := &Adapter{
+		username:      conf.Username,
+		password:      conf.Password,
+		port:          conf.Server.Port,
+		serverEnabled: conf.Server.Enabled,
+		dispatchers:   map[string]Dispatcher{},
+	}
 	mqtt.DEBUG = log.New(os.Stdout, "[MQTT DEBUG] ", 0)
 	opts := mqtt.NewClientOptions()
 	opts.Username = conf.Username
@@ -32,22 +39,14 @@ func NewAdapter(conf config.IoT) *Adapter {
 	opts.CleanSession = false
 	opts.AutoReconnect = true
 	opts.KeepAlive = 60
-	opts.WriteTimeout = 60 * time.Second
+	opts.WriteTimeout = 30 * time.Second
 	opts.AddBroker(conf.Broker)
-	opts.OnConnect = func(c mqtt.Client) {
-		xlog.Info("connected to MQTT broker")
-	}
+	opts.OnConnect = a.onConnect
 	opts.OnConnectionLost = func(client mqtt.Client, err error) {
 		xlog.Errorf("connection lost to MQTT broker: %v", err)
 	}
-	return &Adapter{
-		client:        mqtt.NewClient(opts),
-		username:      conf.Username,
-		password:      conf.Password,
-		port:          conf.Server.Port,
-		serverEnabled: conf.Server.Enabled,
-		dispatchers:   map[string]Dispatcher{},
-	}
+	a.client = mqtt.NewClient(opts)
+	return a
 }
 
 func (a *Adapter) RegisterDispatchers(dispatchers ...Dispatcher) {
@@ -108,16 +107,9 @@ func (a *Adapter) Publish(topic string, qos byte, payload []byte) error {
 	return nil
 }
 
-func (a *Adapter) Run() error {
-	if a.serverEnabled {
-		if err := a.startMQTTServer(); err != nil {
-			return err
-		}
-	}
-	if t := a.client.Connect(); t.Wait() && t.Error() != nil {
-		return t.Error()
-	}
-	t := a.client.Subscribe("iot/v2/gw/+/dev/+/msg/+/", 0, func(c mqtt.Client, message mqtt.Message) {
+func (a *Adapter) onConnect(c mqtt.Client) {
+	xlog.Info("connected to MQTT broker")
+	t := c.Subscribe("iot/v2/gw/+/dev/+/msg/+/", 0, func(c mqtt.Client, message mqtt.Message) {
 		msg := parse(message)
 		if dispatcher, ok := a.dispatchers[msg.Header.Type]; ok {
 			xlog.Debugf("receive %s message => [%s]", dispatcher.Name(), msg.Body.Device)
@@ -125,6 +117,17 @@ func (a *Adapter) Run() error {
 		}
 	})
 	if t.Wait() && t.Error() != nil {
+		xlog.Errorf("subscribe message error: %s", t.Error())
+	}
+}
+
+func (a *Adapter) Run() error {
+	if a.serverEnabled {
+		if err := a.startMQTTServer(); err != nil {
+			return err
+		}
+	}
+	if t := a.client.Connect(); t.Wait() && t.Error() != nil {
 		return t.Error()
 	}
 	xlog.Info("iot server start successful")
