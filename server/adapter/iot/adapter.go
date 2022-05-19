@@ -89,7 +89,7 @@ func (a *Adapter) Unsubscribe(topic string) {
 }
 
 func (a *Adapter) Publish(topic string, qos byte, payload []byte) error {
-	t := a.client.Publish(topic, qos, false, payload)
+	t := a.client.Publish(topic, qos, true, payload)
 	go func() {
 		_ = t.Wait()
 		if t.Error() != nil {
