@@ -2,7 +2,6 @@ package command
 
 import (
 	"context"
-
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
@@ -12,7 +11,7 @@ import (
 type AlarmRuleGroupCreateCmd struct {
 	entity.AlarmRuleGroup
 
-	RuleCreateCmds []AlarmRuleCreateCmd
+	RuleCreateCmds []*AlarmRuleCreateCmd
 
 	alarmRuleGroupRepo dependency.AlarmRuleGroupRepository
 	// alarmRuleGroupSourceRepo dependency.AlarmRuleGroupSourceRepository

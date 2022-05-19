@@ -41,7 +41,7 @@ func (cmd AlarmRuleCreateCmd) Run() error {
 	})
 }
 
-func (cmd AlarmRuleCreateCmd) RunWithContext(ctx context.Context) error {
+func (cmd *AlarmRuleCreateCmd) RunWithContext(ctx context.Context) error {
 	if err := cmd.alarmRuleRepo.Create(ctx, &cmd.AlarmRule); err != nil {
 		return err
 	}
@@ -53,5 +53,6 @@ func (cmd AlarmRuleCreateCmd) RunWithContext(ctx context.Context) error {
 			return err
 		}
 	}
+
 	return ruleengine.UpdateRules(cmd.AlarmRule)
 }

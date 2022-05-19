@@ -181,7 +181,7 @@ func (factory Alarm) NewAlarmRuleGroupCreateCmd(req request.AlarmRuleGroup) (*co
 
 	cmd := command.NewAlarmRuleGroupCreateCmd()
 
-	cmd.RuleCreateCmds = make([]command.AlarmRuleCreateCmd, 0)
+	cmd.RuleCreateCmds = make([]*command.AlarmRuleCreateCmd, 0)
 	cmd.AlarmRuleGroup = e
 
 	for _, r := range req.Rules {
@@ -189,7 +189,7 @@ func (factory Alarm) NewAlarmRuleGroupCreateCmd(req request.AlarmRuleGroup) (*co
 		if err != nil {
 			return &cmd, err
 		}
-		cmd.RuleCreateCmds = append(cmd.RuleCreateCmds, *c)
+		cmd.RuleCreateCmds = append(cmd.RuleCreateCmds, c)
 	}
 
 	return &cmd, nil
