@@ -64,7 +64,7 @@ func (p Bye) Process(ctx *iot.Context, msg iot.Message) error {
 							Timestamp: time.Now().Unix(),
 							ProjectID: e.ProjectID,
 						}
-						event.Content = fmt.Sprintf(`{"code": %d}`, 2)
+						event.Content = fmt.Sprintf(`{"code": %d}`, 102)
 					}
 					return nil
 				}
