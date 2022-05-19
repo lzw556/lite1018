@@ -3,6 +3,8 @@ package factory
 import (
 	"context"
 	"errors"
+	"strings"
+
 	"github.com/spf13/cast"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/request"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/response"
@@ -14,22 +16,23 @@ import (
 	spec "github.com/thetasensors/theta-cloud-lite/server/domain/specification"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/errcode"
 	"gorm.io/gorm"
-	"strings"
 )
 
 type Alarm struct {
-	alarmRecordRepo   dependency.AlarmRecordRepository
-	alarmRuleRepo     dependency.AlarmRuleRepository
-	alarmSourceRepo   dependency.AlarmSourceRepository
-	alarmTemplateRepo dependency.AlarmTemplateRepository
+	alarmRecordRepo    dependency.AlarmRecordRepository
+	alarmRuleRepo      dependency.AlarmRuleRepository
+	alarmRuleGroupRepo dependency.AlarmRuleGroupRepository
+	alarmSourceRepo    dependency.AlarmSourceRepository
+	alarmTemplateRepo  dependency.AlarmTemplateRepository
 }
 
 func NewAlarm() Alarm {
 	return Alarm{
-		alarmRecordRepo:   repository.AlarmRecord{},
-		alarmRuleRepo:     repository.AlarmRule{},
-		alarmSourceRepo:   repository.AlarmSource{},
-		alarmTemplateRepo: repository.AlarmTemplate{},
+		alarmRecordRepo:    repository.AlarmRecord{},
+		alarmRuleRepo:      repository.AlarmRule{},
+		alarmSourceRepo:    repository.AlarmSource{},
+		alarmTemplateRepo:  repository.AlarmTemplate{},
+		alarmRuleGroupRepo: repository.AlarmRuleGroup{},
 	}
 }
 
@@ -160,5 +163,34 @@ func (factory Alarm) NewAlarmRecordRemoveCmd(id uint) (*command.AlarmRecordRemov
 	}
 	cmd := command.NewAlarmRecordRemoveCmd()
 	cmd.AlarmRecord = e
+	return &cmd, nil
+}
+
+func (factory Alarm) NewAlarmRuleGroupCreateCmd(req request.AlarmRuleGroup) (*command.AlarmRuleGroupCreateCmd, error) {
+	ctx := context.TODO()
+	e, err := factory.alarmRuleGroupRepo.GetBySpecs(ctx, spec.NameEqSpec(req.Name))
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, err
+	}
+	if e.ID != 0 {
+		return nil, response.BusinessErr(errcode.AlarmRuleGroupNameExists, "")
+	}
+	e.Name = req.Name
+	e.Description = req.Description
+	e.Status = 1
+
+	cmd := command.NewAlarmRuleGroupCreateCmd()
+
+	cmd.RuleCreateCmds = make([]command.AlarmRuleCreateCmd, 0)
+	cmd.AlarmRuleGroup = e
+
+	for _, r := range req.Rules {
+		c, err := factory.NewAlarmRuleCreateCmd(r)
+		if err != nil {
+			return &cmd, err
+		}
+		cmd.RuleCreateCmds = append(cmd.RuleCreateCmds, *c)
+	}
+
 	return &cmd, nil
 }

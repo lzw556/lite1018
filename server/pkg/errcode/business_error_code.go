@@ -58,6 +58,8 @@ const (
 	AlarmRuleNotFoundError
 	AlarmRecordAlreadyAcknowledgedError
 	AlarmRecordNotFoundError
+	AlarmRuleGroupNameExists
+	AlarmRuleGroupNotFoundError
 )
 
 const (
@@ -110,6 +112,8 @@ var businessErrorMap = map[BusinessErrorCode]string{
 	FirmwareExistsError:                 "固件已存在",
 	AlarmRuleNameExists:                 "规则名称已经存在",
 	AlarmRuleNotFoundError:              "报警规则不存在",
+	AlarmRuleGroupNameExists:            "规则名称已经存在",
+	AlarmRuleGroupNotFoundError:         "报警规则不存在",
 	AlarmRecordAlreadyAcknowledgedError: "报警已被处理",
 	AlarmRecordNotFoundError:            "报警记录不存在",
 	RoleExistsError:                     "角色已存在",

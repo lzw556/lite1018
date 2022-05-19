@@ -43,3 +43,11 @@ type AcknowledgeAlarmRecord struct {
 
 	Note string `json:"note"`
 }
+
+type AlarmRuleGroup struct {
+	Name        string      `json:"name"`
+	Description string      `json:"description"`
+	Rules       []AlarmRule `json:"rules"`
+
+	ProjectID uint `json:"-"`
+}
