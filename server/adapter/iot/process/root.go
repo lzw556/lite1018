@@ -54,21 +54,20 @@ func (r root) Process(ctx *iot.Context, msg iot.Message) error {
 	if gateway.NetworkID != device.NetworkID {
 		return fmt.Errorf("device %s is not in gateway %s", device.MacAddress, gateway.MacAddress)
 	}
-	if state, err := r.deviceStateRepo.Get(device.MacAddress); err == nil {
-		if !state.IsOnline {
-			state.IsOnline = true
-			state.ConnectedAt = time.Now().UTC().Unix()
-			state.Notify(device.MacAddress)
-			if device.IsGateway() {
-				if network, err := r.networkRepo.Get(c, device.NetworkID); err == nil {
-					command.SyncNetworkLinkStates(network, 3*time.Second)
-				}
+	state, _ := r.deviceStateRepo.Get(device.MacAddress)
+	if !state.IsOnline {
+		state.IsOnline = true
+		state.ConnectedAt = time.Now().UTC().Unix()
+		state.Notify(device.MacAddress)
+		if device.IsGateway() {
+			if network, err := r.networkRepo.Get(c, device.NetworkID); err == nil {
+				command.SyncNetworkLinkStates(network, 3*time.Second)
 			}
-		} else {
-			state.ConnectedAt = time.Now().UTC().Unix()
 		}
-		_ = r.deviceStateRepo.Create(device.MacAddress, state)
+	} else {
+		state.ConnectedAt = time.Now().UTC().Unix()
 	}
+	_ = r.deviceStateRepo.Create(device.MacAddress, state)
 	ctx.Set(device.MacAddress, device)
 	ctx.Set(gateway.MacAddress, gateway)
 	return nil
