@@ -308,7 +308,7 @@ func (VibrationTemperature3Axis) Properties(sensorID uint) Properties {
 			{
 				Key:       "displacement_peak_difference",
 				Name:      "位移峰峰值",
-				Unit:      "",
+				Unit:      "μm",
 				Precision: 3,
 				Sort:      5,
 				IsShow:    true,

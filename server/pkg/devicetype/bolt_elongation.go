@@ -105,7 +105,7 @@ func (BoltElongation) Settings() Settings {
 			Key:      "elastic_modulus",
 			Type:     FloatValueType,
 			Value:    210.0,
-			Unit:     "Gpa",
+			Unit:     "GPa",
 			Parent:   "preload_is_enabled",
 			Show:     true,
 			Category: SensorsSettingCategory,
@@ -301,7 +301,7 @@ func (BoltElongation) Properties(sensorID uint) Properties {
 			{
 				Key:       "pressure",
 				Name:      "压力",
-				Unit:      "",
+				Unit:      "MPa",
 				Precision: 3,
 				Sort:      1,
 				IsShow:    true,
@@ -316,7 +316,7 @@ func (BoltElongation) Properties(sensorID uint) Properties {
 			{
 				Key:    "acceleration",
 				Name:   "加速度",
-				Unit:   "",
+				Unit:   "m/s²",
 				Sort:   8,
 				IsShow: false,
 				Fields: []Field{
