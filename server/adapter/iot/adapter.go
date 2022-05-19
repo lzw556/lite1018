@@ -35,7 +35,6 @@ func NewAdapter(conf config.IoT) *Adapter {
 		SetAutoReconnect(true).
 		SetCleanSession(false).
 		SetConnectRetry(true).
-		SetOrderMatters(false).
 		AddBroker(conf.Broker).
 		SetOnConnectHandler(a.onConnect).
 		SetConnectionLostHandler(func(client mqtt.Client, err error) {
