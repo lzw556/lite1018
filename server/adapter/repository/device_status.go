@@ -68,11 +68,7 @@ func (repo DeviceState) Find(mac string, from, to time.Time) ([]entity.DeviceSta
 func (repo DeviceState) Delete(mac string) error {
 	err := repo.BoltDB().Update(func(tx *bbolt.Tx) error {
 		bucket := tx.Bucket([]byte(entity.DeviceState{}.BucketName()))
-		dataBucket, err := bucket.CreateBucketIfNotExists([]byte(mac))
-		if err != nil {
-			return err
-		}
-		return dataBucket.DeleteBucket([]byte(mac))
+		return bucket.DeleteBucket([]byte(mac))
 	})
 	return err
 }
