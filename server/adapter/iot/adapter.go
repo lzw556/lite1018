@@ -35,18 +35,18 @@ func NewAdapter(conf config.IoT) *Adapter {
 	mqtt.CRITICAL = log.New(os.Stdout, "[MQTT CRITICAL] ", 0)
 	mqtt.WARN = log.New(os.Stdout, "[MQTT WARN] ", 0)
 	opts := mqtt.NewClientOptions()
-	opts.Username = conf.Username
-	opts.Password = conf.Password
-	opts.ClientID = fmt.Sprintf("iot-%s", uuid.NewV1().String())
-	opts.CleanSession = false
-	opts.AutoReconnect = true
-	opts.ConnectRetry = true
-	opts.AddBroker(conf.Broker)
-	opts.OnConnect = a.onConnect
-	opts.ConnectTimeout = 0 // 0 means no timeout
-	opts.OnConnectionLost = func(client mqtt.Client, err error) {
-		xlog.Errorf("connection lost to MQTT broker: %v", err)
-	}
+	opts.SetUsername(conf.Username).
+		SetPassword(conf.Password).
+		SetClientID(fmt.Sprintf("iot-%s", uuid.NewV1().String())).
+		SetAutoReconnect(true).
+		SetCleanSession(false).
+		SetConnectRetry(true).
+		SetOrderMatters(false).
+		AddBroker(conf.Broker).
+		SetOnConnectHandler(a.onConnect).
+		SetConnectionLostHandler(func(client mqtt.Client, err error) {
+			xlog.Errorf("connection lost to MQTT broker: %v", err)
+		})
 	a.client = mqtt.NewClient(opts)
 	return a
 }
