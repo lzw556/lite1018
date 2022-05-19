@@ -10,7 +10,6 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/xlog"
 	"log"
 	"os"
-	"time"
 )
 
 type Adapter struct {
@@ -32,14 +31,16 @@ func NewAdapter(conf config.IoT) *Adapter {
 		dispatchers:   map[string]Dispatcher{},
 	}
 	mqtt.DEBUG = log.New(os.Stdout, "[MQTT DEBUG] ", 0)
+	mqtt.ERROR = log.New(os.Stdout, "[MQTT ERROR] ", 0)
+	mqtt.CRITICAL = log.New(os.Stdout, "[MQTT CRITICAL] ", 0)
+	mqtt.WARN = log.New(os.Stdout, "[MQTT WARN] ", 0)
 	opts := mqtt.NewClientOptions()
 	opts.Username = conf.Username
 	opts.Password = conf.Password
 	opts.ClientID = fmt.Sprintf("iot-%s", uuid.NewV1().String())
 	opts.CleanSession = false
 	opts.AutoReconnect = true
-	opts.KeepAlive = 60
-	opts.WriteTimeout = 30 * time.Second
+	opts.ConnectRetry = true
 	opts.AddBroker(conf.Broker)
 	opts.OnConnect = a.onConnect
 	opts.OnConnectionLost = func(client mqtt.Client, err error) {
@@ -75,11 +76,6 @@ func (a *Adapter) startMQTTServer() error {
 }
 
 func (a *Adapter) Subscribe(topic string, qos byte, handler func(c mqtt.Client, msg mqtt.Message)) error {
-	if !a.client.IsConnected() {
-		if t := a.client.Connect(); t.Wait() && t.Error() != nil {
-			return t.Error()
-		}
-	}
 	t := a.client.Subscribe(topic, qos, handler)
 	if t.Wait() && t.Error() != nil {
 		return t.Error()
@@ -92,11 +88,6 @@ func (a *Adapter) Unsubscribe(topic string) {
 }
 
 func (a *Adapter) Publish(topic string, qos byte, payload []byte) error {
-	if !a.client.IsConnected() {
-		if t := a.client.Connect(); t.Wait() && t.Error() != nil {
-			return t.Error()
-		}
-	}
 	t := a.client.Publish(topic, qos, false, payload)
 	go func() {
 		_ = t.Wait()
