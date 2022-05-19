@@ -10,6 +10,7 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/xlog"
 	"log"
 	"os"
+	"time"
 )
 
 type Adapter struct {
@@ -30,8 +31,15 @@ func NewAdapter(conf config.IoT) *Adapter {
 	opts.ClientID = fmt.Sprintf("iot-%s", uuid.NewV1().String())
 	opts.CleanSession = false
 	opts.AutoReconnect = true
+	opts.KeepAlive = 60
+	opts.WriteTimeout = 60 * time.Second
 	opts.AddBroker(conf.Broker)
-	opts.OnConnectionLost = lostConnection
+	opts.OnConnect = func(c mqtt.Client) {
+		xlog.Info("connected to MQTT broker")
+	}
+	opts.OnConnectionLost = func(client mqtt.Client, err error) {
+		xlog.Errorf("connection lost to MQTT broker: %v", err)
+	}
 	return &Adapter{
 		client:        mqtt.NewClient(opts),
 		username:      conf.Username,
@@ -121,10 +129,6 @@ func (a *Adapter) Run() error {
 	}
 	xlog.Info("iot server start successful")
 	return nil
-}
-
-func lostConnection(c mqtt.Client, err error) {
-	xlog.Errorf("lost connection to mqtt broker: %s", err.Error())
 }
 
 func (a *Adapter) Close() {
