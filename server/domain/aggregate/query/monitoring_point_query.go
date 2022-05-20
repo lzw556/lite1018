@@ -43,8 +43,32 @@ func (query MonitoringPointQuery) Paging(page, size int) ([]vo.MonitoringPoint, 
 	return result, total, nil
 }
 
-func (query MonitoringPointQuery) newMonitoringPoint(monitoringPoint entity.MonitoringPoint) vo.MonitoringPoint {
-	return vo.NewMonitoringPoint(monitoringPoint)
+func (query MonitoringPointQuery) newMonitoringPoint(mp entity.MonitoringPoint) vo.MonitoringPoint {
+	result := vo.NewMonitoringPoint(mp)
+
+	if t := monitoringpointtype.Get(mp.Type); t != nil {
+		result.Properties = make(vo.MPProperties, 0)
+		for _, property := range t.Properties() {
+			result.Properties = append(result.Properties, vo.NewMonitoringPointProperty(property))
+		}
+		sort.Sort(result.Properties)
+
+		if data, err := query.monitoringPointDataRepo.Last(mp.ID); err == nil {
+			if !data.Time.IsZero() {
+				monitoringPointData := vo.NewMonitoringPointData(data.Time)
+				values := map[string]interface{}{}
+				for _, property := range result.Properties {
+					for _, field := range property.Fields {
+						values[field.Key] = data.Values[field.Key]
+					}
+				}
+				monitoringPointData.Values = values
+				result.Data = &monitoringPointData
+			}
+		}
+	}
+
+	return result
 }
 
 func (query MonitoringPointQuery) List() ([]vo.MonitoringPoint, error) {

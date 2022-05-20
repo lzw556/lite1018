@@ -46,6 +46,7 @@ func (s MonitoringPoint) GetMonitoringPointByID(id uint) (*vo.MonitoringPoint, e
 	}
 
 	voMonitoringPoint := vo.NewMonitoringPoint(monitoringPoint)
+
 	return &voMonitoringPoint, nil
 }
 

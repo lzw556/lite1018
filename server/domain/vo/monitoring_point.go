@@ -10,6 +10,9 @@ type MonitoringPoint struct {
 	Type       uint                   `json:"type"`
 	AssetID    uint                   `json:"assetId"`
 	Attributes map[string]interface{} `json:"attributes"`
+
+	Properties MPProperties
+	Data       *MonitoringPointData
 }
 
 func NewMonitoringPoint(e entity.MonitoringPoint) MonitoringPoint {
