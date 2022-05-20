@@ -62,8 +62,8 @@ func (p DeviceStatus) Process(ctx *iot.Context, msg iot.Message) error {
 					if network, err := p.networkRepo.Get(context.TODO(), device.NetworkID); err == nil {
 						go command.SyncNetworkLinkStates(network, 3*time.Second)
 					}
+					p.addDeviceOnlineEvent(device)
 				}
-				p.addDeviceOnlineEvent(device)
 			}
 			if err := p.repository.Create(device.MacAddress, state); err != nil {
 				return fmt.Errorf("save device status failed: %v", err)
