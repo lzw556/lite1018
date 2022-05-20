@@ -44,8 +44,6 @@ func (cmd AlarmRuleGroupCreateCmd) Run() error {
 					GroupID:     cmd.AlarmRuleGroup.ID,
 				}
 
-				fmt.Println(fmt.Sprintf("source=%+v", e))
-
 				if err := cmd.alarmRuleGroupSourceRepo.Create(txCtx, &e); err != nil {
 					return err
 				}
