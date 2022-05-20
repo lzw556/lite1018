@@ -66,7 +66,7 @@ func (p RestartStatus) Process(ctx *iot.Context, msg iot.Message) error {
 				SourceID:  device.ID,
 				Category:  entity.EventCategoryDevice,
 				Timestamp: int64(m.Timestamp),
-				Content:   fmt.Sprintf(`{"code":%d}`, 0),
+				Content:   fmt.Sprintf(`{"code":%d}`, m.Code),
 				ProjectID: device.ProjectID,
 			}
 			if err := p.eventRepo.Create(context.TODO(), &event); err != nil {
