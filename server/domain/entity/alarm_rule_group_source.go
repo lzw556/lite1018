@@ -13,3 +13,5 @@ type AlarmRuleGroupSource struct {
 func (AlarmRuleGroupSource) TableName() string {
 	return "ts_alarm_rule_group_source"
 }
+
+type AlarmRuleGroupSources []AlarmRuleGroupSource

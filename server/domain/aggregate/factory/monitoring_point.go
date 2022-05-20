@@ -38,6 +38,7 @@ func (factory MonitoringPoint) NewMonitoringPointCreateCmd(req request.CreateMon
 	e.Type = req.Type
 	e.AssetID = req.AssetID
 	e.ProjectID = req.ProjectID
+	e.Attributes = req.Attributes
 
 	cmd := command.NewMonitoringPointCreateCmd()
 	cmd.MonitoringPoint = e
@@ -101,6 +102,8 @@ func (factory MonitoringPoint) buildSpecs(filters request.Filters) []spec.Specif
 			specs = append(specs, spec.TypeEqSpec(cast.ToUint(v)))
 		case "name":
 			specs = append(specs, spec.NameEqSpec(cast.ToString(v)))
+		case "asset_id":
+			specs = append(specs, spec.AssetEqSpec(cast.ToUint(v)))
 		}
 	}
 	return specs

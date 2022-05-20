@@ -5,11 +5,11 @@ import (
 )
 
 type Asset struct {
-	ID        uint
-	Name      string
-	Type      uint
-	ParentID  uint
-	ProjectID uint
+	ID        uint   `json:"id"`
+	Name      string `json:"name"`
+	Type      uint   `json:"type"`
+	ParentID  uint   `json:"parentId"`
+	ProjectID uint   `json:"projectId"`
 }
 
 func NewAsset(e entity.Asset) Asset {

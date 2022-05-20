@@ -1,17 +1,24 @@
 package entity
 
 import (
+	"database/sql/driver"
+	"errors"
 	"fmt"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/cache"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/eventbus"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/json"
 	"gorm.io/gorm"
 )
 
+type Attributes map[string]interface{}
+
 type MonitoringPoint struct {
 	gorm.Model
-	Name      string `gorm:"type:varchar(64)"`
-	Type      uint
-	AssetID   uint
+	Name       string `gorm:"type:varchar(64)"`
+	Type       uint
+	AssetID    uint
+	Attributes Attributes
+
 	ProjectID uint
 
 	AlarmRuleStates map[uint]AlarmRuleState `gorm:"-"`
@@ -19,6 +26,18 @@ type MonitoringPoint struct {
 
 func (MonitoringPoint) TableName() string {
 	return "ts_monitoring_point"
+}
+
+func (a *Attributes) Scan(value interface{}) error {
+	bytes, ok := value.([]byte)
+	if !ok {
+		return errors.New(fmt.Sprint("Failed to unmarshal algorithmParameters value:", value))
+	}
+	return json.Unmarshal(bytes, &a)
+}
+
+func (a Attributes) Value() (driver.Value, error) {
+	return json.Marshal(a)
 }
 
 func (mp *MonitoringPoint) UpdateAlarmRuleState(e AlarmRule) {

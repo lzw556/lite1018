@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"fmt"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
@@ -13,14 +14,14 @@ type AlarmRuleGroupCreateCmd struct {
 
 	RuleCreateCmds []*AlarmRuleCreateCmd
 
-	alarmRuleGroupRepo dependency.AlarmRuleGroupRepository
-	// alarmRuleGroupSourceRepo dependency.AlarmRuleGroupSourceRepository
+	alarmRuleGroupRepo       dependency.AlarmRuleGroupRepository
+	alarmRuleGroupSourceRepo dependency.AlarmRuleGroupSourceRepository
 }
 
 func NewAlarmRuleGroupCreateCmd() AlarmRuleGroupCreateCmd {
 	return AlarmRuleGroupCreateCmd{
-		alarmRuleGroupRepo: repository.AlarmRuleGroup{},
-		// alarmRuleGroupSourceRepo: repository.AlarmRuleGroupSource{},
+		alarmRuleGroupRepo:       repository.AlarmRuleGroup{},
+		alarmRuleGroupSourceRepo: repository.AlarmRuleGroupSource{},
 	}
 }
 
@@ -33,6 +34,21 @@ func (cmd AlarmRuleGroupCreateCmd) Run() error {
 		for _, ruleCreateCmd := range cmd.RuleCreateCmds {
 			if err := ruleCreateCmd.RunWithContext(txCtx); err != nil {
 				return err
+			}
+		}
+
+		for _, ruleCreateCmd := range cmd.RuleCreateCmds {
+			if ruleCreateCmd.AlarmRule.ID > 0 {
+				e := entity.AlarmRuleGroupSource{
+					AlarmRuleID: ruleCreateCmd.AlarmRule.ID,
+					GroupID:     cmd.AlarmRuleGroup.ID,
+				}
+
+				fmt.Println(fmt.Sprintf("source=%+v", e))
+
+				if err := cmd.alarmRuleGroupSourceRepo.Create(txCtx, &e); err != nil {
+					return err
+				}
 			}
 		}
 

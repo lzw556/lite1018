@@ -89,6 +89,8 @@ func (factory Asset) buildSpecs(filters request.Filters) []spec.Specification {
 			specs = append(specs, spec.TypeEqSpec(cast.ToUint(v)))
 		case "name":
 			specs = append(specs, spec.NameEqSpec(cast.ToString(v)))
+		case "parent_id":
+			specs = append(specs, spec.ParentIdEqSpec(cast.ToUint(v)))
 		}
 	}
 	return specs
