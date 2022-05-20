@@ -13,6 +13,7 @@ const (
 
 var types = []Typer{
 	BoltAngle{},
+	Preload{},
 }
 
 type Typer interface {
