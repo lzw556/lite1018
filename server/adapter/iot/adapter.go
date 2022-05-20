@@ -8,6 +8,7 @@ import (
 	uuid "github.com/satori/go.uuid"
 	"github.com/thetasensors/theta-cloud-lite/server/config"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/xlog"
+	"time"
 )
 
 type Adapter struct {
@@ -35,8 +36,10 @@ func NewAdapter(conf config.IoT) *Adapter {
 		SetAutoReconnect(true).
 		SetCleanSession(false).
 		SetConnectRetry(true).
+		SetPingTimeout(10 * time.Second).
 		SetOrderMatters(false).
 		AddBroker(conf.Broker).
+		SetDefaultPublishHandler(a.onPublish).
 		SetOnConnectHandler(a.onConnect).
 		SetConnectionLostHandler(func(client mqtt.Client, err error) {
 			xlog.Errorf("connection lost to MQTT broker: %v", err)
@@ -91,6 +94,11 @@ func (a *Adapter) Publish(topic string, qos byte, payload []byte) error {
 		}
 	}()
 	return nil
+}
+
+func (a Adapter) onPublish(c mqtt.Client, msg mqtt.Message) {
+	xlog.Infof("publish topic: %s", msg.Topic())
+	xlog.Infof("publish message: %s", string(msg.Payload()))
 }
 
 func (a *Adapter) onConnect(c mqtt.Client) {
