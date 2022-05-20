@@ -39,7 +39,7 @@ const AddNetworkModal:FC<AddNetworkModalProps> = (props) => {
         })
     }
 
-    return <Modal {...props} width={420} title={"网络添加"} okText={"确定"} onOk={onAdd} cancelText={"取消"} confirmLoading={isLoading}>
+    return <Modal {...props} width={460} title={"网络添加"} okText={"确定"} onOk={onAdd} cancelText={"取消"} confirmLoading={isLoading}>
         <Form form={form} labelCol={{span: 7}} validateMessages={defaultValidateMessages}>
             <fieldset>
                 <legend>基本信息</legend>

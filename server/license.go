@@ -1,4 +1,4 @@
-//go:build theta
+//go:build license
 
 package main
 
@@ -22,6 +22,11 @@ var rbacModel string
 var rbacPolicy string
 
 func main() {
+	key := "thetasensorskeyaesfitbitsencrypt"
+	if !license.ValidateKeyFile([]byte(key), "../license.dat") {
+		fmt.Println("Invalid key file")
+		return
+	}
 	initialize.InitFolder()
 	global.Viper = core.Viper()
 	dbConf := config.Database{}
