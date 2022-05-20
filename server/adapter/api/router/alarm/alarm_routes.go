@@ -118,3 +118,13 @@ func (r alarmRouter) getAlarmRecordAcknowledge(ctx *gin.Context) (interface{}, e
 	id := cast.ToUint(ctx.Param("id"))
 	return r.service.GetAlarmRecordAcknowledgeByID(id)
 }
+
+func (r alarmRouter) createAlarmRuleGroup(ctx *gin.Context) (interface{}, error) {
+	var req request.AlarmRuleGroup
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		return nil, response.InvalidParameterError(err.Error())
+	}
+
+	req.ProjectID = cast.ToUint(ctx.MustGet("project_id"))
+	return nil, r.service.CreateAlarmRuleGroup(req)
+}

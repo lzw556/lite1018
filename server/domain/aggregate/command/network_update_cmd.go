@@ -2,6 +2,8 @@ package command
 
 import (
 	"context"
+	"time"
+
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/request"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/response"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/iot/command"
@@ -13,7 +15,6 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/devicetype"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/errcode"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/transaction"
-	"time"
 )
 
 type NetworkUpdateCmd struct {
@@ -46,6 +47,9 @@ func (cmd NetworkUpdateCmd) Update(req request.Network) (*vo.Network, error) {
 		}
 		return nil
 	})
+	if err != nil {
+		return nil, err
+	}
 	gateway, err := cmd.deviceRepo.Get(context.TODO(), cmd.Network.GatewayID)
 	if err != nil {
 		return nil, err

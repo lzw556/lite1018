@@ -147,3 +147,11 @@ func (s Alarm) DeleteAlarmRecordByID(id uint) error {
 	}
 	return cmd.Run()
 }
+
+func (s Alarm) CreateAlarmRuleGroup(req request.AlarmRuleGroup) error {
+	cmd, err := s.factory.NewAlarmRuleGroupCreateCmd(req)
+	if err != nil {
+		return err
+	}
+	return cmd.Run()
+}

@@ -16,7 +16,7 @@ func _() {
 	_ = x[UserExistsError-11004]
 	_ = x[InvalidTokenError-11005]
 	_ = x[AssetNotFoundError-12001]
-	_ = x[AssetImageSizeTooLargeError-12002]
+	_ = x[AssetImageSizeTooLargeError-12003]
 	_ = x[DeviceNotFoundError-13001]
 	_ = x[DeviceMacExistsError-13002]
 	_ = x[UnknownDeviceTypeError-13003]
