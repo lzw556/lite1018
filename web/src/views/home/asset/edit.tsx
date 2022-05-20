@@ -2,7 +2,7 @@ import { Form, Input, Modal, ModalProps, Select } from 'antd';
 import * as React from 'react';
 import { defaultValidateMessages, Rules } from '../../../constants/validator';
 import { AssetTypes } from './constants';
-import { Asset, AssetRow, convertRow } from './props';
+import { Asset, AssetRow, convertRow, filterAssets } from './props';
 import { addAsset, getAssets, updateAsset } from './services';
 
 export const AssetEdit: React.FC<
@@ -19,9 +19,7 @@ export const AssetEdit: React.FC<
   ]);
 
   React.useEffect(() => {
-    getAssets().then((assets) =>
-      setParents(assets.filter((asset) => asset.Type === AssetTypes.WindTurbind.type))
-    );
+    getAssets().then((assets) => setParents(filterAssets(assets, 'WindTurbind')));
   }, []);
 
   React.useEffect(() => {
@@ -64,7 +62,7 @@ export const AssetEdit: React.FC<
             <Input />
           </Form.Item>
         )}
-        <Form.Item label='名称' name='name' rules={[Rules.range(5, 50)]}>
+        <Form.Item label='名称' name='name' rules={[Rules.range(4, 50)]}>
           <Input placeholder={`请填写${label}名称`} />
         </Form.Item>
         <Form.Item label='类型' name='type' hidden={!!type} initialValue={type}>

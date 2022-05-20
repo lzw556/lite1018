@@ -15,8 +15,9 @@ export const ChartContainer = <T,>({
   const genericOps = cloneDeep(COMMON_OPTIONS);
   const _ops = merge(genericOps, {
     ...options,
-    series: options.series.map((item) => ({ ...item, label: COMMON_OPTIONS_SERIES.label }))
+    // series: options.series.map((item) => ({ ...item, label: COMMON_OPTIONS_SERIES.label }))
   });
+  console.log(_ops)
   return (
     <div className='chart-container'>
       {title && <h3 className='chart-title'>{title}</h3>}

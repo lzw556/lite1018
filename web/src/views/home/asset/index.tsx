@@ -4,7 +4,7 @@ import * as React from 'react';
 import { SearchResultPage } from '../searchResultPage';
 import { AssetTypes } from './constants';
 import { AssetEdit } from './edit';
-import { AssetRow } from './props';
+import { AssetRow, filterAssets } from './props';
 import { deleteAsset, getAssets } from './services';
 
 const AssetManagement: React.FC = () => {
@@ -83,7 +83,7 @@ const AssetManagement: React.FC = () => {
   }, []);
 
   React.useEffect(() => {
-    const dataSource = assets.filter((asset) => asset.Type === AssetTypes.WindTurbind.type);
+    const dataSource = filterAssets(assets, 'WindTurbind');
     setResult((prev) => ({
       ...prev,
       dataSource,

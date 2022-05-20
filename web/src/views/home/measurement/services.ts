@@ -8,8 +8,7 @@ export function getMeasurements() {
 }
 
 export function addMeasurement(measurement: Measurement) {
-  // return request.post<MeasurementRow>('/monitoringPoints', measurement).then(PostResponse);
-  return request.post<MeasurementRow>('/monitoringPoints', measurement);
+  return request.post<MeasurementRow>('/monitoringPoints', measurement).then(PostResponse);
 }
 
 export function updateMeasurement(id: Measurement['id'], measurement: Measurement) {
@@ -21,5 +20,10 @@ export function deleteMeasurement(id: Measurement['id']) {
 }
 
 export function bindDevice(id: Measurement['id'], device_id: number) {
-  return request.post(`/monitoringPoints/${id}/bindDevice`, { device_id });
+  //TODO
+  return request.post(`/monitoringPoints/${id}/bindDevice`, {
+    device_id,
+    algorithm_id: 1,
+    parameters: {}
+  });
 }

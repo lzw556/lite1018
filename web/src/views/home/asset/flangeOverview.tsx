@@ -8,7 +8,7 @@ import '../home.css';
 import { OverviewPage } from '../overviewPage';
 import { Overview, TableListItem } from '../props';
 
-const MeasurementOverview: React.FC = () => {
+const FlangeOverview: React.FC = () => {
   const { search } = useLocation();
   const id = Number(search.substring(search.lastIndexOf('id=') + 3));
   const [overview, setOverview] = React.useState<Overview>();
@@ -239,4 +239,4 @@ const MeasurementOverview: React.FC = () => {
   );
 };
 
-export default MeasurementOverview;
+export default FlangeOverview;

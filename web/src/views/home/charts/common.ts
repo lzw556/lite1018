@@ -27,6 +27,7 @@ export type ChartOptions<SeriesOptions> = {
   tooltip?: Tooltip;
   xAxis?: XAxis;
   yAxis?: YAxis;
+  label?: any;
 };
 
 export const COMMON_OPTIONS = {
@@ -43,7 +44,7 @@ export const COMMON_OPTIONS = {
 };
 
 export const COMMON_OPTIONS_SERIES = {
-  label: {
-    color: '#8a8e99'
-  }
+  // label: {
+  //   color: '#8a8e99'
+  // }
 };

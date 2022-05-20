@@ -2,8 +2,8 @@ import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
 import { Button, ButtonProps, Empty, Popconfirm, Space, Spin, TableProps } from 'antd';
 import * as React from 'react';
 import { Link } from 'react-router-dom';
-import { AssetTypes, MeasurementTypes } from '../asset/constants';
-import { AssetRow } from '../asset/props';
+import { MeasurementTypes } from '../asset/constants';
+import { AssetRow, filterAssets } from '../asset/props';
 import { getAssets } from '../asset/services';
 import { SearchResultPage } from '../searchResultPage';
 import { MeasurementEdit } from './edit';
@@ -22,7 +22,7 @@ const MeasurementManagement: React.FC = () => {
     }
   ];
   const [result, setResult] = React.useState<TableProps<any>>({
-    rowKey: 'ID',
+    rowKey: 'id',
     columns: [
       { title: '名称', dataIndex: 'name', key: 'name', width: '50%' },
       {
@@ -89,10 +89,7 @@ const MeasurementManagement: React.FC = () => {
   };
 
   React.useEffect(() => {
-    if (
-      isLoaded &&
-      assets.filter((asset) => asset.Type === AssetTypes.WindTurbind.type).length > 0
-    ) {
+    if (isLoaded && filterAssets(assets, 'WindTurbind').length > 0) {
       setHasAssets(true);
     }
   }, [assets, isLoaded]);

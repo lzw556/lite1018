@@ -35,7 +35,7 @@ export type Overview = {
     name: string;
     value: string | number;
   }[];
-  chartList: {
+  chartList?: {
     title: string;
     colProps: {
       xs: { span: number };

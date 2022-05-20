@@ -1,6 +1,8 @@
-import { Form, Input, message, Modal, ModalProps, Select } from 'antd';
+import { Form, Input, Modal, ModalProps, Select } from 'antd';
 import * as React from 'react';
+import DeviceSelect from '../../../components/select/deviceSelect';
 import { defaultValidateMessages, Rules } from '../../../constants/validator';
+import { DeviceType } from '../../../types/device_type';
 import { AssetTypes, MeasurementTypes } from '../asset/constants';
 import { AssetRow } from '../asset/props';
 import { getAssets } from '../asset/services';
@@ -10,9 +12,18 @@ import { addMeasurement, bindDevice, updateMeasurement } from './services';
 export const MeasurementEdit: React.FC<
   ModalProps & { selectedRow?: MeasurementRow } & { onSuccess: () => void }
 > = (props) => {
+  const types = [
+    DeviceType.BoltLoosening,
+    DeviceType.BoltElongation,
+    DeviceType.HighTemperatureCorrosion,
+    DeviceType.NormalTemperatureCorrosion,
+    DeviceType.AngleDip,
+    DeviceType.PressureTemperature,
+    DeviceType.VibrationTemperature3Axis
+  ].join(',');
   const { selectedRow, onSuccess } = props;
   const { id } = selectedRow || {};
-  const [form] = Form.useForm<Measurement>();
+  const [form] = Form.useForm<Measurement & { device_id: number }>();
   const [parents, setParents] = React.useState<AssetRow[]>([
     { ID: 0, Name: '', Type: 0, ParentID: -1, ProjectID: 1 }
   ]);
@@ -41,22 +52,9 @@ export const MeasurementEdit: React.FC<
             const { id } = values;
             try {
               if (!id) {
-                addMeasurement(values).then(({ data: { code, msg, data } }) => {
-                  if (code === 200) {
-                    if (data.id) {
-                      bindDevice(data.id, 0).then(({ data: { code, msg } }) => {
-                        if (code === 200) {
-                          onSuccess();
-                        } else {
-                          message.error(`添加失败：${msg}`);
-                        }
-                      });
-                    } else {
-                      message.error(`添加失败`);
-                    }
-                  } else {
-                    message.error(`添加失败：${msg}`);
-                  }
+                addMeasurement(values).then((measurement) => {
+                  bindDevice(measurement.id, values.device_id);
+                  onSuccess();
                 });
               } else {
                 updateMeasurement(id, values).then(() => {
@@ -96,6 +94,13 @@ export const MeasurementEdit: React.FC<
               </Select.Option>
             ))}
           </Select>
+        </Form.Item>
+        <Form.Item
+          label='传感器'
+          name='device_id'
+          rules={[{ required: true, message: `请选择传感器` }]}
+        >
+          <DeviceSelect filters={{ types }} />
         </Form.Item>
       </Form>
     </Modal>
