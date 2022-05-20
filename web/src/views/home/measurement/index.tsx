@@ -2,8 +2,8 @@ import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
 import { Button, ButtonProps, Empty, Popconfirm, Space, Spin, TableProps } from 'antd';
 import * as React from 'react';
 import { Link } from 'react-router-dom';
-import { MeasurementTypes } from '../asset/constants';
-import { AssetRow, filterAssets } from '../asset/props';
+import { AssetTypes, MeasurementTypes } from '../asset/constants';
+import { AssetRow } from '../asset/props';
 import { getAssets } from '../asset/services';
 import { SearchResultPage } from '../searchResultPage';
 import { MeasurementEdit } from './edit';
@@ -11,7 +11,20 @@ import { MeasurementRow } from './props';
 import { deleteMeasurement, getMeasurements } from './services';
 
 const MeasurementManagement: React.FC = () => {
-  const [isLoaded, setIsLoaded] = React.useState(false);
+  const [assets, setAssets] = React.useState<{
+    loading: boolean;
+    items: AssetRow[];
+  }>({
+    loading: true,
+    items: []
+  });
+  const [measurements, setMeasurements] = React.useState<{
+    loading: boolean;
+    items: MeasurementRow[];
+  }>({
+    loading: true,
+    items: []
+  });
   const [visible, setVisible] = React.useState(false);
   const [selectedRow, setSelectedRow] = React.useState<MeasurementRow>();
   const actions: ButtonProps[] = [
@@ -60,39 +73,32 @@ const MeasurementManagement: React.FC = () => {
     ],
     size: 'small',
     pagination: false,
-    loading: !isLoaded,
+    loading: true,
     locale: { emptyText: <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description='暂无数据' /> }
   });
-  const [measurements, setMeasurements] = React.useState<MeasurementRow[]>([]);
-  const [assets, setAssets] = React.useState<AssetRow[]>([]);
   const [hasAssets, setHasAssets] = React.useState(false);
 
   const open = (selectedRow?: MeasurementRow) => {
     setSelectedRow(selectedRow);
     setVisible(true);
   };
-  const fetchMeasurements = () => {
-    setIsLoaded(false);
-    getMeasurements()
-      .then(setMeasurements)
-      .then(() => setIsLoaded(true));
+  const fetchMeasurements = (filters?: Pick<MeasurementRow, 'type'>) => {
+    setMeasurements((prev) => ({ ...prev, loading: true }));
+    getMeasurements().then((measurements) =>
+      setMeasurements({ loading: false, items: measurements })
+    );
+  };
+  const fetchAssets = (filters?: Pick<AssetRow, 'type'>) => {
+    setAssets((prev) => ({ ...prev, loading: true }));
+    getAssets(filters).then((assets) => setAssets({ loading: false, items: assets }));
   };
   React.useEffect(() => {
-    fetchAssets();
+    fetchAssets({ type: AssetTypes.WindTurbind.type });
   }, []);
 
-  const fetchAssets = () => {
-    setIsLoaded(false);
-    getAssets()
-      .then(setAssets)
-      .then(() => setIsLoaded(true));
-  };
-
   React.useEffect(() => {
-    if (isLoaded && filterAssets(assets, 'WindTurbind').length > 0) {
-      setHasAssets(true);
-    }
-  }, [assets, isLoaded]);
+    if (!assets.loading) setHasAssets(assets.items.length > 0);
+  }, [assets]);
 
   React.useEffect(() => {
     if (hasAssets) fetchMeasurements();
@@ -101,12 +107,12 @@ const MeasurementManagement: React.FC = () => {
   React.useEffect(() => {
     setResult((prev) => ({
       ...prev,
-      dataSource: measurements,
-      loading: !isLoaded
+      dataSource: measurements.items,
+      loading: measurements.loading
     }));
-  }, [measurements, isLoaded]);
+  }, [measurements]);
 
-  if (!isLoaded) {
+  if (assets.loading) {
     return <Spin />;
   } else if (!hasAssets) {
     return (

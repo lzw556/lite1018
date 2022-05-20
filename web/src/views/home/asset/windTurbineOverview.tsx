@@ -7,17 +7,19 @@ import { MeasurementIcon } from '../measurement/icon';
 import { getMeasurements } from '../measurement/services';
 import { OverviewPage } from '../overviewPage';
 import { Introduction } from '../props';
-import { filterAssets } from './props';
+import { AssetTypes } from './constants';
 import { getAssets } from './services';
 
 const WindTurbineOverview: React.FC = () => {
   const { search } = useLocation();
   const id = Number(search.substring(search.lastIndexOf('id=') + 3));
   const [properties, setProperties] = React.useState([
-    { name: '监测螺栓数量', value: 4 },
-    { name: '异常螺栓数量', value: 4 },
-    { name: '最大预紧力', value: '400kN' },
-    { name: '最新预紧力', value: '300kN' }
+    { name: '监测点数量', value: 40 },
+    { name: '紧急报警监测点数量', value: 0 },
+    { name: '重要报警监测点数量', value: 0 },
+    { name: '次要报警监测点数量', value: 0 },
+    { name: '传感器数量', value: 40 },
+    { name: '离线传感器数量', value: 0 }
   ]);
   const [flanges, setFlanges] = React.useState<{
     loading: boolean;
@@ -27,23 +29,23 @@ const WindTurbineOverview: React.FC = () => {
     items: []
   });
   React.useEffect(() => {
-    getAssets().then((assets) => {
+    getAssets({ parent_id: id, type: AssetTypes.Flange.type }).then((assets) => {
       setFlanges({
         loading: false,
-        items: filterAssets(assets, 'Flange', id).map((item) => ({
-          parentId: item.ParentID,
-          id: item.ID,
+        items: assets.map((item) => ({
+          parentId: item.parentId,
+          id: item.id,
           title: {
-            name: item.Name,
-            path: `/project-overview?locale=project-overview/wind-overview&id=${item.ParentID}/flange-overview&id=${item.ID}`
+            name: item.name,
+            path: `/project-overview?locale=project-overview/wind-overview&id=${item.parentId}/flange-overview&id=${item.id}`
           },
           alarmState: 'normal',
           icon: { svg: <MeasurementIcon />, small: true, focus: true },
           properties: [
-            { name: '监测点', value: 1 },
-            { name: '异常监测点', value: 5 },
-            { name: '螺栓监测', value: '正常' },
-            { name: '报警', value: 3 }
+            { name: '监测点', value: 8 },
+            { name: '异常监测点', value: 0 },
+            { name: '最大预紧力', value: '345kN' },
+            { name: '最小预紧力', value: '310kN' }
           ]
         }))
       });
@@ -56,8 +58,8 @@ const WindTurbineOverview: React.FC = () => {
         if (!flange.chart) {
           getMeasurements().then((measurements) => {
             const children = measurements.filter((mea) => mea.assetId === flange.id);
-            const statisticOfFlange: any = getStatisticOfFlange(children.length);
-            if (children.length > 0) {
+            const statisticOfFlange: any = getStatisticOfFlange(8);
+            if (8 > 0) {
               setTimeout(() => {
                 setFlanges((prev) => ({
                   ...prev,
@@ -178,6 +180,8 @@ const WindTurbineOverview: React.FC = () => {
         {
           type: 'radar',
           name: '实际值',
+          lineStyle: { color: 'rgb(255, 68, 0, .6)' },
+          itemStyle: { color: 'rgb(255, 68, 0, .6)' },
           data: [{ value: valuesReal }]
         },
         {
@@ -186,7 +190,8 @@ const WindTurbineOverview: React.FC = () => {
           coordinateSystem: 'polar',
           data: valuesRule,
           symbol: 'none',
-          lineStyle: { type: 'dashed' }
+          itemStyle: { color: '#00800080' },
+          lineStyle: { type: 'dashed', color: '#00800080' }
         },
         {
           type: 'scatter',

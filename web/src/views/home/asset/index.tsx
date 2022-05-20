@@ -4,15 +4,20 @@ import * as React from 'react';
 import { SearchResultPage } from '../searchResultPage';
 import { AssetTypes } from './constants';
 import { AssetEdit } from './edit';
-import { AssetRow, filterAssets } from './props';
+import { AssetRow } from './props';
 import { deleteAsset, getAssets } from './services';
 
 const AssetManagement: React.FC = () => {
-  const [isLoaded, setIsLoaded] = React.useState(false);
+  const [assets, setAssets] = React.useState<{
+    loading: boolean;
+    items: AssetRow[];
+  }>({
+    loading: true,
+    items: []
+  });
   const [visible, setVisible] = React.useState(false);
   const [selectedRow, setSelectedRow] = React.useState<AssetRow>();
   const [initialValues, setInitialValues] = React.useState(AssetTypes.WindTurbind);
-  const [assets, setAssets] = React.useState<AssetRow[]>([]);
   const [disabled, setDisabled] = React.useState(true);
   const actions: ButtonProps[] = [
     {
@@ -28,9 +33,9 @@ const AssetManagement: React.FC = () => {
     }
   ];
   const [result, setResult] = React.useState<TableProps<any>>({
-    rowKey: 'ID',
+    rowKey: 'id',
     columns: [
-      { title: '名称', dataIndex: 'Name', key: 'name', width: '50%' },
+      { title: '名称', dataIndex: 'name', key: 'name', width: '50%' },
       {
         title: '操作',
         key: 'action',
@@ -42,8 +47,8 @@ const AssetManagement: React.FC = () => {
             <Popconfirm
               title={'确定要删除该风机吗?'}
               onConfirm={() => {
-                deleteAsset(row.ID).then(() => {
-                  fetchAssets();
+                deleteAsset(row.id).then(() => {
+                  fetchAssets({ type: AssetTypes.WindTurbind.type });
                 });
               }}
             >
@@ -54,7 +59,7 @@ const AssetManagement: React.FC = () => {
             <Button type='text' size='small' title='添加法兰'>
               <PlusOutlined
                 style={{ color: 'rgba(0,0,0,.55)' }}
-                onClick={() => open({ ...AssetTypes.Flange, parent_id: row.ID })}
+                onClick={() => open({ ...AssetTypes.Flange, parent_id: row.id })}
               />
             </Button>
           </Space>
@@ -63,7 +68,7 @@ const AssetManagement: React.FC = () => {
     ],
     size: 'small',
     pagination: false,
-    loading: !isLoaded,
+    loading: true,
     locale: { emptyText: <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description='暂无数据' /> }
   });
   const open = (initialValues: typeof AssetTypes.WindTurbind, selectedRow?: AssetRow) => {
@@ -72,27 +77,24 @@ const AssetManagement: React.FC = () => {
     setVisible(true);
   };
 
-  const fetchAssets = () => {
-    setIsLoaded(false);
-    getAssets()
-      .then(setAssets)
-      .then(() => setIsLoaded(true));
+  const fetchAssets = (filters?: Pick<AssetRow, 'type'>) => {
+    setAssets((prev) => ({ ...prev, loading: true }));
+    getAssets(filters).then((assets) => setAssets({ loading: false, items: assets }));
   };
   React.useEffect(() => {
-    fetchAssets();
+    fetchAssets({ type: AssetTypes.WindTurbind.type });
   }, []);
 
   React.useEffect(() => {
-    const dataSource = filterAssets(assets, 'WindTurbind');
     setResult((prev) => ({
       ...prev,
-      dataSource,
-      loading: !isLoaded
+      loading: assets.loading,
+      dataSource: assets.items
     }));
-    if (isLoaded) {
-      setDisabled(dataSource.length === 0);
+    if (!assets.loading) {
+      setDisabled(assets.items.length === 0);
     }
-  }, [assets, isLoaded]);
+  }, [assets]);
 
   return (
     <SearchResultPage {...{ actions, result }}>

@@ -2,9 +2,8 @@ import request from '../../../utils/request';
 import { DeleteResponse, GetResponse, PostResponse, PutResponse } from '../../../utils/response';
 import { Asset, AssetRow } from './props';
 
-export function getAssets() {
-  //TODO add filter:type
-  return request.get<AssetRow[]>(`/assets`).then(GetResponse);
+export function getAssets(filters?: Partial<Pick<Asset, 'type' | 'parent_id'>>) {
+  return request.get<AssetRow[]>(`/assets`, { ...filters }).then(GetResponse);
 }
 
 export function addAsset(asset: Asset) {

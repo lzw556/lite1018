@@ -6,6 +6,7 @@ export type Title = {
 };
 
 export type Legend = {
+  data?: { name: string; itemStyle?: { color: string }; icon?: string }[];
   bottom: number;
 };
 
@@ -15,6 +16,9 @@ export type XAxis = {
 };
 export type YAxis = {
   type: 'category' | 'value';
+  minInterval?: number;
+  min?: number;
+  max?: number;
 };
 export type Tooltip = {
   trigger: 'item' | 'axis';
@@ -44,7 +48,7 @@ export const COMMON_OPTIONS = {
 };
 
 export const COMMON_OPTIONS_SERIES = {
-  // label: {
-  //   color: '#8a8e99'
-  // }
+  label: {
+    color: '#8a8e99'
+  }
 };

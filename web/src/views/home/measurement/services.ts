@@ -2,9 +2,9 @@ import request from '../../../utils/request';
 import { DeleteResponse, GetResponse, PostResponse, PutResponse } from '../../../utils/response';
 import { Measurement, MeasurementRow } from './props';
 
-export function getMeasurements() {
+export function getMeasurements(filters?: Pick<Measurement, 'asset_id'>) {
   //TODO add filter:type
-  return request.get<MeasurementRow[]>(`/monitoringPoints`).then(GetResponse);
+  return request.get<MeasurementRow[]>(`/monitoringPoints`, { ...filters }).then(GetResponse);
 }
 
 export function addMeasurement(measurement: Measurement) {

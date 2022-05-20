@@ -25,12 +25,12 @@ export const MeasurementEdit: React.FC<
   const { id } = selectedRow || {};
   const [form] = Form.useForm<Measurement & { device_id: number }>();
   const [parents, setParents] = React.useState<AssetRow[]>([
-    { ID: 0, Name: '', Type: 0, ParentID: -1, ProjectID: 1 }
+    { id: 0, name: '', type: 0, parentId: -1, ProjectID: 1 }
   ]);
 
   React.useEffect(() => {
-    getAssets().then((assets) =>
-      setParents(assets.filter((asset) => asset.Type === AssetTypes.Flange.type))
+    getAssets({ type: AssetTypes.Flange.type }).then((assets) =>
+      setParents(assets.filter((asset) => asset.type === AssetTypes.Flange.type))
     );
   }, []);
 
@@ -88,9 +88,9 @@ export const MeasurementEdit: React.FC<
         </Form.Item>
         <Form.Item label='法兰' name='asset_id' rules={[{ required: true, message: `请选择法兰` }]}>
           <Select placeholder='请选择法兰'>
-            {parents.map(({ ID, Name }) => (
-              <Select.Option key={ID} value={ID}>
-                {Name}
+            {parents.map(({ id, name }) => (
+              <Select.Option key={id} value={id}>
+                {name}
               </Select.Option>
             ))}
           </Select>

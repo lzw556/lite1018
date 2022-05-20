@@ -2,7 +2,7 @@ import { Form, Input, Modal, ModalProps, Select } from 'antd';
 import * as React from 'react';
 import { defaultValidateMessages, Rules } from '../../../constants/validator';
 import { AssetTypes } from './constants';
-import { Asset, AssetRow, convertRow, filterAssets } from './props';
+import { Asset, AssetRow, convertRow } from './props';
 import { addAsset, getAssets, updateAsset } from './services';
 
 export const AssetEdit: React.FC<
@@ -11,15 +11,15 @@ export const AssetEdit: React.FC<
   } & { onSuccess: () => void }
 > = (props) => {
   const { selectedRow, initialValues, onSuccess } = props;
-  const { ID } = selectedRow || {};
+  const { id } = selectedRow || {};
   const { type, label, parent_id } = initialValues || {};
   const [form] = Form.useForm<Asset>();
   const [parents, setParents] = React.useState<AssetRow[]>([
-    { ID: 0, Name: '', Type: 0, ParentID: -1, ProjectID: 1 }
+    { id: 0, name: '', type: 0, parentId: -1, ProjectID: 1 }
   ]);
 
   React.useEffect(() => {
-    getAssets().then((assets) => setParents(filterAssets(assets, 'WindTurbind')));
+    getAssets({ type: AssetTypes.WindTurbind.type }).then((assets) => setParents(assets));
   }, []);
 
   React.useEffect(() => {
@@ -31,9 +31,9 @@ export const AssetEdit: React.FC<
   return (
     <Modal
       {...{
-        title: ID ? `${label}编辑` : `${label}添加`,
+        title: id ? `${label}编辑` : `${label}添加`,
         cancelText: '取消',
-        okText: ID ? '更新' : '添加',
+        okText: id ? '更新' : '添加',
         ...props,
         onOk: () => {
           form.validateFields().then((values) => {
@@ -57,7 +57,7 @@ export const AssetEdit: React.FC<
       }}
     >
       <Form form={form} labelCol={{ span: 4 }} validateMessages={defaultValidateMessages}>
-        {ID && (
+        {id && (
           <Form.Item label='id' name='id' hidden={true}>
             <Input />
           </Form.Item>
@@ -82,9 +82,9 @@ export const AssetEdit: React.FC<
           rules={[{ required: true, message: `请选择风机` }]}
         >
           <Select placeholder='请选择风机'>
-            {parents.map(({ ID, Name }) => (
-              <Select.Option key={ID} value={ID}>
-                {Name}
+            {parents.map(({ id, name }) => (
+              <Select.Option key={id} value={id}>
+                {name}
               </Select.Option>
             ))}
           </Select>
