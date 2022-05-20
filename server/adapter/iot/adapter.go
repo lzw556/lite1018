@@ -35,6 +35,7 @@ func NewAdapter(conf config.IoT) *Adapter {
 		SetAutoReconnect(true).
 		SetCleanSession(false).
 		SetConnectRetry(true).
+		SetOrderMatters(false).
 		AddBroker(conf.Broker).
 		SetOnConnectHandler(a.onConnect).
 		SetConnectionLostHandler(func(client mqtt.Client, err error) {
@@ -82,7 +83,7 @@ func (a *Adapter) Unsubscribe(topic string) {
 }
 
 func (a *Adapter) Publish(topic string, qos byte, payload []byte) error {
-	t := a.client.Publish(topic, qos, true, payload)
+	t := a.client.Publish(topic, qos, false, payload)
 	go func() {
 		_ = t.Wait()
 		if t.Error() != nil {

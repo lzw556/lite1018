@@ -54,28 +54,19 @@ func (p LinkStatus) Process(ctx *iot.Context, msg iot.Message) error {
 		return err
 	}
 
-	deviceState, err := p.deviceStateRepo.Get(device.MacAddress)
-	if err != nil {
-		return fmt.Errorf("device [%s] not found: %v", linkStatus.Address, err)
-	}
+	deviceState, _ := p.deviceStateRepo.Get(device.MacAddress)
 
 	// 2 offline 4 reconnecting failed
 	isOnline := linkStatus.State == "online"
 
-	isChanged := deviceState.IsOnline != isOnline
-	deviceState.IsOnline = isOnline
-	if deviceState.IsOnline {
-		deviceState.ConnectedAt = time.Now().UTC().Unix()
-	}
-	if err := p.deviceStateRepo.Create(linkStatus.Address, deviceState); err != nil {
-		return fmt.Errorf("update device state failed: %v", err)
-	}
+	deviceState.SetIsOnline(isOnline)
+	deviceState.ConnectedAt = time.Now().Unix()
+	_ = p.deviceStateRepo.Create(linkStatus.Address, deviceState)
 
-	if isChanged {
+	if deviceState.ConnectionStatusChanged {
 		deviceState.Notify(linkStatus.Address)
-		device.State = deviceState
 	}
-	p.addEvent(device, linkStatus.StateUpdateTime, int32(linkStatus.Param))
+	p.addEvent(device, deviceState.ConnectedAt, int32(linkStatus.Param))
 	return nil
 }
 
@@ -86,11 +77,9 @@ func (p LinkStatus) addEvent(device entity.Device, timestamp int64, code int32) 
 		Category:  entity.EventCategoryDevice,
 		Timestamp: timestamp,
 		ProjectID: device.ProjectID,
+		Content:   fmt.Sprintf(`{"code": %d}`, code),
 	}
-	if device.State.IsOnline {
-		event.Content = fmt.Sprintf(`{"code": %d}`, 1)
-	} else {
-		event.Content = fmt.Sprintf(`{"code": %d}`, code)
+	if err := p.eventRepo.Create(context.TODO(), &event); err != nil {
+		xlog.Errorf("create event failed: %v", err)
 	}
-	_ = p.eventRepo.Create(context.TODO(), &event)
 }

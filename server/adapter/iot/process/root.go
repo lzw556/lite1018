@@ -4,11 +4,9 @@ import (
 	"context"
 	"fmt"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/iot"
-	"github.com/thetasensors/theta-cloud-lite/server/adapter/iot/command"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
 	spec "github.com/thetasensors/theta-cloud-lite/server/domain/specification"
-	"time"
 )
 
 type root struct {
@@ -54,20 +52,6 @@ func (r root) Process(ctx *iot.Context, msg iot.Message) error {
 	if gateway.NetworkID != device.NetworkID {
 		return fmt.Errorf("device %s is not in gateway %s", device.MacAddress, gateway.MacAddress)
 	}
-	state, _ := r.deviceStateRepo.Get(device.MacAddress)
-	if !state.IsOnline {
-		state.IsOnline = true
-		state.ConnectedAt = time.Now().UTC().Unix()
-		state.Notify(device.MacAddress)
-		if device.IsGateway() {
-			if network, err := r.networkRepo.Get(c, device.NetworkID); err == nil {
-				command.SyncNetworkLinkStates(network, 3*time.Second)
-			}
-		}
-	} else {
-		state.ConnectedAt = time.Now().UTC().Unix()
-	}
-	_ = r.deviceStateRepo.Create(device.MacAddress, state)
 	ctx.Set(device.MacAddress, device)
 	ctx.Set(gateway.MacAddress, gateway)
 	return nil

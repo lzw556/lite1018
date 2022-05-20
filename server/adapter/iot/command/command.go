@@ -13,7 +13,6 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/errcode"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/json"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/xlog"
-	"sync"
 	"time"
 )
 
@@ -87,20 +86,22 @@ func SyncNetworkLinkStates(network entity.Network, timeout time.Duration) {
 		return
 	}
 	statusMap := make(map[string]bool)
-	for _, r := range result {
+	for i := range result {
+		r := result[i]
 		if r.Mac != gateway.MacAddress {
 			statusMap[r.Mac] = r.State == 3
 		}
 	}
-	for _, device := range devices {
-		if state, err := deviceStateRepo.Get(device.MacAddress); err == nil {
-			if isOnline, ok := statusMap[device.MacAddress]; ok {
-				state.IsOnline = isOnline
+	for i := range devices {
+		device := devices[i]
+		state, _ := deviceStateRepo.Get(device.MacAddress)
+		if online, ok := statusMap[device.MacAddress]; ok {
+			state.SetIsOnline(online)
+			if err := deviceStateRepo.Create(device.MacAddress, state); err != nil {
+				xlog.Errorf("save device state failed: %v", err)
+			}
+			if state.ConnectionStatusChanged {
 				state.Notify(device.MacAddress)
-				if err := deviceStateRepo.Create(device.MacAddress, state); err != nil {
-					xlog.Errorf("save device state failed: %v", err)
-					return
-				}
 				event := entity.Event{
 					Code:      entity.EventCodeStatus,
 					Category:  entity.EventCategoryDevice,
@@ -131,13 +132,12 @@ func SyncNetwork(network entity.Network, devices []entity.Device, timeout time.D
 		}
 	}
 	if isOnline(gateway.MacAddress) {
-		go SyncWsnSettings(network, gateway, timeout)
-		//if network.Mode == entity.NetworkModePushing {
+		SyncWsnSettings(network, gateway, timeout)
 		if err := SyncDeviceList(gateway, devices, timeout); err != nil {
 			return err
 		}
-		//}
 		SyncDeviceSettings(network, gateway, devices...)
+		SyncNetworkLinkStates(network, timeout)
 		return nil
 	}
 	return response.BusinessErr(errcode.DeviceOfflineError, "")
@@ -251,20 +251,6 @@ func SyncDeviceList(gateway entity.Device, devices []entity.Device, timeout time
 	if err := ClearDevices(gateway); err != nil {
 		return err
 	}
-
-	var wg sync.WaitGroup
-	for i := range devices {
-		wg.Add(1)
-		go func(device entity.Device) {
-			if device.MacAddress != gateway.MacAddress {
-				if err := deviceStateRepo.Delete(device.MacAddress); err != nil {
-					xlog.Errorf("delete device state failed: %v => [%s]", err, device.MacAddress)
-				}
-			}
-			wg.Done()
-		}(devices[i])
-	}
-	wg.Wait()
 
 	xlog.Infof("starting sync device list => [%s]", gateway.MacAddress)
 	if isOnline(gateway.MacAddress) {
