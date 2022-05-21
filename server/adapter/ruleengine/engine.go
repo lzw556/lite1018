@@ -59,6 +59,8 @@ func ExecuteSelectedRules(sourceID uint, rules ...entity.AlarmRule) {
 			switch r.Category {
 			case entity.AlarmRuleCategoryDevice:
 				alert = rule.NewDeviceAlert(sourceID, r)
+			case entity.AlarmRuleCategoryMonitoringPoint:
+				alert = rule.NewMonitoringPointAlert(sourceID, r)
 			}
 			if err := alert.Execute(pool); err != nil {
 				return

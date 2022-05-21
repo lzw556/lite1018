@@ -18,14 +18,16 @@ import (
 type MonitoringPointQuery struct {
 	Specs []spec.Specification
 
-	monitoringPointRepo     dependency.MonitoringPointRepository
-	monitoringPointDataRepo dependency.MonitoringPointDataRepository
+	monitoringPointRepo              dependency.MonitoringPointRepository
+	monitoringPointDataRepo          dependency.MonitoringPointDataRepository
+	monitoringPointDeviceBindingRepo dependency.MonitoringPointDeviceBindingRepository
 }
 
 func NewMonitoringPointQuery() MonitoringPointQuery {
 	return MonitoringPointQuery{
-		monitoringPointRepo:     repository.MonitoringPoint{},
-		monitoringPointDataRepo: repository.MonitoringPointData{},
+		monitoringPointRepo:              repository.MonitoringPoint{},
+		monitoringPointDataRepo:          repository.MonitoringPointData{},
+		monitoringPointDeviceBindingRepo: repository.MonitoringPointDeviceBinding{},
 	}
 }
 
@@ -64,6 +66,16 @@ func (query MonitoringPointQuery) newMonitoringPoint(mp entity.MonitoringPoint) 
 				}
 				monitoringPointData.Values = values
 				result.Data = &monitoringPointData
+			}
+		}
+
+		if bindings, err := query.monitoringPointDeviceBindingRepo.FindBySpecs(context.TODO(), spec.MonitoringPointIDEqSpec(mp.ID)); err != nil {
+			for _, b := range bindings {
+				dq := DeviceQuery{}
+				dev, err := dq.Get(b.DeviceID)
+				if err == nil {
+					result.BindingDevices = append(result.BindingDevices, dev)
+				}
 			}
 		}
 	}
