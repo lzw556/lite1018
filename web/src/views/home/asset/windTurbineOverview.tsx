@@ -37,7 +37,7 @@ const WindTurbineOverview: React.FC = () => {
           id: item.id,
           title: {
             name: item.name,
-            path: `/project-overview?locale=project-overview/wind-overview&id=${item.parentId}/flange-overview&id=${item.id}`
+            path: `/project-overview${search}/flange-overview&id=${item.id}`
           },
           alarmState: 'normal',
           icon: { svg: <MeasurementIcon />, small: true, focus: true },

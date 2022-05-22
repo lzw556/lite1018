@@ -60,7 +60,7 @@ const FlangeOverview: React.FC = () => {
       rowKey: 'id',
       title: () => <h3>当前数据</h3>,
       columns: [
-        { title: '监测点', dataIndex: 'name', key: 'name' },
+        { title: '监测点', dataIndex: 'name', key: 'name', render: (name: string, row: MeasurementRow) => <Link to={`/project-overview${search}/blot-overview&id=${row.id}`}>{name}</Link> },
         { title: '状态', dataIndex: 'state', key: 'state' },
         { title: '预紧力(kN)', dataIndex: 'preload', key: 'preload' },
         { title: '应力(Mpa)', dataIndex: 'preload2', key: 'preload2' },
