@@ -39,6 +39,14 @@ function generateFakeMaxinum(measurements: MeasurementRow[], max: number) {
   return maxinum;
 }
 
+function generateFakeSpecification(measurements: MeasurementRow[], max: number) {
+  const maxinum = [];
+  for (let index = 360; index > 0; index=index -3) {
+    maxinum.push([max, index]);
+  }
+  return maxinum;
+}
+
 function generateFakeCircle(measurements: MeasurementRow[]) {
   const bolts = [];
   const count = measurements.length;
@@ -68,6 +76,7 @@ export function useChartOptions(
   const startAngle = 360 / count + 90;
   const indicator = generateFakeMaxinum(measurements, 600);
   const _actual = generateFakeActual(measurements);
+  const specification = generateFakeSpecification(measurements, 600)
   const _maxinum = generateFakeCircle(measurements);
 
   const origin = {
@@ -144,7 +153,7 @@ export function useChartOptions(
         type: 'line',
         name: '规定值',
         coordinateSystem: 'polar',
-        data: valuesRule,
+        data: specification,
         symbol: 'none',
         itemStyle: { color: '#00800080' },
         lineStyle: { type: 'dashed', color: '#00800080' }
@@ -157,7 +166,7 @@ export function useChartOptions(
         symbol:
           'path://M675.9 107.2H348.1c-42.9 0-82.5 22.9-104 60.1L80 452.1c-21.4 37.1-21.4 82.7 0 119.8l164.1 284.8c21.4 37.2 61.1 60.1 104 60.1h327.8c42.9 0 82.5-22.9 104-60.1L944 571.9c21.4-37.1 21.4-82.7 0-119.8L779.9 167.3c-21.4-37.1-61.1-60.1-104-60.1z',
         symbolSize: 30,
-        data: valuesSensor,
+        data: _maxinum,
         itemStyle: {
           opacity: 1,
           color: '#555'

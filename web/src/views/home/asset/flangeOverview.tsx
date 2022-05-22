@@ -1,7 +1,7 @@
 import { Empty, Spin, TableProps } from 'antd';
 import { number } from 'echarts';
 import * as React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useHistory } from 'react-router-dom';
 import MyBreadcrumb from '../../../components/myBreadcrumb';
 import { Series_Bar } from '../charts/bar';
 import { ChartOptions } from '../charts/common';
@@ -14,6 +14,7 @@ import { Overview, TableListItem } from '../props';
 
 const FlangeOverview: React.FC = () => {
   const { search } = useLocation();
+  const history = useHistory();
   const id = Number(search.substring(search.lastIndexOf('id=') + 3));
   const [overview, setOverview] = React.useState<Overview>();
   const [measurements, setMeasurements] = React.useState<{
@@ -151,8 +152,11 @@ const FlangeOverview: React.FC = () => {
       <Empty
         description={
           <p>
-            还没有监测点, 去<Link to='/asset-management?locale=asset-management'>创建</Link>, 或{' '}
-            <Link to={`/project-overview?locale=project-overview/wind-overview&id=${2}`}>返回</Link>
+            还没有监测点, 去<Link to='/measurement-management?locale=measruement-management'>创建</Link>, 或
+            <a href='#!' onClick={(e) => {
+              history.go(-1);
+              e.preventDefault();
+            }}>返回</a>
           </p>
         }
       />

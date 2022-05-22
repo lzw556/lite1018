@@ -218,7 +218,7 @@ const WindTurbineOverview: React.FC = () => {
       <Empty
         description={
           <p>
-            还没有法兰, 去<Link to='/asset-management?locale=asset-management'>创建</Link>, 或{' '}
+            还没有法兰, 去<Link to='/asset-management?locale=asset-management'>创建</Link>, 或
             <Link to={`/project-overview?locale=project-overview`}>返回</Link>
           </p>
         }
