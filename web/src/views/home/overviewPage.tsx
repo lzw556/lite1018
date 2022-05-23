@@ -43,9 +43,13 @@ export const OverviewPage: React.FC<Overview> = (props) => {
           <ShadowCard>
             <Row>
               {chartList.map(({ colProps, options, title, style }, index) => (
-                <Col {...colProps} key={index}>
-                  <ChartContainer title={title} options={options} style={style} />
-                </Col>
+                <>
+                  {options && (
+                    <Col {...colProps} key={index}>
+                      <ChartContainer title={title} options={options} style={style} />
+                    </Col>
+                  )}
+                </>
               ))}
             </Row>
           </ShadowCard>

@@ -93,7 +93,7 @@ const WindTurbineOverview: React.FC = () => {
     const valuesRealMax = [];
     const valuesBg = [];
     for (let index = boltNumberPerFlange; index > 0; index--) {
-      valuesReal.push(300 + Math.random() * 20);
+      valuesReal.push(300 + Math.random() * index * 35);
       valuesRealMax.push({ name: index, max });
       valuesBg.push([800, interval * index]);
     }
@@ -112,7 +112,7 @@ const WindTurbineOverview: React.FC = () => {
 
     const count = 360;
     for (let index = count; index > 0; index = index - 3) {
-      valuesRule.push([max, (360 / count) * index]);
+      valuesRule.push([320, (360 / count) * index]);
     }
     return {
       polar: [
@@ -168,7 +168,8 @@ const WindTurbineOverview: React.FC = () => {
       legend: {
         data: [
           {
-            name: '实际值'
+            name: '实际值',
+            icon: 'circle'
           },
           {
             name: '规定值'
@@ -180,8 +181,8 @@ const WindTurbineOverview: React.FC = () => {
         {
           type: 'radar',
           name: '实际值',
-          lineStyle: { color: 'rgb(255, 68, 0, .6)' },
-          itemStyle: { color: 'rgb(255, 68, 0, .6)' },
+          lineStyle: { color: '#00800080' },
+          itemStyle: { color: '#00800080' },
           data: [{ value: valuesReal }]
         },
         {
@@ -190,8 +191,8 @@ const WindTurbineOverview: React.FC = () => {
           coordinateSystem: 'polar',
           data: valuesRule,
           symbol: 'none',
-          itemStyle: { color: '#00800080' },
-          lineStyle: { type: 'dashed', color: '#00800080' }
+          itemStyle: { color: 'rgb(255, 68, 0, .6)' },
+          lineStyle: { type: 'dashed', color: 'rgb(255, 68, 0, .6)' }
         },
         {
           type: 'scatter',

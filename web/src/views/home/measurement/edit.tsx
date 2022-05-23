@@ -74,7 +74,7 @@ export const MeasurementEdit: React.FC<
             <Input />
           </Form.Item>
         )}
-        <Form.Item label='名称' name='name' rules={[Rules.range(5, 50)]}>
+        <Form.Item label='名称' name='name' rules={[Rules.range(4, 50)]}>
           <Input placeholder={`请填写监测点名称`} />
         </Form.Item>
         <Form.Item label='类型' name='type' rules={[{ required: true, message: `请选择类型` }]}>

@@ -1,22 +1,19 @@
-import { Empty, Spin, TableProps } from 'antd';
-import { number } from 'echarts';
+import { Empty, Spin } from 'antd';
+import moment from 'moment';
 import * as React from 'react';
 import { Link, useLocation, useHistory } from 'react-router-dom';
 import MyBreadcrumb from '../../../components/myBreadcrumb';
-import { Series_Bar } from '../charts/bar';
-import { ChartOptions } from '../charts/common';
-import { Series_Line } from '../charts/line';
 import '../home.css';
-import { Measurement, MeasurementRow } from '../measurement/props';
+import { MeasurementRow } from '../measurement/props';
 import { getMeasurements } from '../measurement/services';
 import { OverviewPage } from '../overviewPage';
-import { Overview, TableListItem } from '../props';
+import { TableListItem } from '../props';
+import { useFlangeChartOptions, usePreloadChartOptions } from './props';
 
 const FlangeOverview: React.FC = () => {
   const { search } = useLocation();
   const history = useHistory();
   const id = Number(search.substring(search.lastIndexOf('id=') + 3));
-  const [overview, setOverview] = React.useState<Overview>();
   const [measurements, setMeasurements] = React.useState<{
     loading: boolean;
     items: MeasurementRow[];
@@ -54,18 +51,36 @@ const FlangeOverview: React.FC = () => {
     xxl: { span: 24 }
   };
 
-  const [statictisOfFlange, setStatictisOfFlange] = React.useState()
+  const statictisOfFlange = useFlangeChartOptions(measurements.items);
+  const statisticOfPreload = usePreloadChartOptions();
   const [tableOfMeasurement, setTableOfMeasurement] = React.useState<TableListItem<MeasurementRow>>(
     {
       rowKey: 'id',
       title: () => <h3>当前数据</h3>,
       columns: [
-        { title: '监测点', dataIndex: 'name', key: 'name', render: (name: string, row: MeasurementRow) => <Link to={`/project-overview${search}/blot-overview&id=${row.id}`}>{name}</Link> },
-        { title: '状态', dataIndex: 'state', key: 'state' },
-        { title: '预紧力(kN)', dataIndex: 'preload', key: 'preload' },
-        { title: '应力(Mpa)', dataIndex: 'preload2', key: 'preload2' },
-        { title: '温度(℃)', dataIndex: 'tempreture', key: 'tempreture' },
-        { title: '采集时间', dataIndex: 'time', key: 'time' }
+        {
+          title: '监测点',
+          dataIndex: 'name',
+          key: 'name',
+          render: (name: string, row: MeasurementRow) => (
+            <Link to={`/project-overview${search}/blot-overview&id=${row.id}`}>{name}</Link>
+          )
+        },
+        { title: '状态', dataIndex: 'state', key: 'state', render: () => '正常' },
+        {
+          title: '预紧力(kN)',
+          dataIndex: 'preload',
+          key: 'preload',
+          render: () => 320 - Math.round(Math.random() * 10)
+        },
+        { title: '应力(Mpa)', dataIndex: 'preload2', key: 'preload2', render: () => '15' },
+        {
+          title: '温度(℃)',
+          dataIndex: 'tempreture',
+          key: 'tempreture',
+          render: () => 50 + Math.round(Math.random() * 10)
+        },
+        { title: '采集时间', dataIndex: 'time', key: 'time', render: () => moment(new Date()).format('YYYY-MM-DD HH:mm:ss') }
       ],
       colProps: colProps3,
       size: 'small',
@@ -81,68 +96,6 @@ const FlangeOverview: React.FC = () => {
     if (!measurements.loading && measurements.items.length > 0) {
       setTableOfMeasurement((prev) => ({ ...prev, dataSource: measurements.items }));
     }
-    const data = [
-      320, 320, 320, 320, 320, 320, 320, 320, 320, 320, 320, 320, 320, 320, 320, 320, 320, 320, 320,
-      320
-    ];
-    const times = data.map((item: number, index: number) => `2022-04-${5 + index}`);
-
-    const statisticOfPreload: ChartOptions<Series_Line> = {
-      title: {
-        text: '',
-        left: 'center'
-      },
-      legend: { bottom: 0 },
-      tooltip: { trigger: 'axis' },
-      xAxis: {
-        type: 'category',
-        data: times
-      },
-      yAxis: { type: 'value', min: 290, max: 360 },
-      series: [
-        {
-          type: 'line',
-          name: '1号螺栓',
-          data: data.map((item) => item + Math.random() * 10)
-        },
-        {
-          type: 'line',
-          name: '2号螺栓',
-          data: data.map((item) => item + Math.random() * 10)
-        },
-        {
-          type: 'line',
-          name: '3号螺栓',
-          data: data.map((item) => item + Math.random() * 10)
-        },
-        {
-          type: 'line',
-          name: '4号螺栓',
-          data: data.map((item) => item + Math.random() * 10)
-        },
-        {
-          type: 'line',
-          name: '5号螺栓',
-          data: data.map((item) => item + Math.random() * 10)
-        },
-        {
-          type: 'line',
-          name: '6号螺栓',
-          data: data.map((item) => item + Math.random() * 10)
-        },
-        {
-          type: 'line',
-          name: '7号螺栓',
-          data: [329, 328, 321, 325, 325, 329, 320, 328, 335, 328, 312, 311, 310, 330, 333]
-        },
-        {
-          type: 'line',
-          name: '8号螺栓',
-          data: [334, 318, 331, 325, 335, 329, 330, 328, 335, 318, 312, 311, 310, 340, 333]
-        }
-      ]
-    };
-
   }, [measurements]);
 
   if (measurements.loading) return <Spin />;
@@ -152,11 +105,17 @@ const FlangeOverview: React.FC = () => {
       <Empty
         description={
           <p>
-            还没有监测点, 去<Link to='/measurement-management?locale=measruement-management'>创建</Link>, 或
-            <a href='#!' onClick={(e) => {
-              history.go(-1);
-              e.preventDefault();
-            }}>返回</a>
+            还没有监测点, 去
+            <Link to='/measurement-management?locale=measruement-management'>创建</Link>, 或
+            <a
+              href='#!'
+              onClick={(e) => {
+                history.go(-1);
+                e.preventDefault();
+              }}
+            >
+              返回
+            </a>
           </p>
         }
       />
@@ -165,7 +124,16 @@ const FlangeOverview: React.FC = () => {
   return (
     <>
       <MyBreadcrumb />
-      <OverviewPage {...{ properties, tabelList: [tableOfMeasurement] }} />
+      <OverviewPage
+        {...{
+          properties,
+          tabelList: [tableOfMeasurement],
+          chartList: [
+            { title: '分布图', colProps: colProps, options: statictisOfFlange },
+            { title: '预紧力趋势', colProps: colProps2, options: statisticOfPreload }
+          ]
+        }}
+      />
     </>
   );
 };
