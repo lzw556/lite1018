@@ -116,7 +116,7 @@ func (query DeviceQuery) newDevice(device entity.Device) vo.Device {
 		if connectionState == nil {
 			connectionState = entity.NewDeviceConnectionState()
 		}
-		result.State.IsOnline = connectionState.IsOnline()
+		result.State.IsOnline = connectionState.IsOnline
 		result.State.ConnectedAt = connectionState.Timestamp
 	}
 	result.Information, _ = query.deviceInformationRepo.Get(device.MacAddress)

@@ -5,17 +5,9 @@ import (
 	"time"
 )
 
-type DeviceConnectionStatus int
-
-const (
-	DeviceConnectionStatusOnline  DeviceConnectionStatus = 0
-	DeviceConnectionStatusLost    DeviceConnectionStatus = 1
-	DeviceConnectionStatusOffline DeviceConnectionStatus = 2
-)
-
 type DeviceConnectionState struct {
-	Status    DeviceConnectionStatus `json:"status"`
-	Timestamp int64                  `json:"timestamp"`
+	IsOnline  bool  `json:"isOnline"`
+	Timestamp int64 `json:"timestamp"`
 
 	IsStatusChanged bool `json:"-"`
 }
@@ -26,22 +18,13 @@ func (DeviceConnectionState) BucketName() string {
 
 func NewDeviceConnectionState() *DeviceConnectionState {
 	return &DeviceConnectionState{
-		Status: DeviceConnectionStatusOffline,
+		IsOnline: false,
 	}
 }
 
-func (d DeviceConnectionState) IsOnline() bool {
-	switch d.Status {
-	case DeviceConnectionStatusOnline:
-		return true
-	default:
-		return false
-	}
-}
-
-func (d *DeviceConnectionState) SetStatus(status DeviceConnectionStatus) {
-	d.IsStatusChanged = d.Status != status
-	d.Status = status
+func (d *DeviceConnectionState) SetIsOnline(isOnline bool) {
+	d.IsStatusChanged = d.IsOnline != isOnline
+	d.IsOnline = isOnline
 	d.Timestamp = time.Now().Unix()
 }
 
@@ -49,7 +32,7 @@ func (d DeviceConnectionState) Notify(mac string) {
 	eventbus.Publish(eventbus.SocketEmit, "socket::deviceStateChangedEvent", map[string]interface{}{
 		"macAddress": mac,
 		"state": map[string]interface{}{
-			"isOnline":    d.IsOnline(),
+			"isOnline":    d.IsOnline,
 			"connectedAt": d.Timestamp,
 		},
 	})

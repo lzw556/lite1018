@@ -47,7 +47,7 @@ func (query NetworkQuery) setDeviceState(device *vo.Device) {
 		if connectionState == nil {
 			connectionState = entity.NewDeviceConnectionState()
 		}
-		device.State.IsOnline = connectionState.IsOnline()
+		device.State.IsOnline = connectionState.IsOnline
 		device.State.ConnectedAt = connectionState.Timestamp
 	}
 }

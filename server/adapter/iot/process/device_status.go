@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/gogo/protobuf/proto"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/iot"
-	"github.com/thetasensors/theta-cloud-lite/server/adapter/iot/command"
 	pd "github.com/thetasensors/theta-cloud-lite/server/adapter/iot/proto"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
@@ -60,15 +59,10 @@ func (p DeviceStatus) Process(ctx *iot.Context, msg iot.Message) error {
 			if connectionState == nil {
 				connectionState = entity.NewDeviceConnectionState()
 			}
-			connectionState.SetStatus(entity.DeviceConnectionStatusOnline)
-			if device.IsGateway() {
-				if connectionState.IsStatusChanged {
-					connectionState.Notify(device.MacAddress)
-					if network, err := p.networkRepo.Get(context.TODO(), device.NetworkID); err == nil {
-						go command.SyncNetworkLinkStates(network, 3*time.Second)
-					}
-					p.addDeviceOnlineEvent(device)
-				}
+			connectionState.SetIsOnline(true)
+			if connectionState.IsStatusChanged {
+				connectionState.Notify(device.MacAddress)
+				p.addDeviceOnlineEvent(device)
 			}
 			if err := p.deviceConnectionState.Update(device.MacAddress, connectionState); err != nil {
 				return fmt.Errorf("save device status failed: %v", err)

@@ -16,15 +16,14 @@ import (
 	"time"
 )
 
-var deviceStateRepo = repository.DeviceState{}
-var deviceConnectionRepo = repository.DeviceConnectionState{}
+var deviceConnectionStateRepo = repository.DeviceConnectionState{}
 var deviceRepo = repository.Device{}
 var networkRepo = repository.Network{}
 var eventRepo = repository.Event{}
 
 func isOnline(mac string) bool {
-	if connectionState, _ := deviceConnectionRepo.Get(mac); connectionState != nil {
-		return connectionState.IsOnline()
+	if connectionState, _ := deviceConnectionStateRepo.Get(mac); connectionState != nil {
+		return connectionState.IsOnline
 	}
 	return false
 }
@@ -86,20 +85,20 @@ func SyncNetworkLinkStates(network entity.Network, timeout time.Duration) {
 		xlog.Errorf("unmarshal [AllStatus] failed:%v", err)
 		return
 	}
-	statusMap := make(map[string]entity.DeviceConnectionStatus)
+	statusMap := make(map[string]bool)
 	for i := range result {
 		r := result[i]
 		if r.Mac != gateway.MacAddress {
 			if r.State == 3 {
-				statusMap[r.Mac] = entity.DeviceConnectionStatusOnline
+				statusMap[r.Mac] = true
 			} else {
-				statusMap[r.Mac] = entity.DeviceConnectionStatusOffline
+				statusMap[r.Mac] = false
 			}
 		}
 	}
 	for i := range devices {
 		device := devices[i]
-		connectionState, err := deviceConnectionRepo.Get(device.MacAddress)
+		connectionState, err := deviceConnectionStateRepo.Get(device.MacAddress)
 		if err != nil {
 			xlog.Errorf("get device connection state failed: %v", err)
 		}
@@ -107,8 +106,8 @@ func SyncNetworkLinkStates(network entity.Network, timeout time.Duration) {
 			connectionState = entity.NewDeviceConnectionState()
 		}
 		if online, ok := statusMap[device.MacAddress]; ok {
-			connectionState.SetStatus(online)
-			if err := deviceConnectionRepo.Update(device.MacAddress, connectionState); err != nil {
+			connectionState.SetIsOnline(online)
+			if err := deviceConnectionStateRepo.Update(device.MacAddress, connectionState); err != nil {
 				xlog.Errorf("save device state failed: %v", err)
 			}
 			if connectionState.IsStatusChanged {
@@ -121,7 +120,7 @@ func SyncNetworkLinkStates(network entity.Network, timeout time.Duration) {
 					ProjectID: device.ProjectID,
 				}
 				code := 0
-				if !connectionState.IsOnline() {
+				if !connectionState.IsOnline {
 					code = 2
 				}
 				event.Content = fmt.Sprintf(`{"code": %d}`, code)
@@ -144,24 +143,27 @@ func SyncNetwork(network entity.Network, devices []entity.Device, timeout time.D
 		}
 	}
 	if isOnline(gateway.MacAddress) {
-		go UpdateWsnSettings(network, gateway, timeout)
+		if err := UpdateWsnSettings(network, gateway, timeout); err != nil {
+			xlog.Errorf("update wsn settings failed: %v", err)
+			return err
+		}
 		if err := SyncDeviceList(gateway, devices, timeout); err != nil {
 			return err
 		}
-		go SyncDeviceSettings(network, gateway, devices...)
+		SyncDeviceSettings(gateway, devices...)
+		network.SyncTimestamp = time.Now().Unix()
+		if err := networkRepo.Save(context.TODO(), &network); err != nil {
+			return err
+		}
 		return nil
 	}
 	return response.BusinessErr(errcode.DeviceOfflineError, "")
 }
 
-func SyncDeviceSettings(network entity.Network, gateway entity.Device, devices ...entity.Device) {
+func SyncDeviceSettings(gateway entity.Device, devices ...entity.Device) {
 	for i := range devices {
 		device := devices[i]
-		//if network.Mode == entity.NetworkModePulling {
-		//	GetDeviceSettings(gateway, device)
-		//} else {
 		UpdateDeviceSettings(gateway, device)
-		//}
 	}
 }
 
@@ -236,23 +238,32 @@ func GetWsnSettings(network entity.Network, gateway entity.Device, timeout time.
 	}
 }
 
-func UpdateWsnSettings(network entity.Network, gateway entity.Device, timeout time.Duration) {
+func UpdateWsnSettings(network entity.Network, gateway entity.Device, timeout time.Duration) error {
 	if isOnline(gateway.MacAddress) {
 		xlog.Infof("starting update wsn settings => [%s]", gateway.MacAddress)
 		cmd := newUpdateWsnSettingsCmd(network)
 		if _, err := cmd.Execute(context.TODO(), gateway.MacAddress, gateway.MacAddress, timeout); err != nil {
 			xlog.Errorf("execute device command %s failed: %v => [%s]", cmd.Name(), err, gateway.MacAddress)
-			return
+			return err
 		}
 		xlog.Infof("sync wsn settings successful=> [%s]", gateway.MacAddress)
 	} else {
 		xlog.Errorf("update wsn settings failed: device offline => [%s]", gateway.MacAddress)
+		return response.BusinessErr(errcode.DeviceOfflineError, "")
 	}
+	return nil
 }
 
 func SyncDeviceList(gateway entity.Device, devices []entity.Device, timeout time.Duration) error {
 	if err := ClearDevices(gateway); err != nil {
 		return err
+	}
+
+	for i := range devices {
+		device := devices[i]
+		if gateway.MacAddress != device.MacAddress {
+			_ = deviceConnectionStateRepo.Delete(device.MacAddress)
+		}
 	}
 
 	xlog.Infof("starting sync device list => [%s]", gateway.MacAddress)

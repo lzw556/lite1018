@@ -41,7 +41,7 @@ func (query StatisticQuery) GetDeviceStatistics() ([]vo.DeviceStatistic, error) 
 	for i, device := range devices {
 		r := vo.DeviceStatistic{}
 		if connectionState, _ := query.deviceConnectionStateRepo.Get(device.MacAddress); connectionState != nil {
-			r.IsOnline = connectionState.IsOnline()
+			r.IsOnline = connectionState.IsOnline
 		}
 		if alertState, err := query.deviceAlertStateRepo.Find(device.MacAddress); err == nil {
 			r.SetAlertState(alertState)

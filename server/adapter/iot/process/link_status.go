@@ -69,11 +69,9 @@ func (p LinkStatus) Process(ctx *iot.Context, msg iot.Message) error {
 	// 2 offline 4 reconnecting failed
 	switch linkStatus.State {
 	case "online":
-		connectionState.SetStatus(entity.DeviceConnectionStatusOnline)
-	case "lost":
-		connectionState.SetStatus(entity.DeviceConnectionStatusLost)
+		connectionState.SetIsOnline(true)
 	default:
-		connectionState.SetStatus(entity.DeviceConnectionStatusOffline)
+		connectionState.SetIsOnline(false)
 	}
 
 	if connectionState.IsStatusChanged {

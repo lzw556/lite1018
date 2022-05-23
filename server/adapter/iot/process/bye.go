@@ -14,16 +14,16 @@ import (
 )
 
 type Bye struct {
-	deviceRepo           dependency.DeviceRepository
-	eventResp            dependency.EventRepository
-	deviceConnectionRepo dependency.DeviceConnectionStateRepository
+	deviceRepo                dependency.DeviceRepository
+	eventResp                 dependency.EventRepository
+	deviceConnectionStateRepo dependency.DeviceConnectionStateRepository
 }
 
 func NewBye() Processor {
 	return newRoot(&Bye{
-		deviceRepo:           repository.Device{},
-		eventResp:            repository.Event{},
-		deviceConnectionRepo: repository.DeviceConnectionState{},
+		deviceRepo:                repository.Device{},
+		eventResp:                 repository.Event{},
+		deviceConnectionStateRepo: repository.DeviceConnectionState{},
 	})
 }
 
@@ -38,13 +38,13 @@ func (p Bye) Next() Processor {
 func (p Bye) Process(ctx *iot.Context, msg iot.Message) error {
 	if value, ok := ctx.Get(msg.Body.Device); ok {
 		if device, ok := value.(entity.Device); ok {
-			connectionState, err := p.deviceConnectionRepo.Get(device.MacAddress)
+			connectionState, err := p.deviceConnectionStateRepo.Get(device.MacAddress)
 			if err != nil {
 				return err
 			}
 			if connectionState != nil {
-				connectionState.SetStatus(entity.DeviceConnectionStatusOffline)
-				err = p.deviceConnectionRepo.Update(device.MacAddress, connectionState)
+				connectionState.SetIsOnline(false)
+				err = p.deviceConnectionStateRepo.Update(device.MacAddress, connectionState)
 				if err != nil {
 					xlog.Errorf("update device connection state failed: %v => [%s]", err, device.MacAddress)
 				}
@@ -63,12 +63,12 @@ func (p Bye) updateDevicesState(gateway entity.Device) {
 		wg.Add(1)
 		go func(device entity.Device) {
 			defer wg.Done()
-			connectionState, err := p.deviceConnectionRepo.Get(device.MacAddress)
+			connectionState, err := p.deviceConnectionStateRepo.Get(device.MacAddress)
 			if err != nil {
 				xlog.Errorf("get device connection state failed: %v => [%s]", err, device.MacAddress)
 				return
 			}
-			connectionState.SetStatus(entity.DeviceConnectionStatusOffline)
+			connectionState.SetIsOnline(false)
 			if connectionState.IsStatusChanged {
 				connectionState.Notify(device.MacAddress)
 				event := entity.Event{
@@ -81,7 +81,7 @@ func (p Bye) updateDevicesState(gateway entity.Device) {
 				event.Content = fmt.Sprintf(`{"code": %d}`, 2)
 				_ = p.eventResp.Create(context.TODO(), &event)
 			}
-			err = p.deviceConnectionRepo.Update(device.MacAddress, connectionState)
+			err = p.deviceConnectionStateRepo.Update(device.MacAddress, connectionState)
 			if err != nil {
 				xlog.Errorf("update device connection state failed: %v => [%s]", err, device.MacAddress)
 			}

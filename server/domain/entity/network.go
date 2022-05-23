@@ -25,7 +25,8 @@ type Network struct {
 	GroupSize               uint `gorm:"default:4;not null;"`
 	GroupInterval           uint
 	Mode                    NetworkMode `gorm:"default:1;not null;"`
-	Gateway                 Device      `gorm:"-"`
+	SyncTimestamp           int64
+	Gateway                 Device `gorm:"-"`
 }
 
 func (Network) TableName() string {

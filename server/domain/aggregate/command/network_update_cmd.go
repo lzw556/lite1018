@@ -53,7 +53,7 @@ func (cmd NetworkUpdateCmd) Update(req request.Network) (*vo.Network, error) {
 		return nil, err
 	}
 	connectionState, _ := cmd.deviceConnectionState.Get(gateway.MacAddress)
-	if connectionState != nil && connectionState.IsOnline() {
+	if connectionState != nil && connectionState.IsOnline {
 		go command.UpdateWsnSettings(cmd.Network, gateway, 3*time.Second)
 	}
 	result := vo.NewNetwork(cmd.Network)
