@@ -26,7 +26,8 @@ type Device struct {
 	ProjectID  uint
 	Settings   DeviceSettings `gorm:"type:json"`
 
-	State           DeviceState             `gorm:"-"`
+	State           DeviceStatus            `gorm:"-"`
+	ConnectionState DeviceConnectionState   `gorm:"-"`
 	AlarmRuleStates map[uint]AlarmRuleState `gorm:"-"`
 }
 

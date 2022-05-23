@@ -12,7 +12,7 @@ type DeviceState struct {
 	repository
 }
 
-func (repo DeviceState) Create(mac string, e entity.DeviceState) error {
+func (repo DeviceState) Create(mac string, e entity.DeviceStatus) error {
 	return repo.BoltDB().Update(func(tx *bbolt.Tx) error {
 		bucket := tx.Bucket([]byte(e.BucketName()))
 		dataBucket, err := bucket.CreateBucketIfNotExists([]byte(mac))
@@ -23,13 +23,13 @@ func (repo DeviceState) Create(mac string, e entity.DeviceState) error {
 		if err != nil {
 			return err
 		}
-		k := time.Unix(e.ConnectedAt, 0).UTC().Format("2006-01-02T15:00:00Z")
+		k := time.Now().Format("2006-01-02T15:00:00Z")
 		return dataBucket.Put([]byte(k), buf)
 	})
 }
 
-func (repo DeviceState) Get(mac string) (entity.DeviceState, error) {
-	var e entity.DeviceState
+func (repo DeviceState) Get(mac string) (entity.DeviceStatus, error) {
+	var e entity.DeviceStatus
 	err := repo.BoltDB().View(func(tx *bbolt.Tx) error {
 		bucket := tx.Bucket([]byte(e.BucketName()))
 		if dataBucket := bucket.Bucket([]byte(mac)); dataBucket != nil {
@@ -42,17 +42,17 @@ func (repo DeviceState) Get(mac string) (entity.DeviceState, error) {
 	return e, err
 }
 
-func (repo DeviceState) Find(mac string, from, to time.Time) ([]entity.DeviceState, error) {
-	var es []entity.DeviceState
+func (repo DeviceState) Find(mac string, from, to time.Time) ([]entity.DeviceStatus, error) {
+	var es []entity.DeviceStatus
 	err := repo.BoltDB().View(func(tx *bbolt.Tx) error {
-		bucket := tx.Bucket([]byte(entity.DeviceState{}.BucketName()))
+		bucket := tx.Bucket([]byte(entity.DeviceStatus{}.BucketName()))
 		if bucket != nil {
 			if dataBucket := bucket.Bucket([]byte(mac)); dataBucket != nil {
 				c := dataBucket.Cursor()
 				min := []byte(from.UTC().Format("2006-01-02T15:04:02Z"))
 				max := []byte(to.UTC().Format("2006-01-02T15:04:02Z"))
 				for k, v := c.Seek(min); k != nil && bytes.Compare(k, max) <= 0; k, v = c.Next() {
-					var e entity.DeviceState
+					var e entity.DeviceStatus
 					if err := json.Unmarshal(v, &e); err != nil {
 						return err
 					}
@@ -67,7 +67,7 @@ func (repo DeviceState) Find(mac string, from, to time.Time) ([]entity.DeviceSta
 
 func (repo DeviceState) Delete(mac string) error {
 	err := repo.BoltDB().Update(func(tx *bbolt.Tx) error {
-		bucket := tx.Bucket([]byte(entity.DeviceState{}.BucketName()))
+		bucket := tx.Bucket([]byte(entity.DeviceStatus{}.BucketName()))
 		return bucket.DeleteBucket([]byte(mac))
 	})
 	return err

@@ -12,6 +12,7 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	spec "github.com/thetasensors/theta-cloud-lite/server/domain/specification"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/xlog"
 	"time"
 )
 
@@ -55,9 +56,11 @@ func (p RestartStatus) Process(ctx *iot.Context, msg iot.Message) error {
 				if err != nil {
 					return fmt.Errorf("find device list failed: %v", err)
 				}
-				if err := command.SyncNetwork(network, devices, 3*time.Second); err != nil {
-					return fmt.Errorf("sync network failed: %v", err)
-				}
+				go func() {
+					if err := command.SyncNetwork(network, devices, 3*time.Second); err != nil {
+						xlog.Errorf("sync network failed: %v", err)
+					}
+				}()
 			}
 
 			// save event
@@ -69,6 +72,7 @@ func (p RestartStatus) Process(ctx *iot.Context, msg iot.Message) error {
 				Content:   fmt.Sprintf(`{"code":%d}`, m.Code),
 				ProjectID: device.ProjectID,
 			}
+			fmt.Println(event)
 			if err := p.eventRepo.Create(context.TODO(), &event); err != nil {
 				return fmt.Errorf("create event failed: %v", err)
 			}
