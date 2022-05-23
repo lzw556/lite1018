@@ -23,28 +23,30 @@ import (
 type DeviceQuery struct {
 	Specs []spec.Specification
 
-	deviceRepo            dependency.DeviceRepository
-	deviceStateRepo       dependency.DeviceStateRepository
-	sensorDataRepo        dependency.SensorDataRepository
-	deviceInformationRepo dependency.DeviceInformationRepository
-	deviceAlertStateRepo  dependency.DeviceAlertStateRepository
-	networkRepo           dependency.NetworkRepository
-	alarmRuleRepo         dependency.AlarmRuleRepository
-	alarmSourceRepo       dependency.AlarmSourceRepository
-	eventRepo             dependency.EventRepository
+	deviceRepo                dependency.DeviceRepository
+	deviceStateRepo           dependency.DeviceStateRepository
+	sensorDataRepo            dependency.SensorDataRepository
+	deviceInformationRepo     dependency.DeviceInformationRepository
+	deviceAlertStateRepo      dependency.DeviceAlertStateRepository
+	deviceConnectionStateRepo dependency.DeviceConnectionStateRepository
+	networkRepo               dependency.NetworkRepository
+	alarmRuleRepo             dependency.AlarmRuleRepository
+	alarmSourceRepo           dependency.AlarmSourceRepository
+	eventRepo                 dependency.EventRepository
 }
 
 func NewDeviceQuery() DeviceQuery {
 	return DeviceQuery{
-		deviceRepo:            repository.Device{},
-		deviceStateRepo:       repository.DeviceState{},
-		sensorDataRepo:        repository.SensorData{},
-		deviceInformationRepo: repository.DeviceInformation{},
-		deviceAlertStateRepo:  repository.DeviceAlertState{},
-		networkRepo:           repository.Network{},
-		eventRepo:             repository.Event{},
-		alarmSourceRepo:       repository.AlarmSource{},
-		alarmRuleRepo:         repository.AlarmRule{},
+		deviceRepo:                repository.Device{},
+		deviceStateRepo:           repository.DeviceState{},
+		sensorDataRepo:            repository.SensorData{},
+		deviceInformationRepo:     repository.DeviceInformation{},
+		deviceAlertStateRepo:      repository.DeviceAlertState{},
+		deviceConnectionStateRepo: repository.DeviceConnectionState{},
+		networkRepo:               repository.Network{},
+		eventRepo:                 repository.Event{},
+		alarmSourceRepo:           repository.AlarmSource{},
+		alarmRuleRepo:             repository.AlarmRule{},
 	}
 }
 
@@ -107,7 +109,16 @@ func (query DeviceQuery) Get(id uint) (*vo.Device, error) {
 func (query DeviceQuery) newDevice(device entity.Device) vo.Device {
 	result := vo.NewDevice(device)
 	result.SetUpgradeState(device)
-	result.State, _ = query.deviceStateRepo.Get(device.MacAddress)
+	if state, err := query.deviceStateRepo.Get(device.MacAddress); err == nil {
+		result.SetState(state)
+	}
+	if connectionState, err := query.deviceConnectionStateRepo.Get(device.MacAddress); err == nil {
+		if connectionState == nil {
+			connectionState = entity.NewDeviceConnectionState()
+		}
+		result.State.IsOnline = connectionState.IsOnline
+		result.State.ConnectedAt = connectionState.Timestamp
+	}
 	result.Information, _ = query.deviceInformationRepo.Get(device.MacAddress)
 	if states, err := query.deviceAlertStateRepo.Find(device.MacAddress); err == nil {
 		result.SetAlertStates(states)
@@ -270,7 +281,7 @@ func (query DeviceQuery) RuntimeDataByRange(id uint, from, to time.Time) ([]vo.S
 	result := make([]vo.SensorRuntimeData, len(data))
 	for i, d := range data {
 		result[i] = vo.SensorRuntimeData{
-			Timestamp:      d.ConnectedAt,
+			Timestamp:      d.Timestamp,
 			BatteryVoltage: d.BatteryVoltage,
 			SignalStrength: d.SignalLevel,
 		}

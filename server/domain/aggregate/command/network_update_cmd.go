@@ -19,16 +19,18 @@ import (
 type NetworkUpdateCmd struct {
 	entity.Network
 
-	networkRepo     dependency.NetworkRepository
-	deviceRepo      dependency.DeviceRepository
-	deviceStateRepo dependency.DeviceStateRepository
+	networkRepo           dependency.NetworkRepository
+	deviceRepo            dependency.DeviceRepository
+	deviceStateRepo       dependency.DeviceStateRepository
+	deviceConnectionState dependency.DeviceConnectionStateRepository
 }
 
 func NewNetworkUpdateCmd() NetworkUpdateCmd {
 	return NetworkUpdateCmd{
-		networkRepo:     repository.Network{},
-		deviceRepo:      repository.Device{},
-		deviceStateRepo: repository.DeviceState{},
+		networkRepo:           repository.Network{},
+		deviceRepo:            repository.Device{},
+		deviceStateRepo:       repository.DeviceState{},
+		deviceConnectionState: repository.DeviceConnectionState{},
 	}
 }
 
@@ -50,8 +52,9 @@ func (cmd NetworkUpdateCmd) Update(req request.Network) (*vo.Network, error) {
 	if err != nil {
 		return nil, err
 	}
-	if state, err := cmd.deviceStateRepo.Get(gateway.MacAddress); err == nil && state.IsOnline {
-		go command.SyncWsnSettings(cmd.Network, gateway, 3*time.Second)
+	connectionState, _ := cmd.deviceConnectionState.Get(gateway.MacAddress)
+	if connectionState != nil && connectionState.IsOnline {
+		go command.UpdateWsnSettings(cmd.Network, gateway, 3*time.Second)
 	}
 	result := vo.NewNetwork(cmd.Network)
 	return &result, nil
@@ -141,10 +144,7 @@ func (cmd NetworkUpdateCmd) RemoveDevices(req request.RemoveDevices) error {
 	}
 	err = transaction.Execute(ctx, func(txCtx context.Context) error {
 		for _, device := range devices {
-			if state, err := cmd.deviceStateRepo.Get(device.MacAddress); err == nil {
-				state.IsOnline = false
-				_ = cmd.deviceStateRepo.Create(device.MacAddress, state)
-			}
+			_ = cmd.deviceConnectionState.Delete(device.MacAddress)
 			if err := cmd.deviceRepo.UpdatesBySpecs(txCtx, map[string]interface{}{"parent": gateway.MacAddress}, spec.ParentEqSpec(device.MacAddress)); err != nil {
 				return err
 			}

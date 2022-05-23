@@ -5,33 +5,35 @@ import (
 	"fmt"
 	"github.com/gogo/protobuf/proto"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/iot"
-	"github.com/thetasensors/theta-cloud-lite/server/adapter/iot/command"
 	pd "github.com/thetasensors/theta-cloud-lite/server/adapter/iot/proto"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/json"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/xlog"
 	"time"
 )
 
 type DeviceStatus struct {
-	repository  dependency.DeviceStateRepository
-	networkRepo dependency.NetworkRepository
-	deviceRepo  dependency.DeviceRepository
-	eventRepo   dependency.EventRepository
+	repository            dependency.DeviceStateRepository
+	networkRepo           dependency.NetworkRepository
+	deviceRepo            dependency.DeviceRepository
+	eventRepo             dependency.EventRepository
+	deviceConnectionState dependency.DeviceConnectionStateRepository
 }
 
 func NewDeviceStatus() Processor {
 	return newRoot(DeviceStatus{
-		repository:  repository.DeviceState{},
-		networkRepo: repository.Network{},
-		deviceRepo:  repository.Device{},
-		eventRepo:   repository.Event{},
+		repository:            repository.DeviceState{},
+		networkRepo:           repository.Network{},
+		deviceRepo:            repository.Device{},
+		eventRepo:             repository.Event{},
+		deviceConnectionState: repository.DeviceConnectionState{},
 	})
 }
 
 func (p DeviceStatus) Name() string {
-	return "DeviceState"
+	return "DeviceStatus"
 }
 
 func (DeviceStatus) Next() Processor {
@@ -43,29 +45,26 @@ func (p DeviceStatus) Process(ctx *iot.Context, msg iot.Message) error {
 		if device, ok := value.(entity.Device); ok {
 			m := pd.DeviceStatusMessage{}
 			if err := proto.Unmarshal(msg.Body.Payload, &m); err != nil {
-				return fmt.Errorf("unmarshal [DeviceState] message failed： %v", err)
+				return fmt.Errorf("unmarshal [DeviceStatus] message failed： %v", err)
 			}
-			var e entity.DeviceState
+			var e entity.DeviceStatus
 			if err := json.Unmarshal([]byte(m.Status), &e); err != nil {
 				return fmt.Errorf("unmarshal device %s status %s failed: %v", device.MacAddress, m.Status, err)
 			}
-			state, _ := p.repository.Get(device.MacAddress)
-			state.ConnectedAt = time.Now().Unix()
-			state.BatteryVoltage = e.BatteryVoltage
-			state.BatteryLevel = e.BatteryLevel
-			state.SignalLevel = e.SignalLevel
-			state.AcquisitionIsEnabled = e.AcquisitionIsEnabled
-			if device.IsGateway() {
-				state.SetIsOnline(true)
-				state.Notify(device.MacAddress)
-				if device.IsGateway() && state.ConnectionStatusChanged {
-					if network, err := p.networkRepo.Get(context.TODO(), device.NetworkID); err == nil {
-						go command.SyncNetworkLinkStates(network, 3*time.Second)
-					}
-					p.addDeviceOnlineEvent(device)
-				}
+			e.Timestamp = time.Now().Unix()
+			connectionState, err := p.deviceConnectionState.Get(device.MacAddress)
+			if err != nil {
+				xlog.Errorf("get device connection state failed: %v => [%s]", err, device.MacAddress)
 			}
-			if err := p.repository.Create(device.MacAddress, state); err != nil {
+			if connectionState == nil {
+				connectionState = entity.NewDeviceConnectionState()
+			}
+			connectionState.SetIsOnline(true)
+			if connectionState.IsStatusChanged {
+				connectionState.Notify(device.MacAddress)
+				p.addDeviceOnlineEvent(device)
+			}
+			if err := p.deviceConnectionState.Update(device.MacAddress, connectionState); err != nil {
 				return fmt.Errorf("save device status failed: %v", err)
 			}
 		}

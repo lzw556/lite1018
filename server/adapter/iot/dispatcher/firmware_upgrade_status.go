@@ -6,15 +6,10 @@ import (
 )
 
 type FirmwareUpgradeStatus struct {
-	context   *iot.Context
-	processor process.Processor
 }
 
 func NewFirmwareUpgradeStatus() iot.Dispatcher {
-	return &FirmwareUpgradeStatus{
-		context:   iot.NewContext(),
-		processor: process.NewFirmwareUpgradeStatus(),
-	}
+	return &FirmwareUpgradeStatus{}
 }
 
 func (d FirmwareUpgradeStatus) Name() string {
@@ -22,5 +17,5 @@ func (d FirmwareUpgradeStatus) Name() string {
 }
 
 func (d FirmwareUpgradeStatus) Dispatch(msg iot.Message) {
-	process.Do(d.context, d.processor, msg)
+	process.Do(iot.NewContext(), process.NewFirmwareUpgradeStatus(), msg)
 }

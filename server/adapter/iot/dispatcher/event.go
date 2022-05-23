@@ -6,15 +6,10 @@ import (
 )
 
 type Event struct {
-	context   *iot.Context
-	processor process.Processor
 }
 
 func NewEvent() iot.Dispatcher {
-	return &Event{
-		context:   iot.NewContext(),
-		processor: process.NewEvent(),
-	}
+	return &Event{}
 }
 
 func (d Event) Name() string {
@@ -22,5 +17,5 @@ func (d Event) Name() string {
 }
 
 func (d Event) Dispatch(msg iot.Message) {
-	process.Do(d.context, d.processor, msg)
+	process.Do(iot.NewContext(), process.NewEvent(), msg)
 }

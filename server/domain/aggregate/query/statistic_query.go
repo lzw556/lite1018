@@ -14,10 +14,11 @@ import (
 type StatisticQuery struct {
 	Specs []spec.Specification
 
-	deviceRepo           dependency.DeviceRepository
-	deviceStateRepo      dependency.DeviceStateRepository
-	deviceAlertStateRepo dependency.DeviceAlertStateRepository
-	alarmRecordRepo      dependency.AlarmRecordRepository
+	deviceRepo                dependency.DeviceRepository
+	deviceStateRepo           dependency.DeviceStateRepository
+	deviceConnectionStateRepo dependency.DeviceConnectionStateRepository
+	deviceAlertStateRepo      dependency.DeviceAlertStateRepository
+	alarmRecordRepo           dependency.AlarmRecordRepository
 }
 
 func NewStatisticQuery() StatisticQuery {
@@ -39,8 +40,8 @@ func (query StatisticQuery) GetDeviceStatistics() ([]vo.DeviceStatistic, error) 
 	result := make([]vo.DeviceStatistic, len(devices))
 	for i, device := range devices {
 		r := vo.DeviceStatistic{}
-		if state, err := query.deviceStateRepo.Get(device.MacAddress); err == nil {
-			r.IsOnline = state.IsOnline
+		if connectionState, _ := query.deviceConnectionStateRepo.Get(device.MacAddress); connectionState != nil {
+			r.IsOnline = connectionState.IsOnline
 		}
 		if alertState, err := query.deviceAlertStateRepo.Find(device.MacAddress); err == nil {
 			r.SetAlertState(alertState)
