@@ -23,10 +23,11 @@ type StatisticQuery struct {
 
 func NewStatisticQuery() StatisticQuery {
 	return StatisticQuery{
-		deviceRepo:           repository.Device{},
-		deviceStateRepo:      repository.DeviceState{},
-		deviceAlertStateRepo: repository.DeviceAlertState{},
-		alarmRecordRepo:      repository.AlarmRecord{},
+		deviceRepo:                repository.Device{},
+		deviceStateRepo:           repository.DeviceState{},
+		deviceAlertStateRepo:      repository.DeviceAlertState{},
+		deviceConnectionStateRepo: repository.DeviceConnectionState{},
+		alarmRecordRepo:           repository.AlarmRecord{},
 	}
 }
 
