@@ -31,3 +31,7 @@ func (repo MonitoringPointDeviceBinding) FindByDeviceID(ctx context.Context, dev
 	}
 	return e, nil
 }
+
+func (repo MonitoringPointDeviceBinding) DeleteBySpecs(ctx context.Context, specs ...specification.Specification) error {
+	return repo.DB(ctx).Scopes(specification.Scopes(specs)...).Delete(&entity.MonitoringPointDeviceBinding{}).Error
+}

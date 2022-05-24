@@ -17,6 +17,10 @@ func (repo DeviceAlertState) Create(mac string, e entity.DeviceAlertState) error
 			return err
 		}
 		dataBucket, err := bucket.CreateBucketIfNotExists([]byte(mac))
+		if err != nil {
+			return err
+		}
+
 		bytes, err := json.Marshal(e)
 		if err != nil {
 			return err

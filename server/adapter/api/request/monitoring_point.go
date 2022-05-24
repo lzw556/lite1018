@@ -21,3 +21,7 @@ type BindDevice struct {
 	AlgorihtmID uint                   `json:"algorithm_id" binding:"required"`
 	Parameters  map[string]interface{} `json:"parameters"`
 }
+
+type UnbindDevice struct {
+	DeviceID uint `json:"device_id" binding:"required"`
+}

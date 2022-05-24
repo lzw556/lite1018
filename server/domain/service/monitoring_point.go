@@ -70,6 +70,15 @@ func (s MonitoringPoint) BindDevice(id uint, req request.BindDevice) error {
 	return cmd.BindDevice(req)
 }
 
+func (s MonitoringPoint) UnbindDevice(id uint, req request.UnbindDevice) error {
+	cmd, err := s.factory.NewMonitoringPointBindDeviceCmd(id)
+	if err != nil {
+		return err
+	}
+
+	return cmd.UnbindDevice(req)
+}
+
 func (s MonitoringPoint) FindMonitoringPointsByPaginate(page, size int, filters request.Filters) ([]vo.MonitoringPoint, int64, error) {
 	query := s.factory.NewMonitoringPointQuery(filters)
 	return query.Paging(page, size)
