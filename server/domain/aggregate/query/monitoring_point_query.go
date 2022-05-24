@@ -31,6 +31,15 @@ func NewMonitoringPointQuery() MonitoringPointQuery {
 	}
 }
 
+func (query MonitoringPointQuery) Get(mpId uint) (vo.MonitoringPoint, error) {
+	mp, err := query.monitoringPointRepo.Get(context.TODO(), mpId)
+	if err != nil {
+		return vo.MonitoringPoint{}, err
+	}
+
+	return query.newMonitoringPoint(mp), nil
+}
+
 func (query MonitoringPointQuery) Paging(page, size int) ([]vo.MonitoringPoint, int64, error) {
 	ctx := context.TODO()
 	es, total, err := query.monitoringPointRepo.PagingBySpecs(ctx, page, size, query.Specs...)
@@ -69,9 +78,10 @@ func (query MonitoringPointQuery) newMonitoringPoint(mp entity.MonitoringPoint) 
 			}
 		}
 
-		if bindings, err := query.monitoringPointDeviceBindingRepo.FindBySpecs(context.TODO(), spec.MonitoringPointIDEqSpec(mp.ID)); err != nil {
+		result.BindingDevices = make([]*vo.Device, 0)
+		if bindings, err := query.monitoringPointDeviceBindingRepo.FindBySpecs(context.TODO(), spec.MonitoringPointIDEqSpec(mp.ID)); err == nil {
 			for _, b := range bindings {
-				dq := DeviceQuery{}
+				dq := NewDeviceQuery()
 				dev, err := dq.Get(b.DeviceID)
 				if err == nil {
 					result.BindingDevices = append(result.BindingDevices, dev)
