@@ -4,6 +4,7 @@ package main
 
 import (
 	"embed"
+	"fmt"
 	"github.com/thetasensors/theta-cloud-lite/server/app"
 	"github.com/thetasensors/theta-cloud-lite/server/config"
 	"github.com/thetasensors/theta-cloud-lite/server/core"
