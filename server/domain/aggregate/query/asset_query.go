@@ -32,12 +32,38 @@ func (query AssetQuery) Paging(page, size int) ([]vo.Asset, int64, error) {
 	result := make([]vo.Asset, len(es))
 	for i, asset := range es {
 		result[i] = query.newAsset(asset)
+		query.iterSetChildren(&result[i])
 	}
 	return result, total, nil
 }
 
 func (query AssetQuery) newAsset(asset entity.Asset) vo.Asset {
 	return vo.NewAsset(asset)
+}
+
+func (query AssetQuery) iterSetChildren(asset *vo.Asset) {
+	children := query.getChildren(asset.ID)
+	asset.Children = children
+	for _, c := range asset.Children {
+		query.iterSetChildren(c)
+	}
+}
+
+func (query AssetQuery) getChildren(assetId uint) []*vo.Asset {
+	es, err := query.assetRepo.FindBySpecs(context.TODO(), spec.ParentIdEqSpec(assetId))
+
+	result := make([]*vo.Asset, 0)
+
+	if err != nil {
+		return result
+	}
+
+	for _, e := range es {
+		asset := query.newAsset(e)
+		result = append(result, &asset)
+	}
+
+	return result
 }
 
 func (query AssetQuery) List() ([]vo.Asset, error) {
@@ -49,6 +75,7 @@ func (query AssetQuery) List() ([]vo.Asset, error) {
 	result := make([]vo.Asset, len(es))
 	for i, asset := range es {
 		result[i] = query.newAsset(asset)
+		query.iterSetChildren(&result[i])
 	}
 	return result, nil
 }
