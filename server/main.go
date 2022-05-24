@@ -4,7 +4,6 @@ package main
 
 import (
 	"embed"
-	"fmt"
 	"github.com/thetasensors/theta-cloud-lite/server/app"
 	"github.com/thetasensors/theta-cloud-lite/server/config"
 	"github.com/thetasensors/theta-cloud-lite/server/core"
@@ -23,7 +22,6 @@ var rbacModel string
 var rbacPolicy string
 
 func main() {
-	fmt.Println(fmt.Sprintf("Server Version: v%s", Version))
 	initialize.InitFolder()
 	global.Viper = core.Viper()
 	dbConf := config.Database{}
