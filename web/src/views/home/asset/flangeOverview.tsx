@@ -63,7 +63,7 @@ const FlangeOverview: React.FC = () => {
           dataIndex: 'name',
           key: 'name',
           render: (name: string, row: MeasurementRow) => (
-            <Link to={`/project-overview${search}/blot-overview&id=${row.id}`}>{name}</Link>
+            <Link to={`/project-overview${search}/bolt-overview&id=${row.id}`}>{name}</Link>
           )
         },
         { title: '状态', dataIndex: 'state', key: 'state', render: () => '正常' },

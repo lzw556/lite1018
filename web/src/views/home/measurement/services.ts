@@ -27,3 +27,7 @@ export function bindDevice(id: Measurement['id'], device_id: number) {
     parameters: {}
   });
 }
+
+export function getData(id: Measurement['id'], from: number, to: number) {
+  return request.get(`/monitoringPoints/${id}/data?from=${from}&to=${to}`);
+}

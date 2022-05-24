@@ -28,7 +28,7 @@ export const AssetManagement = lazy(() => import('./home/asset'));
 export const WindTurbineOverview = lazy(() => import('./home/asset/windTurbineOverview'));
 export const FlangeOverview = lazy(() => import('./home/asset/flangeOverview'));
 export const MeasurementManagement = lazy(() => import('./home/measurement'));
-export const BlotOverview = lazy(()=>import('./home/measurement/blotOverview'));
+export const BoltOverview = lazy(()=>import('./home/measurement/boltOverview'));
 
 export const Unauthorized = lazy(() => import('./403'));
 export const NotFound = lazy(() => import('./404'));

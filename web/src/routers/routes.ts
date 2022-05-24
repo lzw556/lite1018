@@ -149,10 +149,10 @@ const SecondaryRoutes: Menu[] = [
     },
     {
       id: 110,
-      name: "blot-overview",
+      name: "bolt-overview",
       path: "/project-overview",
       title: "监测点",
-      view: "BlotOverview",
+      view: "BoltOverview",
       icon: "",
       hidden: true,
       isAuth: true,
