@@ -42,33 +42,14 @@ func (p Bye) Process(ctx *iot.Context, msg iot.Message) error {
 			if err != nil {
 				return err
 			}
-			if connectionState != nil {
-				connectionState.SetIsOnline(false)
-				err = p.deviceConnectionStateRepo.Update(device.MacAddress, connectionState)
-				if err != nil {
-					xlog.Errorf("update device connection state failed: %v => [%s]", err, device.MacAddress)
-				}
-			}
-			go p.updateDevicesState(device)
-
-		}
-	}
-	return nil
-}
-
-func (p Bye) updateDevicesState(gateway entity.Device) {
-	devices, _ := p.deviceRepo.FindBySpecs(context.TODO(), spec.NetworkEqSpec(gateway.NetworkID))
-	var wg sync.WaitGroup
-	for i := range devices {
-		wg.Add(1)
-		go func(device entity.Device) {
-			defer wg.Done()
-			connectionState, err := p.deviceConnectionStateRepo.Get(device.MacAddress)
-			if err != nil {
-				xlog.Errorf("get device connection state failed: %v => [%s]", err, device.MacAddress)
-				return
+			if connectionState == nil {
+				connectionState = entity.NewDeviceConnectionState()
 			}
 			connectionState.SetIsOnline(false)
+			err = p.deviceConnectionStateRepo.Update(device.MacAddress, connectionState)
+			if err != nil {
+				xlog.Errorf("update device connection state failed: %v => [%s]", err, device.MacAddress)
+			}
 			if connectionState.IsStatusChanged {
 				connectionState.Notify(device.MacAddress)
 				event := entity.Event{
@@ -80,10 +61,45 @@ func (p Bye) updateDevicesState(gateway entity.Device) {
 				}
 				event.Content = fmt.Sprintf(`{"code": %d}`, 2)
 				_ = p.eventResp.Create(context.TODO(), &event)
+				if device.IsGateway() {
+					go p.updateChildrenConnectionState(device)
+				}
 			}
-			err = p.deviceConnectionStateRepo.Update(device.MacAddress, connectionState)
-			if err != nil {
-				xlog.Errorf("update device connection state failed: %v => [%s]", err, device.MacAddress)
+		}
+	}
+	return nil
+}
+
+func (p Bye) updateChildrenConnectionState(gateway entity.Device) {
+	devices, _ := p.deviceRepo.FindBySpecs(context.TODO(), spec.NetworkEqSpec(gateway.NetworkID))
+	var wg sync.WaitGroup
+	for i := range devices {
+		wg.Add(1)
+		go func(device entity.Device) {
+			defer wg.Done()
+			if device.MacAddress != gateway.MacAddress {
+				connectionState, err := p.deviceConnectionStateRepo.Get(device.MacAddress)
+				if err != nil {
+					xlog.Errorf("get device connection state failed: %v => [%s]", err, device.MacAddress)
+					return
+				}
+				connectionState.SetIsOnline(false)
+				if connectionState.IsStatusChanged {
+					connectionState.Notify(device.MacAddress)
+					event := entity.Event{
+						Code:      entity.EventCodeStatus,
+						Category:  entity.EventCategoryDevice,
+						SourceID:  device.ID,
+						Timestamp: time.Now().Unix(),
+						ProjectID: device.ProjectID,
+					}
+					event.Content = fmt.Sprintf(`{"code": %d}`, 2)
+					_ = p.eventResp.Create(context.TODO(), &event)
+				}
+				err = p.deviceConnectionStateRepo.Update(device.MacAddress, connectionState)
+				if err != nil {
+					xlog.Errorf("update device connection state failed: %v => [%s]", err, device.MacAddress)
+				}
 			}
 		}(devices[i])
 	}
