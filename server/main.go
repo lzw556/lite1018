@@ -22,6 +22,7 @@ var rbacModel string
 var rbacPolicy string
 
 func main() {
+	fmt.Println(fmt.Sprintf("Server Version: v%s", Version))
 	initialize.InitFolder()
 	global.Viper = core.Viper()
 	dbConf := config.Database{}

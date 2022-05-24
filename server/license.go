@@ -24,6 +24,7 @@ var rbacModel string
 var rbacPolicy string
 
 func main() {
+	fmt.Println(fmt.Sprintf("Server Version: v%s", Version))
 	key := "thetasensorskeyaesfitbitsencrypt"
 	if !license.ValidateKeyFile([]byte(key), "license.dat") {
 		fmt.Println("Invalid key file")
