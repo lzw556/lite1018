@@ -19,6 +19,7 @@ type DeviceStatus struct {
 	networkRepo           dependency.NetworkRepository
 	deviceRepo            dependency.DeviceRepository
 	eventRepo             dependency.EventRepository
+	deviceStatusRepo      dependency.DeviceStateRepository
 	deviceConnectionState dependency.DeviceConnectionStateRepository
 }
 
@@ -28,6 +29,7 @@ func NewDeviceStatus() Processor {
 		networkRepo:           repository.Network{},
 		deviceRepo:            repository.Device{},
 		eventRepo:             repository.Event{},
+		deviceStatusRepo:      repository.DeviceState{},
 		deviceConnectionState: repository.DeviceConnectionState{},
 	})
 }
@@ -52,6 +54,8 @@ func (p DeviceStatus) Process(ctx *iot.Context, msg iot.Message) error {
 				return fmt.Errorf("unmarshal device %s status %s failed: %v", device.MacAddress, m.Status, err)
 			}
 			e.Timestamp = time.Now().Unix()
+			_ = p.deviceStatusRepo.Create(device.MacAddress, e)
+
 			connectionState, err := p.deviceConnectionState.Get(device.MacAddress)
 			if err != nil {
 				xlog.Errorf("get device connection state failed: %v => [%s]", err, device.MacAddress)
