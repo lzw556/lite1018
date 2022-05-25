@@ -1,7 +1,8 @@
 import moment from 'moment';
 import { LineChartStyles } from '../../constants/chart';
 import { MeasurementHistoryData, MeasurementRow } from './measurement/props';
-import { round } from 'lodash';
+import { cloneDeep, round } from 'lodash';
+import { AssetRow } from './asset/props';
 
 export function generateColProps({
   xs,
@@ -229,7 +230,7 @@ export function generateMeasurementHistoryDataOptions(data: MeasurementHistoryDa
         }
       },
       legend: { show: false },
-      grid: {bottom: 20},
+      grid: { bottom: 20 },
       title: {
         text: `${property.name}${property.unit ? `(${property.unit})` : ''}`,
         subtext: `${seriesData.map(({ name, data }) => name + ' ' + data[data.length - 1])}`
@@ -248,4 +249,21 @@ export function generateMeasurementHistoryDataOptions(data: MeasurementHistoryDa
       yAxis: { type: 'value' }
     };
   });
+}
+// use in treeTable
+export function filterEmptyChildren(assets: AssetRow[]) {
+  if (assets.length === 0) return [];
+  const copy = cloneDeep(assets);
+  return copy.map((asset) => loopAssetTree(asset));
+}
+
+function loopAssetTree(asset: AssetRow): AssetRow {
+  if (asset.children && asset.children.length === 0) {
+    delete asset.children;
+    return asset;
+  } else if (asset.children && asset.children.length > 0) {
+    return { ...asset, children: asset.children.map((asset) => loopAssetTree(asset)) };
+  } else {
+    return asset;
+  }
 }

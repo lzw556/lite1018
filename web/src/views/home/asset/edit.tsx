@@ -14,9 +14,7 @@ export const AssetEdit: React.FC<
   const { id } = selectedRow || {};
   const { type, label, parent_id } = initialValues || {};
   const [form] = Form.useForm<Asset>();
-  const [parents, setParents] = React.useState<AssetRow[]>([
-    { id: 0, name: '', type: 0, parentId: -1, ProjectID: 1 }
-  ]);
+  const [parents, setParents] = React.useState<AssetRow[]>([]);
 
   React.useEffect(() => {
     getAssets({ type: AssetTypes.WindTurbind.type }).then((assets) => setParents(assets));

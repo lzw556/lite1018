@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { MeasurementRow } from '../measurement/props';
 
 export type Asset = {
   id: number;
@@ -12,7 +13,11 @@ export type AssetRow = {
   name: string;
   type: number;
   parentId: number;
-  ProjectID: number;
+  projectId: number;
+  monitoringPoints?: MeasurementRow[];
+  children?: AssetRow[];
+  label: React.ReactNode;
+  value: string | number;
 };
 
 export function convertRow(values?: AssetRow): Asset | null {

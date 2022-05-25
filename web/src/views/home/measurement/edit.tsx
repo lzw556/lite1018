@@ -1,4 +1,4 @@
-import { Form, Input, Modal, ModalProps, Select } from 'antd';
+import { Cascader, Form, Input, Modal, ModalProps, Select } from 'antd';
 import * as React from 'react';
 import DeviceSelect from '../../../components/select/deviceSelect';
 import { defaultValidateMessages, Rules } from '../../../constants/validator';
@@ -24,14 +24,10 @@ export const MeasurementEdit: React.FC<
   const { selectedRow, onSuccess } = props;
   const { id } = selectedRow || {};
   const [form] = Form.useForm<Measurement & { device_id: number }>();
-  const [parents, setParents] = React.useState<AssetRow[]>([
-    { id: 0, name: '', type: 0, parentId: -1, ProjectID: 1 }
-  ]);
+  const [parents, setParents] = React.useState<AssetRow[]>([]);
 
   React.useEffect(() => {
-    getAssets({ type: AssetTypes.Flange.type }).then((assets) =>
-      setParents(assets.filter((asset) => asset.type === AssetTypes.Flange.type))
-    );
+    getAssets({ type: AssetTypes.WindTurbind.type }).then(setParents);
   }, []);
 
   React.useEffect(() => {
@@ -49,21 +45,22 @@ export const MeasurementEdit: React.FC<
         ...props,
         onOk: () => {
           form.validateFields().then((values) => {
-            const { id } = values;
-            try {
-              if (!id) {
-                addMeasurement(values).then((measurement) => {
-                  bindDevice(measurement.id, values.device_id);
-                  onSuccess();
-                });
-              } else {
-                updateMeasurement(id, values).then(() => {
-                  onSuccess();
-                });
-              }
-            } catch (error) {
-              console.log(error);
-            }
+            console.log(values);
+            // const { id } = values;
+            // try {
+            //   if (!id) {
+            //     addMeasurement(values).then((measurement) => {
+            //       bindDevice(measurement.id, values.device_id);
+            //       onSuccess();
+            //     });
+            //   } else {
+            //     updateMeasurement(id, values).then(() => {
+            //       onSuccess();
+            //     });
+            //   }
+            // } catch (error) {
+            //   console.log(error);
+            // }
           });
         }
       }}
@@ -86,7 +83,7 @@ export const MeasurementEdit: React.FC<
             ))}
           </Select>
         </Form.Item>
-        <Form.Item label='法兰' name='asset_id' rules={[{ required: true, message: `请选择法兰` }]}>
+        {/* <Form.Item label='法兰' name='asset_id' rules={[{ required: true, message: `请选择法兰` }]}>
           <Select placeholder='请选择法兰'>
             {parents.map(({ id, name }) => (
               <Select.Option key={id} value={id}>
@@ -94,6 +91,9 @@ export const MeasurementEdit: React.FC<
               </Select.Option>
             ))}
           </Select>
+        </Form.Item> */}
+        <Form.Item label='法兰' name='asset_id' rules={[{ required: true, message: `请选择法兰` }]}>
+          <Cascader options={parents} fieldNames={{ label: 'name', value: 'id' }} />
         </Form.Item>
         <Form.Item
           label='传感器'
