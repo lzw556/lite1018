@@ -73,10 +73,9 @@ func (p LinkStatus) Process(ctx *iot.Context, msg iot.Message) error {
 	default:
 		connectionState.SetIsOnline(false)
 	}
+	_ = p.deviceConnectionStateRepo.Update(device.MacAddress, connectionState)
 
-	if connectionState.IsStatusChanged {
-		connectionState.Notify(linkStatus.Address)
-	}
+	connectionState.Notify(linkStatus.Address)
 	// 此处不记录设备上线事件, 设备上线事件在deviceStatus中记录
 	if !connectionState.IsOnline {
 		p.addEvent(device, connectionState.Timestamp, int32(linkStatus.Param))
