@@ -62,3 +62,32 @@ func (s Asset) FindAssets(filters request.Filters) ([]vo.Asset, error) {
 	query := s.factory.NewAssetQuery(filters)
 	return query.List()
 }
+
+func (s Asset) iterCalcMonitoringPointNum(asset vo.Asset) uint {
+	var total uint = 0
+
+	if asset.MonitoringPoints != nil {
+		total += uint(len(asset.MonitoringPoints))
+	}
+
+	if asset.Children != nil {
+		for _, c := range asset.Children {
+			total += s.iterCalcMonitoringPointNum(*c)
+		}
+	}
+
+	return total
+}
+
+func (s Asset) GetStatistics(id uint) (vo.AssetStatistics, error) {
+	result := vo.NewAssetStatistics(id)
+
+	asset, err := s.GetAssetByID(id)
+	if err != nil {
+		return result, err
+	}
+
+	result.MonitoringPointNum = s.iterCalcMonitoringPointNum(*asset)
+
+	return result, nil
+}
