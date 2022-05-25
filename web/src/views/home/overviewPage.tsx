@@ -5,23 +5,12 @@ import { ChartContainer } from './charts/chartContainer';
 import './home.css';
 import { IntroductionPage } from './introductionPage';
 import { Overview } from './props';
+import { generateColProps } from './utils';
 
 export const OverviewPage: React.FC<Overview> = (props) => {
   const { properties, chartList, introductionList, tabelList } = props;
-  const colProps = {
-    xs: { span: 24 },
-    sm: { span: 24 },
-    md: { span: 12 },
-    xl: { span: 6 },
-    xxl: { span: 6 }
-  };
-  const colProps2 = {
-    xs: { span: 24 },
-    sm: { span: 24 },
-    md: { span: 12 },
-    xl: { span: 8 },
-    xxl: { span: 6 }
-  };
+  const colProps = generateColProps({ md: 12, lg: 12, xl: 6, xxl: 6 });
+  const colProps2 = generateColProps({ md: 12, lg: 12, xl: 8, xxl: 6 });
 
   return (
     <Row gutter={[0, 16]}>

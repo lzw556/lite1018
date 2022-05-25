@@ -18,7 +18,7 @@ export const IntroductionPage: React.FC<Introduction> = (props) => {
           <Link to={path}>{name}</Link>
         </h3>
       </div>
-      <dl className='introduction-content'>
+      <dl className='name-value-groups'>
         {properties.map(({ name, value }) => (
           <div className='name-value' key={value}>
             <dt>{name}</dt>

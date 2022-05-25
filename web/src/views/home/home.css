@@ -7,6 +7,28 @@
   text-align: center;
 }
 
+dl.name-value-groups {
+  margin: 0;
+}
+.name-value {
+  display: flex;
+  line-height: 30px;
+}
+.name-value dt {
+  flex: 0 0 55%;
+  max-width: 10em;
+  color: #8a8e99;
+}
+.name-value dd {
+  flex: 0 0 45%;
+  margin: 0;
+}
+@media (max-width: 600px) {
+  .name-value{
+    flex-direction: column;
+  }
+}
+
 .introduction {
   position: relative;
   padding: 24px;
@@ -21,21 +43,6 @@
   font-size: 16px;
   font-weight: 600;
   color: rgba(0, 0, 0, 0.6);
-}
-dl.introduction-content {
-  margin: 0;
-}
-.introduction .name-value {
-  display: flex;
-  line-height: 30px;
-}
-.introduction .name-value dt {
-  flex: 0 0 55%;
-  color: #8a8e99;
-}
-.introduction .name-value dd {
-  flex: 0 0 45%;
-  margin: 0;
 }
 .introduction .introduction-icon {
   position: absolute;

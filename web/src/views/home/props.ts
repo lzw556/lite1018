@@ -2,11 +2,6 @@ import { ButtonProps, FormItemProps } from 'antd';
 import { TableProps } from 'antd/lib/table';
 import { ChartOptions } from './charts/common';
 
-export type Entity = {
-  id: number;
-  name: string;
-};
-
 export type Introduction = {
   parentId: number;
   id: number;
@@ -44,7 +39,7 @@ export type Overview = {
       xl: { span: number };
       xxl: { span: number };
     };
-    options: ChartOptions<unknown>;
+    options?: ChartOptions<unknown>;
     style?: React.CSSProperties;
   }[];
   introductionList?: Introduction[];

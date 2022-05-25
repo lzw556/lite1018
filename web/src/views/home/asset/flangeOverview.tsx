@@ -8,7 +8,8 @@ import { MeasurementRow } from '../measurement/props';
 import { getMeasurements } from '../measurement/services';
 import { OverviewPage } from '../overviewPage';
 import { TableListItem } from '../props';
-import { useFlangeChartOptions, usePreloadChartOptions } from './props';
+import { generateColProps, generateFlangeChartOptions } from '../utils';
+import { usePreloadChartOptions } from './props';
 
 const FlangeOverview: React.FC = () => {
   const { search } = useLocation();
@@ -29,29 +30,7 @@ const FlangeOverview: React.FC = () => {
     { name: '传感器数量', value: 8 },
     { name: '离线传感器数量', value: 0 }
   ]);
-  const colProps = {
-    xs: { span: 24 },
-    sm: { span: 24 },
-    md: { span: 24 },
-    xl: { span: 12 },
-    xxl: { span: 9 }
-  };
-  const colProps2 = {
-    xs: { span: 24 },
-    sm: { span: 24 },
-    md: { span: 24 },
-    xl: { span: 12 },
-    xxl: { span: 15 }
-  };
-  const colProps3 = {
-    xs: { span: 24 },
-    sm: { span: 24 },
-    md: { span: 24 },
-    xl: { span: 24 },
-    xxl: { span: 24 }
-  };
 
-  const statictisOfFlange = useFlangeChartOptions(measurements.items);
   const statisticOfPreload = usePreloadChartOptions();
   const [tableOfMeasurement, setTableOfMeasurement] = React.useState<TableListItem<MeasurementRow>>(
     {
@@ -80,9 +59,14 @@ const FlangeOverview: React.FC = () => {
           key: 'tempreture',
           render: () => 50 + Math.round(Math.random() * 10)
         },
-        { title: '采集时间', dataIndex: 'time', key: 'time', render: () => moment(new Date()).format('YYYY-MM-DD HH:mm:ss') }
+        {
+          title: '采集时间',
+          dataIndex: 'time',
+          key: 'time',
+          render: () => moment(new Date()).format('YYYY-MM-DD HH:mm:ss')
+        }
       ],
-      colProps: colProps3,
+      colProps: generateColProps({ xl: 24, xxl: 24 }),
       size: 'small',
       pagination: false
     }
@@ -129,8 +113,15 @@ const FlangeOverview: React.FC = () => {
           properties,
           tabelList: [tableOfMeasurement],
           chartList: [
-            { title: '分布图', colProps: colProps, options: statictisOfFlange },
-            { title: '预紧力趋势', colProps: colProps2, options: statisticOfPreload }
+            {
+              title: '分布图',
+              colProps: generateColProps({ xl: 12, xxl: 9 }),
+              options: generateFlangeChartOptions(measurements.items, {
+                inner: '55%',
+                outer: '70%'
+              })
+            },
+            { title: '预紧力趋势', colProps: generateColProps({ xl: 12, xxl: 15 }), options: statisticOfPreload }
           ]
         }}
       />
