@@ -194,3 +194,7 @@ func (factory Alarm) NewAlarmRuleGroupCreateCmd(req request.AlarmRuleGroup) (*co
 
 	return &cmd, nil
 }
+
+func (factory Alarm) NewAlarmRuleGroupRemoveCmd(ruleGroupId uint) (*command.AlarmRuleGroupRemoveCmd, error) {
+
+}

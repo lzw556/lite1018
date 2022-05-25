@@ -128,3 +128,8 @@ func (r alarmRouter) createAlarmRuleGroup(ctx *gin.Context) (interface{}, error)
 	req.ProjectID = cast.ToUint(ctx.MustGet("project_id"))
 	return nil, r.service.CreateAlarmRuleGroup(req)
 }
+
+func (r alarmRouter) deleteAlarmRuleGroup(ctx *gin.Context) (interface{}, error) {
+	id := cast.ToUint(ctx.Param("id"))
+	return nil, r.service.DeleteAlarmRuleGroupByID(id)
+}
