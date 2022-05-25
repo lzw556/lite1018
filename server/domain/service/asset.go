@@ -1,8 +1,6 @@
 package service
 
 import (
-	"context"
-
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/request"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/asset"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
@@ -33,14 +31,9 @@ func (s Asset) CreateAsset(req request.CreateAsset) error {
 }
 
 func (s Asset) GetAssetByID(id uint) (*vo.Asset, error) {
-	ctx := context.TODO()
-	asset, err := s.repository.Get(ctx, id)
-	if err != nil {
-		return nil, err
-	}
-
-	voAsset := vo.NewAsset(asset)
-	return &voAsset, nil
+	query := s.factory.NewAssetQuery(nil)
+	voAsset, err := query.Get(id)
+	return &voAsset, err
 }
 
 func (s Asset) UpdateAssetByID(id uint, req request.UpdateAsset) error {

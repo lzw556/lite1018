@@ -13,13 +13,31 @@ import (
 type AssetQuery struct {
 	Specs []spec.Specification
 
-	assetRepo dependency.AssetRepository
+	assetRepo           dependency.AssetRepository
+	monitoringPointRepo dependency.MonitoringPointRepository
 }
 
 func NewAssetQuery() AssetQuery {
 	return AssetQuery{
-		assetRepo: repository.Asset{},
+		assetRepo:           repository.Asset{},
+		monitoringPointRepo: repository.MonitoringPoint{},
 	}
+}
+
+func (query AssetQuery) newAsset(asset entity.Asset) vo.Asset {
+	return vo.NewAsset(asset)
+}
+
+func (query AssetQuery) Get(assetId uint) (vo.Asset, error) {
+	e, err := query.assetRepo.Get(context.TODO(), assetId)
+	if err != nil {
+		return vo.Asset{}, err
+	}
+
+	voAsset := query.newAsset(e)
+	query.iterSetChildren(&voAsset)
+
+	return voAsset, nil
 }
 
 func (query AssetQuery) Paging(page, size int) ([]vo.Asset, int64, error) {
@@ -37,13 +55,19 @@ func (query AssetQuery) Paging(page, size int) ([]vo.Asset, int64, error) {
 	return result, total, nil
 }
 
-func (query AssetQuery) newAsset(asset entity.Asset) vo.Asset {
-	return vo.NewAsset(asset)
-}
-
 func (query AssetQuery) iterSetChildren(asset *vo.Asset) {
 	children := query.getChildren(asset.ID)
 	asset.Children = children
+	mps, err := query.monitoringPointRepo.FindBySpecs(context.TODO(), spec.AssetEqSpec(asset.ID))
+	if err == nil {
+		voMps := make([]*vo.MonitoringPoint, 0)
+		for _, mp := range mps {
+			voMp := vo.NewMonitoringPoint(mp)
+			voMps = append(voMps, &voMp)
+		}
+
+		asset.MonitoringPoints = voMps
+	}
 	for _, c := range asset.Children {
 		query.iterSetChildren(c)
 	}

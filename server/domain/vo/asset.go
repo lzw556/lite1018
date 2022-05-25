@@ -11,8 +11,8 @@ type Asset struct {
 	ParentID  uint   `json:"parentId"`
 	ProjectID uint   `json:"projectId"`
 
-	Children         []*Asset           `json:"children"`
-	MonitoringPoints []*MonitoringPoint `json:"monitoringPoints"`
+	Children         []*Asset           `json:"children,omitempty"`
+	MonitoringPoints []*MonitoringPoint `json:"monitoringPoints,omitempty"`
 }
 
 func NewAsset(e entity.Asset) Asset {
