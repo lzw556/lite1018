@@ -258,12 +258,14 @@ func SyncDeviceList(gateway entity.Device, devices []entity.Device) error {
 		return err
 	}
 
-	for i := range devices {
-		device := devices[i]
-		if gateway.MacAddress != device.MacAddress {
-			_ = deviceConnectionStateRepo.Delete(device.MacAddress)
+	go func() {
+		for i := range devices {
+			device := devices[i]
+			if gateway.MacAddress != device.MacAddress {
+				_ = deviceConnectionStateRepo.Delete(device.MacAddress)
+			}
 		}
-	}
+	}()
 
 	xlog.Infof("starting sync device list => [%s]", gateway.MacAddress)
 	if isOnline(gateway.MacAddress) {
