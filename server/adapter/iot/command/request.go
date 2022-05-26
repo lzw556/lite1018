@@ -1,7 +1,6 @@
 package command
 
 import (
-	"context"
 	"fmt"
 	uuid "github.com/satori/go.uuid"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter"
@@ -18,7 +17,7 @@ type Request interface {
 	Response() chan Response
 	Qos() byte
 	Payload() ([]byte, error)
-	Execute(ctx context.Context, gateway string, target string, timeout time.Duration) (*Response, error)
+	Execute(gateway string, target string) (*Response, error)
 }
 
 type Response struct {
@@ -40,7 +39,7 @@ func newRequest() request {
 	}
 }
 
-func (cmd request) do(ctx context.Context, gateway string, target string, request Request, timeout time.Duration) (*Response, error) {
+func (cmd request) do(gateway string, target string, request Request) (*Response, error) {
 	xlog.Debugf("executing %s command => [%s]", request.Name(), target)
 	payload, err := request.Payload()
 	if err != nil {
@@ -59,9 +58,7 @@ func (cmd request) do(ctx context.Context, gateway string, target string, reques
 	case resp := <-request.Response():
 		xlog.Debugf("%s command executed successful => [%s]", request.Name(), target)
 		return &resp, nil
-	case <-ctx.Done():
-		return nil, response.BusinessErr(errcode.DeviceCommandCancelledError, "")
-	case <-time.After(timeout):
+	case <-time.After(2 * time.Second):
 		return nil, response.BusinessErr(errcode.DeviceCommandSendTimeoutError, "")
 	}
 }
