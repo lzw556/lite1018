@@ -57,6 +57,10 @@ func (d Device) CancelUpgrade() {
 	_ = cache.SetStruct(fmt.Sprintf("device_upgrade_status_%d", d.ID), status)
 }
 
+func (d Device) RemoveUpgradeStatus() {
+	_ = cache.Delete(fmt.Sprintf("device_upgrade_status_%d", d.ID))
+}
+
 func (d Device) UpgradeNotify(status DeviceUpgradeStatus) {
 	eventbus.Publish(eventbus.SocketEmit, "socket::deviceUpgradeStatusChangedEvent", map[string]interface{}{
 		"macAddress": d.MacAddress,
