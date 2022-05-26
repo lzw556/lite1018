@@ -64,7 +64,6 @@ func (s Asset) FindAssets(filters request.Filters) ([]vo.Asset, error) {
 }
 
 func (s Asset) iterCalcStatistics(asset vo.Asset, result *vo.AssetStatistics) error {
-
 	if asset.MonitoringPoints != nil && len(asset.MonitoringPoints) > 0 {
 		result.MonitoringPointNum += uint(len(asset.MonitoringPoints))
 		for _, mp := range asset.MonitoringPoints {
