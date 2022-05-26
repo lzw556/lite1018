@@ -40,6 +40,8 @@ func (p RestartStatus) Process(ctx *iot.Context, msg iot.Message) error {
 				return fmt.Errorf("unmarshal [RestartStatus] message failed: %v", err)
 			}
 
+			device.RemoveUpgradeStatus()
+
 			// add event
 			event := entity.Event{
 				Code:      entity.EventCodeReboot,
@@ -53,7 +55,7 @@ func (p RestartStatus) Process(ctx *iot.Context, msg iot.Message) error {
 				return fmt.Errorf("create event failed: %v", err)
 			}
 			if queue := background.GetTaskQueue(device.MacAddress); queue != nil && !queue.IsRunning() {
-				queue.Run()
+				go queue.Run()
 			}
 		}
 	}
