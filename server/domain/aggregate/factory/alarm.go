@@ -195,6 +195,13 @@ func (factory Alarm) NewAlarmRuleGroupCreateCmd(req request.AlarmRuleGroup) (*co
 	return &cmd, nil
 }
 
-func (factory Alarm) NewAlarmRuleGroupRemoveCmd(ruleGroupId uint) (*command.AlarmRuleGroupRemoveCmd, error) {
+func (factory Alarm) NewAlarmRuleGroupRemoveCmd(id uint) (*command.AlarmRuleGroupRemoveCmd, error) {
+	e, err := factory.alarmRuleGroupRepo.Get(context.TODO(), id)
+	if err != nil {
+		return nil, response.BusinessErr(errcode.AlarmRuleGroupNotFoundError, "")
+	}
+	cmd := command.NewAlarmRuleGroupRemoveCmd()
+	cmd.AlarmRuleGroup = e
 
+	return &cmd, nil
 }

@@ -74,7 +74,7 @@ func (query AssetQuery) iterSetChildren(asset *vo.Asset) {
 }
 
 func (query AssetQuery) getChildren(assetId uint) []*vo.Asset {
-	es, err := query.assetRepo.FindBySpecs(context.TODO(), spec.ParentIdEqSpec(assetId))
+	es, err := query.assetRepo.FindBySpecs(context.TODO(), spec.ParentIDEqSpec(assetId))
 
 	result := make([]*vo.Asset, 0)
 

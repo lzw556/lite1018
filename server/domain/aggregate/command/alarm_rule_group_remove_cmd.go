@@ -29,7 +29,7 @@ func NewAlarmRuleGroupRemoveCmd() AlarmRuleGroupRemoveCmd {
 
 func (cmd AlarmRuleGroupRemoveCmd) Run() error {
 	return transaction.Execute(context.TODO(), func(txCtx context.Context) error {
-		sources, err := cmd.alarmRuleGroupSourceRepo.FindBySpecs(txCtx, spec.GroupIdEqSpec(cmd.AlarmRuleGroup.ID))
+		sources, err := cmd.alarmRuleGroupSourceRepo.FindBySpecs(txCtx, spec.GroupIDEqSpec(cmd.AlarmRuleGroup.ID))
 		if err != nil {
 			return err
 		}
