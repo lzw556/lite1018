@@ -46,5 +46,5 @@ func (cmd deleteDeviceCmd) Payload() ([]byte, error) {
 }
 
 func (cmd deleteDeviceCmd) Execute(gateway string, target string) (*Response, error) {
-	return cmd.do(gateway, target, cmd)
+	return cmd.do(gateway, target, cmd, 3)
 }

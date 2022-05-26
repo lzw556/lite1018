@@ -40,5 +40,5 @@ func (cmd resetCmd) Payload() ([]byte, error) {
 }
 
 func (cmd resetCmd) Execute(gateway string, target string) (*Response, error) {
-	return cmd.request.do(gateway, target, cmd)
+	return cmd.request.do(gateway, target, cmd, 3)
 }

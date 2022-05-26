@@ -67,5 +67,5 @@ func toDeviceItem(e entity.Device) *pd.DeviceItem {
 }
 
 func (cmd updateDevicesCmd) Execute(gateway string, target string) (*Response, error) {
-	return cmd.request.do(gateway, target, cmd)
+	return cmd.request.do(gateway, target, cmd, 5)
 }
