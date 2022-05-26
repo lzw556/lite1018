@@ -147,7 +147,7 @@ func SyncNetwork(network entity.Network, devices []entity.Device, timeout time.D
 			xlog.Errorf("update wsn settings failed: %v", err)
 			return err
 		}
-		if err := SyncDeviceList(gateway, devices, timeout); err != nil {
+		if err := SyncDeviceList(gateway, devices); err != nil {
 			return err
 		}
 		SyncDeviceSettings(gateway, devices...)
@@ -253,7 +253,7 @@ func UpdateWsnSettings(network entity.Network, gateway entity.Device) error {
 	return nil
 }
 
-func SyncDeviceList(gateway entity.Device, devices []entity.Device, timeout time.Duration) error {
+func SyncDeviceList(gateway entity.Device, devices []entity.Device) error {
 	if err := ClearDevices(gateway); err != nil {
 		return err
 	}
@@ -324,7 +324,7 @@ func DeviceUpgrade(gateway entity.Device, device entity.Device, firmware entity.
 	}
 	queue.Append(background.NewTask(device, NewDeviceUpgradeExecutor(firmware)))
 	if !queue.IsRunning() {
-		queue.Run()
+		go queue.Run()
 	}
 	return nil
 }

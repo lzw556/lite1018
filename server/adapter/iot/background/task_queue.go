@@ -75,15 +75,13 @@ func (q *TaskQueue) Stop() {
 
 func (q *TaskQueue) Run() {
 	q.running = true
-	go func() {
-		for q.tasks != nil && q.running {
-			if err := q.tasks.Run(q.gateway); err != nil {
-				xlog.Errorf("device [%s] task run failed: %v", q.tasks.MacAddress, err)
-			}
-			q.tasks = q.tasks.next
+	for q.tasks != nil && q.running {
+		if err := q.tasks.Run(q.gateway); err != nil {
+			xlog.Errorf("device [%s] task run failed: %v", q.tasks.MacAddress, err)
 		}
-		q.running = false
-	}()
+		q.tasks = q.tasks.next
+	}
+	q.running = false
 }
 
 func (q *TaskQueue) IsRunning() bool {
