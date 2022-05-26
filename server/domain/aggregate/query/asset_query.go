@@ -61,9 +61,12 @@ func (query AssetQuery) iterSetChildren(asset *vo.Asset) {
 	mps, err := query.monitoringPointRepo.FindBySpecs(context.TODO(), spec.AssetEqSpec(asset.ID))
 	if err == nil {
 		voMps := make([]*vo.MonitoringPoint, 0)
+		mpQuery := NewMonitoringPointQuery()
 		for _, mp := range mps {
-			voMp := vo.NewMonitoringPoint(mp)
-			voMps = append(voMps, &voMp)
+			voMp, err := mpQuery.Get(mp.ID)
+			if err == nil {
+				voMps = append(voMps, &voMp)
+			}
 		}
 
 		asset.MonitoringPoints = voMps
