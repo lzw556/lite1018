@@ -87,7 +87,7 @@ func (a *Adapter) Unsubscribe(topic string) {
 
 func (a *Adapter) Publish(topic string, qos byte, payload []byte) error {
 	t := a.client.Publish(topic, qos, false, payload)
-	xlog.Infof("publish to topic: %s, payload: %s", topic, string(payload))
+	xlog.Infof("publish to topic: %s, payload size = %s", topic, len(payload))
 	xlog.Infof("mqtt client connection state: %v", a.client.IsConnectionOpen())
 	go func() {
 		_ = t.Wait()
