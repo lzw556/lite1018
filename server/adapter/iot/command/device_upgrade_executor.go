@@ -90,6 +90,7 @@ func (e DeviceUpgradeExecutor) loadFirmware(gateway string, device entity.Device
 		device.UpdateDeviceUpgradeStatus(entity.DeviceUpgradeLoading, progress)
 		seqID = seqId + 1
 	}
+	device.UpdateDeviceUpgradeStatus(entity.DeviceUpgradePending, 0)
 	xlog.Infof("load firmware data complete => [%s]", device.MacAddress)
 	return nil
 }

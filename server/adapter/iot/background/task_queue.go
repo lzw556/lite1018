@@ -76,9 +76,11 @@ func (q *TaskQueue) Stop() {
 func (q *TaskQueue) Run() {
 	q.running = true
 	for q.tasks != nil && q.running {
+		xlog.Infof("run device upgrade task => [%s]", q.tasks.MacAddress)
 		if err := q.tasks.Run(q.gateway); err != nil {
-			xlog.Errorf("device [%s] task run failed: %v", q.tasks.MacAddress, err)
+			xlog.Errorf("device upgrade task run failed: %v => %s", err, q.tasks.MacAddress)
 		}
+		xlog.Infof("device upgrade task run success => [%s]", q.tasks.MacAddress)
 		q.tasks = q.tasks.next
 	}
 	q.running = false
