@@ -51,9 +51,7 @@ func (cmd request) do(gateway string, target string, request Request, timeout ti
 	if err != nil {
 		return nil, response.BusinessErr(errcode.DeviceCommandExecFailedError, err.Error())
 	}
-	if err := adapter.IoT.Publish(fmt.Sprintf("iot/v2/gw/%s/dev/%s/cmd/%s/", gateway, target, request.Name()), request.Qos(), payload); err != nil {
-		return nil, response.BusinessErr(errcode.DeviceCommandSendFailedError, err.Error())
-	}
+	adapter.IoT.Publish(fmt.Sprintf("iot/v2/gw/%s/dev/%s/cmd/%s/", gateway, target, request.Name()), request.Qos(), payload)
 	select {
 	case resp := <-request.Response():
 		xlog.Debugf("%s command executed successful => [%s]", request.Name(), target)
