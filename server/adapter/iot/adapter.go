@@ -19,6 +19,7 @@ type Adapter struct {
 	port          int
 	serverEnabled bool
 	dispatchers   map[string]Dispatcher
+	publishChan   chan PublishMessage
 }
 
 func NewAdapter(conf config.IoT) *Adapter {
@@ -28,6 +29,7 @@ func NewAdapter(conf config.IoT) *Adapter {
 		port:          conf.Server.Port,
 		serverEnabled: conf.Server.Enabled,
 		dispatchers:   map[string]Dispatcher{},
+		publishChan:   make(chan PublishMessage, 0),
 	}
 	opts := mqtt.NewClientOptions()
 	opts.SetUsername(conf.Username).
@@ -85,19 +87,12 @@ func (a *Adapter) Unsubscribe(topic string) {
 	a.client.Unsubscribe(topic)
 }
 
-func (a *Adapter) Publish(topic string, qos byte, payload []byte) error {
-	xlog.Infof("mqtt client connection state: %v", a.client.IsConnectionOpen())
-	t := a.client.Publish(topic, qos, false, payload)
-	xlog.Infof("publish to topic: %s, payload size = %s", topic, len(payload))
-	go func() {
-		xlog.Infof("start waiting for publish result")
-		_ = t.Wait()
-		xlog.Infof("publish result: %v", t.Error())
-		if t.Error() != nil {
-			xlog.Errorf("publish message error: %s", t.Error())
-		}
-	}()
-	return nil
+func (a *Adapter) Publish(topic string, qos byte, payload []byte) {
+	a.publishChan <- PublishMessage{
+		Topic:   topic,
+		Qos:     qos,
+		Payload: payload,
+	}
 }
 
 func (a Adapter) onPublish(c mqtt.Client, msg mqtt.Message) {
@@ -128,6 +123,17 @@ func (a *Adapter) Run() error {
 		return t.Error()
 	}
 	xlog.Info("iot server start successful")
+	go func() {
+		for msg := range a.publishChan {
+			xlog.Infof("publish message to topic: %s payload: %d", msg.Topic, len(msg.Payload))
+			t := a.client.Publish(msg.Topic, msg.Qos, false, msg.Payload)
+			if t.Wait() && t.Error() != nil {
+				xlog.Errorf("publish message error: %s", t.Error())
+				continue
+			}
+			xlog.Infof("publish message to topic: %s success", msg.Topic)
+		}
+	}()
 	return nil
 }
 
