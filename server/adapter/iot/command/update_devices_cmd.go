@@ -1,7 +1,6 @@
 package command
 
 import (
-	"context"
 	"encoding/binary"
 	"fmt"
 	"github.com/gogo/protobuf/proto"
@@ -9,7 +8,6 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/utils"
 	"sort"
-	"time"
 )
 
 type updateDevicesCmd struct {
@@ -68,6 +66,6 @@ func toDeviceItem(e entity.Device) *pd.DeviceItem {
 	return item
 }
 
-func (cmd updateDevicesCmd) Execute(ctx context.Context, gateway string, target string, timeout time.Duration) (*Response, error) {
-	return cmd.request.do(ctx, gateway, target, cmd, timeout)
+func (cmd updateDevicesCmd) Execute(gateway string, target string) (*Response, error) {
+	return cmd.request.do(gateway, target, cmd)
 }

@@ -13,7 +13,6 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/devicetype"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/errcode"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/transaction"
-	"time"
 )
 
 type NetworkUpdateCmd struct {
@@ -54,7 +53,7 @@ func (cmd NetworkUpdateCmd) Update(req request.Network) (*vo.Network, error) {
 	}
 	connectionState, _ := cmd.deviceConnectionState.Get(gateway.MacAddress)
 	if connectionState != nil && connectionState.IsOnline {
-		go command.UpdateWsnSettings(cmd.Network, gateway, 3*time.Second)
+		go command.UpdateWsnSettings(cmd.Network, gateway)
 	}
 	result := vo.NewNetwork(cmd.Network)
 	return &result, nil
