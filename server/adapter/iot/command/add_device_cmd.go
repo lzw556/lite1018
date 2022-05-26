@@ -50,5 +50,5 @@ func (cmd addDeviceCmd) Payload() ([]byte, error) {
 }
 
 func (cmd addDeviceCmd) Execute(gateway string, target string) (*Response, error) {
-	return cmd.request.do(gateway, target, cmd)
+	return cmd.request.do(gateway, target, cmd, 3)
 }

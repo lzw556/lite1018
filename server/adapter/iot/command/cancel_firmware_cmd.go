@@ -40,5 +40,5 @@ func (cmd cancelFirmwareCmd) Payload() ([]byte, error) {
 }
 
 func (cmd cancelFirmwareCmd) Execute(gateway string, target string) (*Response, error) {
-	return cmd.request.do(gateway, target, cmd)
+	return cmd.request.do(gateway, target, cmd, 5)
 }

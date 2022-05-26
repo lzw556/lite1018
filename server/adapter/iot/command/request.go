@@ -39,7 +39,7 @@ func newRequest() request {
 	}
 }
 
-func (cmd request) do(gateway string, target string, request Request) (*Response, error) {
+func (cmd request) do(gateway string, target string, request Request, timeout time.Duration) (*Response, error) {
 	xlog.Debugf("executing %s command => [%s]", request.Name(), target)
 	payload, err := request.Payload()
 	if err != nil {
@@ -58,7 +58,7 @@ func (cmd request) do(gateway string, target string, request Request) (*Response
 	case resp := <-request.Response():
 		xlog.Debugf("%s command executed successful => [%s]", request.Name(), target)
 		return &resp, nil
-	case <-time.After(2 * time.Second):
+	case <-time.After(timeout):
 		return nil, response.BusinessErr(errcode.DeviceCommandSendTimeoutError, "")
 	}
 }
