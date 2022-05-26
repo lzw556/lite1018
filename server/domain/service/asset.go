@@ -63,20 +63,29 @@ func (s Asset) FindAssets(filters request.Filters) ([]vo.Asset, error) {
 	return query.List()
 }
 
-func (s Asset) iterCalcMonitoringPointNum(asset vo.Asset) uint {
-	var total uint = 0
+func (s Asset) iterCalcStatistics(asset vo.Asset, result *vo.AssetStatistics) error {
 
-	if asset.MonitoringPoints != nil {
-		total += uint(len(asset.MonitoringPoints))
+	if asset.MonitoringPoints != nil && len(asset.MonitoringPoints) > 0 {
+		result.MonitoringPointNum += uint(len(asset.MonitoringPoints))
+		for _, mp := range asset.MonitoringPoints {
+			if mp.BindingDevices != nil && len(mp.BindingDevices) > 0 {
+				result.DeviceNum += uint(len(mp.BindingDevices))
+				for _, dev := range mp.BindingDevices {
+					if !dev.State.IsOnline {
+						result.OfflineDeviceNum += 1
+					}
+				}
+			}
+		}
 	}
 
 	if asset.Children != nil {
 		for _, c := range asset.Children {
-			total += s.iterCalcMonitoringPointNum(*c)
+			s.iterCalcStatistics(*c, result)
 		}
 	}
 
-	return total
+	return nil
 }
 
 func (s Asset) GetStatistics(id uint) (vo.AssetStatistics, error) {
@@ -87,7 +96,7 @@ func (s Asset) GetStatistics(id uint) (vo.AssetStatistics, error) {
 		return result, err
 	}
 
-	result.MonitoringPointNum = s.iterCalcMonitoringPointNum(*asset)
+	err = s.iterCalcStatistics(*asset, &result)
 
-	return result, nil
+	return result, err
 }
