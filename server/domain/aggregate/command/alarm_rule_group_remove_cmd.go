@@ -22,6 +22,8 @@ type AlarmRuleGroupRemoveCmd struct {
 
 func NewAlarmRuleGroupRemoveCmd() AlarmRuleGroupRemoveCmd {
 	return AlarmRuleGroupRemoveCmd{
+		alarmRuleRepo:            repository.AlarmRule{},
+		alarmSourceRepo:          repository.AlarmSource{},
 		alarmRuleGroupRepo:       repository.AlarmRuleGroup{},
 		alarmRuleGroupSourceRepo: repository.AlarmRuleGroupSource{},
 	}
