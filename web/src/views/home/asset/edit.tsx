@@ -1,7 +1,7 @@
 import { Form, Input, Modal, ModalProps, Select } from 'antd';
 import * as React from 'react';
 import { defaultValidateMessages, Rules } from '../../../constants/validator';
-import { AssetTypes } from './constants';
+import { AssetTypes } from '../constants';
 import { Asset, AssetRow, convertRow } from './props';
 import { addAsset, getAssets, updateAsset } from './services';
 

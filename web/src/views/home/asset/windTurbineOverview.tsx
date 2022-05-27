@@ -1,14 +1,14 @@
 import { Empty, Spin } from 'antd';
 import * as React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import MyBreadcrumb from '../../../components/myBreadcrumb';
+import { AssetNavigator } from '../assetNavigator';
 import '../home.css';
 import { MeasurementIcon } from '../measurement/icon';
 import { getMeasurements } from '../measurement/services';
 import { OverviewPage } from '../overviewPage';
 import { Introduction } from '../props';
 import { generateFlangeChartOptions } from '../utils';
-import { AssetTypes } from './constants';
+import { AssetTypes } from '../constants';
 import { getAssets } from './services';
 
 const WindTurbineOverview: React.FC = () => {
@@ -38,7 +38,7 @@ const WindTurbineOverview: React.FC = () => {
           id: item.id,
           title: {
             name: item.name,
-            path: `/project-overview${search}/flange-overview&id=${item.id}`
+            path: `${AssetTypes.Flange.url}&id=${item.id}`
           },
           alarmState: 'normal',
           icon: { svg: <MeasurementIcon />, small: true, focus: true },
@@ -104,7 +104,7 @@ const WindTurbineOverview: React.FC = () => {
     );
   return (
     <>
-      <MyBreadcrumb />
+      <AssetNavigator id={id} />
       <OverviewPage {...{ properties, introductionList: flanges.items }} />
     </>
   );

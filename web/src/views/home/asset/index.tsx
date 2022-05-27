@@ -4,7 +4,7 @@ import { forEach } from 'lodash';
 import * as React from 'react';
 import { SearchResultPage } from '../searchResultPage';
 import { filterEmptyChildren } from '../utils';
-import { AssetTypes } from './constants';
+import { AssetTypes } from '../constants';
 import { AssetEdit } from './edit';
 import { AssetRow } from './props';
 import { deleteAsset, getAssets } from './services';
@@ -58,12 +58,14 @@ const AssetManagement: React.FC = () => {
                 <DeleteOutlined />
               </Button>
             </Popconfirm>
-            <Button type='text' size='small' title='添加法兰'>
-              <PlusOutlined
-                style={{ color: 'rgba(0,0,0,.55)' }}
-                onClick={() => open({ ...AssetTypes.Flange, parent_id: row.id })}
-              />
-            </Button>
+            {row.type === AssetTypes.WindTurbind.type && (
+              <Button type='text' size='small' title='添加法兰'>
+                <PlusOutlined
+                  style={{ color: 'rgba(0,0,0,.55)' }}
+                  onClick={() => open({ ...AssetTypes.Flange, parent_id: row.id })}
+                />
+              </Button>
+            )}
           </Space>
         )
       }

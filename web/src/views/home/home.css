@@ -91,3 +91,9 @@ dl.name-value-groups {
 .introduction.danger.focus .introduction-icon .icon-svg {
   fill: #dc3545;
 }
+.asset-navigator{
+  margin-bottom: 8px;
+}
+.asset-navigator .asset-navigator-item{
+  font-size: 16px;
+}

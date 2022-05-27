@@ -3,6 +3,7 @@ import { LineChartStyles } from '../../constants/chart';
 import { MeasurementHistoryData, MeasurementRow } from './measurement/props';
 import { cloneDeep, round } from 'lodash';
 import { AssetRow } from './asset/props';
+import { Node } from './props';
 
 export function generateColProps({
   xs,
@@ -254,16 +255,32 @@ export function generateMeasurementHistoryDataOptions(data: MeasurementHistoryDa
 export function filterEmptyChildren(assets: AssetRow[]) {
   if (assets.length === 0) return [];
   const copy = cloneDeep(assets);
-  return copy.map((asset) => loopAssetTree(asset));
+  return copy.map((asset) =>
+    mapTreeNode(asset, (asset) => {
+      if (asset.children && asset.children.length === 0) {
+        delete asset.children;
+        return asset;
+      } else {
+        return asset;
+      }
+    })
+  );
 }
 
-function loopAssetTree(asset: AssetRow): AssetRow {
-  if (asset.children && asset.children.length === 0) {
-    delete asset.children;
-    return asset;
-  } else if (asset.children && asset.children.length > 0) {
-    return { ...asset, children: asset.children.map((asset) => loopAssetTree(asset)) };
+export function mapTreeNode<N extends Node>(node: N, fn: <N extends Node>(node: N) => N): N {
+  if (node.children && node.children.length > 0) {
+    return { ...fn(node), children: node.children.map((node) => mapTreeNode(node, fn)) };
   } else {
-    return asset;
+    return fn(node);
+  }
+}
+
+export function forEachTreeNode<N extends Node>(
+  node: N,
+  fn: <N extends Node>(node: N) => void
+): void {
+  fn(node);
+  if (node.children && node.children.length > 0) {
+    node.children.map((node) => forEachTreeNode(node, fn));
   }
 }

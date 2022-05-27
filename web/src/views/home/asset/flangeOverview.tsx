@@ -2,14 +2,16 @@ import { Empty, Spin } from 'antd';
 import moment from 'moment';
 import * as React from 'react';
 import { Link, useLocation, useHistory } from 'react-router-dom';
-import MyBreadcrumb from '../../../components/myBreadcrumb';
+import { AssetNavigator } from '../assetNavigator';
+import { MeasurementTypes } from '../constants';
 import '../home.css';
 import { MeasurementRow } from '../measurement/props';
 import { getMeasurements } from '../measurement/services';
 import { OverviewPage } from '../overviewPage';
-import { TableListItem } from '../props';
+import { TableListItem, Overview } from '../props';
 import { generateColProps, generateFlangeChartOptions } from '../utils';
-import { usePreloadChartOptions } from './props';
+import { AssetStatistics, usePreloadChartOptions } from './props';
+import { getAsset } from './services';
 
 const FlangeOverview: React.FC = () => {
   const { search } = useLocation();
@@ -22,14 +24,7 @@ const FlangeOverview: React.FC = () => {
     loading: true,
     items: []
   });
-  const [properties, setProperties] = React.useState([
-    { name: '监测点数量', value: 8 },
-    { name: '紧急报警监测点数量', value: 0 },
-    { name: '重要报警监测点数量', value: 0 },
-    { name: '次要报警监测点数量', value: 0 },
-    { name: '传感器数量', value: 8 },
-    { name: '离线传感器数量', value: 0 }
-  ]);
+  const [statistics, setStatistics] = React.useState<Overview['statistics']>();
 
   const statisticOfPreload = usePreloadChartOptions();
   const [tableOfMeasurement, setTableOfMeasurement] = React.useState<TableListItem<MeasurementRow>>(
@@ -42,7 +37,7 @@ const FlangeOverview: React.FC = () => {
           dataIndex: 'name',
           key: 'name',
           render: (name: string, row: MeasurementRow) => (
-            <Link to={`/project-overview${search}/bolt-overview&id=${row.id}`}>{name}</Link>
+            <Link to={`${MeasurementTypes.dynamicPreload.url}&id=${row.id}`}>{name}</Link>
           )
         },
         { title: '状态', dataIndex: 'state', key: 'state', render: () => '正常' },
@@ -72,6 +67,7 @@ const FlangeOverview: React.FC = () => {
     }
   );
   React.useEffect(() => {
+    getAsset(id);
     getMeasurements({ asset_id: id }).then((measurements) =>
       setMeasurements({ loading: false, items: measurements })
     );
@@ -94,7 +90,7 @@ const FlangeOverview: React.FC = () => {
             <a
               href='#!'
               onClick={(e) => {
-                history.go(-1);
+                history.goBack();
                 e.preventDefault();
               }}
             >
@@ -107,10 +103,10 @@ const FlangeOverview: React.FC = () => {
 
   return (
     <>
-      <MyBreadcrumb />
+      <AssetNavigator id={id} />
       <OverviewPage
         {...{
-          properties,
+          statistics,
           tabelList: [tableOfMeasurement],
           chartList: [
             {
@@ -121,7 +117,11 @@ const FlangeOverview: React.FC = () => {
                 outer: '70%'
               })
             },
-            { title: '预紧力趋势', colProps: generateColProps({ xl: 12, xxl: 15 }), options: statisticOfPreload }
+            {
+              title: '预紧力趋势',
+              colProps: generateColProps({ xl: 12, xxl: 15 }),
+              options: statisticOfPreload
+            }
           ]
         }}
       />

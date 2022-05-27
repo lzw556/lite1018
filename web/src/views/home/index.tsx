@@ -2,7 +2,7 @@ import { Empty, Spin } from 'antd';
 import * as React from 'react';
 import { Link } from 'react-router-dom';
 import { ColorDanger, ColorHealth, ColorInfo, ColorWarn } from '../../constants/color';
-import { AssetTypes } from './asset/constants';
+import { AssetTypes } from './constants';
 import { AssetIcon } from './asset/icon';
 import { getAssets } from './asset/services';
 import { Series_Bar } from './charts/bar';
@@ -12,6 +12,7 @@ import './home.css';
 import { OverviewPage } from './overviewPage';
 import { Introduction } from './props';
 import { generateColProps } from './utils';
+import { getAlarmStateOfAsset, transformAssetStatistics } from './asset/props';
 
 const ProjectOverview: React.FC = () => {
   const colProps = generateColProps({ xl: 8, xxl: 5 });
@@ -37,16 +38,11 @@ const ProjectOverview: React.FC = () => {
           id: item.id,
           title: {
             name: item.name,
-            path: `/project-overview?locale=project-overview/wind-overview&id=${item.id}`
+            path: `${AssetTypes.WindTurbind.url}&id=${item.id}`
           },
-          alarmState: 'normal',
+          alarmState: getAlarmStateOfAsset(item.statistics.alarmNum),
           icon: { svg: <AssetIcon />, small: true },
-          properties: [
-            { name: '监测点', value: 40 },
-            { name: '异常监测点', value: 0 },
-            { name: '螺栓监测', value: '正常' },
-            { name: '离线', value: 0 }
-          ]
+          statistics: transformAssetStatistics(item.statistics)
         }))
       })
     );

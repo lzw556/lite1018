@@ -2,7 +2,7 @@ import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
 import { Button, ButtonProps, Empty, Popconfirm, Space, Spin, TableProps } from 'antd';
 import * as React from 'react';
 import { Link } from 'react-router-dom';
-import { AssetTypes, MeasurementTypes } from '../asset/constants';
+import { AssetTypes, MeasurementTypes } from '../constants';
 import { AssetRow } from '../asset/props';
 import { getAssets } from '../asset/services';
 import { SearchResultPage } from '../searchResultPage';

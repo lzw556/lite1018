@@ -1,52 +1,132 @@
-import { Breadcrumb } from 'antd';
-import React from 'react';
+import { Breadcrumb, Dropdown, Menu, Space } from 'antd';
+import * as React from 'react';
+import { Link, useHistory } from 'react-router-dom';
+import { AssetTypes, MeasurementTypes } from './constants';
+import { AssetRow } from './asset/props';
+import { getAssets } from './asset/services';
+import { Node } from './props';
+import { forEachTreeNode } from './utils';
+import { DownOutlined } from '@ant-design/icons';
 
-export const AssetNavigator = () => {
-  type Node = { id: number; name: string; parentId: number; children?: Node[] };
-  const node: Node = {
-    id: 1,
-    name: '总览',
-    parentId: -1,
-    children: [
-      { id: 2, name: '1号风机', parentId: 1, children: [{ id: 3, name: '1号叶根', parentId: 2 }] },
-      {
-        id: 4,
-        name: '2号风机',
-        parentId: 1,
-        children: [
-          {
-            id: 5,
-            name: '1号叶根',
-            parentId: 4,
-            children: [
-              { id: 8, name: '1号螺栓', parentId: 5 },
-              { id: 9, name: '2号螺栓', parentId: 5 }
-            ]
-          },
-          { id: 6, name: '2号叶根', parentId: 4 },
-          { id: 7, name: '3号叶根', parentId: 4 }
-        ]
+type BreadcrumbItemData = Node & { type?: number };
+export const AssetNavigator: React.FC<{ id: number }> = ({ id }) => {
+  const history = useHistory();
+  const [assets, setAssets] = React.useState<AssetRow[]>([]);
+  const [items, setItems] = React.useState<[number, boolean, Node[]][]>([]);
+  React.useEffect(() => {
+    getAssets({ type: AssetTypes.WindTurbind.type }).then(setAssets);
+  }, []);
+
+  React.useEffect(() => {
+    const findParent = (id: number, source: Node[], paths: { parentId: number; id: number }[]) => {
+      const item = source.find((item) => item.id === id);
+      if (item) {
+        paths.push({ parentId: item.parentId, id: item.id });
+        if (item.parentId !== -1) {
+          findParent(item.parentId, source, paths);
+        }
       }
-    ]
-  };
-
-  const expand = (array: Node[][], node: Node) => {
-    if (node.children) {
-      array.push([...node.children]);
-      let _arr: Node[] = [];
-      node.children.forEach((node) => {
-        if (node.children) _arr.push(...node.children);
+    };
+    if (assets.length > 0) {
+      const node = { id: 0, name: '总览', parentId: -1, children: assets };
+      const arr: Node[] = [];
+      forEachTreeNode(node, (node) => {
+        arr.push(node);
+        if (node.monitoringPoints && node.monitoringPoints.length > 0)
+          arr.push(
+            ...node.monitoringPoints.map((point) => ({ ...point, parentId: point.assetId }))
+          );
       });
-      if (_arr.length > 0) array.push([..._arr]);
-      _arr.forEach((node) => expand(array, node));
+      if (arr.length > 0) {
+        const paths: { parentId: number; id: number }[] = [];
+        findParent(id, arr, paths);
+        setItems(
+          paths
+            .reverse()
+            .map(({ parentId, id }, index) => [
+              id,
+              paths.length - 1 === index,
+              arr.filter((item) => item.parentId === parentId)
+            ])
+        );
+      }
+    }
+  }, [assets, id]);
+
+  const renderBreadcrumbItemDDMenu = (assets: BreadcrumbItemData[]) => {
+    if (assets.length > 0) {
+      return (
+        <Menu>
+          {assets.map((asset) => (
+            <Menu.Item
+              key={asset.id}
+              onClick={() => {
+                history.replace(pickUrlFromType(asset));
+              }}
+            >
+              {asset.name}
+            </Menu.Item>
+          ))}
+        </Menu>
+      );
+    } else {
+      return <></>;
     }
   };
-  const jj: Node[][] = [];
-  expand(jj, node);
-  console.log(jj);
-  return (
-    <Breadcrumb>
-      <Breadcrumb.Item>总览</Breadcrumb.Item>
-    </Breadcrumb>
-  );
+
+  const renderChildrenOfItem = (
+    asset: BreadcrumbItemData,
+    isLast: boolean,
+    assets: BreadcrumbItemData[]
+  ) => {
+    const menu = renderBreadcrumbItemDDMenu(assets);
+    const downIcon = <DownOutlined style={{ fontSize: '10px', cursor: 'pointer' }} />;
+    if (isLast) {
+      return (
+        <Dropdown overlay={menu} trigger={['click']}>
+          <Space>
+            <span>{asset.name}</span>
+            {assets.length > 0 && downIcon}
+          </Space>
+        </Dropdown>
+      );
+    } else {
+      return (
+        <Space>
+          <Link to={pickUrlFromType(asset)}>{asset.name}</Link>
+          {assets.length > 0 && (
+            <Dropdown overlay={menu} trigger={['click']} placement='bottomRight'>
+              {downIcon}
+            </Dropdown>
+          )}
+        </Space>
+      );
+    }
+  };
+
+  const pickUrlFromType = (asset: BreadcrumbItemData) => {
+    const types = [...Object.values(AssetTypes), ...Object.values(MeasurementTypes)];
+    const assetType = types.find((_type) => _type.type === asset.type);
+    return assetType
+      ? `${assetType.url}&id=${asset.id}`
+      : `/project-overview?locale=/project-overview`;
+  };
+
+  const renderBreadcrumbItem = ([id, isLast, assets]: [
+    id: number,
+    isLast: boolean,
+    assets: BreadcrumbItemData[]
+  ]) => {
+    const asset = assets.find((asset) => asset.id === id);
+    if (!asset) return null;
+    const restAssets = assets.filter((asset) => asset.id !== id);
+    return (
+      <Breadcrumb.Item key={asset.id} className='asset-navigator-item'>
+        {renderChildrenOfItem(asset, isLast, restAssets)}
+      </Breadcrumb.Item>
+    );
+  };
+
+  if (items.length === 0) return null;
+  return <Breadcrumb className='asset-navigator'>{items.map(renderBreadcrumbItem)}</Breadcrumb>;
 };

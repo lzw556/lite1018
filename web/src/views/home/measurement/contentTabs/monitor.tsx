@@ -13,7 +13,7 @@ export const Monitor: React.FC<MeasurementRow> = (props) => {
     const from = moment().startOf('day').subtract(7, 'd').utc().unix();
     const to = moment().endOf('day').utc().unix();
     getData(id, from, to).then((data) => {
-      setHistoryOptions(generateMeasurementHistoryDataOptions(data));
+      if (data.length > 0) setHistoryOptions(generateMeasurementHistoryDataOptions(data));
     });
   }, [id]);
 
@@ -21,8 +21,8 @@ export const Monitor: React.FC<MeasurementRow> = (props) => {
 
   return (
     <Row gutter={[32, 16]}>
-      {historyOptions.map((ops: any) => (
-        <Col span={6}>
+      {historyOptions.map((ops: any, index: number) => (
+        <Col span={6} key={index}>
           <ChartContainer title='' options={ops} />
         </Col>
       ))}

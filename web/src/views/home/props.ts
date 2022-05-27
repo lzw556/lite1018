@@ -1,17 +1,16 @@
 import { ButtonProps, FormItemProps } from 'antd';
 import { TableProps } from 'antd/lib/table';
 import { ChartOptions } from './charts/common';
+import { MeasurementRow } from './measurement/props';
 
-export type Introduction = {
+export type AlarmState = 'normal' | 'info' | 'warn' | 'danger';
+
+export type Introduction = Pick<Overview, 'statistics'> & {
   parentId: number;
   id: number;
   title: { name: string; path: string };
-  properties: {
-    name: string;
-    value: string | number;
-  }[];
   icon: { svg: JSX.Element; small: boolean; focus?: boolean };
-  alarmState: 'normal' | 'info' | 'warn' | 'danger';
+  alarmState: AlarmState;
   chart?: { title: string; options: ChartOptions<unknown>; style?: React.CSSProperties };
 };
 
@@ -26,9 +25,10 @@ export type TableListItem<T> = TableProps<T> & {
 };
 
 export type Overview = {
-  properties?: {
+  statistics?: {
     name: string;
     value: string | number;
+    hidden?: boolean;
   }[];
   chartList?: {
     title: string;
@@ -50,4 +50,12 @@ export type SearchResult = {
   actions?: ButtonProps[];
   filters?: FormItemProps<any>[];
   result: TableProps<any>;
+};
+
+export type Node = {
+  id: number;
+  name: string;
+  parentId: number;
+  children?: Node[];
+  monitoringPoints?: MeasurementRow[];
 };

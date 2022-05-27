@@ -8,17 +8,17 @@ import { Overview } from './props';
 import { generateColProps } from './utils';
 
 export const OverviewPage: React.FC<Overview> = (props) => {
-  const { properties, chartList, introductionList, tabelList } = props;
+  const { statistics, chartList, introductionList, tabelList } = props;
   const colProps = generateColProps({ md: 12, lg: 12, xl: 6, xxl: 6 });
   const colProps2 = generateColProps({ md: 12, lg: 12, xl: 8, xxl: 6 });
 
   return (
     <Row gutter={[0, 16]}>
-      {properties && (
+      {statistics && (
         <Col span={24}>
           <ShadowCard>
             <Row>
-              {properties.map(({ name, value }, index) => (
+              {statistics.map(({ name, value }, index) => (
                 <Col span={4} key={index} {...colProps}>
                   <Statistic title={name} value={value} />
                 </Col>
@@ -32,13 +32,13 @@ export const OverviewPage: React.FC<Overview> = (props) => {
           <ShadowCard>
             <Row>
               {chartList.map(({ colProps, options, title, style }, index) => (
-                <>
+                <React.Fragment key={index}>
                   {options && (
-                    <Col {...colProps} key={index}>
+                    <Col {...colProps}>
                       <ChartContainer title={title} options={options} style={style} />
                     </Col>
                   )}
-                </>
+                </React.Fragment>
               ))}
             </Row>
           </ShadowCard>

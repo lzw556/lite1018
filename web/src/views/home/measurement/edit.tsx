@@ -3,7 +3,7 @@ import * as React from 'react';
 import DeviceSelect from '../../../components/select/deviceSelect';
 import { defaultValidateMessages, Rules } from '../../../constants/validator';
 import { DeviceType } from '../../../types/device_type';
-import { AssetTypes, MeasurementTypes } from '../asset/constants';
+import { AssetTypes, MeasurementTypes } from '../constants';
 import { AssetRow } from '../asset/props';
 import { getAssets } from '../asset/services';
 import { convertRow, Measurement, MeasurementRow } from './props';
@@ -27,7 +27,7 @@ export const MeasurementEdit: React.FC<
   const [parents, setParents] = React.useState<AssetRow[]>([]);
 
   React.useEffect(() => {
-    getAssets({ type: AssetTypes.WindTurbind.type }).then(setParents);
+    getAssets({ type: AssetTypes.Flange.type }).then(setParents);
   }, []);
 
   React.useEffect(() => {
@@ -46,21 +46,21 @@ export const MeasurementEdit: React.FC<
         onOk: () => {
           form.validateFields().then((values) => {
             console.log(values);
-            // const { id } = values;
-            // try {
-            //   if (!id) {
-            //     addMeasurement(values).then((measurement) => {
-            //       bindDevice(measurement.id, values.device_id);
-            //       onSuccess();
-            //     });
-            //   } else {
-            //     updateMeasurement(id, values).then(() => {
-            //       onSuccess();
-            //     });
-            //   }
-            // } catch (error) {
-            //   console.log(error);
-            // }
+            const { id } = values;
+            try {
+              if (!id) {
+                addMeasurement(values).then((measurement) => {
+                  bindDevice(measurement.id, values.device_id);
+                  onSuccess();
+                });
+              } else {
+                updateMeasurement(id, values).then(() => {
+                  onSuccess();
+                });
+              }
+            } catch (error) {
+              console.log(error);
+            }
           });
         }
       }}
@@ -83,7 +83,7 @@ export const MeasurementEdit: React.FC<
             ))}
           </Select>
         </Form.Item>
-        {/* <Form.Item label='法兰' name='asset_id' rules={[{ required: true, message: `请选择法兰` }]}>
+        <Form.Item label='法兰' name='asset_id' rules={[{ required: true, message: `请选择法兰` }]}>
           <Select placeholder='请选择法兰'>
             {parents.map(({ id, name }) => (
               <Select.Option key={id} value={id}>
@@ -91,10 +91,11 @@ export const MeasurementEdit: React.FC<
               </Select.Option>
             ))}
           </Select>
-        </Form.Item> */}
-        <Form.Item label='法兰' name='asset_id' rules={[{ required: true, message: `请选择法兰` }]}>
-          <Cascader options={parents} fieldNames={{ label: 'name', value: 'id' }} />
         </Form.Item>
+        {/* TODO */}
+        {/* <Form.Item label='法兰' name='asset_id' rules={[{ required: true, message: `请选择法兰` }]}>
+          <Cascader options={parents} fieldNames={{ label: 'name', value: 'id' }} />
+        </Form.Item> */}
         <Form.Item
           label='传感器'
           name='device_id'

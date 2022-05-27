@@ -1,12 +1,12 @@
 import { Col, Empty, Row, Spin } from 'antd';
 import * as React from 'react';
 import { useLocation, useHistory, Link } from 'react-router-dom';
-import MyBreadcrumb from '../../../components/myBreadcrumb';
 import '../home.css';
 import { MeasurementRow } from './props';
 import { getMeasurement } from './services';
 import { MeasurementContents } from './contentTabs';
 import { MeasurementDevices } from './deviceTabs';
+import { AssetNavigator } from '../assetNavigator';
 
 const BoltOverview: React.FC = () => {
   const { search } = useLocation();
@@ -33,7 +33,7 @@ const BoltOverview: React.FC = () => {
             <a
               href='#!'
               onClick={(e) => {
-                history.go(-1);
+                history.goBack();
                 e.preventDefault();
               }}
             >
@@ -47,7 +47,7 @@ const BoltOverview: React.FC = () => {
 
   return (
     <>
-      <MyBreadcrumb />
+      <AssetNavigator id={id} />
       <Row gutter={[0, 16]}>
         <Col span={24}>
           <MeasurementDevices devices={measurement.bindingDevices} />

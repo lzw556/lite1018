@@ -6,7 +6,7 @@ import { Introduction } from './props';
 export const IntroductionPage: React.FC<Introduction> = (props) => {
   const {
     title: { name, path },
-    properties,
+    statistics,
     icon: { svg, small, focus },
     alarmState,
     chart
@@ -19,12 +19,13 @@ export const IntroductionPage: React.FC<Introduction> = (props) => {
         </h3>
       </div>
       <dl className='name-value-groups'>
-        {properties.map(({ name, value }) => (
-          <div className='name-value' key={value}>
-            <dt>{name}</dt>
-            <dd>{value}</dd>
-          </div>
-        ))}
+        {statistics &&
+          statistics.map(({ name, value }, index) => (
+            <div className='name-value' key={index}>
+              <dt>{name}</dt>
+              <dd>{value}</dd>
+            </div>
+          ))}
       </dl>
       {chart && chart.options && (
         <ChartContainer options={chart.options} title={chart.title} style={chart.style} />
