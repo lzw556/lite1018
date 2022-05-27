@@ -68,8 +68,8 @@ func (s Asset) FindAssets(filters request.Filters) ([]vo.Asset, error) {
 		return result, err
 	}
 
-	for _, asset := range result {
-		s.iterAppendStatistics(&asset)
+	for i := range result {
+		s.iterAppendStatistics(&result[i])
 	}
 
 	return result, nil
