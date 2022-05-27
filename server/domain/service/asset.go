@@ -33,6 +33,9 @@ func (s Asset) CreateAsset(req request.CreateAsset) error {
 func (s Asset) GetAssetByID(id uint) (*vo.Asset, error) {
 	query := s.factory.NewAssetQuery(nil)
 	voAsset, err := query.Get(id)
+
+	s.iterAppendStatistics(&voAsset)
+
 	return &voAsset, err
 }
 
@@ -60,7 +63,16 @@ func (s Asset) FindAssetsByPaginate(page, size int, filters request.Filters) ([]
 
 func (s Asset) FindAssets(filters request.Filters) ([]vo.Asset, error) {
 	query := s.factory.NewAssetQuery(filters)
-	return query.List()
+	result, err := query.List()
+	if err != nil {
+		return result, err
+	}
+
+	for _, asset := range result {
+		s.iterAppendStatistics(&asset)
+	}
+
+	return result, nil
 }
 
 func (s Asset) iterCalcStatistics(asset vo.Asset, result *vo.AssetStatistics) error {
@@ -90,12 +102,34 @@ func (s Asset) iterCalcStatistics(asset vo.Asset, result *vo.AssetStatistics) er
 func (s Asset) GetStatistics(id uint) (vo.AssetStatistics, error) {
 	result := vo.NewAssetStatistics(id)
 
-	asset, err := s.GetAssetByID(id)
+	query := s.factory.NewAssetQuery(nil)
+	asset, err := query.Get(id)
+
 	if err != nil {
 		return result, err
 	}
 
-	err = s.iterCalcStatistics(*asset, &result)
+	err = s.iterCalcStatistics(asset, &result)
 
 	return result, err
+}
+
+func (s Asset) iterAppendStatistics(asset *vo.Asset) error {
+	stat, err := s.GetStatistics(asset.ID)
+	if err != nil {
+		return err
+	}
+
+	asset.Statistics = stat
+
+	if asset.Children != nil && len(asset.Children) > 0 {
+		for _, child := range asset.Children {
+			err := s.iterAppendStatistics(child)
+			if err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
 }

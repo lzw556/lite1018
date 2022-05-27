@@ -13,6 +13,7 @@ type Asset struct {
 
 	Children         []*Asset           `json:"children,omitempty"`
 	MonitoringPoints []*MonitoringPoint `json:"monitoringPoints,omitempty"`
+	Statistics       AssetStatistics    `json:"statistics,omitempty"`
 }
 
 func NewAsset(e entity.Asset) Asset {
