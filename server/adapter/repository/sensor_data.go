@@ -2,10 +2,11 @@ package repository
 
 import (
 	"bytes"
+	"time"
+
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/json"
 	"go.etcd.io/bbolt"
-	"time"
 )
 
 type SensorData struct {
@@ -23,6 +24,10 @@ func (repo SensorData) Create(e entity.SensorData) error {
 			return err
 		}
 		dataBucket, err := sensorBucket.CreateBucketIfNotExists(itob(e.SensorType))
+		if err != nil {
+			return err
+		}
+
 		buf, err := json.Marshal(e)
 		if err != nil {
 			return err

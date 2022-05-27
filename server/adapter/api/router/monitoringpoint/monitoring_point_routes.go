@@ -47,6 +47,16 @@ func (r monitoringPointRouter) bindDevice(ctx *gin.Context) (interface{}, error)
 	return nil, r.service.BindDevice(id, req)
 }
 
+func (r monitoringPointRouter) unbindDevice(ctx *gin.Context) (interface{}, error) {
+	id := cast.ToUint(ctx.Param("id"))
+	var req request.UnbindDevice
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		return nil, response.InvalidParameterError(err.Error())
+	}
+
+	return nil, r.service.UnbindDevice(id, req)
+}
+
 func (r monitoringPointRouter) find(ctx *gin.Context) (interface{}, error) {
 	filters := request.NewFilters(ctx)
 	if _, ok := ctx.GetQuery("page"); ok {

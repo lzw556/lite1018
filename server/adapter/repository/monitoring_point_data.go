@@ -25,6 +25,9 @@ func (repo MonitoringPointData) Create(e entity.MonitoringPointData) error {
 			return err
 		}
 		buf, err := json.Marshal(e)
+		if err != nil {
+			return err
+		}
 
 		return mpBucket.Put([]byte(e.Time.UTC().Format("2006-01-02T15:04:05Z")), buf)
 	})

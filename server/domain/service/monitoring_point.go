@@ -1,7 +1,6 @@
 package service
 
 import (
-	"context"
 	"time"
 
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/request"
@@ -39,15 +38,9 @@ func (s MonitoringPoint) CreateMonitoringPoint(req request.CreateMonitoringPoint
 }
 
 func (s MonitoringPoint) GetMonitoringPointByID(id uint) (*vo.MonitoringPoint, error) {
-	ctx := context.TODO()
-	monitoringPoint, err := s.repository.Get(ctx, id)
-	if err != nil {
-		return nil, err
-	}
-
-	voMonitoringPoint := vo.NewMonitoringPoint(monitoringPoint)
-
-	return &voMonitoringPoint, nil
+	query := s.factory.NewMonitoringPointQuery(nil)
+	mp, err := query.Get(id)
+	return &mp, err
 }
 
 func (s MonitoringPoint) UpdateMonitoringPointByID(id uint, req request.UpdateMonitoringPoint) error {
@@ -75,6 +68,15 @@ func (s MonitoringPoint) BindDevice(id uint, req request.BindDevice) error {
 	}
 
 	return cmd.BindDevice(req)
+}
+
+func (s MonitoringPoint) UnbindDevice(id uint, req request.UnbindDevice) error {
+	cmd, err := s.factory.NewMonitoringPointBindDeviceCmd(id)
+	if err != nil {
+		return err
+	}
+
+	return cmd.UnbindDevice(req)
 }
 
 func (s MonitoringPoint) FindMonitoringPointsByPaginate(page, size int, filters request.Filters) ([]vo.MonitoringPoint, int64, error) {

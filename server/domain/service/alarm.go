@@ -3,6 +3,8 @@ package service
 import (
 	"context"
 	"errors"
+	"time"
+
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/request"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/alarm"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
@@ -11,7 +13,6 @@ import (
 	spec "github.com/thetasensors/theta-cloud-lite/server/domain/specification"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/vo"
 	"gorm.io/gorm"
-	"time"
 )
 
 type Alarm struct {
@@ -153,5 +154,15 @@ func (s Alarm) CreateAlarmRuleGroup(req request.AlarmRuleGroup) error {
 	if err != nil {
 		return err
 	}
+
+	return cmd.Run()
+}
+
+func (s Alarm) DeleteAlarmRuleGroupByID(id uint) error {
+	cmd, err := s.factory.NewAlarmRuleGroupRemoveCmd(id)
+	if err != nil {
+		return err
+	}
+
 	return cmd.Run()
 }

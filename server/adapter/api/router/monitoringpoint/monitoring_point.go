@@ -21,6 +21,7 @@ func (r *monitoringPointRouter) initRoutes() {
 	r.routes = []router.Route{
 		router.NewPostRoute("monitoringPoints", r.create),
 		router.NewPostRoute("monitoringPoints/:id/bindDevice", r.bindDevice),
+		router.NewPostRoute("monitoringPoints/:id/unbindDevice", r.unbindDevice),
 
 		router.NewGetRoute("monitoringPoints", r.find),
 		router.NewGetRoute("monitoringPoints/:id", r.get),

@@ -2,6 +2,7 @@ package repository
 
 import (
 	"fmt"
+
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/json"
 	"go.etcd.io/bbolt"
@@ -18,6 +19,10 @@ func (repo MonitoringPointAlertState) Create(mpId uint, e entity.MonitoringPoint
 			return err
 		}
 		dataBucket, err := bucket.CreateBucketIfNotExists([]byte(fmt.Sprintf("MP%d", mpId)))
+		if err != nil {
+			return err
+		}
+
 		bytes, err := json.Marshal(e)
 		if err != nil {
 			return err

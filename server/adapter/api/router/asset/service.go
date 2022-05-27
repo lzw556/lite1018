@@ -13,4 +13,6 @@ type Service interface {
 
 	FindAssetsByPaginate(page, size int, filters request.Filters) ([]vo.Asset, int64, error)
 	FindAssets(filters request.Filters) ([]vo.Asset, error)
+
+	GetStatistics(id uint) (vo.AssetStatistics, error)
 }

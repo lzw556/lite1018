@@ -50,3 +50,8 @@ func (r assetRouter) find(ctx *gin.Context) (interface{}, error) {
 	}
 	return r.service.FindAssets(filters)
 }
+
+func (r assetRouter) getStatistics(ctx *gin.Context) (interface{}, error) {
+	id := cast.ToUint(ctx.Param("id"))
+	return r.service.GetStatistics(id)
+}

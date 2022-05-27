@@ -11,4 +11,5 @@ type MonitoringPointDeviceBindingRepository interface {
 	Create(ctx context.Context, e *entity.MonitoringPointDeviceBinding) error
 	FindBySpecs(ctx context.Context, specs ...specification.Specification) ([]entity.MonitoringPointDeviceBinding, error)
 	FindByDeviceID(ctx context.Context, id uint) (entity.MonitoringPointDeviceBinding, error)
+	DeleteBySpecs(ctx context.Context, specs ...specification.Specification) error
 }

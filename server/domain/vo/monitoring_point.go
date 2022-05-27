@@ -5,15 +5,15 @@ import (
 )
 
 type MonitoringPoint struct {
-	ID         uint                   `json:"id"`
-	Name       string                 `json:"name"`
-	Type       uint                   `json:"type"`
-	AssetID    uint                   `json:"assetId"`
-	Attributes map[string]interface{} `json:"attributes"`
+	ID      uint   `json:"id"`
+	Name    string `json:"name"`
+	Type    uint   `json:"type"`
+	AssetID uint   `json:"assetId"`
 
-	BindingDevices []*Device            `json:"bindingDevices"`
-	Properties     MPProperties         `json:"properties"`
-	Data           *MonitoringPointData `json:"data"`
+	Attributes     map[string]interface{} `json:"attributes,omitempty"`
+	BindingDevices []*Device              `json:"bindingDevices,omitempty"`
+	Properties     MPProperties           `json:"properties,omitempty"`
+	Data           *MonitoringPointData   `json:"data,omitempty"`
 }
 
 func NewMonitoringPoint(e entity.MonitoringPoint) MonitoringPoint {

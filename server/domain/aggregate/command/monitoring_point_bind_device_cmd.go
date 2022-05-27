@@ -7,6 +7,7 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
+	spec "github.com/thetasensors/theta-cloud-lite/server/domain/specification"
 )
 
 type MonitoringPointBindDeviceCmd struct {
@@ -30,6 +31,14 @@ func (cmd MonitoringPointBindDeviceCmd) BindDevice(req request.BindDevice) error
 		Parameters:        req.Parameters,
 	}
 	if err := cmd.monitoringPointDeviceBindingRepo.Create(ctx, &binding); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (cmd MonitoringPointBindDeviceCmd) UnbindDevice(req request.UnbindDevice) error {
+	if err := cmd.monitoringPointDeviceBindingRepo.DeleteBySpecs(context.TODO(), spec.DeviceIDEqSpec(req.DeviceID)); err != nil {
 		return err
 	}
 

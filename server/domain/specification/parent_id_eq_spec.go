@@ -4,13 +4,13 @@ import (
 	"gorm.io/gorm"
 )
 
-type ParentIdEqSpec uint
+type ParentIDEqSpec uint
 
-func (s ParentIdEqSpec) IsSpecifiedBy(v interface{}) bool {
+func (s ParentIDEqSpec) IsSpecifiedBy(v interface{}) bool {
 	return true
 }
 
-func (s ParentIdEqSpec) Scope() func(db *gorm.DB) *gorm.DB {
+func (s ParentIDEqSpec) Scope() func(db *gorm.DB) *gorm.DB {
 	return func(db *gorm.DB) *gorm.DB {
 		return db.Where("parent_id = ?", s)
 	}
