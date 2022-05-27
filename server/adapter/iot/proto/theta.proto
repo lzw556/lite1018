@@ -5,6 +5,11 @@ message ByeMessage {
   int32 code = 3;
 }
 
+message HelloMessage {
+  int32 timestamp = 1;
+  int32 code = 3;
+}
+
 message LinkStatusMessage {
   int32 timestamp = 1;
   string reqId = 2;

@@ -88,6 +88,7 @@ func runIoTServer() {
 		dispatcher.NewSensorData(),
 		dispatcher.NewLargeSensorData(),
 		dispatcher.NewDeviceInformation(),
+		dispatcher.NewHello(),
 		dispatcher.NewBye(),
 		dispatcher.NewEvent(),
 		dispatcher.NewCalibrationStatus(),
