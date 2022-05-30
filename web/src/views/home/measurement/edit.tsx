@@ -1,9 +1,9 @@
-import { Form, Input, Modal, ModalProps, Select } from 'antd';
+import { Cascader, Form, Input, Modal, ModalProps, Select } from 'antd';
 import * as React from 'react';
 import DeviceSelect from '../../../components/select/deviceSelect';
 import { defaultValidateMessages, Rules } from '../../../constants/validator';
 import { DeviceType } from '../../../types/device_type';
-import { AssetTypes, MeasurementTypes } from '../asset/constants';
+import { AssetTypes, MeasurementTypes } from '../constants';
 import { AssetRow } from '../asset/props';
 import { getAssets } from '../asset/services';
 import { convertRow, Measurement, MeasurementRow } from './props';
@@ -24,14 +24,10 @@ export const MeasurementEdit: React.FC<
   const { selectedRow, onSuccess } = props;
   const { id } = selectedRow || {};
   const [form] = Form.useForm<Measurement & { device_id: number }>();
-  const [parents, setParents] = React.useState<AssetRow[]>([
-    { id: 0, name: '', type: 0, parentId: -1, ProjectID: 1 }
-  ]);
+  const [parents, setParents] = React.useState<AssetRow[]>([]);
 
   React.useEffect(() => {
-    getAssets({ type: AssetTypes.Flange.type }).then((assets) =>
-      setParents(assets.filter((asset) => asset.type === AssetTypes.Flange.type))
-    );
+    getAssets({ type: AssetTypes.Flange.type }).then(setParents);
   }, []);
 
   React.useEffect(() => {
@@ -49,6 +45,7 @@ export const MeasurementEdit: React.FC<
         ...props,
         onOk: () => {
           form.validateFields().then((values) => {
+            console.log(values);
             const { id } = values;
             try {
               if (!id) {
@@ -74,7 +71,7 @@ export const MeasurementEdit: React.FC<
             <Input />
           </Form.Item>
         )}
-        <Form.Item label='名称' name='name' rules={[Rules.range(5, 50)]}>
+        <Form.Item label='名称' name='name' rules={[Rules.range(4, 50)]}>
           <Input placeholder={`请填写监测点名称`} />
         </Form.Item>
         <Form.Item label='类型' name='type' rules={[{ required: true, message: `请选择类型` }]}>
@@ -95,6 +92,10 @@ export const MeasurementEdit: React.FC<
             ))}
           </Select>
         </Form.Item>
+        {/* TODO */}
+        {/* <Form.Item label='法兰' name='asset_id' rules={[{ required: true, message: `请选择法兰` }]}>
+          <Cascader options={parents} fieldNames={{ label: 'name', value: 'id' }} />
+        </Form.Item> */}
         <Form.Item
           label='传感器'
           name='device_id'

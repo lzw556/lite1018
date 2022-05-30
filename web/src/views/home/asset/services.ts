@@ -6,6 +6,10 @@ export function getAssets(filters?: Partial<Pick<Asset, 'type' | 'parent_id'>>) 
   return request.get<AssetRow[]>(`/assets`, { ...filters }).then(GetResponse);
 }
 
+export function getAsset(id: number) {
+  return request.get<AssetRow>(`/assets/${id}`).then(GetResponse);
+}
+
 export function addAsset(asset: Asset) {
   return request.post('/assets', asset).then(PostResponse);
 }

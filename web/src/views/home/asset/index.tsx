@@ -1,8 +1,10 @@
 import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
 import { Button, ButtonProps, Empty, Popconfirm, Space, TableProps } from 'antd';
+import { forEach } from 'lodash';
 import * as React from 'react';
 import { SearchResultPage } from '../searchResultPage';
-import { AssetTypes } from './constants';
+import { filterEmptyChildren } from '../utils';
+import { AssetTypes } from '../constants';
 import { AssetEdit } from './edit';
 import { AssetRow } from './props';
 import { deleteAsset, getAssets } from './services';
@@ -33,7 +35,7 @@ const AssetManagement: React.FC = () => {
     }
   ];
   const [result, setResult] = React.useState<TableProps<any>>({
-    rowKey: 'id',
+    rowKey: (row: AssetRow) => row.id + row.type,
     columns: [
       { title: '名称', dataIndex: 'name', key: 'name', width: '50%' },
       {
@@ -56,12 +58,14 @@ const AssetManagement: React.FC = () => {
                 <DeleteOutlined />
               </Button>
             </Popconfirm>
-            <Button type='text' size='small' title='添加法兰'>
-              <PlusOutlined
-                style={{ color: 'rgba(0,0,0,.55)' }}
-                onClick={() => open({ ...AssetTypes.Flange, parent_id: row.id })}
-              />
-            </Button>
+            {row.type === AssetTypes.WindTurbind.type && (
+              <Button type='text' size='small' title='添加法兰'>
+                <PlusOutlined
+                  style={{ color: 'rgba(0,0,0,.55)' }}
+                  onClick={() => open({ ...AssetTypes.Flange, parent_id: row.id })}
+                />
+              </Button>
+            )}
           </Space>
         )
       }
@@ -89,7 +93,7 @@ const AssetManagement: React.FC = () => {
     setResult((prev) => ({
       ...prev,
       loading: assets.loading,
-      dataSource: assets.items
+      dataSource: filterEmptyChildren(assets.items)
     }));
     if (!assets.loading) {
       setDisabled(assets.items.length === 0);
@@ -106,7 +110,7 @@ const AssetManagement: React.FC = () => {
             selectedRow,
             initialValues,
             onSuccess: () => {
-              fetchAssets();
+              fetchAssets({ type: AssetTypes.WindTurbind.type });
               setVisible(false);
             }
           }}

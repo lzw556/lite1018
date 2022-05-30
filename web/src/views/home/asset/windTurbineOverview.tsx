@@ -1,13 +1,14 @@
 import { Empty, Spin } from 'antd';
 import * as React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import MyBreadcrumb from '../../../components/myBreadcrumb';
+import { AssetNavigator } from '../assetNavigator';
 import '../home.css';
 import { MeasurementIcon } from '../measurement/icon';
 import { getMeasurements } from '../measurement/services';
 import { OverviewPage } from '../overviewPage';
 import { Introduction } from '../props';
-import { AssetTypes } from './constants';
+import { generateFlangeChartOptions } from '../utils';
+import { AssetTypes } from '../constants';
 import { getAssets } from './services';
 
 const WindTurbineOverview: React.FC = () => {
@@ -37,7 +38,7 @@ const WindTurbineOverview: React.FC = () => {
           id: item.id,
           title: {
             name: item.name,
-            path: `/project-overview${search}/flange-overview&id=${item.id}`
+            path: `${AssetTypes.Flange.url}&id=${item.id}`
           },
           alarmState: 'normal',
           icon: { svg: <MeasurementIcon />, small: true, focus: true },
@@ -50,7 +51,7 @@ const WindTurbineOverview: React.FC = () => {
         }))
       });
     });
-  }, [id]);
+  }, [id, search]);
 
   React.useEffect(() => {
     if (flanges.items.length > 0) {
@@ -58,7 +59,10 @@ const WindTurbineOverview: React.FC = () => {
         if (!flange.chart) {
           getMeasurements().then((measurements) => {
             const children = measurements.filter((mea) => mea.assetId === flange.id);
-            const statisticOfFlange: any = getStatisticOfFlange(8);
+            const statisticOfFlange: any = generateFlangeChartOptions(children, {
+              inner: '45%',
+              outer: '60%'
+            });
             if (8 > 0) {
               setTimeout(() => {
                 setFlanges((prev) => ({
@@ -86,132 +90,6 @@ const WindTurbineOverview: React.FC = () => {
     }
   }, [flanges]);
 
-  const getStatisticOfFlange = (boltNumberPerFlange: number) => {
-    const interval = 360 / boltNumberPerFlange;
-    const max = 600;
-    const valuesReal = [];
-    const valuesRealMax = [];
-    const valuesBg = [];
-    for (let index = boltNumberPerFlange; index > 0; index--) {
-      valuesReal.push(300 + Math.random() * 20);
-      valuesRealMax.push({ name: index, max });
-      valuesBg.push([800, interval * index]);
-    }
-    const valuesSensor = valuesBg.map((item, index) => ({
-      name: `item${index}`,
-      value: item,
-      label: {
-        show: true,
-        color: '#fff',
-        formatter: (paras: any) => {
-          return paras.data.value[1] / interval;
-        }
-      }
-    }));
-    const valuesRule = [];
-
-    const count = 360;
-    for (let index = count; index > 0; index = index - 3) {
-      valuesRule.push([max, (360 / count) * index]);
-    }
-    return {
-      polar: [
-        { id: 'inner', radius: '45%' },
-        { id: 'outer', radius: '60%' }
-      ],
-      angleAxis: [
-        {
-          type: 'value',
-          polarIndex: 0,
-          axisLine: { show: false },
-          axisTick: { show: false },
-          axisLabel: { show: false },
-          splitLine: { show: false }
-        },
-        {
-          type: 'value',
-          polarIndex: 1,
-          startAngle: 360 / boltNumberPerFlange + 90,
-          axisLine: { show: true, lineStyle: { type: 'dashed' } },
-          axisTick: { show: false },
-          axisLabel: { show: false },
-          splitLine: { show: false }
-        }
-      ],
-      radiusAxis: [
-        {
-          polarIndex: 0,
-          max: 700,
-          axisLine: { show: false },
-          axisTick: { show: false },
-          axisLabel: { color: '#ccc' }
-        },
-        {
-          polarIndex: 1,
-          type: 'value',
-          axisLine: { show: false },
-          axisTick: { show: false },
-          axisLabel: { show: false },
-          splitLine: { show: false },
-          min: 1,
-          max: 801
-        }
-      ],
-      radar: {
-        radius: '50%',
-        indicator: valuesRealMax,
-        axisName: { show: false },
-        axisLine: { show: false },
-        splitLine: { show: false },
-        splitArea: { show: false }
-      },
-      legend: {
-        data: [
-          {
-            name: '实际值'
-          },
-          {
-            name: '规定值'
-          }
-        ],
-        bottom: 0
-      },
-      series: [
-        {
-          type: 'radar',
-          name: '实际值',
-          lineStyle: { color: 'rgb(255, 68, 0, .6)' },
-          itemStyle: { color: 'rgb(255, 68, 0, .6)' },
-          data: [{ value: valuesReal }]
-        },
-        {
-          type: 'line',
-          name: '规定值',
-          coordinateSystem: 'polar',
-          data: valuesRule,
-          symbol: 'none',
-          itemStyle: { color: '#00800080' },
-          lineStyle: { type: 'dashed', color: '#00800080' }
-        },
-        {
-          type: 'scatter',
-          name: 'bg',
-          coordinateSystem: 'polar',
-          polarIndex: 1,
-          symbol:
-            'path://M675.9 107.2H348.1c-42.9 0-82.5 22.9-104 60.1L80 452.1c-21.4 37.1-21.4 82.7 0 119.8l164.1 284.8c21.4 37.2 61.1 60.1 104 60.1h327.8c42.9 0 82.5-22.9 104-60.1L944 571.9c21.4-37.1 21.4-82.7 0-119.8L779.9 167.3c-21.4-37.1-61.1-60.1-104-60.1z',
-          symbolSize: 30,
-          data: valuesSensor,
-          itemStyle: {
-            opacity: 1,
-            color: '#555'
-          },
-          zlevel: 10
-        }
-      ]
-    };
-  };
-
   if (flanges.loading) return <Spin />;
   if (flanges.items.length === 0)
     return (
@@ -226,7 +104,7 @@ const WindTurbineOverview: React.FC = () => {
     );
   return (
     <>
-      <MyBreadcrumb />
+      <AssetNavigator id={id} />
       <OverviewPage {...{ properties, introductionList: flanges.items }} />
     </>
   );
