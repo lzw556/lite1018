@@ -39,6 +39,7 @@ func (q *TaskQueue) Append(task *Task) {
 
 func (q *TaskQueue) Remove(device entity.Device) {
 	q.mu.Lock()
+	defer q.mu.Unlock()
 	prev := q.tasks
 	found := false
 	for prev != nil {
@@ -56,7 +57,6 @@ func (q *TaskQueue) Remove(device entity.Device) {
 	if found {
 		prev.next = prev.next.next
 	}
-	q.mu.Unlock()
 }
 
 func (q *TaskQueue) GetTask(device entity.Device) *Task {

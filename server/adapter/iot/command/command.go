@@ -350,8 +350,8 @@ func CancelDeviceUpgrade(gateway entity.Device, device entity.Device) error {
 			task.Cancel()
 		}
 	}
-	queue.Remove(device)
 	device.CancelUpgrade()
+	queue.Remove(device)
 	return nil
 }
 
