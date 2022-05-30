@@ -205,3 +205,8 @@ func (factory Alarm) NewAlarmRuleGroupRemoveCmd(id uint) (*command.AlarmRuleGrou
 
 	return &cmd, nil
 }
+
+func (factory Alarm) NewAlarmRuleGroupQuery(filters request.Filters) (*query.AlarmRuleGroupQuery, error) {
+	q := query.NewAlarmRuleGroupQuery()
+	return &q, nil
+}
