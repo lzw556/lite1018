@@ -4,6 +4,7 @@ import (
 	"github.com/gogo/protobuf/proto"
 	pd "github.com/thetasensors/theta-cloud-lite/server/adapter/iot/proto"
 	"strconv"
+	"time"
 )
 
 type loadFirmwareCmd struct {
@@ -54,5 +55,5 @@ func (cmd loadFirmwareCmd) Payload() ([]byte, error) {
 }
 
 func (cmd loadFirmwareCmd) Execute(gateway string, target string) (*Response, error) {
-	return cmd.request.do(gateway, target, cmd, 3)
+	return cmd.request.do(gateway, target, cmd, 5*time.Second)
 }
