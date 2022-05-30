@@ -39,6 +39,7 @@ func (e DeviceUpgradeExecutor) Execute(ctx context.Context, gateway, device enti
 	xlog.Infof("start device upgrade job => [%s]", device.MacAddress)
 	if resp.Code == 1 {
 		if err := e.loadFirmware(gateway.MacAddress, device); err != nil {
+			device.UpdateDeviceUpgradeStatus(entity.DeviceUpgradeError, 0)
 			return err
 		}
 	}
