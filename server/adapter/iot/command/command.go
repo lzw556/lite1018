@@ -339,7 +339,7 @@ func CancelDeviceUpgrade(gateway entity.Device, device entity.Device) error {
 	status := device.GetUpgradeStatus()
 	xlog.Infof("device upgrade code: %d => [%s]", status.Code, device.MacAddress)
 	switch status.Code {
-	case entity.DeviceUpgradeLoading, entity.DeviceUpgradeUpgrading, entity.DeviceUpgradePending:
+	case entity.DeviceUpgradeLoading, entity.DeviceUpgradeUpgrading:
 		cmd := newCancelFirmwareCmd()
 		_, err := cmd.Execute(gateway.MacAddress, device.MacAddress)
 		if err != nil {
@@ -349,12 +349,9 @@ func CancelDeviceUpgrade(gateway entity.Device, device entity.Device) error {
 		if task != nil {
 			task.Cancel()
 		}
-		queue.Remove(device)
-		device.CancelUpgrade()
-	default:
-		queue.Remove(device)
-		device.CancelUpgrade()
 	}
+	queue.Remove(device)
+	device.CancelUpgrade()
 	return nil
 }
 
