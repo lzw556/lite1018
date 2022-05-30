@@ -9,7 +9,7 @@ import { forEachTreeNode } from './utils';
 import { DownOutlined } from '@ant-design/icons';
 
 type BreadcrumbItemData = Node & { type?: number };
-export const AssetNavigator: React.FC<{ id: number }> = ({ id }) => {
+export const AssetNavigator: React.FC<Pick<Node, 'id' | 'type'>> = ({ id, type }) => {
   const history = useHistory();
   const [assets, setAssets] = React.useState<AssetRow[]>([]);
   const [items, setItems] = React.useState<[number, boolean, Node[]][]>([]);
@@ -18,8 +18,19 @@ export const AssetNavigator: React.FC<{ id: number }> = ({ id }) => {
   }, []);
 
   React.useEffect(() => {
-    const findParent = (id: number, source: Node[], paths: { parentId: number; id: number }[]) => {
-      const item = source.find((item) => item.id === id);
+    const findParent = (
+      id: number,
+      source: Node[],
+      paths: { parentId: number; id: number }[],
+      type?: number
+    ) => {
+      const item = source.find((item) => {
+        if (type) {
+          return item.id === id && item.type === type;
+        } else {
+          return item.id === id;
+        }
+      });
       if (item) {
         paths.push({ parentId: item.parentId, id: item.id });
         if (item.parentId !== -1) {
@@ -39,7 +50,7 @@ export const AssetNavigator: React.FC<{ id: number }> = ({ id }) => {
       });
       if (arr.length > 0) {
         const paths: { parentId: number; id: number }[] = [];
-        findParent(id, arr, paths);
+        findParent(id, arr, paths, type);
         setItems(
           paths
             .reverse()
@@ -51,7 +62,7 @@ export const AssetNavigator: React.FC<{ id: number }> = ({ id }) => {
         );
       }
     }
-  }, [assets, id]);
+  }, [assets, id, type]);
 
   const renderBreadcrumbItemDDMenu = (assets: BreadcrumbItemData[]) => {
     if (assets.length > 0) {

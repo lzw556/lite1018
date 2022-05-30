@@ -16,6 +16,7 @@ export type Property = {
   fields: { key: string; name: string; dataIndex: number; value: number }[];
   data: { [propName: string]: number };
 };
+
 export type MeasurementRow = {
   id: number;
   name: string;
@@ -23,7 +24,7 @@ export type MeasurementRow = {
   assetId: number;
   bindingDevices: Device[];
   attributes?: any;
-  properties: Property[];
+  assetName: string;
 };
 
 export function convertRow(values?: MeasurementRow): Measurement | null {

@@ -6,25 +6,20 @@ import { AssetNavigator } from '../assetNavigator';
 import { MeasurementTypes } from '../constants';
 import '../home.css';
 import { MeasurementRow } from '../measurement/props';
-import { getMeasurements } from '../measurement/services';
 import { OverviewPage } from '../overviewPage';
-import { TableListItem, Overview } from '../props';
+import { TableListItem, NameValue } from '../props';
 import { generateColProps, generateFlangeChartOptions } from '../utils';
-import { AssetStatistics, usePreloadChartOptions } from './props';
+import { AssetRow, transformAssetStatistics, usePreloadChartOptions } from './props';
 import { getAsset } from './services';
 
 const FlangeOverview: React.FC = () => {
   const { search } = useLocation();
   const history = useHistory();
   const id = Number(search.substring(search.lastIndexOf('id=') + 3));
-  const [measurements, setMeasurements] = React.useState<{
-    loading: boolean;
-    items: MeasurementRow[];
-  }>({
-    loading: true,
-    items: []
-  });
-  const [statistics, setStatistics] = React.useState<Overview['statistics']>();
+  const [asset, setAsset] = React.useState<AssetRow>();
+  const [loading, setLoading] = React.useState(true);
+  const [measurements, setMeasurements] = React.useState<MeasurementRow[]>();
+  const [statistics, setStatistics] = React.useState<NameValue[]>();
 
   const statisticOfPreload = usePreloadChartOptions();
   const [tableOfMeasurement, setTableOfMeasurement] = React.useState<TableListItem<MeasurementRow>>(
@@ -67,20 +62,35 @@ const FlangeOverview: React.FC = () => {
     }
   );
   React.useEffect(() => {
-    getAsset(id);
-    getMeasurements({ asset_id: id }).then((measurements) =>
-      setMeasurements({ loading: false, items: measurements })
-    );
+    getAsset(id).then((asset) => {
+      setLoading(false);
+      setAsset(asset);
+    });
   }, [id]);
   React.useEffect(() => {
-    if (!measurements.loading && measurements.items.length > 0) {
-      setTableOfMeasurement((prev) => ({ ...prev, dataSource: measurements.items }));
+    if (asset) {
+      const { statistics, monitoringPoints } = asset;
+      setStatistics(
+        transformAssetStatistics(
+          statistics,
+          'monitoringPointNum',
+          ['danger', '紧急报警监测点'],
+          ['warn', '重要报警监测点'],
+          ['info', '次要报警监测点'],
+          'deviceNum',
+          'offlineDeviceNum'
+        ).statistics
+      );
+      setMeasurements(monitoringPoints);
+      if (monitoringPoints && monitoringPoints.length > 0) {
+        setTableOfMeasurement((prev) => ({ ...prev, dataSource: monitoringPoints }));
+      }
     }
-  }, [measurements]);
+  }, [asset]);
 
-  if (measurements.loading) return <Spin />;
+  if (loading) return <Spin />;
   //TODO
-  if (measurements.items.length === 0)
+  if (!measurements || measurements.length === 0)
     return (
       <Empty
         description={
@@ -103,7 +113,7 @@ const FlangeOverview: React.FC = () => {
 
   return (
     <>
-      <AssetNavigator id={id} />
+      <AssetNavigator id={id} type={asset?.type} />
       <OverviewPage
         {...{
           statistics,
@@ -112,7 +122,7 @@ const FlangeOverview: React.FC = () => {
             {
               title: '分布图',
               colProps: generateColProps({ xl: 12, xxl: 9 }),
-              options: generateFlangeChartOptions(measurements.items, {
+              options: generateFlangeChartOptions(measurements, {
                 inner: '55%',
                 outer: '70%'
               })

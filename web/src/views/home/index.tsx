@@ -12,7 +12,7 @@ import './home.css';
 import { OverviewPage } from './overviewPage';
 import { Introduction } from './props';
 import { generateColProps } from './utils';
-import { getAlarmStateOfAsset, transformAssetStatistics } from './asset/props';
+import { transformAssetStatistics } from './asset/props';
 
 const ProjectOverview: React.FC = () => {
   const colProps = generateColProps({ xl: 8, xxl: 5 });
@@ -33,17 +33,26 @@ const ProjectOverview: React.FC = () => {
     getAssets({ type: AssetTypes.WindTurbind.type }).then((assets) =>
       setWindTurbines({
         loading: false,
-        items: assets.map((item) => ({
-          parentId: item.parentId,
-          id: item.id,
-          title: {
-            name: item.name,
-            path: `${AssetTypes.WindTurbind.url}&id=${item.id}`
-          },
-          alarmState: getAlarmStateOfAsset(item.statistics.alarmNum),
-          icon: { svg: <AssetIcon />, small: true },
-          statistics: transformAssetStatistics(item.statistics)
-        }))
+        items: assets.map((item) => {
+          const { alarmState, statistics } = transformAssetStatistics(
+            item.statistics,
+            'monitoringPointNum',
+            ['anomalous', '异常监测点'],
+            'deviceNum',
+            'offlineDeviceNum'
+          );
+          return {
+            parentId: item.parentId,
+            id: item.id,
+            title: {
+              name: item.name,
+              path: `${AssetTypes.WindTurbind.url}&id=${item.id}`
+            },
+            alarmState,
+            icon: { svg: <AssetIcon />, small: true },
+            statistics
+          };
+        })
       })
     );
     setStatisticOfAsset(generatePieOptions(12, { normal: 11, error: 1 }));

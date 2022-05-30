@@ -3,7 +3,8 @@ import { TableProps } from 'antd/lib/table';
 import { ChartOptions } from './charts/common';
 import { MeasurementRow } from './measurement/props';
 
-export type AlarmState = 'normal' | 'info' | 'warn' | 'danger';
+export type AlarmState = 'normal' | 'info' | 'warn' | 'danger' | 'anomalous';
+export type AlarmStatistics = Record<AlarmState, NameValue>;
 
 export type Introduction = Pick<Overview, 'statistics'> & {
   parentId: number;
@@ -24,12 +25,10 @@ export type TableListItem<T> = TableProps<T> & {
   };
 };
 
+export type NameValue = { name: string; value: string | number };
+
 export type Overview = {
-  statistics?: {
-    name: string;
-    value: string | number;
-    hidden?: boolean;
-  }[];
+  statistics?: NameValue[];
   chartList?: {
     title: string;
     colProps: {
@@ -57,5 +56,6 @@ export type Node = {
   name: string;
   parentId: number;
   children?: Node[];
+  type?: number;
   monitoringPoints?: MeasurementRow[];
 };
