@@ -38,15 +38,12 @@ func (p Bye) Next() Processor {
 func (p Bye) Process(ctx *iot.Context, msg iot.Message) error {
 	if value, ok := ctx.Get(msg.Body.Device); ok {
 		if device, ok := value.(entity.Device); ok {
-			connectionState, err := p.deviceConnectionStateRepo.Get(device.MacAddress)
-			if err != nil {
-				return err
-			}
+			connectionState, _ := p.deviceConnectionStateRepo.Get(device.MacAddress)
 			if connectionState == nil {
 				connectionState = entity.NewDeviceConnectionState()
 			}
 			connectionState.SetIsOnline(false)
-			err = p.deviceConnectionStateRepo.Update(device.MacAddress, connectionState)
+			err := p.deviceConnectionStateRepo.Update(device.MacAddress, connectionState)
 			if err != nil {
 				xlog.Errorf("update device connection state failed: %v => [%s]", err, device.MacAddress)
 			}
@@ -61,9 +58,9 @@ func (p Bye) Process(ctx *iot.Context, msg iot.Message) error {
 				}
 				event.Content = fmt.Sprintf(`{"code": %d}`, 2)
 				_ = p.eventResp.Create(context.TODO(), &event)
-				if device.IsGateway() {
-					go p.updateChildrenConnectionState(device)
-				}
+			}
+			if device.IsGateway() && !connectionState.IsOnline {
+				go p.updateChildrenConnectionState(device)
 			}
 		}
 	}
