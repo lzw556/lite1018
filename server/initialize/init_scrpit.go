@@ -78,7 +78,7 @@ func initMenus(db *gorm.DB) error {
 		{
 			ID:       2001,
 			Title:    "资产管理",
-			Name:     "",
+			Name:     "assets-management",
 			ParentID: 0,
 			Icon:     "icon-asset-management",
 			IsAuth:   true,
