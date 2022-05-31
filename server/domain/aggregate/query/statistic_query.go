@@ -14,18 +14,20 @@ import (
 type StatisticQuery struct {
 	Specs []spec.Specification
 
-	deviceRepo           dependency.DeviceRepository
-	deviceStateRepo      dependency.DeviceStateRepository
-	deviceAlertStateRepo dependency.DeviceAlertStateRepository
-	alarmRecordRepo      dependency.AlarmRecordRepository
+	deviceRepo                dependency.DeviceRepository
+	deviceStateRepo           dependency.DeviceStateRepository
+	deviceConnectionStateRepo dependency.DeviceConnectionStateRepository
+	deviceAlertStateRepo      dependency.DeviceAlertStateRepository
+	alarmRecordRepo           dependency.AlarmRecordRepository
 }
 
 func NewStatisticQuery() StatisticQuery {
 	return StatisticQuery{
-		deviceRepo:           repository.Device{},
-		deviceStateRepo:      repository.DeviceState{},
-		deviceAlertStateRepo: repository.DeviceAlertState{},
-		alarmRecordRepo:      repository.AlarmRecord{},
+		deviceRepo:                repository.Device{},
+		deviceStateRepo:           repository.DeviceState{},
+		deviceAlertStateRepo:      repository.DeviceAlertState{},
+		deviceConnectionStateRepo: repository.DeviceConnectionState{},
+		alarmRecordRepo:           repository.AlarmRecord{},
 	}
 }
 
@@ -39,8 +41,8 @@ func (query StatisticQuery) GetDeviceStatistics() ([]vo.DeviceStatistic, error) 
 	result := make([]vo.DeviceStatistic, len(devices))
 	for i, device := range devices {
 		r := vo.DeviceStatistic{}
-		if state, err := query.deviceStateRepo.Get(device.MacAddress); err == nil {
-			r.IsOnline = state.IsOnline
+		if connectionState, _ := query.deviceConnectionStateRepo.Get(device.MacAddress); connectionState != nil {
+			r.IsOnline = connectionState.IsOnline
 		}
 		if alertState, err := query.deviceAlertStateRepo.Find(device.MacAddress); err == nil {
 			r.SetAlertState(alertState)

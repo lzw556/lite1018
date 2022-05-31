@@ -14,18 +14,20 @@ import (
 type NetworkQuery struct {
 	Specs []spec.Specification
 
-	networkRepo           dependency.NetworkRepository
-	deviceRepo            dependency.DeviceRepository
-	deviceStateRepo       dependency.DeviceStateRepository
-	deviceInformationRepo dependency.DeviceInformationRepository
+	networkRepo               dependency.NetworkRepository
+	deviceRepo                dependency.DeviceRepository
+	deviceStateRepo           dependency.DeviceStateRepository
+	deviceInformationRepo     dependency.DeviceInformationRepository
+	deviceConnectionStateRepo dependency.DeviceConnectionStateRepository
 }
 
 func NewNetworkQuery() NetworkQuery {
 	return NetworkQuery{
-		networkRepo:           repository.Network{},
-		deviceRepo:            repository.Device{},
-		deviceStateRepo:       repository.DeviceState{},
-		deviceInformationRepo: repository.DeviceInformation{},
+		networkRepo:               repository.Network{},
+		deviceRepo:                repository.Device{},
+		deviceStateRepo:           repository.DeviceState{},
+		deviceInformationRepo:     repository.DeviceInformation{},
+		deviceConnectionStateRepo: repository.DeviceConnectionState{},
 	}
 }
 
@@ -35,6 +37,19 @@ func (query NetworkQuery) check(id uint) (entity.Network, error) {
 		return entity.Network{}, response.BusinessErr(errcode.NetworkNotFoundError, err.Error())
 	}
 	return e, nil
+}
+
+func (query NetworkQuery) setDeviceState(device *vo.Device) {
+	if state, err := query.deviceStateRepo.Get(device.MacAddress); err == nil {
+		device.SetState(state)
+	}
+	if connectionState, err := query.deviceConnectionStateRepo.Get(device.MacAddress); err == nil {
+		if connectionState == nil {
+			connectionState = entity.NewDeviceConnectionState()
+		}
+		device.State.IsOnline = connectionState.IsOnline
+		device.State.ConnectedAt = connectionState.Timestamp
+	}
 }
 
 func (query NetworkQuery) Get(id uint) (*vo.Network, error) {
@@ -48,14 +63,14 @@ func (query NetworkQuery) Get(id uint) (*vo.Network, error) {
 	if gateway, err := query.deviceRepo.Get(ctx, network.GatewayID); err == nil {
 		result.AddGateway(gateway)
 		result.Gateway.Information, _ = query.deviceInformationRepo.Get(gateway.MacAddress)
-		result.Gateway.State, _ = query.deviceStateRepo.Get(gateway.MacAddress)
+		query.setDeviceState(&result.Gateway)
 	}
 
 	if devices, err := query.deviceRepo.FindBySpecs(ctx, spec.NetworkEqSpec(network.ID)); err == nil {
 		nodes := make([]vo.Device, len(devices))
 		for i, device := range devices {
 			nodes[i] = vo.NewDevice(device)
-			nodes[i].State, _ = query.deviceStateRepo.Get(device.MacAddress)
+			query.setDeviceState(&nodes[i])
 		}
 		result.SetNodes(nodes)
 	}

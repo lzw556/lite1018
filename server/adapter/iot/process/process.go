@@ -14,7 +14,7 @@ type Processor interface {
 func Do(ctx *iot.Context, processor Processor, msg iot.Message) {
 	for processor != nil {
 		if err := processor.Process(ctx, msg); err != nil {
-			xlog.Errorf("process [%s]Processor failed: %v", processor.Name(), err)
+			xlog.Errorf("process [%s] Processor failed: %v", processor.Name(), err)
 			return
 		}
 		processor = processor.Next()

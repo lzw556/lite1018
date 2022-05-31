@@ -1,14 +1,12 @@
 package command
 
 import (
-	"context"
 	"encoding/binary"
 	"fmt"
 	"github.com/gogo/protobuf/proto"
 	pd "github.com/thetasensors/theta-cloud-lite/server/adapter/iot/proto"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/utils"
-	"time"
 )
 
 type addDeviceCmd struct {
@@ -51,6 +49,6 @@ func (cmd addDeviceCmd) Payload() ([]byte, error) {
 	return proto.Marshal(&m)
 }
 
-func (cmd addDeviceCmd) Execute(ctx context.Context, gateway string, target string, timeout time.Duration) (*Response, error) {
-	return cmd.request.do(ctx, gateway, target, cmd, timeout)
+func (cmd addDeviceCmd) Execute(gateway string, target string) (*Response, error) {
+	return cmd.request.do(gateway, target, cmd, 3)
 }

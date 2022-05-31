@@ -4,12 +4,14 @@ package main
 
 import (
 	"embed"
+	"fmt"
 	"github.com/thetasensors/theta-cloud-lite/server/app"
 	"github.com/thetasensors/theta-cloud-lite/server/config"
 	"github.com/thetasensors/theta-cloud-lite/server/core"
 	"github.com/thetasensors/theta-cloud-lite/server/initialize"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/casbin"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/global"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/license"
 )
 
 //go:embed static
@@ -21,9 +23,12 @@ var rbacModel string
 //go:embed rbac_policy.csv
 var rbacPolicy string
 
+var version = "1.4.0"
+
 func main() {
+	fmt.Println(fmt.Sprintf("Server Version: v%s", version))
 	key := "thetasensorskeyaesfitbitsencrypt"
-	if !license.ValidateKeyFile([]byte(key), "../license.dat") {
+	if !license.ValidateKeyFile([]byte(key), "license.dat") {
 		fmt.Println("Invalid key file")
 		return
 	}

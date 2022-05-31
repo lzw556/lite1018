@@ -1,10 +1,8 @@
 package command
 
 import (
-	"context"
 	"github.com/gogo/protobuf/proto"
 	pd "github.com/thetasensors/theta-cloud-lite/server/adapter/iot/proto"
-	"time"
 )
 
 type resetDataCmd struct {
@@ -41,6 +39,6 @@ func (cmd resetDataCmd) Payload() ([]byte, error) {
 	return proto.Marshal(&m)
 }
 
-func (cmd resetDataCmd) Execute(ctx context.Context, gateway string, target string, timeout time.Duration) (*Response, error) {
-	return cmd.request.do(ctx, gateway, target, cmd, timeout)
+func (cmd resetDataCmd) Execute(gateway string, target string) (*Response, error) {
+	return cmd.request.do(gateway, target, cmd, 3)
 }

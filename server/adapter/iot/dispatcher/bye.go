@@ -6,15 +6,10 @@ import (
 )
 
 type Bye struct {
-	context   *iot.Context
-	processor process.Processor
 }
 
 func NewBye() iot.Dispatcher {
-	return &Bye{
-		context:   iot.NewContext(),
-		processor: process.NewBye(),
-	}
+	return &Bye{}
 }
 
 func (Bye) Name() string {
@@ -22,5 +17,5 @@ func (Bye) Name() string {
 }
 
 func (d Bye) Dispatch(msg iot.Message) {
-	process.Do(d.context, d.processor, msg)
+	process.Do(iot.NewContext(), process.NewBye(), msg)
 }

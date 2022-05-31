@@ -1,7 +1,6 @@
 package command
 
 import (
-	"context"
 	"fmt"
 	uuid "github.com/satori/go.uuid"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter"
@@ -18,7 +17,7 @@ type Request interface {
 	Response() chan Response
 	Qos() byte
 	Payload() ([]byte, error)
-	Execute(ctx context.Context, gateway string, target string, timeout time.Duration) (*Response, error)
+	Execute(gateway string, target string) (*Response, error)
 }
 
 type Response struct {
@@ -40,28 +39,32 @@ func newRequest() request {
 	}
 }
 
-func (cmd request) do(ctx context.Context, gateway string, target string, request Request, timeout time.Duration) (*Response, error) {
+func (cmd request) do(gateway string, target string, request Request, timeout time.Duration) (*Response, error) {
 	xlog.Debugf("executing %s command => [%s]", request.Name(), target)
 	payload, err := request.Payload()
 	if err != nil {
 		return nil, response.BusinessErr(errcode.DeviceCommandSendFailedError, err.Error())
 	}
-	err = eventbus.SubscribeOnce(request.ID(), func(response Response) {
-		request.Response() <- response
-	})
-	if err != nil {
-		return nil, response.BusinessErr(errcode.DeviceCommandExecFailedError, err.Error())
-	}
-	if err := adapter.IoT.Publish(fmt.Sprintf("iot/v2/gw/%s/dev/%s/cmd/%s/", gateway, target, request.Name()), request.Qos(), payload); err != nil {
-		return nil, response.BusinessErr(errcode.DeviceCommandSendFailedError, err.Error())
-	}
-	select {
-	case resp := <-request.Response():
-		xlog.Debugf("%s command executed successful => [%s]", request.Name(), target)
-		return &resp, nil
-	case <-ctx.Done():
-		return nil, response.BusinessErr(errcode.DeviceCommandCancelledError, "")
-	case <-time.After(timeout):
-		return nil, response.BusinessErr(errcode.DeviceCommandSendTimeoutError, "")
+	topic := fmt.Sprintf("iot/v2/gw/%s/dev/%s/cmd/%s/", gateway, target, request.Name())
+	if cmd.response != nil {
+		// publish mqtt with response
+		err = eventbus.SubscribeOnce(request.ID(), func(response Response) {
+			request.Response() <- response
+		})
+		if err != nil {
+			return nil, response.BusinessErr(errcode.DeviceCommandExecFailedError, err.Error())
+		}
+		adapter.IoT.Publish(topic, request.Qos(), payload)
+		select {
+		case resp := <-request.Response():
+			xlog.Debugf("%s command executed successful => [%s]", request.Name(), target)
+			return &resp, nil
+		case <-time.After(timeout * time.Second):
+			return nil, response.BusinessErr(errcode.DeviceCommandSendTimeoutError, "")
+		}
+	} else {
+		// publish mqtt without response
+		adapter.IoT.Publish(topic, request.Qos(), payload)
+		return nil, nil
 	}
 }

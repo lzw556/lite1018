@@ -26,7 +26,8 @@ type Device struct {
 	ProjectID  uint
 	Settings   DeviceSettings `gorm:"type:json"`
 
-	State           DeviceState             `gorm:"-"`
+	State           DeviceStatus            `gorm:"-"`
+	ConnectionState DeviceConnectionState   `gorm:"-"`
 	AlarmRuleStates map[uint]AlarmRuleState `gorm:"-"`
 }
 
@@ -54,6 +55,10 @@ func (d Device) CancelUpgrade() {
 	status.Code = DeviceUpgradeCancelled
 	d.UpgradeNotify(status)
 	_ = cache.SetStruct(fmt.Sprintf("device_upgrade_status_%d", d.ID), status)
+}
+
+func (d Device) RemoveUpgradeStatus() {
+	_ = cache.Delete(fmt.Sprintf("device_upgrade_status_%d", d.ID))
 }
 
 func (d Device) UpgradeNotify(status DeviceUpgradeStatus) {

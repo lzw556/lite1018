@@ -9,7 +9,7 @@ import (
 func InitBuckets(db *bbolt.DB) {
 	buckets := []core.Bucket{
 		entity.System{},
-		entity.DeviceState{},
+		entity.DeviceStatus{},
 		entity.SensorData{},
 		entity.LargeSensorData{},
 		entity.DeviceInformation{},
