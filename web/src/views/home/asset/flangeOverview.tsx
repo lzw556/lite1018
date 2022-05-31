@@ -1,15 +1,23 @@
 import { Empty, Spin } from 'antd';
+import Item from 'antd/lib/list/Item';
 import moment from 'moment';
 import * as React from 'react';
 import { Link, useLocation, useHistory } from 'react-router-dom';
+import { LineChartStyles } from '../../../constants/chart';
 import { AssetNavigator } from '../assetNavigator';
 import { MeasurementTypes } from '../constants';
 import '../home.css';
 import { MeasurementRow } from '../measurement/props';
+import { getData } from '../measurement/services';
 import { OverviewPage } from '../overviewPage';
 import { TableListItem, NameValue } from '../props';
-import { generateColProps, generateFlangeChartOptions } from '../utils';
-import { AssetRow, transformAssetStatistics, usePreloadChartOptions } from './props';
+import {
+  generateColProps,
+  generateFlangeChartOptions,
+  transformMeasurementHistoryData,
+  transformSingleMeasurmentData
+} from '../utils';
+import { AssetRow, generatePreloadOptions, transformAssetStatistics } from './props';
 import { getAsset } from './services';
 
 const FlangeOverview: React.FC = () => {
@@ -20,8 +28,7 @@ const FlangeOverview: React.FC = () => {
   const [loading, setLoading] = React.useState(true);
   const [measurements, setMeasurements] = React.useState<MeasurementRow[]>();
   const [statistics, setStatistics] = React.useState<NameValue[]>();
-
-  const statisticOfPreload = usePreloadChartOptions();
+  const [statisticOfPreload, setStatisticOfPreload] = React.useState<any>();
   const [tableOfMeasurement, setTableOfMeasurement] = React.useState<TableListItem<MeasurementRow>>(
     {
       rowKey: 'id',
@@ -33,28 +40,10 @@ const FlangeOverview: React.FC = () => {
           key: 'name',
           render: (name: string, row: MeasurementRow) => (
             <Link to={`${MeasurementTypes.dynamicPreload.url}&id=${row.id}`}>{name}</Link>
-          )
+          ),
+          width: 200
         },
-        { title: '状态', dataIndex: 'state', key: 'state', render: () => '正常' },
-        {
-          title: '预紧力(kN)',
-          dataIndex: 'preload',
-          key: 'preload',
-          render: () => 320 - Math.round(Math.random() * 10)
-        },
-        { title: '应力(Mpa)', dataIndex: 'preload2', key: 'preload2', render: () => '15' },
-        {
-          title: '温度(℃)',
-          dataIndex: 'tempreture',
-          key: 'tempreture',
-          render: () => 50 + Math.round(Math.random() * 10)
-        },
-        {
-          title: '采集时间',
-          dataIndex: 'time',
-          key: 'time',
-          render: () => moment(new Date()).format('YYYY-MM-DD HH:mm:ss')
-        }
+        { title: '状态', dataIndex: 'state', key: 'state', render: () => '正常', width: 120 }
       ],
       colProps: generateColProps({ xl: 24, xxl: 24 }),
       size: 'small',
@@ -83,10 +72,64 @@ const FlangeOverview: React.FC = () => {
       );
       setMeasurements(monitoringPoints);
       if (monitoringPoints && monitoringPoints.length > 0) {
-        setTableOfMeasurement((prev) => ({ ...prev, dataSource: monitoringPoints }));
+        setTableOfMeasurement((prev) => {
+          if (prev.columns) {
+            return {
+              ...prev,
+              columns: [...prev.columns, ...transformSingleMeasurmentData(monitoringPoints[0])],
+              dataSource: monitoringPoints
+            };
+          } else {
+            return prev;
+          }
+        });
       }
     }
   }, [asset]);
+
+  React.useEffect(() => {
+    if (measurements && measurements.length > 0) {
+      const from = moment().startOf('day').subtract(7, 'd').utc().unix();
+      const to = moment().endOf('day').utc().unix();
+      if (!statisticOfPreload) {
+        getData(measurements[0].id, from, to).then((data) => {
+          if (data.length > 0) {
+            const datas = transformMeasurementHistoryData(data, 'preload');
+            if (datas.length > 0) {
+              setStatisticOfPreload(generatePreloadOptions(datas[0], measurements[0].name));
+            }
+          }
+        });
+      } else if (
+        statisticOfPreload.series &&
+        statisticOfPreload.series.length &&
+        statisticOfPreload.series.length !== measurements.length
+      ) {
+        measurements
+          .filter((item) => item.id !== measurements[0].id)
+          .forEach(({ id, name }) => {
+            getData(id, from, to).then((data) => {
+              if (data.length > 0) {
+                const datas = transformMeasurementHistoryData(data, 'preload');
+                if (datas.length > 0) {
+                  setStatisticOfPreload((prev: any) => ({
+                    ...prev,
+                    series: prev.series.concat(
+                      datas[0].seriesData.map(({ data }: any, index: any) => ({
+                        type: 'line',
+                        name,
+                        areaStyle: LineChartStyles[statisticOfPreload.series.length].areaStyle,
+                        data
+                      }))
+                    )
+                  }));
+                }
+              }
+            });
+          });
+      }
+    }
+  }, [measurements, statisticOfPreload]);
 
   if (loading) return <Spin />;
   //TODO

@@ -18,7 +18,7 @@ export const MeasurementContents: React.FC<MeasurementRow> = (measurement) => {
       tabList={[
         { key: 'monitor', tab: '监控' },
         { key: 'history', tab: '历史数据' },
-        { key: 'alarm', tab: '报警记录' }
+        // { key: 'alarm', tab: '报警记录' }
       ]}
       onTabChange={(key) => {
         setKey(key);

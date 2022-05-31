@@ -190,33 +190,40 @@ function generateFakeCircle(measurements: MeasurementRow[]) {
   }));
 }
 
-export function transformMeasurementHistoryData(data: MeasurementHistoryData) {
+export function transformMeasurementHistoryData(
+  data: MeasurementHistoryData,
+  propertyName?: string
+) {
   const firstValue = data[0].values;
-  return firstValue.map((property) => {
-    const times = data.map(({ timestamp }) => moment.unix(timestamp).local());
-    const fields = firstValue.filter(({ key }) => key === property.key)[0].fields;
-    const seriesData = fields.map((field) => {
-      const fieldData = data.map(({ values }) => {
-        let value = NaN;
-        const crtProperty = values.find(({ key }) => key === property.key);
-        if (crtProperty) {
-          const crtField = crtProperty.fields.find(({ key }) => key === field.key);
-          if (crtField) value = crtProperty.data[field.name];
-        }
-        if (value) {
-          const precision = property.precision ?? 3;
-          value = round(value, precision);
-        }
-        return value;
+  const times = data.map(({ timestamp }) => moment.unix(timestamp).local());
+  return firstValue
+    .filter((property) => (propertyName ? property.key === propertyName : true))
+    .map((property) => {
+      const seriesData = property.fields.map((field) => {
+        const fieldData = data.map(({ values }) => {
+          let value = NaN;
+          const crtProperty = values.find(({ key }) => key === property.key);
+          if (crtProperty) {
+            const crtField = crtProperty.fields.find(({ key }) => key === field.key);
+            if (crtField) value = crtProperty.data[field.name];
+          }
+          if (value) {
+            const precision = property.precision ?? 3;
+            value = round(value, precision);
+          }
+          return value;
+        });
+        return { name: field.name, data: fieldData };
       });
-      return { name: field.name, data: fieldData };
+      return { times, seriesData, property };
     });
-    return { times, seriesData, property };
-  });
 }
 
-export function generateMeasurementHistoryDataOptions(data: MeasurementHistoryData) {
-  const optionsData = transformMeasurementHistoryData(data);
+export function generateMeasurementHistoryDataOptions(
+  data: MeasurementHistoryData,
+  propertyName?: string
+) {
+  const optionsData = transformMeasurementHistoryData(data, propertyName);
   return optionsData.map(({ times, seriesData, property }) => {
     return {
       tooltip: {
@@ -230,11 +237,13 @@ export function generateMeasurementHistoryDataOptions(data: MeasurementHistoryDa
           return relVal;
         }
       },
-      legend: { show: false },
+      legend: { show: !!propertyName },
       grid: { bottom: 20 },
       title: {
         text: `${property.name}${property.unit ? `(${property.unit})` : ''}`,
-        subtext: `${seriesData.map(({ name, data }) => name + ' ' + data[data.length - 1])}`
+        subtext: propertyName
+          ? ''
+          : `${seriesData.map(({ name, data }) => name + ' ' + data[data.length - 1])}`
       },
       series: seriesData.map(({ name, data }, index) => ({
         type: 'line',
@@ -283,4 +292,55 @@ export function forEachTreeNode<N extends Node>(
   if (node.children && node.children.length > 0) {
     node.children.map((node) => forEachTreeNode(node, fn));
   }
+}
+
+export function transformSingleMeasurmentData(measurement: MeasurementRow) {
+  const { properties, data } = measurement;
+  if (!data) return [];
+  const { values, timestamp } = data;
+  const res = [];
+  for (const property of properties) {
+    const { fields } = property;
+    for (const keyOfValues in values) {
+      const field = fields.find(({ key }) => key === keyOfValues);
+      if (field) {
+        const precision = property.precision ?? 3;
+        res.push({
+          unit: property.unit,
+          sort: property.sort,
+          ...field,
+          value: round(values[keyOfValues], precision)
+        });
+        break;
+      }
+    }
+  }
+  return generatePropertyColumns({ [timestamp]: res });
+}
+
+function generatePropertyColumns(data: {
+  [x: number]: {
+    value: number;
+    key: string;
+    name: string;
+    dataIndex: number;
+    unit: string;
+    sort: number;
+  }[];
+}) {
+  const timestamp = Number(Object.keys(data)[0]);
+  const properties = data[timestamp];
+  return properties
+    .map(({ name, key, value, unit }) => ({
+      title: `${name}${unit ? `(${unit})` : ''}`,
+      key,
+      render: () => value.toString(),
+      width: 120
+    }))
+    .concat({
+      title: '采集时间',
+      key: 'timestamp',
+      render: () => moment(timestamp * 1000).format('YYYY-MM-DD HH:mm:ss'),
+      width: 150
+    });
 }

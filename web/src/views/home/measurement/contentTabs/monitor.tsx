@@ -20,7 +20,7 @@ export const Monitor: React.FC<MeasurementRow> = (props) => {
   if (!historyOptions || historyOptions.length === 0) return null;
 
   return (
-    <Row gutter={[32, 16]}>
+    <Row gutter={[32, 32]}>
       {historyOptions.map((ops: any, index: number) => (
         <Col span={6} key={index}>
           <ChartContainer title='' options={ops} />

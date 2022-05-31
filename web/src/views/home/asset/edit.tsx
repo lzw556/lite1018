@@ -35,7 +35,6 @@ export const AssetEdit: React.FC<
         ...props,
         onOk: () => {
           form.validateFields().then((values) => {
-            console.log(values);
             const { id } = values;
             try {
               if (!id) {

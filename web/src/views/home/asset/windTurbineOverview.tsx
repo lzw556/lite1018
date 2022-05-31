@@ -6,7 +6,11 @@ import '../home.css';
 import { MeasurementIcon } from '../measurement/icon';
 import { OverviewPage } from '../overviewPage';
 import { Introduction, NameValue, TableListItem } from '../props';
-import { generateColProps, generateFlangeChartOptions } from '../utils';
+import {
+  generateColProps,
+  generateFlangeChartOptions,
+  transformSingleMeasurmentData
+} from '../utils';
 import { AssetTypes } from '../constants';
 import { getAsset } from './services';
 import { AssetRow, transformAssetStatistics } from './props';
@@ -20,6 +24,7 @@ const WindTurbineOverview: React.FC = () => {
   const [statistics, setStatistics] = React.useState<NameValue[]>();
   const [flanges, setFlanges] = React.useState<Introduction[]>();
   const [table, setTable] = React.useState<TableListItem<any>>({
+    rowKey: 'id',
     columns: [
       {
         title: '法兰',
@@ -36,7 +41,8 @@ const WindTurbineOverview: React.FC = () => {
       {
         title: '状态',
         key: 'alarmState',
-        render: (val: any, record: MeasurementRow) => ''
+        render: (val: any, record: MeasurementRow) => '',
+        width: 120
       }
     ],
     colProps: generateColProps({ xl: 24, xxl: 24 }),
@@ -100,7 +106,18 @@ const WindTurbineOverview: React.FC = () => {
         });
         setFlanges(items);
       }
-      if (measurements.length) setTable((prev) => ({ ...prev, dataSource: measurements }));
+      if (measurements.length)
+        setTable((prev) => {
+          if (prev.columns) {
+            return {
+              ...prev,
+              columns: [...prev.columns, ...transformSingleMeasurmentData(measurements[0])],
+              dataSource: measurements
+            };
+          } else {
+            return prev;
+          }
+        });
     }
   }, [asset]);
 

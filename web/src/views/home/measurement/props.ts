@@ -25,6 +25,11 @@ export type MeasurementRow = {
   bindingDevices: Device[];
   attributes?: any;
   assetName: string;
+  properties: Property[];
+  data?: {
+    timestamp: number;
+    values: { [propName: string]: number };
+  };
 };
 
 export function convertRow(values?: MeasurementRow): Measurement | null {

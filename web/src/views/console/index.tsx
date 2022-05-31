@@ -6,7 +6,6 @@ import {isLogin} from "../../utils/session";
 import {Spin} from "antd";
 import {useDispatch} from "redux-react-hook";
 import {setMenusAction} from "../../store/actions/getMenusSuccess";
-import { menus_fake } from "../home/menus";
 
 const ConsolePage = (props: any) => {
     const [menus, setMenus] = useState<Menu[]>()
@@ -15,7 +14,7 @@ const ConsolePage = (props: any) => {
     useEffect(() => {
         if (isLogin()) {
             GetMyMenusRequest().then(data => {
-                setMenus([...menus_fake, ...data].filter(menu => menu.id!==3100))
+                setMenus(data)
                 dispatch(setMenusAction(data))
             })
         } else {
