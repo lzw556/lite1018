@@ -174,3 +174,21 @@ func (s Alarm) GetAlarmRuleGroupByID(id uint) (*vo.AlarmRuleGroup, error) {
 	}
 	return query.Get(id)
 }
+
+func (s Alarm) AlarmRuleGroupBind(id uint, req request.AlarmRuleGroupBind) error {
+	cmd, err := s.factory.NewAlarmRuleGroupBindingCmd(id)
+	if err != nil {
+		return err
+	}
+
+	return cmd.Bind(req)
+}
+
+func (s Alarm) AlarmRuleGroupUnbind(id uint, req request.AlarmRuleGroupUnbind) error {
+	cmd, err := s.factory.NewAlarmRuleGroupBindingCmd(id)
+	if err != nil {
+		return err
+	}
+
+	return cmd.Unbind(req)
+}

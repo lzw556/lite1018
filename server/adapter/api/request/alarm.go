@@ -51,3 +51,16 @@ type AlarmRuleGroup struct {
 
 	ProjectID uint `json:"-"`
 }
+
+type AlarmRuleGroupBinding struct {
+	AlarmRuleID uint `json:"alarm_rule_id"`
+	SourceID    uint `json:"source_id"`
+}
+
+type AlarmRuleGroupBind struct {
+	Bindings []AlarmRuleGroupBinding `json:"bindings"`
+}
+
+type AlarmRuleGroupUnbind struct {
+	Bindings []AlarmRuleGroupBinding `json:"bindings"`
+}

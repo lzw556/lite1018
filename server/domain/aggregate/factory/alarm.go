@@ -210,3 +210,14 @@ func (factory Alarm) NewAlarmRuleGroupQuery(filters request.Filters) (*query.Ala
 	q := query.NewAlarmRuleGroupQuery()
 	return &q, nil
 }
+
+func (factory Alarm) NewAlarmRuleGroupBindingCmd(id uint) (*command.AlarmRuleGroupBindCmd, error) {
+	e, err := factory.alarmRuleGroupRepo.Get(context.TODO(), id)
+	if err != nil {
+		return nil, response.BusinessErr(errcode.AlarmRuleGroupNotFoundError, "")
+	}
+
+	cmd := command.NewAlarmRuleGroupBindCmd()
+	cmd.AlarmRuleGroup = e
+	return &cmd, nil
+}

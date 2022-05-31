@@ -33,8 +33,11 @@ func (s Asset) CreateAsset(req request.CreateAsset) error {
 func (s Asset) GetAssetByID(id uint) (*vo.Asset, error) {
 	query := s.factory.NewAssetQuery(nil)
 	voAsset, err := query.Get(id)
+	if err != nil {
+		return nil, err
+	}
 
-	s.iterAppendStatistics(&voAsset)
+	err = s.iterAppendStatistics(&voAsset)
 
 	return &voAsset, err
 }
@@ -69,7 +72,10 @@ func (s Asset) FindAssets(filters request.Filters) ([]vo.Asset, error) {
 	}
 
 	for i := range result {
-		s.iterAppendStatistics(&result[i])
+		err := s.iterAppendStatistics(&result[i])
+		if err != nil {
+			return []vo.Asset{}, err
+		}
 	}
 
 	return result, nil
@@ -92,7 +98,10 @@ func (s Asset) iterCalcStatistics(asset vo.Asset, result *vo.AssetStatistics) er
 
 	if asset.Children != nil {
 		for _, c := range asset.Children {
-			s.iterCalcStatistics(*c, result)
+			err := s.iterCalcStatistics(*c, result)
+			if err != nil {
+				return err
+			}
 		}
 	}
 

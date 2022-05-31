@@ -22,6 +22,8 @@ func (r *alarmRouter) initRoutes() {
 		router.NewPostRoute("alarmRules/:id/sources", r.addSourcesToAlarmRule),
 		router.NewPostRoute("alarmRecords/:id/acknowledge", r.acknowledgeAlarmRecord),
 		router.NewPostRoute("alarmRuleGroups", r.createAlarmRuleGroup),
+		router.NewPostRoute("alarmRuleGroups/:id/bind", r.alarmRuleGroupBind),
+		router.NewPostRoute("alarmRuleGroups/:id/unbind", r.alarmRuleGroupUnbind),
 
 		// GET
 		router.NewGetRoute("alarmRules", r.findAlarmRules),
