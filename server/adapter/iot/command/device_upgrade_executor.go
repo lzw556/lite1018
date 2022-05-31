@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	mqtt2 "github.com/eclipse/paho.mqtt.golang"
 	"github.com/gogo/protobuf/proto"
@@ -16,6 +17,10 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/json"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/xlog"
 	"time"
+)
+
+var (
+	ErrUpgradeCancelled = errors.New("upgrade cancelled")
 )
 
 type DeviceUpgradeExecutor struct {
@@ -38,8 +43,12 @@ func (e DeviceUpgradeExecutor) Execute(ctx context.Context, gateway, device enti
 	}
 	xlog.Infof("start device upgrade job => [%s]", device.MacAddress)
 	if resp.Code == 1 {
-		if err := e.loadFirmware(gateway.MacAddress, device); err != nil {
-			device.UpdateDeviceUpgradeStatus(entity.DeviceUpgradeError, 0)
+		if err = e.loadFirmware(gateway.MacAddress, device); err != nil {
+			if err == ErrUpgradeCancelled {
+				device.UpdateDeviceUpgradeStatus(entity.DeviceUpgradeCancelled, 0)
+			} else {
+				device.UpdateDeviceUpgradeStatus(entity.DeviceUpgradeError, 0)
+			}
 			return err
 		}
 	}
@@ -109,7 +118,7 @@ func (e DeviceUpgradeExecutor) sendFirmwareData(gateway string, device entity.De
 		}
 		return cast.ToInt(status["seqId"]), cast.ToFloat32(status["progress"]), nil
 	}
-	return 0, 0, fmt.Errorf("device [%s] upgrade failed: %s", device.MacAddress, resp.Code)
+	return 0, 0, ErrUpgradeCancelled
 }
 
 func (e DeviceUpgradeExecutor) upgrade(ctx context.Context, gateway string, device entity.Device) int {

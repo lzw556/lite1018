@@ -127,7 +127,6 @@ func SyncNetworkLinkStates(network entity.Network) {
 				if err := eventRepo.Create(context.TODO(), &event); err != nil {
 					xlog.Errorf("create event failed: %v", err)
 				}
-
 			}
 		}
 	}
