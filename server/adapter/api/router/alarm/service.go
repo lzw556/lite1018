@@ -22,6 +22,7 @@ type Service interface {
 	GetAlarmRecordByID(id uint) (*vo.AlarmRecord, error)
 	AcknowledgeAlarmRecordByID(id uint, req request.AcknowledgeAlarmRecord) error
 	GetAlarmRecordAcknowledgeByID(id uint) (*vo.AlarmRecordAcknowledge, error)
+	GetAlarmRuleGroupByID(id uint) (*vo.AlarmRuleGroup, error)
 
 	DeleteAlarmRecordByID(id uint) error
 	DeleteAlarmRuleGroupByID(id uint) error

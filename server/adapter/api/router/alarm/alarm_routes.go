@@ -133,3 +133,8 @@ func (r alarmRouter) deleteAlarmRuleGroup(ctx *gin.Context) (interface{}, error)
 	id := cast.ToUint(ctx.Param("id"))
 	return nil, r.service.DeleteAlarmRuleGroupByID(id)
 }
+
+func (r alarmRouter) getAlarmRuleGroup(ctx *gin.Context) (interface{}, error) {
+	id := cast.ToUint(ctx.Param("id"))
+	return r.service.GetAlarmRuleGroupByID(id)
+}

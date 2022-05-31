@@ -166,3 +166,11 @@ func (s Alarm) DeleteAlarmRuleGroupByID(id uint) error {
 
 	return cmd.Run()
 }
+
+func (s Alarm) GetAlarmRuleGroupByID(id uint) (*vo.AlarmRuleGroup, error) {
+	query, err := s.factory.NewAlarmRuleGroupQuery(nil)
+	if err != nil {
+		return nil, err
+	}
+	return query.Get(id)
+}
