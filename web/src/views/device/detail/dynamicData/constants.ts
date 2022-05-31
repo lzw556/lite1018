@@ -1,18 +1,18 @@
 export const DYNAMIC_DATA_BOLTELONGATION = {
   data_type: 1073872901,
   fields: [
-    { label: '长度', value: 'dynamic_length', unit: 'mm' },
     { label: '预紧力', value: 'dynamic_preload', unit: 'kN' },
-    { label: '压强', value: 'dynamic_pressure', unit: 'MPa' },
+    { label: '压力', value: 'dynamic_pressure', unit: 'MPa' },
+    { label: '长度', value: 'dynamic_length', unit: 'mm' },
     { label: '飞行时间', value: 'dynamic_tof', unit: 'ns' },
     { label: '加速度', value: 'dynamic_acceleration', unit: 'g' }
   ] as const,
   metaData: [
     { label: '预紧力', value: 'min_preload', unit: 'kN' },
-    { label: '温度', value: 'temperature', unit: '℃' },
     { label: '长度', value: 'min_length', unit: 'mm' },
-    { label: '缺陷位置', value: 'defect_location', unit: 'mm' },
-    { label: '飞行时间', value: 'min_tof', unit: 'ns' }
+    { label: '温度', value: 'temperature', unit: '℃' },
+    { label: '飞行时间', value: 'min_tof', unit: 'ns' },
+    { label: '缺陷位置', value: 'defect_location', unit: 'mm' }
   ] as const
 };
 
