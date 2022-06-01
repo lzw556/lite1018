@@ -1,7 +1,6 @@
 package process
 
 import (
-	"context"
 	"fmt"
 	"github.com/gogo/protobuf/proto"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/iot"
@@ -10,17 +9,16 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
+	"github.com/thetasensors/theta-cloud-lite/server/worker"
 )
 
 type RestartStatus struct {
 	deviceRepo dependency.DeviceRepository
-	eventRepo  dependency.EventRepository
 }
 
 func NewRestartStatus() Processor {
 	return newRoot(&RestartStatus{
 		deviceRepo: repository.Device{},
-		eventRepo:  repository.Event{},
 	})
 }
 
@@ -43,16 +41,13 @@ func (p RestartStatus) Process(ctx *iot.Context, msg iot.Message) error {
 			device.RemoveUpgradeStatus()
 
 			// add event
-			event := entity.Event{
+			worker.EventsChan <- entity.Event{
 				Code:      entity.EventCodeReboot,
 				SourceID:  device.ID,
 				Category:  entity.EventCategoryDevice,
 				Timestamp: int64(m.Timestamp),
 				Content:   fmt.Sprintf(`{"code":%d}`, m.Code),
 				ProjectID: device.ProjectID,
-			}
-			if err := p.eventRepo.Create(context.TODO(), &event); err != nil {
-				return fmt.Errorf("create event failed: %v", err)
 			}
 			if queue := background.GetTaskQueue(device.MacAddress); queue != nil && !queue.IsRunning() {
 				go queue.Run()

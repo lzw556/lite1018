@@ -9,23 +9,23 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	spec "github.com/thetasensors/theta-cloud-lite/server/domain/specification"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/cache"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/devicetype"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/errcode"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/eventbus"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/json"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/xlog"
+	"github.com/thetasensors/theta-cloud-lite/server/worker"
 	"time"
 )
 
-var deviceConnectionStateRepo = repository.DeviceConnectionState{}
 var deviceRepo = repository.Device{}
 var networkRepo = repository.Network{}
 var eventRepo = repository.Event{}
 
 func isOnline(mac string) bool {
-	if connectionState, _ := deviceConnectionStateRepo.Get(mac); connectionState != nil {
-		return connectionState.IsOnline
-	}
-	return false
+	state, _, _ := cache.GetConnection(mac)
+	return state
 }
 
 func Execute(gateway, device entity.Device, t Type) error {
@@ -98,34 +98,36 @@ func SyncNetworkLinkStates(network entity.Network) {
 	}
 	for i := range devices {
 		device := devices[i]
-		connectionState, err := deviceConnectionStateRepo.Get(device.MacAddress)
-		if err != nil {
-			xlog.Errorf("get device connection state failed: %v", err)
-		}
-		if connectionState == nil {
-			connectionState = entity.NewDeviceConnectionState()
-		}
-		if online, ok := statusMap[device.MacAddress]; ok {
-			connectionState.SetIsOnline(online)
-			if err := deviceConnectionStateRepo.Update(device.MacAddress, connectionState); err != nil {
-				xlog.Errorf("save device state failed: %v", err)
-			}
-			if connectionState.IsStatusChanged {
-				connectionState.Notify(device.MacAddress)
-				event := entity.Event{
-					Code:      entity.EventCodeStatus,
-					Category:  entity.EventCategoryDevice,
-					SourceID:  device.ID,
-					Timestamp: time.Now().Unix(),
-					ProjectID: device.ProjectID,
-				}
-				code := 0
-				if !connectionState.IsOnline {
-					code = 2
-				}
-				event.Content = fmt.Sprintf(`{"code": %d}`, code)
-				if err := eventRepo.Create(context.TODO(), &event); err != nil {
-					xlog.Errorf("create event failed: %v", err)
+		if device.MacAddress != gateway.MacAddress {
+			oldState, _, _ := cache.GetConnection(device.MacAddress)
+			newState, _ := statusMap[device.MacAddress]
+			if newState != oldState {
+				eventbus.Publish(eventbus.SocketEmit, "socket::deviceStateChangedEvent", map[string]interface{}{
+					"macAddress": device.MacAddress,
+					"state": map[string]interface{}{
+						"isOnline":    newState,
+						"connectedAt": time.Now().Unix(),
+					},
+				})
+				go func(isOnline bool) {
+					event := entity.Event{
+						Code:      entity.EventCodeStatus,
+						Category:  entity.EventCategoryDevice,
+						SourceID:  device.ID,
+						Timestamp: time.Now().Unix(),
+						ProjectID: device.ProjectID,
+					}
+					code := 0
+					if !isOnline {
+						code = 2
+					}
+					event.Content = fmt.Sprintf(`{"code": %d}`, code)
+					worker.EventsChan <- event
+				}(newState)
+				if newState {
+					cache.SetOnline(device.MacAddress)
+				} else {
+					cache.SetOffline(device.MacAddress)
 				}
 			}
 		}
@@ -258,12 +260,14 @@ func SyncDeviceList(gateway entity.Device, devices []entity.Device) error {
 	}
 
 	go func() {
+		macs := make([]string, 0)
 		for i := range devices {
 			device := devices[i]
 			if gateway.MacAddress != device.MacAddress {
-				_ = deviceConnectionStateRepo.Delete(device.MacAddress)
+				macs = append(macs, device.MacAddress)
 			}
 		}
+		cache.BatchDeleteConnections(macs...)
 	}()
 
 	xlog.Infof("starting sync device list => [%s]", gateway.MacAddress)

@@ -5,32 +5,32 @@ import (
 	"fmt"
 	"github.com/gogo/protobuf/proto"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/iot"
+	"github.com/thetasensors/theta-cloud-lite/server/adapter/iot/command"
 	pd "github.com/thetasensors/theta-cloud-lite/server/adapter/iot/proto"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/cache"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/json"
-	"github.com/thetasensors/theta-cloud-lite/server/pkg/xlog"
+	"github.com/thetasensors/theta-cloud-lite/server/worker"
 	"time"
 )
 
 type DeviceStatus struct {
-	repository            dependency.DeviceStateRepository
-	networkRepo           dependency.NetworkRepository
-	deviceRepo            dependency.DeviceRepository
-	eventRepo             dependency.EventRepository
-	deviceStatusRepo      dependency.DeviceStateRepository
-	deviceConnectionState dependency.DeviceConnectionStateRepository
+	repository       dependency.DeviceStateRepository
+	networkRepo      dependency.NetworkRepository
+	deviceRepo       dependency.DeviceRepository
+	eventRepo        dependency.EventRepository
+	deviceStatusRepo dependency.DeviceStateRepository
 }
 
 func NewDeviceStatus() Processor {
 	return newRoot(DeviceStatus{
-		repository:            repository.DeviceState{},
-		networkRepo:           repository.Network{},
-		deviceRepo:            repository.Device{},
-		eventRepo:             repository.Event{},
-		deviceStatusRepo:      repository.DeviceState{},
-		deviceConnectionState: repository.DeviceConnectionState{},
+		repository:       repository.DeviceState{},
+		networkRepo:      repository.Network{},
+		deviceRepo:       repository.Device{},
+		eventRepo:        repository.Event{},
+		deviceStatusRepo: repository.DeviceState{},
 	})
 }
 
@@ -56,20 +56,16 @@ func (p DeviceStatus) Process(ctx *iot.Context, msg iot.Message) error {
 			e.Timestamp = time.Now().Unix()
 			_ = p.deviceStatusRepo.Create(device.MacAddress, e)
 
-			connectionState, err := p.deviceConnectionState.Get(device.MacAddress)
-			if err != nil {
-				xlog.Errorf("get device connection state failed: %v => [%s]", err, device.MacAddress)
+			isOnline, _, _ := cache.GetConnection(device.MacAddress)
+			cache.SetOnline(device.MacAddress)
+			if !isOnline {
+				go p.addDeviceOnlineEvent(device)
+				device.NotifyConnectionState(true, time.Now().Unix())
 			}
-			if connectionState == nil {
-				connectionState = entity.NewDeviceConnectionState()
-			}
-			connectionState.SetIsOnline(true)
-			if connectionState.IsStatusChanged {
-				connectionState.Notify(device.MacAddress)
-				p.addDeviceOnlineEvent(device)
-			}
-			if err := p.deviceConnectionState.Update(device.MacAddress, connectionState); err != nil {
-				return fmt.Errorf("save device status failed: %v", err)
+			if device.IsGateway() && !isOnline {
+				if network, err := p.networkRepo.Get(context.TODO(), device.NetworkID); err == nil {
+					go command.SyncNetworkLinkStates(network)
+				}
 			}
 		}
 	}
@@ -77,7 +73,7 @@ func (p DeviceStatus) Process(ctx *iot.Context, msg iot.Message) error {
 }
 
 func (p DeviceStatus) addDeviceOnlineEvent(device entity.Device) {
-	event := entity.Event{
+	worker.EventsChan <- entity.Event{
 		Code:      entity.EventCodeStatus,
 		SourceID:  device.ID,
 		Category:  entity.EventCategoryDevice,
@@ -85,5 +81,4 @@ func (p DeviceStatus) addDeviceOnlineEvent(device entity.Device) {
 		ProjectID: device.ProjectID,
 		Content:   fmt.Sprintf(`{"code": %d}`, 0),
 	}
-	_ = p.eventRepo.Create(context.TODO(), &event)
 }
