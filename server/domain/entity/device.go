@@ -27,7 +27,6 @@ type Device struct {
 	Settings   DeviceSettings `gorm:"type:json"`
 
 	State           DeviceStatus            `gorm:"-"`
-	ConnectionState DeviceConnectionState   `gorm:"-"`
 	AlarmRuleStates map[uint]AlarmRuleState `gorm:"-"`
 }
 
@@ -142,6 +141,16 @@ func (d Device) IsDC() bool {
 
 func (d Device) IsSQ() bool {
 	return d.Type == devicetype.AngleDipType
+}
+
+func (d Device) NotifyConnectionState(isOnline bool, timestamp int64) {
+	eventbus.Publish(eventbus.SocketEmit, "socket::deviceStateChangedEvent", map[string]interface{}{
+		"macAddress": d.MacAddress,
+		"state": map[string]interface{}{
+			"isOnline":    isOnline,
+			"connectedAt": timestamp,
+		},
+	})
 }
 
 type Devices []Device

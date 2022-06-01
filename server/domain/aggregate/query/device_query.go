@@ -12,6 +12,7 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	spec "github.com/thetasensors/theta-cloud-lite/server/domain/specification"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/vo"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/cache"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/devicetype"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/errcode"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/xlog"
@@ -23,30 +24,28 @@ import (
 type DeviceQuery struct {
 	Specs []spec.Specification
 
-	deviceRepo                dependency.DeviceRepository
-	deviceStateRepo           dependency.DeviceStateRepository
-	sensorDataRepo            dependency.SensorDataRepository
-	deviceInformationRepo     dependency.DeviceInformationRepository
-	deviceAlertStateRepo      dependency.DeviceAlertStateRepository
-	deviceConnectionStateRepo dependency.DeviceConnectionStateRepository
-	networkRepo               dependency.NetworkRepository
-	alarmRuleRepo             dependency.AlarmRuleRepository
-	alarmSourceRepo           dependency.AlarmSourceRepository
-	eventRepo                 dependency.EventRepository
+	deviceRepo            dependency.DeviceRepository
+	deviceStateRepo       dependency.DeviceStateRepository
+	sensorDataRepo        dependency.SensorDataRepository
+	deviceInformationRepo dependency.DeviceInformationRepository
+	deviceAlertStateRepo  dependency.DeviceAlertStateRepository
+	networkRepo           dependency.NetworkRepository
+	alarmRuleRepo         dependency.AlarmRuleRepository
+	alarmSourceRepo       dependency.AlarmSourceRepository
+	eventRepo             dependency.EventRepository
 }
 
 func NewDeviceQuery() DeviceQuery {
 	return DeviceQuery{
-		deviceRepo:                repository.Device{},
-		deviceStateRepo:           repository.DeviceState{},
-		sensorDataRepo:            repository.SensorData{},
-		deviceInformationRepo:     repository.DeviceInformation{},
-		deviceAlertStateRepo:      repository.DeviceAlertState{},
-		deviceConnectionStateRepo: repository.DeviceConnectionState{},
-		networkRepo:               repository.Network{},
-		eventRepo:                 repository.Event{},
-		alarmSourceRepo:           repository.AlarmSource{},
-		alarmRuleRepo:             repository.AlarmRule{},
+		deviceRepo:            repository.Device{},
+		deviceStateRepo:       repository.DeviceState{},
+		sensorDataRepo:        repository.SensorData{},
+		deviceInformationRepo: repository.DeviceInformation{},
+		deviceAlertStateRepo:  repository.DeviceAlertState{},
+		networkRepo:           repository.Network{},
+		eventRepo:             repository.Event{},
+		alarmSourceRepo:       repository.AlarmSource{},
+		alarmRuleRepo:         repository.AlarmRule{},
 	}
 }
 
@@ -112,13 +111,7 @@ func (query DeviceQuery) newDevice(device entity.Device) vo.Device {
 	if state, err := query.deviceStateRepo.Get(device.MacAddress); err == nil {
 		result.SetState(state)
 	}
-	if connectionState, err := query.deviceConnectionStateRepo.Get(device.MacAddress); err == nil {
-		if connectionState == nil {
-			connectionState = entity.NewDeviceConnectionState()
-		}
-		result.State.IsOnline = connectionState.IsOnline
-		result.State.ConnectedAt = connectionState.Timestamp
-	}
+	result.State.IsOnline, result.State.ConnectedAt, _ = cache.GetConnection(device.MacAddress)
 	result.Information, _ = query.deviceInformationRepo.Get(device.MacAddress)
 	if states, err := query.deviceAlertStateRepo.Find(device.MacAddress); err == nil {
 		result.SetAlertStates(states)
@@ -485,7 +478,6 @@ func (query DeviceQuery) FindEventsByID(id uint, from, to int64) ([]vo.DeviceEve
 	for i, e := range es {
 		result[i] = vo.NewDeviceEvent(e)
 	}
-	sort.Sort(result)
 	return result, nil
 }
 
@@ -502,6 +494,7 @@ func (query DeviceQuery) PagingEventsByID(id uint, from, to int64, page int, siz
 	for i, e := range es {
 		result[i] = vo.NewDeviceEvent(e)
 	}
+	sort.Sort(result)
 	return result, total, nil
 }
 
