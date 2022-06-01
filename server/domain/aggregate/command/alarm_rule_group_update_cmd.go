@@ -3,7 +3,6 @@ package command
 import (
 	"context"
 
-	"fmt"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/request"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/ruleengine"
