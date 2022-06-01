@@ -48,6 +48,7 @@ type AlarmRuleGroup struct {
 	Name        string      `json:"name"`
 	Description string      `json:"description"`
 	Rules       []AlarmRule `json:"rules"`
+	Type        uint        `json:"type"`
 
 	ProjectID uint `json:"-"`
 }

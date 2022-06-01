@@ -4,10 +4,16 @@ import (
 	"gorm.io/gorm"
 )
 
+const (
+	AlarmRuleGroupTypeDevice = iota + 1
+	AlarmRuleGroupTypeMonitoringPoint
+)
+
 type AlarmRuleGroup struct {
 	gorm.Model
 	Name        string `gorm:"type:varchar(30)"`
 	Description string `gorm:"type:varchar(128)"`
+	Type        uint
 
 	Status uint8 `gorm:"default:1;not null"`
 }
