@@ -3,12 +3,13 @@ package query
 import (
 	"context"
 	"fmt"
+	"time"
+
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	spec "github.com/thetasensors/theta-cloud-lite/server/domain/specification"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/vo"
-	"time"
 )
 
 type StatisticQuery struct {
@@ -18,6 +19,8 @@ type StatisticQuery struct {
 	deviceStateRepo      dependency.DeviceStateRepository
 	deviceAlertStateRepo dependency.DeviceAlertStateRepository
 	alarmRecordRepo      dependency.AlarmRecordRepository
+	assetRepo            dependency.AssetRepository
+	monitoringPointRepo  dependency.MonitoringPointRepository
 }
 
 func NewStatisticQuery() StatisticQuery {
@@ -26,6 +29,8 @@ func NewStatisticQuery() StatisticQuery {
 		deviceStateRepo:      repository.DeviceState{},
 		deviceAlertStateRepo: repository.DeviceAlertState{},
 		alarmRecordRepo:      repository.AlarmRecord{},
+		assetRepo:            repository.Asset{},
+		monitoringPointRepo:  repository.MonitoringPoint{},
 	}
 }
 
@@ -88,5 +93,34 @@ func (query StatisticQuery) GetAlertStatistics() ([]vo.AlertStatistic, error) {
 		}
 		result = append(result, r)
 	}
+	return result, nil
+}
+
+func (query StatisticQuery) GetAllStatistics() (vo.AllStatistics, error) {
+	ctx := context.TODO()
+	result := vo.AllStatistics{}
+
+	devices, err := query.deviceRepo.FindBySpecs(ctx, query.Specs...)
+	if err != nil {
+		return result, err
+	}
+
+	result.DeviceNum = uint(len(devices))
+
+	monitoringPoints, err := query.monitoringPointRepo.FindBySpecs(ctx, query.Specs...)
+	if err != nil {
+		return result, err
+	}
+
+	result.MonitoringPointNum = uint(len(monitoringPoints))
+
+	rootAssetSpecs := append(query.Specs, spec.ParentIDEqSpec(0))
+	rootAssets, err := query.assetRepo.FindBySpecs(ctx, rootAssetSpecs...)
+	if err != nil {
+		return result, err
+	}
+
+	result.RootAssetNum = uint(len(rootAssets))
+
 	return result, nil
 }

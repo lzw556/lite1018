@@ -39,6 +39,7 @@ func (r *alarmRouter) initRoutes() {
 		//PUT
 		router.NewPutRoute("alarmRules/:id", r.updateAlarmRule),
 		router.NewPutRoute("alarmRules/:id/status/:status", r.updateAlarmRuleStatus),
+		router.NewPutRoute("alarmRuleGroups/:id", r.updateAlarmRuleGroup),
 
 		//DELETE
 		router.NewDeleteRoute("alarmRules/:id", r.deleteAlarmRule),

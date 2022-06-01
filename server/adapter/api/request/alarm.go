@@ -10,6 +10,7 @@ type AlarmTemplate struct {
 }
 
 type AlarmRule struct {
+	ID          uint   `josn:"id,omitempty"`
 	Name        string `json:"name,omitempty" binding:"omitempty,max=16,min=4"`
 	Description string `json:"description"`
 	SourceIDs   []uint `json:"source_ids"`
@@ -64,4 +65,13 @@ type AlarmRuleGroupBind struct {
 
 type AlarmRuleGroupUnbind struct {
 	Bindings []AlarmRuleGroupBinding `json:"bindings"`
+}
+
+type UpdateAlarmRuleGroup struct {
+	Name        string      `json:"name"`
+	Description string      `json:"description"`
+	Rules       []AlarmRule `json:"rules"`
+	Type        uint        `json:"type"`
+
+	ProjectID uint `json:"-"`
 }

@@ -13,9 +13,11 @@ const (
 
 type Asset struct {
 	gorm.Model
-	Name      string `gorm:"type:varchar(64)"`
-	Type      uint
-	ParentID  uint
+	Name       string `gorm:"type:varchar(64)"`
+	Type       uint
+	ParentID   uint
+	Attributes Attributes
+
 	ProjectID uint
 }
 

@@ -31,7 +31,7 @@ func (MonitoringPoint) TableName() string {
 func (a *Attributes) Scan(value interface{}) error {
 	bytes, ok := value.([]byte)
 	if !ok {
-		return errors.New(fmt.Sprint("Failed to unmarshal algorithmParameters value:", value))
+		return errors.New(fmt.Sprint("Failed to unmarshal attributes value:", value))
 	}
 	return json.Unmarshal(bytes, &a)
 }

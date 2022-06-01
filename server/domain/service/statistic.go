@@ -26,3 +26,8 @@ func (s Statistic) GetAlertStatistics(filters request.Filters) ([]vo.AlertStatis
 	query := s.factory.NewStatisticQuery(filters)
 	return query.GetAlertStatistics()
 }
+
+func (s Statistic) GetAllStatistics(filters request.Filters) (vo.AllStatistics, error) {
+	query := s.factory.NewStatisticQuery(filters)
+	return query.GetAllStatistics()
+}

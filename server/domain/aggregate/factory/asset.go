@@ -34,6 +34,7 @@ func (factory Asset) NewAssetCreateCmd(req request.CreateAsset) (*command.AssetC
 	e.Name = req.Name
 	e.Type = req.Type
 	e.ParentID = req.ParentID
+	e.Attributes = req.Attributes
 	e.ProjectID = req.ProjectID
 
 	cmd := command.NewAssetCreateCmd()

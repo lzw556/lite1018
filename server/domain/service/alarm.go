@@ -158,6 +158,15 @@ func (s Alarm) CreateAlarmRuleGroup(req request.AlarmRuleGroup) error {
 	return cmd.Run()
 }
 
+func (s Alarm) UpdateAlarmRuleGroup(id uint, req request.UpdateAlarmRuleGroup) error {
+	cmd, err := s.factory.NewAlarmRuleGroupUpdateCmd(id)
+	if err != nil {
+		return err
+	}
+
+	return cmd.Update(req)
+}
+
 func (s Alarm) DeleteAlarmRuleGroupByID(id uint) error {
 	cmd, err := s.factory.NewAlarmRuleGroupRemoveCmd(id)
 	if err != nil {
