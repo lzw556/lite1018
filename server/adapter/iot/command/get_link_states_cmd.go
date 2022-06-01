@@ -41,5 +41,5 @@ func (cmd getLinkStatesCmd) Payload() ([]byte, error) {
 }
 
 func (cmd getLinkStatesCmd) Execute(gateway string, target string) (*Response, error) {
-	return cmd.request.do(gateway, target, cmd, 3)
+	return cmd.request.do(gateway, target, cmd, 10)
 }

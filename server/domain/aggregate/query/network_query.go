@@ -8,26 +8,25 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	spec "github.com/thetasensors/theta-cloud-lite/server/domain/specification"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/vo"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/cache"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/errcode"
 )
 
 type NetworkQuery struct {
 	Specs []spec.Specification
 
-	networkRepo               dependency.NetworkRepository
-	deviceRepo                dependency.DeviceRepository
-	deviceStateRepo           dependency.DeviceStateRepository
-	deviceInformationRepo     dependency.DeviceInformationRepository
-	deviceConnectionStateRepo dependency.DeviceConnectionStateRepository
+	networkRepo           dependency.NetworkRepository
+	deviceRepo            dependency.DeviceRepository
+	deviceStateRepo       dependency.DeviceStateRepository
+	deviceInformationRepo dependency.DeviceInformationRepository
 }
 
 func NewNetworkQuery() NetworkQuery {
 	return NetworkQuery{
-		networkRepo:               repository.Network{},
-		deviceRepo:                repository.Device{},
-		deviceStateRepo:           repository.DeviceState{},
-		deviceInformationRepo:     repository.DeviceInformation{},
-		deviceConnectionStateRepo: repository.DeviceConnectionState{},
+		networkRepo:           repository.Network{},
+		deviceRepo:            repository.Device{},
+		deviceStateRepo:       repository.DeviceState{},
+		deviceInformationRepo: repository.DeviceInformation{},
 	}
 }
 
@@ -43,13 +42,7 @@ func (query NetworkQuery) setDeviceState(device *vo.Device) {
 	if state, err := query.deviceStateRepo.Get(device.MacAddress); err == nil {
 		device.SetState(state)
 	}
-	if connectionState, err := query.deviceConnectionStateRepo.Get(device.MacAddress); err == nil {
-		if connectionState == nil {
-			connectionState = entity.NewDeviceConnectionState()
-		}
-		device.State.IsOnline = connectionState.IsOnline
-		device.State.ConnectedAt = connectionState.Timestamp
-	}
+	device.State.IsOnline, device.State.ConnectedAt, _ = cache.GetConnection(device.MacAddress)
 }
 
 func (query NetworkQuery) Get(id uint) (*vo.Network, error) {

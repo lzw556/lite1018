@@ -10,6 +10,7 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	spec "github.com/thetasensors/theta-cloud-lite/server/domain/specification"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/vo"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/cache"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/devicetype"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/errcode"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/transaction"
@@ -18,18 +19,16 @@ import (
 type NetworkUpdateCmd struct {
 	entity.Network
 
-	networkRepo           dependency.NetworkRepository
-	deviceRepo            dependency.DeviceRepository
-	deviceStateRepo       dependency.DeviceStateRepository
-	deviceConnectionState dependency.DeviceConnectionStateRepository
+	networkRepo     dependency.NetworkRepository
+	deviceRepo      dependency.DeviceRepository
+	deviceStateRepo dependency.DeviceStateRepository
 }
 
 func NewNetworkUpdateCmd() NetworkUpdateCmd {
 	return NetworkUpdateCmd{
-		networkRepo:           repository.Network{},
-		deviceRepo:            repository.Device{},
-		deviceStateRepo:       repository.DeviceState{},
-		deviceConnectionState: repository.DeviceConnectionState{},
+		networkRepo:     repository.Network{},
+		deviceRepo:      repository.Device{},
+		deviceStateRepo: repository.DeviceState{},
 	}
 }
 
@@ -51,8 +50,8 @@ func (cmd NetworkUpdateCmd) Update(req request.Network) (*vo.Network, error) {
 	if err != nil {
 		return nil, err
 	}
-	connectionState, _ := cmd.deviceConnectionState.Get(gateway.MacAddress)
-	if connectionState != nil && connectionState.IsOnline {
+	isOnline, _, _ := cache.GetConnection(gateway.MacAddress)
+	if isOnline {
 		go command.UpdateWsnSettings(cmd.Network, gateway)
 	}
 	result := vo.NewNetwork(cmd.Network)
@@ -143,7 +142,7 @@ func (cmd NetworkUpdateCmd) RemoveDevices(req request.RemoveDevices) error {
 	}
 	err = transaction.Execute(ctx, func(txCtx context.Context) error {
 		for _, device := range devices {
-			_ = cmd.deviceConnectionState.Delete(device.MacAddress)
+			cache.BatchDeleteConnections(device.MacAddress)
 			if err := cmd.deviceRepo.UpdatesBySpecs(txCtx, map[string]interface{}{"parent": gateway.MacAddress}, spec.ParentEqSpec(device.MacAddress)); err != nil {
 				return err
 			}

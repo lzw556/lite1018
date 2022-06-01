@@ -10,23 +10,23 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	spec "github.com/thetasensors/theta-cloud-lite/server/domain/specification"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/cache"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/json"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/xlog"
+	"github.com/thetasensors/theta-cloud-lite/server/worker"
 )
 
 type LinkStatus struct {
-	deviceRepo                dependency.DeviceRepository
-	eventRepo                 dependency.EventRepository
-	deviceConnectionStateRepo dependency.DeviceConnectionStateRepository
-	deviceLinkStatusRepo      dependency.DeviceLinkStatusRepository
+	deviceRepo           dependency.DeviceRepository
+	eventRepo            dependency.EventRepository
+	deviceLinkStatusRepo dependency.DeviceLinkStatusRepository
 }
 
 func NewLinkStatus() Processor {
 	return newRoot(LinkStatus{
-		deviceRepo:                repository.Device{},
-		eventRepo:                 repository.Event{},
-		deviceConnectionStateRepo: repository.DeviceConnectionState{},
-		deviceLinkStatusRepo:      repository.DeviceLinkStatus{},
+		deviceRepo:           repository.Device{},
+		eventRepo:            repository.Event{},
+		deviceLinkStatusRepo: repository.DeviceLinkStatus{},
 	})
 }
 
@@ -57,40 +57,29 @@ func (p LinkStatus) Process(ctx *iot.Context, msg iot.Message) error {
 
 	go p.addLinkStatusLog(linkStatus)
 
-	connectionState, err := p.deviceConnectionStateRepo.Get(device.MacAddress)
-	if err != nil {
-		xlog.Errorf("get device connection state failed: %v => [%s]", err, device.MacAddress)
-		return err
-	}
-	if connectionState == nil {
-		connectionState = entity.NewDeviceConnectionState()
-	}
-
+	isOnline, _, _ := cache.GetConnection(device.MacAddress)
 	// 2 offline 4 reconnecting failed
 	if linkStatus.State != "online" {
-		connectionState.SetIsOnline(false)
+		cache.SetOffline(linkStatus.Address)
 	}
-	_ = p.deviceConnectionStateRepo.Update(device.MacAddress, connectionState)
 
-	connectionState.Notify(linkStatus.Address)
 	// 此处不记录设备上线事件, 设备上线事件在deviceStatus中记录
-	if !connectionState.IsOnline {
-		p.addEvent(device, connectionState.Timestamp, int32(linkStatus.Param))
+	isOnline, timestamp, _ := cache.GetConnection(linkStatus.Address)
+	device.NotifyConnectionState(isOnline, timestamp)
+	if !isOnline {
+		p.addEvent(device, timestamp, int32(linkStatus.Param))
 	}
 	return nil
 }
 
 func (p LinkStatus) addEvent(device entity.Device, timestamp int64, code int32) {
-	event := entity.Event{
+	worker.EventsChan <- entity.Event{
 		Code:      entity.EventCodeStatus,
 		SourceID:  device.ID,
 		Category:  entity.EventCategoryDevice,
 		Timestamp: timestamp,
 		ProjectID: device.ProjectID,
 		Content:   fmt.Sprintf(`{"code": %d}`, code),
-	}
-	if err := p.eventRepo.Create(context.TODO(), &event); err != nil {
-		xlog.Errorf("create event failed: %v", err)
 	}
 }
 

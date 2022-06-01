@@ -31,6 +31,7 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/cache"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/utils"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/xlog"
+	"github.com/thetasensors/theta-cloud-lite/server/worker"
 	"net/http"
 	"os"
 	"os/exec"
@@ -49,11 +50,18 @@ func Start(mode string, dist embed.FS) {
 
 	runTask()
 
-	runIoTServer()
+	conf := config.IoT{}
+	if err := config.Scan("iot", &conf); err != nil {
+		panic(err)
+	}
+
+	runIoTServer(conf)
 
 	runSocketServer()
 
 	runApiServer(mode, dist)
+
+	go worker.Run()
 
 	<-ctx.Done()
 
@@ -75,11 +83,7 @@ func runTask() {
 	}()
 }
 
-func runIoTServer() {
-	conf := config.IoT{}
-	if err := config.Scan("iot", &conf); err != nil {
-		panic(err)
-	}
+func runIoTServer(conf config.IoT) {
 	adapter.IoT = iot.NewAdapter(conf)
 	adapter.IoT.RegisterDispatchers(
 		dispatcher.NewDeviceStatus(),
