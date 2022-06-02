@@ -294,15 +294,21 @@ export function forEachTreeNode<N extends Node>(
   }
 }
 
-export function transformSingleMeasurmentData(measurement: MeasurementRow) {
+export function transformSingleMeasurmentData(measurement: MeasurementRow, ...filters: string[]) {
   const { properties, data } = measurement;
   if (!data) return [];
-  const { values, timestamp } = data;
+  const { values } = data;
   const res = [];
   for (const property of properties) {
     const { fields } = property;
     for (const keyOfValues in values) {
-      const field = fields.find(({ key }) => key === keyOfValues);
+      const field = fields.find(({ key }) => {
+        if (filters.length > 0) {
+          return key === keyOfValues && filters.find((propname) => propname === key);
+        } else {
+          return key === keyOfValues;
+        }
+      });
       if (field) {
         const precision = property.precision ?? 3;
         res.push({
@@ -315,32 +321,27 @@ export function transformSingleMeasurmentData(measurement: MeasurementRow) {
       }
     }
   }
-  return generatePropertyColumns({ [timestamp]: res });
+  return res;
 }
 
-function generatePropertyColumns(data: {
-  [x: number]: {
-    value: number;
-    key: string;
-    name: string;
-    dataIndex: number;
-    unit: string;
-    sort: number;
-  }[];
-}) {
-  const timestamp = Number(Object.keys(data)[0]);
-  const properties = data[timestamp];
-  return properties
-    .map(({ name, key, value, unit }) => ({
-      title: `${name}${unit ? `(${unit})` : ''}`,
-      key,
-      render: () => value.toString(),
-      width: 120
-    }))
-    .concat({
-      title: '采集时间',
-      key: 'timestamp',
-      render: () => moment(timestamp * 1000).format('YYYY-MM-DD HH:mm:ss'),
-      width: 150
-    });
+export function generatePropertyColumns(measurement: MeasurementRow, ...filters: string[]) {
+  const properties = transformSingleMeasurmentData(measurement, ...filters);
+  console.log(properties)
+  const timestamp = measurement.data?.timestamp;
+  if (properties.length > 0 && timestamp) {
+    return properties
+      .map(({ name, key, value, unit }) => ({
+        title: `${name}${unit ? `(${unit})` : ''}`,
+        key,
+        render: () => value.toString(),
+        width: 120
+      }))
+      .concat({
+        title: '采集时间',
+        key: 'timestamp',
+        render: () => moment(timestamp * 1000).format('YYYY-MM-DD HH:mm:ss'),
+        width: 150
+      });
+  }
+  return [];
 }

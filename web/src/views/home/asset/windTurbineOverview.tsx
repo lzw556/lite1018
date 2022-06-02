@@ -6,11 +6,7 @@ import '../home.css';
 import { MeasurementIcon } from '../measurement/icon';
 import { OverviewPage } from '../overviewPage';
 import { Introduction, NameValue, TableListItem } from '../props';
-import {
-  generateColProps,
-  generateFlangeChartOptions,
-  transformSingleMeasurmentData
-} from '../utils';
+import { generateColProps, generateFlangeChartOptions, generatePropertyColumns } from '../utils';
 import { AssetTypes } from '../constants';
 import { getAsset } from './services';
 import { AssetRow, transformAssetStatistics } from './props';
@@ -111,7 +107,7 @@ const WindTurbineOverview: React.FC = () => {
           if (prev.columns) {
             return {
               ...prev,
-              columns: [...prev.columns, ...transformSingleMeasurmentData(measurements[0])],
+              columns: [...prev.columns, ...generatePropertyColumns(measurements[0])],
               dataSource: measurements
             };
           } else {

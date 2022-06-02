@@ -1,5 +1,4 @@
 import { Empty, Spin } from 'antd';
-import Item from 'antd/lib/list/Item';
 import moment from 'moment';
 import * as React from 'react';
 import { Link, useLocation, useHistory } from 'react-router-dom';
@@ -14,8 +13,8 @@ import { TableListItem, NameValue } from '../props';
 import {
   generateColProps,
   generateFlangeChartOptions,
-  transformMeasurementHistoryData,
-  transformSingleMeasurmentData
+  generatePropertyColumns,
+  transformMeasurementHistoryData
 } from '../utils';
 import { AssetRow, generatePreloadOptions, transformAssetStatistics } from './props';
 import { getAsset } from './services';
@@ -76,7 +75,7 @@ const FlangeOverview: React.FC = () => {
           if (prev.columns) {
             return {
               ...prev,
-              columns: [...prev.columns, ...transformSingleMeasurmentData(monitoringPoints[0])],
+              columns: [...prev.columns, ...generatePropertyColumns(monitoringPoints[0])],
               dataSource: monitoringPoints
             };
           } else {
