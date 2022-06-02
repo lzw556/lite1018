@@ -4,6 +4,7 @@ import { MeasurementHistoryData, MeasurementRow } from './measurement/props';
 import { cloneDeep, round } from 'lodash';
 import { AssetRow } from './asset/props';
 import { Node } from './props';
+import { MeasurementTypes } from './constants';
 
 export function generateColProps({
   xs,
@@ -33,18 +34,24 @@ export function generateColProps({
 
 export function generateFlangeChartOptions(
   measurements: MeasurementRow[],
-  size: { inner: string; outer: string },
-  actual?: number[],
-  maxinum?: number[]
+  size: { inner: string; outer: string }
 ) {
   const count = measurements.length;
   if (!count) return null;
   const startAngle = 360 / count + 90;
-  const indicator = generateFakeMaxinum(measurements, 600);
-  const _actual = generateFakeActual(measurements);
-  const specification = generateFakeSpecification(300);
-  const _maxinum = generateFakeCircle(measurements);
-
+  const actuals = generateActuals(measurements);
+  let minActual = actuals[0][0];
+  let maxActual = minActual;
+  actuals.forEach(([value, angle]) => {
+    if (value > maxActual) maxActual = value;
+    if (value < minActual) minActual = value;
+  });
+  const factor = maxActual - minActual > 0 ? (maxActual - minActual) / 2 : Math.abs(maxActual) / 2;
+  minActual = minActual - factor;
+  maxActual = maxActual + factor;
+  const circleMax = maxActual + 1;
+  const _maxinum = generateFakeCircle(measurements, circleMax);
+  const specification = generateFakeSpecification((minActual + maxActual) / 2);
   return {
     polar: [
       { id: 'inner', radius: size.inner },
@@ -72,7 +79,8 @@ export function generateFlangeChartOptions(
     radiusAxis: [
       {
         polarIndex: 0,
-        max: 700,
+        max: maxActual,
+        min: minActual,
         axisLine: { show: false },
         axisTick: { show: false },
         axisLabel: { color: '#ccc' }
@@ -84,18 +92,10 @@ export function generateFlangeChartOptions(
         axisTick: { show: false },
         axisLabel: { show: false },
         splitLine: { show: false },
-        min: 1,
-        max: 801
+        min: minActual,
+        max: circleMax
       }
     ],
-    radar: {
-      radius: '50%',
-      indicator,
-      axisName: { show: false },
-      axisLine: { show: false },
-      splitLine: { show: false },
-      splitArea: { show: false }
-    },
     legend: {
       data: [
         {
@@ -110,11 +110,12 @@ export function generateFlangeChartOptions(
     },
     series: [
       {
-        type: 'radar',
+        type: 'line',
         name: '实际值',
+        coordinateSystem: 'polar',
         lineStyle: { color: '#00800080' },
         itemStyle: { color: '#00800080' },
-        data: [{ value: _actual }]
+        data: actuals
       },
       {
         type: 'line',
@@ -144,22 +145,23 @@ export function generateFlangeChartOptions(
   };
 }
 
-function generateFakeActual(measurements: MeasurementRow[]) {
-  const actual = [];
-  const count = measurements.length;
-  for (let index = count; index > 0; index--) {
-    actual.push(300 + Math.random() * 200);
+function generateActuals(measurements: MeasurementRow[]) {
+  const actuals = [];
+  const interval = 360 / measurements.length;
+  let first = 0;
+  for (let index = 0; index < measurements.length; index++) {
+    const point = measurements[index];
+    let propName = '';
+    if (point.type === MeasurementTypes.preload.type) {
+      propName = 'preload';
+    } else if (point.type === MeasurementTypes.loosening_angle.type) {
+      propName = 'loosening_angle';
+    }
+    const data = transformSingleMeasurmentData(measurements[index], propName);
+    actuals.push([data.length > 0 ? data[0].value : 0, index * interval]);
+    if (index === 0) first = data.length > 0 ? data[0].value : 0;
   }
-  return actual;
-}
-
-function generateFakeMaxinum(measurements: MeasurementRow[], max: number) {
-  const maxinum = [];
-  const count = measurements.length;
-  for (let index = count; index > 0; index--) {
-    maxinum.push({ name: index, max });
-  }
-  return maxinum;
+  return actuals.concat([[first, 360]]);
 }
 
 function generateFakeSpecification(max: number) {
@@ -170,12 +172,12 @@ function generateFakeSpecification(max: number) {
   return maxinum;
 }
 
-function generateFakeCircle(measurements: MeasurementRow[]) {
+function generateFakeCircle(measurements: MeasurementRow[], max: number) {
   const bolts = [];
   const count = measurements.length;
   const interval = 360 / count;
   for (let index = count; index > 0; index--) {
-    bolts.push([800, interval * index]);
+    bolts.push([max, interval * index]);
   }
   return bolts.map((item, index) => ({
     name: `item${index}`,
@@ -326,7 +328,6 @@ export function transformSingleMeasurmentData(measurement: MeasurementRow, ...fi
 
 export function generatePropertyColumns(measurement: MeasurementRow, ...filters: string[]) {
   const properties = transformSingleMeasurmentData(measurement, ...filters);
-  console.log(properties)
   const timestamp = measurement.data?.timestamp;
   if (properties.length > 0 && timestamp) {
     return properties
