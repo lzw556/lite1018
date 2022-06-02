@@ -92,6 +92,7 @@ func runIoTServer(conf config.IoT) {
 		dispatcher.NewSensorData(),
 		dispatcher.NewLargeSensorData(),
 		dispatcher.NewDeviceInformation(),
+		dispatcher.NewPing(),
 		dispatcher.NewHello(),
 		dispatcher.NewBye(),
 		dispatcher.NewEvent(),

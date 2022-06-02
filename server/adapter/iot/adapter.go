@@ -40,6 +40,7 @@ func NewAdapter(conf config.IoT) *Adapter {
 		SetConnectRetry(true).
 		SetPingTimeout(10 * time.Second).
 		SetOrderMatters(false).
+		SetCleanSession(true).
 		AddBroker(conf.Broker).
 		SetDefaultPublishHandler(a.onPublish).
 		SetOnConnectHandler(a.onConnect).
