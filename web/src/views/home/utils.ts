@@ -331,16 +331,23 @@ export function generatePropertyColumns(measurement: MeasurementRow, ...filters:
   const timestamp = measurement.data?.timestamp;
   if (properties.length > 0 && timestamp) {
     return properties
-      .map(({ name, key, value, unit }) => ({
+      .map(({ name, key, unit }) => ({
         title: `${name}${unit ? `(${unit})` : ''}`,
         key,
-        render: () => value.toString(),
+        render: (measurement: MeasurementRow) => {
+          const data = transformSingleMeasurmentData(measurement, key);
+          return data.length > 0 ? data[0].value.toString() : '-';
+        },
         width: 120
       }))
       .concat({
         title: '采集时间',
         key: 'timestamp',
-        render: () => moment(timestamp * 1000).format('YYYY-MM-DD HH:mm:ss'),
+        render: (measurement: MeasurementRow) => {
+          return measurement.data && measurement.data.timestamp
+            ? moment(measurement.data.timestamp * 1000).format('YYYY-MM-DD HH:mm:ss')
+            : '-';
+        },
         width: 150
       });
   }
