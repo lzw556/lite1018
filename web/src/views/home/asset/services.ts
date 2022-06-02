@@ -1,5 +1,6 @@
 import request from '../../../utils/request';
 import { DeleteResponse, GetResponse, PostResponse, PutResponse } from '../../../utils/response';
+import { ProjectStatistics } from '../props';
 import { Asset, AssetRow } from './props';
 
 export function getAssets(filters?: Partial<Pick<Asset, 'type' | 'parent_id'>>) {
@@ -20,4 +21,8 @@ export function updateAsset(id: Asset['id'], asset: Asset) {
 
 export function deleteAsset(id: Asset['id']) {
   return request.delete(`/assets/${id}`).then(DeleteResponse);
+}
+
+export function getProjectStatistics() {
+  return request.get<ProjectStatistics>(`/statistics/all`).then(GetResponse);
 }

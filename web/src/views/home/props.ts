@@ -59,3 +59,12 @@ export type Node = {
   type?: number;
   monitoringPoints?: MeasurementRow[];
 };
+
+export type ProjectStatistics = {
+  deviceAlarmNum: number;
+  deviceNum: number;
+  monitoringPointAlarmNum: number;
+  monitoringPointNum: number;
+  rootAssetAlarmNum: number;
+  rootAssetNum: number;
+};

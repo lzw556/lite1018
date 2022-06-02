@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { ColorDanger, ColorHealth, ColorInfo, ColorWarn } from '../../constants/color';
 import { AssetTypes } from './constants';
 import { AssetIcon } from './asset/icon';
-import { getAssets } from './asset/services';
+import { getAssets, getProjectStatistics } from './asset/services';
 import { Series_Bar } from './charts/bar';
 import { ChartOptions } from './charts/common';
 import { Series_Pie } from './charts/pie';
@@ -30,6 +30,35 @@ const ProjectOverview: React.FC = () => {
   const [statisticOfSensor, setStatisticOfSensor] = React.useState<ChartOptions<Series_Pie>>();
   const [statisticOfAlarm, setStatisticOfAlarm] = React.useState<ChartOptions<Series_Bar>>();
   React.useEffect(() => {
+    getProjectStatistics().then(
+      ({
+        rootAssetNum,
+        rootAssetAlarmNum,
+        deviceNum,
+        deviceAlarmNum,
+        monitoringPointNum,
+        monitoringPointAlarmNum
+      }) => {
+        setStatisticOfAsset(
+          generatePieOptions(rootAssetNum, {
+            normal: rootAssetNum - rootAssetAlarmNum,
+            error: rootAssetAlarmNum
+          })
+        );
+        setStatisticOfMeasurement(
+          generatePieOptions(monitoringPointNum, {
+            normal: monitoringPointNum - monitoringPointAlarmNum,
+            error: monitoringPointAlarmNum
+          })
+        );
+        setStatisticOfSensor(
+          generatePieOptions(deviceNum, {
+            normal: deviceNum - deviceAlarmNum,
+            error: deviceAlarmNum
+          })
+        );
+      }
+    );
     getAssets({ type: AssetTypes.WindTurbind.type }).then((assets) =>
       setWindTurbines({
         loading: false,
@@ -55,9 +84,6 @@ const ProjectOverview: React.FC = () => {
         })
       })
     );
-    setStatisticOfAsset(generatePieOptions(12, { normal: 11, error: 1 }));
-    setStatisticOfMeasurement(generatePieOptions(480, { normal: 472, error: 8 }));
-    setStatisticOfSensor(generatePieOptions(480, { normal: 472, error: 8 }));
     setStatisticOfAlarm({
       title: {
         text: '',
@@ -106,7 +132,7 @@ const ProjectOverview: React.FC = () => {
             { name: 'warn', value: 0, itemStyle: { color: ColorWarn } },
             { name: 'warn', value: 0, itemStyle: { color: ColorWarn } },
             { name: 'warn', value: 0, itemStyle: { color: ColorWarn } },
-            { name: 'warn', value: 2, itemStyle: { color: ColorWarn } },
+            { name: 'warn', value: 0, itemStyle: { color: ColorWarn } },
             { name: 'warn', value: 0, itemStyle: { color: ColorWarn } },
             { name: 'warn', value: 0, itemStyle: { color: ColorWarn } },
             { name: 'warn', value: 0, itemStyle: { color: ColorWarn } }
