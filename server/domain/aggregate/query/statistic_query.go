@@ -10,6 +10,7 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	spec "github.com/thetasensors/theta-cloud-lite/server/domain/specification"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/vo"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/devicetype"
 )
 
 type StatisticQuery struct {
@@ -100,7 +101,8 @@ func (query StatisticQuery) GetAllStatistics() (vo.AllStatistics, error) {
 	ctx := context.TODO()
 	result := vo.AllStatistics{}
 
-	devices, err := query.deviceRepo.FindBySpecs(ctx, query.Specs...)
+	sensorQuerySpecs := append(query.Specs, spec.TypeGtSpec(devicetype.RouterType))
+	devices, err := query.deviceRepo.FindBySpecs(ctx, sensorQuerySpecs...)
 	if err != nil {
 		return result, err
 	}
