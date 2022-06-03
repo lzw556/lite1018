@@ -6,21 +6,7 @@ import { AssetRow } from './asset/props';
 import { Node } from './props';
 import { MeasurementTypes } from './constants';
 
-export function generateColProps({
-  xs,
-  sm,
-  md,
-  lg,
-  xl,
-  xxl
-}: {
-  xs?: number;
-  sm?: number;
-  md?: number;
-  lg?: number;
-  xl?: number;
-  xxl?: number;
-}) {
+export function generateColProps({ xs, sm, md, lg, xl, xxl }: { xs?: number; sm?: number; md?: number; lg?: number; xl?: number; xxl?: number }) {
   const colCount = 24;
   return {
     xs: { span: xs ?? colCount },
@@ -32,10 +18,7 @@ export function generateColProps({
   };
 }
 
-export function generateFlangeChartOptions(
-  measurements: MeasurementRow[],
-  size: { inner: string; outer: string }
-) {
+export function generateFlangeChartOptions(measurements: MeasurementRow[], size: { inner: string; outer: string }) {
   const count = measurements.length;
   if (!count) return null;
   const startAngle = 360 / count + 90;
@@ -192,10 +175,7 @@ function generateFakeCircle(measurements: MeasurementRow[], max: number) {
   }));
 }
 
-export function transformMeasurementHistoryData(
-  data: MeasurementHistoryData,
-  propertyName?: string
-) {
+export function transformMeasurementHistoryData(data: MeasurementHistoryData, propertyName?: string) {
   const firstValue = data[0].values;
   const times = data.map(({ timestamp }) => moment.unix(timestamp).local());
   return firstValue
@@ -221,10 +201,7 @@ export function transformMeasurementHistoryData(
     });
 }
 
-export function generateMeasurementHistoryDataOptions(
-  data: MeasurementHistoryData,
-  propertyName?: string
-) {
+export function generateMeasurementHistoryDataOptions(data: MeasurementHistoryData, propertyName?: string) {
   const optionsData = transformMeasurementHistoryData(data, propertyName);
   return optionsData.map(({ times, seriesData, property }) => {
     return {
@@ -243,9 +220,7 @@ export function generateMeasurementHistoryDataOptions(
       grid: { bottom: 20 },
       title: {
         text: `${property.name}${property.unit ? `(${property.unit})` : ''}`,
-        subtext: propertyName
-          ? ''
-          : `${seriesData.map(({ name, data }) => name + ' ' + data[data.length - 1])}`
+        subtext: propertyName ? '' : `${seriesData.map(({ name, data }) => name + ' ' + data[data.length - 1])}`
       },
       series: seriesData.map(({ name, data }, index) => ({
         type: 'line',
@@ -280,16 +255,16 @@ export function filterEmptyChildren(assets: AssetRow[]) {
 
 export function mapTreeNode<N extends Node>(node: N, fn: <N extends Node>(node: N) => N): N {
   if (node.children && node.children.length > 0) {
-    return { ...fn(node), children: node.children.map((node) => mapTreeNode(node, fn)) };
+    return {
+      ...fn(node),
+      children: node.children.map((node) => mapTreeNode(node, fn))
+    };
   } else {
     return fn(node);
   }
 }
 
-export function forEachTreeNode<N extends Node>(
-  node: N,
-  fn: <N extends Node>(node: N) => void
-): void {
+export function forEachTreeNode<N extends Node>(node: N, fn: <N extends Node>(node: N) => void): void {
   fn(node);
   if (node.children && node.children.length > 0) {
     node.children.map((node) => forEachTreeNode(node, fn));
@@ -326,10 +301,9 @@ export function transformSingleMeasurmentData(measurement: MeasurementRow, ...fi
   return res;
 }
 
-export function generatePropertyColumns(measurement: MeasurementRow, ...filters: string[]) {
-  const properties = transformSingleMeasurmentData(measurement, ...filters);
-  const timestamp = measurement.data?.timestamp;
-  if (properties.length > 0 && timestamp) {
+export function generatePropertyColumns(measurement: MeasurementRow) {
+  const properties = pickFirstClassProperties(measurement);
+  if (properties.length > 0) {
     return properties
       .map(({ name, key, unit }) => ({
         title: `${name}${unit ? `(${unit})` : ''}`,
@@ -344,12 +318,22 @@ export function generatePropertyColumns(measurement: MeasurementRow, ...filters:
         title: '采集时间',
         key: 'timestamp',
         render: (measurement: MeasurementRow) => {
-          return measurement.data && measurement.data.timestamp
-            ? moment(measurement.data.timestamp * 1000).format('YYYY-MM-DD HH:mm:ss')
-            : '-';
+          return measurement.data && measurement.data.timestamp ? moment(measurement.data.timestamp * 1000).format('YYYY-MM-DD HH:mm:ss') : '-';
         },
         width: 150
       });
   }
   return [];
+}
+
+function getFirstClassProperties(measurementType: number) {
+  const type = Object.values(MeasurementTypes).find((type) => type.type === measurementType);
+  return type ? type.firstClassProperties : [];
+}
+
+function pickFirstClassProperties(measurement: MeasurementRow) {
+  const firstClassProperties = getFirstClassProperties(measurement.type);
+  return measurement.properties.filter(({ fields }) => {
+    return fields.find((field) => firstClassProperties.find((property) => property === field.key));
+  });
 }
