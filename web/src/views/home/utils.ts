@@ -135,14 +135,11 @@ function generateActuals(measurements: MeasurementRow[]) {
   for (let index = 0; index < measurements.length; index++) {
     const point = measurements[index];
     let propName = '';
-    if (point.type === MeasurementTypes.preload.type) {
-      propName = 'preload';
-    } else if (point.type === MeasurementTypes.loosening_angle.type) {
-      propName = 'loosening_angle';
-    }
-    const data = transformSingleMeasurmentData(measurements[index], propName);
-    actuals.push([data.length > 0 ? data[0].value : 0, index * interval]);
-    if (index === 0) first = data.length > 0 ? data[0].value : 0;
+    const firstClassProperties = getFirstClassProperties(point.type);
+    if (firstClassProperties.length > 0) propName = firstClassProperties[0];
+    const data = transformSingleMeasurmentData(point, propName);
+    actuals.push([data.length > 0 ? data[0].value : NaN, index * interval]);
+    if (index === 0) first = data.length > 0 ? data[0].value : NaN;
   }
   return actuals.concat([[first, 360]]);
 }
