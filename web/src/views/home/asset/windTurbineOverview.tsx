@@ -6,8 +6,8 @@ import '../home.css';
 import { MeasurementIcon } from '../measurement/icon';
 import { OverviewPage } from '../overviewPage';
 import { Introduction, NameValue, TableListItem } from '../props';
-import { generateColProps, generateFlangeChartOptions, generatePropertyColumns } from '../utils';
-import { AssetTypes } from '../constants';
+import { generateColProps, generateFlangeChartOptions, pickFirstClassProperties, transformSingleMeasurmentData } from '../utils';
+import { AssetTypes, MeasurementTypes } from '../constants';
 import { getAsset } from './services';
 import { AssetRow, transformAssetStatistics } from './props';
 import { MeasurementRow } from '../measurement/props';
@@ -32,14 +32,28 @@ const WindTurbineOverview: React.FC = () => {
         title: '名称',
         dataIndex: 'name',
         key: 'name',
-        width: 200
+        width: 200,
+        render: (name: string, row: MeasurementRow) => (
+          <Link to={`${MeasurementTypes.dynamicPreload.url}&id=${row.id}`}>{name}</Link>
+        ),
       },
       {
         title: '状态',
         key: 'alarmState',
         render: (val: any, record: MeasurementRow) => '',
         width: 120
-      }
+      },
+      {
+        title: '数据',
+        dataIndex: 'data',
+        key: 'data',
+        width: 260,
+        render: (x, record: MeasurementRow) => {
+          const filters = pickFirstClassProperties(record).map(property => property.key)
+          const data = transformSingleMeasurmentData(record, ...filters);
+          return data.length > 0 ? data.map(({ name, value }) => `${name}: ${value}`).join(',') : '暂无数据'
+        }
+      },
     ],
     colProps: generateColProps({ xl: 24, xxl: 24 }),
     size: 'small',
@@ -107,7 +121,6 @@ const WindTurbineOverview: React.FC = () => {
           if (prev.columns) {
             return {
               ...prev,
-              columns: [...prev.columns, ...generatePropertyColumns(measurements[0])],
               dataSource: measurements
             };
           } else {

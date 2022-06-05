@@ -100,56 +100,24 @@ const ProjectOverview: React.FC = () => {
       tooltip: { trigger: 'axis' },
       xAxis: {
         type: 'category',
-        data: [
-          '2022-04-08',
-          '2022-04-09',
-          '2022-04-10',
-          '2022-04-11',
-          '2022-04-12',
-          '2022-04-13',
-          '2022-04-14'
-        ]
+        data: []
       },
       yAxis: { type: 'value', minInterval: 1 },
       series: [
         {
           type: 'bar',
           name: '次要',
-          data: [
-            { name: 'info', value: 0, itemStyle: { color: ColorInfo } },
-            { name: 'info', value: 0, itemStyle: { color: ColorInfo } },
-            { name: 'info', value: 0, itemStyle: { color: ColorInfo } },
-            { name: 'info', value: 0, itemStyle: { color: ColorInfo } },
-            { name: 'info', value: 0, itemStyle: { color: ColorInfo } },
-            { name: 'info', value: 0, itemStyle: { color: ColorInfo } },
-            { name: 'info', value: 0, itemStyle: { color: ColorInfo } }
-          ]
+          data: []
         },
         {
           type: 'bar',
           name: '重要',
-          data: [
-            { name: 'warn', value: 0, itemStyle: { color: ColorWarn } },
-            { name: 'warn', value: 0, itemStyle: { color: ColorWarn } },
-            { name: 'warn', value: 0, itemStyle: { color: ColorWarn } },
-            { name: 'warn', value: 0, itemStyle: { color: ColorWarn } },
-            { name: 'warn', value: 0, itemStyle: { color: ColorWarn } },
-            { name: 'warn', value: 0, itemStyle: { color: ColorWarn } },
-            { name: 'warn', value: 0, itemStyle: { color: ColorWarn } }
-          ]
+          data: []
         },
         {
           type: 'bar',
           name: '紧急',
-          data: [
-            { name: 'danger', value: 0, itemStyle: { color: ColorDanger } },
-            { name: 'danger', value: 0, itemStyle: { color: ColorDanger } },
-            { name: 'danger', value: 0, itemStyle: { color: ColorDanger } },
-            { name: 'danger', value: 0, itemStyle: { color: ColorDanger } },
-            { name: 'danger', value: 0, itemStyle: { color: ColorDanger } },
-            { name: 'danger', value: 0, itemStyle: { color: ColorDanger } },
-            { name: 'danger', value: 0, itemStyle: { color: ColorDanger } }
-          ]
+          data: []
         }
       ]
     });

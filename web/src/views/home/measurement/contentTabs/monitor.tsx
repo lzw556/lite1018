@@ -1,4 +1,4 @@
-import { Col, Row } from 'antd';
+import { Col, Empty, Row, Spin } from 'antd';
 import moment from 'moment';
 import * as React from 'react';
 import { ChartContainer } from '../../charts/chartContainer';
@@ -8,16 +8,19 @@ import { getData } from '../services';
 
 export const Monitor: React.FC<MeasurementRow> = (props) => {
   const { id } = props;
+  const [loading, setLoading] = React.useState(true);
   const [historyOptions, setHistoryOptions] = React.useState<any>();
   React.useEffect(() => {
     const from = moment().startOf('day').subtract(7, 'd').utc().unix();
     const to = moment().endOf('day').utc().unix();
     getData(id, from, to).then((data) => {
+      setLoading(false)
       if (data.length > 0) setHistoryOptions(generateMeasurementHistoryDataOptions(data));
     });
   }, [id]);
 
-  if (!historyOptions || historyOptions.length === 0) return null;
+  if (loading) return <Spin />;
+  if (!historyOptions || historyOptions.length === 0) return <Empty description='暂无数据' />;
 
   return (
     <Row gutter={[32, 32]}>

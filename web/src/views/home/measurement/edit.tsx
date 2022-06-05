@@ -12,19 +12,15 @@ import { addMeasurement, bindDevice, updateMeasurement } from './services';
 export const MeasurementEdit: React.FC<
   ModalProps & { selectedRow?: MeasurementRow } & { onSuccess: () => void }
 > = (props) => {
-  const types = [
+  const [types, setTypes] = React.useState([
     DeviceType.BoltLoosening,
-    DeviceType.BoltElongation,
-    DeviceType.HighTemperatureCorrosion,
-    DeviceType.NormalTemperatureCorrosion,
-    DeviceType.AngleDip,
-    DeviceType.PressureTemperature,
-    DeviceType.VibrationTemperature3Axis
-  ].join(',');
+    DeviceType.BoltElongation
+  ]);
   const { selectedRow, onSuccess } = props;
   const { id } = selectedRow || {};
   const [form] = Form.useForm<Measurement & { device_id: number }>();
   const [parents, setParents] = React.useState<AssetRow[]>([]);
+  const [disabled, setDisabled] = React.useState(true)
 
   React.useEffect(() => {
     getAssets({ type: AssetTypes.Flange.type }).then(setParents);
@@ -74,7 +70,11 @@ export const MeasurementEdit: React.FC<
           <Input placeholder={`请填写监测点名称`} />
         </Form.Item>
         <Form.Item label='类型' name='type' rules={[{ required: true, message: `请选择类型` }]}>
-          <Select placeholder='请选择类型'>
+          <Select placeholder='请选择类型' onChange={e => {
+            const type = Object.values(MeasurementTypes).find((type) => type.type === e);
+            if (parents.length > 0 && type) setTypes(type.deviceTypes)
+            setDisabled(false)
+          }}>
             {Object.values(MeasurementTypes).map(({ type, label }) => (
               <Select.Option key={type} value={type}>
                 {label}
@@ -100,7 +100,7 @@ export const MeasurementEdit: React.FC<
           name='device_id'
           rules={[{ required: true, message: `请选择传感器` }]}
         >
-          <DeviceSelect filters={{ types }} />
+          <DeviceSelect filters={{ types: types.join(',') }} disabled={disabled} />
         </Form.Item>
       </Form>
     </Modal>

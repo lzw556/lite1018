@@ -27,23 +27,24 @@ const FlangeOverview: React.FC = () => {
   const [loading, setLoading] = React.useState(true);
   const [measurements, setMeasurements] = React.useState<MeasurementRow[]>();
   const [statistics, setStatistics] = React.useState<NameValue[]>();
-  const [statisticOfPreload, setStatisticOfPreload] = React.useState<any>();
+  const [statisticOfPreload, setStatisticOfPreload] = React.useState<any>(generatePreloadOptions({ times: [], seriesData: [], property: '' }, ''));
+  const commonColumns = [
+    {
+      title: '监测点',
+      dataIndex: 'name',
+      key: 'name',
+      render: (name: string, row: MeasurementRow) => (
+        <Link to={`${MeasurementTypes.dynamicPreload.url}&id=${row.id}`}>{name}</Link>
+      ),
+      width: 200
+    },
+    { title: '状态', dataIndex: 'state', key: 'state', render: () => '正常', width: 120 }
+  ]
   const [tableOfMeasurement, setTableOfMeasurement] = React.useState<TableListItem<MeasurementRow>>(
     {
       rowKey: 'id',
       title: () => <h3>当前数据</h3>,
-      columns: [
-        {
-          title: '监测点',
-          dataIndex: 'name',
-          key: 'name',
-          render: (name: string, row: MeasurementRow) => (
-            <Link to={`${MeasurementTypes.dynamicPreload.url}&id=${row.id}`}>{name}</Link>
-          ),
-          width: 200
-        },
-        { title: '状态', dataIndex: 'state', key: 'state', render: () => '正常', width: 120 }
-      ],
+      columns: commonColumns,
       colProps: generateColProps({ xl: 24, xxl: 24 }),
       size: 'small',
       pagination: false
@@ -75,7 +76,7 @@ const FlangeOverview: React.FC = () => {
           if (prev.columns) {
             return {
               ...prev,
-              columns: [...prev.columns, ...generatePropertyColumns(monitoringPoints[0])],
+              columns: [...commonColumns, ...generatePropertyColumns(monitoringPoints[0])],
               dataSource: monitoringPoints
             };
           } else {
@@ -142,7 +143,7 @@ const FlangeOverview: React.FC = () => {
             <a
               href='#!'
               onClick={(e) => {
-                history.goBack();
+                history.go(-1);
                 e.preventDefault();
               }}
             >
@@ -153,10 +154,12 @@ const FlangeOverview: React.FC = () => {
       />
     );
 
+  const measurementType = Object.values(MeasurementTypes).find((type) => type.type === measurements[0].type);
+
   return (
     <>
       <AssetNavigator id={id} type={asset?.type} />
-      <OverviewPage
+      {measurementType && <OverviewPage
         {...{
           statistics,
           tabelList: [tableOfMeasurement],
@@ -170,13 +173,13 @@ const FlangeOverview: React.FC = () => {
               })
             },
             {
-              title: '预紧力趋势',
+              title: `${measurementType.label}趋势`,
               colProps: generateColProps({ xl: 12, xxl: 15 }),
               options: statisticOfPreload
             }
           ]
         }}
-      />
+      />}
     </>
   );
 };

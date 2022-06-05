@@ -9,6 +9,7 @@ import { SearchResultPage } from '../searchResultPage';
 import { MeasurementEdit } from './edit';
 import { MeasurementRow } from './props';
 import { deleteMeasurement, getMeasurements } from './services';
+import { pickFirstClassProperties, transformSingleMeasurmentData } from '../utils';
 
 const MeasurementManagement: React.FC = () => {
   const [assets, setAssets] = React.useState<{
@@ -37,7 +38,11 @@ const MeasurementManagement: React.FC = () => {
   const [result, setResult] = React.useState<TableProps<any>>({
     rowKey: 'id',
     columns: [
-      { title: '名称', dataIndex: 'name', key: 'name', width: '50%' },
+      {
+        title: '名称', dataIndex: 'name', key: 'name', width: '50%', render: (name: string, row: MeasurementRow) => (
+          <Link to={`${MeasurementTypes.dynamicPreload.url}&id=${row.id}`}>{name}</Link>
+        ),
+      },
       {
         title: '类型',
         key: 'type',
@@ -45,6 +50,17 @@ const MeasurementManagement: React.FC = () => {
         render: (row: MeasurementRow) => {
           const type = Object.values(MeasurementTypes).find((type) => type.type === row.type);
           return type ? type.label : '-';
+        }
+      },
+      {
+        title: '数据',
+        dataIndex: 'data',
+        key: 'data',
+        width: 260,
+        render: (x, record: MeasurementRow) => {
+          const filters = pickFirstClassProperties(record).map(property => property.key)
+          const data = transformSingleMeasurmentData(record, ...filters);
+          return data.length > 0 ? data.map(({ name, value }) => `${name}: ${value}`).join(',') : '暂无数据'
         }
       },
       {

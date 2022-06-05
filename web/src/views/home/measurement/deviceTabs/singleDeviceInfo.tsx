@@ -7,10 +7,11 @@ import { DeviceType } from '../../../../types/device_type';
 import { SingleDeviceStatus } from '../../../device/SingleDeviceStatus';
 import { generateColProps } from '../../utils';
 import '../../../../string-extension';
+import { Link } from 'react-router-dom';
 
 export const SingleDeviceInfo: React.FC<Device> = (props) => {
   const colProps = generateColProps({ xxl: 8, xl: 8, lg: 12, md: 12 });
-  const { name, typeId, information, alertStates, state, macAddress, data } = props;
+  const { id, name, typeId, information, alertStates, state, macAddress, data } = props;
   const { batteryVoltage, signalLevel, connectedAt } = state;
   return (
     <ShadowCard>
@@ -19,7 +20,7 @@ export const SingleDeviceInfo: React.FC<Device> = (props) => {
           <dl className='name-value-groups'>
             <div className='name-value'>
               <dt>设备名称</dt>
-              <dd>{name}</dd>
+              <dd><Link to={`/device-management?locale=devices/deviceDetail&id=${id}`}>{name}</Link></dd>
             </div>
           </dl>
         </Col>
@@ -78,7 +79,7 @@ export const SingleDeviceInfo: React.FC<Device> = (props) => {
             <div className='name-value'>
               <dt>最近连接时间</dt>
               <dd>
-                {state && connectedAt
+                {state && connectedAt > 0
                   ? moment(connectedAt * 1000).format('YYYY-MM-DD HH:mm:ss')
                   : '-'}
               </dd>
@@ -90,7 +91,7 @@ export const SingleDeviceInfo: React.FC<Device> = (props) => {
             <div className='name-value'>
               <dt>最近一次采集时间</dt>
               <dd>
-                {data && data.timestamp
+                {data && data.timestamp > 0
                   ? moment.unix(data.timestamp).local().format('YYYY-MM-DD HH:mm:ss')
                   : '-'}
               </dd>

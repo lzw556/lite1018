@@ -4,7 +4,7 @@ import { MeasurementHistoryData, MeasurementRow } from './measurement/props';
 import { cloneDeep, round } from 'lodash';
 import { AssetRow } from './asset/props';
 import { Node } from './props';
-import { MeasurementTypes } from './constants';
+import { AssetTypes, MeasurementTypes } from './constants';
 
 export function generateColProps({ xs, sm, md, lg, xl, xxl }: { xs?: number; sm?: number; md?: number; lg?: number; xl?: number; xxl?: number }) {
   const colCount = 24;
@@ -328,9 +328,13 @@ function getFirstClassProperties(measurementType: number) {
   return type ? type.firstClassProperties : [];
 }
 
-function pickFirstClassProperties(measurement: MeasurementRow) {
+export function pickFirstClassProperties(measurement: MeasurementRow) {
   const firstClassProperties = getFirstClassProperties(measurement.type);
   return measurement.properties.filter(({ fields }) => {
     return fields.find((field) => firstClassProperties.find((property) => property === field.key));
   });
+}
+
+export function getAssetType(typeId: number) {
+  return Object.values(AssetTypes).find((type) => type.type === typeId);
 }

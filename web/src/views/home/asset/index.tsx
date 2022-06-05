@@ -3,11 +3,12 @@ import { Button, ButtonProps, Empty, Popconfirm, Space, TableProps } from 'antd'
 import { forEach } from 'lodash';
 import * as React from 'react';
 import { SearchResultPage } from '../searchResultPage';
-import { filterEmptyChildren } from '../utils';
+import { filterEmptyChildren, getAssetType } from '../utils';
 import { AssetTypes } from '../constants';
 import { AssetEdit } from './edit';
-import { AssetRow } from './props';
+import { AssetRow, transformAssetStatistics } from './props';
 import { deleteAsset, getAssets } from './services';
+import { Link } from 'react-router-dom';
 
 const AssetManagement: React.FC = () => {
   const [assets, setAssets] = React.useState<{
@@ -37,37 +38,59 @@ const AssetManagement: React.FC = () => {
   const [result, setResult] = React.useState<TableProps<any>>({
     rowKey: (row: AssetRow) => row.id + row.type,
     columns: [
-      { title: '名称', dataIndex: 'name', key: 'name', width: '50%' },
+      {
+        title: '名称', dataIndex: 'name', key: 'name', width: 200, render: (name: string, row: AssetRow) => {
+          const assetType = getAssetType(row.type);
+          const hasChildren = ((row.monitoringPoints && row.monitoringPoints.length) || (row.children && row.children.length))
+          return assetType && hasChildren ? <Link to={`${assetType.url}&id=${row.id}`}>{name}</Link> : name
+        }
+      },
+      {
+        title: '数据', dataIndex: 'data', key: 'data', width: 400, render: (name: string, row: AssetRow) => {
+          const { alarmState, statistics } = transformAssetStatistics(
+            row.statistics,
+            'monitoringPointNum',
+            ['anomalous', '异常监测点'],
+            'deviceNum',
+            'offlineDeviceNum'
+          );
+          return statistics.map(({ name, value }) => `${name}: ${value}`).join(',')
+        }
+      },
       {
         title: '操作',
         key: 'action',
-        render: (row: AssetRow) => (
-          <Space>
-            <Button type='text' size='small' title='编辑风机'>
-              <EditOutlined onClick={() => open(AssetTypes.WindTurbind, row)} />
-            </Button>
-            <Popconfirm
-              title={'确定要删除该风机吗?'}
-              onConfirm={() => {
-                deleteAsset(row.id).then(() => {
-                  fetchAssets({ type: AssetTypes.WindTurbind.type });
-                });
-              }}
-            >
-              <Button type='text' danger={true} size='small' title='删除风机'>
-                <DeleteOutlined />
+        render: (x, row: AssetRow) => {
+          const assetType = getAssetType(row.type);
+          const name = assetType ? assetType.label : '风机';
+          return (
+            <Space>
+              <Button type='text' size='small' title={`编辑${name}`}>
+                <EditOutlined onClick={() => assetType && open(assetType, row)} />
               </Button>
-            </Popconfirm>
-            {row.type === AssetTypes.WindTurbind.type && (
-              <Button type='text' size='small' title='添加法兰'>
-                <PlusOutlined
-                  style={{ color: 'rgba(0,0,0,.55)' }}
-                  onClick={() => open({ ...AssetTypes.Flange, parent_id: row.id })}
-                />
-              </Button>
-            )}
-          </Space>
-        )
+              <Popconfirm
+                title={`确定要删除该${name}吗?`}
+                onConfirm={() => {
+                  deleteAsset(row.id).then(() => {
+                    fetchAssets({ type: AssetTypes.WindTurbind.type });
+                  });
+                }}
+              >
+                <Button type='text' danger={true} size='small' title={`删除${name}`}>
+                  <DeleteOutlined />
+                </Button>
+              </Popconfirm>
+              {row.type === AssetTypes.WindTurbind.type && (
+                <Button type='text' size='small' title='添加法兰'>
+                  <PlusOutlined
+                    style={{ color: 'rgba(0,0,0,.55)' }}
+                    onClick={() => open({ ...AssetTypes.Flange, parent_id: row.id })}
+                  />
+                </Button>
+              )}
+            </Space>
+          )
+        }
       }
     ],
     size: 'small',
