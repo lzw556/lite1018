@@ -86,6 +86,32 @@ export const AssetEdit: React.FC<
             ))}
           </Select>
         </Form.Item>
+        {AssetTypes.Flange.categories && type !== AssetTypes.WindTurbind.type && (
+          <Form.Item
+            label='法兰类型'
+            name={['attributes', 'type']}
+            rules={[{ required: true, message: `请选择法兰类型` }]}
+          >
+            <Select placeholder='请选择法兰类型'>
+              {AssetTypes.Flange.categories.map(({ value, label }) => (
+                <Select.Option key={value} value={value}>
+                  {label}
+                </Select.Option>
+              ))}
+            </Select>
+          </Form.Item>
+        )}
+        {AssetTypes.Flange.categories && type !== AssetTypes.WindTurbind.type && (
+          <Form.Item label='序号' name={['attributes', 'index']}>
+            <Select placeholder='请选择序号'>
+              {[1, 2, 3, 4, 5].map((item) => (
+                <Select.Option key={item} value={item}>
+                  {item}
+                </Select.Option>
+              ))}
+            </Select>
+          </Form.Item>
+        )}
       </Form>
     </Modal>
   );

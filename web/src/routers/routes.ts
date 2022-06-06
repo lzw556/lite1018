@@ -158,6 +158,17 @@ const SecondaryRoutes: Menu[] = [
       isAuth: true,
       children: [],
   },
+  {
+    id: 111,
+    name: "addAlarmRules",
+    path: "/alarm-management",
+    title: "添加规则2",
+    view: "AlarmRuleCreation",
+    icon: "",
+    hidden: true,
+    isAuth: true,
+    children: [],
+},
 ]
 
 export {

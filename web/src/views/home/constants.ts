@@ -7,6 +7,7 @@ export const AssetTypes: Record<
     label: string;
     parent_id?: number;
     url: string;
+    categories?: { label: string; value: number | string }[];
   }
 > = {
   WindTurbind: {
@@ -15,7 +16,17 @@ export const AssetTypes: Record<
     parent_id: 0,
     url: '/project-overview?locale=project-overview/windturbine'
   },
-  Flange: { type: 3, label: '法兰', url: '/project-overview?locale=project-overview/flange' }
+  Flange: {
+    type: 3,
+    label: '法兰',
+    url: '/project-overview?locale=project-overview/flange',
+    categories: [
+      { label: '塔筒', value: 1 },
+      { label: '叶根', value: 2 },
+      { label: '轮毂-机舱连接', value: 3 },
+      { label: '变桨轴承', value: 4 }
+    ]
+  }
 };
 
 export const MeasurementTypes: Record<

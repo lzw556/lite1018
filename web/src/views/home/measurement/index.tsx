@@ -39,7 +39,7 @@ const MeasurementManagement: React.FC = () => {
     rowKey: 'id',
     columns: [
       {
-        title: '名称', dataIndex: 'name', key: 'name', width: '50%', render: (name: string, row: MeasurementRow) => (
+        title: '名称', dataIndex: 'name', key: 'name', width: 260, render: (name: string, row: MeasurementRow) => (
           <Link to={`${MeasurementTypes.dynamicPreload.url}&id=${row.id}`}>{name}</Link>
         ),
       },
@@ -56,7 +56,7 @@ const MeasurementManagement: React.FC = () => {
         title: '数据',
         dataIndex: 'data',
         key: 'data',
-        width: 260,
+        width: 400,
         render: (x, record: MeasurementRow) => {
           const filters = pickFirstClassProperties(record).map(property => property.key)
           const data = transformSingleMeasurmentData(record, ...filters);
