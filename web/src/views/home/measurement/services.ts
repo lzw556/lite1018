@@ -26,7 +26,7 @@ export function bindDevice(id: Measurement['id'], device_id: number) {
   //TODO
   return request.post(`/monitoringPoints/${id}/bindDevice`, {
     device_id,
-    algorithm_id: 1,
+    process_id: 1,
     parameters: {}
   });
 }

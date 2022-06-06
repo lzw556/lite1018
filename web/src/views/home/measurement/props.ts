@@ -5,6 +5,7 @@ export type Measurement = {
   name: string;
   type: number;
   asset_id: number;
+  device_id?: number;
 };
 
 export type Property = {
@@ -22,7 +23,7 @@ export type MeasurementRow = {
   name: string;
   type: number;
   assetId: number;
-  bindingDevices: Device[];
+  bindingDevices?: Device[];
   attributes?: any;
   assetName: string;
   properties: Property[];
@@ -34,7 +35,16 @@ export type MeasurementRow = {
 
 export function convertRow(values?: MeasurementRow): Measurement | null {
   if (!values) return null;
-  return { id: values.id, name: values.name, type: values.type, asset_id: values.assetId };
+  return {
+    id: values.id,
+    name: values.name,
+    type: values.type,
+    asset_id: values.assetId,
+    device_id:
+      values.bindingDevices && values.bindingDevices.length > 0
+        ? values.bindingDevices[0].id
+        : undefined
+  };
 }
 
 export type MeasurementHistoryData = {

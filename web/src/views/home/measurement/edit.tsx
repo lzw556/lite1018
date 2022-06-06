@@ -70,10 +70,18 @@ export const MeasurementEdit: React.FC<
           <Select
             placeholder='请选择类型'
             onChange={(e) => {
-              const type = Object.values(MeasurementTypes).find((type) => type.type === e);
-              if (parents.length > 0 && type) setTypes(type.deviceTypes);
-              setDisabled(false);
+              if (!id) {
+                const type = Object.values(MeasurementTypes).find((type) => type.type === e);
+                if (type) {
+                  setTypes(type.deviceTypes);
+                  if (form.getFieldValue('device_id')) {
+                    form.setFieldsValue({ device_id: undefined });
+                  }
+                }
+                setDisabled(false);
+              }
             }}
+            disabled={!!id}
           >
             {Object.values(MeasurementTypes).map(({ type, label }) => (
               <Select.Option key={type} value={type}>
@@ -100,9 +108,9 @@ export const MeasurementEdit: React.FC<
           name='device_id'
           rules={[{ required: true, message: `请选择传感器` }]}
         >
-          <DeviceSelect filters={{ types: types.join(',') }} disabled={disabled} />
+          <DeviceSelect filters={{ types: types.join(',') }} disabled={disabled || !!id} />
         </Form.Item>
-        <Form.Item label='序号' name={['attributes', 'index']}>
+        <Form.Item label='序号' name={['attributes', 'index']} initialValue={1}>
           <Select placeholder='请选择序号'>
             {[1, 2, 3, 4, 5].map((item) => (
               <Select.Option key={item} value={item}>
