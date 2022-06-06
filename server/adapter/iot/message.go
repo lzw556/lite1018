@@ -37,3 +37,9 @@ func parse(msg mqtt.Message) Message {
 		},
 	}
 }
+
+type PublishMessage struct {
+	Topic   string
+	Qos     byte
+	Payload []byte
+}

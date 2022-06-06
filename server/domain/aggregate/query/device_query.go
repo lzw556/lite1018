@@ -12,6 +12,7 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	spec "github.com/thetasensors/theta-cloud-lite/server/domain/specification"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/vo"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/cache"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/devicetype"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/errcode"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/xlog"
@@ -107,7 +108,10 @@ func (query DeviceQuery) Get(id uint) (*vo.Device, error) {
 func (query DeviceQuery) newDevice(device entity.Device) vo.Device {
 	result := vo.NewDevice(device)
 	result.SetUpgradeState(device)
-	result.State, _ = query.deviceStateRepo.Get(device.MacAddress)
+	if state, err := query.deviceStateRepo.Get(device.MacAddress); err == nil {
+		result.SetState(state)
+	}
+	result.State.IsOnline, result.State.ConnectedAt, _ = cache.GetConnection(device.MacAddress)
 	result.Information, _ = query.deviceInformationRepo.Get(device.MacAddress)
 	if states, err := query.deviceAlertStateRepo.Find(device.MacAddress); err == nil {
 		result.SetAlertStates(states)
@@ -115,7 +119,9 @@ func (query DeviceQuery) newDevice(device entity.Device) vo.Device {
 	if t := devicetype.Get(device.Type); t != nil {
 		result.Properties = make(vo.Properties, 0)
 		for _, property := range t.Properties(t.SensorID()) {
-			result.Properties = append(result.Properties, vo.NewProperty(property))
+			if property.IsShow {
+				result.Properties = append(result.Properties, vo.NewProperty(property))
+			}
 		}
 		sort.Sort(result.Properties)
 
@@ -182,11 +188,13 @@ func (query DeviceQuery) findCharacteristicData(device entity.Device, from, to t
 		for i := range data {
 			properties := make(vo.Properties, 0)
 			for _, p := range t.Properties(t.SensorID()) {
-				property := vo.NewProperty(p)
-				for _, field := range p.Fields {
-					property.SetData(field.Name, data[i].Values[field.Key])
+				if p.IsShow {
+					property := vo.NewProperty(p)
+					for _, field := range p.Fields {
+						property.SetData(field.Name, data[i].Values[field.Key])
+					}
+					properties = append(properties, property)
 				}
-				properties = append(properties, property)
 			}
 			r := vo.NewDeviceData(data[i].Time)
 			r.Values = properties
@@ -266,7 +274,7 @@ func (query DeviceQuery) RuntimeDataByRange(id uint, from, to time.Time) ([]vo.S
 	result := make([]vo.SensorRuntimeData, len(data))
 	for i, d := range data {
 		result[i] = vo.SensorRuntimeData{
-			Timestamp:      d.ConnectedAt,
+			Timestamp:      d.Timestamp,
 			BatteryVoltage: d.BatteryVoltage,
 			SignalStrength: d.SignalLevel,
 		}
@@ -470,7 +478,6 @@ func (query DeviceQuery) FindEventsByID(id uint, from, to int64) ([]vo.DeviceEve
 	for i, e := range es {
 		result[i] = vo.NewDeviceEvent(e)
 	}
-	sort.Sort(result)
 	return result, nil
 }
 
@@ -487,6 +494,7 @@ func (query DeviceQuery) PagingEventsByID(id uint, from, to int64, page int, siz
 	for i, e := range es {
 		result[i] = vo.NewDeviceEvent(e)
 	}
+	sort.Sort(result)
 	return result, total, nil
 }
 

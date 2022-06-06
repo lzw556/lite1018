@@ -1,3 +1,5 @@
+//go:build theta
+
 package main
 
 import (

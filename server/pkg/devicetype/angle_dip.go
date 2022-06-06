@@ -104,6 +104,7 @@ func (d AngleDip) Properties(sensorID uint) Properties {
 				Unit:      "°",
 				Precision: 3,
 				Sort:      0,
+				IsShow:    true,
 				Fields: []Field{
 					{
 						Name:      "倾斜角",
@@ -118,6 +119,7 @@ func (d AngleDip) Properties(sensorID uint) Properties {
 				Unit:      "°",
 				Precision: 3,
 				Sort:      1,
+				IsShow:    true,
 				Fields: []Field{
 					{
 						Name:      "俯仰角",
@@ -132,11 +134,27 @@ func (d AngleDip) Properties(sensorID uint) Properties {
 				Unit:      "°",
 				Precision: 3,
 				Sort:      2,
+				IsShow:    true,
 				Fields: []Field{
 					{
 						Name:      "翻滚角",
 						Key:       "roll",
 						DataIndex: 2,
+					},
+				},
+			},
+			{
+				Key:       "waggle",
+				Name:      "晃度",
+				Unit:      "",
+				Precision: 3,
+				Sort:      3,
+				IsShow:    true,
+				Fields: []Field{
+					{
+						Key:       "waggle",
+						Name:      "晃度",
+						DataIndex: 3,
 					},
 				},
 			},

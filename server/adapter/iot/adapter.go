@@ -8,6 +8,7 @@ import (
 	uuid "github.com/satori/go.uuid"
 	"github.com/thetasensors/theta-cloud-lite/server/config"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/xlog"
+	"time"
 )
 
 type Adapter struct {
@@ -18,23 +19,36 @@ type Adapter struct {
 	port          int
 	serverEnabled bool
 	dispatchers   map[string]Dispatcher
+	publishChan   chan PublishMessage
 }
 
 func NewAdapter(conf config.IoT) *Adapter {
-	opts := mqtt.NewClientOptions()
-	opts.Username = conf.Username
-	opts.Password = conf.Password
-	opts.ClientID = "iot"
-	opts.CleanSession = false
-	opts.AddBroker(conf.Broker)
-	return &Adapter{
-		client:        mqtt.NewClient(opts),
+	a := &Adapter{
 		username:      conf.Username,
 		password:      conf.Password,
 		port:          conf.Server.Port,
 		serverEnabled: conf.Server.Enabled,
 		dispatchers:   map[string]Dispatcher{},
+		publishChan:   make(chan PublishMessage, 0),
 	}
+	opts := mqtt.NewClientOptions()
+	opts.SetUsername(conf.Username).
+		SetPassword(conf.Password).
+		SetClientID(fmt.Sprintf("iot-%s", uuid.NewV1().String())).
+		SetAutoReconnect(true).
+		SetCleanSession(false).
+		SetConnectRetry(true).
+		SetPingTimeout(10 * time.Second).
+		SetOrderMatters(false).
+		SetCleanSession(true).
+		AddBroker(conf.Broker).
+		SetDefaultPublishHandler(a.onPublish).
+		SetOnConnectHandler(a.onConnect).
+		SetConnectionLostHandler(func(client mqtt.Client, err error) {
+			xlog.Errorf("connection lost to MQTT broker: %v", err)
+		})
+	a.client = mqtt.NewClient(opts)
+	return a
 }
 
 func (a *Adapter) RegisterDispatchers(dispatchers ...Dispatcher) {
@@ -63,11 +77,6 @@ func (a *Adapter) startMQTTServer() error {
 }
 
 func (a *Adapter) Subscribe(topic string, qos byte, handler func(c mqtt.Client, msg mqtt.Message)) error {
-	if !a.client.IsConnected() {
-		if t := a.client.Connect(); t.Wait() && t.Error() != nil {
-			return t.Error()
-		}
-	}
 	t := a.client.Subscribe(topic, qos, handler)
 	if t.Wait() && t.Error() != nil {
 		return t.Error()
@@ -79,12 +88,30 @@ func (a *Adapter) Unsubscribe(topic string) {
 	a.client.Unsubscribe(topic)
 }
 
-func (a *Adapter) Publish(topic string, qos byte, payload []byte) error {
-	t := a.client.Publish(topic, qos, false, payload)
-	if t.Wait() && t.Error() != nil {
-		return t.Error()
+func (a *Adapter) Publish(topic string, qos byte, payload []byte) {
+	a.publishChan <- PublishMessage{
+		Topic:   topic,
+		Qos:     qos,
+		Payload: payload,
 	}
-	return nil
+}
+
+func (a Adapter) onPublish(c mqtt.Client, msg mqtt.Message) {
+	xlog.Infof("publish topic: %s", msg.Topic())
+}
+
+func (a *Adapter) onConnect(c mqtt.Client) {
+	xlog.Info("connected to MQTT broker")
+	t := c.Subscribe("iot/v2/gw/+/dev/+/msg/+/", 0, func(c mqtt.Client, message mqtt.Message) {
+		msg := parse(message)
+		if dispatcher, ok := a.dispatchers[msg.Header.Type]; ok {
+			xlog.Debugf("receive %s message => [%s]", dispatcher.Name(), msg.Body.Device)
+			go dispatcher.Dispatch(msg)
+		}
+	})
+	if t.Wait() && t.Error() != nil {
+		xlog.Errorf("subscribe message error: %s", t.Error())
+	}
 }
 
 func (a *Adapter) Run() error {
@@ -96,17 +123,18 @@ func (a *Adapter) Run() error {
 	if t := a.client.Connect(); t.Wait() && t.Error() != nil {
 		return t.Error()
 	}
-	t := a.client.Subscribe("iot/v2/gw/+/dev/+/msg/+/", 1, func(c mqtt.Client, message mqtt.Message) {
-		msg := parse(message)
-		if dispatcher, ok := a.dispatchers[msg.Header.Type]; ok {
-			xlog.Debugf("receive %s message => [%s]", dispatcher.Name(), msg.Body.Device)
-			go dispatcher.Dispatch(msg)
-		}
-	})
-	if t.Wait() && t.Error() != nil {
-		return t.Error()
-	}
 	xlog.Info("iot server start successful")
+	go func() {
+		for msg := range a.publishChan {
+			xlog.Infof("publish message to topic: %s payload: %d", msg.Topic, len(msg.Payload))
+			t := a.client.Publish(msg.Topic, msg.Qos, false, msg.Payload)
+			if t.Wait() && t.Error() != nil {
+				xlog.Errorf("publish message error: %s", t.Error())
+				continue
+			}
+			xlog.Infof("publish message to topic: %s success", msg.Topic)
+		}
+	}()
 	return nil
 }
 

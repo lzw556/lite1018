@@ -16,7 +16,7 @@ func (repo Event) Create(ctx context.Context, e *entity.Event) error {
 
 func (repo Event) FindBySpecs(ctx context.Context, specs ...spec.Specification) ([]entity.Event, error) {
 	var es []entity.Event
-	err := repo.DB(ctx).Scopes(spec.Scopes(specs)...).Find(&es).Error
+	err := repo.DB(ctx).Scopes(spec.Scopes(specs)...).Order("created_at DESC").Find(&es).Error
 	return es, err
 }
 

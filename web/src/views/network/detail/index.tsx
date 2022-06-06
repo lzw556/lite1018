@@ -29,7 +29,6 @@ const NetworkDetail = () => {
   const location = useLocation();
   const history = useHistory();
   const [network, setNetwork] = useState<Network>();
-  const [addDeviceVisible, setAddDeviceVisible] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
   const [form] = Form.useForm();
 
@@ -107,7 +106,7 @@ const NetworkDetail = () => {
           </Col>
           <Col xl={8} xxl={6}>
             <ShadowCard style={{ marginLeft: 10, height: '100%' }}>
-              <Form form={form} labelCol={{ span: 8 }} validateMessages={defaultValidateMessages}>
+              <Form form={form} labelCol={{ span: 9 }} validateMessages={defaultValidateMessages}>
                 <Form.Item label={'名称'} name={'name'} rules={[Rules.range(4, 16)]}>
                   <Input placeholder={'请输入网络名称'} />
                 </Form.Item>
@@ -164,26 +163,8 @@ const NetworkDetail = () => {
   return (
     <Content style={{display:'flex',flexDirection:'column'}}>
       <MyBreadcrumb firstBreadState={location.state as any}>
-        <HasPermission value={Permission.NetworkAddDevices}>
-          <Space>
-            <Button type={'primary'} onClick={() => setAddDeviceVisible(true)}>
-              接入设备 <PlusOutlined />
-            </Button>
-          </Space>
-        </HasPermission>
       </MyBreadcrumb>
       {renderInformation()}
-      {network && (
-        <AddDeviceModal
-          network={network}
-          visible={addDeviceVisible}
-          onCancel={() => setAddDeviceVisible(false)}
-          onSuccess={() => {
-            onRefresh();
-            setAddDeviceVisible(false);
-          }}
-        />
-      )}
     </Content>
   );
 };

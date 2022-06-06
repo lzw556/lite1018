@@ -2,7 +2,6 @@ package command
 
 import (
 	"context"
-	"time"
 
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/request"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/response"
@@ -12,6 +11,7 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	spec "github.com/thetasensors/theta-cloud-lite/server/domain/specification"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/vo"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/cache"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/devicetype"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/errcode"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/transaction"
@@ -54,8 +54,9 @@ func (cmd NetworkUpdateCmd) Update(req request.Network) (*vo.Network, error) {
 	if err != nil {
 		return nil, err
 	}
-	if state, err := cmd.deviceStateRepo.Get(gateway.MacAddress); err == nil && state.IsOnline {
-		go command.SyncWsnSettings(cmd.Network, gateway, 3*time.Second)
+	isOnline, _, _ := cache.GetConnection(gateway.MacAddress)
+	if isOnline {
+		go command.UpdateWsnSettings(cmd.Network, gateway)
 	}
 	result := vo.NewNetwork(cmd.Network)
 	return &result, nil
@@ -145,10 +146,7 @@ func (cmd NetworkUpdateCmd) RemoveDevices(req request.RemoveDevices) error {
 	}
 	err = transaction.Execute(ctx, func(txCtx context.Context) error {
 		for _, device := range devices {
-			if state, err := cmd.deviceStateRepo.Get(device.MacAddress); err == nil {
-				state.IsOnline = false
-				_ = cmd.deviceStateRepo.Create(device.MacAddress, state)
-			}
+			cache.BatchDeleteConnections(device.MacAddress)
 			if err := cmd.deviceRepo.UpdatesBySpecs(txCtx, map[string]interface{}{"parent": gateway.MacAddress}, spec.ParentEqSpec(device.MacAddress)); err != nil {
 				return err
 			}

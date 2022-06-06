@@ -1,11 +1,9 @@
 package command
 
 import (
-	"context"
 	"github.com/gogo/protobuf/proto"
 	pd "github.com/thetasensors/theta-cloud-lite/server/adapter/iot/proto"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/xlog"
-	"time"
 )
 
 type calibrateCmd struct {
@@ -23,12 +21,16 @@ func newCalibrateCmd(sensorType uint, param float32) calibrateCmd {
 	return cmd
 }
 
+func (cmd calibrateCmd) ID() string {
+	return cmd.request.id
+}
+
 func (cmd calibrateCmd) Name() string {
 	return "calibrate"
 }
 
-func (cmd calibrateCmd) Response() string {
-	return "calibrateResponse"
+func (cmd calibrateCmd) Response() chan Response {
+	return cmd.response
 }
 
 func (cmd calibrateCmd) Qos() byte {
@@ -46,6 +48,6 @@ func (cmd calibrateCmd) Payload() ([]byte, error) {
 	return proto.Marshal(&m)
 }
 
-func (cmd calibrateCmd) Execute(ctx context.Context, gateway string, target string, timeout time.Duration) ([]byte, error) {
-	return cmd.request.do(ctx, gateway, target, cmd, timeout)
+func (cmd calibrateCmd) Execute(gateway string, target string) (*Response, error) {
+	return cmd.request.do(gateway, target, cmd, 3)
 }

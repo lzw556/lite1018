@@ -1,0 +1,108 @@
+name: Build
+on:
+  release:
+    types:
+      - "published"
+    branches:
+      - "1.4.x"
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up node env
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12
+          check-latest: true
+          retister-url: 'https://npm.pkg.github.com'
+      - run: make react_install
+      - run: CI=false make react_build
+
+      - name: Rename
+        run: mv web/build web/static
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: static
+          path: web/static
+
+  build:
+    needs: [prepare]
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        target:
+          - linux-amd64
+          - windows-amd64
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Download static
+        uses: actions/download-artifact@v3
+        with:
+          name: static
+          path: server
+
+      - name: Show folder
+        run: cd server && ls
+
+      - uses: actions/setup-go@v2
+        with:
+          go-version: "1.18.1"
+      - env:
+          TARGET: ${{ matrix.target }}
+        run: |
+          echo "${TARGET}"
+          case ${TARGET} in
+            linux-amd64)
+              cd server && CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build --tags license -o ../deploy/script/linux/bin/cloud-lite ./main.go
+            ;;
+            windows-amd64)
+              sudo apt-get update && sudo apt-get install mingw-w64 && cd server && CGO_ENABLED=1 GOOS=windows GOARCH=amd64 CC=x86_64-w64-mingw32-gcc go build --tags license -o ../deploy/script/windows/bin/cloud-lite.exe ./main.go
+            ;;
+          esac
+
+      - name: Package
+        env:
+          TARGET: ${{ matrix.target }}
+        run: |
+          case ${TARGET} in
+            linux-amd64)
+              cd deploy/script/linux && tar -cvf cloud-lite-linux-amd64.tar * && mv cloud-lite-linux-amd64.tar ../../
+            ;;
+            windows-amd64)
+              cd deploy/script/windows && zip -r cloud-lite-windows-amd64.zip * && mv cloud-lite-windows-amd64.zip ../../
+            ;;
+          esac
+
+      - name: Upload binary
+        uses: actions/upload-artifact@v3
+        with:
+          name: cloud-lite
+          path: |
+            deploy/*.tar
+            deploy/*.zip
+
+  upload:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Download binary
+        uses: actions/download-artifact@v3
+        with:
+          name: cloud-lite
+
+      - name: Display binary
+        run: ls
+
+      - name: Upload to github
+        uses: AButler/upload-release-assets@v2.0
+        with:
+          files: '*.tar;*.zip'
+          repo-token: ${{ secrets.GITHUB_TOKEN }}

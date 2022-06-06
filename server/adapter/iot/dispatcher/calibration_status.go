@@ -6,15 +6,10 @@ import (
 )
 
 type CalibrationStatus struct {
-	context   *iot.Context
-	processor process.Processor
 }
 
 func NewCalibrationStatus() iot.Dispatcher {
-	return &CalibrationStatus{
-		context:   iot.NewContext(),
-		processor: process.NewCalibrationStatus(),
-	}
+	return &CalibrationStatus{}
 }
 
 func (d CalibrationStatus) Name() string {
@@ -22,5 +17,5 @@ func (d CalibrationStatus) Name() string {
 }
 
 func (d CalibrationStatus) Dispatch(msg iot.Message) {
-	process.Do(d.context, d.processor, msg)
+	process.Do(iot.NewContext(), process.NewCalibrationStatus(), msg)
 }

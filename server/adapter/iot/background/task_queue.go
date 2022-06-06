@@ -39,21 +39,24 @@ func (q *TaskQueue) Append(task *Task) {
 
 func (q *TaskQueue) Remove(device entity.Device) {
 	q.mu.Lock()
+	defer q.mu.Unlock()
 	prev := q.tasks
 	found := false
-	for {
+	for prev != nil {
+		xlog.Debugf("check task %s", prev.Device.MacAddress)
 		if prev.next == nil {
 			break
 		} else if prev.next.MacAddress == device.MacAddress {
+			xlog.Infof("remove device %s from task queue", device.MacAddress)
 			found = true
 			break
+		} else {
+			prev = prev.next
 		}
-		prev.next = prev
 	}
 	if found {
 		prev.next = prev.next.next
 	}
-	q.mu.Unlock()
 }
 
 func (q *TaskQueue) GetTask(device entity.Device) *Task {
@@ -72,15 +75,15 @@ func (q *TaskQueue) Stop() {
 
 func (q *TaskQueue) Run() {
 	q.running = true
-	go func() {
-		for q.tasks != nil && q.running {
-			if err := q.tasks.Run(q.gateway); err != nil {
-				xlog.Errorf("device [%s] task run failed: %v", q.tasks.MacAddress, err)
-			}
-			q.tasks = q.tasks.next
+	for q.tasks != nil && q.running {
+		xlog.Infof("run device upgrade task => [%s]", q.tasks.MacAddress)
+		if err := q.tasks.Run(q.gateway); err != nil {
+			xlog.Errorf("device upgrade task run failed: %v => %s", err, q.tasks.MacAddress)
 		}
-		q.running = false
-	}()
+		xlog.Infof("device upgrade task run success => [%s]", q.tasks.MacAddress)
+		q.tasks = q.tasks.next
+	}
+	q.running = false
 }
 
 func (q *TaskQueue) IsRunning() bool {

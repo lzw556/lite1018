@@ -6,15 +6,10 @@ import (
 )
 
 type SensorData struct {
-	context   *iot.Context
-	processor process.Processor
 }
 
 func NewSensorData() iot.Dispatcher {
-	return SensorData{
-		context:   iot.NewContext(),
-		processor: process.NewSensorData(),
-	}
+	return SensorData{}
 }
 
 func (SensorData) Name() string {
@@ -22,5 +17,5 @@ func (SensorData) Name() string {
 }
 
 func (d SensorData) Dispatch(msg iot.Message) {
-	process.Do(d.context, d.processor, msg)
+	process.Do(iot.NewContext(), process.NewSensorData(), msg)
 }

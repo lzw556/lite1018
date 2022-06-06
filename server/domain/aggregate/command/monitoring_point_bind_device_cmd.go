@@ -24,6 +24,16 @@ func NewMonitoringPointBindDeviceCmd() MonitoringPointBindDeviceCmd {
 
 func (cmd MonitoringPointBindDeviceCmd) BindDevice(req request.BindDevice) error {
 	ctx := context.TODO()
+
+	bindings, err := cmd.monitoringPointDeviceBindingRepo.FindBySpecs(ctx, spec.MonitoringPointIDEqSpec(cmd.MonitoringPoint.ID), spec.DeviceIDEqSpec(req.DeviceID), spec.ProcessIDEqSpec(req.ProcessID))
+	if err != nil {
+		return err
+	}
+
+	if len(bindings) > 0 {
+		return nil
+	}
+
 	binding := entity.MonitoringPointDeviceBinding{
 		MonitoringPointID: cmd.MonitoringPoint.ID,
 		DeviceID:          req.DeviceID,

@@ -4,14 +4,16 @@ import (
 	"fmt"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/json"
+	"time"
 )
 
 type DeviceEvent struct {
-	ID        uint   `json:"id"`
-	Name      string `json:"name"`
-	Message   string `json:"message"`
-	Content   string `json:"content"`
-	Timestamp int64  `json:"timestamp"`
+	ID        uint      `json:"id"`
+	Name      string    `json:"name"`
+	Message   string    `json:"message"`
+	Content   string    `json:"content"`
+	Timestamp int64     `json:"timestamp"`
+	CreatedAt time.Time `json:"-"`
 }
 
 func NewDeviceEvent(e entity.Event) DeviceEvent {
@@ -19,7 +21,8 @@ func NewDeviceEvent(e entity.Event) DeviceEvent {
 		ID:        e.ID,
 		Name:      e.Code.String(),
 		Content:   e.Content,
-		Timestamp: e.Timestamp,
+		Timestamp: e.CreatedAt.Unix(),
+		CreatedAt: e.CreatedAt,
 	}
 	content := struct {
 		Code int         `json:"code"`
@@ -48,7 +51,7 @@ func (list DeviceEventList) Len() int {
 }
 
 func (list DeviceEventList) Less(i, j int) bool {
-	return list[i].Timestamp < list[j].Timestamp
+	return list[i].CreatedAt.UnixMilli() > list[j].CreatedAt.UnixMilli()
 }
 
 func (list DeviceEventList) Swap(i, j int) {

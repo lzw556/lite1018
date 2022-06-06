@@ -2,31 +2,30 @@ package command
 
 import (
 	"context"
-	"github.com/golang/protobuf/proto"
+	"fmt"
 	"github.com/spf13/cast"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/response"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/iot/background"
-	pd "github.com/thetasensors/theta-cloud-lite/server/adapter/iot/proto"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	spec "github.com/thetasensors/theta-cloud-lite/server/domain/specification"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/cache"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/devicetype"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/errcode"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/eventbus"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/json"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/xlog"
-	"golang.org/x/sync/errgroup"
+	"github.com/thetasensors/theta-cloud-lite/server/worker"
 	"time"
 )
 
-var deviceStateRepo = repository.DeviceState{}
 var deviceRepo = repository.Device{}
 var networkRepo = repository.Network{}
+var eventRepo = repository.Event{}
 
 func isOnline(mac string) bool {
-	if state, err := deviceStateRepo.Get(mac); err == nil {
-		return state.IsOnline
-	}
-	return false
+	state, _, _ := cache.GetConnection(mac)
+	return state
 }
 
 func Execute(gateway, device entity.Device, t Type) error {
@@ -43,9 +42,9 @@ func Execute(gateway, device entity.Device, t Type) error {
 	default:
 		return response.BusinessErr(errcode.UnknownDeviceTypeError, "")
 	}
-	if gateway.State.IsOnline {
+	if isOnline(gateway.MacAddress) {
 		xlog.Infof("execute command %s => [%s]", cmd.Name(), device.MacAddress)
-		_, err := cmd.Execute(context.TODO(), gateway.MacAddress, device.MacAddress, 3*time.Second)
+		_, err := cmd.Execute(gateway.MacAddress, device.MacAddress)
 		if err != nil {
 			xlog.Errorf("execute device [%s] command %s failed: %v", device.MacAddress, cmd.Name(), err)
 			return err
@@ -58,7 +57,7 @@ func Execute(gateway, device entity.Device, t Type) error {
 	return response.BusinessErr(errcode.DeviceOfflineError, "")
 }
 
-func SyncNetworkLinkStates(network entity.Network, timeout time.Duration) {
+func SyncNetworkLinkStates(network entity.Network) {
 	devices, err := deviceRepo.FindBySpecs(context.TODO(), spec.NetworkEqSpec(network.ID))
 	if err != nil {
 		xlog.Errorf("sync network link states failed: %v", err)
@@ -73,46 +72,65 @@ func SyncNetworkLinkStates(network entity.Network, timeout time.Duration) {
 	}
 	xlog.Infof("starting sync devices link status => [%s]", gateway.MacAddress)
 	cmd := newGetLinkStatesCmd()
-	payload, err := cmd.Execute(context.TODO(), gateway.MacAddress, gateway.MacAddress, timeout)
+	resp, err := cmd.Execute(gateway.MacAddress, gateway.MacAddress)
 	if err != nil {
 		xlog.Errorf("execute command %s failed: %v => [%s]", cmd.Name(), err, gateway.MacAddress)
-		return
-	}
-	m := pd.LinkStatesMessage{}
-	if err := proto.Unmarshal(payload, &m); err != nil {
-		xlog.Errorf("unmarshal [AllLinkStatus] message failed:%v", err)
 		return
 	}
 	var result []struct {
 		Mac   string `json:"mac"`
 		State int    `json:"state"`
 	}
-	if err := json.Unmarshal([]byte(m.States), &result); err != nil {
+	if err := json.Unmarshal(resp.Payload, &result); err != nil {
 		xlog.Errorf("unmarshal [AllStatus] failed:%v", err)
 		return
 	}
 	statusMap := make(map[string]bool)
-	for _, r := range result {
+	for i := range result {
+		r := result[i]
 		if r.Mac != gateway.MacAddress {
-			statusMap[r.Mac] = r.State == 3
+			if r.State == 3 {
+				statusMap[r.Mac] = true
+			} else {
+				statusMap[r.Mac] = false
+			}
 		}
 	}
-	var eg errgroup.Group
 	for i := range devices {
 		device := devices[i]
-		eg.Go(func() error {
-			if state, err := deviceStateRepo.Get(device.MacAddress); err == nil {
-				if isOnline, ok := statusMap[device.MacAddress]; ok {
-					state.IsOnline = isOnline
-					state.Notify(device.MacAddress)
+		if device.MacAddress != gateway.MacAddress {
+			oldState, _, _ := cache.GetConnection(device.MacAddress)
+			newState, _ := statusMap[device.MacAddress]
+			if newState != oldState {
+				eventbus.Publish(eventbus.SocketEmit, "socket::deviceStateChangedEvent", map[string]interface{}{
+					"macAddress": device.MacAddress,
+					"state": map[string]interface{}{
+						"isOnline":    newState,
+						"connectedAt": time.Now().Unix(),
+					},
+				})
+				go func(isOnline bool) {
+					event := entity.Event{
+						Code:      entity.EventCodeStatus,
+						Category:  entity.EventCategoryDevice,
+						SourceID:  device.ID,
+						Timestamp: time.Now().Unix(),
+						ProjectID: device.ProjectID,
+					}
+					code := 0
+					if !isOnline {
+						code = 2
+					}
+					event.Content = fmt.Sprintf(`{"code": %d}`, code)
+					worker.EventsChan <- event
+				}(newState)
+				if newState {
+					cache.SetOnline(device.MacAddress)
+				} else {
+					cache.SetOffline(device.MacAddress)
 				}
 			}
-			return nil
-		})
-	}
-	if err := eg.Wait(); err != nil {
-		xlog.Errorf("sync devices link status failed:%v => [%s]", gateway.MacAddress)
-		return
+		}
 	}
 	xlog.Infof("sync devices link status successful=> [%s]", gateway.MacAddress)
 }
@@ -126,33 +144,34 @@ func SyncNetwork(network entity.Network, devices []entity.Device, timeout time.D
 		}
 	}
 	if isOnline(gateway.MacAddress) {
-		go SyncWsnSettings(network, gateway, timeout)
-		//if network.Mode == entity.NetworkModePushing {
-		if err := SyncDeviceList(gateway, devices, timeout); err != nil {
+		if err := UpdateWsnSettings(network, gateway); err != nil {
+			xlog.Errorf("update wsn settings failed: %v", err)
 			return err
 		}
-		//}
-		SyncDeviceSettings(network, gateway, devices...)
+		if err := SyncDeviceList(gateway, devices); err != nil {
+			return err
+		}
+		SyncDeviceSettings(gateway, devices...)
+		network.SyncTimestamp = time.Now().Unix()
+		if err := networkRepo.Save(context.TODO(), &network); err != nil {
+			return err
+		}
 		return nil
 	}
 	return response.BusinessErr(errcode.DeviceOfflineError, "")
 }
 
-func SyncDeviceSettings(network entity.Network, gateway entity.Device, devices ...entity.Device) {
+func SyncDeviceSettings(gateway entity.Device, devices ...entity.Device) {
 	for i := range devices {
 		device := devices[i]
-		//if network.Mode == entity.NetworkModePulling {
-		//	GetDeviceSettings(gateway, device)
-		//} else {
 		UpdateDeviceSettings(gateway, device)
-		//}
 	}
 }
 
 func UpdateDeviceSettings(gateway, device entity.Device) {
 	xlog.Infof("starting update device settings => [%s]", device.MacAddress)
 	cmd := newUpdateDeviceSettingsCmd(device.Settings)
-	if _, err := cmd.Execute(context.TODO(), gateway.MacAddress, device.MacAddress, 3*time.Second); err != nil {
+	if _, err := cmd.Execute(gateway.MacAddress, device.MacAddress); err != nil {
 		xlog.Errorf("execute command %s failed: %v => [%s]", cmd.Name(), err, gateway.MacAddress)
 		return
 	}
@@ -162,19 +181,14 @@ func UpdateDeviceSettings(gateway, device entity.Device) {
 func GetDeviceSettings(gateway, device entity.Device) {
 	xlog.Infof("starting get device settings => [%s]", device.MacAddress)
 	cmd := newGetDeviceSettingsCmd()
-	payload, err := cmd.Execute(context.TODO(), gateway.MacAddress, device.MacAddress, 3*time.Second)
+	resp, err := cmd.Execute(gateway.MacAddress, device.MacAddress)
 	if err != nil {
 		xlog.Errorf("execute command %s failed: %v => [%s]", cmd.Name(), err, gateway.MacAddress)
 		return
 	}
-	m := pd.DeviceSettingsMessage{}
-	if err := proto.Unmarshal(payload, &m); err != nil {
-		xlog.Errorf("unmarshal device settings failed: %v => [%s]", err, gateway.MacAddress)
-		return
-	}
-	if m.Code == 0 {
+	if resp.Code == 0 {
 		settings := map[string]map[string]interface{}{}
-		if err := json.Unmarshal([]byte(m.Settings), &settings); err != nil {
+		if err := json.Unmarshal(resp.Payload, &settings); err != nil {
 			xlog.Errorf("unmarshal device settings failed: %v => [%s]", err, gateway.MacAddress)
 			return
 		}
@@ -189,33 +203,20 @@ func GetDeviceSettings(gateway, device entity.Device) {
 		xlog.Infof("get device settings successful=> [%s]", device.MacAddress)
 		return
 	}
-	xlog.Errorf("get device settings failed: %d => [%s]", m.Code, gateway.MacAddress)
+	xlog.Errorf("get device settings failed: %d => [%s]", resp.Code, gateway.MacAddress)
 }
 
-func SyncWsnSettings(network entity.Network, gateway entity.Device, timeout time.Duration) {
-	//if network.Mode == entity.NetworkModePulling {
-	//	GetWsnSettings(network, gateway, timeout)
-	//} else {
-	UpdateWsnSettings(network, gateway, timeout)
-	//}
-}
-
-func GetWsnSettings(network entity.Network, gateway entity.Device, timeout time.Duration) {
+func GetWsnSettings(network entity.Network, gateway entity.Device) {
 	xlog.Infof("starting get wsn settings => [%s]", gateway.MacAddress)
 	cmd := newGetWsnCmd()
-	payload, err := cmd.Execute(context.TODO(), gateway.MacAddress, gateway.MacAddress, timeout)
+	resp, err := cmd.Execute(gateway.MacAddress, gateway.MacAddress)
 	if err != nil {
 		xlog.Errorf("execute command %s failed: %v => [%s]", cmd.Name(), err, gateway.MacAddress)
 		return
 	}
-	m := pd.DeviceSettingsMessage{}
-	if err := proto.Unmarshal(payload, &m); err != nil {
-		xlog.Errorf("unmarshal wsn settings failed: %v => [%s]", err, gateway.MacAddress)
-		return
-	}
-	if m.Code == 0 {
+	if resp.Code == 0 {
 		settings := map[string]map[string]interface{}{}
-		if err := json.Unmarshal([]byte(m.Settings), &settings); err != nil {
+		if err := json.Unmarshal(resp.Payload, &settings); err != nil {
 			xlog.Errorf("unmarshal wsn settings failed: %v => [%s]", err, gateway.MacAddress)
 			return
 		}
@@ -233,33 +234,46 @@ func GetWsnSettings(network entity.Network, gateway entity.Device, timeout time.
 		}
 		xlog.Infof("get wsn settings successful=> [%s]", gateway.MacAddress)
 	} else {
-		xlog.Errorf("get wsn settings failed: %d => [%s]", m.Code, gateway.MacAddress)
+		xlog.Errorf("get wsn settings failed: %d => [%s]", resp.Code, gateway.MacAddress)
 	}
 }
 
-func UpdateWsnSettings(network entity.Network, gateway entity.Device, timeout time.Duration) {
+func UpdateWsnSettings(network entity.Network, gateway entity.Device) error {
 	if isOnline(gateway.MacAddress) {
 		xlog.Infof("starting update wsn settings => [%s]", gateway.MacAddress)
 		cmd := newUpdateWsnSettingsCmd(network)
-		if _, err := cmd.Execute(context.TODO(), gateway.MacAddress, gateway.MacAddress, timeout); err != nil {
+		if _, err := cmd.Execute(gateway.MacAddress, gateway.MacAddress); err != nil {
 			xlog.Errorf("execute device command %s failed: %v => [%s]", cmd.Name(), err, gateway.MacAddress)
-			return
+			return err
 		}
 		xlog.Infof("sync wsn settings successful=> [%s]", gateway.MacAddress)
 	} else {
 		xlog.Errorf("update wsn settings failed: device offline => [%s]", gateway.MacAddress)
+		return response.BusinessErr(errcode.DeviceOfflineError, "")
 	}
+	return nil
 }
 
-func SyncDeviceList(gateway entity.Device, devices []entity.Device, timeout time.Duration) error {
+func SyncDeviceList(gateway entity.Device, devices []entity.Device) error {
 	if err := ClearDevices(gateway); err != nil {
 		return err
 	}
 
+	go func() {
+		macs := make([]string, 0)
+		for i := range devices {
+			device := devices[i]
+			if gateway.MacAddress != device.MacAddress {
+				macs = append(macs, device.MacAddress)
+			}
+		}
+		cache.BatchDeleteConnections(macs...)
+	}()
+
 	xlog.Infof("starting sync device list => [%s]", gateway.MacAddress)
 	if isOnline(gateway.MacAddress) {
 		cmd := newUpdateDevicesCmd(gateway, devices)
-		if _, err := cmd.Execute(context.TODO(), gateway.MacAddress, gateway.MacAddress, timeout); err != nil {
+		if _, err := cmd.Execute(gateway.MacAddress, gateway.MacAddress); err != nil {
 			xlog.Errorf("execute device command %s failed: %v => [%s]", cmd.Name(), err, gateway.MacAddress)
 			return err
 		}
@@ -271,9 +285,8 @@ func SyncDeviceList(gateway entity.Device, devices []entity.Device, timeout time
 }
 
 func AddDevice(gateway entity.Device, device entity.Device) {
-	timeout := 3 * time.Second
 	cmd := newAddDeviceCmd(device)
-	if _, err := cmd.Execute(context.TODO(), gateway.MacAddress, gateway.MacAddress, timeout); err != nil {
+	if _, err := cmd.Execute(gateway.MacAddress, gateway.MacAddress); err != nil {
 		xlog.Errorf("execute device command %s failed: %v => [%s]", cmd.Name(), err, gateway.MacAddress)
 		return
 	}
@@ -282,9 +295,8 @@ func AddDevice(gateway entity.Device, device entity.Device) {
 }
 
 func UpdateDevice(gateway entity.Device, device entity.Device) {
-	timeout := 3 * time.Second
 	cmd := newUpdateDeviceCmd(device)
-	if _, err := cmd.Execute(context.TODO(), gateway.MacAddress, gateway.MacAddress, timeout); err != nil {
+	if _, err := cmd.Execute(gateway.MacAddress, gateway.MacAddress); err != nil {
 		xlog.Errorf("execute device command %s failed: %v => [%s]", cmd.Name(), err, gateway.MacAddress)
 		return
 	}
@@ -292,9 +304,8 @@ func UpdateDevice(gateway entity.Device, device entity.Device) {
 }
 
 func ClearDevices(gateway entity.Device) error {
-	timeout := 3 * time.Second
 	cmd := newClearDevicesCmd()
-	if _, err := cmd.Execute(context.TODO(), gateway.MacAddress, gateway.MacAddress, timeout); err != nil {
+	if _, err := cmd.Execute(gateway.MacAddress, gateway.MacAddress); err != nil {
 		xlog.Errorf("execute device command %s failed: %v => [%s]", cmd.Name(), err, gateway.MacAddress)
 		return err
 	}
@@ -302,9 +313,8 @@ func ClearDevices(gateway entity.Device) error {
 }
 
 func DeleteDevice(gateway entity.Device, device entity.Device) {
-	timeout := 3 * time.Second
 	cmd := newDeleteDeviceCmd(device.MacAddress)
-	if _, err := cmd.Execute(context.TODO(), gateway.MacAddress, gateway.MacAddress, timeout); err != nil {
+	if _, err := cmd.Execute(gateway.MacAddress, gateway.MacAddress); err != nil {
 		xlog.Errorf("execute device command %s failed: %v => [%s]", cmd.Name(), err, gateway.MacAddress)
 		return
 	}
@@ -319,7 +329,7 @@ func DeviceUpgrade(gateway entity.Device, device entity.Device, firmware entity.
 	}
 	queue.Append(background.NewTask(device, NewDeviceUpgradeExecutor(firmware)))
 	if !queue.IsRunning() {
-		queue.Run()
+		go queue.Run()
 	}
 	return nil
 }
@@ -329,11 +339,12 @@ func CancelDeviceUpgrade(gateway entity.Device, device entity.Device) error {
 	if queue == nil {
 		return nil
 	}
-	switch device.GetUpgradeStatus().Code {
+	status := device.GetUpgradeStatus()
+	xlog.Infof("device upgrade code: %d => [%s]", status.Code, device.MacAddress)
+	switch status.Code {
 	case entity.DeviceUpgradeLoading, entity.DeviceUpgradeUpgrading:
 		cmd := newCancelFirmwareCmd()
-		ctx := context.TODO()
-		_, err := cmd.Execute(ctx, gateway.MacAddress, device.MacAddress, 3*time.Second)
+		_, err := cmd.Execute(gateway.MacAddress, device.MacAddress)
 		if err != nil {
 			xlog.Errorf("execute device command %s failed: %v => [%s]", cmd.Name(), err, gateway.MacAddress)
 		}
@@ -341,11 +352,9 @@ func CancelDeviceUpgrade(gateway entity.Device, device entity.Device) error {
 		if task != nil {
 			task.Cancel()
 		}
-		device.CancelUpgrade()
-	default:
-		queue.Remove(device)
-		device.CancelUpgrade()
 	}
+	device.CancelUpgrade()
+	queue.Remove(device)
 	return nil
 }
 
@@ -353,7 +362,7 @@ func Calibrate(gateway entity.Device, device entity.Device, param float32) error
 	if isOnline(gateway.MacAddress) {
 		if t := devicetype.Get(device.Type); t != nil {
 			cmd := newCalibrateCmd(t.SensorID(), param)
-			if _, err := cmd.Execute(context.TODO(), gateway.MacAddress, device.MacAddress, 3*time.Second); err != nil {
+			if _, err := cmd.Execute(gateway.MacAddress, device.MacAddress); err != nil {
 				xlog.Errorf("execute device command %s failed: %v => [%s]", cmd.Name(), err, gateway.MacAddress)
 				return err
 			}

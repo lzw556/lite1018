@@ -15,9 +15,12 @@ var eventMessage = map[entity.EventCode]map[int]string{
 		1: "设备升级取消",
 	},
 	entity.EventCodeStatus: {
-		1: "设备上线",
-		2: "设备离线",
-		4: "设备离线状态下重连失败",
+		0:   "设备上线",
+		1:   "设备丢失",
+		2:   "设备离线",
+		3:   "设备丢失状态下重连失败",
+		4:   "设备离线状态下重连失败",
+		102: "设备更新为离线状态(上级设备离线)",
 	},
 	entity.EventCodeDataAcquisitionFailed: {
 		33619969:   "温度传感器通讯错误",

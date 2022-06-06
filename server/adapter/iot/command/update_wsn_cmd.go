@@ -1,13 +1,11 @@
 package command
 
 import (
-	"context"
 	"fmt"
 	"github.com/gogo/protobuf/proto"
 	pd "github.com/thetasensors/theta-cloud-lite/server/adapter/iot/proto"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/json"
-	"time"
 )
 
 type wsnSettings struct {
@@ -36,15 +34,15 @@ func newUpdateWsnSettingsCmd(network entity.Network) updateWsnCmd {
 }
 
 func (cmd updateWsnCmd) ID() string {
-	return cmd.id
+	return cmd.request.id
 }
 
 func (cmd updateWsnCmd) Name() string {
 	return "updateWsn"
 }
 
-func (cmd updateWsnCmd) Response() string {
-	return "updateWsnResponse"
+func (cmd updateWsnCmd) Response() chan Response {
+	return cmd.response
 }
 
 func (cmd updateWsnCmd) Qos() byte {
@@ -65,6 +63,6 @@ func (cmd updateWsnCmd) Payload() ([]byte, error) {
 	return proto.Marshal(&m)
 }
 
-func (cmd updateWsnCmd) Execute(ctx context.Context, gateway string, target string, timeout time.Duration) ([]byte, error) {
-	return cmd.request.do(ctx, gateway, target, cmd, timeout)
+func (cmd updateWsnCmd) Execute(gateway string, target string) (*Response, error) {
+	return cmd.request.do(gateway, target, cmd, 3)
 }

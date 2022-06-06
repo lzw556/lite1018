@@ -2,26 +2,26 @@ package process
 
 import (
 	"context"
+	"fmt"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/iot"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	spec "github.com/thetasensors/theta-cloud-lite/server/domain/specification"
-	"github.com/thetasensors/theta-cloud-lite/server/pkg/devicetype"
-	"github.com/thetasensors/theta-cloud-lite/server/pkg/xlog"
-	"golang.org/x/sync/errgroup"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/cache"
+	"github.com/thetasensors/theta-cloud-lite/server/worker"
 	"time"
 )
 
 type Bye struct {
-	deviceRepo      dependency.DeviceRepository
-	deviceStateRepo dependency.DeviceStateRepository
+	deviceRepo dependency.DeviceRepository
+	eventResp  dependency.EventRepository
 }
 
 func NewBye() Processor {
 	return newRoot(&Bye{
-		deviceRepo:      repository.Device{},
-		deviceStateRepo: repository.DeviceState{},
+		deviceRepo: repository.Device{},
+		eventResp:  repository.Event{},
 	})
 }
 
@@ -36,36 +36,27 @@ func (p Bye) Next() Processor {
 func (p Bye) Process(ctx *iot.Context, msg iot.Message) error {
 	if value, ok := ctx.Get(msg.Body.Device); ok {
 		if device, ok := value.(entity.Device); ok {
-			if state, err := p.deviceStateRepo.Get(device.MacAddress); err == nil {
-				state.IsOnline = false
-				state.ConnectedAt = time.Now().UTC().Unix()
-				if err := p.deviceStateRepo.Create(device.MacAddress, state); err != nil {
-					xlog.Errorf("update device state failed: %v => [%s]", err, device.MacAddress)
-				}
-				state.Notify(device.MacAddress)
-			}
-			if device.Type == devicetype.GatewayType {
-				devices, _ := p.deviceRepo.FindBySpecs(context.TODO(), spec.NetworkEqSpec(device.NetworkID))
-				var eg errgroup.Group
-				for i := range devices {
-					e := devices[i]
-					eg.Go(func() error {
-						if state, err := p.deviceStateRepo.Get(e.MacAddress); err == nil {
-							state.IsOnline = false
-							state.ConnectedAt = time.Now().UTC().Unix()
-							if err := p.deviceStateRepo.Create(e.MacAddress, state); err != nil {
-								xlog.Errorf("update device state failed: %v => [%s]", err, e.MacAddress)
-							}
-							state.Notify(e.MacAddress)
-						}
-						return nil
-					})
-				}
-				if err := eg.Wait(); err != nil {
-					xlog.Errorf("update device state failed: %v", err)
-				}
-			}
+			go p.updateChildrenConnectionState(device)
 		}
 	}
 	return nil
+}
+
+func (p Bye) updateChildrenConnectionState(gateway entity.Device) {
+	devices, _ := p.deviceRepo.FindBySpecs(context.TODO(), spec.NetworkEqSpec(gateway.NetworkID))
+	macs := make([]string, 0)
+	for _, device := range devices {
+		macs = append(macs, device.MacAddress)
+		event := entity.Event{
+			Code:      entity.EventCodeStatus,
+			Category:  entity.EventCategoryDevice,
+			SourceID:  device.ID,
+			Timestamp: time.Now().Unix(),
+			ProjectID: device.ProjectID,
+		}
+		event.Content = fmt.Sprintf(`{"code": %d}`, 2)
+		worker.EventsChan <- event
+		device.NotifyConnectionState(false, time.Now().Unix())
+	}
+	cache.BatchDeleteConnections(macs...)
 }

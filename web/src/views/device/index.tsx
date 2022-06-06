@@ -41,7 +41,6 @@ import UpgradeModal from './upgrade';
 import '../../string-extension';
 import { IsUpgrading } from '../../types/device_upgrade_status';
 import '../../assets/iconfont.css';
-import AlertIcon from '../../components/alertIcon';
 import MyBreadcrumb from '../../components/myBreadcrumb';
 import HasPermission from '../../permission';
 import usePermission, { Permission } from '../../permission/permission';
@@ -53,7 +52,7 @@ import './index.css';
 import { SingleDeviceStatus } from './SingleDeviceStatus';
 import { getValueOfFirstClassProperty, generateDeviceTypeCollections, omitSpecificKeys, Filters } from './util';
 import { isMobile } from '../../utils/deviceDetection';
-import { Link, useLocation } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { PagedOption } from '../../types/props';
 import EditCalibrateParas from './edit/editCalibrateParas';
 import { AlarmRuleSettings } from './detail/setting/alarmRuleSettings';
@@ -64,11 +63,12 @@ const { Text } = Typography;
 type RememberdState = {filters: Filters; pagedOptions: PagedOption; searchTarget: number;}
 
 const DevicePage = () => {
-  const { state } = useLocation<RememberdState>();
-  const [searchTarget, setSearchTarget] = useState(state ? state.searchTarget :0);
+  const local = localStorage.getItem('deviceListFilters');
+  const localObj :RememberdState = local ? JSON.parse(local) : null
+  const [searchTarget, setSearchTarget] = useState(localObj ? localObj.searchTarget :0);
   const pagedOptionsDefault = { index: 1, size: 10 };
-  const [pagedOptions, setPagedOptions] = useState(state ? state.pagedOptions : pagedOptionsDefault);
-  const [filters, setFilters] = useState<Filters | undefined>(state ? state.filters: undefined);
+  const [pagedOptions, setPagedOptions] = useState(localObj ? localObj.pagedOptions : pagedOptionsDefault);
+  const [filters, setFilters] = useState<Filters | undefined>(localObj ? localObj.filters: undefined);
   const [device, setDevice] = useState<Device>();
   const [editSettingVisible, setEditSettingVisible] = useState<boolean>(false);
   const [editBaseInfoVisible, setEditBaseInfoVisible] = useState<boolean>(false);
@@ -84,6 +84,10 @@ const DevicePage = () => {
     const { index, size } = pagedOptions;
     PagingDevicesRequest(index, size, omitSpecificKeys(filters ?? {}, [])).then(setDataSource);
   }, [pagedOptions, filters, refreshKey]);
+
+  useEffect(()=> {
+    localStorage.setItem('deviceListFilters', JSON.stringify({filters, pagedOptions, searchTarget}))
+  }, [pagedOptions, filters, searchTarget])
 
   const onRefresh = () => {
     setRefreshKey(refreshKey + 1);
@@ -280,7 +284,7 @@ const DevicePage = () => {
               if(!field) return null;
               let value = field.value;
               if(!value) {
-                value = '-'
+                value = value === 0 ? value : '-';
               }else if(!Number.isInteger(field.value)){
                 value = field.value.toFixed(attr.precision)
               }
@@ -367,7 +371,7 @@ const DevicePage = () => {
               <Label name={'网络'}>
                 <NetworkSelect bordered={false} onChange={(network) => {
                   setFilters(prev => ({...prev, network_id: network}));
-                  setPagedOptions(pagedOptionsDefault);
+                  setPagedOptions(pagedOptions);
                 }} allowClear defaultValue={filters?.network_id}/>
               </Label>
               <Label name='设备类型'>
@@ -377,7 +381,7 @@ const DevicePage = () => {
                   allowClear={true}
                   onChange={(val) => {
                     setFilters(prev => ({...prev, type: Number.isInteger(val) ? Number(val) : undefined}));
-                    setPagedOptions(pagedOptionsDefault);
+                    setPagedOptions(pagedOptions);
                   }}
                   defaultValue={filters?.type}
                 >
@@ -407,7 +411,7 @@ const DevicePage = () => {
                     setFilters(prev => {
                       return searchTarget === 0 ? {...prev, name: val} : {...prev, mac_address: val}
                     })
-                    setPagedOptions(pagedOptionsDefault);
+                    setPagedOptions(pagedOptions);
                   }}
                   allowClear
                   enterButton

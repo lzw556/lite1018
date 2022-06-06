@@ -13,7 +13,7 @@ export const getValueOfFirstClassProperty = (
   const firstClassProperties = getFirstClassProperties(typeId, properties);
   fields.forEach((field) => {
     const property = firstClassProperties.find((pro) =>
-      pro.fields.find((subpro) => subpro.key === field)
+      pro.fields.find((subpro) => subpro.key === field && subpro.important)
     );
     if (property && !data.find((pro: any) => pro.key === property.key)) {
       data.push({

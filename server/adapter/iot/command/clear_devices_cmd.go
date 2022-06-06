@@ -1,7 +1,6 @@
 package command
 
 import (
-	"context"
 	"github.com/gogo/protobuf/proto"
 	pd "github.com/thetasensors/theta-cloud-lite/server/adapter/iot/proto"
 	"time"
@@ -17,12 +16,16 @@ func newClearDevicesCmd() clearDevicesCmd {
 	}
 }
 
+func (cmd clearDevicesCmd) ID() string {
+	return cmd.request.id
+}
+
 func (cmd clearDevicesCmd) Name() string {
 	return "clearDevices"
 }
 
-func (cmd clearDevicesCmd) Response() string {
-	return "clearDevicesResponse"
+func (cmd clearDevicesCmd) Response() chan Response {
+	return cmd.response
 }
 
 func (cmd clearDevicesCmd) Qos() byte {
@@ -37,6 +40,6 @@ func (cmd clearDevicesCmd) Payload() ([]byte, error) {
 	return proto.Marshal(&m)
 }
 
-func (cmd clearDevicesCmd) Execute(ctx context.Context, gateway string, target string, timeout time.Duration) ([]byte, error) {
-	return cmd.request.do(ctx, gateway, target, cmd, timeout)
+func (cmd clearDevicesCmd) Execute(gateway string, target string) (*Response, error) {
+	return cmd.request.do(gateway, target, cmd, 5)
 }
