@@ -60,7 +60,8 @@ export function generatePreloadOptions({
       type: 'category',
       data: times.map((item: any) => item.format('YYYY-MM-DD HH:mm:ss'))
     },
-    yAxis: { type: 'value', min: 290, max: 360 },
+    // yAxis: { type: 'value', min: 290, max: 360 },
+    yAxis: { type: 'value' },
     series: seriesData.map(({ name, data }: any, index: any) => ({
       type: 'line',
       name: measurementName,

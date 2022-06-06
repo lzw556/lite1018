@@ -1,6 +1,5 @@
 import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
 import { Button, ButtonProps, Empty, Popconfirm, Space, TableProps } from 'antd';
-import { forEach } from 'lodash';
 import * as React from 'react';
 import { SearchResultPage } from '../searchResultPage';
 import { filterEmptyChildren, getAssetType } from '../utils';
