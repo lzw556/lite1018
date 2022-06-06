@@ -17,9 +17,9 @@ type UpdateMonitoringPoint struct {
 }
 
 type BindDevice struct {
-	DeviceID    uint                   `json:"device_id" binding:"required"`
-	AlgorihtmID uint                   `json:"algorithm_id" binding:"required"`
-	Parameters  map[string]interface{} `json:"parameters"`
+	DeviceID   uint                   `json:"device_id" binding:"required"`
+	ProcessID  uint                   `json:"process_id" binding:"required"`
+	Parameters map[string]interface{} `json:"parameters"`
 }
 
 type UnbindDevice struct {
