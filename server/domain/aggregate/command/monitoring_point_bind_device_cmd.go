@@ -27,7 +27,7 @@ func (cmd MonitoringPointBindDeviceCmd) BindDevice(req request.BindDevice) error
 	binding := entity.MonitoringPointDeviceBinding{
 		MonitoringPointID: cmd.MonitoringPoint.ID,
 		DeviceID:          req.DeviceID,
-		AlgorithmID:       req.AlgorihtmID,
+		ProcessID:         req.ProcessID,
 		Parameters:        req.Parameters,
 	}
 	if err := cmd.monitoringPointDeviceBindingRepo.Create(ctx, &binding); err != nil {

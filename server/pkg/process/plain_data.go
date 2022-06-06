@@ -1,4 +1,4 @@
-package algorithm
+package process
 
 import (
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"

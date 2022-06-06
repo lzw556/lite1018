@@ -11,8 +11,8 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	spec "github.com/thetasensors/theta-cloud-lite/server/domain/specification"
-	"github.com/thetasensors/theta-cloud-lite/server/pkg/algorithm"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/devicetype"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/process"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/xlog"
 	"sync"
 	"time"
@@ -84,8 +84,8 @@ func (p *SensorData) Process(ctx *iot.Context, msg iot.Message) error {
 					}
 				}
 
-				algo := algorithm.NewAlgorithm()
-				if err := algo.ProcessDeviceSensorData(device, e); err != nil {
+				proc := process.NewProcess()
+				if err := proc.ProcessDeviceSensorData(device, e); err != nil {
 					return fmt.Errorf("Save monitoring point data failed: %v", err)
 				}
 			}

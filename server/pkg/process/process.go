@@ -1,4 +1,4 @@
-package algorithm
+package process
 
 import (
 	"context"
@@ -13,10 +13,10 @@ import (
 )
 
 const (
-	AlgorithmTypePlainData = iota + 1
+	ProcessTypePlainData = iota + 1
 )
 
-type Algorithm struct {
+type Process struct {
 	monitoringPointRepo              dependency.MonitoringPointRepository
 	monitoringPointDeviceBindingRepo dependency.MonitoringPointDeviceBindingRepository
 	monitoringPointDataRepo          dependency.MonitoringPointDataRepository
@@ -25,8 +25,8 @@ type Algorithm struct {
 	mu                               sync.RWMutex
 }
 
-func NewAlgorithm() Algorithm {
-	return Algorithm{
+func NewProcess() Process {
+	return Process{
 		monitoringPointRepo:              repository.MonitoringPoint{},
 		monitoringPointDeviceBindingRepo: repository.MonitoringPointDeviceBinding{},
 		monitoringPointDataRepo:          repository.MonitoringPointData{},
@@ -36,39 +36,39 @@ func NewAlgorithm() Algorithm {
 	}
 }
 
-func (algo *Algorithm) ProcessDeviceSensorData(dev entity.Device, sensorData entity.SensorData) error {
+func (proc *Process) ProcessDeviceSensorData(dev entity.Device, sensorData entity.SensorData) error {
 	ctx := context.TODO()
-	bindings, err := algo.monitoringPointDeviceBindingRepo.FindBySpecs(ctx, spec.DeviceIDEqSpec(dev.ID))
+	bindings, err := proc.monitoringPointDeviceBindingRepo.FindBySpecs(ctx, spec.DeviceIDEqSpec(dev.ID))
 	if err != nil {
 		return err
 	}
 
 	for _, binding := range bindings {
-		mp, err := algo.monitoringPointRepo.Get(ctx, binding.MonitoringPointID)
+		mp, err := proc.monitoringPointRepo.Get(ctx, binding.MonitoringPointID)
 		var mpData entity.MonitoringPointData
 		if err == nil {
-			switch binding.AlgorithmID {
-			case AlgorithmTypePlainData:
+			switch binding.ProcessID {
+			case ProcessTypePlainData:
 				mpData = ProcessPlainData(mp, sensorData)
 			default:
 				mpData = ProcessPlainData(mp, sensorData)
 			}
 
-			err = algo.monitoringPointDataRepo.Create(mpData)
+			err = proc.monitoringPointDataRepo.Create(mpData)
 			if err != nil {
 				return fmt.Errorf("Failed to save monitoring point data.")
 			}
 		}
 
-		if sources, err := algo.alarmSourceRepo.FindBySpecs(context.TODO(), spec.SourceEqSpec(mp.ID)); err == nil {
+		if sources, err := proc.alarmSourceRepo.FindBySpecs(context.TODO(), spec.SourceEqSpec(mp.ID)); err == nil {
 			ids := make([]uint, len(sources))
 			for i, source := range sources {
 				ids[i] = source.AlarmRuleID
 			}
 
-			if alarmRules, err := algo.alarmRuleRepo.FindBySpecs(context.TODO(), spec.PrimaryKeyInSpec(ids), spec.CategoryEqSpec(entity.AlarmRuleCategoryMonitoringPoint)); err == nil {
-				algo.mu.Lock()
-				defer algo.mu.Unlock()
+			if alarmRules, err := proc.alarmRuleRepo.FindBySpecs(context.TODO(), spec.PrimaryKeyInSpec(ids), spec.CategoryEqSpec(entity.AlarmRuleCategoryMonitoringPoint)); err == nil {
+				proc.mu.Lock()
+				defer proc.mu.Unlock()
 				ruleengine.ExecuteSelectedRules(mp.ID, alarmRules...)
 			}
 		}

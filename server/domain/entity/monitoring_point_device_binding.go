@@ -14,7 +14,7 @@ type MonitoringPointDeviceBinding struct {
 	gorm.Model
 	MonitoringPointID uint
 	DeviceID          uint
-	AlgorithmID       uint
+	ProcessID         uint
 	Parameters        AlgorithmParameters `gorm:"type:json"`
 }
 
