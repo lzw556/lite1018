@@ -8,6 +8,7 @@ export type Asset = {
   name: string;
   type: number;
   parent_id: number;
+  attributes?: { index: number; type: number };
 };
 
 export type AssetRow = {
@@ -21,6 +22,7 @@ export type AssetRow = {
   label: React.ReactNode;
   value: string | number;
   statistics: AssetChildrenStatistics;
+  attributes?: { index: number; type: number };
 };
 
 export type AssetChildrenStatistics = {
@@ -37,18 +39,27 @@ export type VM_AssetStatistics = Record<keyof AssetChildrenStatistics, NameValue
 
 export function convertRow(values?: AssetRow): Asset | null {
   if (!values) return null;
-  return { id: values.id, name: values.name, parent_id: values.parentId, type: values.type };
+  return {
+    id: values.id,
+    name: values.name,
+    parent_id: values.parentId,
+    type: values.type,
+    attributes: values.attributes
+  };
 }
 
-export function generatePreloadOptions({
-  times,
-  seriesData,
-  property
-}: {
-  times: any;
-  seriesData: any;
-  property: any;
-}, measurementName:string) {
+export function generatePreloadOptions(
+  {
+    times,
+    seriesData,
+    property
+  }: {
+    times: any;
+    seriesData: any;
+    property: any;
+  },
+  measurementName: string
+) {
   return {
     title: {
       text: '',

@@ -102,7 +102,7 @@ export const AssetEdit: React.FC<
           </Form.Item>
         )}
         {AssetTypes.Flange.categories && type !== AssetTypes.WindTurbind.type && (
-          <Form.Item label='序号' name={['attributes', 'index']}>
+          <Form.Item label='序号' name={['attributes', 'index']} initialValue={1}>
             <Select placeholder='请选择序号'>
               {[1, 2, 3, 4, 5].map((item) => (
                 <Select.Option key={item} value={item}>
