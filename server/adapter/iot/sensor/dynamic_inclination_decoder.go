@@ -1,11 +1,11 @@
 package sensor
 
 import (
-	"bytes"
 	"encoding/binary"
 	"fmt"
 	"github.com/mitchellh/mapstructure"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
+	"math"
 )
 
 type DynamicInclinationDecoder struct{}
@@ -16,29 +16,22 @@ func NewDynamicInclinationDecoder() RawDataDecoder {
 
 func (s DynamicInclinationDecoder) Decode(data []byte) (map[string]interface{}, error) {
 	result := entity.SqRawData{}
-	var dataLength uint32
-	_ = binary.Read(bytes.NewReader(data[:2]), binary.LittleEndian, &result.Metadata.Odr)
-	_ = binary.Read(bytes.NewReader(data[2:4]), binary.LittleEndian, &result.Metadata.Number)
-	_ = binary.Read(bytes.NewReader(data[4:8]), binary.LittleEndian, &dataLength)
-	_ = binary.Read(bytes.NewReader(data[12:16]), binary.LittleEndian, &result.Metadata.MeanInclination)
-	_ = binary.Read(bytes.NewReader(data[16:20]), binary.LittleEndian, &result.Metadata.MeanPitch)
-	_ = binary.Read(bytes.NewReader(data[20:24]), binary.LittleEndian, &result.Metadata.MeanRoll)
+	result.Metadata.Odr = binary.LittleEndian.Uint16(data[:2])
+	result.Metadata.Number = binary.LittleEndian.Uint16(data[2:4])
+	dataLength := binary.LittleEndian.Uint32(data[4:8])
+	result.Metadata.MeanInclination = math.Float32frombits(binary.LittleEndian.Uint32(data[12:16]))
+	result.Metadata.MeanPitch = math.Float32frombits(binary.LittleEndian.Uint32(data[16:20]))
+	result.Metadata.MeanRoll = math.Float32frombits(binary.LittleEndian.Uint32(data[20:24]))
+	result.Metadata.MeanWaggle = math.Float32frombits(binary.LittleEndian.Uint32(data[24:28]))
 
-	valueBytes := data[24:]
+	valueBytes := data[28:]
 	if int(dataLength) == len(valueBytes) {
-		for i := 0; i < len(valueBytes); i += 12 {
-			b := valueBytes[i : i+12]
-			var (
-				inclination float32
-				pitch       float32
-				roll        float32
-			)
-			_ = binary.Read(bytes.NewReader(b[:4]), binary.LittleEndian, &inclination)
-			_ = binary.Read(bytes.NewReader(b[4:8]), binary.LittleEndian, &pitch)
-			_ = binary.Read(bytes.NewReader(b[8:12]), binary.LittleEndian, &roll)
-			result.DynamicInclination = append(result.DynamicInclination, inclination)
-			result.DynamicPitch = append(result.DynamicPitch, pitch)
-			result.DynamicRoll = append(result.DynamicRoll, roll)
+		for i := 0; i < len(valueBytes); i += 16 {
+			b := valueBytes[i : i+16]
+			result.DynamicInclination = append(result.DynamicInclination, math.Float32frombits(binary.LittleEndian.Uint32(b[:4])))
+			result.DynamicPitch = append(result.DynamicPitch, math.Float32frombits(binary.LittleEndian.Uint32(b[4:8])))
+			result.DynamicRoll = append(result.DynamicRoll, math.Float32frombits(binary.LittleEndian.Uint32(b[8:12])))
+			result.DynamicWaggle = append(result.DynamicWaggle, math.Float32frombits(binary.LittleEndian.Uint32(b[12:16])))
 		}
 		d := map[string]interface{}{}
 		if err := mapstructure.Decode(result, &d); err != nil {

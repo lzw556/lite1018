@@ -5,16 +5,10 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/iot/process"
 )
 
-type RestartStatus struct {
-	context   *iot.Context
-	processor process.Processor
-}
+type RestartStatus struct{}
 
 func NewRestartStatus() RestartStatus {
-	return RestartStatus{
-		context:   iot.NewContext(),
-		processor: process.NewRestartStatus(),
-	}
+	return RestartStatus{}
 }
 
 func (RestartStatus) Name() string {
@@ -22,5 +16,5 @@ func (RestartStatus) Name() string {
 }
 
 func (d RestartStatus) Dispatch(msg iot.Message) {
-	process.Do(d.context, d.processor, msg)
+	process.Do(iot.NewContext(), process.NewRestartStatus(), msg)
 }

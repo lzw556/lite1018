@@ -26,7 +26,7 @@ type Device struct {
 	ProjectID  uint
 	Settings   DeviceSettings `gorm:"type:json"`
 
-	State           DeviceState             `gorm:"-"`
+	State           DeviceStatus            `gorm:"-"`
 	AlarmRuleStates map[uint]AlarmRuleState `gorm:"-"`
 }
 
@@ -54,6 +54,10 @@ func (d Device) CancelUpgrade() {
 	status.Code = DeviceUpgradeCancelled
 	d.UpgradeNotify(status)
 	_ = cache.SetStruct(fmt.Sprintf("device_upgrade_status_%d", d.ID), status)
+}
+
+func (d Device) RemoveUpgradeStatus() {
+	_ = cache.Delete(fmt.Sprintf("device_upgrade_status_%d", d.ID))
 }
 
 func (d Device) UpgradeNotify(status DeviceUpgradeStatus) {
@@ -137,6 +141,16 @@ func (d Device) IsDC() bool {
 
 func (d Device) IsSQ() bool {
 	return d.Type == devicetype.AngleDipType
+}
+
+func (d Device) NotifyConnectionState(isOnline bool, timestamp int64) {
+	eventbus.Publish(eventbus.SocketEmit, "socket::deviceStateChangedEvent", map[string]interface{}{
+		"macAddress": d.MacAddress,
+		"state": map[string]interface{}{
+			"isOnline":    isOnline,
+			"connectedAt": timestamp,
+		},
+	})
 }
 
 type Devices []Device

@@ -1,10 +1,8 @@
 package command
 
 import (
-	"context"
 	"github.com/gogo/protobuf/proto"
 	pd "github.com/thetasensors/theta-cloud-lite/server/adapter/iot/proto"
-	"time"
 )
 
 type getDeviceSettingsCmd struct {
@@ -17,12 +15,16 @@ func newGetDeviceSettingsCmd() getDeviceSettingsCmd {
 	}
 }
 
+func (cmd getDeviceSettingsCmd) ID() string {
+	return cmd.request.id
+}
+
 func (cmd getDeviceSettingsCmd) Name() string {
 	return "getDeviceSettings"
 }
 
-func (cmd getDeviceSettingsCmd) Response() string {
-	return "getDeviceSettingsResponse"
+func (cmd getDeviceSettingsCmd) Response() chan Response {
+	return cmd.response
 }
 
 func (cmd getDeviceSettingsCmd) Qos() byte {
@@ -37,6 +39,6 @@ func (cmd getDeviceSettingsCmd) Payload() ([]byte, error) {
 	return proto.Marshal(&m)
 }
 
-func (cmd getDeviceSettingsCmd) Execute(ctx context.Context, gateway string, target string, timeout time.Duration) ([]byte, error) {
-	return cmd.request.do(ctx, gateway, target, cmd, timeout)
+func (cmd getDeviceSettingsCmd) Execute(gateway string, target string) (*Response, error) {
+	return cmd.request.do(gateway, target, cmd, 3)
 }

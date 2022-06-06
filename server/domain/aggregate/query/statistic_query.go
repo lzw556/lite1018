@@ -10,7 +10,9 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	spec "github.com/thetasensors/theta-cloud-lite/server/domain/specification"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/vo"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/cache"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/devicetype"
+	"time"
 )
 
 type StatisticQuery struct {
@@ -45,9 +47,7 @@ func (query StatisticQuery) GetDeviceStatistics() ([]vo.DeviceStatistic, error) 
 	result := make([]vo.DeviceStatistic, len(devices))
 	for i, device := range devices {
 		r := vo.DeviceStatistic{}
-		if state, err := query.deviceStateRepo.Get(device.MacAddress); err == nil {
-			r.IsOnline = state.IsOnline
-		}
+		r.IsOnline, _, _ = cache.GetConnection(device.MacAddress)
 		if alertState, err := query.deviceAlertStateRepo.Find(device.MacAddress); err == nil {
 			r.SetAlertState(alertState)
 		}

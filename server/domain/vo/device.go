@@ -18,7 +18,7 @@ type Device struct {
 
 	Network       *Network                    `json:"network,omitempty"`
 	Information   entity.DeviceInformation    `json:"information"`
-	State         entity.DeviceState          `json:"state"`
+	State         DeviceState                 `json:"state"`
 	Properties    Properties                  `json:"properties,omitempty"`
 	UpgradeStatus *entity.DeviceUpgradeStatus `json:"upgradeStatus,omitempty"`
 	AlertStates   []AlertState                `json:"alertStates,omitempty"`
@@ -41,6 +41,10 @@ func (d *Device) SetNetwork(e entity.Network) {
 		ID:   e.ID,
 		Name: e.Name,
 	}
+}
+
+func (d *Device) SetState(e entity.DeviceStatus) {
+	d.State = NewDeviceState(e)
 }
 
 func (d *Device) SetUpgradeState(e entity.Device) {

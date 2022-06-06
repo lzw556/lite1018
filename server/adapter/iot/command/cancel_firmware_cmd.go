@@ -1,10 +1,8 @@
 package command
 
 import (
-	"context"
 	"github.com/gogo/protobuf/proto"
 	pd "github.com/thetasensors/theta-cloud-lite/server/adapter/iot/proto"
-	"time"
 )
 
 type cancelFirmwareCmd struct {
@@ -17,12 +15,16 @@ func newCancelFirmwareCmd() cancelFirmwareCmd {
 	}
 }
 
+func (cmd cancelFirmwareCmd) ID() string {
+	return cmd.request.id
+}
+
 func (cmd cancelFirmwareCmd) Name() string {
 	return "cancelFirmware"
 }
 
-func (cmd cancelFirmwareCmd) Response() string {
-	return "cancelFirmwareResponse"
+func (cmd cancelFirmwareCmd) Response() chan Response {
+	return cmd.response
 }
 
 func (cmd cancelFirmwareCmd) Qos() byte {
@@ -37,6 +39,6 @@ func (cmd cancelFirmwareCmd) Payload() ([]byte, error) {
 	return proto.Marshal(&m)
 }
 
-func (cmd cancelFirmwareCmd) Execute(ctx context.Context, gateway string, target string, timeout time.Duration) ([]byte, error) {
-	return cmd.request.do(ctx, gateway, target, cmd, timeout)
+func (cmd cancelFirmwareCmd) Execute(gateway string, target string) (*Response, error) {
+	return cmd.request.do(gateway, target, cmd, 5)
 }

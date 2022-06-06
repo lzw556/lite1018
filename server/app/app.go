@@ -31,6 +31,7 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/user"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/crontask"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/iot"
+	"github.com/thetasensors/theta-cloud-lite/server/adapter/iot/command"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/iot/dispatcher"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/ruleengine"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/socket"
@@ -39,6 +40,13 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/cache"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/utils"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/xlog"
+	"github.com/thetasensors/theta-cloud-lite/server/worker"
+	"net/http"
+	"os"
+	"os/exec"
+	"os/signal"
+	"runtime"
+	"syscall"
 )
 
 func Start(mode string, dist embed.FS) {
@@ -51,11 +59,18 @@ func Start(mode string, dist embed.FS) {
 
 	runTask()
 
-	runIoTServer()
+	conf := config.IoT{}
+	if err := config.Scan("iot", &conf); err != nil {
+		panic(err)
+	}
+
+	runIoTServer(conf)
 
 	runSocketServer()
 
 	runApiServer(mode, dist)
+
+	go worker.Run()
 
 	<-ctx.Done()
 
@@ -77,11 +92,7 @@ func runTask() {
 	}()
 }
 
-func runIoTServer() {
-	conf := config.IoT{}
-	if err := config.Scan("iot", &conf); err != nil {
-		panic(err)
-	}
+func runIoTServer(conf config.IoT) {
 	adapter.IoT = iot.NewAdapter(conf)
 	adapter.IoT.RegisterDispatchers(
 		dispatcher.NewDeviceStatus(),
@@ -90,9 +101,29 @@ func runIoTServer() {
 		dispatcher.NewSensorData(),
 		dispatcher.NewLargeSensorData(),
 		dispatcher.NewDeviceInformation(),
+		dispatcher.NewPing(),
+		dispatcher.NewHello(),
 		dispatcher.NewBye(),
 		dispatcher.NewEvent(),
 		dispatcher.NewCalibrationStatus(),
+		command.NewAddDeviceResponse(),
+		command.NewCalibrateResponse(),
+		command.NewCancelFirmwareResponse(),
+		command.NewClearDevicesResponse(),
+		command.NewDeleteDeviceResponse(),
+		command.NewGetDeviceSettingsResponse(),
+		command.NewGetLinkStatesResponse(),
+		command.NewGetWsnResponse(),
+		command.NewLoadFirmwareResponse(),
+		command.NewProvisionResponse(),
+		command.NewRebootResponse(),
+		command.NewResetResponse(),
+		command.NewResetDataResponse(),
+		command.NewUpdateDeviceSettingsResponse(),
+		command.NewUpdateDeviceResponse(),
+		command.NewUpdateDevicesResponse(),
+		command.NewUpdateWsnResponse(),
+		command.NewUpgradeFirmwareResponse(),
 	)
 	if err := adapter.IoT.Run(); err != nil {
 		xlog.Error("iot server start failed", err)

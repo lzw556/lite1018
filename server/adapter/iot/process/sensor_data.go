@@ -60,6 +60,8 @@ func (p *SensorData) Process(ctx *iot.Context, msg iot.Message) error {
 			}
 			xlog.Debugf("received sensor data: %+v", e)
 			if t := devicetype.Get(device.Type); t != nil {
+				p.mu.Lock()
+				defer p.mu.Unlock()
 				e.Values = map[string]interface{}{}
 				for _, property := range t.Properties(e.SensorType) {
 					for _, field := range property.Fields {
@@ -78,8 +80,6 @@ func (p *SensorData) Process(ctx *iot.Context, msg iot.Message) error {
 						ids[i] = source.AlarmRuleID
 					}
 					if alarmRules, err := p.alarmRuleRepo.FindBySpecs(context.TODO(), spec.PrimaryKeyInSpec(ids)); err == nil {
-						p.mu.Lock()
-						defer p.mu.Unlock()
 						ruleengine.ExecuteSelectedRules(device.ID, alarmRules...)
 					}
 				}

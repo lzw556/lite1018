@@ -6,15 +6,10 @@ import (
 )
 
 type DeviceInformation struct {
-	context   *iot.Context
-	processor process.Processor
 }
 
 func NewDeviceInformation() iot.Dispatcher {
-	return DeviceInformation{
-		context:   iot.NewContext(),
-		processor: process.NewDeviceInformation(),
-	}
+	return DeviceInformation{}
 }
 
 func (DeviceInformation) Name() string {
@@ -22,5 +17,5 @@ func (DeviceInformation) Name() string {
 }
 
 func (d DeviceInformation) Dispatch(msg iot.Message) {
-	process.Do(d.context, d.processor, msg)
+	process.Do(iot.NewContext(), process.NewDeviceInformation(), msg)
 }

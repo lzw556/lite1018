@@ -17,11 +17,9 @@ type CalibrationStatus struct {
 }
 
 func NewCalibrationStatus() Processor {
-	return newRoot(
-		&CalibrationStatus{
-			eventRepo: repository.Event{},
-		},
-	)
+	return newRoot(&CalibrationStatus{
+		eventRepo: repository.Event{},
+	})
 }
 
 func (p CalibrationStatus) Name() string {

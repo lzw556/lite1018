@@ -5,6 +5,16 @@ message ByeMessage {
   int32 code = 3;
 }
 
+message HelloMessage {
+  int32 timestamp = 1;
+  int32 code = 3;
+}
+
+message PingMessage {
+  int32 timestamp = 1;
+  int32 code = 3;
+}
+
 message LinkStatusMessage {
   int32 timestamp = 1;
   string reqId = 2;
@@ -167,6 +177,12 @@ message TunnelDataMessage {
   int32 timestamp = 1;
   int32 code = 3;
   string message = 4;
+}
+
+message PongCommand {
+  int32 timestamp = 1;
+  string reqId = 2;
+  int32 subCommand = 3;
 }
 
 message RebootCommand {

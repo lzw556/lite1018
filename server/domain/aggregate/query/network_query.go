@@ -8,6 +8,7 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	spec "github.com/thetasensors/theta-cloud-lite/server/domain/specification"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/vo"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/cache"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/errcode"
 )
 
@@ -37,6 +38,13 @@ func (query NetworkQuery) check(id uint) (entity.Network, error) {
 	return e, nil
 }
 
+func (query NetworkQuery) setDeviceState(device *vo.Device) {
+	if state, err := query.deviceStateRepo.Get(device.MacAddress); err == nil {
+		device.SetState(state)
+	}
+	device.State.IsOnline, device.State.ConnectedAt, _ = cache.GetConnection(device.MacAddress)
+}
+
 func (query NetworkQuery) Get(id uint) (*vo.Network, error) {
 	network, err := query.check(id)
 	if err != nil {
@@ -48,14 +56,14 @@ func (query NetworkQuery) Get(id uint) (*vo.Network, error) {
 	if gateway, err := query.deviceRepo.Get(ctx, network.GatewayID); err == nil {
 		result.AddGateway(gateway)
 		result.Gateway.Information, _ = query.deviceInformationRepo.Get(gateway.MacAddress)
-		result.Gateway.State, _ = query.deviceStateRepo.Get(gateway.MacAddress)
+		query.setDeviceState(&result.Gateway)
 	}
 
 	if devices, err := query.deviceRepo.FindBySpecs(ctx, spec.NetworkEqSpec(network.ID)); err == nil {
 		nodes := make([]vo.Device, len(devices))
 		for i, device := range devices {
 			nodes[i] = vo.NewDevice(device)
-			nodes[i].State, _ = query.deviceStateRepo.Get(device.MacAddress)
+			query.setDeviceState(&nodes[i])
 		}
 		result.SetNodes(nodes)
 	}

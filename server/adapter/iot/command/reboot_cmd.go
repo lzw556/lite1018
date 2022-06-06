@@ -1,10 +1,8 @@
 package command
 
 import (
-	"context"
 	"github.com/gogo/protobuf/proto"
 	pd "github.com/thetasensors/theta-cloud-lite/server/adapter/iot/proto"
-	"time"
 )
 
 type rebootCmd struct {
@@ -17,12 +15,16 @@ func newRebootCmd() rebootCmd {
 	}
 }
 
+func (cmd rebootCmd) ID() string {
+	return cmd.request.id
+}
+
 func (cmd rebootCmd) Name() string {
 	return "reboot"
 }
 
-func (cmd rebootCmd) Response() string {
-	return "rebootResponse"
+func (cmd rebootCmd) Response() chan Response {
+	return cmd.response
 }
 
 func (cmd rebootCmd) Qos() byte {
@@ -37,6 +39,6 @@ func (cmd rebootCmd) Payload() ([]byte, error) {
 	return proto.Marshal(&m)
 }
 
-func (cmd rebootCmd) Execute(ctx context.Context, gateway string, target string, timeout time.Duration) ([]byte, error) {
-	return cmd.request.do(ctx, gateway, target, cmd, timeout)
+func (cmd rebootCmd) Execute(gateway string, target string) (*Response, error) {
+	return cmd.request.do(gateway, target, cmd, 3)
 }

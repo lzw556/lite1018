@@ -6,15 +6,10 @@ import (
 )
 
 type LinkStatus struct {
-	context   *iot.Context
-	processor process.Processor
 }
 
 func NewLinkStatus() LinkStatus {
-	return LinkStatus{
-		context:   iot.NewContext(),
-		processor: process.NewLinkStatus(),
-	}
+	return LinkStatus{}
 }
 
 func (LinkStatus) Name() string {
@@ -22,5 +17,5 @@ func (LinkStatus) Name() string {
 }
 
 func (d LinkStatus) Dispatch(msg iot.Message) {
-	process.Do(d.context, d.processor, msg)
+	process.Do(iot.NewContext(), process.NewLinkStatus(), msg)
 }

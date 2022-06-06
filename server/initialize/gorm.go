@@ -28,38 +28,10 @@ func InitTables(db *gorm.DB) error {
 		&entity.MonitoringPointDeviceBinding{},
 		&entity.AlarmRuleGroup{},
 		&entity.AlarmRuleGroupSource{},
+		&entity.DeviceLinkStatus{},
 	}
 
-	//db.Migrator().DropTable("casbin_rule")
-	//var devices []entity.Device
-	//if db.Find(&devices).Error == nil {
-	//	for _, device := range devices {
-	//		if t := devicetype.Get(device.Type); t != nil {
-	//			device.Settings = make([]entity.DeviceSetting, len(t.Settings()))
-	//			for i, setting := range t.Settings() {
-	//				device.Settings[i] = entity.DeviceSetting{
-	//					Key:      setting.Key,
-	//					Value:    setting.Value,
-	//					Category: string(setting.Category),
-	//				}
-	//			}
-	//			db.Save(&device)
-	//		}
-	//	}
-	//}
-	//var result []map[string]interface{}
-	//db.Table("ts_alarm_rule").Unscoped().Find(&result)
-	//for _, r := range result {
-	//	fmt.Println(r["id"])
-	//	v := cast.ToString(r["source_type"])
-	//	typeID := strings.Split(v, "::")[1]
-	//	db.Table("ts_alarm_rule").Unscoped().Where("id = ?", r["id"]).UpdateColumns(map[string]interface{}{
-	//		"source_type": typeID,
-	//		"category":    1,
-	//	})
-	//}
-	//
-	db.Migrator().DropTable(&entity.Menu{}, &entity.RoleMenuRelation{})
+	//db.Migrator().DropTable(&entity.Menu{}, &entity.RoleMenuRelation{})
 	for _, table := range tables {
 		if !db.Migrator().HasTable(table) {
 			if err := db.Migrator().CreateTable(table); err != nil {

@@ -1,7 +1,6 @@
 package command
 
 import (
-	"context"
 	"encoding/binary"
 	"github.com/gogo/protobuf/proto"
 	pd "github.com/thetasensors/theta-cloud-lite/server/adapter/iot/proto"
@@ -21,12 +20,16 @@ func newDeleteDeviceCmd(mac string) deleteDeviceCmd {
 	}
 }
 
+func (cmd deleteDeviceCmd) ID() string {
+	return cmd.request.id
+}
+
 func (cmd deleteDeviceCmd) Name() string {
 	return "deleteDevice"
 }
 
-func (cmd deleteDeviceCmd) Response() string {
-	return "deleteDeviceResponse"
+func (cmd deleteDeviceCmd) Response() chan Response {
+	return cmd.response
 }
 
 func (cmd deleteDeviceCmd) Qos() byte {
@@ -42,6 +45,6 @@ func (cmd deleteDeviceCmd) Payload() ([]byte, error) {
 	return proto.Marshal(&m)
 }
 
-func (cmd deleteDeviceCmd) Execute(ctx context.Context, gateway string, target string, timeout time.Duration) ([]byte, error) {
-	return cmd.do(ctx, gateway, target, cmd, timeout)
+func (cmd deleteDeviceCmd) Execute(gateway string, target string) (*Response, error) {
+	return cmd.do(gateway, target, cmd, 3)
 }

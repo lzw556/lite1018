@@ -1,14 +1,12 @@
 package command
 
 import (
-	"context"
 	"encoding/binary"
 	"fmt"
 	"github.com/gogo/protobuf/proto"
 	pd "github.com/thetasensors/theta-cloud-lite/server/adapter/iot/proto"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/utils"
-	"time"
 )
 
 type updateDeviceCmd struct {
@@ -23,12 +21,16 @@ func newUpdateDeviceCmd(device entity.Device) updateDeviceCmd {
 	}
 }
 
+func (cmd updateDeviceCmd) ID() string {
+	return cmd.request.id
+}
+
 func (cmd updateDeviceCmd) Name() string {
 	return "updateDevice"
 }
 
-func (cmd updateDeviceCmd) Response() string {
-	return "updateDeviceResponse"
+func (cmd updateDeviceCmd) Response() chan Response {
+	return cmd.response
 }
 
 func (cmd updateDeviceCmd) Qos() byte {
@@ -47,6 +49,6 @@ func (cmd updateDeviceCmd) Payload() ([]byte, error) {
 	return proto.Marshal(&m)
 }
 
-func (cmd updateDeviceCmd) Execute(ctx context.Context, gateway string, target string, timeout time.Duration) ([]byte, error) {
-	return cmd.request.do(ctx, gateway, target, cmd, timeout)
+func (cmd updateDeviceCmd) Execute(gateway string, target string) (*Response, error) {
+	return cmd.request.do(gateway, target, cmd, 3)
 }

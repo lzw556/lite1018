@@ -8,7 +8,7 @@ require (
 	github.com/bilibili/gengine v1.5.7
 	github.com/casbin/casbin/v2 v2.44.0
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
-	github.com/eclipse/paho.mqtt.golang v1.3.5
+	github.com/eclipse/paho.mqtt.golang v1.3.6-0.20220319000430-87173763ce05
 	github.com/gin-contrib/cors v1.3.1
 	github.com/gin-contrib/gzip v0.0.5
 	github.com/gin-contrib/static v0.0.1
@@ -31,7 +31,7 @@ require (
 	go.etcd.io/bbolt v1.3.6
 	go.uber.org/zap v1.21.0
 	golang.org/x/crypto v0.0.0-20220411220226-7b82a4e95df4
-	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
+	golang.org/x/sync v0.0.0-20220513210516-0976fa681c29
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0
 	gorm.io/driver/mysql v1.3.3
 	gorm.io/driver/postgres v1.3.4
@@ -89,7 +89,7 @@ require (
 	github.com/yusufpapurcu/wmi v1.2.2 // indirect
 	go.uber.org/atomic v1.7.0 // indirect
 	go.uber.org/multierr v1.6.0 // indirect
-	golang.org/x/net v0.0.0-20220412020605-290c469a71a5 // indirect
+	golang.org/x/net v0.0.0-20220524220425-1d687d428aca // indirect
 	golang.org/x/sys v0.0.0-20220412211240-33da011f77ad // indirect
 	golang.org/x/text v0.3.7 // indirect
 	google.golang.org/protobuf v1.28.0 // indirect
