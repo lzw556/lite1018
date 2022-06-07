@@ -153,23 +153,22 @@ function generateFakeSpecification(max: number) {
 }
 
 function generateFakeCircle(measurements: MeasurementRow[], max: number) {
-  const bolts = [];
-  const count = measurements.length;
-  const interval = 360 / count;
-  for (let index = count; index > 0; index--) {
-    bolts.push([max, interval * index]);
-  }
-  return bolts.map((item, index) => ({
-    name: `item${index}`,
-    value: item,
-    label: {
-      show: true,
-      color: '#fff',
-      formatter: (paras: any) => {
-        return paras.data.value[1] / interval;
+  const interval = 360 / measurements.length;
+  return measurements
+    .sort((prev, next) => {
+      const prevIndex = prev.attributes?.index || 5;
+      const nextIndex = next.attributes?.index || 5;
+      return prevIndex - nextIndex;
+    })
+    .map(({ name, attributes }, index) => ({
+      name,
+      value: [max, interval * index],
+      label: {
+        show: true,
+        color: '#fff',
+        formatter: (paras: any) => attributes?.index
       }
-    }
-  }));
+    }));
 }
 
 export function transformMeasurementHistoryData(data: MeasurementHistoryData, propertyName?: string) {

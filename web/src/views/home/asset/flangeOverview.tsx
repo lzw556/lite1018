@@ -40,7 +40,7 @@ const FlangeOverview: React.FC = () => {
         ),
         width: 200
       },
-      { title: '状态', dataIndex: 'state', key: 'state', render: () => '正常', width: 120 }
+      { title: '状态', dataIndex: 'state', key: 'state', render: () => '', width: 120 }
     ],
     []
   );
@@ -152,7 +152,7 @@ const FlangeOverview: React.FC = () => {
         description={
           <p>
             还没有监测点, 去
-            <Link to='/measurement-management?locale=measruement-management'>创建</Link>, 或
+            <Link to='/measurement-management?locale=measurement-management'>创建</Link>, 或
             <a
               href='#!'
               onClick={(e) => {
