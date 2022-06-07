@@ -55,6 +55,7 @@ func (factory MonitoringPoint) NewMonitoringPointUpdateCmd(monitoringPointID uin
 	e.Name = req.Name
 	e.Type = req.Type
 	e.AssetID = req.AssetID
+	e.Attributes = req.Attributes
 
 	cmd := command.NewMonitoringPointUpdateCmd()
 	cmd.MonitoringPoint = e
