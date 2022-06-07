@@ -7,14 +7,14 @@ import { AssetTypes, MeasurementTypes } from '../constants';
 import { AssetRow } from '../asset/props';
 import { getAssets } from '../asset/services';
 import { convertRow, Measurement, MeasurementRow } from './props';
-import { addMeasurement, bindDevice, updateMeasurement } from './services';
+import { addMeasurement, bindDevice, unbindDevice, updateMeasurement } from './services';
 
 export const MeasurementEdit: React.FC<
   ModalProps & { selectedRow?: MeasurementRow } & { onSuccess: () => void }
 > = (props) => {
   const [types, setTypes] = React.useState([DeviceType.BoltLoosening, DeviceType.BoltElongation]);
   const { selectedRow, onSuccess } = props;
-  const { id } = selectedRow || {};
+  const { id, bindingDevices } = selectedRow || {};
   const [form] = Form.useForm<Measurement & { device_id: number }>();
   const [parents, setParents] = React.useState<AssetRow[]>([]);
   const [disabled, setDisabled] = React.useState(true);
@@ -46,6 +46,14 @@ export const MeasurementEdit: React.FC<
                   onSuccess();
                 });
               } else {
+                if (
+                  bindingDevices &&
+                  bindingDevices.length > 0 &&
+                  bindingDevices[0].id !== values.device_id
+                ) {
+                  unbindDevice(id, bindingDevices[0].id);
+                  bindDevice(id, values.device_id);
+                }
                 updateMeasurement(id, values).then(() => {
                   onSuccess();
                 });
@@ -108,7 +116,7 @@ export const MeasurementEdit: React.FC<
           name='device_id'
           rules={[{ required: true, message: `请选择传感器` }]}
         >
-          <DeviceSelect filters={{ types: types.join(',') }} disabled={disabled || !!id} />
+          <DeviceSelect filters={{ types: types.join(',') }} disabled={disabled && !id} />
         </Form.Item>
         <Form.Item label='序号' name={['attributes', 'index']} initialValue={1}>
           <Select placeholder='请选择序号'>
