@@ -53,6 +53,7 @@ func (factory Asset) NewAssetUpdateCmd(assetID uint, req request.UpdateAsset) (*
 	e.Name = req.Name
 	e.Type = req.Type
 	e.ParentID = req.ParentID
+	e.Attributes = req.Attributes
 
 	cmd := command.NewAssetUpdateCmd()
 	cmd.Asset = e
