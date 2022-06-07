@@ -6,7 +6,12 @@ import '../home.css';
 import { MeasurementIcon } from '../measurement/icon';
 import { OverviewPage } from '../overviewPage';
 import { Introduction, NameValue, TableListItem } from '../props';
-import { generateColProps, generateFlangeChartOptions, pickFirstClassProperties, transformSingleMeasurmentData } from '../utils';
+import {
+  generateColProps,
+  generateFlangeChartOptions,
+  pickFirstClassProperties,
+  transformSingleMeasurmentData
+} from '../utils';
 import { AssetTypes, MeasurementTypes } from '../constants';
 import { getAsset } from './services';
 import { AssetRow, transformAssetStatistics } from './props';
@@ -35,7 +40,7 @@ const WindTurbineOverview: React.FC = () => {
         width: 200,
         render: (name: string, row: MeasurementRow) => (
           <Link to={`${MeasurementTypes.dynamicPreload.url}&id=${row.id}`}>{name}</Link>
-        ),
+        )
       },
       {
         title: '状态',
@@ -49,11 +54,13 @@ const WindTurbineOverview: React.FC = () => {
         key: 'data',
         width: 260,
         render: (x, record: MeasurementRow) => {
-          const filters = pickFirstClassProperties(record).map(property => property.key)
+          const filters = pickFirstClassProperties(record).map((property) => property.key);
           const data = transformSingleMeasurmentData(record, ...filters);
-          return data.length > 0 ? data.map(({ name, value }) => `${name}: ${value}`).join(',') : '暂无数据'
+          return data.length > 0
+            ? data.map(({ name, value }) => `${name}: ${value}`).join(',')
+            : '暂无数据';
         }
-      },
+      }
     ],
     colProps: generateColProps({ xl: 24, xxl: 24 }),
     size: 'small',
@@ -81,39 +88,50 @@ const WindTurbineOverview: React.FC = () => {
       );
       const measurements: MeasurementRow[] = [];
       if (children && children.length > 0) {
-        const items = children.map((item) => {
-          let chart: any = null;
-          if (item.monitoringPoints && item.monitoringPoints.length > 0) {
-            chart = {
-              title: '',
-              options: generateFlangeChartOptions(item.monitoringPoints, {
-                inner: '45%',
-                outer: '60%'
-              }),
-              style: { left: '-24px', top: '-20px' }
-            };
-            measurements.push(
-              ...item.monitoringPoints.map((point) => ({ ...point, assetName: item.name }))
+        const items = children
+          .sort((prev, next) => {
+            const { index: prevIndex } = prev.attributes || { index: 5, type: 4 };
+            const { index: nextIndex } = next.attributes || { index: 5, type: 4 };
+            return prevIndex - nextIndex;
+          })
+          .sort((prev, next) => {
+            const { type: prevType } = prev.attributes || { index: 5, type: 4 };
+            const { type: nextType } = next.attributes || { index: 5, type: 4 };
+            return prevType - nextType;
+          })
+          .map((item) => {
+            let chart: any = null;
+            if (item.monitoringPoints && item.monitoringPoints.length > 0) {
+              chart = {
+                title: '',
+                options: generateFlangeChartOptions(item.monitoringPoints, {
+                  inner: '45%',
+                  outer: '60%'
+                }),
+                style: { left: '-24px', top: '-20px' }
+              };
+              measurements.push(
+                ...item.monitoringPoints.map((point) => ({ ...point, assetName: item.name }))
+              );
+            }
+            const { alarmState, statistics } = transformAssetStatistics(
+              item.statistics,
+              'monitoringPointNum',
+              ['anomalous', '异常监测点']
             );
-          }
-          const { alarmState, statistics } = transformAssetStatistics(
-            item.statistics,
-            'monitoringPointNum',
-            ['anomalous', '异常监测点']
-          );
-          return {
-            parentId: item.parentId,
-            id: item.id,
-            title: {
-              name: item.name,
-              path: `${AssetTypes.Flange.url}&id=${item.id}`
-            },
-            alarmState,
-            icon: { svg: <MeasurementIcon />, small: true, focus: true },
-            statistics,
-            chart
-          };
-        });
+            return {
+              parentId: item.parentId,
+              id: item.id,
+              title: {
+                name: item.name,
+                path: `${AssetTypes.Flange.url}&id=${item.id}`
+              },
+              alarmState,
+              icon: { svg: <MeasurementIcon />, small: true, focus: true },
+              statistics,
+              chart
+            };
+          });
         setFlanges(items);
       }
       if (measurements.length)
