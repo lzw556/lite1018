@@ -71,7 +71,7 @@ const AssetManagement: React.FC = () => {
                 title={`确定要删除该${name}吗?`}
                 onConfirm={() => {
                   deleteAsset(row.id).then(() => {
-                    fetchAssets({ type: AssetTypes.WindTurbind.type });
+                    fetchAssets({ type: AssetTypes.WindTurbind.id });
                   });
                 }}
               >
@@ -79,7 +79,7 @@ const AssetManagement: React.FC = () => {
                   <DeleteOutlined />
                 </Button>
               </Popconfirm>
-              {row.type === AssetTypes.WindTurbind.type && (
+              {row.type === AssetTypes.WindTurbind.id && (
                 <Button type='text' size='small' title='添加法兰'>
                   <PlusOutlined
                     style={{ color: 'rgba(0,0,0,.55)' }}
@@ -108,7 +108,7 @@ const AssetManagement: React.FC = () => {
     getAssets(filters).then((assets) => setAssets({ loading: false, items: assets }));
   };
   React.useEffect(() => {
-    fetchAssets({ type: AssetTypes.WindTurbind.type });
+    fetchAssets({ type: AssetTypes.WindTurbind.id });
   }, []);
 
   React.useEffect(() => {
@@ -132,7 +132,7 @@ const AssetManagement: React.FC = () => {
             selectedRow,
             initialValues,
             onSuccess: () => {
-              fetchAssets({ type: AssetTypes.WindTurbind.type });
+              fetchAssets({ type: AssetTypes.WindTurbind.id });
               setVisible(false);
             }
           }}

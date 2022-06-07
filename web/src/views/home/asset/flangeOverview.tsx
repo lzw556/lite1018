@@ -94,7 +94,7 @@ const FlangeOverview: React.FC = () => {
   React.useEffect(() => {
     if (measurements && measurements.length > 0) {
       const measurementType = Object.values(MeasurementTypes).find(
-        (type) => type.type === measurements[0].type
+        (type) => type.id === measurements[0].type
       );
       const from = moment().startOf('day').subtract(7, 'd').utc().unix();
       const to = moment().endOf('day').utc().unix();
@@ -168,7 +168,7 @@ const FlangeOverview: React.FC = () => {
     );
 
   const measurementType = Object.values(MeasurementTypes).find(
-    (type) => type.type === measurements[0].type
+    (type) => type.id === measurements[0].type
   );
 
   return (

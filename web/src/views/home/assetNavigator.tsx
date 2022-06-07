@@ -14,7 +14,7 @@ export const AssetNavigator: React.FC<Pick<Node, 'id' | 'type'>> = ({ id, type }
   const [assets, setAssets] = React.useState<AssetRow[]>([]);
   const [items, setItems] = React.useState<[number, boolean, Node[]][]>([]);
   React.useEffect(() => {
-    getAssets({ type: AssetTypes.WindTurbind.type }).then(setAssets);
+    getAssets({ type: AssetTypes.WindTurbind.id }).then(setAssets);
   }, []);
 
   React.useEffect(() => {
@@ -117,7 +117,7 @@ export const AssetNavigator: React.FC<Pick<Node, 'id' | 'type'>> = ({ id, type }
 
   const pickUrlFromType = (asset: BreadcrumbItemData) => {
     const types = [...Object.values(AssetTypes), ...Object.values(MeasurementTypes)];
-    const assetType = types.find((_type) => _type.type === asset.type);
+    const assetType = types.find((_type) => _type.id === asset.type);
     return assetType
       ? `${assetType.url}&id=${asset.id}`
       : `/project-overview?locale=/project-overview`;

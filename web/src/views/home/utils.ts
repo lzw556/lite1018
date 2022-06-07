@@ -323,7 +323,7 @@ export function generatePropertyColumns(measurement: MeasurementRow) {
 }
 
 function getFirstClassProperties(measurementType: number) {
-  const type = Object.values(MeasurementTypes).find((type) => type.type === measurementType);
+  const type = Object.values(MeasurementTypes).find((type) => type.id === measurementType);
   return type ? type.firstClassProperties : [];
 }
 
@@ -335,5 +335,5 @@ export function pickFirstClassProperties(measurement: MeasurementRow) {
 }
 
 export function getAssetType(typeId: number) {
-  return Object.values(AssetTypes).find((type) => type.type === typeId);
+  return Object.values(AssetTypes).find((type) => type.id === typeId);
 }

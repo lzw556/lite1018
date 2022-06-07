@@ -48,7 +48,7 @@ const MeasurementManagement: React.FC = () => {
         key: 'type',
         width: 120,
         render: (row: MeasurementRow) => {
-          const type = Object.values(MeasurementTypes).find((type) => type.type === row.type);
+          const type = Object.values(MeasurementTypes).find((type) => type.id === row.type);
           return type ? type.label : '-';
         }
       },
@@ -109,7 +109,7 @@ const MeasurementManagement: React.FC = () => {
     getAssets(filters).then((assets) => setAssets({ loading: false, items: assets }));
   };
   React.useEffect(() => {
-    fetchAssets({ type: AssetTypes.WindTurbind.type });
+    fetchAssets({ type: AssetTypes.WindTurbind.id });
   }, []);
 
   React.useEffect(() => {

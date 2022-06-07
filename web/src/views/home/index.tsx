@@ -59,7 +59,7 @@ const ProjectOverview: React.FC = () => {
         );
       }
     );
-    getAssets({ type: AssetTypes.WindTurbind.type }).then((assets) =>
+    getAssets({ type: AssetTypes.WindTurbind.id }).then((assets) =>
       setWindTurbines({
         loading: false,
         items: assets.map((item) => {

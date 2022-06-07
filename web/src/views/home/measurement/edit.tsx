@@ -20,7 +20,7 @@ export const MeasurementEdit: React.FC<
   const [disabled, setDisabled] = React.useState(true);
 
   React.useEffect(() => {
-    getAssets({ type: AssetTypes.Flange.type }).then(setParents);
+    getAssets({ type: AssetTypes.Flange.id }).then(setParents);
   }, []);
 
   React.useEffect(() => {
@@ -79,9 +79,9 @@ export const MeasurementEdit: React.FC<
             placeholder='请选择类型'
             onChange={(e) => {
               if (!id) {
-                const type = Object.values(MeasurementTypes).find((type) => type.type === e);
+                const type = Object.values(MeasurementTypes).find((type) => type.id === e);
                 if (type) {
-                  setTypes(type.deviceTypes);
+                  setTypes([type.deviceType]);
                   if (form.getFieldValue('device_id')) {
                     form.setFieldsValue({ device_id: undefined });
                   }
@@ -91,8 +91,8 @@ export const MeasurementEdit: React.FC<
             }}
             disabled={!!id}
           >
-            {Object.values(MeasurementTypes).map(({ type, label }) => (
-              <Select.Option key={type} value={type}>
+            {Object.values(MeasurementTypes).map(({ id, label }) => (
+              <Select.Option key={id} value={id}>
                 {label}
               </Select.Option>
             ))}
