@@ -1,7 +1,6 @@
 import { Empty, Spin } from 'antd';
 import * as React from 'react';
 import { Link } from 'react-router-dom';
-import { ColorDanger, ColorHealth, ColorInfo, ColorWarn } from '../../constants/color';
 import { AssetTypes } from './constants';
 import { AssetIcon } from './asset/icon';
 import { getAssets, getProjectStatistics } from './asset/services';
@@ -12,7 +11,8 @@ import './home.css';
 import { OverviewPage } from './overviewPage';
 import { Introduction } from './props';
 import { generateColProps } from './utils';
-import { transformAssetStatistics } from './asset/props';
+import { generateProjectAlarmStatis, transformAssetStatistics } from './asset/props';
+import { ColorHealth, ColorOffline } from '../../constants/color';
 
 const ProjectOverview: React.FC = () => {
   const colProps = generateColProps({ xl: 8, xxl: 5 });
@@ -35,27 +35,31 @@ const ProjectOverview: React.FC = () => {
         rootAssetNum,
         rootAssetAlarmNum,
         deviceNum,
-        deviceAlarmNum,
+        deviceOfflineNum,
         monitoringPointNum,
         monitoringPointAlarmNum
       }) => {
         setStatisticOfAsset(
-          generatePieOptions(rootAssetNum, {
-            normal: rootAssetNum - rootAssetAlarmNum,
-            error: rootAssetAlarmNum
-          })
+          generatePieOptions(
+            `共${rootAssetNum}台`,
+            generateProjectAlarmStatis(rootAssetNum, rootAssetAlarmNum)
+          )
         );
         setStatisticOfMeasurement(
-          generatePieOptions(monitoringPointNum, {
-            normal: monitoringPointNum - monitoringPointAlarmNum,
-            error: monitoringPointAlarmNum
-          })
+          generatePieOptions(
+            `共${monitoringPointNum}个`,
+            generateProjectAlarmStatis(monitoringPointNum, monitoringPointAlarmNum)
+          )
         );
         setStatisticOfSensor(
-          generatePieOptions(deviceNum, {
-            normal: deviceNum - deviceAlarmNum,
-            error: deviceAlarmNum
-          })
+          generatePieOptions(`共${deviceNum}个`, [
+            {
+              name: '在线',
+              value: deviceNum - deviceOfflineNum,
+              itemStyle: { color: ColorHealth }
+            },
+            { name: '离线', value: deviceOfflineNum, itemStyle: { color: ColorOffline } }
+          ])
         );
       }
     );
@@ -84,53 +88,52 @@ const ProjectOverview: React.FC = () => {
         })
       })
     );
-    setStatisticOfAlarm({
-      title: {
-        text: '',
-        left: 'center'
-      },
-      legend: {
-        bottom: 20,
-        data: [
-          { name: '次要', itemStyle: { color: ColorInfo } },
-          { name: '重要', itemStyle: { color: ColorWarn } },
-          { name: '紧急', itemStyle: { color: ColorDanger } }
-        ]
-      },
-      tooltip: { trigger: 'axis' },
-      xAxis: {
-        type: 'category',
-        data: []
-      },
-      yAxis: { type: 'value', minInterval: 1 },
-      series: [
-        {
-          type: 'bar',
-          name: '次要',
-          data: []
-        },
-        {
-          type: 'bar',
-          name: '重要',
-          data: []
-        },
-        {
-          type: 'bar',
-          name: '紧急',
-          data: []
-        }
-      ]
-    });
+    // setStatisticOfAlarm({
+    //   title: {
+    //     text: '',
+    //     left: 'center'
+    //   },
+    //   legend: {
+    //     bottom: 20,
+    //     data: [
+    //       { name: '次要', itemStyle: { color: ColorInfo } },
+    //       { name: '重要', itemStyle: { color: ColorWarn } },
+    //       { name: '紧急', itemStyle: { color: ColorDanger } }
+    //     ]
+    //   },
+    //   tooltip: { trigger: 'axis' },
+    //   xAxis: {
+    //     type: 'category',
+    //     data: []
+    //   },
+    //   yAxis: { type: 'value', minInterval: 1 },
+    //   series: [
+    //     {
+    //       type: 'bar',
+    //       name: '次要',
+    //       data: []
+    //     },
+    //     {
+    //       type: 'bar',
+    //       name: '重要',
+    //       data: []
+    //     },
+    //     {
+    //       type: 'bar',
+    //       name: '紧急',
+    //       data: []
+    //     }
+    //   ]
+    // });
   }, []);
 
   const generatePieOptions = (
-    count: number,
-    data: { normal: number; error: number }
+    title: string,
+    data: { name: string; value: string | number; itemStyle: { color: string } }[]
   ): ChartOptions<Series_Pie> => {
-    const { normal, error } = data;
     return {
       title: {
-        text: `共${count}台`,
+        text: title,
         left: 'center',
         top: 'center'
       },
@@ -142,10 +145,7 @@ const ProjectOverview: React.FC = () => {
           radius: ['40%', '50%'],
           center: ['50%', '50%'],
           label: { formatter: '{b} {c}' },
-          data: [
-            { name: '正常', value: normal, itemStyle: { color: ColorHealth } },
-            { name: '异常', value: error, itemStyle: { color: '#ccc' } }
-          ]
+          data
         }
       ]
     };

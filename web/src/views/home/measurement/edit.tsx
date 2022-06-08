@@ -10,7 +10,7 @@ import { convertRow, Measurement, MeasurementRow } from './props';
 import { addMeasurement, bindDevice, unbindDevice, updateMeasurement } from './services';
 
 export const MeasurementEdit: React.FC<
-  ModalProps & { selectedRow?: MeasurementRow } & { onSuccess: () => void }
+  ModalProps & { selectedRow?: MeasurementRow } & { onSuccess: (assetId?: number) => void }
 > = (props) => {
   const [types, setTypes] = React.useState([DeviceType.BoltLoosening, DeviceType.BoltElongation]);
   const { selectedRow, onSuccess } = props;
@@ -18,6 +18,7 @@ export const MeasurementEdit: React.FC<
   const [form] = Form.useForm<Measurement & { device_id: number }>();
   const [parents, setParents] = React.useState<AssetRow[]>([]);
   const [disabled, setDisabled] = React.useState(true);
+  const [assetId, setAssetId] = React.useState<number>();
 
   React.useEffect(() => {
     getAssets({ type: AssetTypes.Flange.id }).then(setParents);
@@ -26,8 +27,17 @@ export const MeasurementEdit: React.FC<
   React.useEffect(() => {
     form.resetFields();
     const values = convertRow(selectedRow);
-    if (values) form.setFieldsValue(values);
+    if (values) {
+      form.setFieldsValue(values);
+    }
   }, [form, selectedRow]);
+
+  React.useEffect(() => {
+    if (selectedRow) {
+      const asset = parents.find(({ id }) => id === selectedRow.assetId);
+      if (asset) setAssetId(asset.parentId);
+    }
+  }, [selectedRow, parents]);
 
   return (
     <Modal
@@ -43,7 +53,7 @@ export const MeasurementEdit: React.FC<
               if (!id) {
                 addMeasurement(values).then((measurement) => {
                   bindDevice(measurement.id, values.device_id);
-                  onSuccess();
+                  onSuccess(assetId);
                 });
               } else {
                 if (
@@ -53,9 +63,11 @@ export const MeasurementEdit: React.FC<
                 ) {
                   unbindDevice(id, bindingDevices[0].id);
                   bindDevice(id, values.device_id);
+                } else if (!bindingDevices || bindingDevices.length === 0) {
+                  bindDevice(id, values.device_id);
                 }
                 updateMeasurement(id, values).then(() => {
-                  onSuccess();
+                  onSuccess(assetId);
                 });
               }
             } catch (error) {
@@ -98,15 +110,6 @@ export const MeasurementEdit: React.FC<
             ))}
           </Select>
         </Form.Item>
-        <Form.Item label='法兰' name='asset_id' rules={[{ required: true, message: `请选择法兰` }]}>
-          <Select placeholder='请选择法兰'>
-            {parents.map(({ id, name }) => (
-              <Select.Option key={id} value={id}>
-                {name}
-              </Select.Option>
-            ))}
-          </Select>
-        </Form.Item>
         {/* TODO */}
         {/* <Form.Item label='法兰' name='asset_id' rules={[{ required: true, message: `请选择法兰` }]}>
           <Cascader options={parents} fieldNames={{ label: 'name', value: 'id' }} />
@@ -118,9 +121,24 @@ export const MeasurementEdit: React.FC<
         >
           <DeviceSelect filters={{ types: types.join(',') }} disabled={disabled && !id} />
         </Form.Item>
+        <Form.Item label='法兰' name='asset_id' rules={[{ required: true, message: `请选择法兰` }]}>
+          <Select
+            placeholder='请选择法兰'
+            onChange={(e) => {
+              const asset = parents.find(({ id }) => e === id);
+              setAssetId(asset?.parentId);
+            }}
+          >
+            {parents.map(({ id, name }) => (
+              <Select.Option key={id} value={id}>
+                {name}
+              </Select.Option>
+            ))}
+          </Select>
+        </Form.Item>
         <Form.Item label='序号' name={['attributes', 'index']} initialValue={1}>
           <Select placeholder='请选择序号'>
-            {[1, 2, 3, 4, 5].map((item) => (
+            {[1, 2, 3, 4, 5, 6, 7, 8].map((item) => (
               <Select.Option key={item} value={item}>
                 {item}
               </Select.Option>

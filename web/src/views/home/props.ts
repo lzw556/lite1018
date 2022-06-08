@@ -1,10 +1,11 @@
-import { ButtonProps, FormItemProps } from 'antd';
+import { ButtonProps } from 'antd';
 import { TableProps } from 'antd/lib/table';
+import React from 'react';
 import { ChartOptions } from './charts/common';
 import { MeasurementRow } from './measurement/props';
 
 export type AlarmState = 'normal' | 'info' | 'warn' | 'danger' | 'anomalous';
-export type AlarmStatistics = Record<AlarmState, NameValue>;
+export type AlarmStatistics = Map<AlarmState, NameValue>;
 
 export type Introduction = Pick<Overview, 'statistics'> & {
   parentId: number;
@@ -40,6 +41,7 @@ export type Overview = {
     };
     options?: ChartOptions<unknown>;
     style?: React.CSSProperties;
+    emptyDescription?: React.ReactNode;
   }[];
   introductionList?: Introduction[];
   tabelList?: TableListItem<any>[];
@@ -47,8 +49,8 @@ export type Overview = {
 
 export type SearchResult = {
   actions?: ButtonProps[];
-  filters?: FormItemProps<any>[];
-  result: TableProps<any>;
+  filters?: JSX.Element[];
+  results: JSX.Element[];
 };
 
 export type Node = {
@@ -61,10 +63,10 @@ export type Node = {
 };
 
 export type ProjectStatistics = {
-  deviceAlarmNum: number;
+  deviceOfflineNum: number;
   deviceNum: number;
-  monitoringPointAlarmNum: number;
+  monitoringPointAlarmNum: [number, number, number];
   monitoringPointNum: number;
-  rootAssetAlarmNum: number;
+  rootAssetAlarmNum: [number, number, number];
   rootAssetNum: number;
 };

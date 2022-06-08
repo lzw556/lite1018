@@ -5,14 +5,9 @@ import { AssetNavigator } from '../assetNavigator';
 import '../home.css';
 import { MeasurementIcon } from '../measurement/icon';
 import { OverviewPage } from '../overviewPage';
-import { Introduction, NameValue, TableListItem } from '../props';
-import {
-  generateColProps,
-  generateFlangeChartOptions,
-  pickFirstClassProperties,
-  transformSingleMeasurmentData
-} from '../utils';
-import { AssetTypes, MeasurementTypes } from '../constants';
+import { Introduction, NameValue } from '../props';
+import { generateFlangeChartOptions } from '../utils';
+import { AssetTypes } from '../constants';
 import { getAsset } from './services';
 import { AssetRow, transformAssetStatistics } from './props';
 import { MeasurementRow } from '../measurement/props';
@@ -24,48 +19,6 @@ const WindTurbineOverview: React.FC = () => {
   const [loading, setLoading] = React.useState(true);
   const [statistics, setStatistics] = React.useState<NameValue[]>();
   const [flanges, setFlanges] = React.useState<Introduction[]>();
-  const [table, setTable] = React.useState<TableListItem<any>>({
-    rowKey: 'id',
-    columns: [
-      {
-        title: '法兰',
-        dataIndex: 'assetName',
-        key: 'assetName',
-        width: 200
-      },
-      {
-        title: '名称',
-        dataIndex: 'name',
-        key: 'name',
-        width: 200,
-        render: (name: string, row: MeasurementRow) => (
-          <Link to={`${MeasurementTypes.dynamicPreload.url}&id=${row.id}`}>{name}</Link>
-        )
-      },
-      {
-        title: '状态',
-        key: 'alarmState',
-        render: (val: any, record: MeasurementRow) => '',
-        width: 120
-      },
-      {
-        title: '数据',
-        dataIndex: 'data',
-        key: 'data',
-        width: 260,
-        render: (x, record: MeasurementRow) => {
-          const filters = pickFirstClassProperties(record).map((property) => property.key);
-          const data = transformSingleMeasurmentData(record, ...filters);
-          return data.length > 0
-            ? data.map(({ name, value }) => `${name}: ${value}`).join(',')
-            : '暂无数据';
-        }
-      }
-    ],
-    colProps: generateColProps({ xl: 24, xxl: 24 }),
-    size: 'small',
-    pagination: false
-  });
   React.useEffect(() => {
     getAsset(id).then((asset) => {
       setLoading(false);
@@ -105,10 +58,10 @@ const WindTurbineOverview: React.FC = () => {
               chart = {
                 title: '',
                 options: generateFlangeChartOptions(item.monitoringPoints, {
-                  inner: '45%',
-                  outer: '60%'
+                  inner: '50%',
+                  outer: '65%'
                 }),
-                style: { left: '-24px', top: '-20px' }
+                style: { left: '-24px', top: '-20px', height: 400 }
               };
               measurements.push(
                 ...item.monitoringPoints.map((point) => ({ ...point, assetName: item.name }))
@@ -134,17 +87,6 @@ const WindTurbineOverview: React.FC = () => {
           });
         setFlanges(items);
       }
-      if (measurements.length)
-        setTable((prev) => {
-          if (prev.columns) {
-            return {
-              ...prev,
-              dataSource: measurements
-            };
-          } else {
-            return prev;
-          }
-        });
     }
   }, [asset]);
 
@@ -163,7 +105,7 @@ const WindTurbineOverview: React.FC = () => {
   return (
     <>
       <AssetNavigator id={id} type={asset?.type} />
-      <OverviewPage {...{ statistics, introductionList: flanges, tabelList: [table] }} />
+      <OverviewPage {...{ statistics, introductionList: flanges }} />
     </>
   );
 };

@@ -11,12 +11,12 @@ export interface AssetTreeSelectProps extends TreeSelectProps<any> {
 const {TreeNode} = TreeSelect;
 
 const AssetTreeSelect: FC<AssetTreeSelectProps> = (props) => {
-    const {onChange, defaultActiveFirstOption, defaultValue} = props;
+    const {onChange, defaultValue} = props;
     const [dataSource, setDataSource] = useState<Asset[]>()
 
     useEffect(() => {
         GetAssetsRequest().then(data => {
-            if (data.length && defaultActiveFirstOption) {
+            if (data.length) {
                 if (onChange) {
                     const asset = data.find(item => item.id === defaultValue);
                     if (asset) {

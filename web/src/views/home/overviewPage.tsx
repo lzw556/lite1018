@@ -9,7 +9,7 @@ import { generateColProps } from './utils';
 
 export const OverviewPage: React.FC<Overview> = (props) => {
   const { statistics, chartList, introductionList, tabelList } = props;
-  const colProps = generateColProps({ md: 12, lg: 12, xl: 6, xxl: 6 });
+  const colProps = generateColProps({ md: 12, lg: 12, xl: 4, xxl: 4 });
   const colProps2 = generateColProps({ md: 12, lg: 12, xl: 8, xxl: 6 });
 
   return (
@@ -31,15 +31,30 @@ export const OverviewPage: React.FC<Overview> = (props) => {
         <Col span={24}>
           <ShadowCard>
             <Row>
-              {chartList.map(({ colProps, options, title, style }, index) => (
-                <React.Fragment key={index}>
-                  {options && (
-                    <Col {...colProps}>
-                      <ChartContainer title={title} options={options} style={style} />
-                    </Col>
-                  )}
-                </React.Fragment>
-              ))}
+              {chartList.map(({ colProps, options, title, style, emptyDescription }, index) => {
+                let content = null;
+                if (options) {
+                  content = <ChartContainer title={title} options={options} style={style} />;
+                } else {
+                  content = (
+                    <div
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'center',
+                        height: '100%'
+                      }}
+                    >
+                      <p style={{ textAlign: 'center' }}>{emptyDescription || '暂无数据'}</p>
+                    </div>
+                  );
+                }
+                return (
+                  <React.Fragment key={index}>
+                    <Col {...colProps}>{content}</Col>
+                  </React.Fragment>
+                );
+              })}
             </Row>
           </ShadowCard>
         </Col>
