@@ -106,6 +106,18 @@ func (query StatisticQuery) GetAllStatistics() (vo.AllStatistics, error) {
 		return result, err
 	}
 
+	for _, dev := range devices {
+		query := NewDeviceQuery()
+		voDev, err := query.Get(dev.ID)
+		if err != nil {
+			return result, err
+		}
+
+		if !voDev.State.IsOnline {
+			result.DeviceOfflineNum++
+		}
+	}
+
 	result.DeviceNum = uint(len(devices))
 
 	monitoringPoints, err := query.monitoringPointRepo.FindBySpecs(ctx, query.Specs...)
@@ -114,6 +126,7 @@ func (query StatisticQuery) GetAllStatistics() (vo.AllStatistics, error) {
 	}
 
 	result.MonitoringPointNum = uint(len(monitoringPoints))
+	result.MonitoringPointAlarmNum = make([]uint, 3)
 
 	rootAssetSpecs := append(query.Specs, spec.ParentIDEqSpec(0))
 	rootAssets, err := query.assetRepo.FindBySpecs(ctx, rootAssetSpecs...)
@@ -122,6 +135,7 @@ func (query StatisticQuery) GetAllStatistics() (vo.AllStatistics, error) {
 	}
 
 	result.RootAssetNum = uint(len(rootAssets))
+	result.RootAssetAlarmNum = make([]uint, 3)
 
 	return result, nil
 }
