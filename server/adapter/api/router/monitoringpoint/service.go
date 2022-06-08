@@ -15,5 +15,6 @@ type Service interface {
 
 	FindMonitoringPointsByPaginate(page, size int, filters request.Filters) ([]vo.MonitoringPoint, int64, error)
 	FindMonitoringPoints(filters request.Filters) ([]vo.MonitoringPoint, error)
+	FindMonitoringPointRawDataByID(id uint, from, to int64) ([]vo.MonitoringPointData, error)
 	FindMonitoringPointDataByID(id uint, from, to int64) ([]vo.MonitoringPointData, error)
 }

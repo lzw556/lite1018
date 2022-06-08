@@ -75,5 +75,9 @@ func (r monitoringPointRouter) findDataByID(ctx *gin.Context) (interface{}, erro
 	id := cast.ToUint(ctx.Param("id"))
 	from := cast.ToInt64(ctx.Query("from"))
 	to := cast.ToInt64(ctx.Query("to"))
-	return r.service.FindMonitoringPointDataByID(id, from, to)
+	if ctx.Query("type") == "raw" {
+		return r.service.FindMonitoringPointRawDataByID(id, from, to)
+	} else {
+		return r.service.FindMonitoringPointDataByID(id, from, to)
+	}
 }

@@ -10,7 +10,7 @@ func ProcessPlainData(mp entity.MonitoringPoint, sensorData entity.SensorData) e
 		Time:              sensorData.Time,
 		MonitoringPointID: mp.ID,
 		MacAddress:        sensorData.MacAddress,
-		SensorType:        sensorData.SensorType,
+		Category:          mptype.MonitoringPointCategoryBasic,
 		Values:            map[string]interface{}{},
 	}
 

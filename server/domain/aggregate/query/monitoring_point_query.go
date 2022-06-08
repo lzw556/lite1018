@@ -64,7 +64,7 @@ func (query MonitoringPointQuery) newMonitoringPoint(mp entity.MonitoringPoint) 
 		}
 		sort.Sort(result.Properties)
 
-		if data, err := query.monitoringPointDataRepo.Last(mp.ID); err == nil {
+		if data, err := query.monitoringPointDataRepo.Last(mp.ID, monitoringpointtype.MonitoringPointCategoryBasic); err == nil {
 			if !data.Time.IsZero() {
 				monitoringPointData := vo.NewMonitoringPointData(data.Time)
 				values := map[string]interface{}{}
@@ -116,7 +116,7 @@ func (query MonitoringPointQuery) FindMonitoringPointDataByID(id uint, from, to 
 	}
 
 	if t := monitoringpointtype.Get(mp.Type); t != nil {
-		data, err := query.monitoringPointDataRepo.Find(mp.ID, from, to)
+		data, err := query.monitoringPointDataRepo.Find(mp.ID, monitoringpointtype.MonitoringPointCategoryBasic, from, to)
 		if err != nil {
 			return nil, err
 		}
@@ -136,5 +136,20 @@ func (query MonitoringPointQuery) FindMonitoringPointDataByID(id uint, from, to 
 		}
 	}
 
+	return result, nil
+}
+
+func (query MonitoringPointQuery) FindMonitoringPointRawDataByID(id uint, from, to time.Time) ([]vo.MonitoringPointData, error) {
+	times, err := query.monitoringPointDataRepo.FindTimes(id, monitoringpointtype.MonitoringPointCategoryRaw, from, to)
+	if err != nil {
+		return nil, err
+	}
+
+	result := make(vo.MonitoringPointDataList, len(times))
+	for i, t := range times {
+		result[i] = vo.NewMonitoringPointData(t)
+	}
+
+	sort.Sort(result)
 	return result, nil
 }

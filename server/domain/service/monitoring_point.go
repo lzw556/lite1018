@@ -93,3 +93,8 @@ func (s MonitoringPoint) FindMonitoringPointDataByID(id uint, from, to int64) ([
 	query := s.factory.NewMonitoringPointQuery(nil)
 	return query.FindMonitoringPointDataByID(id, time.Unix(from, 0), time.Unix(to, 0))
 }
+
+func (s MonitoringPoint) FindMonitoringPointRawDataByID(id uint, from, to int64) ([]vo.MonitoringPointData, error) {
+	query := s.factory.NewMonitoringPointQuery(nil)
+	return query.FindMonitoringPointRawDataByID(id, time.Unix(from, 0), time.Unix(to, 0))
+}
