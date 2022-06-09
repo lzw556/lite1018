@@ -17,4 +17,5 @@ type Service interface {
 	FindMonitoringPoints(filters request.Filters) ([]vo.MonitoringPoint, error)
 	FindMonitoringPointRawDataByID(id uint, from, to int64) ([]vo.MonitoringPointData, error)
 	FindMonitoringPointDataByID(id uint, from, to int64) ([]vo.MonitoringPointData, error)
+	GetMonitoringPointDataByIDAndTimestamp(id uint, category uint, timestamp int64, filters request.Filters) (*vo.MonitoringPointData, error)
 }

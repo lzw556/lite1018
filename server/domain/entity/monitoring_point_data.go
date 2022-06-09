@@ -9,6 +9,7 @@ type MonitoringPointData struct {
 	MonitoringPointID uint                   `json:"monitoring_ponint_id"`
 	MacAddress        string                 `json:"mac_address"`
 	Category          uint                   `json:"category"`
+	SensorType        uint                   `json:"sensor_type"`
 	Values            map[string]interface{} `json:"values"`
 }
 

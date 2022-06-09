@@ -5,6 +5,7 @@ import (
 	"github.com/spf13/cast"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/request"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/response"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/monitoringpointtype"
 )
 
 func (r monitoringPointRouter) create(ctx *gin.Context) (interface{}, error) {
@@ -80,4 +81,11 @@ func (r monitoringPointRouter) findDataByID(ctx *gin.Context) (interface{}, erro
 	} else {
 		return r.service.FindMonitoringPointDataByID(id, from, to)
 	}
+}
+
+func (r monitoringPointRouter) getDataByIDAndTimestamp(ctx *gin.Context) (interface{}, error) {
+	id := cast.ToUint(ctx.Param("id"))
+	timestamp := cast.ToInt64(ctx.Param("timestamp"))
+	filters := request.NewFilters(ctx)
+	return r.service.GetMonitoringPointDataByIDAndTimestamp(id, monitoringpointtype.MonitoringPointCategoryRaw, timestamp, filters)
 }

@@ -45,19 +45,21 @@ func (proc *Process) ProcessDeviceSensorData(dev entity.Device, sensorData entit
 
 	for _, binding := range bindings {
 		mp, err := proc.monitoringPointRepo.Get(ctx, binding.MonitoringPointID)
-		var mpData entity.MonitoringPointData
-		if err == nil {
-			switch binding.ProcessID {
-			case ProcessTypePlainData:
-				mpData = ProcessPlainData(mp, sensorData)
-			default:
-				mpData = ProcessPlainData(mp, sensorData)
-			}
+		if err != nil {
+			continue
+		}
 
-			err = proc.monitoringPointDataRepo.Create(mpData)
-			if err != nil {
-				return fmt.Errorf("Failed to save monitoring point data.")
-			}
+		var mpData entity.MonitoringPointData
+		switch binding.ProcessID {
+		case ProcessTypePlainData:
+			mpData = ProcessPlainData(mp, sensorData)
+		default:
+			mpData = ProcessPlainData(mp, sensorData)
+		}
+
+		err = proc.monitoringPointDataRepo.Create(mpData)
+		if err != nil {
+			return fmt.Errorf("Failed to save monitoring point data.")
 		}
 
 		if sources, err := proc.alarmSourceRepo.FindBySpecs(context.TODO(), spec.SourceEqSpec(mp.ID)); err == nil {
@@ -74,5 +76,36 @@ func (proc *Process) ProcessDeviceSensorData(dev entity.Device, sensorData entit
 		}
 	}
 
+	return nil
+}
+
+func (proc *Process) ProcessDeviceSensorRawData(dev entity.Device, sensorData entity.SensorData) error {
+	fmt.Printf("#### process raw data, dev %d\n", dev.ID)
+	ctx := context.TODO()
+	bindings, err := proc.monitoringPointDeviceBindingRepo.FindBySpecs(ctx, spec.DeviceIDEqSpec(dev.ID))
+	if err != nil {
+		return err
+	}
+
+	for _, binding := range bindings {
+		mp, err := proc.monitoringPointRepo.Get(ctx, binding.MonitoringPointID)
+		if err != nil {
+			continue
+		}
+
+		var mpData entity.MonitoringPointData
+		switch binding.ProcessID {
+		case ProcessTypePlainData:
+			mpData = ProcessPlainRawData(mp, sensorData)
+		default:
+			mpData = ProcessPlainRawData(mp, sensorData)
+		}
+
+		fmt.Printf("#### saving raw data %+v\n", mpData)
+		err = proc.monitoringPointDataRepo.Create(mpData)
+		if err != nil {
+			return fmt.Errorf("Failed to save monitoring point data.")
+		}
+	}
 	return nil
 }
