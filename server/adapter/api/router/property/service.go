@@ -4,4 +4,5 @@ import "github.com/thetasensors/theta-cloud-lite/server/domain/vo"
 
 type Service interface {
 	FindPropertiesByDeviceType(deviceType uint) (vo.Properties, error)
+	FindMonitoringPointProperties(monitoringPointType uint) (vo.MPProperties, error)
 }
