@@ -35,7 +35,7 @@ const AssetManagement: React.FC = () => {
     }
   ];
   const [result, setResult] = React.useState<TableProps<any>>({
-    rowKey: (row: AssetRow) => row.id + row.type,
+    rowKey: (row: AssetRow) => `${row.id}-${row.type}`,
     columns: [
       {
         title: '名称',
