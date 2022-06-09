@@ -31,6 +31,13 @@ export function bindDevice(id: Measurement['id'], device_id: number) {
   });
 }
 
+export function unbindDevice(id: Measurement['id'], device_id: number) {
+  //TODO
+  return request.post(`/monitoringPoints/${id}/unbindDevice`, { device_id });
+}
+
 export function getData(id: Measurement['id'], from: number, to: number) {
-  return request.get<MeasurementHistoryData>(`/monitoringPoints/${id}/data?from=${from}&to=${to}`).then(GetResponse);
+  return request
+    .get<MeasurementHistoryData>(`/monitoringPoints/${id}/data?from=${from}&to=${to}`)
+    .then(GetResponse);
 }

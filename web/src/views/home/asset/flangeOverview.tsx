@@ -5,7 +5,7 @@ import { Link, useLocation, useHistory } from 'react-router-dom';
 import { AssetNavigator } from '../assetNavigator';
 import { MeasurementTypes } from '../constants';
 import '../home.css';
-import { MeasurementRow } from '../measurement/props';
+import { MeasurementHistoryData, MeasurementRow } from '../measurement/props';
 import { getData } from '../measurement/services';
 import { OverviewPage } from '../overviewPage';
 import { TableListItem, NameValue } from '../props';
@@ -29,6 +29,11 @@ const FlangeOverview: React.FC = () => {
   const [statisticOfPreload, setStatisticOfPreload] = React.useState<any>(
     generatePreloadOptions({ times: [], seriesData: [], property: '' }, '')
   );
+  const [historyDatas, setHistoryDatas] = React.useState<
+    { name: string; data: MeasurementHistoryData }[]
+  >([]);
+  const [measurementType, setMeasurementType] =
+    React.useState<typeof MeasurementTypes.loosening_angle>();
   const commonColumns = React.useMemo(
     () => [
       {
@@ -40,7 +45,7 @@ const FlangeOverview: React.FC = () => {
         ),
         width: 200
       },
-      { title: '状态', dataIndex: 'state', key: 'state', render: () => '正常', width: 120 }
+      { title: '状态', dataIndex: 'state', key: 'state', render: () => '', width: 120 }
     ],
     []
   );
@@ -94,55 +99,48 @@ const FlangeOverview: React.FC = () => {
   React.useEffect(() => {
     if (measurements && measurements.length > 0) {
       const measurementType = Object.values(MeasurementTypes).find(
-        (type) => type.type === measurements[0].type
+        (type) => type.id === measurements[0].type
       );
+      if (measurementType) setMeasurementType(measurementType);
       const from = moment().startOf('day').subtract(7, 'd').utc().unix();
       const to = moment().endOf('day').utc().unix();
-      if (statisticOfPreload.series.length === 0 && measurementType) {
-        getData(measurements[0].id, from, to).then((data) => {
-          if (data.length > 0) {
-            const datas = transformMeasurementHistoryData(
-              data,
-              measurementType.firstClassProperties[0]
-            );
-            if (datas.length > 0) {
-              setStatisticOfPreload(generatePreloadOptions(datas[0], measurements[0].name));
+      measurements.forEach(({ id, name }) => {
+        getData(id, from, to).then((data) => {
+          if (data.length > 0) setHistoryDatas((prev) => [...prev, { name, data }]);
+        });
+      });
+    }
+  }, [measurements]);
+
+  React.useEffect(() => {
+    if (historyDatas.length > 0 && measurementType) {
+      historyDatas.forEach(({ name, data }, index) => {
+        if (data.length > 0) {
+          const datas = transformMeasurementHistoryData(
+            data,
+            measurementType.firstClassProperties[0]
+          );
+          if (datas.length > 0) {
+            if (index === 0) {
+              setStatisticOfPreload(generatePreloadOptions(datas[0], name));
+            } else {
+              setStatisticOfPreload((prev: any) => ({
+                ...prev,
+                series: prev.series.concat(
+                  datas[0].seriesData.map(({ data }: any) => ({
+                    type: 'line',
+                    name,
+                    areaStyle: {},
+                    data
+                  }))
+                )
+              }));
             }
           }
-        });
-      } else if (
-        statisticOfPreload.series.length > 0 &&
-        statisticOfPreload.series.length !== measurements.filter((point) => point.data).length &&
-        measurementType
-      ) {
-        measurements
-          .filter((item) => item.id !== measurements[0].id)
-          .forEach(({ id, name }) => {
-            getData(id, from, to).then((data) => {
-              if (data.length > 0) {
-                const datas = transformMeasurementHistoryData(
-                  data,
-                  measurementType.firstClassProperties[0]
-                );
-                if (datas.length > 0) {
-                  setStatisticOfPreload((prev: any) => ({
-                    ...prev,
-                    series: prev.series.concat(
-                      datas[0].seriesData.map(({ data }: any, index: any) => ({
-                        type: 'line',
-                        name,
-                        areaStyle: {},
-                        data
-                      }))
-                    )
-                  }));
-                }
-              }
-            });
-          });
-      }
+        }
+      });
     }
-  }, [measurements, statisticOfPreload]);
+  }, [historyDatas, measurementType]);
 
   if (loading) return <Spin />;
   //TODO
@@ -152,7 +150,7 @@ const FlangeOverview: React.FC = () => {
         description={
           <p>
             还没有监测点, 去
-            <Link to='/measurement-management?locale=measruement-management'>创建</Link>, 或
+            <Link to='/measurement-management?locale=measurement-management'>创建</Link>, 或
             <a
               href='#!'
               onClick={(e) => {
@@ -167,10 +165,6 @@ const FlangeOverview: React.FC = () => {
       />
     );
 
-  const measurementType = Object.values(MeasurementTypes).find(
-    (type) => type.type === measurements[0].type
-  );
-
   return (
     <>
       <AssetNavigator id={id} type={asset?.type} />
@@ -184,14 +178,16 @@ const FlangeOverview: React.FC = () => {
                 title: '分布图',
                 colProps: generateColProps({ xl: 12, xxl: 9 }),
                 options: generateFlangeChartOptions(measurements, {
-                  inner: '55%',
-                  outer: '70%'
-                })
+                  inner: '65%',
+                  outer: '80%'
+                }),
+                style: { height: 550 }
               },
               {
                 title: `${measurementType.label}趋势`,
                 colProps: generateColProps({ xl: 12, xxl: 15 }),
-                options: statisticOfPreload
+                options: statisticOfPreload,
+                style: { height: 550 }
               }
             ]
           }}

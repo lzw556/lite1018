@@ -32,26 +32,21 @@ const MyBreadcrumb: FC<MyBreadcrumbProps> = ({ children, label, firstBreadState 
       <Col span={children ? 12 : 24}>
         <Breadcrumb style={{ fontSize: '16pt', fontWeight: 'bold' }}>
           {paths.map(({ search, name }, index: number) => {
-            const menu = findMenu(routes, name, location.pathname)
+            const menu = findMenu(routes, name, location.pathname);
             if (paths.length - 1 === index) {
               return <Breadcrumb.Item key={index}>{label ? label : menu?.title}</Breadcrumb.Item>;
             }
-            return (
-              <Link
-                to={{
-                  pathname: menu?.path,
-                  search,
-                  state: firstBreadState
-                }}
-                key={index}
-              >
-                {isMobile ? (
-                  <ArrowLeftOutlined style={{ paddingRight: 8, fontSize: '16pt' }} />
-                ) : (
-                  <Breadcrumb.Item>{menu?.title}</Breadcrumb.Item>
-                )}
-              </Link>
-            );
+            if (isMobile) {
+              <Link to={{ pathname: menu?.path, search }}>
+                <ArrowLeftOutlined style={{ paddingRight: 8, fontSize: '16pt' }} />
+              </Link>;
+            } else {
+              return (
+                <Breadcrumb.Item>
+                  <Link to={{ pathname: menu?.path, search }}>{menu?.title}</Link>
+                </Breadcrumb.Item>
+              );
+            }
           })}
         </Breadcrumb>
       </Col>

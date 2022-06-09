@@ -12,12 +12,12 @@ export const AssetEdit: React.FC<
 > = (props) => {
   const { selectedRow, initialValues, onSuccess } = props;
   const { id } = selectedRow || {};
-  const { type, label, parent_id } = initialValues || {};
+  const { id: assetTypeId, label, parent_id } = initialValues || {};
   const [form] = Form.useForm<Asset>();
   const [parents, setParents] = React.useState<AssetRow[]>([]);
 
   React.useEffect(() => {
-    getAssets({ type: AssetTypes.WindTurbind.type }).then((assets) => setParents(assets));
+    getAssets({ type: AssetTypes.WindTurbind.id }).then((assets) => setParents(assets));
   }, []);
 
   React.useEffect(() => {
@@ -62,10 +62,10 @@ export const AssetEdit: React.FC<
         <Form.Item label='名称' name='name' rules={[Rules.range(4, 50)]}>
           <Input placeholder={`请填写${label}名称`} />
         </Form.Item>
-        <Form.Item label='类型' name='type' hidden={!!type} initialValue={type}>
+        <Form.Item label='类型' name='type' hidden={!!assetTypeId} initialValue={assetTypeId}>
           <Select>
-            {Object.values(AssetTypes).map(({ type, label }) => (
-              <Select.Option key={type} value={type}>
+            {Object.values(AssetTypes).map(({ id, label }) => (
+              <Select.Option key={id} value={id}>
                 {label}
               </Select.Option>
             ))}
@@ -86,7 +86,7 @@ export const AssetEdit: React.FC<
             ))}
           </Select>
         </Form.Item>
-        {AssetTypes.Flange.categories && type !== AssetTypes.WindTurbind.type && (
+        {AssetTypes.Flange.categories && assetTypeId !== AssetTypes.WindTurbind.id && (
           <Form.Item
             label='法兰类型'
             name={['attributes', 'type']}
@@ -101,7 +101,7 @@ export const AssetEdit: React.FC<
             </Select>
           </Form.Item>
         )}
-        {AssetTypes.Flange.categories && type !== AssetTypes.WindTurbind.type && (
+        {AssetTypes.Flange.categories && assetTypeId !== AssetTypes.WindTurbind.id && (
           <Form.Item label='序号' name={['attributes', 'index']} initialValue={1}>
             <Select placeholder='请选择序号'>
               {[1, 2, 3, 4, 5].map((item) => (

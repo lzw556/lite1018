@@ -5,8 +5,23 @@ import { cloneDeep, round } from 'lodash';
 import { AssetRow } from './asset/props';
 import { Node } from './props';
 import { AssetTypes, MeasurementTypes } from './constants';
+import { ColorDanger, ColorInfo, ColorWarn } from '../../constants/color';
 
-export function generateColProps({ xs, sm, md, lg, xl, xxl }: { xs?: number; sm?: number; md?: number; lg?: number; xl?: number; xxl?: number }) {
+export function generateColProps({
+  xs,
+  sm,
+  md,
+  lg,
+  xl,
+  xxl
+}: {
+  xs?: number;
+  sm?: number;
+  md?: number;
+  lg?: number;
+  xl?: number;
+  xxl?: number;
+}) {
   const colCount = 24;
   return {
     xs: { span: xs ?? colCount },
@@ -18,10 +33,12 @@ export function generateColProps({ xs, sm, md, lg, xl, xxl }: { xs?: number; sm?
   };
 }
 
-export function generateFlangeChartOptions(measurements: MeasurementRow[], size: { inner: string; outer: string }) {
+export function generateFlangeChartOptions(
+  measurements: MeasurementRow[],
+  size: { inner: string; outer: string }
+) {
   const count = measurements.length;
   if (!count) return null;
-  const startAngle = 360 / count + 90;
   const actuals = generateActuals(measurements);
   let minActual = actuals[0][0];
   let maxActual = minActual;
@@ -35,112 +52,151 @@ export function generateFlangeChartOptions(measurements: MeasurementRow[], size:
   const circleMax = maxActual + 1;
   const _maxinum = generateFakeCircle(measurements, circleMax);
   const specification = generateFakeSpecification((minActual + maxActual) / 2);
-  return {
-    polar: [
-      { id: 'inner', radius: size.inner },
-      { id: 'outer', radius: size.outer }
-    ],
-    angleAxis: [
-      {
-        type: 'value',
-        polarIndex: 0,
-        axisLine: { show: false },
-        axisTick: { show: false },
-        axisLabel: { show: false },
-        splitLine: { show: false }
-      },
-      {
-        type: 'value',
-        polarIndex: 1,
-        startAngle,
-        axisLine: { show: true, lineStyle: { type: 'dashed' } },
-        axisTick: { show: false },
-        axisLabel: { show: false },
-        splitLine: { show: false }
-      }
-    ],
-    radiusAxis: [
-      {
-        polarIndex: 0,
-        max: maxActual,
-        min: minActual,
-        axisLine: { show: false },
-        axisTick: { show: false },
-        axisLabel: { color: '#ccc' }
-      },
-      {
-        polarIndex: 1,
-        type: 'value',
-        axisLine: { show: false },
-        axisTick: { show: false },
-        axisLabel: { show: false },
-        splitLine: { show: false },
-        min: minActual,
-        max: circleMax
-      }
-    ],
-    legend: {
-      data: [
+  if (measurements[0].type === MeasurementTypes.preload.id) {
+    return {
+      polar: [
+        { id: 'inner', radius: size.inner },
+        { id: 'outer', radius: size.outer }
+      ],
+      angleAxis: [
         {
-          name: '实际值',
-          icon: 'circle'
+          type: 'value',
+          polarIndex: 0,
+          axisLine: { show: false },
+          axisTick: { show: false },
+          axisLabel: { show: false },
+          splitLine: { show: false }
         },
         {
-          name: '规定值'
+          type: 'value',
+          polarIndex: 1,
+          startAngle: 0,
+          clockwise: false,
+          interval: 360 / measurements.length,
+          min: 0,
+          max: 360,
+          axisLine: { show: true, lineStyle: { type: 'dashed' } },
+          axisTick: { show: false },
+          axisLabel: { show: false },
+          splitLine: { show: false }
         }
       ],
-      bottom: 0
-    },
-    series: [
-      {
-        type: 'line',
-        name: '实际值',
-        coordinateSystem: 'polar',
-        lineStyle: { color: '#00800080' },
-        itemStyle: { color: '#00800080' },
-        data: actuals
-      },
-      {
-        type: 'line',
-        name: '规定值',
-        coordinateSystem: 'polar',
-        data: specification,
-        symbol: 'none',
-        itemStyle: { color: 'rgb(255, 68, 0, .6)' },
-        lineStyle: { type: 'dashed', color: 'rgb(255, 68, 0, .6)' }
-      },
-      {
-        type: 'scatter',
-        name: 'bg',
-        coordinateSystem: 'polar',
-        polarIndex: 1,
-        symbol:
-          'path://M675.9 107.2H348.1c-42.9 0-82.5 22.9-104 60.1L80 452.1c-21.4 37.1-21.4 82.7 0 119.8l164.1 284.8c21.4 37.2 61.1 60.1 104 60.1h327.8c42.9 0 82.5-22.9 104-60.1L944 571.9c21.4-37.1 21.4-82.7 0-119.8L779.9 167.3c-21.4-37.1-61.1-60.1-104-60.1z',
-        symbolSize: 30,
-        data: _maxinum,
-        itemStyle: {
-          opacity: 1,
-          color: '#555'
+      radiusAxis: [
+        {
+          polarIndex: 0,
+          max: maxActual,
+          min: minActual,
+          axisLine: { show: false },
+          axisTick: { show: false },
+          axisLabel: { color: '#ccc' }
         },
-        zlevel: 10
-      }
-    ]
-  };
+        {
+          polarIndex: 1,
+          type: 'value',
+          axisLine: { show: false },
+          axisTick: { show: false },
+          axisLabel: { show: false },
+          splitLine: { show: false },
+          min: minActual,
+          max: circleMax
+        }
+      ],
+      legend: {
+        data: [
+          {
+            name: '实际值',
+            icon: 'circle'
+          },
+          {
+            name: '规定值'
+          }
+        ],
+        bottom: 0
+      },
+      series: [
+        {
+          type: 'line',
+          name: '实际值',
+          coordinateSystem: 'polar',
+          lineStyle: { color: '#00800080' },
+          itemStyle: { color: '#00800080' },
+          data: actuals,
+          tooltip: {
+            formatter: (params: any) => {
+              return `${params.data[0]}`;
+            }
+          }
+        },
+        {
+          type: 'line',
+          name: '规定值',
+          coordinateSystem: 'polar',
+          data: specification,
+          symbol: 'none',
+          itemStyle: { color: 'rgb(255, 68, 0, .6)' },
+          lineStyle: { type: 'dashed', color: 'rgb(255, 68, 0, .6)' }
+        },
+        {
+          type: 'scatter',
+          name: 'bg',
+          coordinateSystem: 'polar',
+          polarIndex: 1,
+          symbol:
+            'path://M675.9 107.2H348.1c-42.9 0-82.5 22.9-104 60.1L80 452.1c-21.4 37.1-21.4 82.7 0 119.8l164.1 284.8c21.4 37.2 61.1 60.1 104 60.1h327.8c42.9 0 82.5-22.9 104-60.1L944 571.9c21.4-37.1 21.4-82.7 0-119.8L779.9 167.3c-21.4-37.1-61.1-60.1-104-60.1z',
+          symbolSize: 30,
+          data: _maxinum,
+          itemStyle: {
+            opacity: 1,
+            color: '#555'
+          },
+          zlevel: 10
+        }
+      ]
+    };
+  } else {
+    return {
+      title: {
+        text: '',
+        left: 'center'
+      },
+      legend: {
+        bottom: 20
+      },
+      tooltip: { trigger: 'axis' },
+      xAxis: {
+        type: 'category'
+      },
+      yAxis: { type: 'value' },
+      series: measurements.map((point) => {
+        let propName = '';
+        const firstClassProperties = getFirstClassProperties(point.type);
+        if (firstClassProperties.length > 0) propName = firstClassProperties[0];
+        const historyData = transformSingleMeasurmentData(point, propName);
+        const data = historyData.length > 0 ? [historyData[0].value] : NaN;
+        return { type: 'bar', name: point.name, data };
+      })
+    };
+  }
 }
 
 function generateActuals(measurements: MeasurementRow[]) {
-  const actuals = [];
+  const actuals: number[][] = [];
   const interval = 360 / measurements.length;
   let first = 0;
-  for (let index = 0; index < measurements.length; index++) {
-    const point = measurements[index];
-    let propName = '';
-    const firstClassProperties = getFirstClassProperties(point.type);
-    if (firstClassProperties.length > 0) propName = firstClassProperties[0];
-    const data = transformSingleMeasurmentData(point, propName);
-    actuals.push([data.length > 0 ? data[0].value : NaN, index * interval]);
-    if (index === 0) first = data.length > 0 ? data[0].value : NaN;
-  }
+  measurements
+    .sort((prev, next) => {
+      const prevIndex = prev.attributes?.index || 5;
+      const nextIndex = next.attributes?.index || 5;
+      return prevIndex - nextIndex;
+    })
+    .forEach((point, index) => {
+      let propName = '';
+      const firstClassProperties = getFirstClassProperties(point.type);
+      if (firstClassProperties.length > 0) propName = firstClassProperties[0];
+      const data = transformSingleMeasurmentData(point, propName);
+      actuals.push([data.length > 0 ? data[0].value : NaN, index * interval]);
+      if (index === 0) first = data.length > 0 ? data[0].value : NaN;
+    });
   return actuals.concat([[first, 360]]);
 }
 
@@ -153,26 +209,28 @@ function generateFakeSpecification(max: number) {
 }
 
 function generateFakeCircle(measurements: MeasurementRow[], max: number) {
-  const bolts = [];
-  const count = measurements.length;
-  const interval = 360 / count;
-  for (let index = count; index > 0; index--) {
-    bolts.push([max, interval * index]);
-  }
-  return bolts.map((item, index) => ({
-    name: `item${index}`,
-    value: item,
-    label: {
-      show: true,
-      color: '#fff',
-      formatter: (paras: any) => {
-        return paras.data.value[1] / interval;
+  const interval = 360 / measurements.length;
+  return measurements
+    .sort((prev, next) => {
+      const prevIndex = prev.attributes?.index || 5;
+      const nextIndex = next.attributes?.index || 5;
+      return prevIndex - nextIndex;
+    })
+    .map(({ name, attributes }, index) => ({
+      name,
+      value: [max, interval * index],
+      label: {
+        show: true,
+        color: '#fff',
+        formatter: (paras: any) => attributes?.index
       }
-    }
-  }));
+    }));
 }
 
-export function transformMeasurementHistoryData(data: MeasurementHistoryData, propertyName?: string) {
+export function transformMeasurementHistoryData(
+  data: MeasurementHistoryData,
+  propertyName?: string
+) {
   const firstValue = data[0].values;
   const times = data.map(({ timestamp }) => moment.unix(timestamp).local());
   return firstValue
@@ -198,7 +256,10 @@ export function transformMeasurementHistoryData(data: MeasurementHistoryData, pr
     });
 }
 
-export function generateMeasurementHistoryDataOptions(data: MeasurementHistoryData, propertyName?: string) {
+export function generateMeasurementHistoryDataOptions(
+  data: MeasurementHistoryData,
+  propertyName?: string
+) {
   const optionsData = transformMeasurementHistoryData(data, propertyName);
   return optionsData.map(({ times, seriesData, property }) => {
     return {
@@ -217,7 +278,9 @@ export function generateMeasurementHistoryDataOptions(data: MeasurementHistoryDa
       grid: { bottom: 20 },
       title: {
         text: `${property.name}${property.unit ? `(${property.unit})` : ''}`,
-        subtext: propertyName ? '' : `${seriesData.map(({ name, data }) => name + ' ' + data[data.length - 1])}`
+        subtext: propertyName
+          ? ''
+          : `${seriesData.map(({ name, data }) => name + ' ' + data[data.length - 1])}`
       },
       series: seriesData.map(({ name, data }, index) => ({
         type: 'line',
@@ -261,7 +324,10 @@ export function mapTreeNode<N extends Node>(node: N, fn: <N extends Node>(node: 
   }
 }
 
-export function forEachTreeNode<N extends Node>(node: N, fn: <N extends Node>(node: N) => void): void {
+export function forEachTreeNode<N extends Node>(
+  node: N,
+  fn: <N extends Node>(node: N) => void
+): void {
   fn(node);
   if (node.children && node.children.length > 0) {
     node.children.map((node) => forEachTreeNode(node, fn));
@@ -315,16 +381,18 @@ export function generatePropertyColumns(measurement: MeasurementRow) {
         title: '采集时间',
         key: 'timestamp',
         render: (measurement: MeasurementRow) => {
-          return measurement.data && measurement.data.timestamp ? moment(measurement.data.timestamp * 1000).format('YYYY-MM-DD HH:mm:ss') : '-';
+          return measurement.data && measurement.data.timestamp
+            ? moment(measurement.data.timestamp * 1000).format('YYYY-MM-DD HH:mm:ss')
+            : '-';
         },
-        width: 150
+        width: 200
       });
   }
   return [];
 }
 
 function getFirstClassProperties(measurementType: number) {
-  const type = Object.values(MeasurementTypes).find((type) => type.type === measurementType);
+  const type = Object.values(MeasurementTypes).find((type) => type.id === measurementType);
   return type ? type.firstClassProperties : [];
 }
 
@@ -336,5 +404,5 @@ export function pickFirstClassProperties(measurement: MeasurementRow) {
 }
 
 export function getAssetType(typeId: number) {
-  return Object.values(AssetTypes).find((type) => type.type === typeId);
+  return Object.values(AssetTypes).find((type) => type.id === typeId);
 }

@@ -7,27 +7,37 @@ import { AssetTypes, MeasurementTypes } from '../constants';
 import { AssetRow } from '../asset/props';
 import { getAssets } from '../asset/services';
 import { convertRow, Measurement, MeasurementRow } from './props';
-import { addMeasurement, bindDevice, updateMeasurement } from './services';
+import { addMeasurement, bindDevice, unbindDevice, updateMeasurement } from './services';
 
 export const MeasurementEdit: React.FC<
-  ModalProps & { selectedRow?: MeasurementRow } & { onSuccess: () => void }
+  ModalProps & { selectedRow?: MeasurementRow } & { onSuccess: (assetId?: number) => void }
 > = (props) => {
   const [types, setTypes] = React.useState([DeviceType.BoltLoosening, DeviceType.BoltElongation]);
   const { selectedRow, onSuccess } = props;
-  const { id } = selectedRow || {};
+  const { id, bindingDevices } = selectedRow || {};
   const [form] = Form.useForm<Measurement & { device_id: number }>();
   const [parents, setParents] = React.useState<AssetRow[]>([]);
   const [disabled, setDisabled] = React.useState(true);
+  const [assetId, setAssetId] = React.useState<number>();
 
   React.useEffect(() => {
-    getAssets({ type: AssetTypes.Flange.type }).then(setParents);
+    getAssets({ type: AssetTypes.Flange.id }).then(setParents);
   }, []);
 
   React.useEffect(() => {
     form.resetFields();
     const values = convertRow(selectedRow);
-    if (values) form.setFieldsValue(values);
+    if (values) {
+      form.setFieldsValue(values);
+    }
   }, [form, selectedRow]);
+
+  React.useEffect(() => {
+    if (selectedRow) {
+      const asset = parents.find(({ id }) => id === selectedRow.assetId);
+      if (asset) setAssetId(asset.parentId);
+    }
+  }, [selectedRow, parents]);
 
   return (
     <Modal
@@ -43,11 +53,21 @@ export const MeasurementEdit: React.FC<
               if (!id) {
                 addMeasurement(values).then((measurement) => {
                   bindDevice(measurement.id, values.device_id);
-                  onSuccess();
+                  onSuccess(assetId);
                 });
               } else {
+                if (
+                  bindingDevices &&
+                  bindingDevices.length > 0 &&
+                  bindingDevices[0].id !== values.device_id
+                ) {
+                  unbindDevice(id, bindingDevices[0].id);
+                  bindDevice(id, values.device_id);
+                } else if (!bindingDevices || bindingDevices.length === 0) {
+                  bindDevice(id, values.device_id);
+                }
                 updateMeasurement(id, values).then(() => {
-                  onSuccess();
+                  onSuccess(assetId);
                 });
               }
             } catch (error) {
@@ -71,9 +91,9 @@ export const MeasurementEdit: React.FC<
             placeholder='请选择类型'
             onChange={(e) => {
               if (!id) {
-                const type = Object.values(MeasurementTypes).find((type) => type.type === e);
+                const type = Object.values(MeasurementTypes).find((type) => type.id === e);
                 if (type) {
-                  setTypes(type.deviceTypes);
+                  setTypes([type.deviceType]);
                   if (form.getFieldValue('device_id')) {
                     form.setFieldsValue({ device_id: undefined });
                   }
@@ -83,18 +103,9 @@ export const MeasurementEdit: React.FC<
             }}
             disabled={!!id}
           >
-            {Object.values(MeasurementTypes).map(({ type, label }) => (
-              <Select.Option key={type} value={type}>
-                {label}
-              </Select.Option>
-            ))}
-          </Select>
-        </Form.Item>
-        <Form.Item label='法兰' name='asset_id' rules={[{ required: true, message: `请选择法兰` }]}>
-          <Select placeholder='请选择法兰'>
-            {parents.map(({ id, name }) => (
+            {Object.values(MeasurementTypes).map(({ id, label }) => (
               <Select.Option key={id} value={id}>
-                {name}
+                {label}
               </Select.Option>
             ))}
           </Select>
@@ -108,11 +119,26 @@ export const MeasurementEdit: React.FC<
           name='device_id'
           rules={[{ required: true, message: `请选择传感器` }]}
         >
-          <DeviceSelect filters={{ types: types.join(',') }} disabled={disabled || !!id} />
+          <DeviceSelect filters={{ types: types.join(',') }} disabled={disabled && !id} />
+        </Form.Item>
+        <Form.Item label='法兰' name='asset_id' rules={[{ required: true, message: `请选择法兰` }]}>
+          <Select
+            placeholder='请选择法兰'
+            onChange={(e) => {
+              const asset = parents.find(({ id }) => e === id);
+              setAssetId(asset?.parentId);
+            }}
+          >
+            {parents.map(({ id, name }) => (
+              <Select.Option key={id} value={id}>
+                {name}
+              </Select.Option>
+            ))}
+          </Select>
         </Form.Item>
         <Form.Item label='序号' name={['attributes', 'index']} initialValue={1}>
           <Select placeholder='请选择序号'>
-            {[1, 2, 3, 4, 5].map((item) => (
+            {[1, 2, 3, 4, 5, 6, 7, 8].map((item) => (
               <Select.Option key={item} value={item}>
                 {item}
               </Select.Option>
