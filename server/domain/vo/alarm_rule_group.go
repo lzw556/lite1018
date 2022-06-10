@@ -8,6 +8,7 @@ type AlarmRuleGroup struct {
 	ID          uint   `json:"id"`
 	Name        string `json:"name"`
 	Description string `json:"description"`
+	Cagtegory   uint   `json:"category"`
 	Type        uint   `json:"type"`
 	Enabled     bool   `json:"status"`
 
@@ -19,6 +20,7 @@ func NewAlarmRuleGroup(e entity.AlarmRuleGroup) AlarmRuleGroup {
 		ID:          e.ID,
 		Name:        e.Name,
 		Description: e.Description,
+		Cagtegory:   e.Category,
 		Type:        e.Type,
 		Enabled:     e.IsEnabled(),
 

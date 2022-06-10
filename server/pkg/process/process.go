@@ -80,7 +80,6 @@ func (proc *Process) ProcessDeviceSensorData(dev entity.Device, sensorData entit
 }
 
 func (proc *Process) ProcessDeviceSensorRawData(dev entity.Device, sensorData entity.SensorData) error {
-	fmt.Printf("#### process raw data, dev %d\n", dev.ID)
 	ctx := context.TODO()
 	bindings, err := proc.monitoringPointDeviceBindingRepo.FindBySpecs(ctx, spec.DeviceIDEqSpec(dev.ID))
 	if err != nil {
@@ -101,7 +100,6 @@ func (proc *Process) ProcessDeviceSensorRawData(dev entity.Device, sensorData en
 			mpData = ProcessPlainRawData(mp, sensorData)
 		}
 
-		fmt.Printf("#### saving raw data %+v\n", mpData)
 		err = proc.monitoringPointDataRepo.Create(mpData)
 		if err != nil {
 			return fmt.Errorf("Failed to save monitoring point data.")

@@ -5,10 +5,10 @@ import (
 )
 
 const (
-	AssetTypeGeneral = iota + 1
-	AssetTypeWindTurine
-	AssetTypeFlange
-	AssetTypeUnknown
+	AssetTypeGeneral    = 100
+	AssetTypeWindTurine = 101
+	AssetTypeFlange     = 102
+	AssetTypeUnknown    = 9999
 )
 
 type Asset struct {

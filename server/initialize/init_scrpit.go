@@ -87,7 +87,7 @@ func initMenus(db *gorm.DB) error {
 		},
 		{
 			ID:       2002,
-			Title:    "风机列表",
+			Title:    "资产列表",
 			Name:     "asset-management",
 			ParentID: 2001,
 			Icon:     "icon-device-monitor",

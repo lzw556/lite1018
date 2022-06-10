@@ -178,6 +178,7 @@ func (factory Alarm) NewAlarmRuleGroupCreateCmd(req request.AlarmRuleGroup) (*co
 	e.Name = req.Name
 	e.Description = req.Description
 	e.Type = req.Type
+	e.Category = req.Category
 	e.Status = 1
 
 	cmd := command.NewAlarmRuleGroupCreateCmd()
