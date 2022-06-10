@@ -11,8 +11,8 @@ export type Legend = {
 };
 
 export type XAxis = {
-  type: 'category';
-  data: number[] | string[];
+  type: string;
+  data?: number[] | string[];
 };
 export type YAxis = {
   type: 'category' | 'value';

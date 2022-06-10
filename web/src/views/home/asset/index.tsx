@@ -2,12 +2,7 @@ import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
 import { Button, ButtonProps, Empty, Popconfirm, Space, Table, TableProps } from 'antd';
 import * as React from 'react';
 import { SearchResultPage } from '../searchResultPage';
-import {
-  filterEmptyChildren,
-  generatePathForRelatedAsset,
-  getAssetType,
-  useMenuWithTarget
-} from '../utils';
+import { filterEmptyChildren, generatePathForRelatedAsset, getAssetType } from '../utils';
 import { AssetTypes } from '../constants';
 import { AssetEdit } from './edit';
 import { AssetRow, transformAssetStatistics } from './props';
@@ -16,8 +11,6 @@ import { Link, useLocation } from 'react-router-dom';
 
 const AssetManagement: React.FC = () => {
   const { pathname, search } = useLocation();
-  const menu = useMenuWithTarget(pathname);
-  console.log('menu', menu);
   const [assets, setAssets] = React.useState<{
     loading: boolean;
     items: AssetRow[];

@@ -36,8 +36,10 @@ export function unbindDevice(id: Measurement['id'], device_id: number) {
   return request.post(`/monitoringPoints/${id}/unbindDevice`, { device_id });
 }
 
-export function getData(id: Measurement['id'], from: number, to: number) {
+export function getData(id: Measurement['id'], from: number, to: number, rawOnly: boolean = false) {
   return request
-    .get<MeasurementHistoryData>(`/monitoringPoints/${id}/data?from=${from}&to=${to}`)
+    .get<MeasurementHistoryData>(
+      `/monitoringPoints/${id}/data?from=${from}&to=${to}${rawOnly ? `&type=raw` : ''}`
+    )
     .then(GetResponse);
 }

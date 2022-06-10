@@ -148,7 +148,7 @@ const ProjectOverview: React.FC = () => {
       series: [
         {
           type: 'pie',
-          name: 'hehe',
+          name: '',
           radius: ['40%', '50%'],
           center: ['50%', '50%'],
           label: { show: false, formatter: '{b} {c}' },

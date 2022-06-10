@@ -33,6 +33,8 @@ export const MeasurementEdit: React.FC<
     form.resetFields();
     const values = convertRow(selectedRow);
     if (values) {
+      const type = Object.values(MeasurementTypes).find((type) => type.id === values.type);
+      if(type) setTypes([type.deviceType])
       form.setFieldsValue(values);
     }
   }, [form, selectedRow]);

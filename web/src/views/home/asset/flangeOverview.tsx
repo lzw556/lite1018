@@ -13,8 +13,7 @@ import {
   generateColProps,
   generateFlangeChartOptions,
   generatePathForRelatedAsset,
-  generatePropertyColumns,
-  transformMeasurementHistoryData
+  generatePropertyColumns
 } from '../utils';
 import { AssetRow, generatePreloadOptions, transformAssetStatistics } from './props';
 import { getAsset } from './services';
@@ -27,9 +26,7 @@ const FlangeOverview: React.FC = () => {
   const [loading, setLoading] = React.useState(true);
   const [measurements, setMeasurements] = React.useState<MeasurementRow[]>();
   const [statistics, setStatistics] = React.useState<NameValue[]>();
-  const [statisticOfPreload, setStatisticOfPreload] = React.useState<any>(
-    generatePreloadOptions({ times: [], seriesData: [], property: '' }, '')
-  );
+  const [statisticOfPreload, setStatisticOfPreload] = React.useState<any>();
   const [historyDatas, setHistoryDatas] = React.useState<
     { name: string; data: MeasurementHistoryData }[]
   >([]);
@@ -109,6 +106,7 @@ const FlangeOverview: React.FC = () => {
       if (measurementType) setMeasurementType(measurementType);
       const from = moment().startOf('day').subtract(7, 'd').utc().unix();
       const to = moment().endOf('day').utc().unix();
+      setHistoryDatas([]);
       measurements.forEach(({ id, name }) => {
         getData(id, from, to).then((data) => {
           if (data.length > 0) setHistoryDatas((prev) => [...prev, { name, data }]);
@@ -119,31 +117,7 @@ const FlangeOverview: React.FC = () => {
 
   React.useEffect(() => {
     if (historyDatas.length > 0 && measurementType) {
-      historyDatas.forEach(({ name, data }, index) => {
-        if (data.length > 0) {
-          const datas = transformMeasurementHistoryData(
-            data,
-            measurementType.firstClassProperties[0]
-          );
-          if (datas.length > 0) {
-            if (index === 0) {
-              setStatisticOfPreload(generatePreloadOptions(datas[0], name));
-            } else {
-              setStatisticOfPreload((prev: any) => ({
-                ...prev,
-                series: prev.series.concat(
-                  datas[0].seriesData.map(({ data }: any) => ({
-                    type: 'line',
-                    name,
-                    areaStyle: {},
-                    data
-                  }))
-                )
-              }));
-            }
-          }
-        }
-      });
+      setStatisticOfPreload(generatePreloadOptions(historyDatas, measurementType));
     }
   }, [historyDatas, measurementType]);
 

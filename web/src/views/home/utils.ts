@@ -51,13 +51,47 @@ export function generateFlangeChartOptions(
     }
   });
   const factor = maxActual - minActual > 0 ? (maxActual - minActual) / 2 : Math.abs(maxActual) / 2;
-  minActual = minActual - factor;
-  maxActual = maxActual + factor;
+  minActual = Math.ceil(minActual - factor);
+  maxActual = Math.ceil(maxActual + factor);
 
   const circleMax = maxActual + 1;
   const _maxinum = generateCircle(measurements, circleMax);
   const specification = generateSpecification((minActual + maxActual) / 2);
-  if (measurements[0].type === MeasurementTypes.preload.id) {
+  if (measurements[0].type === MeasurementTypes.loosening_angle.id) {
+    return {
+      title: {
+        text: '',
+        left: 'center'
+      },
+      legend: {
+        bottom: 0
+      },
+      tooltip: {
+        trigger: 'axis',
+        formatter: (paras: any) => {
+          let text = '';
+          paras.forEach(
+            ({ seriesName, marker, value }: any) =>
+              (text += `${marker} ${seriesName} ${value} <br />`)
+          );
+          return text;
+        }
+      },
+      xAxis: {
+        type: 'category',
+        show: false
+      },
+      yAxis: { type: 'value' },
+      series: measurements.map((point) => {
+        let propName = '';
+        const firstClassProperties = getFirstClassProperties(point.type);
+        if (firstClassProperties.length > 0) propName = firstClassProperties[0];
+        const historyData = transformSingleMeasurmentData(point, propName);
+        const data = historyData.length > 0 ? [historyData[0].value] : NaN;
+        return { type: 'bar', name: point.name, data, barMaxWidth: 50 };
+      })
+    };
+  } else {
     return {
       polar: [
         { id: 'inner', radius: size.inner },
@@ -77,6 +111,7 @@ export function generateFlangeChartOptions(
           polarIndex: 1,
           startAngle: 0,
           clockwise: false,
+          boundaryGap: false,
           axisLine: { show: true, lineStyle: { type: 'dashed' } },
           axisTick: { show: false },
           axisLabel: { show: false },
@@ -156,29 +191,6 @@ export function generateFlangeChartOptions(
         }
       ]
     };
-  } else {
-    return {
-      title: {
-        text: '',
-        left: 'center'
-      },
-      legend: {
-        bottom: 20
-      },
-      tooltip: { trigger: 'axis' },
-      xAxis: {
-        type: 'category'
-      },
-      yAxis: { type: 'value' },
-      series: measurements.map((point) => {
-        let propName = '';
-        const firstClassProperties = getFirstClassProperties(point.type);
-        if (firstClassProperties.length > 0) propName = firstClassProperties[0];
-        const historyData = transformSingleMeasurmentData(point, propName);
-        const data = historyData.length > 0 ? [historyData[0].value] : NaN;
-        return { type: 'bar', name: point.name, data };
-      })
-    };
   }
 }
 
@@ -218,14 +230,15 @@ function generateCircle(measurements: MeasurementRow[], max: number) {
       const nextIndex = next.attributes?.index || 5;
       return prevIndex - nextIndex;
     })
-    .map(({ name, attributes }, index) => ({
+    .map(({ name, attributes }) => ({
       name,
       value: max,
       label: {
         show: true,
         color: '#fff',
         formatter: (paras: any) => attributes?.index
-      }
+      },
+      tooltip: { formatter: '{b}' }
     }));
 }
 
@@ -234,7 +247,7 @@ export function transformMeasurementHistoryData(
   propertyName?: string
 ) {
   const firstValue = data[0].values;
-  const times = data.map(({ timestamp }) => moment.unix(timestamp).local());
+  const times = data.map(({ timestamp }) => timestamp);
   return firstValue
     .filter((property) => (propertyName ? property.key === propertyName : true))
     .map((property) => {
@@ -256,6 +269,25 @@ export function transformMeasurementHistoryData(
       });
       return { times, seriesData, property };
     });
+}
+
+export function transformMeasurementHistoryData2(
+  data: MeasurementHistoryData,
+  propertyName: string
+) {
+  return data.map(({ timestamp, values }) => {
+    const property = values.find(({ fields }) => fields.find(({ key }) => key === propertyName));
+    let value = NaN;
+    if (property) {
+      const precision = property.precision ?? 3;
+      value = round(property.data[property.name], precision);
+    }
+    const valueText = Number.isNaN(value) ? '' : `${value}`;
+    return {
+      property,
+      data: [moment.unix(timestamp).local().format('YYYY-MM-DD HH:mm:ss'), valueText]
+    };
+  });
 }
 
 export function generateMeasurementHistoryDataOptions(
@@ -293,7 +325,7 @@ export function generateMeasurementHistoryDataOptions(
       xAxis: {
         type: 'category',
         boundaryGap: false,
-        data: times.map((item: any) => item.format('YYYY-MM-DD HH:mm:ss'))
+        data: times.map((item) => moment.unix(item).local().format('YYYY-MM-DD HH:mm:ss'))
       },
       yAxis: { type: 'value' }
     };

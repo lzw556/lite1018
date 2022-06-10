@@ -181,7 +181,7 @@ const AlarmRuleGroupCreation = () => {
                   </Input.Group>
                 </Form.Item>
                 <Form.Item label='等级' {...restFields} name={[name, 'level']} initialValue={3}>
-                  <Select style={{ width: '12.5%', minWidth: 100 }}>
+                  <Select style={{ width: '15%', minWidth: 80 }}>
                     <Select.Option key={1} value={1}>
                       次要
                     </Select.Option>
@@ -192,77 +192,6 @@ const AlarmRuleGroupCreation = () => {
                       紧急
                     </Select.Option>
                   </Select>
-                </Form.Item>
-                <Form.Item label='报警条件'>
-                  <Space direction='vertical'>
-                    <Space>
-                      <Typography.Text type={'secondary'}>当监控对象连续</Typography.Text>
-                      <Form.Item
-                        {...restFields}
-                        name={[name, 'duration']}
-                        normalize={Normalizes.number}
-                        noStyle
-                        rules={[Rules.number]}
-                        initialValue={1}
-                      >
-                        <Input size={'small'} style={{ width: '64px' }} />
-                      </Form.Item>
-                      <Typography.Text type={'secondary'}>个周期内</Typography.Text>
-                    </Space>
-                    <Space>
-                      <Form.Item
-                        {...restFields}
-                        name={[name, 'operation']}
-                        noStyle
-                        initialValue={'>='}
-                      >
-                        <Select size={'small'} style={{ width: '64px' }}>
-                          <Select.Option key={'>'} value={'>'}>
-                            &gt;
-                          </Select.Option>
-                          <Select.Option key={'>='} value={'>='}>
-                            &gt;=
-                          </Select.Option>
-                          <Select.Option key={'<'} value={'<'}>
-                            &lt;
-                          </Select.Option>
-                          <Select.Option key={'<='} value={'<='}>
-                            &lt;=
-                          </Select.Option>
-                        </Select>
-                      </Form.Item>
-                      <Form.Item
-                        {...restFields}
-                        name={[name, 'threshold']}
-                        rules={[Rules.number]}
-                        noStyle
-                      >
-                        <Input
-                          size={'small'}
-                          style={{ width: '64px' }}
-                          suffix={metric.length > 0 && metric[index] ? metric[index].unit : ''}
-                        />
-                      </Form.Item>
-                      <Typography.Text type={'secondary'}>时</Typography.Text>
-                    </Space>
-                    <Space>
-                      <Typography.Text type={'secondary'}>产生</Typography.Text>
-                      <Form.Item {...restFields} name={[name, 'level']} noStyle initialValue={3}>
-                        <Select size={'small'} style={{ width: '88px' }}>
-                          <Select.Option key={1} value={1}>
-                            次要
-                          </Select.Option>
-                          <Select.Option key={2} value={2}>
-                            重要
-                          </Select.Option>
-                          <Select.Option key={3} value={3}>
-                            紧急
-                          </Select.Option>
-                        </Select>
-                      </Form.Item>
-                      <Typography.Text type={'secondary'}>报警</Typography.Text>
-                    </Space>
-                  </Space>
                 </Form.Item>
                 {name !== 0 && (
                   <Button

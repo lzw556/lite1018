@@ -1,8 +1,11 @@
+import { uniq } from 'lodash';
+import moment from 'moment';
 import * as React from 'react';
-import { LineChartStyles } from '../../../constants/chart';
 import { ColorDanger, ColorHealth, ColorInfo, ColorWarn } from '../../../constants/color';
-import { MeasurementRow } from '../measurement/props';
+import { MeasurementTypes } from '../constants';
+import { MeasurementHistoryData, MeasurementRow } from '../measurement/props';
 import { AlarmState, NameValue } from '../props';
+import { transformMeasurementHistoryData, transformMeasurementHistoryData2 } from '../utils';
 
 export type Asset = {
   id: number;
@@ -46,17 +49,17 @@ export function convertRow(values?: AssetRow): Asset | null {
 }
 
 export function generatePreloadOptions(
-  {
-    times,
-    seriesData,
-    property
-  }: {
-    times: any;
-    seriesData: any;
-    property: any;
-  },
-  measurementName: string
+  history: { name: string; data: MeasurementHistoryData }[],
+  measurementType: typeof MeasurementTypes.loosening_angle
 ) {
+  const series = history.map(({name, data }) => {
+    return {
+      type: 'line',
+      name,
+      data: transformMeasurementHistoryData2(data, measurementType.firstClassProperties[0])
+    };
+  });
+
   return {
     title: {
       text: '',
@@ -64,18 +67,10 @@ export function generatePreloadOptions(
     },
     legend: { bottom: 0 },
     tooltip: { trigger: 'axis' },
-    xAxis: {
-      type: 'category',
-      data: times.map((item: any) => item.format('YYYY-MM-DD HH:mm:ss'))
-    },
+    xAxis: { type: 'time' },
     // yAxis: { type: 'value', min: 290, max: 360 },
     yAxis: { type: 'value' },
-    series: seriesData.map(({ name, data }: any, index: any) => ({
-      type: 'line',
-      name: measurementName,
-      areaStyle: LineChartStyles[index].areaStyle,
-      data
-    }))
+    series
   };
 }
 
