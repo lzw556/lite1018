@@ -10,7 +10,7 @@ import { convertRow, Measurement, MeasurementRow } from './props';
 import { addMeasurement, bindDevice, unbindDevice, updateMeasurement } from './services';
 
 export const MeasurementEdit: React.FC<
-  ModalProps & { selectedRow?: MeasurementRow } & { onSuccess: (assetId?: number) => void }
+  ModalProps & { selectedRow?: MeasurementRow } & { onSuccess: () => void }
 > = (props) => {
   const [types, setTypes] = React.useState([DeviceType.BoltLoosening, DeviceType.BoltElongation]);
   const { selectedRow, onSuccess } = props;
@@ -18,10 +18,15 @@ export const MeasurementEdit: React.FC<
   const [form] = Form.useForm<Measurement & { device_id: number }>();
   const [parents, setParents] = React.useState<AssetRow[]>([]);
   const [disabled, setDisabled] = React.useState(true);
-  const [assetId, setAssetId] = React.useState<number>();
 
   React.useEffect(() => {
-    getAssets({ type: AssetTypes.Flange.id }).then(setParents);
+    getAssets({ type: AssetTypes.Flange.id }).then((assets) => {
+      const local = localStorage.getItem('measurementListFilters');
+      const filters: { windTurbineId: number } = local ? JSON.parse(local) : null;
+      setParents(
+        assets.filter((asset) => (filters ? filters.windTurbineId === asset.parentId : true))
+      );
+    });
   }, []);
 
   React.useEffect(() => {
@@ -31,13 +36,6 @@ export const MeasurementEdit: React.FC<
       form.setFieldsValue(values);
     }
   }, [form, selectedRow]);
-
-  React.useEffect(() => {
-    if (selectedRow) {
-      const asset = parents.find(({ id }) => id === selectedRow.assetId);
-      if (asset) setAssetId(asset.parentId);
-    }
-  }, [selectedRow, parents]);
 
   return (
     <Modal
@@ -53,7 +51,7 @@ export const MeasurementEdit: React.FC<
               if (!id) {
                 addMeasurement(values).then((measurement) => {
                   bindDevice(measurement.id, values.device_id);
-                  onSuccess(assetId);
+                  onSuccess();
                 });
               } else {
                 if (
@@ -67,7 +65,7 @@ export const MeasurementEdit: React.FC<
                   bindDevice(id, values.device_id);
                 }
                 updateMeasurement(id, values).then(() => {
-                  onSuccess(assetId);
+                  onSuccess();
                 });
               }
             } catch (error) {
@@ -122,13 +120,7 @@ export const MeasurementEdit: React.FC<
           <DeviceSelect filters={{ types: types.join(',') }} disabled={disabled && !id} />
         </Form.Item>
         <Form.Item label='法兰' name='asset_id' rules={[{ required: true, message: `请选择法兰` }]}>
-          <Select
-            placeholder='请选择法兰'
-            onChange={(e) => {
-              const asset = parents.find(({ id }) => e === id);
-              setAssetId(asset?.parentId);
-            }}
-          >
+          <Select placeholder='请选择法兰'>
             {parents.map(({ id, name }) => (
               <Select.Option key={id} value={id}>
                 {name}

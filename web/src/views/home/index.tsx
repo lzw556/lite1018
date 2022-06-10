@@ -1,6 +1,6 @@
 import { Empty, Spin } from 'antd';
 import * as React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { AssetTypes } from './constants';
 import { AssetIcon } from './asset/icon';
 import { getAssets, getProjectStatistics } from './asset/services';
@@ -10,11 +10,12 @@ import { Series_Pie } from './charts/pie';
 import './home.css';
 import { OverviewPage } from './overviewPage';
 import { Introduction } from './props';
-import { generateColProps } from './utils';
+import { generateColProps, generatePathForRelatedAsset } from './utils';
 import { generateProjectAlarmStatis, transformAssetStatistics } from './asset/props';
 import { ColorHealth, ColorOffline } from '../../constants/color';
 
 const ProjectOverview: React.FC = () => {
+  const { pathname, search } = useLocation();
   const colProps = generateColProps({ xl: 8, xxl: 5 });
   const colProps2 = generateColProps({ xl: 24, xxl: 9 });
   const [windTurbines, setWindTurbines] = React.useState<{
@@ -79,7 +80,12 @@ const ProjectOverview: React.FC = () => {
             id: item.id,
             title: {
               name: item.name,
-              path: `${AssetTypes.WindTurbind.url}&id=${item.id}`
+              path: generatePathForRelatedAsset(
+                pathname,
+                search,
+                AssetTypes.WindTurbind.id,
+                item.id
+              )
             },
             alarmState,
             icon: { svg: <AssetIcon />, small: true },
@@ -88,44 +94,45 @@ const ProjectOverview: React.FC = () => {
         })
       })
     );
-    // setStatisticOfAlarm({
-    //   title: {
-    //     text: '',
-    //     left: 'center'
-    //   },
-    //   legend: {
-    //     bottom: 20,
-    //     data: [
-    //       { name: '次要', itemStyle: { color: ColorInfo } },
-    //       { name: '重要', itemStyle: { color: ColorWarn } },
-    //       { name: '紧急', itemStyle: { color: ColorDanger } }
-    //     ]
-    //   },
-    //   tooltip: { trigger: 'axis' },
-    //   xAxis: {
-    //     type: 'category',
-    //     data: []
-    //   },
-    //   yAxis: { type: 'value', minInterval: 1 },
-    //   series: [
-    //     {
-    //       type: 'bar',
-    //       name: '次要',
-    //       data: []
-    //     },
-    //     {
-    //       type: 'bar',
-    //       name: '重要',
-    //       data: []
-    //     },
-    //     {
-    //       type: 'bar',
-    //       name: '紧急',
-    //       data: []
-    //     }
-    //   ]
-    // });
-  }, []);
+    setStatisticOfAlarm({
+      title: {
+        text: '暂无数据',
+        left: 'center',
+        top: 'center'
+      },
+      legend: {
+        bottom: 20,
+        data: [
+          // { name: '次要', itemStyle: { color: ColorInfo } },
+          // { name: '重要', itemStyle: { color: ColorWarn } },
+          // { name: '紧急', itemStyle: { color: ColorDanger } }
+        ]
+      },
+      tooltip: { trigger: 'axis' },
+      xAxis: {
+        type: 'category',
+        data: []
+      },
+      yAxis: { type: 'value', minInterval: 1 },
+      series: [
+        {
+          type: 'bar',
+          name: '次要',
+          data: []
+        },
+        {
+          type: 'bar',
+          name: '重要',
+          data: []
+        },
+        {
+          type: 'bar',
+          name: '紧急',
+          data: []
+        }
+      ]
+    });
+  }, [pathname, search]);
 
   const generatePieOptions = (
     title: string,
@@ -144,7 +151,7 @@ const ProjectOverview: React.FC = () => {
           name: 'hehe',
           radius: ['40%', '50%'],
           center: ['50%', '50%'],
-          label: { formatter: '{b} {c}' },
+          label: { show: false, formatter: '{b} {c}' },
           data
         }
       ]

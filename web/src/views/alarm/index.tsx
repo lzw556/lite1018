@@ -13,12 +13,9 @@ const AlarmPage = () => {
       <MyBreadcrumb>
         <HasPermission value={Permission.AlarmRuleAdd}>
           <Space>
-            <Button href='#/alarm-management?locale=alarmRules/addAlarmRule' type='primary'>
+            <Button href='#/alarm-management?locale=alarmRules/addAlarmRuleGroup' type='primary'>
               创建规则 <PlusOutlined />
             </Button>
-            {/* <Button href='#/alarm-management?locale=alarmRules/addAlarmRules' type='primary'>
-              创建规则2 <PlusOutlined />
-            </Button> */}
           </Space>
         </HasPermission>
       </MyBreadcrumb>

@@ -48,7 +48,7 @@ const BoltOverview: React.FC = () => {
 
   return (
     <>
-      <AssetNavigator id={id} type={measurement.type} />
+      <AssetNavigator id={measurement.id} parentId={measurement.assetId}/>
       <Row gutter={[0, 16]}>
         <Col span={24}>
           <MeasurementDevices devices={measurement.bindingDevices} />

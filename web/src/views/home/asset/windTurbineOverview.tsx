@@ -6,14 +6,14 @@ import '../home.css';
 import { MeasurementIcon } from '../measurement/icon';
 import { OverviewPage } from '../overviewPage';
 import { Introduction, NameValue } from '../props';
-import { generateFlangeChartOptions } from '../utils';
+import { generateFlangeChartOptions, generatePathForRelatedAsset } from '../utils';
 import { AssetTypes } from '../constants';
 import { getAsset } from './services';
 import { AssetRow, transformAssetStatistics } from './props';
 import { MeasurementRow } from '../measurement/props';
 
 const WindTurbineOverview: React.FC = () => {
-  const { search } = useLocation();
+  const { pathname, search } = useLocation();
   const id = Number(search.substring(search.lastIndexOf('id=') + 3));
   const [asset, setAsset] = React.useState<AssetRow>();
   const [loading, setLoading] = React.useState(true);
@@ -77,7 +77,7 @@ const WindTurbineOverview: React.FC = () => {
               id: item.id,
               title: {
                 name: item.name,
-                path: `${AssetTypes.Flange.url}&id=${item.id}`
+                path: generatePathForRelatedAsset(pathname, search, AssetTypes.Flange.id, item.id)
               },
               alarmState,
               icon: { svg: <MeasurementIcon />, small: true, focus: true },
@@ -88,7 +88,7 @@ const WindTurbineOverview: React.FC = () => {
         setFlanges(items);
       }
     }
-  }, [asset]);
+  }, [asset, pathname, search]);
 
   if (loading) return <Spin />;
   if (!flanges || flanges.length === 0)
@@ -104,7 +104,7 @@ const WindTurbineOverview: React.FC = () => {
     );
   return (
     <>
-      <AssetNavigator id={id} type={asset?.type} />
+      {asset && <AssetNavigator id={asset.id} parentId={asset.parentId} />}
       <OverviewPage {...{ statistics, introductionList: flanges }} />
     </>
   );

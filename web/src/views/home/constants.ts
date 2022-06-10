@@ -11,15 +11,15 @@ export const AssetTypes: Record<
   }
 > = {
   WindTurbind: {
-    id: 2,
+    id: 101,
     label: '风机',
     parent_id: 0,
-    url: '/project-overview?locale=project-overview/windturbine'
+    url: '/windturbine'
   },
   Flange: {
-    id: 3,
+    id: 102,
     label: '法兰',
-    url: '/project-overview?locale=project-overview/flange',
+    url: '/flange',
     categories: [
       { label: '塔筒', value: 1 },
       { label: '叶根', value: 2 },
@@ -40,24 +40,24 @@ export const MeasurementTypes: Record<
   }
 > = {
   loosening_angle: {
-    id: 10001,
+    id: 10101,
     label: '松动角度',
-    url: '/project-overview?locale=project-overview/bolt',
-    firstClassProperties: ['loosening_angle', 'attitude', 'motion'],
+    url: '/bolt',
+    firstClassProperties: ['loosening_angle', 'attitude', 'motion', 'temperature'],
     deviceType: DeviceType.BoltLoosening
   },
   preload: {
-    id: 10101,
+    id: 10301,
     label: '预紧力',
-    url: '/project-overview?locale=project-overview/bolt',
-    firstClassProperties: ['preload', 'temperature', 'pressure'],
+    url: '/bolt',
+    firstClassProperties: ['preload', 'pressure', 'tof', 'temperature'],
     deviceType: DeviceType.BoltElongation
   },
   dynamicPreload: {
-    id: 10102,
+    id: 10302,
     label: '动态预紧力',
-    url: '/project-overview?locale=project-overview/bolt',
-    firstClassProperties: ['preload', 'temperature', 'pressure'],
+    url: '/bolt',
+    firstClassProperties: ['preload', 'pressure', 'tof', 'temperature'],
     deviceType: DeviceType.BoltElongation
   }
 };

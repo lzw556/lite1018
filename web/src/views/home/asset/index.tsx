@@ -2,14 +2,22 @@ import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
 import { Button, ButtonProps, Empty, Popconfirm, Space, Table, TableProps } from 'antd';
 import * as React from 'react';
 import { SearchResultPage } from '../searchResultPage';
-import { filterEmptyChildren, getAssetType } from '../utils';
+import {
+  filterEmptyChildren,
+  generatePathForRelatedAsset,
+  getAssetType,
+  useMenuWithTarget
+} from '../utils';
 import { AssetTypes } from '../constants';
 import { AssetEdit } from './edit';
 import { AssetRow, transformAssetStatistics } from './props';
 import { deleteAsset, getAssets } from './services';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 const AssetManagement: React.FC = () => {
+  const { pathname, search } = useLocation();
+  const menu = useMenuWithTarget(pathname);
+  console.log('menu', menu);
   const [assets, setAssets] = React.useState<{
     loading: boolean;
     items: AssetRow[];
@@ -35,7 +43,7 @@ const AssetManagement: React.FC = () => {
     }
   ];
   const [result, setResult] = React.useState<TableProps<any>>({
-    rowKey: (row: AssetRow) => row.id + row.type,
+    rowKey: (row: AssetRow) => `${row.id}-${row.type}`,
     columns: [
       {
         title: '名称',
@@ -48,7 +56,9 @@ const AssetManagement: React.FC = () => {
             (row.monitoringPoints && row.monitoringPoints.length) ||
             (row.children && row.children.length);
           return assetType && hasChildren ? (
-            <Link to={`${assetType.url}&id=${row.id}`}>{name}</Link>
+            <Link to={generatePathForRelatedAsset(pathname, search, assetType.id, row.id)}>
+              {name}
+            </Link>
           ) : (
             name
           );
@@ -68,7 +78,10 @@ const AssetManagement: React.FC = () => {
             flangeType &&
             assetType.categories
           ) {
-            return assetType.categories.find((cate) => cate.value === flangeType)?.label;
+            return (
+              assetType.categories.find((cate) => cate.value === flangeType)?.label +
+              AssetTypes.Flange.label
+            );
           }
           return assetType?.label;
         }

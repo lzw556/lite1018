@@ -11,7 +11,7 @@ import {
   TableProps
 } from 'antd';
 import * as React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { AssetTypes, MeasurementTypes } from '../constants';
 import { AssetRow } from '../asset/props';
 import { getAssets } from '../asset/services';
@@ -19,10 +19,11 @@ import { SearchResultPage } from '../searchResultPage';
 import { MeasurementEdit } from './edit';
 import { MeasurementRow } from './props';
 import { deleteMeasurement } from './services';
-import { generatePropertyColumns, getAssetType } from '../utils';
+import { generatePathForRelatedAsset, generatePropertyColumns } from '../utils';
 import Label from '../../../components/label';
 
 const MeasurementManagement: React.FC = () => {
+  const { pathname, search } = useLocation();
   const [assets, setAssets] = React.useState<{
     loading: boolean;
     items: AssetRow[];
@@ -30,7 +31,11 @@ const MeasurementManagement: React.FC = () => {
     loading: true,
     items: []
   });
-  const [conditions, setConditions] = React.useState<{ windTurbineId: number }>();
+  const local = localStorage.getItem('measurementListFilters');
+  const localObj: { windTurbineId: number } = local ? JSON.parse(local) : null;
+  const [filters, setFilters] = React.useState<{ windTurbineId: number } | undefined>(
+    localObj ? localObj : undefined
+  );
   const [wind, setWind] = React.useState<AssetRow>();
   const [visible, setVisible] = React.useState(false);
   const [selectedRow, setSelectedRow] = React.useState<MeasurementRow>();
@@ -42,95 +47,89 @@ const MeasurementManagement: React.FC = () => {
     }
   ];
 
-  const generateTable = (dataSource: TableProps<any>['dataSource']) => {
+  const generateTable = (title: string, dataSource: TableProps<any>['dataSource']) => {
     return (
-      <Table
-        {...{
-          rowKey: 'id',
-          columns: [
-            {
-              title: '法兰',
-              dataIndex: 'assetId',
-              onCell: (_, index) => {
-                if (index === 0) return { rowSpan: 5 };
-                return { rowSpan: 0 };
-              },
-              render: (data, row) => {
-                const flange: AssetRow | undefined = wind?.children?.find(({ id }) => id === data);
-                if (flange) {
-                  const assetType = getAssetType(flange.type);
-                  if (assetType)
-                    return <Link to={`${assetType.url}&id=${flange.id}`}>{flange.name}</Link>;
-                }
-                return '';
-              },
-              width: 300
-            },
-            {
-              title: '名称',
-              dataIndex: 'name',
-              key: 'name',
-              // width: 300,
-              render: (name: string, row: MeasurementRow) => (
-                <Link to={`${MeasurementTypes.dynamicPreload.url}&id=${row.id}`}>{name}</Link>
-              )
-            },
-            {
-              title: '序号',
-              dataIndex: 'index',
-              key: 'index',
-              width: 100,
-              render: (name: string, row: MeasurementRow) => row.attributes?.index
-            },
-            {
-              title: '传感器',
-              dataIndex: 'devices',
-              key: 'devices',
-              width: 200,
-              render: (name: string, row: MeasurementRow) =>
-                row.bindingDevices && row.bindingDevices.length > 0
-                  ? row.bindingDevices.map(({ id, name }) => (
-                      <Link to={`/device-management?locale=devices/deviceDetail&id=${id}`}>
-                        {name}
-                      </Link>
-                    ))
-                  : ''
-            },
-            ...generatePropertyColumns(dataSource ? dataSource[0] : []),
-            {
-              title: '操作',
-              key: 'action',
-              render: (row: MeasurementRow) => (
-                <Space>
-                  <Button type='text' size='small' title='编辑监测点'>
-                    <EditOutlined onClick={() => open(row)} />
-                  </Button>
-                  <Popconfirm
-                    title={'确定要删除该监测点吗?'}
-                    onConfirm={() => {
-                      deleteMeasurement(row.id).then(() => {
-                        fetchAssets({ type: AssetTypes.WindTurbind.id });
-                      });
-                    }}
+      <>
+        <p style={{ marginBottom: 8 }}>{title}</p>
+        <Table
+          {...{
+            rowKey: 'id',
+            columns: [
+              {
+                title: '名称',
+                dataIndex: 'name',
+                key: 'name',
+                // width: 300,
+                render: (name: string, row: MeasurementRow) => (
+                  <Link
+                    to={generatePathForRelatedAsset(
+                      pathname,
+                      search,
+                      MeasurementTypes.preload.id,
+                      row.id
+                    )}
                   >
-                    <Button type='text' danger={true} size='small' title='删除监测点'>
-                      <DeleteOutlined />
+                    {name}
+                  </Link>
+                )
+              },
+              {
+                title: '状态',
+                dataIndex: 'status',
+                key: 'status',
+                width: 100,
+                render: (name: string, row: MeasurementRow) => ''
+              },
+              {
+                title: '传感器',
+                dataIndex: 'devices',
+                key: 'devices',
+                width: 200,
+                render: (name: string, row: MeasurementRow) =>
+                  row.bindingDevices && row.bindingDevices.length > 0
+                    ? row.bindingDevices.map(({ id, name }) => (
+                        <Link to={`/device-management?locale=devices/deviceDetail&id=${id}`}>
+                          {name}
+                        </Link>
+                      ))
+                    : ''
+              },
+              ...generatePropertyColumns(dataSource ? dataSource[0] : []),
+              {
+                title: '操作',
+                key: 'action',
+                render: (row: MeasurementRow) => (
+                  <Space>
+                    <Button type='text' size='small' title='编辑监测点'>
+                      <EditOutlined onClick={() => open(row)} />
                     </Button>
-                  </Popconfirm>
-                </Space>
-              ),
-              width: 120
-            }
-          ],
-          size: 'small',
-          dataSource,
-          pagination: false,
-          locale: {
-            emptyText: <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description='暂无数据' />
-          },
-          bordered: true
-        }}
-      />
+                    <Popconfirm
+                      title={'确定要删除该监测点吗?'}
+                      onConfirm={() => {
+                        deleteMeasurement(row.id).then(() => {
+                          fetchAssets({ type: AssetTypes.WindTurbind.id });
+                        });
+                      }}
+                    >
+                      <Button type='text' danger={true} size='small' title='删除监测点'>
+                        <DeleteOutlined />
+                      </Button>
+                    </Popconfirm>
+                  </Space>
+                ),
+                width: 120
+              }
+            ],
+            size: 'small',
+            dataSource,
+            pagination: false,
+            locale: {
+              emptyText: <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description='暂无数据' />
+            },
+            bordered: true
+          }}
+        />
+      </>
     );
   };
 
@@ -148,13 +147,14 @@ const MeasurementManagement: React.FC = () => {
   }, []);
 
   React.useEffect(() => {
-    if (!assets.loading && !conditions) {
-      setConditions((prev) => ({ ...prev, windTurbineId: assets.items[0].id }));
+    if (assets.items.length > 0 && !filters) {
+      setFilters((prev) => ({ ...prev, windTurbineId: assets.items[0].id }));
     }
-    if (conditions) {
-      setWind(assets.items.find((asset) => asset.id === conditions.windTurbineId));
+    if (filters) {
+      localStorage.setItem('measurementListFilters', JSON.stringify(filters));
+      setWind(assets.items.find((asset) => asset.id === filters.windTurbineId));
     }
-  }, [assets, conditions]);
+  }, [filters, assets]);
 
   const generateTables = () => {
     if (!wind) return [];
@@ -171,8 +171,9 @@ const MeasurementManagement: React.FC = () => {
         return prevType - nextType;
       })
       .filter(({ monitoringPoints }) => monitoringPoints && monitoringPoints.length > 0)
-      .map(({ monitoringPoints }) =>
+      .map(({ name, monitoringPoints }) =>
         generateTable(
+          name,
           monitoringPoints
             ? monitoringPoints.sort((prev, next) => {
                 const { index: prevIndex } = prev.attributes || { index: 5, type: 4 };
@@ -191,9 +192,9 @@ const MeasurementManagement: React.FC = () => {
           <Select
             bordered={false}
             onChange={(val) => {
-              setConditions((prev) => ({ ...prev, windTurbineId: val }));
+              setFilters((prev) => ({ ...prev, windTurbineId: val }));
             }}
-            defaultValue={conditions?.windTurbineId || assets.items[0].id}
+            defaultValue={filters?.windTurbineId || assets.items[0].id}
           >
             {assets.items.map(({ id, name }) => (
               <Select.Option key={id} value={id}>
@@ -230,11 +231,8 @@ const MeasurementManagement: React.FC = () => {
             visible,
             onCancel: () => setVisible(false),
             selectedRow,
-            onSuccess: (assetId) => {
-              if (assetId) {
-                fetchAssets({ type: AssetTypes.WindTurbind.id });
-                setConditions((prev) => ({ ...prev, windTurbineId: assetId }));
-              }
+            onSuccess: () => {
+              fetchAssets({ type: AssetTypes.WindTurbind.id });
               setVisible(false);
             }
           }}

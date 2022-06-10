@@ -12,6 +12,7 @@ import { TableListItem, NameValue } from '../props';
 import {
   generateColProps,
   generateFlangeChartOptions,
+  generatePathForRelatedAsset,
   generatePropertyColumns,
   transformMeasurementHistoryData
 } from '../utils';
@@ -19,7 +20,7 @@ import { AssetRow, generatePreloadOptions, transformAssetStatistics } from './pr
 import { getAsset } from './services';
 
 const FlangeOverview: React.FC = () => {
-  const { search } = useLocation();
+  const { search, pathname } = useLocation();
   const history = useHistory();
   const id = Number(search.substring(search.lastIndexOf('id=') + 3));
   const [asset, setAsset] = React.useState<AssetRow>();
@@ -41,13 +42,17 @@ const FlangeOverview: React.FC = () => {
         dataIndex: 'name',
         key: 'name',
         render: (name: string, row: MeasurementRow) => (
-          <Link to={`${MeasurementTypes.dynamicPreload.url}&id=${row.id}`}>{name}</Link>
+          <Link
+            to={generatePathForRelatedAsset(pathname, search, MeasurementTypes.preload.id, row.id)}
+          >
+            {name}
+          </Link>
         ),
         width: 200
       },
       { title: '状态', dataIndex: 'state', key: 'state', render: () => '', width: 120 }
     ],
-    []
+    [pathname, search]
   );
   const [tableOfMeasurement, setTableOfMeasurement] = React.useState<TableListItem<MeasurementRow>>(
     {
@@ -167,7 +172,7 @@ const FlangeOverview: React.FC = () => {
 
   return (
     <>
-      <AssetNavigator id={id} type={asset?.type} />
+      {asset && <AssetNavigator id={asset.id} parentId={asset.parentId} />}
       {measurementType && (
         <OverviewPage
           {...{
