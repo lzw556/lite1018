@@ -73,17 +73,15 @@ export function generateFlangeChartOptions(
           splitLine: { show: false }
         },
         {
-          type: 'value',
+          type: 'category',
           polarIndex: 1,
           startAngle: 0,
           clockwise: false,
-          interval: 360 / measurements.length,
-          min: -10,
-          max: 361,
           axisLine: { show: true, lineStyle: { type: 'dashed' } },
           axisTick: { show: false },
           axisLabel: { show: false },
-          splitLine: { show: false }
+          splitLine: { show: false },
+          data: measurements.map((point) => point.name)
         }
       ],
       radiusAxis: [
@@ -103,7 +101,7 @@ export function generateFlangeChartOptions(
           axisLabel: { show: false },
           splitLine: { show: false },
           min: minActual,
-          max: circleMax
+          max: circleMax + 1
         }
       ],
       legend: {
@@ -214,7 +212,6 @@ function generateSpecification(max: number) {
 }
 
 function generateCircle(measurements: MeasurementRow[], max: number) {
-  const interval = 360 / measurements.length;
   return measurements
     .sort((prev, next) => {
       const prevIndex = prev.attributes?.index || 5;
@@ -223,7 +220,7 @@ function generateCircle(measurements: MeasurementRow[], max: number) {
     })
     .map(({ name, attributes }, index) => ({
       name,
-      value: [max, interval * index],
+      value: max,
       label: {
         show: true,
         color: '#fff',
