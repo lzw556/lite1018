@@ -1,16 +1,18 @@
 import { Breadcrumb, Dropdown, Menu, Space } from 'antd';
 import * as React from 'react';
-import { Link, useHistory } from 'react-router-dom';
+import { Link, useHistory, useLocation } from 'react-router-dom';
 import { AssetTypes, MeasurementTypes } from './constants';
 import { AssetRow } from './asset/props';
 import { getAssets } from './asset/services';
 import { Node } from './props';
-import { forEachTreeNode } from './utils';
+import { forEachTreeNode, generatePathForRelatedAsset, useMenuWithTarget } from './utils';
 import { DownOutlined } from '@ant-design/icons';
 
 type BreadcrumbItemData = Node & { type?: number };
-export const AssetNavigator: React.FC<Pick<Node, 'id' | 'type'>> = ({ id, type }) => {
+export const AssetNavigator: React.FC<Pick<Node, 'id' | 'parentId'>> = ({ id, parentId }) => {
   const history = useHistory();
+  const { pathname, search } = useLocation();
+  const menu = useMenuWithTarget(pathname);
   const [assets, setAssets] = React.useState<AssetRow[]>([]);
   const [items, setItems] = React.useState<[number, boolean, Node[]][]>([]);
   React.useEffect(() => {
@@ -18,19 +20,8 @@ export const AssetNavigator: React.FC<Pick<Node, 'id' | 'type'>> = ({ id, type }
   }, []);
 
   React.useEffect(() => {
-    const findParent = (
-      id: number,
-      source: Node[],
-      paths: { parentId: number; id: number }[],
-      type?: number
-    ) => {
-      const item = source.find((item) => {
-        if (type) {
-          return item.id === id && item.type === type;
-        } else {
-          return item.id === id;
-        }
-      });
+    const findParent = (id: number, source: Node[], paths: { parentId: number; id: number }[]) => {
+      const item = source.filter((node) => (node.type || 0) < 10000).find((item) => item.id === id);
       if (item) {
         paths.push({ parentId: item.parentId, id: item.id });
         if (item.parentId !== -1) {
@@ -39,7 +30,7 @@ export const AssetNavigator: React.FC<Pick<Node, 'id' | 'type'>> = ({ id, type }
       }
     };
     if (assets.length > 0) {
-      const node = { id: 0, name: '总览', parentId: -1, children: assets };
+      const node = { id: 0, name: menu?.title || '总览', parentId: -1, children: assets };
       const arr: Node[] = [];
       forEachTreeNode(node, (node) => {
         arr.push(node);
@@ -49,8 +40,8 @@ export const AssetNavigator: React.FC<Pick<Node, 'id' | 'type'>> = ({ id, type }
           );
       });
       if (arr.length > 0) {
-        const paths: { parentId: number; id: number }[] = [];
-        findParent(id, arr, paths, type);
+        const paths: { parentId: number; id: number }[] = [{ parentId, id }];
+        findParent(parentId, arr, paths);
         setItems(
           paths
             .reverse()
@@ -62,7 +53,7 @@ export const AssetNavigator: React.FC<Pick<Node, 'id' | 'type'>> = ({ id, type }
         );
       }
     }
-  }, [assets, id, type]);
+  }, [assets, id, menu?.title, parentId]);
 
   const renderBreadcrumbItemDDMenu = (assets: BreadcrumbItemData[]) => {
     if (assets.length > 0) {
@@ -119,8 +110,8 @@ export const AssetNavigator: React.FC<Pick<Node, 'id' | 'type'>> = ({ id, type }
     const types = [...Object.values(AssetTypes), ...Object.values(MeasurementTypes)];
     const assetType = types.find((_type) => _type.id === asset.type);
     return assetType
-      ? `${assetType.url}&id=${asset.id}`
-      : `/project-overview?locale=/project-overview`;
+      ? generatePathForRelatedAsset(pathname, search, assetType.id, asset.id)
+      : `${pathname}${search.split('/')[0]}`;
   };
 
   const renderBreadcrumbItem = ([id, isLast, assets]: [

@@ -67,7 +67,7 @@ const AlarmRuleGroupCreation = () => {
         <Input placeholder={`请填写描述`} />
       </Form.Item>
       <Divider />
-      <Form.List name='rules'>
+      <Form.List name='rules' initialValue={[0]}>
         {(fields, { add, remove }) => (
           <>
             {fields.map(({ key, name, ...restFields }, index) => (
@@ -104,7 +104,9 @@ const AlarmRuleGroupCreation = () => {
                         .then((data) => {
                           targetOption.loading = false;
                           const properties = data.filter((property) =>
-                            targetOption.firstClassProperties?.find((key: any) => key === property.key)
+                            targetOption.firstClassProperties?.find(
+                              (key: any) => key === property.key
+                            )
                           );
                           targetOption.children = properties.map((item) => {
                             return { value: item.key, label: item.name };
@@ -117,7 +119,7 @@ const AlarmRuleGroupCreation = () => {
                         });
                     }}
                     onChange={(values: any) => {
-                      console.log(values)
+                      console.log(values);
                       let prop = properties.find((item) => item.key === values[values.length - 1]);
                       if (prop && prop.fields.length === 1) {
                         setMetric((prev) => [
@@ -131,6 +133,65 @@ const AlarmRuleGroupCreation = () => {
                       }
                     }}
                   />
+                </Form.Item>
+                <Form.Item
+                  label='周期'
+                  {...restFields}
+                  name={[name, 'duration']}
+                  normalize={Normalizes.number}
+                  rules={[Rules.number]}
+                  initialValue={1}
+                >
+                  <Input style={{width: '50%'}}/>
+                </Form.Item>
+                <Form.Item label='条件'>
+                  <Input.Group compact style={{width: '50%'}}>
+                    <Form.Item
+                      {...restFields}
+                      name={[name, 'operation']}
+                      noStyle
+                      initialValue={'>='}
+                    >
+                      <Select style={{ width: '30%', minWidth: 80 }}>
+                        <Select.Option key={'>'} value={'>'}>
+                          &gt;
+                        </Select.Option>
+                        <Select.Option key={'>='} value={'>='}>
+                          &gt;=
+                        </Select.Option>
+                        <Select.Option key={'<'} value={'<'}>
+                          &lt;
+                        </Select.Option>
+                        <Select.Option key={'<='} value={'<='}>
+                          &lt;=
+                        </Select.Option>
+                      </Select>
+                    </Form.Item>
+                    <Form.Item
+                      {...restFields}
+                      name={[name, 'threshold']}
+                      rules={[Rules.number]}
+                      noStyle
+                    >
+                      <Input
+                        style={{width: '70%'}}
+                        suffix={metric.length > 0 && metric[index] ? metric[index].unit : ''}
+                      />
+                    </Form.Item>
+                  </Input.Group>
+                </Form.Item>
+                <Form.Item label='等级' {...restFields} name={[name, 'level']} initialValue={3}>
+                  <Select style={{ width: '12.5%', minWidth: 100 }}>
+                    <Select.Option key={1} value={1}>
+                      次要
+                    </Select.Option>
+                    <Select.Option key={2} value={2}>
+                      重要
+                    </Select.Option>
+                    <Select.Option key={3} value={3}>
+                      紧急
+                    </Select.Option>
+                  </Select>
                 </Form.Item>
                 <Form.Item label='报警条件'>
                   <Space direction='vertical'>
@@ -203,11 +264,13 @@ const AlarmRuleGroupCreation = () => {
                     </Space>
                   </Space>
                 </Form.Item>
-                <Button
-                  icon={<MinusCircleOutlined />}
-                  style={{ position: 'absolute', top: 0 }}
-                  onClick={() => remove(name)}
-                />
+                {name !== 0 && (
+                  <Button
+                    icon={<MinusCircleOutlined />}
+                    style={{ position: 'absolute', top: 0 }}
+                    onClick={() => remove(name)}
+                  />
+                )}
                 <Divider />
               </div>
             ))}

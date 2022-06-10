@@ -29,7 +29,7 @@ export const WindTurbineOverview = lazy(() => import('./home/asset/windTurbineOv
 export const FlangeOverview = lazy(() => import('./home/asset/flangeOverview'));
 export const MeasurementManagement = lazy(() => import('./home/measurement'));
 export const BoltOverview = lazy(()=>import('./home/measurement/boltOverview'));
-export const AlarmRuleCreation = lazy(() => import('./home/measurement/alarmRuleCreation'));
+export const AlarmRuleGroupCreation = lazy(() => import('./home/measurement/alarmRuleGroupCreation'));
 
 export const Unauthorized = lazy(() => import('./403'));
 export const NotFound = lazy(() => import('./404'));

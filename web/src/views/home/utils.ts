@@ -5,7 +5,9 @@ import { cloneDeep, round } from 'lodash';
 import { AssetRow } from './asset/props';
 import { Node } from './props';
 import { AssetTypes, MeasurementTypes } from './constants';
-import { ColorDanger, ColorInfo, ColorWarn } from '../../constants/color';
+import React from 'react';
+import { getMenus } from '../../utils/session';
+import { Menu } from '../../types/menu';
 
 export function generateColProps({
   xs,
@@ -41,17 +43,20 @@ export function generateFlangeChartOptions(
   if (!count) return null;
   const actuals = generateActuals(measurements);
   let minActual = actuals[0][0];
-  let maxActual = minActual;
+  let maxActual = actuals[0][0];
   actuals.forEach(([value, angle]) => {
-    if (value > maxActual) maxActual = value;
-    if (value < minActual) minActual = value;
+    if (!Number.isNaN(value)) {
+      if (value > maxActual || Number.isNaN(maxActual)) maxActual = value;
+      if (value < minActual || Number.isNaN(minActual)) minActual = value;
+    }
   });
   const factor = maxActual - minActual > 0 ? (maxActual - minActual) / 2 : Math.abs(maxActual) / 2;
   minActual = minActual - factor;
   maxActual = maxActual + factor;
+
   const circleMax = maxActual + 1;
-  const _maxinum = generateFakeCircle(measurements, circleMax);
-  const specification = generateFakeSpecification((minActual + maxActual) / 2);
+  const _maxinum = generateCircle(measurements, circleMax);
+  const specification = generateSpecification((minActual + maxActual) / 2);
   if (measurements[0].type === MeasurementTypes.preload.id) {
     return {
       polar: [
@@ -73,8 +78,8 @@ export function generateFlangeChartOptions(
           startAngle: 0,
           clockwise: false,
           interval: 360 / measurements.length,
-          min: 0,
-          max: 360,
+          min: -10,
+          max: 361,
           axisLine: { show: true, lineStyle: { type: 'dashed' } },
           axisTick: { show: false },
           axisLabel: { show: false },
@@ -108,7 +113,7 @@ export function generateFlangeChartOptions(
             icon: 'circle'
           },
           {
-            name: '规定值'
+            name: '报警值'
           }
         ],
         bottom: 0
@@ -129,7 +134,7 @@ export function generateFlangeChartOptions(
         },
         {
           type: 'line',
-          name: '规定值',
+          name: '报警值',
           coordinateSystem: 'polar',
           data: specification,
           symbol: 'none',
@@ -200,7 +205,7 @@ function generateActuals(measurements: MeasurementRow[]) {
   return actuals.concat([[first, 360]]);
 }
 
-function generateFakeSpecification(max: number) {
+function generateSpecification(max: number) {
   const maxinum = [];
   for (let index = 360; index > 0; index = index - 3) {
     maxinum.push([max, index]);
@@ -208,7 +213,7 @@ function generateFakeSpecification(max: number) {
   return maxinum;
 }
 
-function generateFakeCircle(measurements: MeasurementRow[], max: number) {
+function generateCircle(measurements: MeasurementRow[], max: number) {
   const interval = 360 / measurements.length;
   return measurements
     .sort((prev, next) => {
@@ -405,4 +410,53 @@ export function pickFirstClassProperties(measurement: MeasurementRow) {
 
 export function getAssetType(typeId: number) {
   return Object.values(AssetTypes).find((type) => type.id === typeId);
+}
+
+export function useMenuWithTarget(pathname: string) {
+  const [menu, setMenu] = React.useState<Menu>();
+  React.useEffect(() => {
+    const menus = getMenus();
+    menus.forEach((menu) => {
+      if (menu.path === pathname) {
+      }
+    });
+    for (const index in menus) {
+      const menu = menus[index];
+      if (menu.path === pathname) {
+        setMenu(menu);
+        break;
+      } else {
+        for (const key in menu.children) {
+          const submenu = menu.children[key];
+          if (submenu.path === pathname) {
+            setMenu(submenu);
+            break;
+          }
+        }
+      }
+    }
+  }, [pathname]);
+  return menu;
+}
+
+function generateMenuPath(pathname: string, search: string) {
+  let path = pathname;
+  if (search.indexOf('/')) {
+    const queries = search.split('/');
+    if (queries.length > 0) path += queries[0];
+  }
+  return path;
+}
+
+export function generatePathForRelatedAsset(
+  pathname: string,
+  search: string,
+  typeId: number,
+  id: number
+) {
+  const base = generateMenuPath(pathname, search);
+  const type = Object.values(AssetTypes)
+    .concat(Object.values(MeasurementTypes))
+    .find((type) => type.id === typeId);
+  return `${base}${type?.url}&id=${id}`;
 }
