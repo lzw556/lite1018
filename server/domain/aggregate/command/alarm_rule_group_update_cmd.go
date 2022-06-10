@@ -32,6 +32,7 @@ func (cmd AlarmRuleGroupUpdateCmd) Update(req request.UpdateAlarmRuleGroup) erro
 	return transaction.Execute(context.TODO(), func(txCtx context.Context) error {
 		cmd.AlarmRuleGroup.Name = req.Name
 		cmd.AlarmRuleGroup.Description = req.Description
+		cmd.AlarmRuleGroup.Category = req.Category
 		cmd.AlarmRuleGroup.Type = req.Type
 
 		if err := cmd.alarmRuleGroupRepo.Save(txCtx, &cmd.AlarmRuleGroup); err != nil {

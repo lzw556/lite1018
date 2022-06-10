@@ -10,6 +10,7 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
+	spec "github.com/thetasensors/theta-cloud-lite/server/domain/specification"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/monitoringpointtype"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/transaction"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/xlog"
@@ -22,6 +23,7 @@ type MonitoringPointAlert struct {
 	monitoringPointRepo           dependency.MonitoringPointRepository
 	monitoringPointAlertStateRepo dependency.MonitoringPointAlertStateRepository
 	alarmRecordRepo               dependency.AlarmRecordRepository
+	alarmRuleGroupSourceRepo      dependency.AlarmRuleGroupSourceRepository
 }
 
 func NewMonitoringPointAlert(sourceID uint, e entity.AlarmRule) *MonitoringPointAlert {
@@ -32,6 +34,7 @@ func NewMonitoringPointAlert(sourceID uint, e entity.AlarmRule) *MonitoringPoint
 		monitoringPointRepo:           repository.MonitoringPoint{},
 		monitoringPointAlertStateRepo: repository.MonitoringPointAlertState{},
 		alarmRecordRepo:               repository.AlarmRecord{},
+		alarmRuleGroupSourceRepo:      repository.AlarmRuleGroupSource{},
 	}
 }
 
@@ -89,16 +92,22 @@ func (a *MonitoringPointAlert) Alert(source interface{}, value float64) {
 		if alertState.Rule.Level < a.alarmRule.Level {
 			monitoringPoint.UpdateAlarmRuleState(a.alarmRule)
 			if monitoringPoint.GetAlarmRuleState(a.alarmRule.ID).Duration == a.alarmRule.Duration {
+				source, err := a.alarmRuleGroupSourceRepo.GetBySpecs(context.TODO(), spec.AlarmRuleEqSpec(a.alarmRule.ID))
+				if err != nil {
+					xlog.Errorf("Invalid alarm rule ID: %d", a.alarmRule.ID)
+					return
+				}
 				record := entity.AlarmRecord{
-					AlarmRuleID: a.alarmRule.ID,
-					SourceID:    monitoringPoint.ID,
-					Metric:      a.alarmRule.Metric,
-					Level:       a.alarmRule.Level,
-					Operation:   a.alarmRule.Operation,
-					Threshold:   a.alarmRule.Threshold,
-					Value:       value,
-					ProjectID:   a.alarmRule.ProjectID,
-					Category:    a.alarmRule.Category,
+					AlarmRuleID:      a.alarmRule.ID,
+					AlarmRuleGroupID: source.AlarmRuleID,
+					SourceID:         monitoringPoint.ID,
+					Metric:           a.alarmRule.Metric,
+					Level:            a.alarmRule.Level,
+					Operation:        a.alarmRule.Operation,
+					Threshold:        a.alarmRule.Threshold,
+					Value:            value,
+					ProjectID:        a.alarmRule.ProjectID,
+					Category:         a.alarmRule.Category,
 				}
 				if err := a.alarmRecordRepo.Create(context.TODO(), &record); err != nil {
 					xlog.Errorf("create alarm record failed: %v", err)

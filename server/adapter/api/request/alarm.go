@@ -49,6 +49,7 @@ type AlarmRuleGroup struct {
 	Name        string      `json:"name"`
 	Description string      `json:"description"`
 	Rules       []AlarmRule `json:"rules"`
+	Category    uint        `json:"category"`
 	Type        uint        `json:"type"`
 
 	ProjectID uint `json:"-"`
@@ -71,6 +72,7 @@ type UpdateAlarmRuleGroup struct {
 	Name        string      `json:"name"`
 	Description string      `json:"description"`
 	Rules       []AlarmRule `json:"rules"`
+	Category    uint        `json:"category"`
 	Type        uint        `json:"type"`
 
 	ProjectID uint `json:"-"`

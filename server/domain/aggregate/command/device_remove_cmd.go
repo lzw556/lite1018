@@ -18,28 +18,30 @@ type DeviceRemoveCmd struct {
 	entity.Device
 	Network entity.Network
 
-	deviceDataRepo        dependency.SensorDataRepository
-	deviceRepo            dependency.DeviceRepository
-	deviceStatusRepo      dependency.DeviceStateRepository
-	deviceInformationRepo dependency.DeviceInformationRepository
-	deviceAlertStateRepo  dependency.DeviceAlertStateRepository
-	networkRepo           dependency.NetworkRepository
-	eventRepo             dependency.EventRepository
-	alarmSourceReo        dependency.AlarmSourceRepository
-	alarmRuleRepo         dependency.AlarmRuleRepository
+	deviceDataRepo                   dependency.SensorDataRepository
+	deviceRepo                       dependency.DeviceRepository
+	deviceStatusRepo                 dependency.DeviceStateRepository
+	deviceInformationRepo            dependency.DeviceInformationRepository
+	deviceAlertStateRepo             dependency.DeviceAlertStateRepository
+	networkRepo                      dependency.NetworkRepository
+	eventRepo                        dependency.EventRepository
+	alarmSourceReo                   dependency.AlarmSourceRepository
+	alarmRuleRepo                    dependency.AlarmRuleRepository
+	monitoringPointDeviceBindingRepo dependency.MonitoringPointDeviceBindingRepository
 }
 
 func NewDeviceRemoveCmd() DeviceRemoveCmd {
 	return DeviceRemoveCmd{
-		deviceRepo:            repository.Device{},
-		deviceDataRepo:        repository.SensorData{},
-		deviceStatusRepo:      repository.DeviceState{},
-		deviceInformationRepo: repository.DeviceInformation{},
-		deviceAlertStateRepo:  repository.DeviceAlertState{},
-		networkRepo:           repository.Network{},
-		eventRepo:             repository.Event{},
-		alarmSourceReo:        repository.AlarmSource{},
-		alarmRuleRepo:         repository.AlarmRule{},
+		deviceRepo:                       repository.Device{},
+		deviceDataRepo:                   repository.SensorData{},
+		deviceStatusRepo:                 repository.DeviceState{},
+		deviceInformationRepo:            repository.DeviceInformation{},
+		deviceAlertStateRepo:             repository.DeviceAlertState{},
+		networkRepo:                      repository.Network{},
+		eventRepo:                        repository.Event{},
+		alarmSourceReo:                   repository.AlarmSource{},
+		alarmRuleRepo:                    repository.AlarmRule{},
+		monitoringPointDeviceBindingRepo: repository.MonitoringPointDeviceBinding{},
 	}
 }
 
@@ -58,6 +60,7 @@ func (cmd DeviceRemoveCmd) Run() error {
 		_ = cmd.deviceInformationRepo.Delete(cmd.Device.MacAddress)
 		_ = cmd.deviceStatusRepo.Delete(cmd.Device.MacAddress)
 		_ = cmd.deviceAlertStateRepo.DeleteAll(cmd.Device.MacAddress)
+		_ = cmd.monitoringPointDeviceBindingRepo.DeleteBySpecs(txCtx, spec.DeviceIDEqSpec(cmd.Device.ID))
 		return cmd.removeAlarmSource(txCtx)
 	})
 	if err != nil {
