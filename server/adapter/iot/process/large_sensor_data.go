@@ -11,6 +11,7 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/cache"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/process"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/xlog"
 	"sync"
 )
@@ -56,6 +57,11 @@ func (p *LargeSensorData) Process(ctx *iot.Context, msg iot.Message) error {
 					e.MacAddress = device.MacAddress
 					if err := p.repository.Create(e); err != nil {
 						return fmt.Errorf("create large sensor data failed: %v", err)
+					}
+
+					proc := process.NewProcess()
+					if err := proc.ProcessDeviceSensorRawData(device, e); err != nil {
+						return fmt.Errorf("Save monitoring point raw data failed: %v", err)
 					}
 				} else {
 					return fmt.Errorf("decode large sensor data failed: %v", err)

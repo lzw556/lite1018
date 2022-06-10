@@ -10,6 +10,7 @@ func ProcessPlainData(mp entity.MonitoringPoint, sensorData entity.SensorData) e
 		Time:              sensorData.Time,
 		MonitoringPointID: mp.ID,
 		MacAddress:        sensorData.MacAddress,
+		Category:          mptype.MonitoringPointCategoryBasic,
 		SensorType:        sensorData.SensorType,
 		Values:            map[string]interface{}{},
 	}
@@ -23,6 +24,19 @@ func ProcessPlainData(mp entity.MonitoringPoint, sensorData entity.SensorData) e
 				}
 			}
 		}
+	}
+
+	return mpData
+}
+
+func ProcessPlainRawData(mp entity.MonitoringPoint, sensorData entity.SensorData) entity.MonitoringPointData {
+	mpData := entity.MonitoringPointData{
+		Time:              sensorData.Time,
+		MonitoringPointID: mp.ID,
+		MacAddress:        sensorData.MacAddress,
+		Category:          mptype.MonitoringPointCategoryRaw,
+		SensorType:        sensorData.SensorType,
+		Values:            sensorData.Values,
 	}
 
 	return mpData

@@ -11,6 +11,11 @@ const (
 	MonitoringPointTypeUnknown = 99999
 )
 
+const (
+	MonitoringPointCategoryBasic = 1
+	MonitoringPointCategoryRaw   = 2
+)
+
 var types = []Typer{
 	BoltAngle{},
 	Preload{},

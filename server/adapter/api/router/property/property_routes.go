@@ -6,5 +6,9 @@ import (
 )
 
 func (r propertyRouter) find(ctx *gin.Context) (interface{}, error) {
-	return r.service.FindPropertiesByDeviceType(cast.ToUint(ctx.Query("device_type")))
+	if ctx.Query("type") == "monitoring_point" {
+		return r.service.FindMonitoringPointProperties(cast.ToUint(ctx.Query("monitoring_point_type")))
+	} else {
+		return r.service.FindPropertiesByDeviceType(cast.ToUint(ctx.Query("device_type")))
+	}
 }

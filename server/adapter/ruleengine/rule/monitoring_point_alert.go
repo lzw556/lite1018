@@ -53,7 +53,7 @@ func (a *MonitoringPointAlert) Value(source interface{}) float64 {
 					}
 				}
 			}
-			data, err := a.monitoringPointDataRepo.Last(monitoringPoint.ID)
+			data, err := a.monitoringPointDataRepo.Last(monitoringPoint.ID, monitoringpointtype.MonitoringPointCategoryBasic)
 			if err != nil {
 				return 0
 			}
