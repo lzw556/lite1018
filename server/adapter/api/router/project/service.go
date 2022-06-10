@@ -15,4 +15,5 @@ type Service interface {
 
 	GetAllocUsersByID(id uint) ([]vo.AllocUser, error)
 	AllocUsersByID(id uint, req request.AllocUsers) error
+	GetMyProjectExportFile(id uint) (*vo.ProjectExported, error)
 }

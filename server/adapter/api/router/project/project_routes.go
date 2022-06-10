@@ -74,3 +74,8 @@ func (r projectRouter) allocUsers(ctx *gin.Context) (interface{}, error) {
 	}
 	return nil, r.service.AllocUsersByID(id, req)
 }
+
+func (r projectRouter) getMyProjectExportFile(ctx *gin.Context) (interface{}, error) {
+	id := cast.ToUint(ctx.Param("id"))
+	return r.service.GetMyProjectExportFile(id)
+}

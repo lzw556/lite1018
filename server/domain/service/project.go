@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"errors"
+
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/request"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/response"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/project"
@@ -96,6 +97,14 @@ func (s Project) DeleteProjectByID(id uint) error {
 	cmd, err := s.factory.NewProjectDeleteCmd(id)
 	if err != nil {
 		return err
+	}
+	return cmd.Run()
+}
+
+func (s Project) GetMyProjectExportFile(id uint) (*vo.ProjectExported, error) {
+	cmd, err := s.factory.NewProjectExportCmd(id)
+	if err != nil {
+		return nil, err
 	}
 	return cmd.Run()
 }
