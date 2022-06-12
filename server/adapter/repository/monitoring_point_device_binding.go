@@ -24,7 +24,7 @@ func (repo MonitoringPointDeviceBinding) FindBySpecs(ctx context.Context, specs 
 	return es, err
 }
 
-func (repo MonitoringPointDeviceBinding) FindByDeviceID(ctx context.Context, deviceID uint) (entity.MonitoringPointDeviceBinding, error) {
+func (repo MonitoringPointDeviceBinding) GetByDeviceID(ctx context.Context, deviceID uint) (entity.MonitoringPointDeviceBinding, error) {
 	var e entity.MonitoringPointDeviceBinding
 	if err := repo.DB(ctx).Where("device_id = ?", deviceID).First(&e).Error; err != nil {
 		return entity.MonitoringPointDeviceBinding{}, err

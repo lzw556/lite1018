@@ -1,24 +1,6 @@
 package vo
 
-type DeviceExported struct {
-	ID            uint                              `json:"id"`
-	Name          string                            `json:"name"`
-	Address       string                            `json:"address"`
-	ParentAddress string                            `json:"parentAddress"`
-	Type          uint                              `json:"type"`
-	Settings      map[string]map[string]interface{} `json:"settings"`
-	Modbus        int                               `json:"modbus"`
-}
-
-type DevicesExported []DeviceExported
-
-type NetworkExported struct {
-	Wsn        map[string]interface{} `json:"wsn"`
-	DeviceList ExportDevices          `json:"deviceList"`
-}
-
 type AssetExported struct {
-	ID         uint                   `json:"id"`
 	Name       string                 `json:"name"`
 	Type       uint                   `json:"type"`
 	ParentID   uint                   `json:"parentId"`
@@ -36,16 +18,14 @@ type DeviceBinding struct {
 }
 
 type MonitoringPointExported struct {
-	ID      uint   `json:"id"`
-	Name    string `json:"name"`
-	Type    uint   `json:"type"`
-	AssetID uint   `json:"assetId"`
+	Name string `json:"name"`
+	Type uint   `json:"type"`
 
 	Attributes map[string]interface{} `json:"attributes,omitempty"`
 	Devices    []*DeviceBinding
 }
 
 type ProjectExported struct {
-	Assets   []*AssetExported   `json:"assets"`
-	Networks []*NetworkExported `json:"networks"`
+	Assets   []*AssetExported     `json:"assets"`
+	Networks []*NetworkExportFile `json:"networks"`
 }
