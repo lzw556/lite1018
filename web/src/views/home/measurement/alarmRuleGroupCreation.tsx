@@ -4,7 +4,7 @@ import * as React from 'react';
 import { CheckAlarmRuleNameRequest } from '../../../apis/alarm';
 import { GetPropertiesRequest } from '../../../apis/property';
 import { defaultValidateMessages, Normalizes, Rules } from '../../../constants/validator';
-import { MeasurementTypes } from '../constants';
+import { MeasurementTypes } from '../common/constants';
 
 interface DataNode {
   label: React.ReactNode;
@@ -22,11 +22,11 @@ const AlarmRuleGroupCreation = () => {
   const [options, setOptions] = React.useState<DataNode[]>(
     Object.values(MeasurementTypes)
       .filter((type) => type.id !== 10102)
-      .map(({ label, deviceType, firstClassProperties }) => ({
+      .map(({ label, deviceType, firstClassFieldKeys }) => ({
         value: deviceType,
         label,
         isLeaf: false,
-        firstClassProperties
+        firstClassFieldKeys
       }))
   );
   const [properties, setProperties] = React.useState<any[]>([]);

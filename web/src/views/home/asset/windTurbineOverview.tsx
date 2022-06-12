@@ -1,16 +1,18 @@
 import { Empty, Spin } from 'antd';
 import * as React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { AssetNavigator } from '../assetNavigator';
+import { AssetNavigator } from '../components/assetNavigator';
 import '../home.css';
 import { MeasurementIcon } from '../measurement/icon';
-import { OverviewPage } from '../overviewPage';
-import { Introduction, NameValue } from '../props';
-import { generateFlangeChartOptions, generatePathForRelatedAsset } from '../utils';
-import { AssetTypes } from '../constants';
+import { combineFinalUrl } from '../common/utils';
+import { AssetTypes } from '../common/constants';
 import { getAsset } from './services';
-import { AssetRow, transformAssetStatistics } from './props';
+import { AssetRow } from './props';
 import { MeasurementRow } from '../measurement/props';
+import { Introduction } from '../components/introductionPage';
+import { OverviewPage } from '../components/overviewPage';
+import { getAssetStatistics, NameValue } from '../common/statisticsHelper';
+import { generateChartOptionsOfLastestData } from '../common/historyDataHelper';
 
 const WindTurbineOverview: React.FC = () => {
   const { pathname, search } = useLocation();
@@ -29,7 +31,7 @@ const WindTurbineOverview: React.FC = () => {
     if (asset) {
       const { children, statistics } = asset;
       setStatistics(
-        transformAssetStatistics(
+        getAssetStatistics(
           statistics,
           'monitoringPointNum',
           ['danger', '紧急报警监测点'],
@@ -57,7 +59,7 @@ const WindTurbineOverview: React.FC = () => {
             if (item.monitoringPoints && item.monitoringPoints.length > 0) {
               chart = {
                 title: '',
-                options: generateFlangeChartOptions(item.monitoringPoints, {
+                options: generateChartOptionsOfLastestData(item.monitoringPoints, {
                   inner: '50%',
                   outer: '65%'
                 }),
@@ -67,7 +69,7 @@ const WindTurbineOverview: React.FC = () => {
                 ...item.monitoringPoints.map((point) => ({ ...point, assetName: item.name }))
               );
             }
-            const { alarmState, statistics } = transformAssetStatistics(
+            const { alarmState, statistics } = getAssetStatistics(
               item.statistics,
               'monitoringPointNum',
               ['anomalous', '异常监测点']
@@ -77,7 +79,7 @@ const WindTurbineOverview: React.FC = () => {
               id: item.id,
               title: {
                 name: item.name,
-                path: generatePathForRelatedAsset(pathname, search, AssetTypes.Flange.id, item.id)
+                path: combineFinalUrl(pathname, search, AssetTypes.Flange.url, item.id)
               },
               alarmState,
               icon: { svg: <MeasurementIcon />, small: true, focus: true },

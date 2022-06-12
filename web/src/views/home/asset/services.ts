@@ -1,6 +1,6 @@
+import { ProjectStatistics } from '..';
 import request from '../../../utils/request';
 import { DeleteResponse, GetResponse, PostResponse, PutResponse } from '../../../utils/response';
-import { ProjectStatistics } from '../props';
 import { Asset, AssetRow } from './props';
 
 export function getAssets(filters?: Partial<Pick<Asset, 'type' | 'parent_id'>>) {

@@ -1,6 +1,7 @@
 import request from '../../../utils/request';
 import { DeleteResponse, GetResponse, PostResponse, PutResponse } from '../../../utils/response';
-import { Measurement, MeasurementHistoryData, MeasurementRow } from './props';
+import { HistoryData } from '../common/historyDataHelper';
+import { Measurement, MeasurementRow } from './props';
 
 export function getMeasurements(filters?: Pick<Measurement, 'asset_id'>) {
   return request.get<MeasurementRow[]>(`/monitoringPoints`, { ...filters }).then(GetResponse);
@@ -37,9 +38,5 @@ export function unbindDevice(id: Measurement['id'], device_id: number) {
 }
 
 export function getData(id: Measurement['id'], from: number, to: number, rawOnly: boolean = false) {
-  return request
-    .get<MeasurementHistoryData>(
-      `/monitoringPoints/${id}/data?from=${from}&to=${to}${rawOnly ? `&type=raw` : ''}`
-    )
-    .then(GetResponse);
+  return request.get<HistoryData>(`/monitoringPoints/${id}/data?from=${from}&to=${to}${rawOnly ? `&type=raw` : ''}`).then(GetResponse);
 }

@@ -48,8 +48,3 @@ export function convertRow(values?: MeasurementRow): Measurement | null {
     attributes: values.attributes
   };
 }
-
-export type MeasurementHistoryData = {
-  timestamp: number;
-  values: Property[];
-}[];

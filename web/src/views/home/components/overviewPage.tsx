@@ -1,12 +1,40 @@
-import { Col, Row, Statistic, Table } from 'antd';
+import { Col, Row, Statistic, Table, TableProps } from 'antd';
 import * as React from 'react';
-import ShadowCard from '../../components/shadowCard';
+import ShadowCard from '../../../components/shadowCard';
+import { generateColProps } from '../common/utils';
 import { ChartContainer } from './charts/chartContainer';
-import './home.css';
-import { IntroductionPage } from './introductionPage';
-import { Overview } from './props';
-import { generateColProps } from './utils';
+import { ChartOptions } from './charts/common';
+import '../home.css';
+import { Introduction, IntroductionPage } from './introductionPage';
+import { NameValue } from '../common/statisticsHelper';
 
+export type TableListItem<T> = TableProps<T> & {
+  colProps?: {
+    xs: { span: number };
+    sm: { span: number };
+    md: { span: number };
+    xl: { span: number };
+    xxl: { span: number };
+  };
+};
+export type Overview = {
+  statistics?: NameValue[];
+  chartList?: {
+    title: string;
+    colProps: {
+      xs: { span: number };
+      sm: { span: number };
+      md: { span: number };
+      xl: { span: number };
+      xxl: { span: number };
+    };
+    options?: ChartOptions<unknown>;
+    style?: React.CSSProperties;
+    emptyDescription?: React.ReactNode;
+  }[];
+  introductionList?: Introduction[];
+  tabelList?: TableListItem<any>[];
+};
 export const OverviewPage: React.FC<Overview> = (props) => {
   const { statistics, chartList, introductionList, tabelList } = props;
   const colProps = generateColProps({ md: 12, lg: 12, xl: 4, xxl: 4 });

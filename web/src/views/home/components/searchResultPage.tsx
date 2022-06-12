@@ -1,9 +1,13 @@
-import { Button, Col, Row, Space } from 'antd';
+import { Button, ButtonProps, Col, Row, Space } from 'antd';
 import * as React from 'react';
-import MyBreadcrumb from '../../components/myBreadcrumb';
-import ShadowCard from '../../components/shadowCard';
-import { SearchResult } from './props';
+import MyBreadcrumb from '../../../components/myBreadcrumb';
+import ShadowCard from '../../../components/shadowCard';
 
+export type SearchResult = {
+  actions?: ButtonProps[];
+  filters?: JSX.Element[];
+  results: JSX.Element[];
+};
 export const SearchResultPage: React.FC<SearchResult> = (props) => {
   const { actions, filters, results } = props;
   return (

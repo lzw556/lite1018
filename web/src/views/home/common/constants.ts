@@ -1,4 +1,4 @@
-import { DeviceType } from '../../types/device_type';
+import { DeviceType } from '../../../types/device_type';
 
 export const AssetTypes: Record<
   'WindTurbind' | 'Flange',
@@ -35,7 +35,7 @@ export const MeasurementTypes: Record<
     id: number;
     label: string;
     url: string;
-    firstClassProperties: string[];
+    firstClassFieldKeys: string[];
     deviceType: number;
   }
 > = {
@@ -43,21 +43,21 @@ export const MeasurementTypes: Record<
     id: 10101,
     label: '松动角度',
     url: '/bolt',
-    firstClassProperties: ['loosening_angle', 'attitude', 'motion', 'temperature'],
+    firstClassFieldKeys: ['loosening_angle', 'attitude', 'motion', 'temperature'],
     deviceType: DeviceType.BoltLoosening
   },
   preload: {
     id: 10301,
     label: '预紧力',
     url: '/bolt',
-    firstClassProperties: ['preload', 'pressure', 'tof', 'temperature'],
+    firstClassFieldKeys: ['preload', 'pressure', 'tof', 'temperature'],
     deviceType: DeviceType.BoltElongation
   },
   dynamicPreload: {
     id: 10302,
     label: '动态预紧力',
     url: '/bolt',
-    firstClassProperties: ['preload', 'pressure', 'tof', 'temperature'],
+    firstClassFieldKeys: ['preload', 'pressure', 'tof', 'temperature'],
     deviceType: DeviceType.BoltElongation
   }
 };

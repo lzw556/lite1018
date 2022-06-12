@@ -1,8 +1,8 @@
 import { Col, Empty, Row, Spin } from 'antd';
 import moment from 'moment';
 import * as React from 'react';
-import { ChartContainer } from '../../charts/chartContainer';
-import { generateMeasurementHistoryDataOptions } from '../../utils';
+import { generateChartOptionsOfHistoryDatas } from '../../common/historyDataHelper';
+import { ChartContainer } from '../../components/charts/chartContainer';
 import { MeasurementRow } from '../props';
 import { getData } from '../services';
 
@@ -15,7 +15,7 @@ export const Monitor: React.FC<MeasurementRow> = (props) => {
     const to = moment().endOf('day').utc().unix();
     getData(id, from, to).then((data) => {
       setLoading(false)
-      if (data.length > 0) setHistoryOptions(generateMeasurementHistoryDataOptions(data));
+      if (data.length > 0) setHistoryOptions(generateChartOptionsOfHistoryDatas(data));
     });
   }, [id]);
 

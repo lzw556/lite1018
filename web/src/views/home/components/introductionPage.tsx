@@ -1,8 +1,18 @@
 import * as React from 'react';
 import { Link } from 'react-router-dom';
+import { AlarmState } from '../common/statisticsHelper';
 import { ChartContainer } from './charts/chartContainer';
-import { Introduction } from './props';
+import { ChartOptions } from './charts/common';
+import { Overview } from './overviewPage';
 
+export type Introduction = Pick<Overview, 'statistics'> & {
+  parentId: number;
+  id: number;
+  title: { name: string; path: string };
+  icon: { svg: JSX.Element; small: boolean; focus?: boolean };
+  alarmState: AlarmState;
+  chart?: { title: string; options: ChartOptions<unknown>; style?: React.CSSProperties };
+};
 export const IntroductionPage: React.FC<Introduction> = (props) => {
   const {
     title: { name, path },

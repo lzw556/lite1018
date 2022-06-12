@@ -1,44 +1,14 @@
-import moment from 'moment';
-import { LineChartStyles } from '../../constants/chart';
-import { MeasurementHistoryData, MeasurementRow } from './measurement/props';
-import { cloneDeep, round } from 'lodash';
-import { AssetRow } from './asset/props';
-import { Node } from './props';
-import { AssetTypes, MeasurementTypes } from './constants';
-import React from 'react';
-import { getMenus } from '../../utils/session';
-import { Menu } from '../../types/menu';
+import { round } from "lodash";
+import moment from "moment";
+import { LineChartStyles } from "../../../constants/chart";
+import { MeasurementRow, Property } from "../measurement/props";
+import { MeasurementTypes } from "./constants";
 
-export function generateColProps({
-  xs,
-  sm,
-  md,
-  lg,
-  xl,
-  xxl
-}: {
-  xs?: number;
-  sm?: number;
-  md?: number;
-  lg?: number;
-  xl?: number;
-  xxl?: number;
-}) {
-  const colCount = 24;
-  return {
-    xs: { span: xs ?? colCount },
-    sm: { span: sm ?? colCount },
-    md: { span: md ?? colCount },
-    lg: { span: lg ?? colCount },
-    xl: { span: xl ?? colCount },
-    xxl: { span: xxl ?? colCount }
-  };
-}
-
-export function generateFlangeChartOptions(
-  measurements: MeasurementRow[],
-  size: { inner: string; outer: string }
-) {
+export type HistoryData = {
+  timestamp: number;
+  values: Property[];
+}[];
+export function generateChartOptionsOfLastestData(measurements: MeasurementRow[], size: { inner: string; outer: string }) {
   const count = measurements.length;
   if (!count) return null;
   const actuals = generateActuals(measurements);
@@ -70,10 +40,7 @@ export function generateFlangeChartOptions(
         trigger: 'axis',
         formatter: (paras: any) => {
           let text = '';
-          paras.forEach(
-            ({ seriesName, marker, value }: any) =>
-              (text += `${marker} ${seriesName} ${value} <br />`)
-          );
+          paras.forEach(({ seriesName, marker, value }: any) => (text += `${marker} ${seriesName} ${value} <br />`));
           return text;
         }
       },
@@ -83,11 +50,9 @@ export function generateFlangeChartOptions(
       },
       yAxis: { type: 'value' },
       series: measurements.map((point) => {
-        let propName = '';
-        const firstClassProperties = getFirstClassProperties(point.type);
-        if (firstClassProperties.length > 0) propName = firstClassProperties[0];
-        const historyData = transformSingleMeasurmentData(point, propName);
-        const data = historyData.length > 0 ? [historyData[0].value] : NaN;
+        let data = NaN;
+        const firstClassFieldKeys = getKeysOfFirstClassFields(point.type);
+        if (firstClassFieldKeys.length > 0 && point.data) data = point.data.values[firstClassFieldKeys[0]];
         return { type: 'bar', name: point.name, data, barMaxWidth: 50 };
       })
     };
@@ -194,6 +159,32 @@ export function generateFlangeChartOptions(
   }
 }
 
+export function generateChartOptionsOfHistoryData(
+  history: { name: string; data: HistoryData }[],
+  measurementType: typeof MeasurementTypes.loosening_angle
+) {
+  const series = history.map(({name, data }) => {
+    return {
+      type: 'line',
+      name,
+      data: pickHistoryData(data, measurementType.firstClassFieldKeys[0])
+    };
+  });
+
+  return {
+    title: {
+      text: '',
+      left: 'center'
+    },
+    legend: { bottom: 0 },
+    tooltip: { trigger: 'axis' },
+    xAxis: { type: 'time' },
+    // yAxis: { type: 'value', min: 290, max: 360 },
+    yAxis: { type: 'value' },
+    series
+  };
+}
+
 function generateActuals(measurements: MeasurementRow[]) {
   const actuals: number[][] = [];
   const interval = 360 / measurements.length;
@@ -205,12 +196,11 @@ function generateActuals(measurements: MeasurementRow[]) {
       return prevIndex - nextIndex;
     })
     .forEach((point, index) => {
-      let propName = '';
-      const firstClassProperties = getFirstClassProperties(point.type);
-      if (firstClassProperties.length > 0) propName = firstClassProperties[0];
-      const data = transformSingleMeasurmentData(point, propName);
-      actuals.push([data.length > 0 ? data[0].value : NaN, index * interval]);
-      if (index === 0) first = data.length > 0 ? data[0].value : NaN;
+      let data = NaN;
+      const firstClassFieldKeys = getKeysOfFirstClassFields(point.type);
+      if (firstClassFieldKeys.length > 0 && point.data) data = point.data.values[firstClassFieldKeys[0]];
+      actuals.push([data, index * interval]);
+      if (index === 0) first = data;
     });
   return actuals.concat([[first, 360]]);
 }
@@ -242,10 +232,7 @@ function generateCircle(measurements: MeasurementRow[], max: number) {
     }));
 }
 
-export function transformMeasurementHistoryData(
-  data: MeasurementHistoryData,
-  propertyName?: string
-) {
+export function getHistoryDatas(data: HistoryData, propertyName?: string) {
   const firstValue = data[0].values;
   const times = data.map(({ timestamp }) => timestamp);
   return firstValue
@@ -271,30 +258,29 @@ export function transformMeasurementHistoryData(
     });
 }
 
-export function transformMeasurementHistoryData2(
-  data: MeasurementHistoryData,
-  propertyName: string
-) {
+export function pickHistoryData(data: HistoryData, propertyName: string) {
   return data.map(({ timestamp, values }) => {
-    const property = values.find(({ fields }) => fields.find(({ key }) => key === propertyName));
     let value = NaN;
-    if (property) {
-      const precision = property.precision ?? 3;
-      value = round(property.data[property.name], precision);
+    let crtProperty = null;
+    for (const property of values) {
+      const field = property.fields.find(({ key }) => key === propertyName);
+      if(field){
+        crtProperty = property;
+        const precision = property.precision ?? 3;
+        value = round(property.data[field.name], precision);
+        break;
+      }
     }
     const valueText = Number.isNaN(value) ? '' : `${value}`;
     return {
-      property,
+      property: crtProperty,
       data: [moment.unix(timestamp).local().format('YYYY-MM-DD HH:mm:ss'), valueText]
     };
   });
 }
 
-export function generateMeasurementHistoryDataOptions(
-  data: MeasurementHistoryData,
-  propertyName?: string
-) {
-  const optionsData = transformMeasurementHistoryData(data, propertyName);
+export function generateChartOptionsOfHistoryDatas(data: HistoryData, propertyName?: string) {
+  const optionsData = getHistoryDatas(data, propertyName);
   return optionsData.map(({ times, seriesData, property }) => {
     return {
       tooltip: {
@@ -312,9 +298,7 @@ export function generateMeasurementHistoryDataOptions(
       grid: { bottom: 20 },
       title: {
         text: `${property.name}${property.unit ? `(${property.unit})` : ''}`,
-        subtext: propertyName
-          ? ''
-          : `${seriesData.map(({ name, data }) => name + ' ' + data[data.length - 1])}`
+        subtext: propertyName ? '' : `${seriesData.map(({ name, data }) => name + ' ' + data[data.length - 1])}`
       },
       series: seriesData.map(({ name, data }, index) => ({
         type: 'line',
@@ -331,83 +315,16 @@ export function generateMeasurementHistoryDataOptions(
     };
   });
 }
-// use in treeTable
-export function filterEmptyChildren(assets: AssetRow[]) {
-  if (assets.length === 0) return [];
-  const copy = cloneDeep(assets);
-  return copy.map((asset) =>
-    mapTreeNode(asset, (asset) => {
-      if (asset.children && asset.children.length === 0) {
-        delete asset.children;
-        return asset;
-      } else {
-        return asset;
-      }
-    })
-  );
-}
-
-export function mapTreeNode<N extends Node>(node: N, fn: <N extends Node>(node: N) => N): N {
-  if (node.children && node.children.length > 0) {
-    return {
-      ...fn(node),
-      children: node.children.map((node) => mapTreeNode(node, fn))
-    };
-  } else {
-    return fn(node);
-  }
-}
-
-export function forEachTreeNode<N extends Node>(
-  node: N,
-  fn: <N extends Node>(node: N) => void
-): void {
-  fn(node);
-  if (node.children && node.children.length > 0) {
-    node.children.map((node) => forEachTreeNode(node, fn));
-  }
-}
-
-export function transformSingleMeasurmentData(measurement: MeasurementRow, ...filters: string[]) {
-  const { properties, data } = measurement;
-  if (!data) return [];
-  const { values } = data;
-  const res = [];
-  for (const property of properties) {
-    const { fields } = property;
-    for (const keyOfValues in values) {
-      const field = fields.find(({ key }) => {
-        if (filters.length > 0) {
-          return key === keyOfValues && filters.find((propname) => propname === key);
-        } else {
-          return key === keyOfValues;
-        }
-      });
-      if (field) {
-        const precision = property.precision ?? 3;
-        res.push({
-          unit: property.unit,
-          sort: property.sort,
-          ...field,
-          value: round(values[keyOfValues], precision)
-        });
-        break;
-      }
-    }
-  }
-  return res;
-}
 
 export function generatePropertyColumns(measurement: MeasurementRow) {
-  const properties = pickFirstClassProperties(measurement);
+  const properties = getFirstClassFields(measurement);
   if (properties.length > 0) {
     return properties
       .map(({ name, key, unit }) => ({
         title: `${name}${unit ? `(${unit})` : ''}`,
         key,
-        render: (measurement: MeasurementRow) => {
-          const data = transformSingleMeasurmentData(measurement, key);
-          return data.length > 0 ? data[0].value.toString() : '-';
+        render: ({ data }: MeasurementRow) => {
+          return data ? data.values[key].toString() : '-';
         },
         width: 120
       }))
@@ -415,9 +332,7 @@ export function generatePropertyColumns(measurement: MeasurementRow) {
         title: '采集时间',
         key: 'timestamp',
         render: (measurement: MeasurementRow) => {
-          return measurement.data && measurement.data.timestamp
-            ? moment(measurement.data.timestamp * 1000).format('YYYY-MM-DD HH:mm:ss')
-            : '-';
+          return measurement.data && measurement.data.timestamp ? moment(measurement.data.timestamp * 1000).format('YYYY-MM-DD HH:mm:ss') : '-';
         },
         width: 200
       });
@@ -425,67 +340,21 @@ export function generatePropertyColumns(measurement: MeasurementRow) {
   return [];
 }
 
-function getFirstClassProperties(measurementType: number) {
+function getKeysOfFirstClassFields(measurementType: number) {
   const type = Object.values(MeasurementTypes).find((type) => type.id === measurementType);
-  return type ? type.firstClassProperties : [];
+  return type ? type.firstClassFieldKeys : [];
 }
 
-export function pickFirstClassProperties(measurement: MeasurementRow) {
-  const firstClassProperties = getFirstClassProperties(measurement.type);
-  return measurement.properties.filter(({ fields }) => {
-    return fields.find((field) => firstClassProperties.find((property) => property === field.key));
-  });
-}
-
-export function getAssetType(typeId: number) {
-  return Object.values(AssetTypes).find((type) => type.id === typeId);
-}
-
-export function useMenuWithTarget(pathname: string) {
-  const [menu, setMenu] = React.useState<Menu>();
-  React.useEffect(() => {
-    const menus = getMenus();
-    menus.forEach((menu) => {
-      if (menu.path === pathname) {
-      }
-    });
-    for (const index in menus) {
-      const menu = menus[index];
-      if (menu.path === pathname) {
-        setMenu(menu);
+function getFirstClassFields(measurement: MeasurementRow) {
+  const fields: (Property['fields'][0] & Pick<Property, 'precision' | 'unit'>)[] = [];
+  getKeysOfFirstClassFields(measurement.type).forEach((fieldKey) => {
+    for (const property of measurement.properties) {
+      const field = property.fields.find((field) => field.key === fieldKey);
+      if (field) {
+        fields.push({ ...field, unit: property.unit, precision: property.precision });
         break;
-      } else {
-        for (const key in menu.children) {
-          const submenu = menu.children[key];
-          if (submenu.path === pathname) {
-            setMenu(submenu);
-            break;
-          }
-        }
       }
     }
-  }, [pathname]);
-  return menu;
-}
-
-function generateMenuPath(pathname: string, search: string) {
-  let path = pathname;
-  if (search.indexOf('/')) {
-    const queries = search.split('/');
-    if (queries.length > 0) path += queries[0];
-  }
-  return path;
-}
-
-export function generatePathForRelatedAsset(
-  pathname: string,
-  search: string,
-  typeId: number,
-  id: number
-) {
-  const base = generateMenuPath(pathname, search);
-  const type = Object.values(AssetTypes)
-    .concat(Object.values(MeasurementTypes))
-    .find((type) => type.id === typeId);
-  return `${base}${type?.url}&id=${id}`;
+  });
+  return fields;
 }

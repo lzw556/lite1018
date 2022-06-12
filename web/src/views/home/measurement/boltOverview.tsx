@@ -6,7 +6,7 @@ import { MeasurementRow } from './props';
 import { getMeasurement } from './services';
 import { MeasurementContents } from './contentTabs';
 import { MeasurementDevices } from './deviceTabs';
-import { AssetNavigator } from '../assetNavigator';
+import { AssetNavigator } from '../components/assetNavigator';
 
 const BoltOverview: React.FC = () => {
   const { search } = useLocation();
