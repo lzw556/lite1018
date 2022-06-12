@@ -1,13 +1,15 @@
 import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
 import { Button, ButtonProps, Empty, Popconfirm, Space, Table, TableProps } from 'antd';
 import * as React from 'react';
-import { SearchResultPage } from '../searchResultPage';
-import { filterEmptyChildren, generatePathForRelatedAsset, getAssetType } from '../utils';
-import { AssetTypes } from '../constants';
+import { combineFinalUrl } from '../common/utils';
+import { AssetTypes } from '../common/constants';
 import { AssetEdit } from './edit';
-import { AssetRow, transformAssetStatistics } from './props';
+import { AssetRow } from './props';
 import { deleteAsset, getAssets } from './services';
 import { Link, useLocation } from 'react-router-dom';
+import { SearchResultPage } from '../components/searchResultPage';
+import { filterEmptyChildren } from '../common/treeDataHelper';
+import { getAssetStatistics } from '../common/statisticsHelper';
 
 const AssetManagement: React.FC = () => {
   const { pathname, search } = useLocation();
@@ -49,7 +51,7 @@ const AssetManagement: React.FC = () => {
             (row.monitoringPoints && row.monitoringPoints.length) ||
             (row.children && row.children.length);
           return assetType && hasChildren ? (
-            <Link to={generatePathForRelatedAsset(pathname, search, assetType.id, row.id)}>
+            <Link to={combineFinalUrl(pathname, search, assetType.url, row.id)}>
               {name}
             </Link>
           ) : (
@@ -85,7 +87,7 @@ const AssetManagement: React.FC = () => {
         key: 'measurementNum',
         width: 150,
         render: (name: string, row: AssetRow) => {
-          const { statistics } = transformAssetStatistics(row.statistics, 'monitoringPointNum');
+          const { statistics } = getAssetStatistics(row.statistics, 'monitoringPointNum');
           return statistics.length > 0 ? statistics[0].value : '-';
         }
       },
@@ -95,7 +97,7 @@ const AssetManagement: React.FC = () => {
         key: 'errorMeasurementNum',
         width: 150,
         render: (name: string, row: AssetRow) => {
-          const { statistics } = transformAssetStatistics(row.statistics, [
+          const { statistics } = getAssetStatistics(row.statistics, [
             'anomalous',
             '异常监测点'
           ]);
@@ -108,7 +110,7 @@ const AssetManagement: React.FC = () => {
         key: 'sensorNum',
         width: 150,
         render: (name: string, row: AssetRow) => {
-          const { statistics } = transformAssetStatistics(row.statistics, 'deviceNum');
+          const { statistics } = getAssetStatistics(row.statistics, 'deviceNum');
           return statistics.length > 0 ? statistics[0].value : '-';
         }
       },
@@ -118,7 +120,7 @@ const AssetManagement: React.FC = () => {
         key: 'offlineNum',
         width: 150,
         render: (name: string, row: AssetRow) => {
-          const { statistics } = transformAssetStatistics(row.statistics, 'offlineDeviceNum');
+          const { statistics } = getAssetStatistics(row.statistics, 'offlineDeviceNum');
           return statistics.length > 0 ? statistics[0].value : '-';
         }
       },
@@ -163,6 +165,11 @@ const AssetManagement: React.FC = () => {
     loading: true,
     locale: { emptyText: <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description='暂无数据' /> }
   });
+
+  const getAssetType = (typeId: number) => {
+    return Object.values(AssetTypes).find((type) => type.id === typeId);
+  }
+
   const open = (initialValues: typeof AssetTypes.WindTurbind, selectedRow?: AssetRow) => {
     setInitialValues(initialValues);
     setSelectedRow(selectedRow);

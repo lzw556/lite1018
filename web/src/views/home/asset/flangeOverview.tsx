@@ -2,21 +2,17 @@ import { Empty, Spin } from 'antd';
 import moment from 'moment';
 import * as React from 'react';
 import { Link, useLocation, useHistory } from 'react-router-dom';
-import { AssetNavigator } from '../assetNavigator';
-import { MeasurementTypes } from '../constants';
+import { AssetNavigator } from '../components/assetNavigator';
+import { MeasurementTypes } from '../common/constants';
 import '../home.css';
-import { MeasurementHistoryData, MeasurementRow } from '../measurement/props';
+import { MeasurementRow } from '../measurement/props';
 import { getData } from '../measurement/services';
-import { OverviewPage } from '../overviewPage';
-import { TableListItem, NameValue } from '../props';
-import {
-  generateColProps,
-  generateFlangeChartOptions,
-  generatePathForRelatedAsset,
-  generatePropertyColumns
-} from '../utils';
-import { AssetRow, generatePreloadOptions, transformAssetStatistics } from './props';
+import { generateColProps, combineFinalUrl } from '../common/utils';
+import { AssetRow } from './props';
 import { getAsset } from './services';
+import { OverviewPage, TableListItem } from '../components/overviewPage';
+import { getAssetStatistics, NameValue } from '../common/statisticsHelper';
+import { generateChartOptionsOfLastestData, generatePropertyColumns, HistoryData, generateChartOptionsOfHistoryData } from '../common/historyDataHelper';
 
 const FlangeOverview: React.FC = () => {
   const { search, pathname } = useLocation();
@@ -28,7 +24,7 @@ const FlangeOverview: React.FC = () => {
   const [statistics, setStatistics] = React.useState<NameValue[]>();
   const [statisticOfPreload, setStatisticOfPreload] = React.useState<any>();
   const [historyDatas, setHistoryDatas] = React.useState<
-    { name: string; data: MeasurementHistoryData }[]
+    { name: string; data: HistoryData }[]
   >([]);
   const [measurementType, setMeasurementType] =
     React.useState<typeof MeasurementTypes.loosening_angle>();
@@ -40,7 +36,7 @@ const FlangeOverview: React.FC = () => {
         key: 'name',
         render: (name: string, row: MeasurementRow) => (
           <Link
-            to={generatePathForRelatedAsset(pathname, search, MeasurementTypes.preload.id, row.id)}
+            to={combineFinalUrl(pathname, search, MeasurementTypes.preload.url, row.id)}
           >
             {name}
           </Link>
@@ -71,7 +67,7 @@ const FlangeOverview: React.FC = () => {
     if (asset) {
       const { statistics, monitoringPoints } = asset;
       setStatistics(
-        transformAssetStatistics(
+        getAssetStatistics(
           statistics,
           'monitoringPointNum',
           ['danger', '紧急报警监测点'],
@@ -117,7 +113,7 @@ const FlangeOverview: React.FC = () => {
 
   React.useEffect(() => {
     if (historyDatas.length > 0 && measurementType) {
-      setStatisticOfPreload(generatePreloadOptions(historyDatas, measurementType));
+      setStatisticOfPreload(generateChartOptionsOfHistoryData(historyDatas, measurementType));
     }
   }, [historyDatas, measurementType]);
 
@@ -156,7 +152,7 @@ const FlangeOverview: React.FC = () => {
               {
                 title: '分布图',
                 colProps: generateColProps({ xl: 12, xxl: 9 }),
-                options: generateFlangeChartOptions(measurements, {
+                options: generateChartOptionsOfLastestData(measurements, {
                   inner: '65%',
                   outer: '80%'
                 }),

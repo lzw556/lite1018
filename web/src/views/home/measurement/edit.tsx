@@ -3,7 +3,7 @@ import * as React from 'react';
 import DeviceSelect from '../../../components/select/deviceSelect';
 import { defaultValidateMessages, Rules } from '../../../constants/validator';
 import { DeviceType } from '../../../types/device_type';
-import { AssetTypes, MeasurementTypes } from '../constants';
+import { AssetTypes, MeasurementTypes } from '../common/constants';
 import { AssetRow } from '../asset/props';
 import { getAssets } from '../asset/services';
 import { convertRow, Measurement, MeasurementRow } from './props';

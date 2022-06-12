@@ -5,7 +5,7 @@ import ShadowCard from '../../../../components/shadowCard';
 import { Device } from '../../../../types/device';
 import { DeviceType } from '../../../../types/device_type';
 import { SingleDeviceStatus } from '../../../device/SingleDeviceStatus';
-import { generateColProps } from '../../utils';
+import { generateColProps } from '../../common/utils';
 import '../../../../string-extension';
 import { Link } from 'react-router-dom';
 

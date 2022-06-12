@@ -1,19 +1,27 @@
 import { Empty, Spin } from 'antd';
 import * as React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { AssetTypes } from './constants';
+import { AssetTypes } from './common/constants';
 import { AssetIcon } from './asset/icon';
 import { getAssets, getProjectStatistics } from './asset/services';
-import { Series_Bar } from './charts/bar';
-import { ChartOptions } from './charts/common';
-import { Series_Pie } from './charts/pie';
+import { Series_Bar } from './components/charts/bar';
+import { ChartOptions } from './components/charts/common';
+import { Series_Pie } from './components/charts/pie';
 import './home.css';
-import { OverviewPage } from './overviewPage';
-import { Introduction } from './props';
-import { generateColProps, generatePathForRelatedAsset } from './utils';
-import { generateProjectAlarmStatis, transformAssetStatistics } from './asset/props';
+import { generateColProps, combineFinalUrl } from './common/utils';
 import { ColorHealth, ColorOffline } from '../../constants/color';
+import { Introduction } from './components/introductionPage';
+import { OverviewPage } from './components/overviewPage';
+import { generateProjectAlarmStatis, getAssetStatistics } from './common/statisticsHelper';
 
+export type ProjectStatistics = {
+  deviceOfflineNum: number;
+  deviceNum: number;
+  monitoringPointAlarmNum: [number, number, number];
+  monitoringPointNum: number;
+  rootAssetAlarmNum: [number, number, number];
+  rootAssetNum: number;
+};
 const ProjectOverview: React.FC = () => {
   const { pathname, search } = useLocation();
   const colProps = generateColProps({ xl: 8, xxl: 5 });
@@ -68,7 +76,7 @@ const ProjectOverview: React.FC = () => {
       setWindTurbines({
         loading: false,
         items: assets.map((item) => {
-          const { alarmState, statistics } = transformAssetStatistics(
+          const { alarmState, statistics } = getAssetStatistics(
             item.statistics,
             'monitoringPointNum',
             ['anomalous', '异常监测点'],
@@ -80,10 +88,10 @@ const ProjectOverview: React.FC = () => {
             id: item.id,
             title: {
               name: item.name,
-              path: generatePathForRelatedAsset(
+              path: combineFinalUrl(
                 pathname,
                 search,
-                AssetTypes.WindTurbind.id,
+                AssetTypes.WindTurbind.url,
                 item.id
               )
             },

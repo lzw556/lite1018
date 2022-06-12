@@ -5,8 +5,8 @@ import * as React from 'react';
 import Label from '../../../../components/label';
 import HasPermission from '../../../../permission';
 import { Permission } from '../../../../permission/permission';
-import { ChartContainer } from '../../charts/chartContainer';
-import { generateMeasurementHistoryDataOptions } from '../../utils';
+import { generateChartOptionsOfHistoryDatas } from '../../common/historyDataHelper';
+import { ChartContainer } from '../../components/charts/chartContainer';
 import { MeasurementRow } from '../props';
 import { getData } from '../services';
 
@@ -24,7 +24,7 @@ export const HistoryData: React.FC<MeasurementRow> = (props) => {
     getData(id, from.utc().unix(), to.utc().unix()).then((data) => {
       setLoading(false);
       if (data.length > 0) {
-        setHistoryOptions(generateMeasurementHistoryDataOptions(data, property));
+        setHistoryOptions(generateChartOptionsOfHistoryDatas(data, property));
       } else {
         setHistoryOptions(null);
       }
