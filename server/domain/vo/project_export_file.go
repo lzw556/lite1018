@@ -1,10 +1,9 @@
 package vo
 
 type AssetExported struct {
+	ID         uint                   `json:"id"`
 	Name       string                 `json:"name"`
 	Type       uint                   `json:"type"`
-	ParentID   uint                   `json:"parentId"`
-	ProjectID  uint                   `json:"projectId"`
 	Attributes map[string]interface{} `json:"attributes,omitempty"`
 
 	Children         []*AssetExported           `json:"children,omitempty"`
@@ -18,11 +17,12 @@ type DeviceBinding struct {
 }
 
 type MonitoringPointExported struct {
+	ID   uint   `json:"id"`
 	Name string `json:"name"`
 	Type uint   `json:"type"`
 
 	Attributes map[string]interface{} `json:"attributes,omitempty"`
-	Devices    []*DeviceBinding
+	Devices    []*DeviceBinding       `json:"devices"`
 }
 
 type ProjectExported struct {
