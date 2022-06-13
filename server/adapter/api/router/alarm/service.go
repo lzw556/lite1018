@@ -20,12 +20,13 @@ type Service interface {
 	AlarmRuleGroupBind(id uint, req request.AlarmRuleGroupBind) error
 	AlarmRuleGroupUnbind(id uint, req request.AlarmRuleGroupUnbind) error
 	UpdateAlarmRuleGroup(id uint, req request.UpdateAlarmRuleGroup) error
+	GetAlarmRuleGroupByID(id uint) (*vo.AlarmRuleGroup, error)
+	FindAlarmRuleGroups(filters request.Filters) ([]vo.AlarmRuleGroup, error)
 
 	FindAlarmRecordByPaginate(page, size int, from, to int64, filters request.Filters) ([]vo.AlarmRecord, int64, error)
 	GetAlarmRecordByID(id uint) (*vo.AlarmRecord, error)
 	AcknowledgeAlarmRecordByID(id uint, req request.AcknowledgeAlarmRecord) error
 	GetAlarmRecordAcknowledgeByID(id uint) (*vo.AlarmRecordAcknowledge, error)
-	GetAlarmRuleGroupByID(id uint) (*vo.AlarmRuleGroup, error)
 
 	DeleteAlarmRecordByID(id uint) error
 	DeleteAlarmRuleGroupByID(id uint) error

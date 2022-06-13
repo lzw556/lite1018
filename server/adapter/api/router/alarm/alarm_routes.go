@@ -139,6 +139,11 @@ func (r alarmRouter) getAlarmRuleGroup(ctx *gin.Context) (interface{}, error) {
 	return r.service.GetAlarmRuleGroupByID(id)
 }
 
+func (r alarmRouter) findAlarmRuleGroups(ctx *gin.Context) (interface{}, error) {
+	filters := request.NewFilters(ctx)
+	return r.service.FindAlarmRuleGroups(filters)
+}
+
 func (r alarmRouter) alarmRuleGroupBind(ctx *gin.Context) (interface{}, error) {
 	var req request.AlarmRuleGroupBind
 	if err := ctx.ShouldBindJSON(&req); err != nil {

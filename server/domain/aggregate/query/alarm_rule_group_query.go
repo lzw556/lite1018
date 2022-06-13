@@ -2,6 +2,7 @@ package query
 
 import (
 	"context"
+
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
 	spec "github.com/thetasensors/theta-cloud-lite/server/domain/specification"
@@ -49,4 +50,23 @@ func (query AlarmRuleGroupQuery) Get(id uint) (*vo.AlarmRuleGroup, error) {
 	}
 
 	return &result, nil
+}
+
+func (query AlarmRuleGroupQuery) List() ([]vo.AlarmRuleGroup, error) {
+	groups, err := query.alarmRuleGroupRepo.FindBySpecs(context.TODO(), query.Specs...)
+	if err != nil {
+		return []vo.AlarmRuleGroup{}, err
+	}
+
+	result := make([]vo.AlarmRuleGroup, len(groups))
+	for i, group := range groups {
+		g, err := query.Get(group.ID)
+		if err != nil {
+			return []vo.AlarmRuleGroup{}, err
+		}
+
+		result[i] = *g
+	}
+
+	return result, nil
 }

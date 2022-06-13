@@ -184,6 +184,14 @@ func (s Alarm) GetAlarmRuleGroupByID(id uint) (*vo.AlarmRuleGroup, error) {
 	return query.Get(id)
 }
 
+func (s Alarm) FindAlarmRuleGroups(filters request.Filters) ([]vo.AlarmRuleGroup, error) {
+	query, err := s.factory.NewAlarmRuleGroupQuery(filters)
+	if err != nil {
+		return nil, err
+	}
+	return query.List()
+}
+
 func (s Alarm) AlarmRuleGroupBind(id uint, req request.AlarmRuleGroupBind) error {
 	cmd, err := s.factory.NewAlarmRuleGroupBindingCmd(id)
 	if err != nil {

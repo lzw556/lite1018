@@ -179,6 +179,7 @@ func (factory Alarm) NewAlarmRuleGroupCreateCmd(req request.AlarmRuleGroup) (*co
 	e.Description = req.Description
 	e.Type = req.Type
 	e.Category = req.Category
+	e.ProjectID = req.ProjectID
 	e.Status = 1
 
 	cmd := command.NewAlarmRuleGroupCreateCmd()
@@ -223,6 +224,14 @@ func (factory Alarm) NewAlarmRuleGroupRemoveCmd(id uint) (*command.AlarmRuleGrou
 
 func (factory Alarm) NewAlarmRuleGroupQuery(filters request.Filters) (*query.AlarmRuleGroupQuery, error) {
 	q := query.NewAlarmRuleGroupQuery()
+	for name, v := range filters {
+		switch name {
+		case "project_id":
+			q.Specs = append(q.Specs, spec.ProjectEqSpec(cast.ToUint(v)))
+		case "name":
+			q.Specs = append(q.Specs, spec.NameEqSpec(cast.ToString(v)))
+		}
+	}
 	return &q, nil
 }
 

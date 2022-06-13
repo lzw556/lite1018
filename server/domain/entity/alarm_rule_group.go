@@ -15,6 +15,7 @@ type AlarmRuleGroup struct {
 	Description string `gorm:"type:varchar(128)"`
 	Category    uint
 	Type        uint
+	ProjectID   uint
 
 	Status uint8 `gorm:"default:1;not null"`
 }
