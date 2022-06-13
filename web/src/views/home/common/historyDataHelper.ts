@@ -322,11 +322,18 @@ export function generatePropertyColumns(measurement: MeasurementRow) {
   const properties = getFirstClassFields(measurement);
   if (properties.length > 0) {
     return properties
-      .map(({ name, key, unit }) => ({
+      .map(({ name, key, unit, precision }) => ({
         title: `${name}${unit ? `(${unit})` : ''}`,
         key,
         render: ({ data }: MeasurementRow) => {
-          return data ? data.values[key].toString() : '-';
+          if(data && data.values){
+            let value = data.values[key];
+            if(value) {
+              value = round(value, precision ?? 3);
+            }
+            return value.toString();
+          }
+          return '-'
         },
         width: 120
       }))
