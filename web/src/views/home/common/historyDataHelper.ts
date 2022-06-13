@@ -53,7 +53,7 @@ export function generateChartOptionsOfLastestData(measurements: MeasurementRow[]
         let data = NaN;
         const firstClassFieldKeys = getKeysOfFirstClassFields(point.type);
         if (firstClassFieldKeys.length > 0 && point.data) data = point.data.values[firstClassFieldKeys[0]];
-        return { type: 'bar', name: point.name, data, barMaxWidth: 50 };
+        return { type: 'bar', name: point.name, data: [data], barMaxWidth: 50 };
       })
     };
   } else {
@@ -167,7 +167,7 @@ export function generateChartOptionsOfHistoryData(
     return {
       type: 'line',
       name,
-      data: pickHistoryData(data, measurementType.firstClassFieldKeys[0])
+      data: pickHistoryData(data, measurementType.firstClassFieldKeys[0]).map(({data}) => data)
     };
   });
 
