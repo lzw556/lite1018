@@ -264,17 +264,19 @@ export function pickHistoryData(data: HistoryData, propertyName: string) {
     let crtProperty = null;
     for (const property of values) {
       const field = property.fields.find(({ key }) => key === propertyName);
-      if(field){
+      if (field) {
         crtProperty = property;
-        const precision = property.precision ?? 3;
-        value = round(property.data[field.name], precision);
+        value = property.data[field.name];
+        if (value) {
+          const precision = property.precision ?? 3;
+          value = round(value, precision);
+        }
         break;
       }
     }
-    const valueText = Number.isNaN(value) ? '' : `${value}`;
     return {
       property: crtProperty,
-      data: [moment.unix(timestamp).local().format('YYYY-MM-DD HH:mm:ss'), valueText]
+      data: [moment.unix(timestamp).local().format('YYYY-MM-DD HH:mm:ss'), value]
     };
   });
 }
