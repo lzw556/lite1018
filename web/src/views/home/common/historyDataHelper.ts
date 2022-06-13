@@ -44,6 +44,7 @@ export function generateChartOptionsOfLastestData(measurements: MeasurementRow[]
           return text;
         }
       },
+      grid: { bottom: '100'},
       xAxis: {
         type: 'category',
         show: false
