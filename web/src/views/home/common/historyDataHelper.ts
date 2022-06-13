@@ -51,9 +51,13 @@ export function generateChartOptionsOfLastestData(measurements: MeasurementRow[]
       },
       yAxis: { type: 'value' },
       series: measurements.map((point) => {
-        let data = NaN;
-        const firstClassFieldKeys = getKeysOfFirstClassFields(point.type);
-        if (firstClassFieldKeys.length > 0 && point.data) data = point.data.values[firstClassFieldKeys[0]];
+      let data = NaN;
+      const firstClassFields = getFirstClassFields(point);
+      if (firstClassFields.length > 0 && point.data) {
+        const field = firstClassFields[0];
+        data = point.data.values[field.key];
+        if (data) data = round(data, field.precision ?? 3);
+      }
         return { type: 'bar', name: point.name, data: [data], barMaxWidth: 50 };
       })
     };
@@ -198,8 +202,12 @@ function generateActuals(measurements: MeasurementRow[]) {
     })
     .forEach((point, index) => {
       let data = NaN;
-      const firstClassFieldKeys = getKeysOfFirstClassFields(point.type);
-      if (firstClassFieldKeys.length > 0 && point.data) data = point.data.values[firstClassFieldKeys[0]];
+      const firstClassFields = getFirstClassFields(point);
+      if (firstClassFields.length > 0 && point.data) {
+        const field = firstClassFields[0];
+        data = point.data.values[field.key];
+        if (data) data = round(data, field.precision ?? 3);
+      }
       actuals.push([data, index * interval]);
       if (index === 0) first = data;
     });
