@@ -1,5 +1,6 @@
 import request from '../../../utils/request';
 import { DeleteResponse, GetResponse, PostResponse, PutResponse } from '../../../utils/response';
+import { Values_be } from '../../device/hooks/useGetingDeviceData';
 import { HistoryData } from '../common/historyDataHelper';
 import { Measurement, MeasurementRow } from './props';
 
@@ -38,5 +39,15 @@ export function unbindDevice(id: Measurement['id'], device_id: number) {
 }
 
 export function getData(id: Measurement['id'], from: number, to: number, rawOnly: boolean = false) {
-  return request.get<HistoryData>(`/monitoringPoints/${id}/data?from=${from}&to=${to}${rawOnly ? `&type=raw` : ''}`).then(GetResponse);
+  return request
+    .get<HistoryData>(
+      `/monitoringPoints/${id}/data?from=${from}&to=${to}${rawOnly ? `&type=raw` : ''}`
+    )
+    .then(GetResponse);
+}
+
+export function getDynamicData(id: Measurement['id'], timestamp: number) {
+  return request
+    .get<{ timestamp: number; values: Values_be }>(`/monitoringPoints/${id}/data/${timestamp}`)
+    .then(GetResponse);
 }
