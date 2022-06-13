@@ -30,7 +30,10 @@ func NewProjectExportCmd() ProjectExportCmd {
 }
 
 func (cmd ProjectExportCmd) Run() (*vo.ProjectExported, error) {
-	result := vo.ProjectExported{}
+	result := vo.ProjectExported{
+		ID:   cmd.Project.ID,
+		Name: cmd.Project.Name,
+	}
 
 	networks, err := cmd.networkRepo.FindBySpecs(context.TODO(), spec.ProjectEqSpec(cmd.Project.ID))
 	if err != nil {
