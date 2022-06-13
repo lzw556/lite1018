@@ -60,7 +60,7 @@ func (cmd ProjectExportCmd) Run() (*vo.ProjectExported, error) {
 
 func (cmd ProjectExportCmd) appendAssets(p *vo.ProjectExported) error {
 	q := query.NewAssetQuery()
-	q.Specs = []spec.Specification{spec.ProjectEqSpec(cmd.Project.ID)}
+	q.Specs = []spec.Specification{spec.ProjectEqSpec(cmd.Project.ID), spec.ParentIDEqSpec(0)}
 	voAssets, err := q.List()
 	if err != nil {
 		return err
