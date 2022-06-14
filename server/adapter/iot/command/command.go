@@ -163,7 +163,7 @@ func SyncNetwork(network entity.Network, devices []entity.Device, timeout time.D
 func SyncDeviceSettings(gateway entity.Device, devices ...entity.Device) {
 	for i := range devices {
 		device := devices[i]
-		UpdateDeviceSettings(gateway, device)
+		go UpdateDeviceSettings(gateway, device)
 	}
 }
 
