@@ -164,7 +164,7 @@ const MeasurementManagement: React.FC = () => {
       wind.children.length === 0 ||
       (wind.children.length > 0 && wind.children.every(({ monitoringPoints }) => !monitoringPoints))
     )
-      return [<Empty description='没有法兰或监测点' />];
+      return [<Empty description='没有法兰或监测点' image={Empty.PRESENTED_IMAGE_SIMPLE} />];
     return wind.children
       .sort((prev, next) => {
         const { type: prevType } = prev.attributes || { index: 5, type: 4 };

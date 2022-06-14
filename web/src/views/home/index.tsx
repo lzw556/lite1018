@@ -179,6 +179,7 @@ const ProjectOverview: React.FC = () => {
             还没有风机, 去<Link to='/asset-management?locale=asset-management'>创建</Link>
           </p>
         }
+        image={Empty.PRESENTED_IMAGE_SIMPLE}
       />
     );
 

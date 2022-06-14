@@ -137,6 +137,7 @@ const FlangeOverview: React.FC = () => {
             </a>
           </p>
         }
+        image={Empty.PRESENTED_IMAGE_SIMPLE}
       />
     );
 

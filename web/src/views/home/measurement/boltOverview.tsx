@@ -44,7 +44,7 @@ const BoltOverview: React.FC = () => {
       />
     );
   if ((!measurement.bindingDevices) ||(measurement.bindingDevices && measurement.bindingDevices.length === 0))
-    return <Empty description='此监测点异常!' />;
+    return <Empty description='此监测点异常!' image={Empty.PRESENTED_IMAGE_SIMPLE} />;
 
   return (
     <>

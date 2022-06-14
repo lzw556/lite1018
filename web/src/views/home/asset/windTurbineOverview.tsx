@@ -110,6 +110,7 @@ const WindTurbineOverview: React.FC = () => {
             <Link to={`/project-overview?locale=project-overview`}>返回</Link>
           </p>
         }
+        image={Empty.PRESENTED_IMAGE_SIMPLE}
       />
     );
   return (

@@ -30,7 +30,6 @@ export type Overview = {
     };
     options?: ChartOptions<unknown>;
     style?: React.CSSProperties;
-    emptyDescription?: React.ReactNode;
   }[];
   introductionList?: Introduction[];
   tabelList?: TableListItem<any>[];
@@ -48,7 +47,7 @@ export const OverviewPage: React.FC<Overview> = (props) => {
             <Row>
               {statistics.map(({ name, value, className }, index) => (
                 <Col span={4} key={index} {...colProps}>
-                  <Statistic title={name} value={value} className={className}/>
+                  <Statistic title={name} value={value} className={className} />
                 </Col>
               ))}
             </Row>
@@ -59,27 +58,12 @@ export const OverviewPage: React.FC<Overview> = (props) => {
         <Col span={24}>
           <ShadowCard>
             <Row>
-              {chartList.map(({ colProps, options, title, style, emptyDescription }, index) => {
-                let content = null;
-                if (options) {
-                  content = <ChartContainer title={title} options={options} style={style} />;
-                } else {
-                  content = (
-                    <div
-                      style={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        justifyContent: 'center',
-                        height: '100%'
-                      }}
-                    >
-                      <p style={{ textAlign: 'center' }}>{emptyDescription || '暂无数据'}</p>
-                    </div>
-                  );
-                }
+              {chartList.map(({ colProps, options, title, style }, index) => {
                 return (
                   <React.Fragment key={index}>
-                    <Col {...colProps}>{content}</Col>
+                    <Col {...colProps}>
+                      <ChartContainer title={title} options={options} style={style} />
+                    </Col>
                   </React.Fragment>
                 );
               })}

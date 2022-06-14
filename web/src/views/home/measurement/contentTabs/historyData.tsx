@@ -36,7 +36,7 @@ export const HistoryData: React.FC<MeasurementRow> = (props) => {
       if (!options || options.length === 0) {
         return (
           <Col span={24}>
-            <Empty description='暂无数据' />
+            <Empty description='暂无数据' image={Empty.PRESENTED_IMAGE_SIMPLE} />
           </Col>
         );
       } else {

@@ -48,7 +48,7 @@ export const IntroductionPage: React.FC<Introduction> = (props) => {
             </div>
           ))}
       </dl>
-      {chart && chart.options && (
+      {chart && (
         <ChartContainer options={chart.options} title={chart.title} style={chart.style} />
       )}
       <div className={small ? `introduction-icon small` : `introduction-icon`}>{svg}</div>

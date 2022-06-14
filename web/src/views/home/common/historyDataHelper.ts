@@ -11,6 +11,7 @@ export type HistoryData = {
 export function generateChartOptionsOfLastestData(measurements: MeasurementRow[], size: { inner: string; outer: string }) {
   const count = measurements.length;
   if (!count) return null;
+  if(measurements.every(({data}) => !data)) return null;
   const actuals = generateActuals(measurements);
   let minActual = actuals[0][0];
   let maxActual = actuals[0][0];
