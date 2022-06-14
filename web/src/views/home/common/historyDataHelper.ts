@@ -345,7 +345,7 @@ export function generatePropertyColumns(measurement: MeasurementRow) {
             if(value) {
               value = round(value, precision ?? 3);
             }
-            return value.toString();
+            return value ? value.toString() : '-';
           }
           return '-'
         },
