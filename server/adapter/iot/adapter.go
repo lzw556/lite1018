@@ -128,11 +128,12 @@ func (a *Adapter) Run() error {
 		for msg := range a.publishChan {
 			xlog.Infof("publish message to topic: %s payload: %d", msg.Topic, len(msg.Payload))
 			t := a.client.Publish(msg.Topic, msg.Qos, false, msg.Payload)
-			if t.Wait() && t.Error() != nil {
-				xlog.Errorf("publish message error: %s", t.Error())
-				continue
-			}
-			xlog.Infof("publish message to topic: %s success", msg.Topic)
+			go func() {
+				if t.Wait() && t.Error() != nil {
+					xlog.Errorf("publish message error: %s", t.Error())
+					return
+				}
+			}()
 		}
 	}()
 	return nil
