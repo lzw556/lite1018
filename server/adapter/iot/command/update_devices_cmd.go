@@ -7,6 +7,7 @@ import (
 	pd "github.com/thetasensors/theta-cloud-lite/server/adapter/iot/proto"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/utils"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/xlog"
 )
 
 type updateDevicesCmd struct {
@@ -47,6 +48,7 @@ func (cmd updateDevicesCmd) Payload() ([]byte, error) {
 	}
 	m.Items = append(m.Items, toDeviceItem(cmd.gateway))
 	m.Items = addChildren(m.Items, cmd.gateway, cmd.children)
+	xlog.Infof("update %d devices to gateway => [%s]", len(m.Items), cmd.gateway.MacAddress)
 	return proto.Marshal(&m)
 }
 
