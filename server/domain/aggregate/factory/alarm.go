@@ -188,6 +188,8 @@ func (factory Alarm) NewAlarmRuleGroupCreateCmd(req request.AlarmRuleGroup) (*co
 	cmd.AlarmRuleGroup = e
 
 	for _, r := range req.Rules {
+		r.SourceType = req.Type
+		r.Category = uint8(req.Category)
 		c, err := factory.NewAlarmRuleCreateCmd(r)
 		if err != nil {
 			return &cmd, err
