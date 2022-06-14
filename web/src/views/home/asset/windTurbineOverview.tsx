@@ -4,7 +4,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { AssetNavigator } from '../components/assetNavigator';
 import '../home.css';
 import { MeasurementIcon } from '../measurement/icon';
-import { combineFinalUrl } from '../common/utils';
+import { combineFinalUrl, generateColProps } from '../common/utils';
 import { AssetTypes } from '../common/constants';
 import { getAsset } from './services';
 import { AssetRow } from './props';
@@ -72,7 +72,9 @@ const WindTurbineOverview: React.FC = () => {
             const { alarmState, statistics } = getAssetStatistics(
               item.statistics,
               'monitoringPointNum',
-              ['anomalous', '异常监测点']
+              ['anomalous', '异常监测点'],
+              'deviceNum',
+              'offlineDeviceNum'
             );
             return {
               parentId: item.parentId,
@@ -84,7 +86,9 @@ const WindTurbineOverview: React.FC = () => {
               alarmState,
               icon: { svg: <MeasurementIcon />, small: true, focus: true },
               statistics,
-              chart
+              chart,
+              colProps: generateColProps({ md: 12, lg: 12, xl: 12, xxl: 8 }),
+              statisticsLayout: 'horizontal'
             };
           });
         setFlanges(items);

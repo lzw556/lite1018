@@ -7,7 +7,14 @@ export type Title = {
 
 export type Legend = {
   data?: { name: string; itemStyle?: { color: string }; icon?: string }[];
-  bottom: number;
+  bottom: number | string;
+  itemGap?: number;
+  itemWidth?: number;
+  itemHeight?: number;
+  textStyle?: {
+    fontSize: number;
+  }
+  formatter?: any;
 };
 
 export type XAxis = {

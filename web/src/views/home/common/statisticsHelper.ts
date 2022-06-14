@@ -1,7 +1,7 @@
 import { ColorDanger, ColorHealth, ColorInfo, ColorWarn } from "../../../constants/color";
 import { AssetChildrenStatistics } from "../asset/props";
 
-export type NameValue = { name: string; value: string | number };
+export type NameValue = { name: string; value: string | number; className?: string; };
 export type AlarmState = 'normal' | 'info' | 'warn' | 'danger' | 'anomalous';
 export type AlarmStatistics = Map<AlarmState, NameValue>;
 type Visible =
@@ -34,14 +34,16 @@ function tranformVM_AssetStatistics(
     }
     const assetStatis = childrenStatis.get(key as keyof AssetChildrenStatistics);
     const alarmStatis = alarmStatisWithName.get(key as AlarmState);
+    let className = 'half'; // hardcode
     if (assetStatis) {
       value = assetStatis.value;
       if (!name) name = assetStatis.name;
     } else if (alarmStatis) {
       value = alarmStatis.value;
       if (!name) name = alarmStatis.name;
+      className = key as AlarmState;
     }
-    groups.push({ name, value });
+    groups.push({ name, value, className });
   });
   return { statistics: groups, alarmState };
 }

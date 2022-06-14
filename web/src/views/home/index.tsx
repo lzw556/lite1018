@@ -88,12 +88,7 @@ const ProjectOverview: React.FC = () => {
             id: item.id,
             title: {
               name: item.name,
-              path: combineFinalUrl(
-                pathname,
-                search,
-                AssetTypes.WindTurbind.url,
-                item.id
-              )
+              path: combineFinalUrl(pathname, search, AssetTypes.WindTurbind.url, item.id)
             },
             alarmState,
             icon: { svg: <AssetIcon />, small: true },
@@ -152,7 +147,16 @@ const ProjectOverview: React.FC = () => {
         left: 'center',
         top: 'center'
       },
-      legend: { bottom: 20 },
+      legend: {
+        bottom: 20,
+        itemWidth: 15,
+        itemHeight: 14,
+        itemGap: 15,
+        formatter: (itemName: string) => {
+          const series = data.find(({ name }) => itemName === name);
+          return series ? `${itemName} ${series.value}` : itemName;
+        }
+      },
       series: [
         {
           type: 'pie',

@@ -40,11 +40,11 @@ export function generateChartOptionsOfLastestData(measurements: MeasurementRow[]
         trigger: 'axis',
         formatter: (paras: any) => {
           let text = '';
-          paras.forEach(({ seriesName, marker, value }: any) => (text += `${marker} ${seriesName} ${value} <br />`));
+          paras.forEach(({ seriesName, marker, value }: any) => (text += `${marker} ${seriesName} ${value ? value : '-'} <br />`));
           return text;
         }
       },
-      grid: { bottom: '100'},
+      grid: { top: 80, bottom: '100'},
       xAxis: {
         type: 'category',
         show: false
@@ -300,7 +300,11 @@ export function generateChartOptionsOfHistoryDatas(data: HistoryData, propertyNa
           let relVal = params[0].name;
           for (let i = 0; i < params.length; i++) {
             let value = Number(params[i].value);
-            relVal += `<br/> ${params[i].marker} ${params[i].seriesName}: ${value}${property.unit}`;
+            let text = '-'
+            if(value){
+              text = `${value}${property.unit}`;
+            }
+            relVal += `<br/> ${params[i].marker} ${params[i].seriesName}: ${text}`;
           }
           return relVal;
         }

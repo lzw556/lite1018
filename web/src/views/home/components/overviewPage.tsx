@@ -43,12 +43,12 @@ export const OverviewPage: React.FC<Overview> = (props) => {
   return (
     <Row gutter={[0, 16]}>
       {statistics && (
-        <Col span={24}>
+        <Col span={24} className='overview-statistic'>
           <ShadowCard>
             <Row>
-              {statistics.map(({ name, value }, index) => (
+              {statistics.map(({ name, value, className }, index) => (
                 <Col span={4} key={index} {...colProps}>
-                  <Statistic title={name} value={value} />
+                  <Statistic title={name} value={value} className={className}/>
                 </Col>
               ))}
             </Row>
@@ -91,7 +91,7 @@ export const OverviewPage: React.FC<Overview> = (props) => {
         <Col span={24}>
           <Row gutter={[16, 16]}>
             {introductionList.map((des) => (
-              <Col {...colProps2} key={des.id}>
+              <Col {...(des.colProps || colProps2)} key={des.id}>
                 <IntroductionPage {...des} />
               </Col>
             ))}

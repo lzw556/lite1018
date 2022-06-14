@@ -51,7 +51,7 @@ const MeasurementManagement: React.FC = () => {
   const generateTable = (title: string, dataSource: TableProps<any>['dataSource']) => {
     return (
       <>
-        <p style={{ marginBottom: 8 }}>{title}</p>
+        <p style={{ marginBottom: 8, marginTop: 8, fontSize:16 }}>{title}</p>
         <Table
           {...{
             rowKey: 'id',
