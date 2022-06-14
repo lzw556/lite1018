@@ -300,7 +300,7 @@ func (BoltElongation) Properties(sensorID uint) Properties {
 			},
 			{
 				Key:       "pressure",
-				Name:      "压力",
+				Name:      "应力",
 				Unit:      "MPa",
 				Precision: 3,
 				Sort:      1,
@@ -308,7 +308,7 @@ func (BoltElongation) Properties(sensorID uint) Properties {
 				Fields: []Field{
 					{
 						Key:       "pressure",
-						Name:      "压力",
+						Name:      "应力",
 						DataIndex: 8,
 					},
 				},
