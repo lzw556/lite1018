@@ -1,13 +1,13 @@
-import { ColorDanger, ColorHealth, ColorInfo, ColorWarn } from "../../../constants/color";
-import { AssetChildrenStatistics } from "../asset/props";
+import { ColorDanger, ColorHealth, ColorInfo, ColorWarn } from '../../../constants/color';
+import { AssetChildrenStatistics } from '../asset/props';
 
-export type NameValue = { name: string; value: string | number; className?: string; };
+export type NameValue = { name: string; value: string | number; className?: string };
 export type AlarmState = 'normal' | 'info' | 'warn' | 'danger' | 'anomalous';
 export type AlarmStatistics = Map<AlarmState, NameValue>;
 type Visible =
   | (keyof AssetChildrenStatistics | AlarmState)
   | [keyof AssetChildrenStatistics | AlarmState, string];
-  
+
 export function getAssetStatistics(statis: AssetChildrenStatistics, ...visibles: Visible[]) {
   const { alarmNum, monitoringPointNum } = statis;
   const alarmState = getAlarmStateOfAsset(alarmNum);
@@ -115,7 +115,7 @@ function mapAlarmStatistics(statis: Map<AlarmState, number>) {
   return res;
 }
 
-function getAlarmStateText(state: AlarmState) {
+export function getAlarmStateText(state: AlarmState) {
   switch (state) {
     case 'normal':
       return '正常';
@@ -132,7 +132,7 @@ function getAlarmStateText(state: AlarmState) {
   }
 }
 
-function getAlarmLevelColor(state: AlarmState) {
+export function getAlarmLevelColor(state: AlarmState) {
   switch (state) {
     case 'normal':
       return ColorHealth;
@@ -157,4 +157,17 @@ export function generateProjectAlarmStatis(total: number, alarmNum: [number, num
       };
     }
   );
+}
+
+export function convertAlarmLevelToState(level: number) {
+  switch (level) {
+    case 1:
+      return 'info' as AlarmState;
+    case 2:
+      return 'warn' as AlarmState;
+    case 3:
+      return 'danger' as AlarmState;
+    default:
+      return 'unknown' as AlarmState;
+  }
 }

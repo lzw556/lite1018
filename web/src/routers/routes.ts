@@ -228,7 +228,7 @@ const SecondaryRoutes: Menu[] = [
     id: 111,
     name: 'addAlarmRuleGroup',
     path: '/alarm-management',
-    title: '添加规则组',
+    title: '添加规则',
     view: 'AlarmRuleGroupCreation',
     icon: '',
     hidden: true,
