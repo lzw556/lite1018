@@ -91,18 +91,22 @@ const WindTurbineOverview: React.FC = () => {
               statisticsLayout: 'horizontal'
             };
           });
-        setFlanges(items);
+        if (measurements.length > 0){
+          setFlanges(items);
+        }else{
+          setFlanges(undefined);
+        }
       }
     }
   }, [asset, pathname, search]);
 
   if (loading) return <Spin />;
-  if (!flanges || flanges.length === 0)
+  if (!asset || !asset.children || asset.children.length === 0 || !flanges || flanges.length === 0)
     return (
       <Empty
         description={
           <p>
-            还没有法兰, 去<Link to='/asset-management?locale=asset-management'>创建</Link>, 或
+            还没有法兰或监测点, 去<Link to='/asset-management?locale=asset-management'>创建</Link>, 或
             <Link to={`/project-overview?locale=project-overview`}>返回</Link>
           </p>
         }
