@@ -42,13 +42,15 @@ func (cmd DeviceUpdateCmd) UpdateBaseInfo(req request.UpdateDevice) error {
 		}
 		cmd.Device.Parent = req.Parent
 
-		if _, err := cmd.deviceRepo.GetBySpecs(txCtx, spec.DeviceMacEqSpec(req.MacAddress)); err == nil {
-			return response.BusinessErr(errcode.DeviceMacExistsError, req.MacAddress)
+		if cmd.MacAddress != req.MacAddress {
+			if _, err := cmd.deviceRepo.GetBySpecs(txCtx, spec.DeviceMacEqSpec(req.MacAddress)); err == nil {
+				return response.BusinessErr(errcode.DeviceMacExistsError, req.MacAddress)
+			}
+			if err := cmd.deviceRepo.UpdatesBySpecs(txCtx, map[string]interface{}{"parent": req.MacAddress}, spec.ParentEqSpec(cmd.Device.MacAddress)); err != nil {
+				return err
+			}
+			cmd.Device.MacAddress = req.MacAddress
 		}
-		if err := cmd.deviceRepo.UpdatesBySpecs(txCtx, map[string]interface{}{"parent": req.MacAddress}, spec.ParentEqSpec(cmd.Device.MacAddress)); err != nil {
-			return err
-		}
-		cmd.Device.MacAddress = req.MacAddress
 
 		return cmd.deviceRepo.Save(txCtx, &cmd.Device)
 	})
