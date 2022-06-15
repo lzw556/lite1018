@@ -49,18 +49,22 @@ func (cmd request) do(gateway string, target string, request Request, timeout ti
 	if cmd.response != nil {
 		// publish mqtt with response
 		err = eventbus.SubscribeOnce(request.ID(), func(response Response) {
+			xlog.Debugf("received response from %s command => [%s]", request.Name(), target)
 			request.Response() <- response
 		})
 		if err != nil {
 			return nil, response.BusinessErr(errcode.DeviceCommandExecFailedError, err.Error())
 		}
+		xlog.Debugf("publishing %s command => [%s]", request.Name(), target)
 		adapter.IoT.Publish(topic, request.Qos(), payload)
+		xlog.Debugf("published %s command => [%s]", request.Name(), target)
 		select {
-		case resp := <-request.Response():
-			xlog.Debugf("%s command executed successful => [%s]", request.Name(), target)
-			return &resp, nil
 		case <-time.After(timeout * time.Second):
 			return nil, response.BusinessErr(errcode.DeviceCommandSendTimeoutError, "")
+		default:
+			xlog.Debugf("waiting for response from %s command => [%s]", request.Name(), target)
+			resp := <-request.Response()
+			return &resp, nil
 		}
 	} else {
 		// publish mqtt without response
