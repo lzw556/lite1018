@@ -190,6 +190,15 @@ func (factory Alarm) NewAlarmRuleGroupCreateCmd(req request.AlarmRuleGroup) (*co
 	for _, r := range req.Rules {
 		r.SourceType = req.Type
 		r.Category = uint8(req.Category)
+
+		e, err := factory.alarmRuleRepo.GetBySpecs(ctx, spec.NameEqSpec(r.Name))
+		if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, err
+		}
+		if e.ID != 0 {
+			return nil, response.BusinessErr(errcode.AlarmRuleNameExists, "")
+		}
+
 		c, err := factory.NewAlarmRuleCreateCmd(r)
 		if err != nil {
 			return &cmd, err
@@ -232,6 +241,12 @@ func (factory Alarm) NewAlarmRuleGroupQuery(filters request.Filters) (*query.Ala
 			q.Specs = append(q.Specs, spec.ProjectEqSpec(cast.ToUint(v)))
 		case "name":
 			q.Specs = append(q.Specs, spec.NameEqSpec(cast.ToString(v)))
+		case "monitoring_point_ids":
+			values := cast.ToString(v)
+			ids := strings.Split(values, ",")
+			for _, mpID := range ids {
+				q.MonitoringPointIDs = append(q.MonitoringPointIDs, cast.ToUint(mpID))
+			}
 		}
 	}
 	return &q, nil
