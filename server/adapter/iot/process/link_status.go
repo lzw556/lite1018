@@ -61,9 +61,7 @@ func (p LinkStatus) Process(ctx *iot.Context, msg iot.Message) error {
 	// 2 offline 4 reconnecting failed
 	if linkStatus.State != "online" {
 		cache.SetOffline(linkStatus.Address)
-		go p.UpdateChildrenConnectionState(linkStatus.Address, false)
-	} else {
-		go p.UpdateChildrenConnectionState(linkStatus.Address, true)
+		go p.SetChildrenOffline(linkStatus.Address)
 	}
 
 	// 此处不记录设备上线事件, 设备上线事件在deviceStatus中记录
@@ -102,17 +100,13 @@ func (p LinkStatus) addLinkStatusLog(linkStatus entity.LinkStatus) {
 	}
 }
 
-func (p LinkStatus) UpdateChildrenConnectionState(parent string, isOnline bool) {
+func (p LinkStatus) SetChildrenOffline(parent string) {
 	devices, _ := p.deviceRepo.FindBySpecs(context.TODO(), spec.ParentEqSpec(parent))
 	macs := make([]string, len(devices))
 	for i, device := range devices {
 		macs[i] = device.MacAddress
 	}
 	if len(macs) > 0 {
-		if isOnline {
-			cache.BatchSetOnline(macs...)
-		} else {
-			cache.BatchSetOffline(macs...)
-		}
+		cache.BatchSetOffline(macs...)
 	}
 }
