@@ -64,8 +64,6 @@ func (p LinkStatus) Process(ctx *iot.Context, msg iot.Message) error {
 	if linkStatus.State != "online" {
 		cache.SetOffline(linkStatus.Address)
 		go p.UpdateChildrenConnectionState(linkStatus.Address, false)
-	} else {
-		go p.UpdateChildrenConnectionState(linkStatus.Address, true)
 	}
 
 	// 此处不记录设备上线事件, 设备上线事件在deviceStatus中记录
