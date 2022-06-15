@@ -85,6 +85,14 @@ func (s Asset) iterCalcStatistics(asset vo.Asset, result *vo.AssetStatistics) er
 	if asset.MonitoringPoints != nil && len(asset.MonitoringPoints) > 0 {
 		result.MonitoringPointNum += uint(len(asset.MonitoringPoints))
 		for _, mp := range asset.MonitoringPoints {
+			switch mp.AlertLevel {
+			case 1:
+				result.AlarmNum[0]++
+			case 2:
+				result.AlarmNum[1]++
+			case 3:
+				result.AlarmNum[2]++
+			}
 			if mp.BindingDevices != nil && len(mp.BindingDevices) > 0 {
 				result.DeviceNum += uint(len(mp.BindingDevices))
 				for _, dev := range mp.BindingDevices {
@@ -130,6 +138,16 @@ func (s Asset) iterAppendStatistics(asset *vo.Asset) error {
 	}
 
 	asset.Statistics = stat
+
+	if stat.AlarmNum[2] > 0 {
+		asset.AlertLevel = 3
+	} else if stat.AlarmNum[1] > 0 {
+		asset.AlertLevel = 2
+	} else if stat.AlarmNum[0] > 0 {
+		asset.AlertLevel = 1
+	} else {
+		asset.AlertLevel = 0
+	}
 
 	if asset.Children != nil && len(asset.Children) > 0 {
 		for _, child := range asset.Children {

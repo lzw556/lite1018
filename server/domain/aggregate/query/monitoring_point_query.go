@@ -25,6 +25,7 @@ type MonitoringPointQuery struct {
 	monitoringPointRepo              dependency.MonitoringPointRepository
 	monitoringPointDataRepo          dependency.MonitoringPointDataRepository
 	monitoringPointDeviceBindingRepo dependency.MonitoringPointDeviceBindingRepository
+	monitoringPointAlertStateRepo    dependency.MonitoringPointAlertStateRepository
 }
 
 func NewMonitoringPointQuery() MonitoringPointQuery {
@@ -32,6 +33,7 @@ func NewMonitoringPointQuery() MonitoringPointQuery {
 		monitoringPointRepo:              repository.MonitoringPoint{},
 		monitoringPointDataRepo:          repository.MonitoringPointData{},
 		monitoringPointDeviceBindingRepo: repository.MonitoringPointDeviceBinding{},
+		monitoringPointAlertStateRepo:    repository.MonitoringPointAlertState{},
 	}
 }
 
@@ -91,6 +93,10 @@ func (query MonitoringPointQuery) newMonitoringPoint(mp entity.MonitoringPoint) 
 					result.BindingDevices = append(result.BindingDevices, dev)
 				}
 			}
+		}
+
+		if states, err := query.monitoringPointAlertStateRepo.Find(mp.ID); err == nil {
+			result.SetAlertStates(states)
 		}
 	}
 
