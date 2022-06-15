@@ -127,6 +127,22 @@ func (query StatisticQuery) GetAllStatistics() (vo.AllStatistics, error) {
 
 	result.MonitoringPointNum = uint(len(monitoringPoints))
 	result.MonitoringPointAlarmNum = make([]uint, 3)
+	for _, mp := range monitoringPoints {
+		mpQuery := NewMonitoringPointQuery()
+		voMp, err := mpQuery.Get(mp.ID)
+		if err != nil {
+			return result, err
+		}
+
+		switch voMp.AlertLevel {
+		case 1:
+			result.MonitoringPointAlarmNum[0]++
+		case 2:
+			result.MonitoringPointAlarmNum[1]++
+		case 3:
+			result.MonitoringPointAlarmNum[2]++
+		}
+	}
 
 	rootAssetSpecs := append(query.Specs, spec.ParentIDEqSpec(0))
 	rootAssets, err := query.assetRepo.FindBySpecs(ctx, rootAssetSpecs...)
@@ -136,6 +152,22 @@ func (query StatisticQuery) GetAllStatistics() (vo.AllStatistics, error) {
 
 	result.RootAssetNum = uint(len(rootAssets))
 	result.RootAssetAlarmNum = make([]uint, 3)
+	for _, rootAsset := range rootAssets {
+		assetQuery := NewAssetQuery()
+		voAsset, err := assetQuery.Get(rootAsset.ID)
+		if err != nil {
+			return result, err
+		}
+
+		switch voAsset.AlertLevel {
+		case 1:
+			result.RootAssetAlarmNum[0]++
+		case 2:
+			result.RootAssetAlarmNum[1]++
+		case 3:
+			result.RootAssetAlarmNum[2]++
+		}
+	}
 
 	return result, nil
 }
