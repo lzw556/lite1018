@@ -5,6 +5,7 @@ import (
 	"github.com/spf13/cast"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/request"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/response"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/json"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/monitoringpointtype"
 )
 
@@ -88,4 +89,15 @@ func (r monitoringPointRouter) getDataByIDAndTimestamp(ctx *gin.Context) (interf
 	timestamp := cast.ToInt64(ctx.Param("timestamp"))
 	filters := request.NewFilters(ctx)
 	return r.service.GetMonitoringPointDataByIDAndTimestamp(id, monitoringpointtype.MonitoringPointCategoryRaw, timestamp, filters)
+}
+
+func (r monitoringPointRouter) downloadDataByID(ctx *gin.Context) (interface{}, error) {
+	id := cast.ToUint(ctx.Param("id"))
+	from := cast.ToInt64(ctx.Query("from"))
+	to := cast.ToInt64(ctx.Query("to"))
+	var pids []string
+	if err := json.Unmarshal([]byte(ctx.Query("pids")), &pids); err != nil {
+		return nil, err
+	}
+	return r.service.DownloadDataByID(id, pids, from, to, ctx.GetHeader("Timezone"))
 }
