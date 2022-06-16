@@ -71,4 +71,5 @@ export type AlarmRule = {
   monitoringPoints?: MeasurementRow[];
   bindedStatus?: boolean;
   bindingStatus?: boolean;
+  alertLevel?:number;
 };

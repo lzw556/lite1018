@@ -161,6 +161,8 @@ export function generateProjectAlarmStatis(total: number, alarmNum: [number, num
 
 export function convertAlarmLevelToState(level: number) {
   switch (level) {
+    case 0:
+      return 'normal' as AlarmState;
     case 1:
       return 'info' as AlarmState;
     case 2:
@@ -168,6 +170,6 @@ export function convertAlarmLevelToState(level: number) {
     case 3:
       return 'danger' as AlarmState;
     default:
-      return 'unknown' as AlarmState;
+      return 'normal' as AlarmState;
   }
 }

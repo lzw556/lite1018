@@ -1,4 +1,4 @@
-import { Empty, Spin } from 'antd';
+import { Empty, Spin, Tag } from 'antd';
 import moment from 'moment';
 import * as React from 'react';
 import { Link, useLocation, useHistory } from 'react-router-dom';
@@ -11,8 +11,19 @@ import { generateColProps, combineFinalUrl } from '../common/utils';
 import { AssetRow } from './props';
 import { getAsset } from './services';
 import { OverviewPage, TableListItem } from '../components/overviewPage';
-import { getAssetStatistics, NameValue } from '../common/statisticsHelper';
-import { generateChartOptionsOfLastestData, generatePropertyColumns, HistoryData, generateChartOptionsOfHistoryData } from '../common/historyDataHelper';
+import {
+  convertAlarmLevelToState,
+  getAlarmStateText,
+  getAssetStatistics,
+  NameValue,
+  getAlarmLevelColor
+} from '../common/statisticsHelper';
+import {
+  generateChartOptionsOfLastestData,
+  generatePropertyColumns,
+  HistoryData,
+  generateChartOptionsOfHistoryData
+} from '../common/historyDataHelper';
 
 const FlangeOverview: React.FC = () => {
   const { search, pathname } = useLocation();
@@ -23,9 +34,7 @@ const FlangeOverview: React.FC = () => {
   const [measurements, setMeasurements] = React.useState<MeasurementRow[]>();
   const [statistics, setStatistics] = React.useState<NameValue[]>();
   const [statisticOfPreload, setStatisticOfPreload] = React.useState<any>();
-  const [historyDatas, setHistoryDatas] = React.useState<
-    { name: string; data: HistoryData }[]
-  >([]);
+  const [historyDatas, setHistoryDatas] = React.useState<{ name: string; data: HistoryData }[]>([]);
   const [measurementType, setMeasurementType] =
     React.useState<typeof MeasurementTypes.loosening_angle>();
   const commonColumns = React.useMemo(
@@ -35,15 +44,31 @@ const FlangeOverview: React.FC = () => {
         dataIndex: 'name',
         key: 'name',
         render: (name: string, row: MeasurementRow) => (
-          <Link
-            to={combineFinalUrl(pathname, search, MeasurementTypes.preload.url, row.id)}
-          >
+          <Link to={combineFinalUrl(pathname, search, MeasurementTypes.preload.url, row.id)}>
             {name}
           </Link>
         ),
         width: 200
       },
-      { title: '状态', dataIndex: 'state', key: 'state', render: () => '', width: 120 }
+      {
+        title: '状态',
+        dataIndex: 'alarmLevel',
+        key: 'alarmLevel',
+        render: (level: number) => {
+          const alarmState = convertAlarmLevelToState(level);
+          return (
+            <Tag
+              style={{
+                border: `solid 1px ${getAlarmLevelColor(alarmState)}`,
+                color: getAlarmLevelColor(alarmState)
+              }}
+            >
+              {getAlarmStateText(alarmState)}
+            </Tag>
+          );
+        },
+        width: 120
+      }
     ],
     [pathname, search]
   );
