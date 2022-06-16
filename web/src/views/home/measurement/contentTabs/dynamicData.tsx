@@ -165,7 +165,7 @@ export const DynamicData: React.FC<MeasurementRow> = (props) => {
           {
             type: 'line',
             name: field.label,
-            data: (items as number[]).map((item) => item.toFixed(3)),
+            data: (items as number[]).map((item) => item ? item.toFixed(3) : item),
             itemStyle: { color: LineChartStyles[0].itemStyle.normal.color }
           }
         ];
@@ -175,7 +175,7 @@ export const DynamicData: React.FC<MeasurementRow> = (props) => {
           name: axis.label,
           data: (items as Fields_be_axis[])
             .map((item) => item[axis.value])
-            .map((item) => item.toFixed(3)),
+            .map((item) => item ? item.toFixed(3) : item),
           itemStyle: { color: LineChartStyles[index].itemStyle.normal.color }
         }));
       }
