@@ -170,3 +170,12 @@ func (r alarmRouter) updateAlarmRuleGroup(ctx *gin.Context) (interface{}, error)
 	id := cast.ToUint(ctx.Param("id"))
 	return nil, r.service.UpdateAlarmRuleGroup(id, req)
 }
+
+func (r alarmRouter) updateAlarmRuleGroupBindings(ctx *gin.Context) (interface{}, error) {
+	var req request.UpdateAlarmRuleGroupBindings
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		return nil, response.InvalidParameterError(err.Error())
+	}
+	id := cast.ToUint(ctx.Param("id"))
+	return nil, r.service.UpdateAlarmRuleGroupBindings(id, req)
+}

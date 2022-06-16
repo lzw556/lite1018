@@ -19,6 +19,7 @@ type Service interface {
 	RemoveSourcesFromAlarmRule(id uint, sources []uint) error
 	AlarmRuleGroupBind(id uint, req request.AlarmRuleGroupBind) error
 	AlarmRuleGroupUnbind(id uint, req request.AlarmRuleGroupUnbind) error
+	UpdateAlarmRuleGroupBindings(id uint, req request.UpdateAlarmRuleGroupBindings) error
 	UpdateAlarmRuleGroup(id uint, req request.UpdateAlarmRuleGroup) error
 	GetAlarmRuleGroupByID(id uint) (*vo.AlarmRuleGroup, error)
 	FindAlarmRuleGroups(filters request.Filters) ([]vo.AlarmRuleGroup, error)

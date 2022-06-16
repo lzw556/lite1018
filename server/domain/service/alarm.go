@@ -209,3 +209,53 @@ func (s Alarm) AlarmRuleGroupUnbind(id uint, req request.AlarmRuleGroupUnbind) e
 
 	return cmd.Unbind(req)
 }
+
+func (s Alarm) UpdateAlarmRuleGroupBindings(id uint, req request.UpdateAlarmRuleGroupBindings) error {
+	ag, err := s.GetAlarmRuleGroupByID(id)
+	if err != nil {
+		return err
+	}
+
+	addGroup := make([]uint, 0)
+	delGroup := make([]uint, 0)
+	for _, mp := range ag.MonitoringPoints {
+		inNew := false
+		for _, mpID := range req.MonitoringPointIDs {
+			if mpID == mp.ID {
+				inNew = true
+			}
+		}
+
+		if !inNew {
+			delGroup = append(delGroup, mp.ID)
+		}
+	}
+
+	for _, mpID := range req.MonitoringPointIDs {
+		inOld := false
+		for _, mp := range ag.MonitoringPoints {
+			if mp.ID == mpID {
+				inOld = true
+				break
+			}
+		}
+
+		if !inOld {
+			addGroup = append(addGroup, mpID)
+		}
+	}
+
+	if err := s.AlarmRuleGroupBind(id, request.AlarmRuleGroupBind{
+		MonitoringPointIDs: addGroup,
+	}); err != nil {
+		return err
+	}
+
+	if err := s.AlarmRuleGroupUnbind(id, request.AlarmRuleGroupUnbind{
+		MonitoringPointIDs: delGroup,
+	}); err != nil {
+		return err
+	}
+
+	return nil
+}

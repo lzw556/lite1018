@@ -77,3 +77,7 @@ type UpdateAlarmRuleGroup struct {
 
 	ProjectID uint `json:"-"`
 }
+
+type UpdateAlarmRuleGroupBindings struct {
+	MonitoringPointIDs []uint `json:"monitoring_point_ids"`
+}

@@ -173,12 +173,15 @@ func (query AssetQuery) List() ([]vo.Asset, error) {
 	ctx := context.TODO()
 	es, err := query.assetRepo.FindBySpecs(ctx, query.Specs...)
 	if err != nil {
-		return nil, err
+		return []vo.Asset{}, err
 	}
 	result := make([]vo.Asset, len(es))
 	for i, asset := range es {
 		result[i] = query.newAsset(asset)
 		query.iterSetChildren(&result[i])
+		if err := query.iterAppendStatistics(&result[i]); err != nil {
+			return []vo.Asset{}, err
+		}
 	}
 	return result, nil
 }
