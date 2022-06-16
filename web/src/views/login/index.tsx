@@ -37,8 +37,8 @@ const LoginPage: FC = () => {
             <Row justify="center" align="bottom">
                 <Col span={24}>
                     <Space size={48}>
-                        <img src={logo} alt="ThetaSensors"/>
-                        <Typography.Text strong className="title">云监控平台</Typography.Text>
+                        <img src={logo} alt="ThetaSensors" style={{height: 80}}/>
+                        <Typography.Text strong className="title">风力发电螺栓监测系统</Typography.Text>
                     </Space>
                 </Col>
             </Row>
