@@ -12,7 +12,9 @@ import { Menu as MenuPro } from '../../../types/menu';
 import { Node } from '../common/treeDataHelper';
 
 type BreadcrumbItemData = Node & { type?: number };
-export const AssetNavigator: React.FC<Pick<Node, 'id' | 'parentId'>> = ({ id, parentId }) => {
+export const AssetNavigator: React.FC<
+  Pick<Node, 'id' | 'parentId'> & { isForceRefresh?: boolean }
+> = ({ id, parentId, isForceRefresh }) => {
   const history = useHistory();
   const { pathname, search } = useLocation();
   const [assets, setAssets] = React.useState<AssetRow[]>([]);
@@ -38,7 +40,7 @@ export const AssetNavigator: React.FC<Pick<Node, 'id' | 'parentId'>> = ({ id, pa
   }, [pathname]);
   React.useEffect(() => {
     getAssets({ type: AssetTypes.WindTurbind.id }).then(setAssets);
-  }, []);
+  }, [isForceRefresh]);
 
   React.useEffect(() => {
     const findParent = (id: number, source: Node[], paths: { parentId: number; id: number }[]) => {

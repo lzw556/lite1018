@@ -50,14 +50,16 @@ export function convertRow(values?: MeasurementRow): Measurement | null {
 }
 
 export type AlarmRule = {
+  id: number;
   name: string;
   description: string;
   category: number;
   type: number;
   rules: {
+    id: number;
     name: string;
     description: string;
-    index: any;
+    index?: any;
     duration: number;
     operation: string;
     threshold: number;
@@ -66,4 +68,7 @@ export type AlarmRule = {
     category: number;
     metric: any;
   }[];
+  monitoringPoints?: MeasurementRow[];
+  bindedStatus?: boolean;
+  bindingStatus?: boolean;
 };

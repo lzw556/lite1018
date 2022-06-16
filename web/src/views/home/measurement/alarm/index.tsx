@@ -1,6 +1,7 @@
 import { DeleteOutlined, EditOutlined, MoreOutlined, PlusOutlined } from '@ant-design/icons';
 import { Button, Empty, Popconfirm, Space, Table, TableProps, Tag } from 'antd';
 import * as React from 'react';
+import { Link } from 'react-router-dom';
 import { MeasurementTypes } from '../../common/constants';
 import {
   convertAlarmLevelToState,
@@ -9,7 +10,7 @@ import {
 } from '../../common/statisticsHelper';
 import { SearchResultPage } from '../../components/searchResultPage';
 import { AlarmRule } from '../props';
-import { getAlarmRules } from '../services';
+import { deleteAlarmRule, getAlarmRules } from '../services';
 import { MeasurementBind } from './measurementBind';
 
 const AlarmRuleList = () => {
@@ -56,7 +57,7 @@ const AlarmRuleList = () => {
     };
   };
   const [result, setResult] = React.useState<TableProps<any>>({
-    rowKey: (row: any) => `${row.id}-${row.type}`,
+    rowKey: 'id',
     columns: [
       {
         title: '名称',
@@ -81,15 +82,17 @@ const AlarmRuleList = () => {
           return (
             <Space>
               <Button type='text' size='small' title={`编辑`}>
-                <EditOutlined />
+                <Link to={`alarm-management?locale=alarmRules/editAlarmRuleGroup&id=${row.id}`}>
+                  <EditOutlined />
+                </Link>
               </Button>
               <Popconfirm
-                title={`确定要删除该吗?`}
-                // onConfirm={() => {
-                //   deleteAsset(row.id).then(() => {
-                //     fetchAssets({ type: AssetTypes.WindTurbind.id });
-                //   });
-                // }}
+                title={`确定要删除该规则吗?`}
+                onConfirm={() => {
+                  deleteAlarmRule(row.id).then(() => {
+                    fetchAlarmRules();
+                  });
+                }}
               >
                 <Button type='text' danger={true} size='small' title={`删除`}>
                   <DeleteOutlined />
@@ -117,10 +120,15 @@ const AlarmRuleList = () => {
     locale: { emptyText: <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description='暂无数据' /> }
   });
 
-  React.useEffect(() => {
+  const fetchAlarmRules = () => {
+    setResult((prev) => ({ ...prev, loading: true }));
     getAlarmRules().then((data) => {
       setResult((prev) => ({ ...prev, loading: false, dataSource: data }));
     });
+  };
+
+  React.useEffect(() => {
+    fetchAlarmRules();
   }, []);
 
   return (
@@ -136,12 +144,16 @@ const AlarmRuleList = () => {
         results: [<Table {...result} />]
       }}
     >
-      {visible && (
+      {visible && selectedRow && (
         <MeasurementBind
           {...{
             visible,
             onCancel: () => setVisible(false),
-            selectedRow
+            selectedRow,
+            onSuccess: () => {
+              setVisible(false);
+              fetchAlarmRules();
+            }
           }}
         />
       )}

@@ -234,6 +234,17 @@ const SecondaryRoutes: Menu[] = [
     hidden: true,
     isAuth: true,
     children: []
+  },
+  {
+    id: 112,
+    name: 'editAlarmRuleGroup',
+    path: '/alarm-management',
+    title: '编辑规则',
+    view: 'AlarmRuleGroupEdit',
+    icon: '',
+    hidden: true,
+    isAuth: true,
+    children: []
   }
 ];
 

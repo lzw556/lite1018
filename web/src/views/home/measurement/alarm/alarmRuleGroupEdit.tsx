@@ -1,39 +1,29 @@
-import { MinusCircleOutlined } from '@ant-design/icons';
-import { Button, Cascader, Divider, Form, Input, Select } from 'antd';
+import { Button, Divider, Form, Input, Select } from 'antd';
 import * as React from 'react';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useLocation } from 'react-router-dom';
 import { CheckAlarmRuleNameRequest } from '../../../../apis/alarm';
 import MyBreadcrumb from '../../../../components/myBreadcrumb';
 import ShadowCard from '../../../../components/shadowCard';
 import { defaultValidateMessages, Normalizes, Rules } from '../../../../constants/validator';
 import { MeasurementTypes } from '../../common/constants';
 import { AlarmRule } from '../props';
-import { addAlarmRule, getPropertiesByMeasurementType } from '../services';
+import { getAlarmRule, updateAlarmRule } from '../services';
 
-interface DataNode {
-  label: React.ReactNode;
-  title?: string;
-  value: string | number;
-  disabled?: boolean;
-  children?: DataNode[];
-  isLeaf?: boolean;
-  loading?: boolean;
-  firstClassFieldKeys?: string[];
-}
-
-const AlarmRuleGroupCreation = () => {
+const AlarmRuleGroupEdit = () => {
   const history = useHistory();
+  const { search } = useLocation();
+  const id = Number(search.substring(search.lastIndexOf('id=') + 3));
   const [form] = Form.useForm();
-  const allOptions = Object.values(MeasurementTypes).map(({ label, id, firstClassFieldKeys }) => ({
-    value: id,
-    label,
-    isLeaf: false,
-    firstClassFieldKeys
-  }));
-  const [options, setOptions] = React.useState<DataNode[]>(allOptions);
-  const [properties, setProperties] = React.useState<any[]>([]);
-  const [metric, setMetric] = React.useState<{ key: string; name: string; unit: string }[]>([]);
-  const [disabled, setDisabled] = React.useState(true);
+  const [rule, setRule] = React.useState<AlarmRule>();
+  React.useEffect(() => {
+    getAlarmRule(id).then(setRule);
+  }, [id]);
+
+  React.useEffect(() => {
+    if (rule) {
+      form.setFieldsValue(rule);
+    }
+  }, [rule, form]);
 
   const onNameValidator = (rule: any, value: any) => {
     return new Promise<void>((resolve, reject) => {
@@ -57,6 +47,7 @@ const AlarmRuleGroupCreation = () => {
     });
   };
 
+  if (!rule) return null;
   return (
     <>
       <MyBreadcrumb />
@@ -72,22 +63,7 @@ const AlarmRuleGroupCreation = () => {
             name='type'
             rules={[{ required: true, message: '请选择监测点类型' }]}
           >
-            <Select
-              style={{ width: '25%', minWidth: 80 }}
-              onChange={(e) => {
-                setDisabled(false);
-                setOptions(allOptions.filter((node) => node.value === e));
-                const formData: AlarmRule['rules'] = form.getFieldValue('rules');
-                if (formData && formData.length > 0) {
-                  form.setFieldsValue(
-                    formData.map((field) => {
-                      delete field.index;
-                      return field;
-                    })
-                  );
-                }
-              }}
-            >
+            <Select disabled={true} style={{ width: '25%', minWidth: 80 }}>
               {Object.values(MeasurementTypes).map(({ label, id }) => (
                 <Select.Option key={id} value={id}>
                   {label}
@@ -95,15 +71,15 @@ const AlarmRuleGroupCreation = () => {
               ))}
             </Select>
           </Form.Item>
-          <Form.Item label='名称' name='name' rules={[Rules.range(4, 16)]}>
+          <Form.Item label='名称' name='name'>
             <Input placeholder={`请填写名称`} />
           </Form.Item>
-          <Form.Item label='描述' name='description' initialValue=''>
+          <Form.Item label='描述' name='description'>
             <Input placeholder={`请填写描述`} />
           </Form.Item>
           <Divider />
-          <Form.List name='rules' initialValue={[0]}>
-            {(fields, { add, remove }) => (
+          <Form.List name='rules'>
+            {(fields) => (
               <>
                 {fields.map(({ key, name, ...restFields }, index) => (
                   <div key={key} style={{ position: 'relative' }}>
@@ -111,66 +87,16 @@ const AlarmRuleGroupCreation = () => {
                       label='名称'
                       {...restFields}
                       name={[name, 'name']}
-                      rules={[Rules.range(4, 16), { validator: onNameValidator }]}
-                      dependencies={index === 0 ? undefined : ['user', index - 1, 'name']}
+                      rules={
+                        index < rule.rules.length
+                          ? undefined
+                          : [Rules.range(4, 16), { validator: onNameValidator }]
+                      }
                     >
-                      <Input placeholder={`请填写名称`} />
+                      <Input placeholder={`请填写名称`} readOnly={index < rule.rules.length} />
                     </Form.Item>
-                    <Form.Item
-                      label='描述'
-                      {...restFields}
-                      name={[name, 'description']}
-                      initialValue=''
-                    >
+                    <Form.Item label='描述' {...restFields} name={[name, 'description']}>
                       <Input placeholder={`请填写描述`} />
-                    </Form.Item>
-                    <Form.Item
-                      {...restFields}
-                      name={[name, 'index']}
-                      label='指标名称'
-                      rules={[{ required: true, message: '请选择指标名称' }]}
-                    >
-                      <Cascader
-                        placeholder={'请选择指标名称'}
-                        options={options}
-                        disabled={disabled}
-                        loadData={(selectedOptions: any) => {
-                          const targetOption = selectedOptions[selectedOptions.length - 1];
-                          targetOption.loading = true;
-                          getPropertiesByMeasurementType(Number(targetOption.value))
-                            .then((data) => {
-                              targetOption.loading = false;
-                              const properties = data.filter((property) =>
-                                targetOption.firstClassFieldKeys?.find(
-                                  (key: any) => key === property.key
-                                )
-                              );
-                              targetOption.children = properties.map((item) => {
-                                return { value: item.key, label: item.name };
-                              });
-                              setOptions([...options]);
-                              setProperties(properties);
-                            })
-                            .catch((_) => {
-                              targetOption.loading = false;
-                            });
-                        }}
-                        onChange={(values: any) => {
-                          let prop = properties.find(
-                            (item) => item.key === values[values.length - 1]
-                          );
-                          if (prop && prop.fields.length === 1) {
-                            setMetric((prev) => [
-                              ...prev,
-                              {
-                                key: prop.key + '.' + prop.fields[0].key,
-                                name: prop.name,
-                                unit: prop.unit
-                              }
-                            ]);
-                          }
-                        }}
-                      />
                     </Form.Item>
                     <Form.Item
                       label='周期'
@@ -188,7 +114,7 @@ const AlarmRuleGroupCreation = () => {
                           {...restFields}
                           name={[name, 'operation']}
                           noStyle
-                          initialValue={'>='}
+                          initialValue='>='
                         >
                           <Select style={{ width: '30%', minWidth: 80 }}>
                             <Select.Option key={'>'} value={'>'}>
@@ -213,7 +139,11 @@ const AlarmRuleGroupCreation = () => {
                         >
                           <Input
                             style={{ width: '70%' }}
-                            suffix={metric.length > 0 && metric[index] ? metric[index].unit : ''}
+                            suffix={
+                              rule.rules.length > 0 && rule.rules[index]
+                                ? rule.rules[index].metric.unit
+                                : ''
+                            }
                           />
                         </Form.Item>
                       </Input.Group>
@@ -231,19 +161,9 @@ const AlarmRuleGroupCreation = () => {
                         </Select.Option>
                       </Select>
                     </Form.Item>
-                    {name !== 0 && (
-                      <Button
-                        icon={<MinusCircleOutlined />}
-                        style={{ position: 'absolute', top: 0 }}
-                        onClick={() => remove(name)}
-                      />
-                    )}
                     <Divider />
                   </div>
                 ))}
-                <Form.Item wrapperCol={{ offset: 2 }}>
-                  <Button onClick={() => add()}>添加规则</Button>
-                </Form.Item>
               </>
             )}
           </Form.List>
@@ -255,19 +175,19 @@ const AlarmRuleGroupCreation = () => {
                   const final = {
                     ...values,
                     category: 2,
-                    rules: values.rules.map((rule, index) => ({
-                      ...rule,
-                      threshold: Number(rule.threshold),
-                      metric: metric[index]
+                    rules: values.rules.map((_rule) => ({
+                      ..._rule,
+                      threshold: Number(_rule.threshold),
+                      description: _rule.description || ''
                     }))
                   };
-                  addAlarmRule(final).then(() =>
+                  updateAlarmRule(id, final).then(() =>
                     history.replace(`alarm-management?locale=alarmRules`)
                   );
                 });
               }}
             >
-              创建
+              保存
             </Button>
           </Form.Item>
         </Form>
@@ -276,4 +196,4 @@ const AlarmRuleGroupCreation = () => {
   );
 };
 
-export default AlarmRuleGroupCreation;
+export default AlarmRuleGroupEdit;
