@@ -108,3 +108,11 @@ func (s Project) GetMyProjectExportFile(id uint) (*vo.ProjectExported, error) {
 	}
 	return cmd.Run()
 }
+
+func (s Project) ImportProject(id uint, req request.ProjectImported) error {
+	cmd, err := s.factory.NewProjectImportCmd(id)
+	if err != nil {
+		return err
+	}
+	return cmd.ImportProject(req)
+}
