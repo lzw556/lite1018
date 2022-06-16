@@ -305,7 +305,7 @@ export function generateChartOptionsOfHistoryDatas(data: HistoryData, propertyNa
         }
       },
       legend: { show: !!propertyName },
-      grid: { bottom: 20 },
+      grid: { bottom: 20, left: 50 },
       title: {
         text: `${property.name}${property.unit ? `(${property.unit})` : ''}`,
         subtext: propertyName ? '' : `${seriesData.map(({ name, data }) => name + ' ' + data[data.length - 1])}`
