@@ -196,5 +196,5 @@ func (cmd ProjectImportCmd) createBinding(mp entity.MonitoringPoint, binding req
 		return err
 	}
 
-	return err
+	return nil
 }
