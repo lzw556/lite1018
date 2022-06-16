@@ -68,7 +68,7 @@ function calculateAlarmStatis(
   statis.set('warn', 0);
   statis.set('danger', 0);
   statis.set('anomalous', 0);
-  if (alarmNum.length === 3) {
+  if (alarmNum && alarmNum.length === 3) {
     statis.set('info', alarmNum[0]);
     statis.set('warn', alarmNum[1]);
     statis.set('danger', alarmNum[2]);
