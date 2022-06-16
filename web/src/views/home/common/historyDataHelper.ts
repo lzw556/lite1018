@@ -57,7 +57,7 @@ export function generateChartOptionsOfLastestData(measurements: MeasurementRow[]
       if (firstClassFields.length > 0 && point.data) {
         const field = firstClassFields[0];
         data = point.data.values[field.key];
-        if (data) data = round(data, field.precision ?? 3);
+        if (data) data = roundValue(data, field.precision);
       }
         return { type: 'bar', name: point.name, data: [data], barMaxWidth: 50 };
       })
@@ -207,7 +207,7 @@ function generateActuals(measurements: MeasurementRow[]) {
       if (firstClassFields.length > 0 && point.data) {
         const field = firstClassFields[0];
         data = point.data.values[field.key];
-        if (data) data = round(data, field.precision ?? 3);
+        if (data) data = roundValue(data, field.precision);
       }
       actuals.push([data, index * interval]);
       if (index === 0) first = data;
@@ -257,8 +257,7 @@ export function getHistoryDatas(data: HistoryData, propertyName?: string) {
             if (crtField) value = crtProperty.data[field.name];
           }
           if (value) {
-            const precision = property.precision ?? 3;
-            value = round(value, precision);
+            value = roundValue(value, property.precision);
           }
           return value;
         });
@@ -268,7 +267,7 @@ export function getHistoryDatas(data: HistoryData, propertyName?: string) {
     });
 }
 
-export function pickHistoryData(data: HistoryData, propertyName: string) {
+function pickHistoryData(data: HistoryData, propertyName: string) {
   return data.map(({ timestamp, values }) => {
     let value = NaN;
     let crtProperty = null;
@@ -278,8 +277,7 @@ export function pickHistoryData(data: HistoryData, propertyName: string) {
         crtProperty = property;
         value = property.data[field.name];
         if (value) {
-          const precision = property.precision ?? 3;
-          value = round(value, precision);
+          value = roundValue(value, property.precision);
         }
         break;
       }
@@ -301,11 +299,7 @@ export function generateChartOptionsOfHistoryDatas(data: HistoryData, propertyNa
           let relVal = params[0].name;
           for (let i = 0; i < params.length; i++) {
             let value = Number(params[i].value);
-            let text = '-'
-            if(value){
-              text = `${value}${property.unit}`;
-            }
-            relVal += `<br/> ${params[i].marker} ${params[i].seriesName}: ${text}`;
+            relVal += `<br/> ${params[i].marker} ${params[i].seriesName}: ${getDisplayValue(value, undefined, property.unit)}`;
           }
           return relVal;
         }
@@ -340,14 +334,11 @@ export function generatePropertyColumns(measurement: MeasurementRow) {
         title: `${name}${unit ? `(${unit})` : ''}`,
         key,
         render: ({ data }: MeasurementRow) => {
+          let value = NaN;
           if(data && data.values){
-            let value = data.values[key];
-            if(value) {
-              value = round(value, precision ?? 3);
-            }
-            return value ? value.toString() : '-';
+            value = data.values[key];
           }
-          return '-'
+          return getDisplayValue(value, precision);
         },
         width: 120
       }))
@@ -361,6 +352,19 @@ export function generatePropertyColumns(measurement: MeasurementRow) {
       });
   }
   return [];
+}
+
+function getDisplayValue(value: number | null | undefined, precision?: number, unit?: string) {
+  if (Number.isNaN(value) || value === null || value === undefined) return '-';
+  let finalValue = value;
+  if (value) {
+    finalValue = roundValue(value, precision);
+  }
+  return `${finalValue}${unit ?? ''}`;
+}
+
+function roundValue(value: number, precision?: number){
+  return round(value, precision ?? 3)
 }
 
 function getKeysOfFirstClassFields(measurementType: number) {
