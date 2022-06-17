@@ -267,7 +267,7 @@ func (query MonitoringPointQuery) DownloadData(id uint, pids []string, from, to 
 		for i, data := range mpData {
 			axis = 65
 			_ = result.File.SetCellValue("Sheet1", fmt.Sprintf("A%d", i+cellOffset), time.Unix(data.Timestamp, 0).In(location).Format("2006-01-02 15:04:05"))
-			if properties, ok := data.Values.(vo.Properties); ok {
+			if properties, ok := data.Values.(vo.MPProperties); ok {
 				for _, property := range properties {
 					if _, ok := downloadKeys[property.Key]; ok {
 						for _, v := range property.Data {
@@ -278,7 +278,12 @@ func (query MonitoringPointQuery) DownloadData(id uint, pids []string, from, to 
 				}
 			}
 		}
+
 		return &result, nil
 	}
 	return nil, response.BusinessErr(errcode.UnknownDeviceTypeError, "")
 }
+
+// func (query AssetQuery) DownloadRawData(id uint, category uint, timestamp time.Time, filters request.Filters) (*vo.ExcelFile, error) {
+
+// }
