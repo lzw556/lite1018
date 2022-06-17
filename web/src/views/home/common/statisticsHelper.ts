@@ -73,6 +73,7 @@ function calculateAlarmStatis(
     statis.set('warn', alarmNum[1]);
     statis.set('danger', alarmNum[2]);
     statis.set('anomalous', alarmNum[0] + alarmNum[1] + alarmNum[2]);
+    statis.set('normal', total - alarmNum[0] - alarmNum[1] - alarmNum[2]);
   }
   if (excludedStates && excludedStates.length > 0) {
     return new Map(
