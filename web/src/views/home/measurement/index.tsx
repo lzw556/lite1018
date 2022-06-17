@@ -77,8 +77,9 @@ const MeasurementManagement: React.FC = () => {
               },
               {
                 title: '状态',
-                dataIndex: 'alarmLevel',
-                key: 'alarmLevel',
+                dataIndex: 'alertLevel',
+                key: 'alertLevel',
+                width: 120,
                 render: (level: number) => {
                   const alarmState = convertAlarmLevelToState(level);
                   return (

@@ -32,6 +32,7 @@ export type MeasurementRow = {
     timestamp: number;
     values: { [propName: string]: number };
   };
+  alertLevel?: number
 };
 
 export function convertRow(values?: MeasurementRow): Measurement | null {
