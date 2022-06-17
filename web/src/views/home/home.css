@@ -87,7 +87,7 @@ dl.name-value-groups.horizontal{
   width: 30px;
   height: 30px;
 }
-.introduction.normal.focus .introduction-icon {
+.introduction.focus .introduction-icon {
   background-color: #fff;
 }
 .introduction.normal.focus .introduction-icon .icon-svg {
