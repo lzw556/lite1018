@@ -14,18 +14,22 @@ import (
 type AlarmRecordUpdateCmd struct {
 	entity.AlarmRecord
 
-	alarmRecordRepo      dependency.AlarmRecordRepository
-	acknowledgeRepo      dependency.AlarmRecordAcknowledgeRepository
-	deviceAlertStateRepo dependency.DeviceAlertStateRepository
-	deviceRepo           dependency.DeviceRepository
+	alarmRecordRepo               dependency.AlarmRecordRepository
+	acknowledgeRepo               dependency.AlarmRecordAcknowledgeRepository
+	deviceAlertStateRepo          dependency.DeviceAlertStateRepository
+	deviceRepo                    dependency.DeviceRepository
+	monitoringPointRepo           dependency.MonitoringPointRepository
+	monitoringPointAlertStateRepo dependency.MonitoringPointAlertStateRepository
 }
 
 func NewAlarmRecordUpdateCmd() AlarmRecordUpdateCmd {
 	return AlarmRecordUpdateCmd{
-		alarmRecordRepo:      repository.AlarmRecord{},
-		acknowledgeRepo:      repository.AlarmRecordAcknowledge{},
-		deviceAlertStateRepo: repository.DeviceAlertState{},
-		deviceRepo:           repository.Device{},
+		alarmRecordRepo:               repository.AlarmRecord{},
+		acknowledgeRepo:               repository.AlarmRecordAcknowledge{},
+		deviceAlertStateRepo:          repository.DeviceAlertState{},
+		deviceRepo:                    repository.Device{},
+		monitoringPointRepo:           repository.MonitoringPoint{},
+		monitoringPointAlertStateRepo: repository.MonitoringPointAlertState{},
 	}
 }
 
@@ -48,6 +52,10 @@ func (cmd AlarmRecordUpdateCmd) AcknowledgeBy(req request.AcknowledgeAlarmRecord
 			case entity.AlarmRuleCategoryDevice:
 				if device, err := cmd.deviceRepo.Get(txCtx, cmd.AlarmRecord.SourceID); err == nil {
 					return cmd.deviceAlertStateRepo.Delete(device.MacAddress, cmd.AlarmRecord.AlarmRuleID)
+				}
+			case entity.AlarmRuleCategoryMonitoringPoint:
+				if mp, err := cmd.monitoringPointRepo.Get(txCtx, cmd.AlarmRecord.SourceID); err == nil {
+					return cmd.monitoringPointAlertStateRepo.Delete(mp.ID, cmd.AlarmRecord.AlarmRuleID)
 				}
 			}
 			return nil
