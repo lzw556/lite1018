@@ -26,3 +26,11 @@ export function deleteAsset(id: Asset['id']) {
 export function getProjectStatistics() {
   return request.get<ProjectStatistics>(`/statistics/all`).then(GetResponse);
 }
+
+export function exportAssets(id: number) {
+  return request.download<any>(`my/projects/${id}/exportFile`);
+}
+
+export function importAssets(id: number, data: any) {
+  return request.post<any>(`my/projects/${id}/import`, data);
+}
