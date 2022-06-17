@@ -70,8 +70,8 @@ func (proc *Process) ProcessDeviceSensorData(dev entity.Device, sensorData entit
 
 			if alarmRules, err := proc.alarmRuleRepo.FindBySpecs(context.TODO(), spec.PrimaryKeyInSpec(ids), spec.CategoryEqSpec(entity.AlarmRuleCategoryMonitoringPoint)); err == nil {
 				proc.mu.Lock()
-				defer proc.mu.Unlock()
 				ruleengine.ExecuteSelectedRules(mp.ID, alarmRules...)
+				proc.mu.Unlock()
 			}
 		}
 	}

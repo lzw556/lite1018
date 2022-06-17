@@ -28,6 +28,7 @@ func (r *alarmRouter) initRoutes() {
 		// GET
 		router.NewGetRoute("alarmRules", r.findAlarmRules),
 		router.NewGetRoute("alarmRules/:id", r.getAlarmRule),
+		router.NewGetRoute("alarmRuleGroups", r.findAlarmRuleGroups),
 		router.NewGetRoute("alarmRuleGroups/:id", r.getAlarmRuleGroup),
 
 		router.NewGetRoute("alarmRecords", r.findAlarmRecords),
@@ -40,6 +41,7 @@ func (r *alarmRouter) initRoutes() {
 		router.NewPutRoute("alarmRules/:id", r.updateAlarmRule),
 		router.NewPutRoute("alarmRules/:id/status/:status", r.updateAlarmRuleStatus),
 		router.NewPutRoute("alarmRuleGroups/:id", r.updateAlarmRuleGroup),
+		router.NewPutRoute("alarmRuleGroups/:id/bindings", r.updateAlarmRuleGroupBindings),
 
 		//DELETE
 		router.NewDeleteRoute("alarmRules/:id", r.deleteAlarmRule),

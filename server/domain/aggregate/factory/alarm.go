@@ -179,6 +179,7 @@ func (factory Alarm) NewAlarmRuleGroupCreateCmd(req request.AlarmRuleGroup) (*co
 	e.Description = req.Description
 	e.Type = req.Type
 	e.Category = req.Category
+	e.ProjectID = req.ProjectID
 	e.Status = 1
 
 	cmd := command.NewAlarmRuleGroupCreateCmd()
@@ -187,6 +188,18 @@ func (factory Alarm) NewAlarmRuleGroupCreateCmd(req request.AlarmRuleGroup) (*co
 	cmd.AlarmRuleGroup = e
 
 	for _, r := range req.Rules {
+		r.SourceType = req.Type
+		r.Category = uint8(req.Category)
+		r.ProjectID = req.ProjectID
+
+		e, err := factory.alarmRuleRepo.GetBySpecs(ctx, spec.NameEqSpec(r.Name))
+		if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, err
+		}
+		if e.ID != 0 {
+			return nil, response.BusinessErr(errcode.AlarmRuleNameExists, "")
+		}
+
 		c, err := factory.NewAlarmRuleCreateCmd(r)
 		if err != nil {
 			return &cmd, err
@@ -223,6 +236,20 @@ func (factory Alarm) NewAlarmRuleGroupRemoveCmd(id uint) (*command.AlarmRuleGrou
 
 func (factory Alarm) NewAlarmRuleGroupQuery(filters request.Filters) (*query.AlarmRuleGroupQuery, error) {
 	q := query.NewAlarmRuleGroupQuery()
+	for name, v := range filters {
+		switch name {
+		case "project_id":
+			q.Specs = append(q.Specs, spec.ProjectEqSpec(cast.ToUint(v)))
+		case "name":
+			q.Specs = append(q.Specs, spec.NameEqSpec(cast.ToString(v)))
+		case "monitoring_point_ids":
+			values := cast.ToString(v)
+			ids := strings.Split(values, ",")
+			for _, mpID := range ids {
+				q.MonitoringPointIDs = append(q.MonitoringPointIDs, cast.ToUint(mpID))
+			}
+		}
+	}
 	return &q, nil
 }
 

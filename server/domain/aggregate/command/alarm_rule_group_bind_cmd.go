@@ -14,31 +14,45 @@ import (
 type AlarmRuleGroupBindCmd struct {
 	entity.AlarmRuleGroup
 
-	AlarmRuleGroupRepo dependency.AlarmRuleGroupRepository
-	AlarmSourceRepo    dependency.AlarmSourceRepository
+	AlarmRuleGroupRepo       dependency.AlarmRuleGroupRepository
+	AlarmRuleGroupSourceRepo dependency.AlarmRuleGroupSourceRepository
+	AlarmSourceRepo          dependency.AlarmSourceRepository
+	MonitoringPointRepo      dependency.MonitoringPointRepository
 }
 
 func NewAlarmRuleGroupBindCmd() AlarmRuleGroupBindCmd {
 	return AlarmRuleGroupBindCmd{
-		AlarmRuleGroupRepo: repository.AlarmRuleGroup{},
-		AlarmSourceRepo:    repository.AlarmSource{},
+		AlarmRuleGroupRepo:       repository.AlarmRuleGroup{},
+		AlarmRuleGroupSourceRepo: repository.AlarmRuleGroupSource{},
+		AlarmSourceRepo:          repository.AlarmSource{},
+		MonitoringPointRepo:      repository.MonitoringPoint{},
 	}
 }
 
 func (cmd AlarmRuleGroupBindCmd) Bind(req request.AlarmRuleGroupBind) error {
 	return transaction.Execute(context.TODO(), func(txCtx context.Context) error {
-		for _, binding := range req.Bindings {
-			result, err := cmd.AlarmSourceRepo.FindBySpecs(txCtx, spec.SourceEqSpec(binding.SourceID), spec.AlarmRuleEqSpec(binding.AlarmRuleID))
-			if err != nil {
+		bindings, err := cmd.AlarmRuleGroupSourceRepo.FindBySpecs(txCtx, spec.GroupIDEqSpec(cmd.AlarmRuleGroup.ID))
+		if err != nil {
+			return err
+		}
+
+		for _, mpID := range req.MonitoringPointIDs {
+			if _, err := cmd.MonitoringPointRepo.Get(txCtx, mpID); err != nil {
 				return err
 			}
-			if len(result) == 0 {
-				err := cmd.AlarmSourceRepo.Create(txCtx, entity.AlarmSource{
-					SourceID:    binding.SourceID,
-					AlarmRuleID: binding.AlarmRuleID,
-				})
+			for _, binding := range bindings {
+				result, err := cmd.AlarmSourceRepo.FindBySpecs(txCtx, spec.SourceEqSpec(mpID), spec.AlarmRuleEqSpec(binding.AlarmRuleID))
 				if err != nil {
 					return err
+				}
+				if len(result) == 0 {
+					err := cmd.AlarmSourceRepo.Create(txCtx, entity.AlarmSource{
+						SourceID:    mpID,
+						AlarmRuleID: binding.AlarmRuleID,
+					})
+					if err != nil {
+						return err
+					}
 				}
 			}
 		}
@@ -49,10 +63,21 @@ func (cmd AlarmRuleGroupBindCmd) Bind(req request.AlarmRuleGroupBind) error {
 
 func (cmd AlarmRuleGroupBindCmd) Unbind(req request.AlarmRuleGroupUnbind) error {
 	return transaction.Execute(context.TODO(), func(txCtx context.Context) error {
-		for _, binding := range req.Bindings {
-			err := cmd.AlarmSourceRepo.DeleteBySpecs(txCtx, spec.SourceEqSpec(binding.SourceID), spec.AlarmRuleEqSpec(binding.AlarmRuleID))
-			if err != nil {
+		bindings, err := cmd.AlarmRuleGroupSourceRepo.FindBySpecs(txCtx, spec.GroupIDEqSpec(cmd.AlarmRuleGroup.ID))
+		if err != nil {
+			return err
+		}
+
+		for _, mpID := range req.MonitoringPointIDs {
+			if _, err := cmd.MonitoringPointRepo.Get(txCtx, mpID); err != nil {
 				return err
+			}
+
+			for _, binding := range bindings {
+				err := cmd.AlarmSourceRepo.DeleteBySpecs(txCtx, spec.SourceEqSpec(mpID), spec.AlarmRuleEqSpec(binding.AlarmRuleID))
+				if err != nil {
+					return err
+				}
 			}
 		}
 

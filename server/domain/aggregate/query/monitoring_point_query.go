@@ -2,6 +2,7 @@ package query
 
 import (
 	"context"
+	"fmt"
 	"sort"
 	"time"
 
@@ -17,6 +18,7 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/devicetype"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/errcode"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/monitoringpointtype"
+	"github.com/xuri/excelize/v2"
 )
 
 type MonitoringPointQuery struct {
@@ -25,6 +27,7 @@ type MonitoringPointQuery struct {
 	monitoringPointRepo              dependency.MonitoringPointRepository
 	monitoringPointDataRepo          dependency.MonitoringPointDataRepository
 	monitoringPointDeviceBindingRepo dependency.MonitoringPointDeviceBindingRepository
+	monitoringPointAlertStateRepo    dependency.MonitoringPointAlertStateRepository
 }
 
 func NewMonitoringPointQuery() MonitoringPointQuery {
@@ -32,6 +35,7 @@ func NewMonitoringPointQuery() MonitoringPointQuery {
 		monitoringPointRepo:              repository.MonitoringPoint{},
 		monitoringPointDataRepo:          repository.MonitoringPointData{},
 		monitoringPointDeviceBindingRepo: repository.MonitoringPointDeviceBinding{},
+		monitoringPointAlertStateRepo:    repository.MonitoringPointAlertState{},
 	}
 }
 
@@ -91,6 +95,10 @@ func (query MonitoringPointQuery) newMonitoringPoint(mp entity.MonitoringPoint) 
 					result.BindingDevices = append(result.BindingDevices, dev)
 				}
 			}
+		}
+
+		if states, err := query.monitoringPointAlertStateRepo.Find(mp.ID); err == nil {
+			result.SetAlertStates(states)
 		}
 	}
 
@@ -206,3 +214,76 @@ func (query MonitoringPointQuery) GetDataByIDAndTimestamp(id uint, category uint
 
 	return &result, nil
 }
+
+func (query MonitoringPointQuery) DownloadData(id uint, pids []string, from, to time.Time, timezone string) (*vo.ExcelFile, error) {
+	mp, err := query.monitoringPointRepo.Get(context.TODO(), id)
+
+	if err != nil {
+		return nil, response.BusinessErr(errcode.MonitoringPointNotFoundError, err.Error())
+	}
+
+	downloadKeys := make(map[string]struct{})
+	for _, key := range pids {
+		downloadKeys[key] = struct{}{}
+	}
+	result := vo.ExcelFile{
+		Name: fmt.Sprintf("%s_%s_%s.xlsx", mp.Name, from.Format("20060102"), to.Format("20060102")),
+		File: excelize.NewFile(),
+	}
+	if t := monitoringpointtype.Get(mp.Type); t != nil {
+		mpData, err := query.FindMonitoringPointDataByID(id, from, to)
+		if err != nil {
+			return nil, err
+		}
+		// set cell title
+		axis := 65
+		_ = result.File.SetCellValue("Sheet1", "A1", "时间")
+		for _, property := range t.Properties() {
+			if _, ok := downloadKeys[property.Key]; ok {
+				axis = axis + 1
+				_ = result.File.SetCellValue("Sheet1", fmt.Sprintf("%s1", string(rune(axis))), property.Name)
+				_ = result.File.MergeCell("Sheet1", fmt.Sprintf("%s1", string(rune(axis))), fmt.Sprintf("%s1", string(rune(axis+len(property.Fields)-1))))
+				// if device.IsSVT() {
+				// 	for i, field := range property.Fields {
+				// 		_ = result.File.SetCellValue("Sheet1", fmt.Sprintf("%s2", string(rune(axis+i))), field.Name)
+				// 	}
+				// }
+				axis += len(property.Fields) - 1
+			}
+		}
+
+		// set cell timezone
+		location, err := time.LoadLocation(timezone)
+		if err != nil {
+			location, _ = time.LoadLocation("Local")
+		}
+
+		// set cell value
+		cellOffset := 2
+		// if device.IsSVT() {
+		// 	cellOffset = 3
+		// }
+
+		for i, data := range mpData {
+			axis = 65
+			_ = result.File.SetCellValue("Sheet1", fmt.Sprintf("A%d", i+cellOffset), time.Unix(data.Timestamp, 0).In(location).Format("2006-01-02 15:04:05"))
+			if properties, ok := data.Values.(vo.MPProperties); ok {
+				for _, property := range properties {
+					if _, ok := downloadKeys[property.Key]; ok {
+						for _, v := range property.Data {
+							axis += 1
+							_ = result.File.SetCellValue("Sheet1", fmt.Sprintf("%s%d", string(rune(axis)), i+cellOffset), v)
+						}
+					}
+				}
+			}
+		}
+
+		return &result, nil
+	}
+	return nil, response.BusinessErr(errcode.UnknownDeviceTypeError, "")
+}
+
+// func (query AssetQuery) DownloadRawData(id uint, category uint, timestamp time.Time, filters request.Filters) (*vo.ExcelFile, error) {
+
+// }

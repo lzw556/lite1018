@@ -28,6 +28,79 @@ func (query AssetQuery) newAsset(asset entity.Asset) vo.Asset {
 	return vo.NewAsset(asset)
 }
 
+func (query AssetQuery) iterCalcStatistics(asset vo.Asset, result *vo.AssetStatistics) error {
+	if asset.MonitoringPoints != nil && len(asset.MonitoringPoints) > 0 {
+		result.MonitoringPointNum += uint(len(asset.MonitoringPoints))
+		for _, mp := range asset.MonitoringPoints {
+			switch mp.AlertLevel {
+			case 1:
+				result.AlarmNum[0]++
+			case 2:
+				result.AlarmNum[1]++
+			case 3:
+				result.AlarmNum[2]++
+			}
+			if mp.BindingDevices != nil && len(mp.BindingDevices) > 0 {
+				result.DeviceNum += uint(len(mp.BindingDevices))
+				for _, dev := range mp.BindingDevices {
+					if !dev.State.IsOnline {
+						result.OfflineDeviceNum += 1
+					}
+				}
+			}
+		}
+	}
+
+	if asset.Children != nil {
+		for _, c := range asset.Children {
+			err := query.iterCalcStatistics(*c, result)
+			if err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
+}
+
+func (query AssetQuery) getStatistics(asset vo.Asset) (vo.AssetStatistics, error) {
+	result := vo.NewAssetStatistics(asset.ID)
+
+	err := query.iterCalcStatistics(asset, &result)
+
+	return result, err
+}
+
+func (query AssetQuery) iterAppendStatistics(asset *vo.Asset) error {
+	stat, err := query.getStatistics(*asset)
+	if err != nil {
+		return err
+	}
+
+	asset.Statistics = stat
+
+	if stat.AlarmNum[2] > 0 {
+		asset.AlertLevel = 3
+	} else if stat.AlarmNum[1] > 0 {
+		asset.AlertLevel = 2
+	} else if stat.AlarmNum[0] > 0 {
+		asset.AlertLevel = 1
+	} else {
+		asset.AlertLevel = 0
+	}
+
+	if asset.Children != nil && len(asset.Children) > 0 {
+		for _, child := range asset.Children {
+			err := query.iterAppendStatistics(child)
+			if err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
+}
+
 func (query AssetQuery) Get(assetId uint) (vo.Asset, error) {
 	e, err := query.assetRepo.Get(context.TODO(), assetId)
 	if err != nil {
@@ -36,6 +109,9 @@ func (query AssetQuery) Get(assetId uint) (vo.Asset, error) {
 
 	voAsset := query.newAsset(e)
 	query.iterSetChildren(&voAsset)
+	if err := query.iterAppendStatistics(&voAsset); err != nil {
+		return voAsset, err
+	}
 
 	return voAsset, nil
 }
@@ -97,12 +173,15 @@ func (query AssetQuery) List() ([]vo.Asset, error) {
 	ctx := context.TODO()
 	es, err := query.assetRepo.FindBySpecs(ctx, query.Specs...)
 	if err != nil {
-		return nil, err
+		return []vo.Asset{}, err
 	}
 	result := make([]vo.Asset, len(es))
 	for i, asset := range es {
 		result[i] = query.newAsset(asset)
 		query.iterSetChildren(&result[i])
+		if err := query.iterAppendStatistics(&result[i]); err != nil {
+			return []vo.Asset{}, err
+		}
 	}
 	return result, nil
 }

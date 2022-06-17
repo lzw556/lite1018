@@ -79,3 +79,12 @@ func (r projectRouter) getMyProjectExportFile(ctx *gin.Context) (interface{}, er
 	id := cast.ToUint(ctx.Param("id"))
 	return r.service.GetMyProjectExportFile(id)
 }
+
+func (r projectRouter) importProject(ctx *gin.Context) (interface{}, error) {
+	var req request.ProjectImported
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		return nil, err
+	}
+	id := cast.ToUint(ctx.Param("id"))
+	return nil, r.service.ImportProject(id, req)
+}

@@ -79,3 +79,13 @@ func (factory Project) NewProjectExportCmd(id uint) (*command.ProjectExportCmd, 
 	cmd.Project = e
 	return &cmd, nil
 }
+
+func (factory Project) NewProjectImportCmd(id uint) (*command.ProjectImportCmd, error) {
+	e, err := factory.projectRepo.Get(context.TODO(), id)
+	if err != nil {
+		return nil, response.BusinessErr(errcode.ProjectNotFoundError, "")
+	}
+	cmd := command.NewProjectImportCmd()
+	cmd.Project = e
+	return &cmd, nil
+}

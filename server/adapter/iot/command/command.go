@@ -21,7 +21,6 @@ import (
 
 var deviceRepo = repository.Device{}
 var networkRepo = repository.Network{}
-var eventRepo = repository.Event{}
 
 func isOnline(mac string) bool {
 	state, _, _ := cache.GetConnection(mac)

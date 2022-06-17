@@ -20,7 +20,7 @@ func NewAssetCreateCmd() AssetCreateCmd {
 	}
 }
 
-func (cmd AssetCreateCmd) Run() error {
+func (cmd *AssetCreateCmd) Run() error {
 	ctx := context.TODO()
 	if err := cmd.assetRepo.Create(ctx, &cmd.Asset); err != nil {
 		return err

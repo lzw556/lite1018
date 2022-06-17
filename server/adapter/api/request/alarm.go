@@ -61,11 +61,11 @@ type AlarmRuleGroupBinding struct {
 }
 
 type AlarmRuleGroupBind struct {
-	Bindings []AlarmRuleGroupBinding `json:"bindings"`
+	MonitoringPointIDs []uint `json:"monitoring_point_ids"`
 }
 
 type AlarmRuleGroupUnbind struct {
-	Bindings []AlarmRuleGroupBinding `json:"bindings"`
+	MonitoringPointIDs []uint `json:"monitoring_point_ids"`
 }
 
 type UpdateAlarmRuleGroup struct {
@@ -76,4 +76,8 @@ type UpdateAlarmRuleGroup struct {
 	Type        uint        `json:"type"`
 
 	ProjectID uint `json:"-"`
+}
+
+type UpdateAlarmRuleGroupBindings struct {
+	MonitoringPointIDs []uint `json:"monitoring_point_ids"`
 }

@@ -103,3 +103,8 @@ func (s MonitoringPoint) GetMonitoringPointDataByIDAndTimestamp(id uint, categor
 	query := s.factory.NewMonitoringPointQuery(nil)
 	return query.GetDataByIDAndTimestamp(id, category, time.Unix(timestamp, 0), filters)
 }
+
+func (s MonitoringPoint) DownloadDataByID(id uint, pids []string, from, to int64, timezone string) (*vo.ExcelFile, error) {
+	query := s.factory.NewMonitoringPointQuery(nil)
+	return query.DownloadData(id, pids, time.Unix(from, 0), time.Unix(to, 0), timezone)
+}
