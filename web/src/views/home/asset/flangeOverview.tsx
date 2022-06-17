@@ -34,7 +34,9 @@ const FlangeOverview: React.FC = () => {
   const [measurements, setMeasurements] = React.useState<MeasurementRow[]>();
   const [statistics, setStatistics] = React.useState<NameValue[]>();
   const [statisticOfPreload, setStatisticOfPreload] = React.useState<any>();
-  const [historyDatas, setHistoryDatas] = React.useState<{ name: string; data: HistoryData }[]>([]);
+  const [historyDatas, setHistoryDatas] = React.useState<
+    { name: string; data: HistoryData; index: number }[]
+  >([]);
   const [measurementType, setMeasurementType] =
     React.useState<typeof MeasurementTypes.loosening_angle>();
   const commonColumns = React.useMemo(
@@ -128,9 +130,10 @@ const FlangeOverview: React.FC = () => {
       const from = moment().startOf('day').subtract(7, 'd').utc().unix();
       const to = moment().endOf('day').utc().unix();
       setHistoryDatas([]);
-      measurements.forEach(({ id, name }) => {
+      measurements.forEach(({ id, name, attributes }) => {
         getData(id, from, to).then((data) => {
-          if (data.length > 0) setHistoryDatas((prev) => [...prev, { name, data }]);
+          if (data.length > 0)
+            setHistoryDatas((prev) => [...prev, { name, data, index: attributes?.index ?? 0 }]);
         });
       });
     }
@@ -138,7 +141,12 @@ const FlangeOverview: React.FC = () => {
 
   React.useEffect(() => {
     if (historyDatas.length > 0 && measurementType) {
-      setStatisticOfPreload(generateChartOptionsOfHistoryData(historyDatas, measurementType));
+      setStatisticOfPreload(
+        generateChartOptionsOfHistoryData(
+          historyDatas.sort((prev, next) => prev.index - next.index),
+          measurementType
+        )
+      );
     }
   }, [historyDatas, measurementType]);
 
