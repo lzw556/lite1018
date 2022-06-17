@@ -46,6 +46,6 @@ type NetworkImported struct {
 }
 
 type ProjectImported struct {
-	Networks []NetworkImported `json:"networks"`
-	Assets   []AssetImported   `json:"assets"`
+	Networks []NetworkImported `json:"networks" binding:"required"`
+	Assets   []AssetImported   `json:"assets" binding:"required"`
 }
