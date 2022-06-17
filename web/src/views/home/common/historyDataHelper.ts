@@ -29,6 +29,11 @@ export function generateChartOptionsOfLastestData(measurements: MeasurementRow[]
   const _maxinum = generateCircle(measurements, circleMax);
   const specification = generateSpecification((minActual + maxActual) / 2);
   if (measurements[0].type === MeasurementTypes.loosening_angle.id) {
+    const firstClassFields = getFirstClassFields(measurements[0]);
+    let field: any = null;
+    if (firstClassFields.length > 0) {
+      field = firstClassFields[0];
+    }
     return {
       title: {
         text: '',
@@ -41,7 +46,7 @@ export function generateChartOptionsOfLastestData(measurements: MeasurementRow[]
         trigger: 'axis',
         formatter: (paras: any) => {
           let text = '';
-          paras.forEach(({ seriesName, marker, value }: any) => (text += `${marker} ${seriesName} ${value ? value : '-'} <br />`));
+          paras.forEach(({ seriesName, marker, value }: any) => (text += `<div style='display:flex;justify-content:space-between;'><span style='flex:0 0 auto'>${marker} ${seriesName}</span><strong style='flex:0 0 auto; text-align:right;text-indent:1em;'>${getDisplayValue(value, field.precision, field.unit)}</strong></div>`));
           return text;
         }
       },
@@ -53,9 +58,7 @@ export function generateChartOptionsOfLastestData(measurements: MeasurementRow[]
       yAxis: { type: 'value' },
       series: measurements.map((point) => {
       let data = NaN;
-      const firstClassFields = getFirstClassFields(point);
-      if (firstClassFields.length > 0 && point.data) {
-        const field = firstClassFields[0];
+      if (field && point.data) {
         data = point.data.values[field.key];
         if (data) data = roundValue(data, field.precision);
       }
@@ -169,11 +172,14 @@ export function generateChartOptionsOfHistoryData(
   history: { name: string; data: HistoryData }[],
   measurementType: typeof MeasurementTypes.loosening_angle
 ) {
+  let crtProperty:any = null;
   const series = history.map(({name, data }) => {
+    const { property, seriesData} = pickHistoryData(data, measurementType.firstClassFieldKeys[0]);
+    crtProperty = property;
     return {
       type: 'line',
       name,
-      data: pickHistoryData(data, measurementType.firstClassFieldKeys[0]).map(({data}) => data)
+      data: seriesData
     };
   });
 
@@ -183,9 +189,8 @@ export function generateChartOptionsOfHistoryData(
       left: 'center'
     },
     legend: { bottom: 0 },
-    tooltip: { trigger: 'axis' },
+    tooltip: { trigger: 'axis', valueFormatter: (value: any) => `${getDisplayValue(value, crtProperty?.precision, crtProperty?.unit)}` },
     xAxis: { type: 'time' },
-    // yAxis: { type: 'value', min: 290, max: 360 },
     yAxis: { type: 'value' },
     series
   };
@@ -268,9 +273,9 @@ export function getHistoryDatas(data: HistoryData, propertyName?: string) {
 }
 
 function pickHistoryData(data: HistoryData, propertyName: string) {
-  return data.map(({ timestamp, values }) => {
+  let crtProperty: any = null;
+  const seriesData = data.map(({ timestamp, values }) => {
     let value = NaN;
-    let crtProperty = null;
     for (const property of values) {
       const field = property.fields.find(({ key }) => key === propertyName);
       if (field) {
@@ -282,11 +287,9 @@ function pickHistoryData(data: HistoryData, propertyName: string) {
         break;
       }
     }
-    return {
-      property: crtProperty,
-      data: [moment.unix(timestamp).local().format('YYYY-MM-DD HH:mm:ss'), value]
-    };
+    return [moment.unix(timestamp).local().format('YYYY-MM-DD HH:mm:ss'), value];
   });
+  return {property: crtProperty, seriesData};
 }
 
 export function generateChartOptionsOfHistoryDatas(data: HistoryData, propertyName?: string) {
