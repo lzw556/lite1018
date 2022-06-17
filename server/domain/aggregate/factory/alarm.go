@@ -190,6 +190,7 @@ func (factory Alarm) NewAlarmRuleGroupCreateCmd(req request.AlarmRuleGroup) (*co
 	for _, r := range req.Rules {
 		r.SourceType = req.Type
 		r.Category = uint8(req.Category)
+		r.ProjectID = req.ProjectID
 
 		e, err := factory.alarmRuleRepo.GetBySpecs(ctx, spec.NameEqSpec(r.Name))
 		if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
