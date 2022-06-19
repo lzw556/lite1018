@@ -12,13 +12,13 @@ type Service interface {
 	DeleteMonitoringPointByID(id uint) error
 	BindDevice(id uint, req request.BindDevice) error
 	UnbindDevice(id uint, req request.UnbindDevice) error
-
 	FindMonitoringPointsByPaginate(page, size int, filters request.Filters) ([]vo.MonitoringPoint, int64, error)
 	FindMonitoringPoints(filters request.Filters) ([]vo.MonitoringPoint, error)
+
 	FindMonitoringPointRawDataByID(id uint, from, to int64) ([]vo.MonitoringPointData, error)
 	FindMonitoringPointDataByID(id uint, from, to int64) ([]vo.MonitoringPointData, error)
 	GetMonitoringPointDataByIDAndTimestamp(id uint, category uint, timestamp int64, filters request.Filters) (*vo.MonitoringPointData, error)
-
 	DownloadDataByID(id uint, pids []string, from, to int64, timezone string) (*vo.ExcelFile, error)
 	DownloadDataByIDAndTimestmap(id uint, category uint, timestamp int64, filers request.Filters) (*vo.ExcelFile, error)
+	RemoveDataByID(id uint, category uint, from, to int64) error
 }

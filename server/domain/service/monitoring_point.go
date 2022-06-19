@@ -113,3 +113,11 @@ func (s MonitoringPoint) DownloadDataByIDAndTimestmap(id uint, category uint, ti
 	query := s.factory.NewMonitoringPointQuery(nil)
 	return query.DownloadRawData(id, time.Unix(timestamp, 0), filters)
 }
+
+func (s MonitoringPoint) RemoveDataByID(id uint, category uint, from, to int64) error {
+	cmd, err := s.factory.NewMonitoringPointRemoveCmd(id)
+	if err != nil {
+		return err
+	}
+	return cmd.RemoveData(category, time.Unix(from, 0), time.Unix(to, 0))
+}

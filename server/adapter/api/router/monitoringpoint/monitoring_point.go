@@ -33,6 +33,7 @@ func (r *monitoringPointRouter) initRoutes() {
 		router.NewPutRoute("monitoringPoints/:id", r.update),
 
 		router.NewDeleteRoute("monitoringPoints/:id", r.delete),
+		router.NewDeleteRoute("monitoringPoints/:id/data", r.removeDataByID),
 	}
 }
 

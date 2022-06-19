@@ -349,9 +349,7 @@ func (query MonitoringPointQuery) downloadKxSensorData(mp entity.MonitoringPoint
 }
 
 func (query MonitoringPointQuery) DownloadRawData(id uint, timestamp time.Time, filters request.Filters) (*vo.ExcelFile, error) {
-
 	mp, err := query.monitoringPointRepo.Get(context.TODO(), id)
-
 	if err != nil {
 		return nil, response.BusinessErr(errcode.MonitoringPointNotFoundError, err.Error())
 	}

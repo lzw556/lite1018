@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"time"
 
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
@@ -15,12 +16,14 @@ type MonitoringPointRemoveCmd struct {
 
 	monitoringPointRepo              dependency.MonitoringPointRepository
 	monitoringPointDeviceBindingRepo dependency.MonitoringPointDeviceBindingRepository
+	monitoringPointDataRepo          dependency.MonitoringPointDataRepository
 }
 
 func NewMonitoringPointRemoveCmd() MonitoringPointRemoveCmd {
 	return MonitoringPointRemoveCmd{
 		monitoringPointRepo:              repository.MonitoringPoint{},
 		monitoringPointDeviceBindingRepo: repository.MonitoringPointDeviceBinding{},
+		monitoringPointDataRepo:          repository.MonitoringPointData{},
 	}
 }
 
@@ -32,4 +35,8 @@ func (cmd MonitoringPointRemoveCmd) Run() error {
 
 		return cmd.monitoringPointRepo.Delete(txCtx, cmd.MonitoringPoint.ID)
 	})
+}
+
+func (cmd MonitoringPointRemoveCmd) RemoveData(category uint, from time.Time, to time.Time) error {
+	return cmd.monitoringPointDataRepo.Delete(cmd.MonitoringPoint.ID, category, from, to)
 }
