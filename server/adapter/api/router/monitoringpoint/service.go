@@ -20,4 +20,5 @@ type Service interface {
 	GetMonitoringPointDataByIDAndTimestamp(id uint, category uint, timestamp int64, filters request.Filters) (*vo.MonitoringPointData, error)
 
 	DownloadDataByID(id uint, pids []string, from, to int64, timezone string) (*vo.ExcelFile, error)
+	DownloadDataByIDAndTimestmap(id uint, category uint, timestamp int64, filers request.Filters) (*vo.ExcelFile, error)
 }

@@ -101,3 +101,10 @@ func (r monitoringPointRouter) downloadDataByID(ctx *gin.Context) (interface{}, 
 	}
 	return r.service.DownloadDataByID(id, pids, from, to, ctx.GetHeader("Timezone"))
 }
+
+func (r monitoringPointRouter) downloadDataByIDAndTimestamp(ctx *gin.Context) (interface{}, error) {
+	id := cast.ToUint(ctx.Param("id"))
+	timestamp := cast.ToInt64(ctx.Param("timestamp"))
+	filters := request.NewFilters(ctx)
+	return r.service.DownloadDataByIDAndTimestmap(id, monitoringpointtype.MonitoringPointCategoryRaw, timestamp, filters)
+}
