@@ -2,7 +2,6 @@ package command
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
@@ -58,27 +57,21 @@ func NewProjectDeleteCmd() ProjectDeleteCmd {
 func (cmd ProjectDeleteCmd) Run() error {
 	return transaction.Execute(context.TODO(), func(txCtx context.Context) error {
 		if err := cmd.removeMonitoringPoints(txCtx); err != nil {
-			fmt.Printf("#### 2\n")
 			return err
 		}
 		if err := cmd.removeAssets(txCtx); err != nil {
-			fmt.Printf("#### 10\n")
 			return err
 		}
 		if err := cmd.removeDevices(txCtx); err != nil {
-			fmt.Printf("#### 3\n")
 			return err
 		}
 		if err := cmd.removeAlarms(txCtx); err != nil {
-			fmt.Printf("#### 4\n")
 			return err
 		}
 		if err := cmd.removeEvents(txCtx); err != nil {
-			fmt.Printf("#### 5\n")
 			return err
 		}
 		if err := cmd.removeUserProjectRelation(txCtx); err != nil {
-			fmt.Printf("#### 6\n")
 			return err
 		}
 		return cmd.projectRepo.Delete(txCtx, cmd.Project.ID)
