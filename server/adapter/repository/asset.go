@@ -52,3 +52,7 @@ func (repo Asset) FindBySpecs(ctx context.Context, specs ...specification.Specif
 	err := repo.DB(ctx).Scopes(specification.Scopes(specs)...).Find(&es).Error
 	return es, err
 }
+
+func (repo Asset) DeleteBySpecs(ctx context.Context, specs ...specification.Specification) error {
+	return repo.DB(ctx).Scopes(specification.Scopes(specs)...).Delete(&entity.Asset{}).Error
+}

@@ -52,3 +52,7 @@ func (repo MonitoringPoint) FindBySpecs(ctx context.Context, specs ...specificat
 	err := repo.DB(ctx).Scopes(specification.Scopes(specs)...).Find(&es).Error
 	return es, err
 }
+
+func (repo MonitoringPoint) DeleteBySpecs(ctx context.Context, specs ...specification.Specification) error {
+	return repo.DB(ctx).Scopes(specification.Scopes(specs)...).Delete(&entity.MonitoringPoint{}).Error
+}

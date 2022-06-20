@@ -90,6 +90,10 @@ func (repo DeviceAlertState) DeleteAll(mac string) error {
 		if err != nil {
 			return err
 		}
-		return bucket.DeleteBucket([]byte(mac))
+		if err = bucket.DeleteBucket([]byte(mac)); err != nil && err.Error() != "bucket not found" {
+			return err
+		} else {
+			return nil
+		}
 	})
 }

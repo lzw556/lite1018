@@ -15,4 +15,5 @@ type MonitoringPointRepository interface {
 
 	PagingBySpecs(ctx context.Context, page, size int, specs ...specification.Specification) (entity.MonitoringPoints, int64, error)
 	FindBySpecs(ctx context.Context, specs ...specification.Specification) (entity.MonitoringPoints, error)
+	DeleteBySpecs(ctx context.Context, specs ...specification.Specification) error
 }
