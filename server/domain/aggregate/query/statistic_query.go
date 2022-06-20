@@ -75,13 +75,13 @@ func (query StatisticQuery) GetAlertStatistics() ([]vo.AlertStatistic, error) {
 	}
 	records := make(map[string][]entity.AlarmRecord, 0)
 	for _, record := range alarmRecords {
-		if record.Category == entity.AlarmRuleCategoryDevice {
-			timeStr := record.CreatedAt.Format("2006-01-02")
-			if _, ok := records[timeStr]; !ok {
-				records[timeStr] = make([]entity.AlarmRecord, 0)
-			}
-			records[timeStr] = append(records[timeStr], record)
+		// if record.Category == entity.AlarmRuleCategoryDevice {
+		timeStr := record.CreatedAt.Format("2006-01-02")
+		if _, ok := records[timeStr]; !ok {
+			records[timeStr] = make([]entity.AlarmRecord, 0)
 		}
+		records[timeStr] = append(records[timeStr], record)
+		// }
 	}
 	result := make([]vo.AlertStatistic, 0)
 	for i := 0; i < 7; i++ {
