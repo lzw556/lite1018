@@ -28,7 +28,7 @@ func (query AssetQuery) newAsset(asset entity.Asset) vo.Asset {
 	return vo.NewAsset(asset)
 }
 
-func (query AssetQuery) iterCalcStatistics(asset vo.Asset, result *vo.AssetStatistics) error {
+func (query AssetQuery) iterCalcStatistics(asset vo.Asset, result *vo.AssetStatistics, devMap map[uint]uint) error {
 	if asset.MonitoringPoints != nil && len(asset.MonitoringPoints) > 0 {
 		result.MonitoringPointNum += uint(len(asset.MonitoringPoints))
 		for _, mp := range asset.MonitoringPoints {
@@ -41,10 +41,13 @@ func (query AssetQuery) iterCalcStatistics(asset vo.Asset, result *vo.AssetStati
 				result.AlarmNum[2]++
 			}
 			if mp.BindingDevices != nil && len(mp.BindingDevices) > 0 {
-				result.DeviceNum += uint(len(mp.BindingDevices))
 				for _, dev := range mp.BindingDevices {
-					if !dev.State.IsOnline {
-						result.OfflineDeviceNum += 1
+					if _, ok := devMap[dev.ID]; !ok {
+						devMap[dev.ID] = 1
+						result.DeviceNum++
+						if !dev.State.IsOnline {
+							result.OfflineDeviceNum += 1
+						}
 					}
 				}
 			}
@@ -53,7 +56,7 @@ func (query AssetQuery) iterCalcStatistics(asset vo.Asset, result *vo.AssetStati
 
 	if asset.Children != nil {
 		for _, c := range asset.Children {
-			err := query.iterCalcStatistics(*c, result)
+			err := query.iterCalcStatistics(*c, result, devMap)
 			if err != nil {
 				return err
 			}
@@ -66,7 +69,8 @@ func (query AssetQuery) iterCalcStatistics(asset vo.Asset, result *vo.AssetStati
 func (query AssetQuery) getStatistics(asset vo.Asset) (vo.AssetStatistics, error) {
 	result := vo.NewAssetStatistics(asset.ID)
 
-	err := query.iterCalcStatistics(asset, &result)
+	devMap := make(map[uint]uint)
+	err := query.iterCalcStatistics(asset, &result, devMap)
 
 	return result, err
 }
