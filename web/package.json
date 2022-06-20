@@ -22,7 +22,7 @@
     "antd-img-crop": "^3.16.0",
     "axios": "^0.21.1",
     "casbin.js": "^1.0.1",
-    "echarts": "^5.2.1",
+    "echarts": "^5.3.3",
     "echarts-for-react": "^3.0.1",
     "http-proxy-middleware": "^2.0.1",
     "konva": "^8.3.0",

@@ -12,6 +12,14 @@ export type Introduction = Pick<Overview, 'statistics'> & {
   icon: { svg: JSX.Element; small: boolean; focus?: boolean };
   alarmState: AlarmState;
   chart?: { title: string; options: ChartOptions<unknown>; style?: React.CSSProperties };
+  colProps?: {
+    xs: { span: number };
+    sm: { span: number };
+    md: { span: number };
+    xl: { span: number };
+    xxl: { span: number };
+  };
+  statisticsLayout?: string;
 };
 export const IntroductionPage: React.FC<Introduction> = (props) => {
   const {
@@ -19,7 +27,8 @@ export const IntroductionPage: React.FC<Introduction> = (props) => {
     statistics,
     icon: { svg, small, focus },
     alarmState,
-    chart
+    chart,
+    statisticsLayout
   } = props;
   return (
     <div className={`introduction ${alarmState} ${focus ? 'focus' : ''}`}>
@@ -28,16 +37,18 @@ export const IntroductionPage: React.FC<Introduction> = (props) => {
           <Link to={path}>{name}</Link>
         </h3>
       </div>
-      <dl className='name-value-groups'>
+      <dl
+        className={statisticsLayout ? `name-value-groups ${statisticsLayout}` : `name-value-groups`}
+      >
         {statistics &&
-          statistics.map(({ name, value }, index) => (
-            <div className='name-value' key={index}>
+          statistics.map(({ name, value, className }, index) => (
+            <div className={`name-value ${className}`} key={index}>
               <dt>{name}</dt>
               <dd>{value}</dd>
             </div>
           ))}
       </dl>
-      {chart && chart.options && (
+      {chart && (
         <ChartContainer options={chart.options} title={chart.title} style={chart.style} />
       )}
       <div className={small ? `introduction-icon small` : `introduction-icon`}>{svg}</div>

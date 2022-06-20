@@ -101,3 +101,21 @@ func (r monitoringPointRouter) downloadDataByID(ctx *gin.Context) (interface{}, 
 	}
 	return r.service.DownloadDataByID(id, pids, from, to, ctx.GetHeader("Timezone"))
 }
+
+func (r monitoringPointRouter) downloadDataByIDAndTimestamp(ctx *gin.Context) (interface{}, error) {
+	id := cast.ToUint(ctx.Param("id"))
+	timestamp := cast.ToInt64(ctx.Param("timestamp"))
+	filters := request.NewFilters(ctx)
+	return r.service.DownloadDataByIDAndTimestmap(id, monitoringpointtype.MonitoringPointCategoryRaw, timestamp, filters)
+}
+
+func (r monitoringPointRouter) removeDataByID(ctx *gin.Context) (interface{}, error) {
+	id := cast.ToUint(ctx.Param("id"))
+	from := cast.ToInt64(ctx.Query("from"))
+	to := cast.ToInt64(ctx.Query("to"))
+	var category uint = monitoringpointtype.MonitoringPointCategoryBasic
+	if ctx.Query("type") == "raw" {
+		category = monitoringpointtype.MonitoringPointCategoryRaw
+	}
+	return nil, r.service.RemoveDataByID(id, category, from, to)
+}

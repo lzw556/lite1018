@@ -3,9 +3,8 @@ import {Button, Col, Divider, Drawer, Dropdown, Menu, Row, Space, Typography} fr
 import "../../App.css";
 import "./layout.css"
 import "../../assets/iconfont.css"
-import {NavLink} from "react-router-dom";
 import logo from "../../assets/images/logo-dark.png";
-import {CaretDownOutlined, CreditCardOutlined, DashboardOutlined, MenuOutlined, UserOutlined} from "@ant-design/icons";
+import {CaretDownOutlined, MenuOutlined, UserOutlined} from "@ant-design/icons";
 import {persistor, store} from "../../store";
 import {useState} from "react";
 import moment from "moment";
@@ -52,77 +51,81 @@ const HeaderLayout = (props: any) => {
         </Menu>
     )
 
-    return <Header className="ts-header">
-        <Row justify="start" className="pc">
-            <Col span={6}>
-                <Space className={"ts-title"}>
-                    <img src={logo} width={100} alt="ThetaSensors" style={{verticalAlign: "middle"}}/>
-                    云监控平台
+    return (
+      <Header className='ts-header'>
+        <Row justify='start' className='pc'>
+          <Col span={12}>
+            <Space className={'ts-title'}>
+              <img src={logo} width={100} alt='ThetaSensors' style={{ verticalAlign: 'middle' }} />
+              风力发电螺栓监测系统
+            </Space>
+          </Col>
+          <Col span={12} style={{textAlign:'right'}}>
+            <Space>
+              <Text style={{ color: 'white' }} strong>
+                {now}
+              </Text>
+              {currentUser && (
+                <ProjectSelect
+                  bordered={false}
+                  defaultValue={getProject()}
+                  defaultActiveFirstOption={true}
+                  suffixIcon={<CaretDownOutlined style={{ color: 'white' }} />}
+                  style={{
+                    width: '120px',
+                    textAlign: 'center',
+                    backgroundColor: 'transparent',
+                    color: 'white'
+                  }}
+                  size={'small'}
+                  onChange={onProjectChange}
+                />
+              )}
+              <Dropdown overlay={menu}>
+                <Space>
+                  <Button type={'text'} style={{ color: '#fff' }}>
+                    <UserOutlined />
+                    {currentUser?.username}
+                  </Button>
                 </Space>
-            </Col>
-            <Col span={18}>
-                <Row justify={"end"}>
-                    <Col offset={1} xl={4} xxl={3}>
-                        <Space>
-                            <Text style={{color: "white"}} strong>{now}</Text>
-                        </Space>
-                    </Col>
-                    <Col xl={3} xxl={2}>
-                        {
-                            currentUser && <ProjectSelect bordered={false}
-                                                          defaultValue={getProject()}
-                                                          defaultActiveFirstOption={true}
-                                                          suffixIcon={<CaretDownOutlined style={{color: "white"}}/>}
-                                                          style={{width: "120px", textAlign: "center", backgroundColor: "transparent", color:"white"}}
-                                                          size={"small"} onChange={onProjectChange}/>
-                        }
-                    </Col>
-                    <Col xl={3} xxl={2}>
-                        <Dropdown overlay={menu}>
-                            <Space>
-                                <Button type={"text"} style={{color: "#fff"}}><UserOutlined/>{currentUser?.username}
-                                </Button>
-                            </Space>
-                        </Dropdown>
-                    </Col>
-                    <Col span={2} hidden={true}>
-                        <Space>
-                            <NavLink to="/asset-management?locale=assetMonitor"
-                                     className="ts-menu"><CreditCardOutlined/> 控制台</NavLink>
-                        </Space>
-                    </Col>
-                    <Col span={3} hidden={true}>
-                        <Space>
-                            <NavLink to="/dashboard" className="ts-menu"><DashboardOutlined/> 监控大屏</NavLink>
-                        </Space>
-                    </Col>
-                </Row>
-            </Col>
+              </Dropdown>
+            </Space>
+          </Col>
         </Row>
-        <div className="mobile">
-           <MenuOutlined onClick={()=>setVisible(true)}/>
-           <div className="logo"><img src={logo} width={100} alt="ThetaSensors" style={{verticalAlign: "middle"}}/></div>
-           <Dropdown overlay={menu}>
-               <UserOutlined/>  
-            </Dropdown>
-            <Drawer visible={visible} placement='left' width='60%'
-                closable={false} 
-                onClose={()=>setVisible(false)} 
-                bodyStyle={{paddingLeft:0, paddingRight:0}}>
-              <NavMenu menus={menus} setVisible={setVisible}/>
-              <Divider/>
-              {currentUser && 
-               <div style={{paddingLeft:24,paddingBottom:100}}>
-                  <ProjectSelect
-                    defaultValue={getProject()}
-                    defaultActiveFirstOption={true}
-                    suffixIcon={<CaretDownOutlined/>}
-                    style={{width: "120px", textAlign: "center"}}
-                    size={"small"} onChange={onProjectChange}/>
-                </div>}
-            </Drawer>          
+        <div className='mobile'>
+          <MenuOutlined onClick={() => setVisible(true)} />
+          <div className='logo'>
+            <img src={logo} width={100} alt='ThetaSensors' style={{ verticalAlign: 'middle' }} />
+          </div>
+          <Dropdown overlay={menu}>
+            <UserOutlined />
+          </Dropdown>
+          <Drawer
+            visible={visible}
+            placement='left'
+            width='60%'
+            closable={false}
+            onClose={() => setVisible(false)}
+            bodyStyle={{ paddingLeft: 0, paddingRight: 0 }}
+          >
+            <NavMenu menus={menus} setVisible={setVisible} />
+            <Divider />
+            {currentUser && (
+              <div style={{ paddingLeft: 24, paddingBottom: 100 }}>
+                <ProjectSelect
+                  defaultValue={getProject()}
+                  defaultActiveFirstOption={true}
+                  suffixIcon={<CaretDownOutlined />}
+                  style={{ width: '120px', textAlign: 'center' }}
+                  size={'small'}
+                  onChange={onProjectChange}
+                />
+              </div>
+            )}
+          </Drawer>
         </div>
-    </Header>
+      </Header>
+    );
 }
 
 export default HeaderLayout

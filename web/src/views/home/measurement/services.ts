@@ -1,7 +1,8 @@
 import request from '../../../utils/request';
 import { DeleteResponse, GetResponse, PostResponse, PutResponse } from '../../../utils/response';
+import { Values_be } from '../../device/hooks/useGetingDeviceData';
 import { HistoryData } from '../common/historyDataHelper';
-import { Measurement, MeasurementRow } from './props';
+import { AlarmRule, Measurement, MeasurementRow, Property } from './props';
 
 export function getMeasurements(filters?: Pick<Measurement, 'asset_id'>) {
   return request.get<MeasurementRow[]>(`/monitoringPoints`, { ...filters }).then(GetResponse);
@@ -38,5 +39,66 @@ export function unbindDevice(id: Measurement['id'], device_id: number) {
 }
 
 export function getData(id: Measurement['id'], from: number, to: number, rawOnly: boolean = false) {
-  return request.get<HistoryData>(`/monitoringPoints/${id}/data?from=${from}&to=${to}${rawOnly ? `&type=raw` : ''}`).then(GetResponse);
+  return request
+    .get<HistoryData>(
+      `/monitoringPoints/${id}/data?from=${from}&to=${to}${rawOnly ? `&type=raw` : ''}`
+    )
+    .then(GetResponse);
+}
+
+export function getDynamicData(id: Measurement['id'], timestamp: number) {
+  return request
+    .get<{ timestamp: number; values: Values_be }>(`/monitoringPoints/${id}/data/${timestamp}`)
+    .then(GetResponse);
+}
+
+export function getPropertiesByMeasurementType(type: number) {
+  return request
+    .get<Property[]>(`/properties?type=monitoring_point&monitoring_point_type=${type}`)
+    .then(GetResponse);
+}
+
+export function addAlarmRule(rule: AlarmRule) {
+  return request.post(`alarmRuleGroups`, rule).then(PostResponse);
+}
+
+export function getAlarmRules(...monitoring_point_ids: number[]) {
+  const params =
+    monitoring_point_ids && monitoring_point_ids.length > 0
+      ? `?monitoring_point_ids=${monitoring_point_ids.join(',')}`
+      : '';
+  return request.get<AlarmRule[]>(`alarmRuleGroups${params}`).then(GetResponse);
+}
+
+export function getAlarmRule(id: number) {
+  return request.get<AlarmRule>(`alarmRuleGroups/${id}`).then(GetResponse);
+}
+
+export function updateAlarmRule(id: number, rule: AlarmRule) {
+  return request.put(`alarmRuleGroups/${id}`, rule).then(PostResponse);
+}
+
+export function deleteAlarmRule(id: number) {
+  return request.delete(`alarmRuleGroups/${id}`).then(DeleteResponse);
+}
+
+export function bindMeasurementsToAlarmRule(
+  id: number,
+  values: { monitoring_point_ids: number[] }
+) {
+  return request.post(`/alarmRuleGroups/${id}/bind`, values).then(PutResponse);
+}
+
+export function unbindMeasurementsToAlarmRule(
+  id: number,
+  values: { monitoring_point_ids: number[] }
+) {
+  return request.post(`/alarmRuleGroups/${id}/unbind`, values).then(PutResponse);
+}
+
+export function bindMeasurementsToAlarmRule2(
+  id: number,
+  values: { monitoring_point_ids?: number[] }
+) {
+  return request.put(`/alarmRuleGroups/${id}/bindings`, values).then(PutResponse);
 }

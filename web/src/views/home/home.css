@@ -10,9 +10,20 @@
 dl.name-value-groups {
   margin: 0;
 }
+dl.name-value-groups.horizontal{
+  display: flex;
+  flex-wrap: wrap;
+}
 .name-value {
   display: flex;
   line-height: 30px;
+}
+.name-value.half {
+  flex: 0 0 50%
+}
+/* hardcord */
+.name-value.anomalous {
+  flex: 0 0 50%
 }
 .name-value dt {
   flex: 0 0 55%;
@@ -24,7 +35,7 @@ dl.name-value-groups {
   margin: 0;
 }
 @media (max-width: 600px) {
-  .name-value{
+  .name-value {
     flex-direction: column;
   }
 }
@@ -54,7 +65,7 @@ dl.name-value-groups {
 }
 
 .introduction.normal .introduction-icon {
-  background-color: #28A745;
+  background-color: #28a745;
 }
 .introduction.info .introduction-icon {
   background-color: #526ecc;
@@ -76,11 +87,11 @@ dl.name-value-groups {
   width: 30px;
   height: 30px;
 }
-.introduction.normal.focus .introduction-icon {
+.introduction.focus .introduction-icon {
   background-color: #fff;
 }
 .introduction.normal.focus .introduction-icon .icon-svg {
-  fill: rgba(24, 144, 255, 0.6);
+  fill: #28a745;
 }
 .introduction.info.focus .introduction-icon .icon-svg {
   fill: #526ecc;
@@ -91,9 +102,22 @@ dl.name-value-groups {
 .introduction.danger.focus .introduction-icon .icon-svg {
   fill: #dc3545;
 }
-.asset-navigator{
+.asset-navigator {
   margin-bottom: 8px;
 }
-.asset-navigator .asset-navigator-item{
+.asset-navigator .asset-navigator-item {
   font-size: 16px;
+}
+.overview-statistic .ant-statistic {
+  max-width: 120px;
+  text-align: center;
+}
+.overview-statistic .ant-statistic.info .ant-statistic-content {
+  color: #526ecc;
+}
+.overview-statistic .ant-statistic.warn .ant-statistic-content {
+  color: #ffc107;
+}
+.overview-statistic .ant-statistic.danger .ant-statistic-content {
+  color: #dc3545;
 }

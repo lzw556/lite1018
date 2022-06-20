@@ -8,7 +8,8 @@ import {
   Space,
   Spin,
   Table,
-  TableProps
+  TableProps,
+  Tag
 } from 'antd';
 import * as React from 'react';
 import { Link, useLocation } from 'react-router-dom';
@@ -22,6 +23,11 @@ import { combineFinalUrl } from '../common/utils';
 import Label from '../../../components/label';
 import { SearchResultPage } from '../components/searchResultPage';
 import { generatePropertyColumns } from '../common/historyDataHelper';
+import {
+  convertAlarmLevelToState,
+  getAlarmStateText,
+  getAlarmLevelColor
+} from '../common/statisticsHelper';
 
 const MeasurementManagement: React.FC = () => {
   const { pathname, search } = useLocation();
@@ -51,7 +57,7 @@ const MeasurementManagement: React.FC = () => {
   const generateTable = (title: string, dataSource: TableProps<any>['dataSource']) => {
     return (
       <>
-        <p style={{ marginBottom: 8 }}>{title}</p>
+        <p style={{ marginBottom: 8, marginTop: 8, fontSize: 16 }}>{title}</p>
         <Table
           {...{
             rowKey: 'id',
@@ -63,12 +69,7 @@ const MeasurementManagement: React.FC = () => {
                 // width: 300,
                 render: (name: string, row: MeasurementRow) => (
                   <Link
-                    to={combineFinalUrl(
-                      pathname,
-                      search,
-                      MeasurementTypes.preload.url,
-                      row.id
-                    )}
+                    to={combineFinalUrl(pathname, search, MeasurementTypes.preload.url, row.id)}
                   >
                     {name}
                   </Link>
@@ -76,10 +77,22 @@ const MeasurementManagement: React.FC = () => {
               },
               {
                 title: '状态',
-                dataIndex: 'status',
-                key: 'status',
-                width: 100,
-                render: (name: string, row: MeasurementRow) => ''
+                dataIndex: 'alertLevel',
+                key: 'alertLevel',
+                width: 120,
+                render: (level: number) => {
+                  const alarmState = convertAlarmLevelToState(level);
+                  return (
+                    <Tag
+                      style={{
+                        border: `solid 1px ${getAlarmLevelColor(alarmState)}`,
+                        color: getAlarmLevelColor(alarmState)
+                      }}
+                    >
+                      {getAlarmStateText(alarmState)}
+                    </Tag>
+                  );
+                }
               },
               {
                 title: '传感器',
@@ -89,10 +102,10 @@ const MeasurementManagement: React.FC = () => {
                 render: (name: string, row: MeasurementRow) =>
                   row.bindingDevices && row.bindingDevices.length > 0
                     ? row.bindingDevices.map(({ id, name }) => (
-                      <Link to={`/device-management?locale=devices/deviceDetail&id=${id}`}>
-                        {name}
-                      </Link>
-                    ))
+                        <Link to={`/device-management?locale=devices/deviceDetail&id=${id}`}>
+                          {name}
+                        </Link>
+                      ))
                     : ''
               },
               ...generatePropertyColumns(dataSource ? dataSource[0] : []),
@@ -164,7 +177,7 @@ const MeasurementManagement: React.FC = () => {
       wind.children.length === 0 ||
       (wind.children.length > 0 && wind.children.every(({ monitoringPoints }) => !monitoringPoints))
     )
-      return [<Empty description='没有法兰或监测点' />];
+      return [<Empty description='没有法兰或监测点' image={Empty.PRESENTED_IMAGE_SIMPLE} />];
     return wind.children
       .sort((prev, next) => {
         const { type: prevType } = prev.attributes || { index: 5, type: 4 };
@@ -177,10 +190,10 @@ const MeasurementManagement: React.FC = () => {
           name,
           monitoringPoints
             ? monitoringPoints.sort((prev, next) => {
-              const { index: prevIndex } = prev.attributes || { index: 5, type: 4 };
-              const { index: nextIndex } = next.attributes || { index: 5, type: 4 };
-              return prevIndex - nextIndex;
-            })
+                const { index: prevIndex } = prev.attributes || { index: 5, type: 4 };
+                const { index: nextIndex } = next.attributes || { index: 5, type: 4 };
+                return prevIndex - nextIndex;
+              })
             : []
         )
       );

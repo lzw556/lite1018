@@ -4,7 +4,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { AssetNavigator } from '../components/assetNavigator';
 import '../home.css';
 import { MeasurementIcon } from '../measurement/icon';
-import { combineFinalUrl } from '../common/utils';
+import { combineFinalUrl, generateColProps } from '../common/utils';
 import { AssetTypes } from '../common/constants';
 import { getAsset } from './services';
 import { AssetRow } from './props';
@@ -72,7 +72,9 @@ const WindTurbineOverview: React.FC = () => {
             const { alarmState, statistics } = getAssetStatistics(
               item.statistics,
               'monitoringPointNum',
-              ['anomalous', '异常监测点']
+              ['anomalous', '异常监测点'],
+              'deviceNum',
+              'offlineDeviceNum'
             );
             return {
               parentId: item.parentId,
@@ -84,24 +86,31 @@ const WindTurbineOverview: React.FC = () => {
               alarmState,
               icon: { svg: <MeasurementIcon />, small: true, focus: true },
               statistics,
-              chart
+              chart,
+              colProps: generateColProps({ md: 12, lg: 12, xl: 12, xxl: 8 }),
+              statisticsLayout: 'horizontal'
             };
           });
-        setFlanges(items);
+        if (measurements.length > 0){
+          setFlanges(items);
+        }else{
+          setFlanges(undefined);
+        }
       }
     }
   }, [asset, pathname, search]);
 
   if (loading) return <Spin />;
-  if (!flanges || flanges.length === 0)
+  if (!asset || !asset.children || asset.children.length === 0 || !flanges || flanges.length === 0)
     return (
       <Empty
         description={
           <p>
-            还没有法兰, 去<Link to='/asset-management?locale=asset-management'>创建</Link>, 或
+            还没有法兰或监测点, 去<Link to='/asset-management?locale=asset-management'>创建</Link>, 或
             <Link to={`/project-overview?locale=project-overview`}>返回</Link>
           </p>
         }
+        image={Empty.PRESENTED_IMAGE_SIMPLE}
       />
     );
   return (

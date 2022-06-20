@@ -11,6 +11,7 @@ export type HistoryData = {
 export function generateChartOptionsOfLastestData(measurements: MeasurementRow[], size: { inner: string; outer: string }) {
   const count = measurements.length;
   if (!count) return null;
+  if(measurements.every(({data}) => !data)) return null;
   const actuals = generateActuals(measurements);
   let minActual = actuals[0][0];
   let maxActual = actuals[0][0];
@@ -28,6 +29,11 @@ export function generateChartOptionsOfLastestData(measurements: MeasurementRow[]
   const _maxinum = generateCircle(measurements, circleMax);
   const specification = generateSpecification((minActual + maxActual) / 2);
   if (measurements[0].type === MeasurementTypes.loosening_angle.id) {
+    const firstClassFields = getFirstClassFields(measurements[0]);
+    let field: any = null;
+    if (firstClassFields.length > 0) {
+      field = firstClassFields[0];
+    }
     return {
       title: {
         text: '',
@@ -40,20 +46,23 @@ export function generateChartOptionsOfLastestData(measurements: MeasurementRow[]
         trigger: 'axis',
         formatter: (paras: any) => {
           let text = '';
-          paras.forEach(({ seriesName, marker, value }: any) => (text += `${marker} ${seriesName} ${value} <br />`));
+          paras.forEach(({ seriesName, marker, value }: any) => (text += `<div style='display:flex;justify-content:space-between;'><span style='flex:0 0 auto'>${marker} ${seriesName}</span><strong style='flex:0 0 auto; text-align:right;text-indent:1em;'>${getDisplayValue(value, field.precision, field.unit)}</strong></div>`));
           return text;
         }
       },
+      grid: { top: 80, bottom: '100'},
       xAxis: {
         type: 'category',
         show: false
       },
       yAxis: { type: 'value' },
       series: measurements.map((point) => {
-        let data = NaN;
-        const firstClassFieldKeys = getKeysOfFirstClassFields(point.type);
-        if (firstClassFieldKeys.length > 0 && point.data) data = point.data.values[firstClassFieldKeys[0]];
-        return { type: 'bar', name: point.name, data, barMaxWidth: 50 };
+      let data = NaN;
+      if (field && point.data) {
+        data = point.data.values[field.key];
+        if (data) data = roundValue(data, field.precision);
+      }
+        return { type: 'bar', name: point.name, data: [data], barMaxWidth: 50 };
       })
     };
   } else {
@@ -163,11 +172,14 @@ export function generateChartOptionsOfHistoryData(
   history: { name: string; data: HistoryData }[],
   measurementType: typeof MeasurementTypes.loosening_angle
 ) {
+  let crtProperty:any = null;
   const series = history.map(({name, data }) => {
+    const { property, seriesData} = pickHistoryData(data, measurementType.firstClassFieldKeys[0]);
+    crtProperty = property;
     return {
       type: 'line',
       name,
-      data: pickHistoryData(data, measurementType.firstClassFieldKeys[0])
+      data: seriesData
     };
   });
 
@@ -177,9 +189,8 @@ export function generateChartOptionsOfHistoryData(
       left: 'center'
     },
     legend: { bottom: 0 },
-    tooltip: { trigger: 'axis' },
+    tooltip: { trigger: 'axis', valueFormatter: (value: any) => `${getDisplayValue(value, crtProperty?.precision, crtProperty?.unit)}` },
     xAxis: { type: 'time' },
-    // yAxis: { type: 'value', min: 290, max: 360 },
     yAxis: { type: 'value' },
     series
   };
@@ -197,8 +208,12 @@ function generateActuals(measurements: MeasurementRow[]) {
     })
     .forEach((point, index) => {
       let data = NaN;
-      const firstClassFieldKeys = getKeysOfFirstClassFields(point.type);
-      if (firstClassFieldKeys.length > 0 && point.data) data = point.data.values[firstClassFieldKeys[0]];
+      const firstClassFields = getFirstClassFields(point);
+      if (firstClassFields.length > 0 && point.data) {
+        const field = firstClassFields[0];
+        data = point.data.values[field.key];
+        if (data) data = roundValue(data, field.precision);
+      }
       actuals.push([data, index * interval]);
       if (index === 0) first = data;
     });
@@ -247,8 +262,7 @@ export function getHistoryDatas(data: HistoryData, propertyName?: string) {
             if (crtField) value = crtProperty.data[field.name];
           }
           if (value) {
-            const precision = property.precision ?? 3;
-            value = round(value, precision);
+            value = roundValue(value, property.precision);
           }
           return value;
         });
@@ -258,25 +272,24 @@ export function getHistoryDatas(data: HistoryData, propertyName?: string) {
     });
 }
 
-export function pickHistoryData(data: HistoryData, propertyName: string) {
-  return data.map(({ timestamp, values }) => {
+function pickHistoryData(data: HistoryData, propertyName: string) {
+  let crtProperty: any = null;
+  const seriesData = data.map(({ timestamp, values }) => {
     let value = NaN;
-    let crtProperty = null;
     for (const property of values) {
       const field = property.fields.find(({ key }) => key === propertyName);
-      if(field){
+      if (field) {
         crtProperty = property;
-        const precision = property.precision ?? 3;
-        value = round(property.data[field.name], precision);
+        value = property.data[field.name];
+        if (value) {
+          value = roundValue(value, property.precision);
+        }
         break;
       }
     }
-    const valueText = Number.isNaN(value) ? '' : `${value}`;
-    return {
-      property: crtProperty,
-      data: [moment.unix(timestamp).local().format('YYYY-MM-DD HH:mm:ss'), valueText]
-    };
+    return [moment.unix(timestamp).local().format('YYYY-MM-DD HH:mm:ss'), value];
   });
+  return {property: crtProperty, seriesData};
 }
 
 export function generateChartOptionsOfHistoryDatas(data: HistoryData, propertyName?: string) {
@@ -289,13 +302,13 @@ export function generateChartOptionsOfHistoryDatas(data: HistoryData, propertyNa
           let relVal = params[0].name;
           for (let i = 0; i < params.length; i++) {
             let value = Number(params[i].value);
-            relVal += `<br/> ${params[i].marker} ${params[i].seriesName}: ${value}${property.unit}`;
+            relVal += `<br/> ${params[i].marker} ${params[i].seriesName}: ${getDisplayValue(value, undefined, property.unit)}`;
           }
           return relVal;
         }
       },
       legend: { show: !!propertyName },
-      grid: { bottom: 20 },
+      grid: { bottom: 20, left: 50 },
       title: {
         text: `${property.name}${property.unit ? `(${property.unit})` : ''}`,
         subtext: propertyName ? '' : `${seriesData.map(({ name, data }) => name + ' ' + data[data.length - 1])}`
@@ -320,11 +333,15 @@ export function generatePropertyColumns(measurement: MeasurementRow) {
   const properties = getFirstClassFields(measurement);
   if (properties.length > 0) {
     return properties
-      .map(({ name, key, unit }) => ({
+      .map(({ name, key, unit, precision }) => ({
         title: `${name}${unit ? `(${unit})` : ''}`,
         key,
         render: ({ data }: MeasurementRow) => {
-          return data ? data.values[key].toString() : '-';
+          let value = NaN;
+          if(data && data.values){
+            value = data.values[key];
+          }
+          return getDisplayValue(value, precision);
         },
         width: 120
       }))
@@ -338,6 +355,19 @@ export function generatePropertyColumns(measurement: MeasurementRow) {
       });
   }
   return [];
+}
+
+function getDisplayValue(value: number | null | undefined, precision?: number, unit?: string) {
+  if (Number.isNaN(value) || value === null || value === undefined) return '-';
+  let finalValue = value;
+  if (value) {
+    finalValue = roundValue(value, precision);
+  }
+  return `${finalValue}${unit ?? ''}`;
+}
+
+function roundValue(value: number, precision?: number){
+  return round(value, precision ?? 3)
 }
 
 function getKeysOfFirstClassFields(measurementType: number) {

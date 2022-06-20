@@ -1,4 +1,4 @@
-import { Empty, Spin } from 'antd';
+import { Empty, Spin, Tag } from 'antd';
 import moment from 'moment';
 import * as React from 'react';
 import { Link, useLocation, useHistory } from 'react-router-dom';
@@ -11,8 +11,19 @@ import { generateColProps, combineFinalUrl } from '../common/utils';
 import { AssetRow } from './props';
 import { getAsset } from './services';
 import { OverviewPage, TableListItem } from '../components/overviewPage';
-import { getAssetStatistics, NameValue } from '../common/statisticsHelper';
-import { generateChartOptionsOfLastestData, generatePropertyColumns, HistoryData, generateChartOptionsOfHistoryData } from '../common/historyDataHelper';
+import {
+  convertAlarmLevelToState,
+  getAlarmStateText,
+  getAssetStatistics,
+  NameValue,
+  getAlarmLevelColor
+} from '../common/statisticsHelper';
+import {
+  generateChartOptionsOfLastestData,
+  generatePropertyColumns,
+  HistoryData,
+  generateChartOptionsOfHistoryData
+} from '../common/historyDataHelper';
 
 const FlangeOverview: React.FC = () => {
   const { search, pathname } = useLocation();
@@ -24,7 +35,7 @@ const FlangeOverview: React.FC = () => {
   const [statistics, setStatistics] = React.useState<NameValue[]>();
   const [statisticOfPreload, setStatisticOfPreload] = React.useState<any>();
   const [historyDatas, setHistoryDatas] = React.useState<
-    { name: string; data: HistoryData }[]
+    { name: string; data: HistoryData; index: number }[]
   >([]);
   const [measurementType, setMeasurementType] =
     React.useState<typeof MeasurementTypes.loosening_angle>();
@@ -35,15 +46,31 @@ const FlangeOverview: React.FC = () => {
         dataIndex: 'name',
         key: 'name',
         render: (name: string, row: MeasurementRow) => (
-          <Link
-            to={combineFinalUrl(pathname, search, MeasurementTypes.preload.url, row.id)}
-          >
+          <Link to={combineFinalUrl(pathname, search, MeasurementTypes.preload.url, row.id)}>
             {name}
           </Link>
         ),
         width: 200
       },
-      { title: '状态', dataIndex: 'state', key: 'state', render: () => '', width: 120 }
+      {
+        title: '状态',
+        dataIndex: 'alertLevel',
+        key: 'alertLevel',
+        render: (level: number) => {
+          const alarmState = convertAlarmLevelToState(level);
+          return (
+            <Tag
+              style={{
+                border: `solid 1px ${getAlarmLevelColor(alarmState)}`,
+                color: getAlarmLevelColor(alarmState)
+              }}
+            >
+              {getAlarmStateText(alarmState)}
+            </Tag>
+          );
+        },
+        width: 120
+      }
     ],
     [pathname, search]
   );
@@ -103,9 +130,10 @@ const FlangeOverview: React.FC = () => {
       const from = moment().startOf('day').subtract(7, 'd').utc().unix();
       const to = moment().endOf('day').utc().unix();
       setHistoryDatas([]);
-      measurements.forEach(({ id, name }) => {
+      measurements.forEach(({ id, name, attributes }) => {
         getData(id, from, to).then((data) => {
-          if (data.length > 0) setHistoryDatas((prev) => [...prev, { name, data }]);
+          if (data.length > 0)
+            setHistoryDatas((prev) => [...prev, { name, data, index: attributes?.index ?? 0 }]);
         });
       });
     }
@@ -113,7 +141,12 @@ const FlangeOverview: React.FC = () => {
 
   React.useEffect(() => {
     if (historyDatas.length > 0 && measurementType) {
-      setStatisticOfPreload(generateChartOptionsOfHistoryData(historyDatas, measurementType));
+      setStatisticOfPreload(
+        generateChartOptionsOfHistoryData(
+          historyDatas.sort((prev, next) => prev.index - next.index),
+          measurementType
+        )
+      );
     }
   }, [historyDatas, measurementType]);
 
@@ -137,6 +170,7 @@ const FlangeOverview: React.FC = () => {
             </a>
           </p>
         }
+        image={Empty.PRESENTED_IMAGE_SIMPLE}
       />
     );
 

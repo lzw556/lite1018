@@ -28,10 +28,12 @@ func (r *monitoringPointRouter) initRoutes() {
 		router.NewGetRoute("monitoringPoints/:id/data", r.findDataByID),
 		router.NewGetRoute("monitoringPoints/:id/data/:timestamp", r.getDataByIDAndTimestamp),
 		router.NewGetRoute("monitoringPoints/:id/download/data", r.downloadDataByID),
+		router.NewGetRoute("monitoringPoints/:id/download/data/:timestamp", r.downloadDataByIDAndTimestamp),
 
 		router.NewPutRoute("monitoringPoints/:id", r.update),
 
 		router.NewDeleteRoute("monitoringPoints/:id", r.delete),
+		router.NewDeleteRoute("monitoringPoints/:id/data", r.removeDataByID),
 	}
 }
 

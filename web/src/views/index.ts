@@ -10,7 +10,7 @@ export const Network = lazy(() => import('./network'));
 export const NetworkDetail = lazy(() => import('./network/detail'));
 export const ImportNetwork = lazy(() => import('./network/import'));
 export const AlarmRecord = lazy(() => import('./alarm/record'));
-export const AlarmRule = lazy(() => import('./alarm'));
+// export const AlarmRule = lazy(() => import('./alarm'));
 export const AddAlarmRule = lazy(() => import('./alarm/rule/add'));
 export const AddAlarmRuleTemplate = lazy(() => import('./alarm/template/add'));
 export const EditAlarmRuleTemplate = lazy(() => import('./alarm/template/edit'));
@@ -29,7 +29,10 @@ export const WindTurbineOverview = lazy(() => import('./home/asset/windTurbineOv
 export const FlangeOverview = lazy(() => import('./home/asset/flangeOverview'));
 export const MeasurementManagement = lazy(() => import('./home/measurement'));
 export const BoltOverview = lazy(()=>import('./home/measurement/boltOverview'));
-export const AlarmRuleGroupCreation = lazy(() => import('./home/measurement/alarmRuleGroupCreation'));
+export const AlarmRule = lazy(() => import('./home/measurement/alarm'));
+export const AlarmRuleGroupCreation = lazy(() => import('./home/measurement/alarm/alarmRuleGroupCreation'));
+export const AlarmRuleGroupEdit = lazy(() => import('./home/measurement/alarm/alarmRuleGroupEdit'));
+export const AssetsImport = lazy(()=>import('./home/asset/assetsImport'));
 
 export const Unauthorized = lazy(() => import('./403'));
 export const NotFound = lazy(() => import('./404'));

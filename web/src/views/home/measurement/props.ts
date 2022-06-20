@@ -32,6 +32,7 @@ export type MeasurementRow = {
     timestamp: number;
     values: { [propName: string]: number };
   };
+  alertLevel?: number
 };
 
 export function convertRow(values?: MeasurementRow): Measurement | null {
@@ -48,3 +49,28 @@ export function convertRow(values?: MeasurementRow): Measurement | null {
     attributes: values.attributes
   };
 }
+
+export type AlarmRule = {
+  id: number;
+  name: string;
+  description: string;
+  category: number;
+  type: number;
+  rules: {
+    id: number;
+    name: string;
+    description: string;
+    index?: any;
+    duration: number;
+    operation: string;
+    threshold: number;
+    level: number;
+    source_type?: number;
+    category: number;
+    metric: any;
+  }[];
+  monitoringPoints?: MeasurementRow[];
+  bindedStatus?: boolean;
+  bindingStatus?: boolean;
+  alertLevel?:number;
+};

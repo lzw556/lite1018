@@ -24,7 +24,7 @@ export type AssetRow = {
 };
 
 export type AssetChildrenStatistics = {
-  alarmNum: [number, number, number];
+  alarmNum: [number, number, number] | null;
   assetId: number;
   deviceNum: number;
   monitoringPointNum: number;

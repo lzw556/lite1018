@@ -20,7 +20,7 @@ export const Monitor: React.FC<MeasurementRow> = (props) => {
   }, [id]);
 
   if (loading) return <Spin />;
-  if (!historyOptions || historyOptions.length === 0) return <Empty description='暂无数据' />;
+  if (!historyOptions || historyOptions.length === 0) return <Empty description='暂无数据' image={Empty.PRESENTED_IMAGE_SIMPLE} />;
 
   return (
     <Row gutter={[32, 32]}>

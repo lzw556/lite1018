@@ -1,13 +1,13 @@
-import { ColorDanger, ColorHealth, ColorInfo, ColorWarn } from "../../../constants/color";
-import { AssetChildrenStatistics } from "../asset/props";
+import { ColorDanger, ColorHealth, ColorInfo, ColorWarn } from '../../../constants/color';
+import { AssetChildrenStatistics } from '../asset/props';
 
-export type NameValue = { name: string; value: string | number };
+export type NameValue = { name: string; value: string | number; className?: string };
 export type AlarmState = 'normal' | 'info' | 'warn' | 'danger' | 'anomalous';
 export type AlarmStatistics = Map<AlarmState, NameValue>;
 type Visible =
   | (keyof AssetChildrenStatistics | AlarmState)
   | [keyof AssetChildrenStatistics | AlarmState, string];
-  
+
 export function getAssetStatistics(statis: AssetChildrenStatistics, ...visibles: Visible[]) {
   const { alarmNum, monitoringPointNum } = statis;
   const alarmState = getAlarmStateOfAsset(alarmNum);
@@ -34,14 +34,16 @@ function tranformVM_AssetStatistics(
     }
     const assetStatis = childrenStatis.get(key as keyof AssetChildrenStatistics);
     const alarmStatis = alarmStatisWithName.get(key as AlarmState);
+    let className = 'half'; // hardcode
     if (assetStatis) {
       value = assetStatis.value;
       if (!name) name = assetStatis.name;
     } else if (alarmStatis) {
       value = alarmStatis.value;
       if (!name) name = alarmStatis.name;
+      className = key as AlarmState;
     }
-    groups.push({ name, value });
+    groups.push({ name, value, className });
   });
   return { statistics: groups, alarmState };
 }
@@ -66,11 +68,12 @@ function calculateAlarmStatis(
   statis.set('warn', 0);
   statis.set('danger', 0);
   statis.set('anomalous', 0);
-  if (alarmNum.length === 3) {
+  if (alarmNum && alarmNum.length === 3) {
     statis.set('info', alarmNum[0]);
     statis.set('warn', alarmNum[1]);
     statis.set('danger', alarmNum[2]);
     statis.set('anomalous', alarmNum[0] + alarmNum[1] + alarmNum[2]);
+    statis.set('normal', total - alarmNum[0] - alarmNum[1] - alarmNum[2]);
   }
   if (excludedStates && excludedStates.length > 0) {
     return new Map(
@@ -113,7 +116,7 @@ function mapAlarmStatistics(statis: Map<AlarmState, number>) {
   return res;
 }
 
-function getAlarmStateText(state: AlarmState) {
+export function getAlarmStateText(state: AlarmState) {
   switch (state) {
     case 'normal':
       return '正常';
@@ -130,7 +133,7 @@ function getAlarmStateText(state: AlarmState) {
   }
 }
 
-function getAlarmLevelColor(state: AlarmState) {
+export function getAlarmLevelColor(state: AlarmState) {
   switch (state) {
     case 'normal':
       return ColorHealth;
@@ -155,4 +158,19 @@ export function generateProjectAlarmStatis(total: number, alarmNum: [number, num
       };
     }
   );
+}
+
+export function convertAlarmLevelToState(level: number) {
+  switch (level) {
+    case 0:
+      return 'normal' as AlarmState;
+    case 1:
+      return 'info' as AlarmState;
+    case 2:
+      return 'warn' as AlarmState;
+    case 3:
+      return 'danger' as AlarmState;
+    default:
+      return 'normal' as AlarmState;
+  }
 }

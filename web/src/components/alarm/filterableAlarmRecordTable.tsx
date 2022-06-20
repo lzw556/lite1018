@@ -110,18 +110,18 @@ export const FilterableAlarmRecordTable: React.FC<{ sourceId?: number }> = ({sou
                 }
             }
         },
-        {
-            title: '资源指标',
-            dataIndex: 'source',
-            key: 'type',
-            width: '10%',
-            render: (source: any) => {
-                if (source) {
-                    return DeviceType.toString(source.typeId)
-                }
-                return "未知指标"
-            }
-        },
+        // {
+        //     title: '资源指标',
+        //     dataIndex: 'source',
+        //     key: 'type',
+        //     width: '10%',
+        //     render: (source: any) => {
+        //         if (source) {
+        //             return DeviceType.toString(source.typeId)
+        //         }
+        //         return "未知指标"
+        //     }
+        // },
         {
             title: '报警源',
             dataIndex: 'source',
