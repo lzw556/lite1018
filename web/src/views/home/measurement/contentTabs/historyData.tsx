@@ -1,5 +1,5 @@
 import { DeleteOutlined, DownloadOutlined } from '@ant-design/icons';
-import { Button, Col, DatePicker, Empty, Row, Select, Space, Spin } from 'antd';
+import { Button, Col, DatePicker, Empty, Modal, Row, Select, Space, Spin } from 'antd';
 import moment from 'moment';
 import * as React from 'react';
 import Label from '../../../../components/label';
@@ -8,7 +8,8 @@ import { Permission } from '../../../../permission/permission';
 import { generateChartOptionsOfHistoryDatas } from '../../common/historyDataHelper';
 import { ChartContainer } from '../../components/charts/chartContainer';
 import { MeasurementRow } from '../props';
-import { getData } from '../services';
+import { clearHistory, getData } from '../services';
+import { HistoryDataDownload } from './historyDataDownload';
 
 export const HistoryData: React.FC<MeasurementRow> = (props) => {
   const { id, properties } = props;
@@ -18,6 +19,7 @@ export const HistoryData: React.FC<MeasurementRow> = (props) => {
   const to = moment().endOf('day');
   const [interval, setInterval] = React.useState<[moment.Moment, moment.Moment]>([from, to]);
   const [property, setProperty] = React.useState(properties[0].key);
+  const [visible, setVisible] = React.useState(false);
   React.useEffect(() => {
     const [from, to] = interval;
     setLoading(true);
@@ -112,14 +114,30 @@ export const HistoryData: React.FC<MeasurementRow> = (props) => {
                 <Button
                   type='primary'
                   onClick={() => {
-                    // setDownloadVisible(true);
+                    setVisible(true);
                   }}
                 >
                   <DownloadOutlined />
                 </Button>
               </HasPermission>
               <HasPermission value={Permission.DeviceDataDelete}>
-                <Button type='default' danger onClick={() => console.log('first')}>
+                <Button
+                  type='default'
+                  danger
+                  onClick={() => {
+                    Modal.confirm({
+                      title: '提示',
+                      content: `确定要删除${props.name}从${from.format('YYYY-MM-DD')}到${to.format(
+                        'YYYY-MM-DD'
+                      )}的数据吗？`,
+                      okText: '确定',
+                      cancelText: '取消',
+                      onOk: (close) => {
+                        clearHistory(id, from.utc().unix(), to.utc().unix()).then((_) => close());
+                      }
+                    });
+                  }}
+                >
                   <DeleteOutlined />
                 </Button>
               </HasPermission>
@@ -128,6 +146,14 @@ export const HistoryData: React.FC<MeasurementRow> = (props) => {
         </Row>
       </Col>
       {renderChart(historyOptions)}
+      {visible && (
+        <HistoryDataDownload
+          measurement={props}
+          visible={visible}
+          onSuccess={() => setVisible(false)}
+          onCancel={() => setVisible(false)}
+        />
+      )}
     </Row>
   );
 };

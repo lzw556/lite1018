@@ -13,8 +13,9 @@ import {
 } from '../../../device/detail/dynamicData/constants';
 import { Fields_be, Fields_be_axis, Values_be } from '../../../device/hooks/useGetingDeviceData';
 import { EmptyLayout } from '../../../layout';
+import { getFilename } from '../../common/utils';
 import { MeasurementRow } from '../props';
-import { getData, getDynamicData } from '../services';
+import { downloadRawHistory, getData, getDynamicData } from '../services';
 
 export const DynamicData: React.FC<MeasurementRow> = (props) => {
   const [range, setRange] = React.useState<[moment.Moment, moment.Moment]>([
@@ -77,7 +78,19 @@ export const DynamicData: React.FC<MeasurementRow> = (props) => {
             render: (text: any, record: any) => {
               if (hasPermission(Permission.DeviceRawDataDownload)) {
                 return (
-                  <Space size='middle'>
+                  <Space
+                    size='middle'
+                    onClick={() => {
+                      downloadRawHistory(props.id, text.timestamp).then((res) => {
+                        const url = window.URL.createObjectURL(new Blob([res.data]));
+                        const link = document.createElement('a');
+                        link.href = url;
+                        link.setAttribute('download', getFilename(res));
+                        document.body.appendChild(link);
+                        link.click();
+                      });
+                    }}
+                  >
                     <a>下载</a>
                   </Space>
                 );

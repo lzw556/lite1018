@@ -102,3 +102,23 @@ export function bindMeasurementsToAlarmRule2(
 ) {
   return request.put(`/alarmRuleGroups/${id}/bindings`, values).then(PutResponse);
 }
+
+export function downloadHistory(id: number, from: number, to: number, pids: any) {
+  return request.download<any>(
+    `/monitoringPoints/${id}/download/data?from=${from}&to=${to}&pids=${pids}`
+  );
+}
+
+export function clearHistory(id: number, from: number, to: number, type: string = '') {
+  const url =
+    type === 'raw'
+      ? `/monitoringPoints/${id}/data?from=${from}&to=${to}&type=${type}`
+      : `/monitoringPoints/${id}/data?from=${from}&to=${to}`;
+  return request.delete(url);
+}
+
+export function downloadRawHistory(id: number, timestamp: number) {
+  return request.download<any>(
+    `/monitoringPoints/${id}/download/data/${timestamp}`
+  );
+}

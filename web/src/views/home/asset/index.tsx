@@ -17,7 +17,7 @@ import {
   UploadProps
 } from 'antd';
 import * as React from 'react';
-import { combineFinalUrl } from '../common/utils';
+import { combineFinalUrl, getFilename } from '../common/utils';
 import { AssetTypes } from '../common/constants';
 import { AssetEdit } from './edit';
 import { AssetRow } from './props';
@@ -27,7 +27,6 @@ import { SearchResultPage } from '../components/searchResultPage';
 import { filterEmptyChildren } from '../common/treeDataHelper';
 import { getAssetStatistics } from '../common/statisticsHelper';
 import { getProject } from '../../../utils/session';
-import moment from 'moment';
 
 const AssetManagement: React.FC = () => {
   const { pathname, search } = useLocation();
@@ -108,22 +107,6 @@ const AssetManagement: React.FC = () => {
       }
     }
   ];
-
-  const getFilename = (res: any) => {
-    let filename = `${moment().format('YYYY-MM-DD HH:mm:ss')}.json`;
-    const dispos = res.headers['content-disposition'];
-    if (dispos) {
-      const disposParts = dispos.split(';');
-      if (disposParts && disposParts.length > 1) {
-        const path = disposParts[1];
-        const pathParts = path.split('filename=');
-        if (pathParts && pathParts.length > 1) {
-          filename = decodeURI(pathParts[1]);
-        }
-      }
-    }
-    return filename;
-  };
 
   const [result, setResult] = React.useState<TableProps<any>>({
     rowKey: (row: AssetRow) => `${row.id}-${row.type}`,
