@@ -71,6 +71,7 @@ export const RecentHistory: React.FC<{ device: Device }> = ({ device }) => {
             xAxis: {
               type: 'category',
               boundaryGap: false,
+              axisLabel: {show: false},
               data: times.map((item: any) => item.format('YYYY-MM-DD HH:mm:ss'))
             }
           };

@@ -345,6 +345,7 @@ export function generateChartOptionsOfHistoryDatas(data: HistoryData, propertyNa
       xAxis: {
         type: 'category',
         boundaryGap: false,
+        axisLabel: {align: 'left'},
         data: times.map((item) => moment.unix(item).local().format('YYYY-MM-DD HH:mm:ss'))
       },
       yAxis: { type: 'value' }
