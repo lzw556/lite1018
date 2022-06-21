@@ -112,6 +112,46 @@ export const AssetEdit: React.FC<
             </Select>
           </Form.Item>
         )}
+        {AssetTypes.Flange.categories && assetTypeId !== AssetTypes.WindTurbind.id && (
+          <Form.Item
+            label='额定值'
+            name={['attributes', 'normal']}
+            initialValue={0}
+            rules={[{ type: 'number', transform: (value: string) => Number(value) }]}
+          >
+            <Input />
+          </Form.Item>
+        )}
+        {AssetTypes.Flange.categories && assetTypeId !== AssetTypes.WindTurbind.id && (
+          <Form.Item
+            label='次要'
+            name={['attributes', 'info']}
+            initialValue={0}
+            rules={[{ type: 'number', transform: (value: string) => Number(value) }]}
+          >
+            <Input />
+          </Form.Item>
+        )}
+        {AssetTypes.Flange.categories && assetTypeId !== AssetTypes.WindTurbind.id && (
+          <Form.Item
+            label='重要'
+            name={['attributes', 'warn']}
+            initialValue={0}
+            rules={[{ type: 'number', transform: (value: string) => Number(value) }]}
+          >
+            <Input />
+          </Form.Item>
+        )}
+        {AssetTypes.Flange.categories && assetTypeId !== AssetTypes.WindTurbind.id && (
+          <Form.Item
+            label='严重'
+            name={['attributes', 'danger']}
+            initialValue={0}
+            rules={[{ type: 'number', transform: (value: string) => Number(value) }]}
+          >
+            <Input />
+          </Form.Item>
+        )}
       </Form>
     </Modal>
   );

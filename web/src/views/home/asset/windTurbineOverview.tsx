@@ -59,10 +59,7 @@ const WindTurbineOverview: React.FC = () => {
             if (item.monitoringPoints && item.monitoringPoints.length > 0) {
               chart = {
                 title: '',
-                options: generateChartOptionsOfLastestData(item.monitoringPoints, {
-                  inner: '50%',
-                  outer: '65%'
-                }),
+                options: generateChartOptionsOfLastestData(item.monitoringPoints, item.attributes),
                 style: { left: '-24px', top: '-20px', height: 400 }
               };
               measurements.push(

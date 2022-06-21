@@ -120,7 +120,6 @@ export const MeasurementBind: React.FC<
               props.onSuccess()
             );
           }
-          console.log(values);
         });
       }}
     >

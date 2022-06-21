@@ -186,10 +186,7 @@ const FlangeOverview: React.FC = () => {
               {
                 title: '分布图',
                 colProps: generateColProps({ xl: 12, xxl: 9 }),
-                options: generateChartOptionsOfLastestData(measurements, {
-                  inner: '65%',
-                  outer: '80%'
-                }),
+                options: generateChartOptionsOfLastestData(measurements, asset?.attributes),
                 style: { height: 550 }
               },
               {

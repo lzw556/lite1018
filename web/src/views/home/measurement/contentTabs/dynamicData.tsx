@@ -150,7 +150,7 @@ export const DynamicData: React.FC<MeasurementRow> = (props) => {
         }
       ]
     };
-    debugger;
+
     if (loading2) return <Spin />;
     if (!dynamicData || !dynamicData.values) {
       return <EmptyLayout description='数据不足' />;

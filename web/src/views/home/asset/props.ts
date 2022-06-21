@@ -6,7 +6,14 @@ export type Asset = {
   name: string;
   type: number;
   parent_id: number;
-  attributes?: { index: number; type: number };
+  attributes?: {
+    index: number;
+    type: number;
+    normal?: number;
+    info?: number;
+    warn?: number;
+    danger?: number;
+  };
 };
 
 export type AssetRow = {
@@ -20,7 +27,14 @@ export type AssetRow = {
   label: React.ReactNode;
   value: string | number;
   statistics: AssetChildrenStatistics;
-  attributes?: { index: number; type: number };
+  attributes?: {
+    index: number;
+    type: number;
+    normal?: number;
+    info?: number;
+    warn?: number;
+    danger?: number;
+  };
 };
 
 export type AssetChildrenStatistics = {
