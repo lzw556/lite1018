@@ -2,7 +2,6 @@ package query
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
@@ -57,31 +56,29 @@ func (query StatisticQuery) GetDeviceStatistics() ([]vo.DeviceStatistic, error) 
 }
 
 func (query StatisticQuery) GetAlertStatistics() ([]vo.AlertStatistic, error) {
-	devices, err := query.deviceRepo.FindBySpecs(context.TODO(), query.Specs...)
+	mps, err := query.monitoringPointRepo.FindBySpecs(context.TODO(), query.Specs...)
 	if err != nil {
 		return nil, err
 	}
-	sourceIDs := make([]uint, len(devices))
-	for i, device := range devices {
-		sourceIDs[i] = device.ID
+	sourceIDs := make([]uint, len(mps))
+	for i, mp := range mps {
+		sourceIDs[i] = mp.ID
 	}
+
 	now := time.Now()
 	end, _ := time.Parse("2006-01-02", now.Format("2006-01-02"))
 	begin, _ := time.Parse("2006-01-02", now.AddDate(0, 0, -7).Format("2006-01-02"))
-	fmt.Println(end)
 	alarmRecords, err := query.alarmRecordRepo.FindBySpecs(context.TODO(), spec.SourceInSpec(sourceIDs), spec.CreatedAtRangeSpec{begin, end})
 	if err != nil {
 		return nil, err
 	}
 	records := make(map[string][]entity.AlarmRecord, 0)
 	for _, record := range alarmRecords {
-		// if record.Category == entity.AlarmRuleCategoryDevice {
 		timeStr := record.CreatedAt.Format("2006-01-02")
 		if _, ok := records[timeStr]; !ok {
 			records[timeStr] = make([]entity.AlarmRecord, 0)
 		}
 		records[timeStr] = append(records[timeStr], record)
-		// }
 	}
 	result := make([]vo.AlertStatistic, 0)
 	for i := 0; i < 7; i++ {
