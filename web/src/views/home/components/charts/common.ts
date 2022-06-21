@@ -15,6 +15,7 @@ export type Legend = {
     fontSize: number;
   }
   formatter?: any;
+  width?: number | string;
 };
 
 export type XAxis = {
@@ -51,7 +52,7 @@ export const COMMON_OPTIONS = {
   tooltip: {
     trigger: 'item'
   },
-  color: ['rgb(0,130,252)', 'rgb(253,216,69)', 'rgb(34,237,124)']
+  color: ['rgb(0,130,252)', 'rgb(253,216,69)', 'rgb(34,237,124)', '#5470c6', '#91cc75', '#fac858', '#ee6666', '#73c0de']
 };
 
 export const COMMON_OPTIONS_SERIES = {

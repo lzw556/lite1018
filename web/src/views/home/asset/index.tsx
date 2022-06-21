@@ -74,8 +74,8 @@ const AssetManagement: React.FC = () => {
     {
       showUploadList: false,
       children: (
-        <Button type='primary' icon={<ImportOutlined />} loading={loading}>
-          导入
+        <Button type='primary' loading={loading}>
+          导入<ImportOutlined />
         </Button>
       ),
       beforeUpload: (file) => {

@@ -54,10 +54,15 @@ const MeasurementManagement: React.FC = () => {
     }
   ];
 
-  const generateTable = (title: string, dataSource: TableProps<any>['dataSource']) => {
+  const generateTable = (id: number, title: string, dataSource: TableProps<any>['dataSource']) => {
     return (
       <>
-        <p style={{ marginBottom: 8, marginTop: 8, fontSize: 16 }}>{title}</p>
+        <Link
+          to={combineFinalUrl(pathname, search, AssetTypes.Flange.url, id)}
+          style={{display:'block', marginBottom: 8, marginTop: 8, fontSize: 16 }}
+        >
+          {title}
+        </Link>
         <Table
           {...{
             rowKey: 'id',
@@ -185,8 +190,9 @@ const MeasurementManagement: React.FC = () => {
         return prevType - nextType;
       })
       .filter(({ monitoringPoints }) => monitoringPoints && monitoringPoints.length > 0)
-      .map(({ name, monitoringPoints }) =>
+      .map(({ id, name, monitoringPoints }) =>
         generateTable(
+          id,
           name,
           monitoringPoints
             ? monitoringPoints.sort((prev, next) => {

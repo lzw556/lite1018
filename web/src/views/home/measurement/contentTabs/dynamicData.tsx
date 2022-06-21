@@ -128,9 +128,7 @@ export const DynamicData: React.FC<MeasurementRow> = (props) => {
                   {item.label}
                 </Col>
                 <Col span={isMobile ? 24 : 16} className='ts-detail-content'>
-                  {meta[item.value] !== null && meta[item.value] !== undefined
-                    ? `${meta[item.value] !== 0 ? meta[item.value].toFixed(3) : 0}${item.unit}`
-                    : '-'}
+                  {getValueOfMetaItem(item.value, meta, item.unit)}
                 </Col>
               </Row>
             </Col>
@@ -138,6 +136,18 @@ export const DynamicData: React.FC<MeasurementRow> = (props) => {
         </Row>
       );
     }
+  };
+
+  const getValueOfMetaItem = (
+    key: typeof DYNAMIC_DATA_BOLTELONGATION.metaData[number]['value'],
+    meta?: Record<typeof DYNAMIC_DATA_BOLTELONGATION.metaData[number]['value'], number>,
+    unit?: string
+  ) => {
+    if (!meta) return '-';
+    if (!meta[key] && meta[key] !== 0) return '-';
+    if (key === 'defect_location' && meta[key] <= 0) return '无缺陷';
+    if (meta[key] !== 0) return `${meta[key].toFixed(3)}${unit}`;
+    return `${meta[key]}${unit}`;
   };
 
   const renderChart = () => {

@@ -155,14 +155,15 @@ const ProjectOverview: React.FC = () => {
         formatter: (itemName: string) => {
           const series = data.find(({ name }) => itemName === name);
           return series ? `${itemName} ${series.value}` : itemName;
-        }
+        },
+        width: '50%'
       },
       series: [
         {
           type: 'pie',
           name: '',
-          radius: ['40%', '50%'],
-          center: ['50%', '50%'],
+          radius: ['45%', '55%'],
+          center: ['50%', '45%'],
           label: { show: false, formatter: '{b} {c}' },
           data
         }
