@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Card, Empty } from 'antd';
 import moment from 'moment';
-import ReactECharts from "echarts-for-react";
+import ReactECharts from 'echarts-for-react';
 import { GetDeviceRuntimeRequest } from '../../apis/device';
 import { DefaultMonitorDataOption, LineChartStyles } from '../../constants/chart';
 import { isMobile } from '../../utils/deviceDetection';
@@ -66,13 +66,20 @@ export const RuntimeChart: React.FC<{ deviceId: number }> = ({ deviceId }) => {
   }, [deviceId]);
 
   if (runtimeOptions && runtimeOptions.length) {
-    return runtimeOptions.map((item: any, index: number) => {
-      return (
-        <Card.Grid key={index} style={{ boxShadow: 'none', border: 'none', width: isMobile ? '100%' : '50%' }}>
-          <ReactECharts option={item} style={{ border: 'none', height: '256px' }} />
-        </Card.Grid>
-      );
-    });
+    return (
+      <Card bordered={false}>
+        {runtimeOptions.map((item: any, index: number) => {
+          return (
+            <Card.Grid
+              key={index}
+              style={{ boxShadow: 'none', border: 'none', width: isMobile ? '100%' : '50%' }}
+            >
+              <ReactECharts option={item} style={{ border: 'none', height: '256px' }} />
+            </Card.Grid>
+          );
+        })}
+      </Card>
+    );
   }
   return <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={'数据不足'} />;
 };
