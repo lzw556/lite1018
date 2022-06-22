@@ -284,6 +284,89 @@ func (query MonitoringPointQuery) DownloadData(id uint, pids []string, from, to 
 	return nil, response.BusinessErr(errcode.UnknownDeviceTypeError, "")
 }
 
-// func (query AssetQuery) DownloadRawData(id uint, category uint, timestamp time.Time, filters request.Filters) (*vo.ExcelFile, error) {
+func (query MonitoringPointQuery) downloadSasRawData(mp entity.MonitoringPoint, data entity.MonitoringPointData) (*vo.ExcelFile, error) {
+	result := vo.ExcelFile{
+		Name: fmt.Sprintf("%s_%s.xlsx", mp.Name, data.Time.Format("20060102")),
+		File: excelize.NewFile(),
+	}
+	col := 65
+	var e entity.SasRawData
+	if err := mapstructure.Decode(data.Values, &e); err != nil {
+		return nil, err
+	}
+	_ = result.File.SetCellValue("Sheet1", fmt.Sprintf("%s%d", string(rune(col)), 1), "dynamic length")
+	_ = result.File.SetCellValue("Sheet1", fmt.Sprintf("%s%d", string(rune(col+1)), 1), "dynamic preload")
+	_ = result.File.SetCellValue("Sheet1", fmt.Sprintf("%s%d", string(rune(col+2)), 1), "dynamic pressure")
+	_ = result.File.SetCellValue("Sheet1", fmt.Sprintf("%s%d", string(rune(col+3)), 1), "dynamic tof")
+	for i := 0; i < len(e.DynamicLength); i++ {
+		_ = result.File.SetCellValue("Sheet1", fmt.Sprintf("%s%d", string(rune(col)), i+2), e.DynamicLength[i])
+		_ = result.File.SetCellValue("Sheet1", fmt.Sprintf("%s%d", string(rune(col+1)), i+2), e.DynamicPreload[i])
+		_ = result.File.SetCellValue("Sheet1", fmt.Sprintf("%s%d", string(rune(col+2)), i+2), e.DynamicPressure[i])
+		_ = result.File.SetCellValue("Sheet1", fmt.Sprintf("%s%d", string(rune(col+3)), i+2), e.DynamicTof[i])
+	}
+	return &result, nil
+}
 
-// }
+func (query MonitoringPointQuery) downloadSqRawData(mp entity.MonitoringPoint, data entity.MonitoringPointData) (*vo.ExcelFile, error) {
+	result := vo.ExcelFile{
+		Name: fmt.Sprintf("%s_%s.xlsx", mp.Name, data.Time.Format("20060102")),
+		File: excelize.NewFile(),
+	}
+	col := 65
+	var e entity.SqRawData
+	if err := mapstructure.Decode(data.Values, &e); err != nil {
+		return nil, err
+	}
+	_ = result.File.SetCellValue("Sheet1", fmt.Sprintf("%s1", string(rune(col))), "dynamic inclination")
+	_ = result.File.SetCellValue("Sheet1", fmt.Sprintf("%s1", string(rune(col+1))), "dynamic pitch")
+	_ = result.File.SetCellValue("Sheet1", fmt.Sprintf("%s1", string(rune(col+2))), "dynamic roll")
+	for i := 0; i < len(e.DynamicInclination); i++ {
+		_ = result.File.SetCellValue("Sheet1", fmt.Sprintf("%s%d", string(rune(col)), i+2), e.DynamicInclination[i])
+		_ = result.File.SetCellValue("Sheet1", fmt.Sprintf("%s%d", string(rune(col+1)), i+2), e.DynamicPitch[i])
+		_ = result.File.SetCellValue("Sheet1", fmt.Sprintf("%s%d", string(rune(col+2)), i+2), e.DynamicRoll[i])
+	}
+	return &result, nil
+}
+
+func (query MonitoringPointQuery) downloadKxSensorData(mp entity.MonitoringPoint, data entity.MonitoringPointData, calculate string) (*vo.ExcelFile, error) {
+	result := vo.ExcelFile{
+		Name: fmt.Sprintf("%s_%s.xlsx", mp.Name, data.Time.Format("20060102")),
+		File: excelize.NewFile(),
+	}
+	col := 65
+	for k, v := range data.Values {
+		var e entity.AxisSensorData
+		if err := mapstructure.Decode(v, &e); err != nil {
+			return nil, err
+		}
+		_ = result.File.SetCellValue("Sheet1", fmt.Sprintf("%s1", string(rune(col))), k)
+		for i, value := range getKxSensorData(e, calculate).Values {
+			_ = result.File.SetCellValue("Sheet1", fmt.Sprintf("%s%d", string(rune(col)), i+2), value)
+		}
+		col += 1
+	}
+	return &result, nil
+}
+
+func (query MonitoringPointQuery) DownloadRawData(id uint, timestamp time.Time, filters request.Filters) (*vo.ExcelFile, error) {
+	mp, err := query.monitoringPointRepo.Get(context.TODO(), id)
+	if err != nil {
+		return nil, response.BusinessErr(errcode.MonitoringPointNotFoundError, err.Error())
+	}
+
+	data, err := query.monitoringPointDataRepo.Get(id, monitoringpointtype.MonitoringPointCategoryRaw, timestamp)
+	if err != nil {
+		return nil, err
+	}
+
+	switch data.SensorType {
+	case devicetype.KxSensor:
+		return query.downloadKxSensorData(mp, data, cast.ToString(filters["calculate"]))
+	case devicetype.DynamicSCL3300Sensor:
+		return query.downloadSqRawData(mp, data)
+	case devicetype.DynamicLengthAttitudeSensor:
+		return query.downloadSasRawData(mp, data)
+	}
+
+	return nil, response.BusinessErr(errcode.UnknownBusinessError, "")
+}

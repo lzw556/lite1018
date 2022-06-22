@@ -16,4 +16,5 @@ type AlarmRuleGroupSourceRepository interface {
   PagingBySpecs(ctx context.Context, page, size int, specs ...specification.Specification) (entity.AlarmRuleGroupSources, int64, error)
   FindBySpecs(ctx context.Context, specs ...specification.Specification) (entity.AlarmRuleGroupSources, error)
   GetBySpecs(ctx context.Context, specs ...specification.Specification) (entity.AlarmRuleGroupSource, error)
+  DeleteBySpecs(ctx context.Context, specs ...specification.Specification) error
 }

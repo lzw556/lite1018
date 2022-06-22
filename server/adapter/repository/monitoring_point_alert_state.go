@@ -92,6 +92,10 @@ func (repo MonitoringPointAlertState) DeleteAll(mpId uint) error {
 		if err != nil {
 			return err
 		}
-		return bucket.DeleteBucket([]byte(fmt.Sprintf("MP%d", mpId)))
+		if err = bucket.DeleteBucket([]byte(fmt.Sprintf("MP%d", mpId))); err != nil && err.Error() != "bucket not found" {
+			return err
+		} else {
+			return nil
+		}
 	})
 }

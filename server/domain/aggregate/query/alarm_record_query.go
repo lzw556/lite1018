@@ -19,6 +19,7 @@ type AlarmRecordQuery struct {
 	deviceRepo                 dependency.DeviceRepository
 	monitoringPointRepo        dependency.MonitoringPointRepository
 	userRepo                   dependency.UserRepository
+	alarmRuleGroupRepo         dependency.AlarmRuleGroupRepository
 }
 
 func NewAlarmRecordQuery() AlarmRecordQuery {
@@ -28,6 +29,7 @@ func NewAlarmRecordQuery() AlarmRecordQuery {
 		deviceRepo:                 repository.Device{},
 		monitoringPointRepo:        repository.MonitoringPoint{},
 		userRepo:                   repository.User{},
+		alarmRuleGroupRepo:         repository.AlarmRuleGroup{},
 	}
 }
 
@@ -37,6 +39,9 @@ func (query AlarmRecordQuery) Get(id uint) (*vo.AlarmRecord, error) {
 		return nil, err
 	}
 	result := vo.NewAlarmRecord(e)
+	if g, err := query.alarmRuleGroupRepo.Get(context.TODO(), result.AlarmRuleGroupID); err == nil {
+		result.AlarmRuleGroupName = g.Name
+	}
 	return &result, nil
 }
 
@@ -52,6 +57,9 @@ func (query AlarmRecordQuery) Paging(page, size int, from, to time.Time) ([]vo.A
 	for i, e := range es {
 		if e.Category == entity.AlarmRuleCategoryMonitoringPoint {
 			result[i] = vo.NewAlarmRecord(e)
+			if g, err := query.alarmRuleGroupRepo.Get(context.TODO(), result[i].AlarmRuleGroupID); err == nil {
+				result[i].AlarmRuleGroupName = g.Name
+			}
 			if _, ok := alertSources[e.SourceID]; !ok {
 				if mp, err := query.monitoringPointRepo.Get(ctx, e.SourceID); err == nil {
 					q := NewMonitoringPointQuery()

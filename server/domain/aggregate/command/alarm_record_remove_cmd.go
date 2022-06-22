@@ -11,16 +11,20 @@ import (
 type AlarmRecordRemoveCmd struct {
 	entity.AlarmRecord
 
-	deviceRepo           dependency.DeviceRepository
-	alarmRecordRepo      dependency.AlarmRecordRepository
-	deviceAlertStateRepo dependency.DeviceAlertStateRepository
+	deviceRepo                    dependency.DeviceRepository
+	alarmRecordRepo               dependency.AlarmRecordRepository
+	deviceAlertStateRepo          dependency.DeviceAlertStateRepository
+	monitoringPointRepo           dependency.MonitoringPointRepository
+	monitoringPointAlertStateRepo dependency.MonitoringPointAlertStateRepository
 }
 
 func NewAlarmRecordRemoveCmd() AlarmRecordRemoveCmd {
 	return AlarmRecordRemoveCmd{
-		deviceRepo:           repository.Device{},
-		alarmRecordRepo:      repository.AlarmRecord{},
-		deviceAlertStateRepo: repository.DeviceAlertState{},
+		deviceRepo:                    repository.Device{},
+		alarmRecordRepo:               repository.AlarmRecord{},
+		deviceAlertStateRepo:          repository.DeviceAlertState{},
+		monitoringPointRepo:           repository.MonitoringPoint{},
+		monitoringPointAlertStateRepo: repository.MonitoringPointAlertState{},
 	}
 }
 
@@ -38,6 +42,17 @@ func (cmd AlarmRecordRemoveCmd) Run() error {
 				}
 			}
 		}
+
+		if cmd.AlarmRecord.Category == entity.AlarmRuleCategoryMonitoringPoint {
+			if mp, err := cmd.monitoringPointRepo.Get(txCtx, cmd.AlarmRecord.SourceID); err == nil {
+				if state, err := cmd.monitoringPointAlertStateRepo.Get(mp.ID, cmd.AlarmRecord.AlarmRuleID); err == nil {
+					if state.Record.ID == cmd.AlarmRecord.ID {
+						return cmd.monitoringPointAlertStateRepo.Delete(mp.ID, cmd.AlarmRecord.AlarmRuleID)
+					}
+				}
+			}
+		}
+
 		return nil
 	})
 }
