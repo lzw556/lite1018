@@ -35,7 +35,9 @@ export const FilterableAlarmRecordTable: React.FC<{ sourceId?: number }> = ({sou
         if (status && status.length > 0) {
             filters.status = status.join(",")
         }
-        PagingAlarmRecordRequest(current, size, startDate.utc().unix(), endDate.utc().unix(), filters, sourceId).then(setDataSource)
+        PagingAlarmRecordRequest(current, size, startDate.utc().unix(), endDate.utc().unix(), filters, sourceId).then(res => {
+            setDataSource({page:res.page, size:res.size,total:res.total, result: res.result.sort((prev: any, next: any)=>prev.alarmRuleGroupId - next.alarmRuleGroupId)})
+        })
     }, [startDate, endDate, alertLevels, refreshKey, status])
 
     React.useEffect(() => {
@@ -94,6 +96,12 @@ export const FilterableAlarmRecordTable: React.FC<{ sourceId?: number }> = ({sou
     }
 
     const columns: any = [
+        {
+            title: '报警名称',
+            dataIndex: 'alarmRuleGroupName',
+            key: 'alarmRuleGroupName',
+            width: '15%'
+        },
         {
             title: '报警级别',
             dataIndex: 'level',
