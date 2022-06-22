@@ -50,7 +50,8 @@ const MeasurementManagement: React.FC = () => {
     {
       type: 'primary',
       children: React.Children.toArray(['添加监测点', <PlusOutlined />]),
-      onClick: () => open()
+      onClick: () => open(),
+      style: { position: 'fixed', top: 75, right: 25, zIndex: 10 }
     }
   ];
 
