@@ -10,7 +10,7 @@ export type HistoryData = {
   timestamp: number;
   values: Property[];
 }[];
-export function generateChartOptionsOfLastestData(measurements: MeasurementRow[], attributes?: AssetRow['attributes']) {
+export function generateChartOptionsOfLastestData(measurements: MeasurementRow[], attributes?: AssetRow['attributes'], isBig: boolean = false) {
   const count = measurements.length;
   if (!count) return null;
   if(measurements.every(({data}) => !data)) return null;
@@ -63,13 +63,13 @@ export function generateChartOptionsOfLastestData(measurements: MeasurementRow[]
       const nextIndex = next.attributes?.index || 5;
       return prevIndex - nextIndex;
     })
-    const outer = generateOuter(sortedMeasurements);
+    const outer = generateOuter(sortedMeasurements, isBig);
     polar.push(outer.radius);
     angleAxis.push(outer.angleAxis);
     radiusAxis.push(outer.radiusAxis);
     series.push(outer.series);
 
-    const actuals = generateActuals(sortedMeasurements);
+    const actuals = generateActuals(sortedMeasurements, isBig);
     series.push(actuals.series);
     radar.push(actuals.radar);
     let startIndex = 1;
@@ -157,8 +157,8 @@ export function generateChartOptionsOfHistoryData(
   };
 }
 
-function generateOuter(measurements: MeasurementRow[]) {
-  const radius = { radius: 150 };
+function generateOuter(measurements: MeasurementRow[], isBig: boolean = false) {
+  const radius = { radius: isBig ? 180 : 150 };
   const angleAxis = {
     type: 'category',
     startAngle: 0,
@@ -205,8 +205,8 @@ function generateOuter(measurements: MeasurementRow[]) {
   return { radius, angleAxis, radiusAxis, series };
 }
 
-function generateActuals(measurements: MeasurementRow[]) {
-  const radius = 120;
+function generateActuals(measurements: MeasurementRow[], isBig: boolean = false) {
+  const radius = isBig ? 150 : 120;
   const seriesData:any =[] ;
   const firstClassFields = getFirstClassFields(measurements[0]);
   let field: any = null;
