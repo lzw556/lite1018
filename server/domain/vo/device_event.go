@@ -39,7 +39,7 @@ func NewDeviceEvent(e entity.Event) DeviceEvent {
 			event.Message = message
 		}
 	} else {
-		event.Message = fmt.Sprintf("%s(错误码: %d)", e.Code.String(), content.Code)
+		event.Message = fmt.Sprintf("%s", content.Data)
 	}
 	return event
 }

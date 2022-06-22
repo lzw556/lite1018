@@ -15,6 +15,7 @@ const (
 
 const (
 	EventCodeDataAcquisitionFailed EventCode = iota + 90401
+	EventCodeDataAcquisitionMessage
 )
 
 const (

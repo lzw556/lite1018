@@ -10,7 +10,7 @@ import (
 type KxData struct {
 	Frequency     uint32    `json:"frequency"`
 	Values        []float64 `json:"values,omitempty"`
-	XAxis         []int     `json:"xAxis,omitempty"`
+	XAxis         []float64 `json:"xAxis,omitempty"`
 	HighEnvelopes []float64 `json:"highEnvelopes,omitempty"`
 	LowEnvelopes  []float64 `json:"lowEnvelopes,omitempty"`
 	XAxisUnit     string    `json:"xAxisUnit"`
@@ -25,21 +25,21 @@ func NewKxData(axis entity.AxisSensorData) KxData {
 
 func (data *KxData) SetFrequencyDomainValues(values [][2]float64) {
 	data.Values = make([]float64, len(values))
-	data.XAxis = make([]int, len(values))
+	data.XAxis = make([]float64, len(values))
 	data.XAxisUnit = "Hz"
 	for i, value := range values {
 		data.Values[i], _ = strconv.ParseFloat(fmt.Sprintf("%.3f", value[0]), 64)
-		data.XAxis[i] = int(value[1])
+		data.XAxis[i] = value[1]
 	}
 }
 
 func (data *KxData) SetTimeDomainValues(values []float64) {
 	data.Values = make([]float64, len(values))
-	data.XAxis = make([]int, len(values))
+	data.XAxis = make([]float64, len(values))
 	data.XAxisUnit = "ms"
 	for i := range values {
 		data.Values[i], _ = strconv.ParseFloat(fmt.Sprintf("%.3f", values[i]), 64)
-		data.XAxis[i] = int(float32(i+1) / float32(data.Frequency) * 1000)
+		data.XAxis[i] = float64(i+1) / float64(data.Frequency) * 1000
 	}
 }
 
