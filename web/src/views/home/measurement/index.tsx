@@ -205,6 +205,16 @@ const MeasurementManagement: React.FC = () => {
       );
   };
 
+  const getSelectedWind = () => {
+    if(assets.items.length > 0){
+      if(filters?.windTurbineId){
+        const wind = assets.items.find(asset => asset.id === filters?.windTurbineId);
+        if(wind) return wind.id;
+      }
+      return assets.items[0].id;
+  }
+}
+
   const generateFilters = () => {
     if (assets.items.length > 0) {
       return [
@@ -214,7 +224,7 @@ const MeasurementManagement: React.FC = () => {
             onChange={(val) => {
               setFilters((prev) => ({ ...prev, windTurbineId: val }));
             }}
-            defaultValue={filters?.windTurbineId || assets.items[0].id}
+            defaultValue={getSelectedWind()}
           >
             {assets.items.map(({ id, name }) => (
               <Select.Option key={id} value={id}>
