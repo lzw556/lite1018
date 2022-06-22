@@ -48,7 +48,7 @@ export function generateChartOptionsOfLastestData(measurements: MeasurementRow[]
         data = point.data.values[field.key];
         if (data) data = roundValue(data, field.precision);
       }
-        return { type: 'bar', name: point.name, data: [data], barMaxWidth: 50 };
+        return { type: 'bar', name: point.name, data: [data], barMaxWidth: 50, markLine: {symbol:'none', data: getMarkLines(attributes)} };
       })
     };
   } else {
@@ -122,6 +122,22 @@ export function generateChartOptionsOfLastestData(measurements: MeasurementRow[]
       series
     };
   }
+}
+
+function getMarkLines(attributes?: AssetRow['attributes']) {
+  const values: { yAxis: number; lineStyle: { color: string } }[] = [];
+  if (attributes) {
+    if (attributes.info && Number(attributes.info)) {
+      values.push({ yAxis: attributes.info, lineStyle: { color: ColorInfo } });
+    }
+    if (attributes.warn && Number(attributes.warn)) {
+      values.push({ yAxis: attributes.warn, lineStyle: { color: ColorWarn } });
+    }
+    if (attributes.danger && Number(attributes.danger)) {
+      values.push({ yAxis: attributes.danger, lineStyle: { color: ColorDanger } });
+    }
+  }
+  return values;
 }
 
 function generateRowOfTooltip(marker: string, seriesName: string, text: string) {
