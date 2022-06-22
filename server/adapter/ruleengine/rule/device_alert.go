@@ -2,8 +2,6 @@ package rule
 
 import (
 	"context"
-	"strings"
-
 	"github.com/bilibili/gengine/engine"
 	"github.com/shopspring/decimal"
 	"github.com/spf13/cast"
@@ -13,27 +11,26 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/devicetype"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/transaction"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/xlog"
+	"strings"
 )
 
 type DeviceAlert struct {
-	id                            uint
-	alarmRule                     entity.AlarmRule
-	sensorDataRepo                dependency.SensorDataRepository
-	deviceRepo                    dependency.DeviceRepository
-	deviceAlertStateRepo          dependency.DeviceAlertStateRepository
-	alarmRecordRepo               dependency.AlarmRecordRepository
-	monitoringPointAlertStateRepo dependency.MonitoringPointAlertStateRepository
+	id                   uint
+	alarmRule            entity.AlarmRule
+	sensorDataRepo       dependency.SensorDataRepository
+	deviceRepo           dependency.DeviceRepository
+	deviceAlertStateRepo dependency.DeviceAlertStateRepository
+	alarmRecordRepo      dependency.AlarmRecordRepository
 }
 
 func NewDeviceAlert(sourceID uint, e entity.AlarmRule) *DeviceAlert {
 	return &DeviceAlert{
-		id:                            sourceID,
-		alarmRule:                     e,
-		sensorDataRepo:                repository.SensorData{},
-		deviceRepo:                    repository.Device{},
-		deviceAlertStateRepo:          repository.DeviceAlertState{},
-		alarmRecordRepo:               repository.AlarmRecord{},
-		monitoringPointAlertStateRepo: repository.MonitoringPointAlertState{},
+		id:                   sourceID,
+		alarmRule:            e,
+		sensorDataRepo:       repository.SensorData{},
+		deviceRepo:           repository.Device{},
+		deviceAlertStateRepo: repository.DeviceAlertState{},
+		alarmRecordRepo:      repository.AlarmRecord{},
 	}
 }
 
@@ -131,13 +128,7 @@ func (a *DeviceAlert) Recovery(source interface{}, value float64) {
 				if err := a.alarmRecordRepo.Save(txCtx, &record); err != nil {
 					return err
 				}
-
-				if record.Category == entity.AlarmRuleCategoryDevice {
-
-					return a.deviceAlertStateRepo.Delete(device.MacAddress, a.alarmRule.ID)
-				} else {
-					return a.monitoringPointAlertStateRepo.Delete(record.SourceID, a.alarmRule.ID)
-				}
+				return a.deviceAlertStateRepo.Delete(device.MacAddress, a.alarmRule.ID)
 			})
 			if err == nil {
 				device.AlertNotify(a.alarmRule.Metric, value, 0)
