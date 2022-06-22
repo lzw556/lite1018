@@ -17,20 +17,22 @@ export type TableListItem<T> = TableProps<T> & {
     xxl: { span: number };
   };
 };
+type Chart = {
+  title?: string;
+  colProps: {
+    xs: { span: number };
+    sm: { span: number };
+    md: { span: number };
+    xl: { span: number };
+    xxl: { span: number };
+  };
+  options?: ChartOptions<unknown>;
+  style?: React.CSSProperties;
+  render?: JSX.Element;
+};
 export type Overview = {
   statistics?: NameValue[];
-  chartList?: {
-    title: string;
-    colProps: {
-      xs: { span: number };
-      sm: { span: number };
-      md: { span: number };
-      xl: { span: number };
-      xxl: { span: number };
-    };
-    options?: ChartOptions<unknown>;
-    style?: React.CSSProperties;
-  }[];
+  chartList?: Chart[];
   introductionList?: Introduction[];
   tabelList?: TableListItem<any>[];
 };
@@ -38,6 +40,11 @@ export const OverviewPage: React.FC<Overview> = (props) => {
   const { statistics, chartList, introductionList, tabelList } = props;
   const colProps = generateColProps({ md: 12, lg: 12, xl: 4, xxl: 4 });
   const colProps2 = generateColProps({ md: 12, lg: 12, xl: 8, xxl: 6 });
+
+  const renderChart = ({ options, title, style, render }: Chart) => {
+    if (render) return render;
+    return <ChartContainer title={title || ''} options={options} style={style} />;
+  };
 
   return (
     <Row gutter={[0, 16]}>
@@ -58,12 +65,10 @@ export const OverviewPage: React.FC<Overview> = (props) => {
         <Col span={24}>
           <ShadowCard>
             <Row>
-              {chartList.map(({ colProps, options, title, style }, index) => {
+              {chartList.map((chart, index) => {
                 return (
                   <React.Fragment key={index}>
-                    <Col {...colProps}>
-                      <ChartContainer title={title} options={options} style={style} />
-                    </Col>
+                    <Col {...chart.colProps}>{renderChart(chart)}</Col>
                   </React.Fragment>
                 );
               })}

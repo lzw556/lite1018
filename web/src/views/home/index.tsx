@@ -4,7 +4,6 @@ import { Link, useLocation } from 'react-router-dom';
 import { AssetTypes } from './common/constants';
 import { AssetIcon } from './asset/icon';
 import { getAssets, getProjectStatistics } from './asset/services';
-import { Series_Bar } from './components/charts/bar';
 import { ChartOptions } from './components/charts/common';
 import { Series_Pie } from './components/charts/pie';
 import './home.css';
@@ -13,6 +12,7 @@ import { ColorHealth, ColorOffline } from '../../constants/color';
 import { Introduction } from './components/introductionPage';
 import { OverviewPage } from './components/overviewPage';
 import { generateProjectAlarmStatis, getAssetStatistics } from './common/statisticsHelper';
+import { AlarmStatisticOfProject } from './AlarmStatisticOfProject';
 
 export type ProjectStatistics = {
   deviceOfflineNum: number;
@@ -37,7 +37,6 @@ const ProjectOverview: React.FC = () => {
   const [statisticOfMeasurement, setStatisticOfMeasurement] =
     React.useState<ChartOptions<Series_Pie>>();
   const [statisticOfSensor, setStatisticOfSensor] = React.useState<ChartOptions<Series_Pie>>();
-  const [statisticOfAlarm, setStatisticOfAlarm] = React.useState<ChartOptions<Series_Bar>>();
   React.useEffect(() => {
     getProjectStatistics().then(
       ({
@@ -97,44 +96,6 @@ const ProjectOverview: React.FC = () => {
         })
       })
     );
-    setStatisticOfAlarm({
-      title: {
-        text: '暂无数据',
-        left: 'center',
-        top: 'center'
-      },
-      legend: {
-        bottom: 20,
-        data: [
-          // { name: '次要', itemStyle: { color: ColorInfo } },
-          // { name: '重要', itemStyle: { color: ColorWarn } },
-          // { name: '紧急', itemStyle: { color: ColorDanger } }
-        ]
-      },
-      tooltip: { trigger: 'axis' },
-      xAxis: {
-        type: 'category',
-        data: []
-      },
-      yAxis: { type: 'value', minInterval: 1 },
-      series: [
-        {
-          type: 'bar',
-          name: '次要',
-          data: []
-        },
-        {
-          type: 'bar',
-          name: '重要',
-          data: []
-        },
-        {
-          type: 'bar',
-          name: '紧急',
-          data: []
-        }
-      ]
-    });
   }, [pathname, search]);
 
   const generatePieOptions = (
@@ -191,7 +152,7 @@ const ProjectOverview: React.FC = () => {
           { title: '风机', colProps, options: statisticOfAsset },
           { title: '监测点', colProps, options: statisticOfMeasurement },
           { title: '传感器', colProps, options: statisticOfSensor },
-          { title: '报警趋势', colProps: colProps2, options: statisticOfAlarm }
+          { colProps: colProps2, render: <AlarmStatisticOfProject title='报警趋势'/> }
         ],
         introductionList: windTurbines.items
       }}
