@@ -146,7 +146,8 @@ export function generateChartOptionsOfHistoryData(
   return {
     title: {
       text: '',
-      left: 'center'
+      left: 80,
+      subtext: crtProperty ? `${crtProperty.name}(${crtProperty.unit})` : ''
     },
     legend: { bottom: 0 },
     tooltip: { trigger: 'axis', valueFormatter: (value: any) => `${getDisplayValue(value, crtProperty?.precision, crtProperty?.unit)}` },

@@ -94,7 +94,7 @@ const HistoryDataPage: FC<DeviceDataProps> = ({device}) => {
                         return relVal;
                     }
                 },
-                title: {text: property.name},
+                title: {text: `${property.name}${property.unit ? `(${property.unit})` : ''}`},
                 legend: {data: legends, left: isMobile ? 'right':'center'},
                 series,
                 xAxis: {
