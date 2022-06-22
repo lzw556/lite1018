@@ -5,7 +5,7 @@ import { useHistory } from 'react-router-dom';
 import { CheckAlarmRuleNameRequest } from '../../../../apis/alarm';
 import MyBreadcrumb from '../../../../components/myBreadcrumb';
 import ShadowCard from '../../../../components/shadowCard';
-import { defaultValidateMessages, Normalizes, Rules } from '../../../../constants/validator';
+import { defaultValidateMessages, Rules } from '../../../../constants/validator';
 import { MeasurementTypes } from '../../common/constants';
 import { AlarmRule } from '../props';
 import { addAlarmRule, getPropertiesByMeasurementType } from '../services';
@@ -55,7 +55,7 @@ const AlarmRuleGroupCreation = () => {
             rules={[{ required: true, message: '请选择监测点类型' }]}
           >
             <Select
-              style={{ width: '25%', minWidth: 80 }}
+              style={{ width: 435 }}
               onChange={(e) => {
                 getPropertiesByMeasurementType(e).then((res) => {
                   const measurementType = Object.values(MeasurementTypes).find(
@@ -118,6 +118,7 @@ const AlarmRuleGroupCreation = () => {
                       >
                         <Select
                           disabled={disabled}
+                          style={{ width: 435 }}
                           onChange={(e) => {
                             const property = properties.find(({ key }) => e === key);
                             if (property && property.fields && property.fields.length > 0) {
@@ -144,14 +145,13 @@ const AlarmRuleGroupCreation = () => {
                       <Form.Item
                         {...restFields}
                         name={[name, 'duration']}
-                        normalize={Normalizes.number}
                         rules={[Rules.number]}
                         initialValue={1}
-                        style={{display:'inline-flex', marginRight: 20}}
+                        style={{display:'inline-flex', marginRight: 20, marginBottom: 0}}
                       >
                         <Input style={{ width: 80 }} />
                       </Form.Item>
-                      <Form.Item label='条件' style={{display:'inline-flex', marginRight: 20}} required>
+                      <Form.Item label='条件' style={{display:'inline-flex', marginRight: 20, marginBottom: 0}} required>
                         <Input.Group compact>
                           <Form.Item
                             {...restFields}
@@ -192,7 +192,7 @@ const AlarmRuleGroupCreation = () => {
                         {...restFields}
                         name={[name, 'level']}
                         initialValue={3}
-                        style={{display:'inline-flex'}}
+                        style={{display:'inline-flex', marginBottom: 0}}
                       >
                         <Select style={{ width: 80 }}>
                           <Select.Option key={1} value={1}>

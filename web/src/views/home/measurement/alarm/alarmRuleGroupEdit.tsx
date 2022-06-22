@@ -63,7 +63,7 @@ const AlarmRuleGroupEdit = () => {
             name='type'
             rules={[{ required: true, message: '请选择监测点类型' }]}
           >
-            <Select disabled={true} style={{ width: '25%', minWidth: 80 }}>
+            <Select disabled={true} style={{ width: 435 }}>
               {Object.values(MeasurementTypes).map(({ label, id }) => (
                 <Select.Option key={id} value={id}>
                   {label}
@@ -93,7 +93,7 @@ const AlarmRuleGroupEdit = () => {
                           : [Rules.range(4, 16), { validator: onNameValidator }]
                       }
                     >
-                      <Input placeholder={`请填写名称`} readOnly={index < rule.rules.length} style={{ width: 435 }}/>
+                      <Input placeholder={`请填写名称`} readOnly={index < rule.rules.length} style={{ width: 435 }} disabled={true}/>
                     </Form.Item>
                     <Form.Item required label='周期'>
                       <Form.Item
