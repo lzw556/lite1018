@@ -1,5 +1,5 @@
 import { MinusCircleOutlined } from '@ant-design/icons';
-import { Button, Cascader, Divider, Form, Input, Select } from 'antd';
+import { Button, Divider, Form, Input, Select } from 'antd';
 import * as React from 'react';
 import { useHistory } from 'react-router-dom';
 import { CheckAlarmRuleNameRequest } from '../../../../apis/alarm';
@@ -10,27 +10,9 @@ import { MeasurementTypes } from '../../common/constants';
 import { AlarmRule } from '../props';
 import { addAlarmRule, getPropertiesByMeasurementType } from '../services';
 
-interface DataNode {
-  label: React.ReactNode;
-  title?: string;
-  value: string | number;
-  disabled?: boolean;
-  children?: DataNode[];
-  isLeaf?: boolean;
-  loading?: boolean;
-  firstClassFieldKeys?: string[];
-}
-
 const AlarmRuleGroupCreation = () => {
   const history = useHistory();
   const [form] = Form.useForm();
-  const allOptions = Object.values(MeasurementTypes).map(({ label, id, firstClassFieldKeys }) => ({
-    value: id,
-    label,
-    isLeaf: false,
-    firstClassFieldKeys
-  }));
-  const [options, setOptions] = React.useState<DataNode[]>(allOptions);
   const [properties, setProperties] = React.useState<any[]>([]);
   const [metric, setMetric] = React.useState<{ key: string; name: string; unit: string }[]>([]);
   const [disabled, setDisabled] = React.useState(true);
@@ -63,8 +45,8 @@ const AlarmRuleGroupCreation = () => {
       <ShadowCard>
         <Form
           form={form}
-          labelCol={{ span: 2 }}
-          wrapperCol={{ span: 8 }}
+          labelCol={{ span: 3 }}
+          wrapperCol={{ span: 18 }}
           validateMessages={defaultValidateMessages}
         >
           <Form.Item
@@ -75,8 +57,19 @@ const AlarmRuleGroupCreation = () => {
             <Select
               style={{ width: '25%', minWidth: 80 }}
               onChange={(e) => {
-                setDisabled(false);
-                setOptions(allOptions.filter((node) => node.value === e));
+                getPropertiesByMeasurementType(e).then((res) => {
+                  const measurementType = Object.values(MeasurementTypes).find(
+                    ({ id }) => e === id
+                  );
+                  if (measurementType) {
+                    setDisabled(false);
+                    setProperties(
+                      res.filter((property) =>
+                        measurementType.firstClassFieldKeys.find((key: any) => key === property.key)
+                      )
+                    );
+                  }
+                });
                 const formData: AlarmRule['rules'] = form.getFieldValue('rules');
                 if (formData && formData.length > 0) {
                   form.setFieldsValue(
@@ -96,10 +89,10 @@ const AlarmRuleGroupCreation = () => {
             </Select>
           </Form.Item>
           <Form.Item label='名称' name='name' rules={[Rules.range(4, 16)]}>
-            <Input placeholder={`请填写名称`} />
+            <Input placeholder={`请填写名称`} style={{ width: 435 }}/>
           </Form.Item>
           <Form.Item label='描述' name='description' initialValue=''>
-            <Input placeholder={`请填写描述`} />
+            <Input placeholder={`请填写描述`} style={{ width: 435 }}/>
           </Form.Item>
           <Divider />
           <Form.List name='rules' initialValue={[0]}>
@@ -114,122 +107,105 @@ const AlarmRuleGroupCreation = () => {
                       rules={[Rules.range(4, 16), { validator: onNameValidator }]}
                       dependencies={index === 0 ? undefined : ['user', index - 1, 'name']}
                     >
-                      <Input placeholder={`请填写名称`} />
+                      <Input placeholder={`请填写名称`} style={{ width: 435 }}/>
                     </Form.Item>
-                    <Form.Item
-                      label='描述'
-                      {...restFields}
-                      name={[name, 'description']}
-                      initialValue=''
-                    >
-                      <Input placeholder={`请填写描述`} />
-                    </Form.Item>
-                    <Form.Item
-                      {...restFields}
-                      name={[name, 'index']}
-                      label='指标名称'
-                      rules={[{ required: true, message: '请选择指标名称' }]}
-                    >
-                      <Cascader
-                        placeholder={'请选择指标名称'}
-                        options={options}
-                        disabled={disabled}
-                        loadData={(selectedOptions: any) => {
-                          const targetOption = selectedOptions[selectedOptions.length - 1];
-                          targetOption.loading = true;
-                          getPropertiesByMeasurementType(Number(targetOption.value))
-                            .then((data) => {
-                              targetOption.loading = false;
-                              const properties = data.filter((property) =>
-                                targetOption.firstClassFieldKeys?.find(
-                                  (key: any) => key === property.key
-                                )
-                              );
-                              targetOption.children = properties.map((item) => {
-                                return { value: item.key, label: item.name };
-                              });
-                              setOptions([...options]);
-                              setProperties(properties);
-                            })
-                            .catch((_) => {
-                              targetOption.loading = false;
-                            });
-                        }}
-                        onChange={(values: any) => {
-                          let prop = properties.find(
-                            (item) => item.key === values[values.length - 1]
-                          );
-                          if (prop && prop.fields.length === 1) {
-                            setMetric((prev) => [
-                              ...prev,
-                              {
-                                key: prop.key + '.' + prop.fields[0].key,
-                                name: prop.name,
-                                unit: prop.unit
-                              }
-                            ]);
-                          }
-                        }}
-                      />
-                    </Form.Item>
-                    <Form.Item
-                      label='周期'
-                      {...restFields}
-                      name={[name, 'duration']}
-                      normalize={Normalizes.number}
-                      rules={[Rules.number]}
-                      initialValue={1}
-                    >
-                      <Input style={{ width: '50%' }} />
-                    </Form.Item>
-                    <Form.Item label='条件'>
-                      <Input.Group compact style={{ width: '50%' }}>
-                        <Form.Item
-                          {...restFields}
-                          name={[name, 'operation']}
-                          noStyle
-                          initialValue={'>='}
+                    {properties && properties.length > 0 && (
+                      <Form.Item
+                        {...restFields}
+                        name={[name, 'index']}
+                        label='指标名称'
+                        rules={[{ required: true, message: '请选择指标名称' }]}
+                      >
+                        <Select
+                          disabled={disabled}
+                          onChange={(e) => {
+                            const property = properties.find(({ key }) => e === key);
+                            if (property && property.fields && property.fields.length > 0) {
+                              setMetric((prev) => [
+                                ...prev,
+                                {
+                                  key: property.key + '.' + property.fields[0].key,
+                                  name: property.name,
+                                  unit: property.unit
+                                }
+                              ]);
+                            }
+                          }}
                         >
-                          <Select style={{ width: '30%', minWidth: 80 }}>
-                            <Select.Option key={'>'} value={'>'}>
-                              &gt;
+                          {properties.map(({ name, key }) => (
+                            <Select.Option key={key} value={key}>
+                              {name}
                             </Select.Option>
-                            <Select.Option key={'>='} value={'>='}>
-                              &gt;=
-                            </Select.Option>
-                            <Select.Option key={'<'} value={'<'}>
-                              &lt;
-                            </Select.Option>
-                            <Select.Option key={'<='} value={'<='}>
-                              &lt;=
-                            </Select.Option>
-                          </Select>
-                        </Form.Item>
-                        <Form.Item
-                          {...restFields}
-                          name={[name, 'threshold']}
-                          rules={[Rules.number]}
-                          noStyle
-                        >
-                          <Input
-                            style={{ width: '70%' }}
-                            suffix={metric.length > 0 && metric[index] ? metric[index].unit : ''}
-                          />
-                        </Form.Item>
-                      </Input.Group>
-                    </Form.Item>
-                    <Form.Item label='等级' {...restFields} name={[name, 'level']} initialValue={3}>
-                      <Select style={{ width: '15%', minWidth: 80 }}>
-                        <Select.Option key={1} value={1}>
-                          次要
-                        </Select.Option>
-                        <Select.Option key={2} value={2}>
-                          重要
-                        </Select.Option>
-                        <Select.Option key={3} value={3}>
-                          紧急
-                        </Select.Option>
-                      </Select>
+                          ))}
+                        </Select>
+                      </Form.Item>
+                    )}
+                    <Form.Item label='周期' required>
+                      <Form.Item
+                        {...restFields}
+                        name={[name, 'duration']}
+                        normalize={Normalizes.number}
+                        rules={[Rules.number]}
+                        initialValue={1}
+                        style={{display:'inline-flex', marginRight: 20}}
+                      >
+                        <Input style={{ width: 80 }} />
+                      </Form.Item>
+                      <Form.Item label='条件' style={{display:'inline-flex', marginRight: 20}} required>
+                        <Input.Group compact>
+                          <Form.Item
+                            {...restFields}
+                            name={[name, 'operation']}
+                            noStyle
+                            initialValue={'>='}
+                          >
+                            <Select style={{ width: 65 }}>
+                              <Select.Option key={'>'} value={'>'}>
+                                &gt;
+                              </Select.Option>
+                              <Select.Option key={'>='} value={'>='}>
+                                &gt;=
+                              </Select.Option>
+                              <Select.Option key={'<'} value={'<'}>
+                                &lt;
+                              </Select.Option>
+                              <Select.Option key={'<='} value={'<='}>
+                                &lt;=
+                              </Select.Option>
+                            </Select>
+                          </Form.Item>
+                          <Form.Item
+                            {...restFields}
+                            name={[name, 'threshold']}
+                            rules={[Rules.number]}
+                            noStyle
+                          >
+                            <Input
+                              style={{ width: 80 }}
+                              suffix={metric.length > 0 && metric[index] ? metric[index].unit : ''}
+                            />
+                          </Form.Item>
+                        </Input.Group>
+                      </Form.Item>
+                      <Form.Item
+                        label='等级'
+                        {...restFields}
+                        name={[name, 'level']}
+                        initialValue={3}
+                        style={{display:'inline-flex'}}
+                      >
+                        <Select style={{ width: 80 }}>
+                          <Select.Option key={1} value={1}>
+                            次要
+                          </Select.Option>
+                          <Select.Option key={2} value={2}>
+                            重要
+                          </Select.Option>
+                          <Select.Option key={3} value={3}>
+                            紧急
+                          </Select.Option>
+                        </Select>
+                      </Form.Item>
                     </Form.Item>
                     {name !== 0 && (
                       <Button
@@ -258,9 +234,11 @@ const AlarmRuleGroupCreation = () => {
                     rules: values.rules.map((rule, index) => ({
                       ...rule,
                       threshold: Number(rule.threshold),
-                      metric: metric[index]
+                      metric: metric[index],
+                      index: [values.type, rule.index]
                     }))
                   };
+                  console.log(final);
                   addAlarmRule(final).then(() =>
                     history.replace(`alarm-management?locale=alarmRules`)
                   );
