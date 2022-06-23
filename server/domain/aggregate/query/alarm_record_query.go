@@ -52,24 +52,23 @@ func (query AlarmRecordQuery) Paging(page, size int, from, to time.Time) ([]vo.A
 	if err != nil {
 		return nil, 0, err
 	}
-	result := make([]vo.AlarmRecord, 0)
+	result := make([]vo.AlarmRecord, len(es))
 	alertSources := map[uint]interface{}{}
-	for _, e := range es {
+	for i, e := range es {
 		if e.Category == entity.AlarmRuleCategoryMonitoringPoint {
-			if g, err := query.alarmRuleGroupRepo.Get(context.TODO(), e.AlarmRuleGroupID); err == nil {
-				record := vo.NewAlarmRecord(e)
-				record.AlarmRuleGroupName = g.Name
-				if _, ok := alertSources[e.SourceID]; !ok {
-					if mp, err := query.monitoringPointRepo.Get(ctx, e.SourceID); err == nil {
-						q := NewMonitoringPointQuery()
-						if voMp, err := q.Get(mp.ID); err == nil {
-							alertSources[e.SourceID] = voMp
-						}
+			result[i] = vo.NewAlarmRecord(e)
+			if g, err := query.alarmRuleGroupRepo.Get(context.TODO(), result[i].AlarmRuleGroupID); err == nil {
+				result[i].AlarmRuleGroupName = g.Name
+			}
+			if _, ok := alertSources[e.SourceID]; !ok {
+				if mp, err := query.monitoringPointRepo.Get(ctx, e.SourceID); err == nil {
+					q := NewMonitoringPointQuery()
+					if voMp, err := q.Get(mp.ID); err == nil {
+						alertSources[e.SourceID] = voMp
 					}
 				}
-				record.Source = alertSources[e.SourceID]
-				result = append(result, record)
 			}
+			result[i].Source = alertSources[e.SourceID]
 		}
 	}
 	return result, total, nil
