@@ -92,14 +92,14 @@ func (a *MonitoringPointAlert) Alert(source interface{}, value float64) {
 		if alertState.Rule.Level < a.alarmRule.Level {
 			monitoringPoint.UpdateAlarmRuleState(a.alarmRule)
 			if monitoringPoint.GetAlarmRuleState(a.alarmRule.ID).Duration == a.alarmRule.Duration {
-				source, err := a.alarmRuleGroupSourceRepo.GetBySpecs(context.TODO(), spec.AlarmRuleEqSpec(a.alarmRule.ID))
+				groupSource, err := a.alarmRuleGroupSourceRepo.GetBySpecs(context.TODO(), spec.AlarmRuleEqSpec(a.alarmRule.ID))
 				if err != nil {
 					xlog.Errorf("Invalid alarm rule ID: %d", a.alarmRule.ID)
 					return
 				}
 				record := entity.AlarmRecord{
 					AlarmRuleID:      a.alarmRule.ID,
-					AlarmRuleGroupID: source.AlarmRuleID,
+					AlarmRuleGroupID: groupSource.GroupID,
 					SourceID:         monitoringPoint.ID,
 					Metric:           a.alarmRule.Metric,
 					Level:            a.alarmRule.Level,
