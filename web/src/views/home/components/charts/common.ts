@@ -1,7 +1,7 @@
 export type Title = {
   text: string;
   left?: 'left' | 'center';
-  top?: 'top' | 'center';
+  top?: 'top' | 'center' | number;
   textStyle?: { color: string };
 };
 
@@ -11,11 +11,10 @@ export type Legend = {
   itemGap?: number;
   itemWidth?: number;
   itemHeight?: number;
-  textStyle?: {
-    fontSize: number;
-  }
+  textStyle?: any
   formatter?: any;
   width?: number | string;
+  left?: any;
 };
 
 export type XAxis = {

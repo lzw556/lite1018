@@ -14,7 +14,7 @@ export function generateChartOptionsOfLastestData(measurements: MeasurementRow[]
   const count = measurements.length;
   if (!count) return null;
   if(measurements.every(({data}) => !data)) return null;
-  if (measurements[0].type === MeasurementTypes.loosening_angle.id) {
+  if (false) {
     const firstClassFields = getFirstClassFields(measurements[0]);
     let field: any = null;
     if (firstClassFields.length > 0) {
@@ -236,7 +236,7 @@ function generateActuals(measurements: MeasurementRow[], isBig: boolean = false)
       value = data.values[field.key];
       if (value) {
         value = roundValue(value, field.precision);
-        if (value > max) max = value;
+        if (Math.abs(value) > max) max = Math.abs(value);
       }
     }
     seriesData.push({name, value});

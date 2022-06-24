@@ -56,7 +56,7 @@ const AssetManagement: React.FC = () => {
     },
     {
       type: 'primary',
-      children: React.Children.toArray(['导出', <ExportOutlined />]),
+      children: React.Children.toArray(['导出配置', <ExportOutlined />]),
       onClick: () => {
         exportAssets(getProject()).then((res) => {
           const url = window.URL.createObjectURL(new Blob([res.data]));
@@ -75,7 +75,7 @@ const AssetManagement: React.FC = () => {
       showUploadList: false,
       children: (
         <Button type='primary' loading={loading}>
-          导入<ImportOutlined />
+          导入配置<ImportOutlined />
         </Button>
       ),
       beforeUpload: (file) => {

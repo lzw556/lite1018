@@ -106,18 +106,29 @@ const ProjectOverview: React.FC = () => {
       title: {
         text: title,
         left: 'center',
-        top: 'center'
+        top: 125
       },
       legend: {
         bottom: 20,
         itemWidth: 15,
         itemHeight: 14,
-        itemGap: 15,
+        itemGap: 5,
+        left: '30%',
         formatter: (itemName: string) => {
           const series = data.find(({ name }) => itemName === name);
-          return series ? `${itemName} ${series.value}` : itemName;
+          return series ? `${itemName} {value|${series.value}}` : itemName;
         },
-        width: '50%'
+        width: '60%',
+        textStyle: {
+          rich: {
+            value: {
+              display: 'inline-block',
+              // color: '#fff',
+              backgroundColor: '#fff',
+              width: 30
+            }
+          }
+        }
       },
       series: [
         {
@@ -152,7 +163,7 @@ const ProjectOverview: React.FC = () => {
           { title: '风机', colProps, options: statisticOfAsset },
           { title: '监测点', colProps, options: statisticOfMeasurement },
           { title: '传感器', colProps, options: statisticOfSensor },
-          { colProps: colProps2, render: <AlarmStatisticOfProject title='报警趋势'/> }
+          { colProps: colProps2, render: <AlarmStatisticOfProject title='报警趋势' /> }
         ],
         introductionList: windTurbines.items
       }}
