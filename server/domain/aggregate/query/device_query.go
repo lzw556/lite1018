@@ -425,6 +425,7 @@ func (query DeviceQuery) downloadKxSensorData(device entity.Device, time time.Ti
 		Name: fmt.Sprintf("%s_%s.xlsx", device.MacAddress, time.Format("20060102")),
 		File: excelize.NewFile(),
 	}
+	_ = result.File.NewSheet("Raw")
 	col := 65
 	for k, v := range data.Values {
 		var e entity.AxisSensorData
@@ -434,6 +435,10 @@ func (query DeviceQuery) downloadKxSensorData(device entity.Device, time time.Ti
 		_ = result.File.SetCellValue("Sheet1", fmt.Sprintf("%s1", string(rune(col))), k)
 		for i, value := range getKxSensorData(e, calculate).Values {
 			_ = result.File.SetCellValue("Sheet1", fmt.Sprintf("%s%d", string(rune(col)), i+2), value)
+		}
+		_ = result.File.SetCellValue("Raw", fmt.Sprintf("%s1", string(rune(col))), k)
+		for i, value := range e.Values {
+			_ = result.File.SetCellValue("Raw", fmt.Sprintf("%s%d", string(rune(col)), i+2), value)
 		}
 		col += 1
 	}
