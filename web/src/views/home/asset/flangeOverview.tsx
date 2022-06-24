@@ -187,13 +187,20 @@ const FlangeOverview: React.FC = () => {
                 title: '分布图',
                 colProps: generateColProps({ xl: 12, xxl: 9 }),
                 options: generateChartOptionsOfLastestData(measurements, asset?.attributes, true),
-                style: { height: 550 }
+                style: { height: 550 },
+                clickHandler: (paras: any, instance: any) => {
+                  const index = paras.value[1];
+                  if(measurements.length > index) {
+                    history.replace(combineFinalUrl(pathname, search, MeasurementTypes.preload.url, measurements[index].id))
+                  }
+                }
               },
               {
                 title: `${measurementType.label}趋势`,
                 colProps: generateColProps({ xl: 12, xxl: 15 }),
                 options: statisticOfPreload,
-                style: { height: 550 }
+                style: { height: 550 },
+                clickHandler: (paras: any, instance: any) => {}
               }
             ]
           }}

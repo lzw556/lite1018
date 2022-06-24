@@ -29,6 +29,7 @@ type Chart = {
   options?: ChartOptions<unknown>;
   style?: React.CSSProperties;
   render?: JSX.Element;
+  clickHandler?: (paras: any, instance: any) => void;
 };
 export type Overview = {
   statistics?: NameValue[];
@@ -41,9 +42,16 @@ export const OverviewPage: React.FC<Overview> = (props) => {
   const colProps = generateColProps({ md: 12, lg: 12, xl: 4, xxl: 4 });
   const colProps2 = generateColProps({ md: 12, lg: 12, xl: 8, xxl: 6 });
 
-  const renderChart = ({ options, title, style, render }: Chart) => {
+  const renderChart = ({ options, title, style, render, clickHandler }: Chart) => {
     if (render) return render;
-    return <ChartContainer title={title || ''} options={options} style={style} />;
+    return (
+      <ChartContainer
+        title={title || ''}
+        options={options}
+        style={style}
+        clickHandler={clickHandler}
+      />
+    );
   };
 
   return (

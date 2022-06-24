@@ -1,11 +1,11 @@
 import { Empty, Spin } from 'antd';
 import * as React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useHistory } from 'react-router-dom';
 import { AssetNavigator } from '../components/assetNavigator';
 import '../home.css';
 import { MeasurementIcon } from '../measurement/icon';
 import { combineFinalUrl, generateColProps } from '../common/utils';
-import { AssetTypes } from '../common/constants';
+import { AssetTypes, MeasurementTypes } from '../common/constants';
 import { getAsset } from './services';
 import { AssetRow } from './props';
 import { MeasurementRow } from '../measurement/props';
@@ -16,6 +16,7 @@ import { generateChartOptionsOfLastestData } from '../common/historyDataHelper';
 
 const WindTurbineOverview: React.FC = () => {
   const { pathname, search } = useLocation();
+  const history = useHistory();
   const id = Number(search.substring(search.lastIndexOf('id=') + 3));
   const [asset, setAsset] = React.useState<AssetRow>();
   const [loading, setLoading] = React.useState(true);
@@ -60,7 +61,13 @@ const WindTurbineOverview: React.FC = () => {
               chart = {
                 title: '',
                 options: generateChartOptionsOfLastestData(item.monitoringPoints, item.attributes),
-                style: { left: '-24px', top: '-20px', height: 400 }
+                style: { left: '-24px', top: '-20px', height: 400 },
+                clickHandler: (paras: any, instance: any) => {
+                  const index = paras.value[1];
+                  if(item.monitoringPoints && item.monitoringPoints.length > index) {
+                    history.replace(combineFinalUrl(pathname, search, MeasurementTypes.preload.url, item.monitoringPoints[index].id))
+                  }
+                }
               };
               measurements.push(
                 ...item.monitoringPoints.map((point) => ({ ...point, assetName: item.name }))
@@ -95,7 +102,7 @@ const WindTurbineOverview: React.FC = () => {
         }
       }
     }
-  }, [asset, pathname, search]);
+  }, [asset, pathname, search, history]);
 
   if (loading) return <Spin />;
   if (!asset || !asset.children || asset.children.length === 0 || !flanges || flanges.length === 0)

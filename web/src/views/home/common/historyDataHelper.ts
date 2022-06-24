@@ -1,19 +1,28 @@
-import { round } from "lodash";
-import moment from "moment";
-import { LineChartStyles } from "../../../constants/chart";
-import { ColorDanger, ColorHealth, ColorInfo, ColorWarn } from "../../../constants/color";
-import { AssetRow } from "../asset/props";
-import { MeasurementRow, Property } from "../measurement/props";
-import { MeasurementTypes } from "./constants";
+import { round } from 'lodash';
+import moment from 'moment';
+import { LineChartStyles } from '../../../constants/chart';
+import { ColorDanger, ColorHealth, ColorInfo, ColorWarn } from '../../../constants/color';
+import { AssetRow } from '../asset/props';
+import { MeasurementRow, Property } from '../measurement/props';
+import { MeasurementTypes } from './constants';
+import {
+  convertAlarmLevelToState,
+  getAlarmLevelColor,
+  getAlarmStateText
+} from './statisticsHelper';
 
 export type HistoryData = {
   timestamp: number;
   values: Property[];
 }[];
-export function generateChartOptionsOfLastestData(measurements: MeasurementRow[], attributes?: AssetRow['attributes'], isBig: boolean = false) {
+export function generateChartOptionsOfLastestData(
+  measurements: MeasurementRow[],
+  attributes?: AssetRow['attributes'],
+  isBig: boolean = false
+) {
   const count = measurements.length;
   if (!count) return null;
-  if(measurements.every(({data}) => !data)) return null;
+  if (measurements.every(({ data }) => !data)) return null;
   if (false) {
     const firstClassFields = getFirstClassFields(measurements[0]);
     let field: any = null;
@@ -32,37 +41,49 @@ export function generateChartOptionsOfLastestData(measurements: MeasurementRow[]
         trigger: 'axis',
         formatter: (paras: any) => {
           let text = '';
-          paras.forEach(({ seriesName, marker, value }: any) => (text += `${generateRowOfTooltip(marker, seriesName, getDisplayValue(value, field.precision, field.unit))}`));
+          paras.forEach(
+            ({ seriesName, marker, value }: any) =>
+              (text += `${generateRowOfTooltip(
+                marker,
+                seriesName,
+                getDisplayValue(value, field.precision, field.unit)
+              )}`)
+          );
           return text;
         }
       },
-      grid: { top: 80, bottom: '100'},
+      grid: { top: 80, bottom: '100' },
       xAxis: {
         type: 'category',
         show: false
       },
       yAxis: { type: 'value' },
       series: measurements.map((point) => {
-      let data = NaN;
-      if (field && point.data) {
-        data = point.data.values[field.key];
-        if (data) data = roundValue(data, field.precision);
-      }
-        return { type: 'bar', name: point.name, data: [data], barMaxWidth: 50, markLine: {symbol:'none', data: getMarkLines(attributes)} };
+        let data = NaN;
+        if (field && point.data) {
+          data = point.data.values[field.key];
+          if (data) data = roundValue(data, field.precision);
+        }
+        return {
+          type: 'bar',
+          name: point.name,
+          data: [data],
+          barMaxWidth: 50,
+          markLine: { symbol: 'none', data: getMarkLines(attributes) }
+        };
       })
     };
   } else {
-    let radar:any = [];
-    const polar: {radius:number}[] = [];
-    const angleAxis:any = [];
-    const radiusAxis:any = [];
-    const series:any = [];
-    const sortedMeasurements = measurements
-    .sort((prev, next) => {
+    let radar: any = [];
+    const polar: { radius: number }[] = [];
+    const angleAxis: any = [];
+    const radiusAxis: any = [];
+    const series: any = [];
+    const sortedMeasurements = measurements.sort((prev, next) => {
       const prevIndex = prev.attributes?.index || 5;
       const nextIndex = next.attributes?.index || 5;
       return prevIndex - nextIndex;
-    })
+    });
     const outer = generateOuter(sortedMeasurements, isBig);
     polar.push(outer.radius);
     angleAxis.push(outer.angleAxis);
@@ -70,37 +91,72 @@ export function generateChartOptionsOfLastestData(measurements: MeasurementRow[]
     series.push(outer.series);
 
     const actuals = generateActuals(sortedMeasurements, isBig);
+    polar.push(actuals.radius);
+    angleAxis.push(actuals.angleAxis);
+    radiusAxis.push(actuals.radiusAxis);
     series.push(actuals.series);
-    radar.push(actuals.radar);
-    let startIndex = 1;
+    let startIndex = 2;
 
-    const scale = actuals.radius / actuals.max
-    if(attributes?.normal){
-      const normal = getLine(attributes?.normal * scale, startIndex, ColorHealth, attributes.normal);
+    const legends = [];
+    const scale = actuals.radius.radius / actuals.max;
+    if (attributes?.normal) {
+      const normal = getLine(
+        attributes?.normal * scale,
+        startIndex,
+        ColorHealth,
+        attributes.normal,
+        '额定值'
+      );
+      legends.push({name: '额定值', itemStyle: {color: ColorHealth}});
       polar.push(normal.radius);
       angleAxis.push(normal.angleAxis);
       radiusAxis.push(normal.radiusAxis);
-      startIndex ++;
+      series.push(normal.series);
+      startIndex++;
     }
-    if(attributes?.info){
-      const info = getLine(attributes?.info * scale, startIndex, ColorInfo, attributes.info);
+    if (attributes?.info) {
+      const info = getLine(
+        attributes?.info * scale,
+        startIndex,
+        ColorInfo,
+        attributes.info,
+        '次要报警'
+      );
+      legends.push({name: '次要报警', itemStyle: {color: ColorInfo}});
       polar.push(info.radius);
       angleAxis.push(info.angleAxis);
       radiusAxis.push(info.radiusAxis);
-      startIndex ++;
+      series.push(info.series);
+      startIndex++;
     }
-    if(attributes?.warn){
-      const warn = getLine(attributes?.warn * scale, startIndex, ColorWarn, attributes.warn);
+    if (attributes?.warn) {
+      const warn = getLine(
+        attributes?.warn * scale,
+        startIndex,
+        ColorWarn,
+        attributes.warn,
+        '重要报警'
+      );
+      legends.push({name: '重要报警', itemStyle: {color: ColorWarn}});
       polar.push(warn.radius);
       angleAxis.push(warn.angleAxis);
       radiusAxis.push(warn.radiusAxis);
-      startIndex ++;
+      series.push(warn.series);
+      startIndex++;
     }
-    if(attributes?.danger){
-      const danger = getLine(attributes?.danger * scale, startIndex, ColorDanger, attributes.danger);
+    if (attributes?.danger) {
+      const danger = getLine(
+        attributes?.danger * scale,
+        startIndex,
+        ColorDanger,
+        attributes.danger,
+        '严重报警'
+      );
+      legends.push({name: '严重报警', itemStyle: {color: ColorDanger}});
       polar.push(danger.radius);
       angleAxis.push(danger.angleAxis);
       radiusAxis.push(danger.radiusAxis);
+      series.push(danger.series);
     }
     return {
       radar,
@@ -108,15 +164,7 @@ export function generateChartOptionsOfLastestData(measurements: MeasurementRow[]
       angleAxis,
       radiusAxis,
       legend: {
-        data: [
-          {
-            name: '实际值',
-            icon: 'circle'
-          },
-          {
-            name: '报警值'
-          }
-        ],
+        data: legends,
         bottom: 0
       },
       series
@@ -148,9 +196,9 @@ export function generateChartOptionsOfHistoryData(
   history: { name: string; data: HistoryData }[],
   measurementType: typeof MeasurementTypes.loosening_angle
 ) {
-  let crtProperty:any = null;
-  const series = history.map(({name, data }) => {
-    const { property, seriesData} = pickHistoryData(data, measurementType.firstClassFieldKeys[0]);
+  let crtProperty: any = null;
+  const series = history.map(({ name, data }) => {
+    const { property, seriesData } = pickHistoryData(data, measurementType.firstClassFieldKeys[0]);
     crtProperty = property;
     return {
       type: 'line',
@@ -166,7 +214,11 @@ export function generateChartOptionsOfHistoryData(
       subtext: crtProperty ? `${crtProperty.name}(${crtProperty.unit})` : ''
     },
     legend: { bottom: 0 },
-    tooltip: { trigger: 'axis', valueFormatter: (value: any) => `${getDisplayValue(value, crtProperty?.precision, crtProperty?.unit)}` },
+    tooltip: {
+      trigger: 'axis',
+      valueFormatter: (value: any) =>
+        `${getDisplayValue(value, crtProperty?.precision, crtProperty?.unit)}`
+    },
     xAxis: { type: 'time' },
     yAxis: { type: 'value' },
     series
@@ -193,7 +245,20 @@ function generateOuter(measurements: MeasurementRow[], isBig: boolean = false) {
     axisLabel: { show: false },
     splitLine: { show: false }
   };
-  const seriesData = measurements.map(({ name, attributes }, index) => ({
+  const seriesData = measurements.map(({ name, attributes, data, alertLevel }, index) => {
+    const firstClassFields = getFirstClassFields(measurements[0]);
+    let field: any = null;
+    if (firstClassFields.length > 0) {
+      field = firstClassFields[0];
+    }
+    let value = 0;
+    if (field && data) {
+      value = data.values[field.key];
+      if (value) {
+        value = roundValue(value, field.precision);
+      }
+    }
+    return {
       name,
       value: [1, index, `${name}`],
       label: {
@@ -201,29 +266,39 @@ function generateOuter(measurements: MeasurementRow[], isBig: boolean = false) {
         color: '#fff',
         formatter: (paras: any) => attributes?.index
       },
-      tooltip: { formatter: '{b}' }
-    }));
-    const series = {
-      type: 'scatter',
-      name: 'outer',
-      coordinateSystem: 'polar',
-      polarIndex: 0,
-      symbol:
-        'path://M675.9 107.2H348.1c-42.9 0-82.5 22.9-104 60.1L80 452.1c-21.4 37.1-21.4 82.7 0 119.8l164.1 284.8c21.4 37.2 61.1 60.1 104 60.1h327.8c42.9 0 82.5-22.9 104-60.1L944 571.9c21.4-37.1 21.4-82.7 0-119.8L779.9 167.3c-21.4-37.1-61.1-60.1-104-60.1z',
-      symbolSize: 30,
-      data: seriesData,
+      tooltip: {
+        formatter: `${
+          alertLevel && alertLevel > 0
+            ? `${getAlarmStateText(convertAlarmLevelToState(alertLevel))}报警<br/>`
+            : ''
+        }${generateRowOfTooltip('', name, getDisplayValue(value, undefined, field?.unit))}`
+      },
       itemStyle: {
         opacity: 1,
-        color: '#555'
-      },
-      zlevel: 10
-    }
+        color:
+          !alertLevel || alertLevel === 0
+            ? '#555'
+            : getAlarmLevelColor(convertAlarmLevelToState(alertLevel))
+      }
+    };
+  });
+  const series = {
+    type: 'scatter',
+    name: 'outer',
+    coordinateSystem: 'polar',
+    polarIndex: 0,
+    symbol:
+      'path://M675.9 107.2H348.1c-42.9 0-82.5 22.9-104 60.1L80 452.1c-21.4 37.1-21.4 82.7 0 119.8l164.1 284.8c21.4 37.2 61.1 60.1 104 60.1h327.8c42.9 0 82.5-22.9 104-60.1L944 571.9c21.4-37.1 21.4-82.7 0-119.8L779.9 167.3c-21.4-37.1-61.1-60.1-104-60.1z',
+    symbolSize: 30,
+    data: seriesData,
+    zlevel: 10
+  };
   return { radius, angleAxis, radiusAxis, series };
 }
 
 function generateActuals(measurements: MeasurementRow[], isBig: boolean = false) {
-  const radius = isBig ? 150 : 120;
-  const seriesData:any =[] ;
+  const radius = { radius: isBig ? 150 : 120 };
+  const seriesData: any = [];
   const firstClassFields = getFirstClassFields(measurements[0]);
   let field: any = null;
   if (firstClassFields.length > 0) {
@@ -239,37 +314,49 @@ function generateActuals(measurements: MeasurementRow[], isBig: boolean = false)
         if (Math.abs(value) > max) max = Math.abs(value);
       }
     }
-    seriesData.push({name, value});
+    seriesData.push([value, (index * 360) / measurements.length]);
   });
-  const radar = {
-    axisName: { show: false },
-    indicator: measurements.map(({ name }) => ({ name, max })),
+  const angleAxis = {
+    polarIndex: 1,
+    type: 'value',
     startAngle: 0,
-    radius,
+    clockwise: false,
+    boundaryGap: false,
     axisLine: { show: false },
+    axisTick: { show: false },
+    axisLabel: { show: false },
     splitLine: { show: false },
-    splitArea: { show: false }
+    min: 0,
+    max: 360
+  };
+  const radiusAxis = {
+    polarIndex: 1,
+    type: 'value',
+    axisLine: { show: false },
+    axisTick: { show: false },
+    axisLabel: { show: false },
+    splitLine: { show: false },
+    max
   };
   const series = {
-    type: 'radar',
+    type: 'line',
     name: '实际值',
-    data: [{value: seriesData.map((item: any) => item.value)}],
-    tooltip:{ formatter: ({marker, value}: any) => {
-       let text = ''
-       measurements.forEach(({name}, index) => {
-         text += `${generateRowOfTooltip(marker, name, getDisplayValue(value[index], undefined, field?.unit))}`
-       })
-       return text;
-    } },
-    zlevel: 15
-  }
-  return { series, radar, max, radius };
+    data: [...seriesData, seriesData[0]],
+    itemStyle: { color: 'rgb(0,130,252)' },
+    tooltip: { show: false },
+    zlevel: 15,
+    coordinateSystem: 'polar',
+    polarIndex: 1,
+    smooth: false
+  };
+  return { series, max, radius, angleAxis, radiusAxis };
 }
 
-function getLine(rd:number, startIndex: number = 0, color: string, value: number){
+function getLine(rd: number, startIndex: number = 0, color: string, value: number, name: string) {
   const radius = { radius: rd };
   const angleAxis = {
-    axisLine: { show: true, lineStyle: { type: 'dashed', color } },
+    // axisLine: { show: true, lineStyle: { type: 'dashed', color } },
+    axisLine: { show: false },
     axisTick: { show: false },
     axisLabel: { show: false },
     splitLine: { show: false },
@@ -280,11 +367,24 @@ function getLine(rd:number, startIndex: number = 0, color: string, value: number
     axisTick: { show: false },
     axisLabel: { show: false, formatter: 'ok' },
     splitLine: { show: false },
-    polarIndex: startIndex,
-    name: value,
-    nameGap: 0
+    polarIndex: startIndex
+    // name: value,
+    // nameGap: 0
   };
-  return {radius, angleAxis, radiusAxis}
+  const data = [];
+  for (let index = 0; index < 360; index = index + 5) {
+    data.push([value, index]);
+  }
+  const series = {
+    type: 'line',
+    coordinateSystem: 'polar',
+    polarIndex: startIndex,
+    data,
+    symbol: 'none',
+    name,
+    lineStyle: { type: 'dashed', color }
+  };
+  return { radius, angleAxis, radiusAxis, series };
 }
 
 export function getHistoryDatas(data: HistoryData, propertyName?: string) {
@@ -329,7 +429,7 @@ function pickHistoryData(data: HistoryData, propertyName: string) {
     }
     return [moment.unix(timestamp).local().format('YYYY-MM-DD HH:mm:ss'), value];
   });
-  return {property: crtProperty, seriesData};
+  return { property: crtProperty, seriesData };
 }
 
 export function generateChartOptionsOfHistoryDatas(data: HistoryData, propertyName?: string) {
@@ -342,7 +442,11 @@ export function generateChartOptionsOfHistoryDatas(data: HistoryData, propertyNa
           let relVal = params[0].name;
           for (let i = 0; i < params.length; i++) {
             let value = Number(params[i].value);
-            relVal += `<br/> ${params[i].marker} ${params[i].seriesName}: ${getDisplayValue(value, undefined, property.unit)}`;
+            relVal += `<br/> ${params[i].marker} ${params[i].seriesName}: ${getDisplayValue(
+              value,
+              undefined,
+              property.unit
+            )}`;
           }
           return relVal;
         }
@@ -351,7 +455,9 @@ export function generateChartOptionsOfHistoryDatas(data: HistoryData, propertyNa
       grid: { bottom: 20, left: 50 },
       title: {
         text: `${property.name}${property.unit ? `(${property.unit})` : ''}`,
-        subtext: propertyName ? '' : `${seriesData.map(({ name, data }) => name + ' ' + data[data.length - 1])}`
+        subtext: propertyName
+          ? ''
+          : `${seriesData.map(({ name, data }) => name + ' ' + data[data.length - 1])}`
       },
       series: seriesData.map(({ name, data }, index) => ({
         type: 'line',
@@ -362,7 +468,7 @@ export function generateChartOptionsOfHistoryDatas(data: HistoryData, propertyNa
       xAxis: {
         type: 'category',
         boundaryGap: false,
-        axisLabel: {align: 'left'},
+        axisLabel: { align: 'left' },
         data: times.map((item) => moment.unix(item).local().format('YYYY-MM-DD HH:mm:ss'))
       },
       yAxis: { type: 'value' }
@@ -379,7 +485,7 @@ export function generatePropertyColumns(measurement: MeasurementRow) {
         key,
         render: ({ data }: MeasurementRow) => {
           let value = NaN;
-          if(data && data.values){
+          if (data && data.values) {
             value = data.values[key];
           }
           return getDisplayValue(value, precision);
@@ -390,7 +496,9 @@ export function generatePropertyColumns(measurement: MeasurementRow) {
         title: '采集时间',
         key: 'timestamp',
         render: (measurement: MeasurementRow) => {
-          return measurement.data && measurement.data.timestamp ? moment(measurement.data.timestamp * 1000).format('YYYY-MM-DD HH:mm:ss') : '-';
+          return measurement.data && measurement.data.timestamp
+            ? moment(measurement.data.timestamp * 1000).format('YYYY-MM-DD HH:mm:ss')
+            : '-';
         },
         width: 200
       });
@@ -407,8 +515,8 @@ function getDisplayValue(value: number | null | undefined, precision?: number, u
   return `${finalValue}${unit ?? ''}`;
 }
 
-function roundValue(value: number, precision?: number){
-  return round(value, precision ?? 3)
+function roundValue(value: number, precision?: number) {
+  return round(value, precision ?? 3);
 }
 
 function getKeysOfFirstClassFields(measurementType: number) {
