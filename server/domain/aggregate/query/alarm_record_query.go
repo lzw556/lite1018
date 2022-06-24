@@ -59,6 +59,8 @@ func (query AlarmRecordQuery) Paging(page, size int, from, to time.Time) ([]vo.A
 			result[i] = vo.NewAlarmRecord(e)
 			if g, err := query.alarmRuleGroupRepo.Get(context.TODO(), result[i].AlarmRuleGroupID); err == nil {
 				result[i].AlarmRuleGroupName = g.Name
+			} else {
+				result[i].AlarmRuleGroupID = 0
 			}
 			if _, ok := alertSources[e.SourceID]; !ok {
 				if mp, err := query.monitoringPointRepo.Get(ctx, e.SourceID); err == nil {
