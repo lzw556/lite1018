@@ -1,22 +1,15 @@
-import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
-import { Button, Col, Empty, Popconfirm, Row, Select, Space, Spin, Table, TableProps, Tag } from 'antd';
+import { PlusOutlined } from '@ant-design/icons';
+import { Button, Empty, Select, Spin } from 'antd';
 import * as React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { AssetTypes, MeasurementTypes } from '../common/constants';
+import { AssetTypes } from '../common/constants';
 import { AssetRow } from '../asset/props';
 import { getAssets } from '../asset/services';
 import { MeasurementEdit } from './edit';
 import { MeasurementRow } from './props';
-import { deleteMeasurement } from './services';
-import { combineFinalUrl } from '../common/utils';
 import Label from '../../../components/label';
 import { SearchResultPage } from '../components/searchResultPage';
-import { generatePropertyColumns } from '../common/historyDataHelper';
-import {
-  convertAlarmLevelToState,
-  getAlarmStateText,
-  getAlarmLevelColor
-} from '../common/statisticsHelper';
+import { MeasurementList } from './measurementList';
 
 const MeasurementManagement: React.FC = () => {
   const { pathname, search } = useLocation();
@@ -35,104 +28,6 @@ const MeasurementManagement: React.FC = () => {
   const [wind, setWind] = React.useState<AssetRow>();
   const [visible, setVisible] = React.useState(false);
   const [selectedRow, setSelectedRow] = React.useState<MeasurementRow>();
-
-  const generateTable = (id: number, title: string, dataSource: TableProps<any>['dataSource']) => {
-    return (
-      <Col span={24} key={id}>
-        <Link
-          to={combineFinalUrl(pathname, search, AssetTypes.Flange.url, id)}
-          style={{ display: 'block', marginBottom: 8, marginTop: 8, fontSize: 16 }}
-        >
-          {title}
-        </Link>
-        <Table
-          {...{
-            rowKey: 'id',
-            columns: [
-              {
-                title: '名称',
-                dataIndex: 'name',
-                key: 'name',
-                // width: 300,
-                render: (name: string, row: MeasurementRow) => (
-                  <Link
-                    to={combineFinalUrl(pathname, search, MeasurementTypes.preload.url, row.id)}
-                  >
-                    {name}
-                  </Link>
-                )
-              },
-              {
-                title: '状态',
-                dataIndex: 'alertLevel',
-                key: 'alertLevel',
-                width: 120,
-                render: (level: number) => {
-                  const alarmState = convertAlarmLevelToState(level);
-                  return (
-                    <Tag
-                      style={{
-                        border: `solid 1px ${getAlarmLevelColor(alarmState)}`,
-                        color: getAlarmLevelColor(alarmState)
-                      }}
-                    >
-                      {getAlarmStateText(alarmState)}
-                    </Tag>
-                  );
-                }
-              },
-              {
-                title: '传感器',
-                dataIndex: 'devices',
-                key: 'devices',
-                width: 200,
-                render: (name: string, row: MeasurementRow) =>
-                  row.bindingDevices && row.bindingDevices.length > 0
-                    ? row.bindingDevices.map(({ id, name }) => (
-                        <Link to={`/device-management?locale=devices/deviceDetail&id=${id}`}>
-                          {name}
-                        </Link>
-                      ))
-                    : ''
-              },
-              ...generatePropertyColumns(dataSource ? dataSource[0] : []),
-              {
-                title: '操作',
-                key: 'action',
-                render: (row: MeasurementRow) => (
-                  <Space>
-                    <Button type='text' size='small' title='编辑监测点'>
-                      <EditOutlined onClick={() => open(row)} />
-                    </Button>
-                    <Popconfirm
-                      title={'确定要删除该监测点吗?'}
-                      onConfirm={() => {
-                        deleteMeasurement(row.id).then(() => {
-                          fetchAssets({ type: AssetTypes.WindTurbind.id });
-                        });
-                      }}
-                    >
-                      <Button type='text' danger={true} size='small' title='删除监测点'>
-                        <DeleteOutlined />
-                      </Button>
-                    </Popconfirm>
-                  </Space>
-                ),
-                width: 120
-              }
-            ],
-            size: 'small',
-            dataSource,
-            pagination: false,
-            locale: {
-              emptyText: <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description='暂无数据' />
-            },
-            bordered: true
-          }}
-        />
-      </Col>
-    );
-  };
 
   const open = (selectedRow?: MeasurementRow) => {
     setSelectedRow(selectedRow);
@@ -156,40 +51,6 @@ const MeasurementManagement: React.FC = () => {
       setWind(assets.items.find((asset) => asset.id === filters.windTurbineId));
     }
   }, [filters, assets]);
-
-  const generateTables = () => {
-    if (!wind) return null;
-    if (
-      !wind.children ||
-      wind.children.length === 0 ||
-      (wind.children.length > 0 && wind.children.every(({ monitoringPoints }) => !monitoringPoints))
-    )
-      return <Empty description='没有法兰或监测点' image={Empty.PRESENTED_IMAGE_SIMPLE} />;
-    return (
-      <Row gutter={[0, 16]}>
-        {wind.children
-          .sort((prev, next) => {
-            const { type: prevType } = prev.attributes || { index: 5, type: 4 };
-            const { type: nextType } = next.attributes || { index: 5, type: 4 };
-            return prevType - nextType;
-          })
-          .filter(({ monitoringPoints }) => monitoringPoints && monitoringPoints.length > 0)
-          .map(({ id, name, monitoringPoints }) =>
-            generateTable(
-              id,
-              name,
-              monitoringPoints
-                ? monitoringPoints.sort((prev, next) => {
-                    const { index: prevIndex } = prev.attributes || { index: 5, type: 4 };
-                    const { index: nextIndex } = next.attributes || { index: 5, type: 4 };
-                    return prevIndex - nextIndex;
-                  })
-                : []
-            )
-          )}
-      </Row>
-    );
-  };
 
   const getSelectedWind = () => {
     if (assets.items.length > 0) {
@@ -253,7 +114,15 @@ const MeasurementManagement: React.FC = () => {
             <PlusOutlined />
           </Button>
         ),
-        results: generateTables()
+        results: (
+          <MeasurementList
+            wind={wind}
+            pathname={pathname}
+            search={search}
+            open={open}
+            fetchAssets={fetchAssets}
+          />
+        )
       }}
     >
       {visible && (
