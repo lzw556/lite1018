@@ -1,16 +1,5 @@
 import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
-import {
-  Button,
-  ButtonProps,
-  Empty,
-  Popconfirm,
-  Select,
-  Space,
-  Spin,
-  Table,
-  TableProps,
-  Tag
-} from 'antd';
+import { Button, Col, Empty, Popconfirm, Row, Select, Space, Spin, Table, TableProps, Tag } from 'antd';
 import * as React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { AssetTypes, MeasurementTypes } from '../common/constants';
@@ -46,21 +35,13 @@ const MeasurementManagement: React.FC = () => {
   const [wind, setWind] = React.useState<AssetRow>();
   const [visible, setVisible] = React.useState(false);
   const [selectedRow, setSelectedRow] = React.useState<MeasurementRow>();
-  const actions: ButtonProps[] = [
-    {
-      type: 'primary',
-      children: React.Children.toArray(['添加监测点', <PlusOutlined />]),
-      onClick: () => open(),
-      style: { position: 'fixed', top: 75, right: 25, zIndex: 10 }
-    }
-  ];
 
   const generateTable = (id: number, title: string, dataSource: TableProps<any>['dataSource']) => {
     return (
-      <>
+      <Col span={24} key={id}>
         <Link
           to={combineFinalUrl(pathname, search, AssetTypes.Flange.url, id)}
-          style={{display:'block', marginBottom: 8, marginTop: 8, fontSize: 16 }}
+          style={{ display: 'block', marginBottom: 8, marginTop: 8, fontSize: 16 }}
         >
           {title}
         </Link>
@@ -149,7 +130,7 @@ const MeasurementManagement: React.FC = () => {
             bordered: true
           }}
         />
-      </>
+      </Col>
     );
   };
 
@@ -177,44 +158,48 @@ const MeasurementManagement: React.FC = () => {
   }, [filters, assets]);
 
   const generateTables = () => {
-    if (!wind) return [];
+    if (!wind) return null;
     if (
       !wind.children ||
       wind.children.length === 0 ||
       (wind.children.length > 0 && wind.children.every(({ monitoringPoints }) => !monitoringPoints))
     )
-      return [<Empty description='没有法兰或监测点' image={Empty.PRESENTED_IMAGE_SIMPLE} />];
-    return wind.children
-      .sort((prev, next) => {
-        const { type: prevType } = prev.attributes || { index: 5, type: 4 };
-        const { type: nextType } = next.attributes || { index: 5, type: 4 };
-        return prevType - nextType;
-      })
-      .filter(({ monitoringPoints }) => monitoringPoints && monitoringPoints.length > 0)
-      .map(({ id, name, monitoringPoints }) =>
-        generateTable(
-          id,
-          name,
-          monitoringPoints
-            ? monitoringPoints.sort((prev, next) => {
-                const { index: prevIndex } = prev.attributes || { index: 5, type: 4 };
-                const { index: nextIndex } = next.attributes || { index: 5, type: 4 };
-                return prevIndex - nextIndex;
-              })
-            : []
-        )
-      );
+      return <Empty description='没有法兰或监测点' image={Empty.PRESENTED_IMAGE_SIMPLE} />;
+    return (
+      <Row gutter={[0, 16]}>
+        {wind.children
+          .sort((prev, next) => {
+            const { type: prevType } = prev.attributes || { index: 5, type: 4 };
+            const { type: nextType } = next.attributes || { index: 5, type: 4 };
+            return prevType - nextType;
+          })
+          .filter(({ monitoringPoints }) => monitoringPoints && monitoringPoints.length > 0)
+          .map(({ id, name, monitoringPoints }) =>
+            generateTable(
+              id,
+              name,
+              monitoringPoints
+                ? monitoringPoints.sort((prev, next) => {
+                    const { index: prevIndex } = prev.attributes || { index: 5, type: 4 };
+                    const { index: nextIndex } = next.attributes || { index: 5, type: 4 };
+                    return prevIndex - nextIndex;
+                  })
+                : []
+            )
+          )}
+      </Row>
+    );
   };
 
   const getSelectedWind = () => {
-    if(assets.items.length > 0){
-      if(filters?.windTurbineId){
-        const wind = assets.items.find(asset => asset.id === filters?.windTurbineId);
-        if(wind) return wind.id;
+    if (assets.items.length > 0) {
+      if (filters?.windTurbineId) {
+        const wind = assets.items.find((asset) => asset.id === filters?.windTurbineId);
+        if (wind) return wind.id;
       }
       return assets.items[0].id;
-  }
-}
+    }
+  };
 
   const generateFilters = () => {
     if (assets.items.length > 0) {
@@ -255,7 +240,22 @@ const MeasurementManagement: React.FC = () => {
   }
 
   return (
-    <SearchResultPage {...{ filters: generateFilters(), actions, results: generateTables() }}>
+    <SearchResultPage
+      {...{
+        filters: generateFilters(),
+        actions: (
+          <Button
+            type='primary'
+            style={{ position: 'fixed', top: 75, right: 25, zIndex: 10 }}
+            onClick={() => open()}
+          >
+            添加监测点
+            <PlusOutlined />
+          </Button>
+        ),
+        results: generateTables()
+      }}
+    >
       {visible && (
         <MeasurementEdit
           {...{

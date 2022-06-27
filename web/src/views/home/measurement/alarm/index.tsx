@@ -134,14 +134,13 @@ const AlarmRuleList = () => {
   return (
     <SearchResultPage
       {...{
-        actions: [
-          {
-            type: 'primary',
-            children: React.Children.toArray(['添加规则', <PlusOutlined />]),
-            href: '#/alarm-management?locale=alarmRules/addAlarmRuleGroup'
-          }
-        ],
-        results: [<Table {...result} />]
+        actions: (
+          <Button type='primary' href='#/alarm-management?locale=alarmRules/addAlarmRuleGroup'>
+            添加规则
+            <PlusOutlined />
+          </Button>
+        ),
+        results: <Table {...result} />
       }}
     >
       {visible && selectedRow && (

@@ -7,13 +7,13 @@ import {
 } from '@ant-design/icons';
 import {
   Button,
-  ButtonProps,
   Empty,
   message,
   Popconfirm,
   Space,
   Table,
   TableProps,
+  Upload,
   UploadProps
 } from 'antd';
 import * as React from 'react';
@@ -42,40 +42,14 @@ const AssetManagement: React.FC = () => {
   const [initialValues, setInitialValues] = React.useState(AssetTypes.WindTurbind);
   const [disabled, setDisabled] = React.useState(true);
   const [loading, setLoading] = React.useState(false);
-  const actions: ButtonProps[] = [
-    {
-      type: 'primary',
-      children: React.Children.toArray(['添加风机', <PlusOutlined />]),
-      onClick: () => open(AssetTypes.WindTurbind)
-    },
-    {
-      type: 'primary',
-      children: React.Children.toArray(['添加法兰', <PlusOutlined />]),
-      onClick: () => open(AssetTypes.Flange),
-      disabled
-    },
-    {
-      type: 'primary',
-      children: React.Children.toArray(['导出配置', <ExportOutlined />]),
-      onClick: () => {
-        exportAssets(getProject()).then((res) => {
-          const url = window.URL.createObjectURL(new Blob([res.data]));
-          const link = document.createElement('a');
-          link.href = url;
-          link.setAttribute('download', getFilename(res));
-          document.body.appendChild(link);
-          link.click();
-        });
-      }
-    }
-  ];
 
   const uploads: UploadProps[] = [
     {
       showUploadList: false,
       children: (
         <Button type='primary' loading={loading}>
-          导入配置<ImportOutlined />
+          导入配置
+          <ImportOutlined />
         </Button>
       ),
       beforeUpload: (file) => {
@@ -262,7 +236,83 @@ const AssetManagement: React.FC = () => {
   }, [assets]);
 
   return (
-    <SearchResultPage {...{ actions, uploads, results: [<Table {...result} />] }}>
+    <SearchResultPage
+      {...{
+        actions: (
+          <Space>
+            <Button type='primary' onClick={() => open(AssetTypes.WindTurbind)}>
+              添加风机
+              <PlusOutlined />
+            </Button>
+            <Button type='primary' onClick={() => open(AssetTypes.Flange)} disabled={disabled}>
+              添加法兰
+              <PlusOutlined />
+            </Button>
+            <Button
+              type='primary'
+              onClick={() => {
+                exportAssets(getProject()).then((res) => {
+                  const url = window.URL.createObjectURL(new Blob([res.data]));
+                  const link = document.createElement('a');
+                  link.href = url;
+                  link.setAttribute('download', getFilename(res));
+                  document.body.appendChild(link);
+                  link.click();
+                });
+              }}
+            >
+              导出配置
+              <ExportOutlined />
+            </Button>
+            <Upload
+              {...{
+                showUploadList: false,
+                children: (
+                  <Button type='primary' loading={loading}>
+                    导入配置
+                    <ImportOutlined />
+                  </Button>
+                ),
+                beforeUpload: (file) => {
+                  const reader = new FileReader();
+                  reader.readAsText(file);
+                  reader.onload = () => {
+                    try {
+                      const data = JSON.parse(reader.result as string);
+                      setLoading(true);
+                      importAssets(getProject(), data).then((res) => {
+                        setLoading(false);
+                        return new Promise<any>((resolve, reject) => {
+                          if (res.data.code === 200) {
+                            message.success('导入成功');
+                            fetchAssets({ type: AssetTypes.WindTurbind.id });
+                            resolve(1);
+                          } else {
+                            message.error(`导入失败: ${res.data.msg}`);
+                            reject(res.data.msg);
+                          }
+                        });
+                      });
+                    } catch (error) {
+                      message.error('文件内部格式不正确');
+                    } finally {
+                      return false;
+                    }
+                  };
+                }
+              }}
+            >
+              <Button type='primary' loading={loading}>
+                导入配置
+                <ImportOutlined />
+              </Button>
+            </Upload>
+          </Space>
+        ),
+        uploads,
+        results: <Table {...result} />
+      }}
+    >
       {visible && (
         <AssetEdit
           {...{
