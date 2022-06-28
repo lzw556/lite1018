@@ -2,8 +2,8 @@ import { Empty, Spin } from 'antd';
 import * as React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { AssetTypes } from './common/constants';
-import { AssetIcon } from './asset/icon';
-import { getAssets, getProjectStatistics } from './asset/services';
+import { WindTurbineIcon } from './summary/windTurbine/icon';
+import { getAssets, getProjectStatistics } from './assetList/services';
 import { ChartOptions } from './components/charts/common';
 import { Series_Pie } from './components/charts/pie';
 import './home.css';
@@ -90,7 +90,7 @@ const ProjectOverview: React.FC = () => {
               path: combineFinalUrl(pathname, search, AssetTypes.WindTurbind.url, item.id)
             },
             alarmState,
-            icon: { svg: <AssetIcon />, small: true },
+            icon: { svg: <WindTurbineIcon />, small: true },
             statistics
           };
         })

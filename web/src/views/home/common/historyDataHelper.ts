@@ -2,8 +2,8 @@ import { round } from 'lodash';
 import moment from 'moment';
 import { LineChartStyles } from '../../../constants/chart';
 import { ColorDanger, ColorHealth, ColorInfo, ColorWarn } from '../../../constants/color';
-import { AssetRow } from '../asset/props';
-import { MeasurementRow, Property } from '../measurement/props';
+import { AssetRow } from '../assetList/props';
+import { MeasurementRow, Property } from '../summary/measurement/props';
 import { MeasurementTypes } from './constants';
 import {
   convertAlarmLevelToState,

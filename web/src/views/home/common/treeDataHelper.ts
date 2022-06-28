@@ -1,5 +1,5 @@
 import { cloneDeep } from "lodash";
-import { MeasurementRow } from "../measurement/props";
+import { MeasurementRow } from "../summary/measurement/props";
 
 export type Node = {
   id: number;

@@ -2,18 +2,18 @@ import { Breadcrumb, Dropdown, Menu, Space } from 'antd';
 import * as React from 'react';
 import { Link, useHistory, useLocation } from 'react-router-dom';
 import { AssetTypes, MeasurementTypes } from '../common/constants';
-import { AssetRow } from '../asset/props';
-import { getAssets } from '../asset/services';
+import { getAssets } from '../assetList/services';
 import { combineFinalUrl } from '../common/utils';
 import { DownOutlined } from '@ant-design/icons';
 import { forEachTreeNode } from '../common/treeDataHelper';
 import { getMenus } from '../../../utils/session';
 import { Menu as MenuPro } from '../../../types/menu';
 import { Node } from '../common/treeDataHelper';
+import { AssetRow } from '../assetList/props';
 
 type BreadcrumbItemData = Node & { type?: number };
 export const AssetNavigator: React.FC<
-  Pick<Node, 'id' | 'parentId'> & { isForceRefresh?: boolean }
+  Pick<Node, 'id' | 'parentId'> & { isForceRefresh?: number }
 > = ({ id, parentId, isForceRefresh }) => {
   const history = useHistory();
   const { pathname, search } = useLocation();

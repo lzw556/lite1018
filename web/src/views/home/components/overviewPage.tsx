@@ -1,4 +1,4 @@
-import { Col, Row, Statistic, Table, TableProps } from 'antd';
+import { Col, Row, Statistic, TableProps, Tabs } from 'antd';
 import * as React from 'react';
 import ShadowCard from '../../../components/shadowCard';
 import { generateColProps } from '../common/utils';
@@ -36,9 +36,10 @@ export type Overview = {
   chartList?: Chart[];
   introductionList?: Introduction[];
   tabelList?: TableListItem<any>[];
+  tabs?: { key: string; tab: string; content: JSX.Element }[];
 };
 export const OverviewPage: React.FC<Overview> = (props) => {
-  const { statistics, chartList, introductionList, tabelList } = props;
+  const { statistics, chartList, introductionList, tabs } = props;
   const colProps = generateColProps({ md: 12, lg: 12, xl: 4, xxl: 4 });
   const colProps2 = generateColProps({ md: 12, lg: 12, xl: 8, xxl: 6 });
 
@@ -55,57 +56,61 @@ export const OverviewPage: React.FC<Overview> = (props) => {
   };
 
   return (
-    <Row gutter={[0, 16]}>
+    <>
       {statistics && (
-        <Col span={24} className='overview-statistic'>
-          <ShadowCard>
-            <Row>
-              {statistics.map(({ name, value, className }, index) => (
-                <Col span={4} key={index} {...colProps}>
-                  <Statistic title={name} value={value} className={className} />
+        <Row style={{marginBottom: 8}}>
+          <Col span={24} className='overview-statistic'>
+            <ShadowCard>
+              <Row>
+                {statistics.map(({ name, value, className }, index) => (
+                  <Col span={4} key={index} {...colProps}>
+                    <Statistic title={name} value={value} className={className} />
+                  </Col>
+                ))}
+              </Row>
+            </ShadowCard>
+          </Col>
+        </Row>
+      )}
+      <Row gutter={[0, 16]}>
+        {chartList && (
+          <Col span={24}>
+            <ShadowCard>
+              <Row>
+                {chartList.map((chart, index) => {
+                  return (
+                    <React.Fragment key={index}>
+                      <Col {...chart.colProps}>{renderChart(chart)}</Col>
+                    </React.Fragment>
+                  );
+                })}
+              </Row>
+            </ShadowCard>
+          </Col>
+        )}
+        {introductionList && (
+          <Col span={24}>
+            <Row gutter={[16, 16]}>
+              {introductionList.map((des) => (
+                <Col {...(des.colProps || colProps2)} key={des.id}>
+                  <IntroductionPage {...des} />
                 </Col>
               ))}
             </Row>
-          </ShadowCard>
-        </Col>
-      )}
-      {chartList && (
-        <Col span={24}>
-          <ShadowCard>
-            <Row>
-              {chartList.map((chart, index) => {
-                return (
-                  <React.Fragment key={index}>
-                    <Col {...chart.colProps}>{renderChart(chart)}</Col>
-                  </React.Fragment>
-                );
-              })}
-            </Row>
-          </ShadowCard>
-        </Col>
-      )}
-      {introductionList && (
-        <Col span={24}>
-          <Row gutter={[16, 16]}>
-            {introductionList.map((des) => (
-              <Col {...(des.colProps || colProps2)} key={des.id}>
-                <IntroductionPage {...des} />
-              </Col>
-            ))}
-          </Row>
-        </Col>
-      )}
-      {tabelList && (
-        <Col span={24}>
-          <Row gutter={[16, 16]}>
-            {tabelList.map(({ colProps, ...props }, index) => (
-              <Col key={index} {...colProps}>
-                <Table {...props} />
-              </Col>
-            ))}
-          </Row>
-        </Col>
-      )}
-    </Row>
+          </Col>
+        )}
+        {tabs && tabs.length > 0 && (
+          <Col span={24}>
+            <Tabs size='small'>
+              {tabs.map(({ key, tab, content }) => (
+                <Tabs.TabPane key={key} tab={tab}>
+                  {content}
+                </Tabs.TabPane>
+              ))}
+            </Tabs>
+          </Col>
+        )}
+      </Row>
+    </>
   );
 };
