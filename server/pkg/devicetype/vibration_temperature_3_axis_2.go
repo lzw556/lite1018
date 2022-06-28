@@ -23,6 +23,15 @@ func (v VibrationTemperature3Axis2) Settings() Settings {
 			Sort:     0,
 		},
 		{
+			Name:     "采集延时",
+			Key:      "sample_offset",
+			Type:     Uint32ValueType,
+			Value:    0,
+			Category: SensorsSettingCategory,
+			Group:    SettingGroupGeneral,
+			Sort:     1,
+		},
+		{
 			Name:  "是否启用自动增益",
 			Key:   "acc3_is_auto",
 			Type:  BoolValueType,
@@ -33,7 +42,7 @@ func (v VibrationTemperature3Axis2) Settings() Settings {
 			},
 			Category: SensorsSettingCategory,
 			Group:    SettingGroupGeneral,
-			Sort:     1,
+			Sort:     2,
 		},
 		{
 			Name:  "量程",
@@ -47,7 +56,7 @@ func (v VibrationTemperature3Axis2) Settings() Settings {
 			},
 			Category: SensorsSettingCategory,
 			Group:    SettingGroupGeneral,
-			Sort:     2,
+			Sort:     3,
 		},
 		{
 			Name:  "采样频率(X、Z轴)",
@@ -78,7 +87,7 @@ func (v VibrationTemperature3Axis2) Settings() Settings {
 			},
 			Category: SensorsSettingCategory,
 			Group:    SettingGroupGeneral,
-			Sort:     4,
+			Sort:     5,
 		},
 		{
 			Name:  "采样频率(Y轴)",
@@ -95,7 +104,7 @@ func (v VibrationTemperature3Axis2) Settings() Settings {
 			},
 			Category: SensorsSettingCategory,
 			Group:    SettingGroupGeneral,
-			Sort:     5,
+			Sort:     6,
 		},
 		{
 			Name:  "采样点数(Y轴)",
@@ -108,7 +117,7 @@ func (v VibrationTemperature3Axis2) Settings() Settings {
 			},
 			Category: SensorsSettingCategory,
 			Group:    SettingGroupGeneral,
-			Sort:     6,
+			Sort:     7,
 		},
 		{
 			Name:     "FFT运算基础频率",
@@ -118,7 +127,7 @@ func (v VibrationTemperature3Axis2) Settings() Settings {
 			Unit:     "Hz",
 			Category: SensorsSettingCategory,
 			Group:    SettingGroupGeneral,
-			Sort:     7,
+			Sort:     8,
 		},
 		{
 			Name:  "是否启用原始数据采样",
@@ -131,7 +140,7 @@ func (v VibrationTemperature3Axis2) Settings() Settings {
 			},
 			Category: SensorsSettingCategory,
 			Group:    SettingGroupAcceleration,
-			Sort:     8,
+			Sort:     9,
 		},
 		{
 			Name:     "原始数据采样周期",
@@ -144,7 +153,7 @@ func (v VibrationTemperature3Axis2) Settings() Settings {
 			Show:     32,
 			Category: SensorsSettingCategory,
 			Group:    SettingGroupAcceleration,
-			Sort:     9,
+			Sort:     10,
 		},
 		{
 			Name:     "原始数据采样延时",
@@ -156,7 +165,7 @@ func (v VibrationTemperature3Axis2) Settings() Settings {
 			Show:     32,
 			Category: SensorsSettingCategory,
 			Group:    SettingGroupAcceleration,
-			Sort:     10,
+			Sort:     11,
 		},
 		{
 			Name:  "原始数据采样量程(X、Z轴)",
@@ -172,7 +181,7 @@ func (v VibrationTemperature3Axis2) Settings() Settings {
 			Show:     32,
 			Category: SensorsSettingCategory,
 			Group:    SettingGroupAcceleration,
-			Sort:     11,
+			Sort:     12,
 		},
 		{
 			Name:  "原始数据采样频率(X、Z轴)",
@@ -189,7 +198,7 @@ func (v VibrationTemperature3Axis2) Settings() Settings {
 			Show:     32,
 			Category: SensorsSettingCategory,
 			Group:    SettingGroupAcceleration,
-			Sort:     12,
+			Sort:     13,
 		},
 		{
 			Name:  "原始数据采样时间(X、Z轴)",
@@ -211,7 +220,7 @@ func (v VibrationTemperature3Axis2) Settings() Settings {
 			Show:     32,
 			Category: SensorsSettingCategory,
 			Group:    SettingGroupAcceleration,
-			Sort:     13,
+			Sort:     14,
 		},
 		{
 			Name:  "原始数据采样频率(Y轴)",
@@ -230,7 +239,7 @@ func (v VibrationTemperature3Axis2) Settings() Settings {
 			Show:     32,
 			Category: SensorsSettingCategory,
 			Group:    SettingGroupAcceleration,
-			Sort:     14,
+			Sort:     15,
 		},
 		{
 			Name:  "原始数据采样时间(Y轴)",
@@ -252,7 +261,7 @@ func (v VibrationTemperature3Axis2) Settings() Settings {
 			Show:     32,
 			Category: SensorsSettingCategory,
 			Group:    SettingGroupAcceleration,
-			Sort:     15,
+			Sort:     16,
 		},
 	}
 }

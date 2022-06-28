@@ -22,13 +22,22 @@ func (AngleDip) Settings() Settings {
 			Sort:     0,
 		},
 		{
+			Name:     "采集延时",
+			Key:      "sample_offset",
+			Type:     Uint32ValueType,
+			Value:    0,
+			Category: SensorsSettingCategory,
+			Group:    SettingGroupGeneral,
+			Sort:     1,
+		},
+		{
 			Name:     "被测物半径",
 			Key:      "object_radius",
 			Type:     FloatValueType,
 			Category: SensorsSettingCategory,
 			Value:    0,
 			Group:    SettingGroupGeneral,
-			Sort:     1,
+			Sort:     2,
 		},
 		{
 			Name:     "被测物高度",
@@ -37,7 +46,7 @@ func (AngleDip) Settings() Settings {
 			Category: SensorsSettingCategory,
 			Value:    0,
 			Group:    SettingGroupGeneral,
-			Sort:     2,
+			Sort:     3,
 		},
 		{
 			Name:     "采样模式",
@@ -50,7 +59,7 @@ func (AngleDip) Settings() Settings {
 				2: "动态模式",
 			},
 			Group: SettingGroupGeneral,
-			Sort:  3,
+			Sort:  4,
 		},
 		{
 			Name:     "动态模式采样频率",
@@ -71,7 +80,7 @@ func (AngleDip) Settings() Settings {
 			Parent: "sensor_flags",
 			Show:   2,
 			Group:  SettingGroupGeneral,
-			Sort:   4,
+			Sort:   5,
 		},
 		{
 			Name:     "动态模式采样时间",
@@ -89,7 +98,7 @@ func (AngleDip) Settings() Settings {
 			Parent: "sensor_flags",
 			Show:   2,
 			Group:  SettingGroupGeneral,
-			Sort:   5,
+			Sort:   6,
 		},
 	}
 }

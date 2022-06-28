@@ -22,6 +22,15 @@ func (BoltLoosening) Settings() Settings {
 			Group:    SettingGroupGeneral,
 			Sort:     0,
 		},
+		{
+			Name:     "采集延时",
+			Key:      "sample_offset",
+			Type:     Uint32ValueType,
+			Value:    0,
+			Category: SensorsSettingCategory,
+			Group:    SettingGroupGeneral,
+			Sort:     1,
+		},
 	}
 }
 

@@ -23,6 +23,15 @@ func (BoltElongation) Settings() Settings {
 			Sort:     0,
 		},
 		{
+			Name:     "采集延时",
+			Key:      "sample_offset",
+			Type:     Uint32ValueType,
+			Value:    0,
+			Category: SensorsSettingCategory,
+			Group:    SettingGroupGeneral,
+			Sort:     1,
+		},
+		{
 			Name:  "采样模式",
 			Key:   "sensor_flags",
 			Type:  Uint64ValueType,
@@ -33,7 +42,7 @@ func (BoltElongation) Settings() Settings {
 			},
 			Category: SensorsSettingCategory,
 			Group:    SettingGroupGeneral,
-			Sort:     1,
+			Sort:     2,
 		},
 		{
 			Name:     "波速",
@@ -42,7 +51,7 @@ func (BoltElongation) Settings() Settings {
 			Value:    5920,
 			Category: SensorsSettingCategory,
 			Group:    SettingGroupGeneral,
-			Sort:     2,
+			Sort:     3,
 		},
 		{
 			Name:  "超声波扫描模式",
@@ -54,7 +63,7 @@ func (BoltElongation) Settings() Settings {
 			},
 			Category: SensorsSettingCategory,
 			Group:    SettingGroupGeneral,
-			Sort:     3,
+			Sort:     4,
 		},
 		{
 			Name:     "是否启用预紧力计算",
@@ -63,7 +72,7 @@ func (BoltElongation) Settings() Settings {
 			Value:    true, // true - enabled, false - disabled
 			Category: SensorsSettingCategory,
 			Group:    SettingGroupPreload,
-			Sort:     4,
+			Sort:     5,
 		},
 		{
 			Name:     "初始预紧力",
@@ -75,7 +84,7 @@ func (BoltElongation) Settings() Settings {
 			Show:     true,
 			Category: SensorsSettingCategory,
 			Group:    SettingGroupPreload,
-			Sort:     5,
+			Sort:     6,
 		},
 		{
 			Name:     "初始预紧长度",
@@ -87,7 +96,7 @@ func (BoltElongation) Settings() Settings {
 			Show:     true,
 			Category: SensorsSettingCategory,
 			Group:    SettingGroupPreload,
-			Sort:     6,
+			Sort:     7,
 		},
 		{
 			Name:     "预紧系数",
@@ -98,7 +107,7 @@ func (BoltElongation) Settings() Settings {
 			Show:     true,
 			Category: SensorsSettingCategory,
 			Group:    SettingGroupPreload,
-			Sort:     7,
+			Sort:     8,
 		},
 		{
 			Name:     "弹性模量",
@@ -110,7 +119,7 @@ func (BoltElongation) Settings() Settings {
 			Show:     true,
 			Category: SensorsSettingCategory,
 			Group:    SettingGroupPreload,
-			Sort:     8,
+			Sort:     9,
 		},
 		{
 			Name:     "截面积",
@@ -122,7 +131,7 @@ func (BoltElongation) Settings() Settings {
 			Show:     true,
 			Category: SensorsSettingCategory,
 			Group:    SettingGroupPreload,
-			Sort:     9,
+			Sort:     10,
 		},
 		{
 			Name:     "有效受力长度",
@@ -134,7 +143,7 @@ func (BoltElongation) Settings() Settings {
 			Show:     true,
 			Category: SensorsSettingCategory,
 			Group:    SettingGroupPreload,
-			Sort:     10,
+			Sort:     11,
 		},
 		{
 			Name:  "动态模式采样频率",
@@ -151,7 +160,7 @@ func (BoltElongation) Settings() Settings {
 			Show:     2,
 			Category: SensorsSettingCategory,
 			Group:    SettingGroupGeneral,
-			Sort:     11,
+			Sort:     12,
 		},
 		{
 			Name:  "动态模式采样时间",
@@ -169,7 +178,7 @@ func (BoltElongation) Settings() Settings {
 			Show:     2,
 			Category: SensorsSettingCategory,
 			Group:    SettingGroupGeneral,
-			Sort:     12,
+			Sort:     13,
 		},
 	}
 }

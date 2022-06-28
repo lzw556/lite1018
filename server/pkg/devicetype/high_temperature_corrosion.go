@@ -24,13 +24,22 @@ func (HighTemperatureCorrosion) Settings() Settings {
 			Sort:     0,
 		},
 		{
+			Name:     "采集延时",
+			Key:      "sample_offset",
+			Type:     Uint32ValueType,
+			Value:    0,
+			Category: SensorsSettingCategory,
+			Group:    SettingGroupGeneral,
+			Sort:     1,
+		},
+		{
 			Name:     "波速",
 			Key:      "speed_object",
 			Type:     FloatValueType,
 			Value:    5920,
 			Category: SensorsSettingCategory,
 			Group:    SettingGroupCorrosion,
-			Sort:     1,
+			Sort:     2,
 		},
 		{
 			Name:  "导波杆长",
@@ -46,7 +55,7 @@ func (HighTemperatureCorrosion) Settings() Settings {
 			},
 			Category: SensorsSettingCategory,
 			Group:    SettingGroupCorrosion,
-			Sort:     2,
+			Sort:     3,
 		},
 		{
 			Name:     "腐蚀率短周期",
@@ -56,7 +65,7 @@ func (HighTemperatureCorrosion) Settings() Settings {
 			Unit:     "天",
 			Category: SensorsSettingCategory,
 			Group:    SettingGroupCorrosion,
-			Sort:     2,
+			Sort:     4,
 		},
 		{
 			Name:     "腐蚀率长周期",
@@ -66,7 +75,7 @@ func (HighTemperatureCorrosion) Settings() Settings {
 			Unit:     "天",
 			Category: SensorsSettingCategory,
 			Group:    SettingGroupCorrosion,
-			Sort:     3,
+			Sort:     5,
 		},
 	}
 }
