@@ -52,7 +52,7 @@ func (p Event) Process(ctx *iot.Context, msg iot.Message) error {
 					Category:  entity.EventCategoryDevice,
 					SourceID:  device.ID,
 					Timestamp: int64(m.Timestamp),
-					Content:   fmt.Sprintf(`{"code": -1, data": %s}`, m.Message),
+					Content:   fmt.Sprintf(`{"code": -1, "data": %s}`, m.Message),
 					ProjectID: device.ProjectID,
 				}
 			}
