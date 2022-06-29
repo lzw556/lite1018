@@ -7,42 +7,42 @@ const AlertMessageNotification = () => {
     const [api, contextHolder] = notification.useNotification();
 
     useEffect(() => {
-        PubSub.subscribe(SocketTopic.deviceAlert, (msg: string, data: any) => {
+        PubSub.subscribe(SocketTopic.monitoringPointAlert, (msg: string, data: any) => {
             console.log(data)
             renderNotification(data)
         })
         return () => {
-            PubSub.unsubscribe(SocketTopic.deviceAlert)
+            PubSub.unsubscribe(SocketTopic.monitoringPointAlert)
         }
     }, [])
 
     const renderNotification = (record: any) => {
-        console.log(`notification ${record.device}`)
+        console.log(`notification ${record}`)
         switch (record.level) {
             case 1:
                 api.info({
-                    key: record.device.macAddress,
+                    key: `${record.monitoringPoint.id}-${record.level}`,
                     message: `次要报警`,
                     description: <div>{renderDescription(record)}</div>,
                 })
                 break
             case 2:
                 api.warning({
-                    key: record.device.macAddress,
+                    key: `${record.monitoringPoint.id}-${record.level}`,
                     message: `重要报警`,
                     description: <div>{renderDescription(record)}</div>,
                 })
                 break
             case 3:
                 api.error({
-                    key: record.device.macAddress,
+                    key: `${record.monitoringPoint.id}-${record.level}`,
                     message: `紧急报警`,
                     description: <div>{renderDescription(record)}</div>,
                 })
                 break
             default:
                 api.success({
-                    key: record.device.macAddress,
+                    key: `${record.monitoringPoint.id}-${record.level}`,
                     message: `恢复正常`,
                     description: <div>{renderDescription(record)}</div>,
                 })
@@ -52,7 +52,7 @@ const AlertMessageNotification = () => {
 
     const renderDescription = (record:any) => {
         return <>
-            <p>{`报警设备: ${record.device.name}`}</p>
+            <p>{`报警监测点: ${record.monitoringPoint.name}`}</p>
             <p>{`报警属性: ${record.metric.name}`}</p>
             <p>{`报警值: ${record.value}`}</p>
         </>
