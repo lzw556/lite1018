@@ -3,7 +3,6 @@ import { FilterableAlarmRecordTable } from '../../../../../components/alarm/filt
 import ShadowCard from '../../../../../components/shadowCard';
 import { MeasurementTypes } from '../../../common/constants';
 import { MeasurementRow } from '../props';
-import { Alarm } from './alarm';
 import { DynamicData } from './dynamicData';
 import { HistoryData } from './historyData';
 import { Monitor } from './monitor';
@@ -13,7 +12,6 @@ export const MeasurementContents: React.FC<MeasurementRow & { onUpdate?: () => v
   const contents: Record<string, JSX.Element> = {
     monitor: <Monitor {...measurement} />,
     history: <HistoryData {...measurement} />,
-    alarm: <Alarm {...measurement} />,
     dynamicData: <DynamicData {...measurement} />,
     setting: <MeasurementSettings {...measurement} />,
     alarmRecord: <FilterableAlarmRecordTable sourceId={measurement.id}/>

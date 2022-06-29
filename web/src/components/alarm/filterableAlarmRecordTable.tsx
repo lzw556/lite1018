@@ -38,7 +38,7 @@ export const FilterableAlarmRecordTable: React.FC<{ sourceId?: number }> = ({sou
         PagingAlarmRecordRequest(current, size, startDate.utc().unix(), endDate.utc().unix(), filters, sourceId).then(res => {
             setDataSource({page:res.page, size:res.size,total:res.total, result: res.result.sort((prev: any, next: any)=>prev.alarmRuleGroupId - next.alarmRuleGroupId)})
         })
-    }, [startDate, endDate, alertLevels, refreshKey, status])
+    }, [sourceId, startDate, endDate, alertLevels, status])
 
     React.useEffect(() => {
         fetchAlarmRecords(1, 10)
