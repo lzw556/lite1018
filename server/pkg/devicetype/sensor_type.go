@@ -13,4 +13,5 @@ const (
 	SCL3300Sensor                       = 16842755
 	DynamicSCL3300Sensor                = 16842756
 	KxSensor                            = 16842753
+	AdvancedKxSensor                    = 16842758
 )

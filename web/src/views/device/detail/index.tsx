@@ -122,6 +122,7 @@ const DeviceDetailPage = () => {
         const title = {key: 'alarm', tab: '报警记录'};
         switch (device.typeId) {
             case DeviceType.VibrationTemperature3Axis:
+            case DeviceType.VibrationTemperature3AxisAdvanced:
                 if (hasPermission(Permission.DeviceData)) {
                     tabs.unshift(...tabTitleList, {key: 'waveData', tab: '波形数据'}, title);
                 }

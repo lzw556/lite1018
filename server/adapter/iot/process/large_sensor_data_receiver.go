@@ -71,7 +71,7 @@ func (r LargeSensorDataReceiver) SensorData() (entity.SensorData, error) {
 	var decoder sensor.RawDataDecoder
 	xlog.Debugf("sensor type: %d", sensorType)
 	switch sensorType {
-	case devicetype.KxSensor:
+	case devicetype.KxSensor, devicetype.AdvancedKxSensor:
 		decoder = sensor.NewKx122Decoder()
 	case devicetype.DynamicLengthAttitudeSensor:
 		decoder = sensor.NewDynamicLengthAttitudeDecoder()

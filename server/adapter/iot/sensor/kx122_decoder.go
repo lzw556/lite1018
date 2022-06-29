@@ -1,7 +1,6 @@
 package sensor
 
 import (
-	"bytes"
 	"encoding/binary"
 	"fmt"
 	"github.com/mitchellh/mapstructure"
@@ -24,14 +23,14 @@ func (s Kx122Decoder) Decode(data []byte) (map[string]interface{}, error) {
 		number     uint32
 		dataLength uint32
 	}{}
-	for i := range metadata {
-		metaByte := data[i*24 : (i+1)*24]
-		_ = binary.Read(bytes.NewBuffer(metaByte[:1]), binary.LittleEndian, &metadata[i].dataType)
-		_ = binary.Read(bytes.NewBuffer(metaByte[1:2]), binary.LittleEndian, &metadata[i].axis)
-		_ = binary.Read(bytes.NewBuffer(metaByte[2:3]), binary.LittleEndian, &metadata[i].ranges)
-		_ = binary.Read(bytes.NewBuffer(metaByte[4:8]), binary.LittleEndian, &metadata[i].odr)
-		_ = binary.Read(bytes.NewBuffer(metaByte[8:12]), binary.LittleEndian, &metadata[i].number)
-		_ = binary.Read(bytes.NewBuffer(metaByte[12:16]), binary.LittleEndian, &metadata[i].dataLength)
+	metadataBytes := data[:72]
+	for i := 0; i < len(metadataBytes); i += 24 {
+		axis := metadataBytes[i+1]
+		metadata[axis].dataType = metadataBytes[i]
+		metadata[axis].ranges = metadataBytes[i+2]
+		metadata[axis].odr = binary.LittleEndian.Uint32(metadataBytes[i+4 : i+8])
+		metadata[axis].number = binary.LittleEndian.Uint32(metadataBytes[i+8 : i+12])
+		metadata[axis].dataLength = binary.LittleEndian.Uint32(metadataBytes[i+12 : i+16])
 	}
 
 	// decode raw data
@@ -43,15 +42,12 @@ func (s Kx122Decoder) Decode(data []byte) (map[string]interface{}, error) {
 		for i, m := range metadata {
 			axisData := valueBytes[rawDataOffset : rawDataOffset+int(m.dataLength)]
 			svtRawData.SetMetadata(i, m.ranges, m.odr, m.number)
-			values := make([]float64, 0)
-			j := 0
-			for j < len(axisData) {
-				var value int16
-				_ = binary.Read(bytes.NewBuffer(axisData[j:j+2]), binary.LittleEndian, &value)
-				values = append(values, float64(value))
-				j += 2
+			switch m.dataType {
+			case 3: // int16
+				svtRawData.SetValues(i, decodeInt16(axisData))
+			case 6: // uint24
+				svtRawData.SetValues(i, decodeUint24(axisData))
 			}
-			svtRawData.SetValues(i, values)
 			rawDataOffset += int(m.dataLength)
 		}
 		d := map[string]interface{}{}
@@ -61,4 +57,26 @@ func (s Kx122Decoder) Decode(data []byte) (map[string]interface{}, error) {
 		return d, nil
 	}
 	return nil, fmt.Errorf("invalid data length data length = %d, receive length = %d", totalLength, len(valueBytes))
+}
+
+func decodeInt16(data []byte) []float64 {
+	j := 0
+	values := make([]float64, 0)
+	for j < len(data) {
+		var value = int16(binary.LittleEndian.Uint16(data[j : j+2]))
+		values = append(values, float64(value))
+		j += 2
+	}
+	return values
+}
+
+func decodeUint24(data []byte) []float64 {
+	j := 0
+	values := make([]float64, 0)
+	for j < len(data) {
+		var value = binary.LittleEndian.Uint32(append(data[j:j+3], 0))
+		values = append(values, float64(value))
+		j += 3
+	}
+	return values
 }

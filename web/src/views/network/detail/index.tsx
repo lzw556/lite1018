@@ -99,7 +99,7 @@ const NetworkDetail = () => {
     if (network) {
       return (
         <Row style={{flexGrow:1}}>
-          <Col xl={16} xxl={18}>
+          <Col xl={16} xxl={18} id={"topologyView"}>
             <ShadowCard style={{height: '100%'}} bodyStyle={{height:'100%'}}>
               <TopologyView network={network} />
             </ShadowCard>
