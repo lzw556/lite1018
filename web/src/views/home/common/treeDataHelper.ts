@@ -24,7 +24,7 @@ export function filterEmptyChildren<T extends Node>(nodes: T[]) {
   );
 }
 
-function mapTreeNode<N extends Node>(node: N, fn: <N extends Node>(node: N) => N): N {
+export function mapTreeNode<N extends Node>(node: N, fn: <N extends Node>(node: N) => N): N {
   if (node.children && node.children.length > 0) {
     return {
       ...fn(node),

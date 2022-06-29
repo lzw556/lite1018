@@ -13,6 +13,8 @@ import {
 import { MeasurementRow } from '../summary/measurement/props';
 import { deleteMeasurement } from '../summary/measurement/services';
 import { combineFinalUrl } from '../common/utils';
+import { sortMeasurementsByAttributes } from './util';
+import { sortFlangesByAttributes } from '../assetList/util';
 
 export const MeasurementOfWindList: React.FC<{
   wind?: AssetRow;
@@ -31,24 +33,13 @@ export const MeasurementOfWindList: React.FC<{
       return <Empty description='没有法兰或监测点' image={Empty.PRESENTED_IMAGE_SIMPLE} />;
     return (
       <Row gutter={[0, 16]}>
-        {wind.children
-          .sort((prev, next) => {
-            const { type: prevType } = prev.attributes || { index: 5, type: 4 };
-            const { type: nextType } = next.attributes || { index: 5, type: 4 };
-            return prevType - nextType;
-          })
+        {sortFlangesByAttributes(wind.children)
           .filter(({ monitoringPoints }) => monitoringPoints && monitoringPoints.length > 0)
           .map(({ id, name, monitoringPoints }) =>
             generateTable(
               id,
               name,
-              monitoringPoints
-                ? monitoringPoints.sort((prev, next) => {
-                    const { index: prevIndex } = prev.attributes || { index: 5, type: 4 };
-                    const { index: nextIndex } = next.attributes || { index: 5, type: 4 };
-                    return prevIndex - nextIndex;
-                  })
-                : []
+              monitoringPoints ? sortMeasurementsByAttributes(monitoringPoints) : []
             )
           )}
       </Row>

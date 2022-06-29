@@ -149,7 +149,7 @@ const FlangeOverview: React.FC = () => {
                       {...{
                         visible,
                         onCancel: () => setVisible(false),
-                        selectedRow,
+                        id: selectedRow?.id,
                         assetId: asset?.parentId,
                         onSuccess: () => {
                           fetchAsset(id);

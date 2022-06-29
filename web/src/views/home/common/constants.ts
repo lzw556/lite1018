@@ -7,7 +7,7 @@ export const AssetTypes: Record<
     label: string;
     parent_id?: number;
     url: string;
-    categories?: { label: string; value: number | string }[];
+    categories?: { label: string; value: number }[];
   }
 > = {
   WindTurbind: {

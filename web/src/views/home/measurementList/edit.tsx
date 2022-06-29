@@ -2,15 +2,29 @@ import { Form, Modal, ModalProps } from 'antd';
 import * as React from 'react';
 import { defaultValidateMessages } from '../../../constants/validator';
 import { Measurement, MeasurementRow } from '../summary/measurement/props';
-import { addMeasurement, bindDevice, unbindDevice, updateMeasurement } from '../summary/measurement/services';
+import {
+  addMeasurement,
+  bindDevice,
+  getMeasurement,
+  unbindDevice,
+  updateMeasurement
+} from '../summary/measurement/services';
 import { EditContent } from './editContent';
 
 export const MeasurementEdit: React.FC<
-  ModalProps & { selectedRow?: MeasurementRow } & { onSuccess: () => void } & { assetId?: number }
+  ModalProps & { id?: number } & { onSuccess: () => void } & {
+    assetId?: number;
+  } & { flangeId?: number }
 > = (props) => {
-  const { selectedRow, onSuccess } = props;
-  const { id, bindingDevices } = selectedRow || {};
+  const { id, onSuccess } = props;
   const [form] = Form.useForm<Measurement & { device_id: number }>();
+  const [selectedRow, setSelectedRow] = React.useState<MeasurementRow>();
+
+  React.useEffect(() => {
+    if (id) {
+      getMeasurement(id).then(setSelectedRow);
+    }
+  }, [id]);
 
   return (
     <Modal
@@ -22,6 +36,7 @@ export const MeasurementEdit: React.FC<
         onOk: () => {
           form.validateFields().then((values) => {
             const { id } = values;
+            const { bindingDevices } = selectedRow || {};
             try {
               if (!id) {
                 addMeasurement(values).then((measurement) => {
@@ -51,7 +66,7 @@ export const MeasurementEdit: React.FC<
       }}
     >
       <Form form={form} labelCol={{ span: 4 }} validateMessages={defaultValidateMessages}>
-        <EditContent {...props} form={form} />
+        <EditContent {...{ ...props, selectedRow }} form={form} />
       </Form>
     </Modal>
   );

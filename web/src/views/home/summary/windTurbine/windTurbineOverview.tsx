@@ -135,7 +135,7 @@ const WindTurbineOverview: React.FC = () => {
                           {...{
                             visible,
                             onCancel: () => setVisible(false),
-                            selectedRow,
+                            id: selectedRow?.id,
                             assetId: asset.id,
                             onSuccess: () => {
                               fetchAsset(id);

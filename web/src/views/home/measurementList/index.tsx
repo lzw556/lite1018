@@ -130,7 +130,7 @@ const MeasurementManagement: React.FC = () => {
           {...{
             visible,
             onCancel: () => setVisible(false),
-            selectedRow,
+            id: selectedRow?.id,
             assetId: filters?.windTurbineId,
             onSuccess: () => {
               fetchAssets({ type: AssetTypes.WindTurbind.id });

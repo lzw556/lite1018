@@ -10,7 +10,7 @@
 dl.name-value-groups {
   margin: 0;
 }
-dl.name-value-groups.horizontal{
+dl.name-value-groups.horizontal {
   display: flex;
   flex-wrap: wrap;
 }
@@ -19,11 +19,11 @@ dl.name-value-groups.horizontal{
   line-height: 30px;
 }
 .name-value.half {
-  flex: 0 0 50%
+  flex: 0 0 50%;
 }
 /* hardcord */
 .name-value.anomalous {
-  flex: 0 0 50%
+  flex: 0 0 50%;
 }
 .name-value dt {
   flex: 0 0 55%;
@@ -120,4 +120,42 @@ dl.name-value-groups.horizontal{
 }
 .overview-statistic .ant-statistic.danger .ant-statistic-content {
   color: #dc3545;
+}
+.asset-list-tree {
+  overflow: auto;
+  /* height: 100vh; */
+  font-size: 16px;
+}
+.asset-list-tree .ant-tree-icon__customize svg {
+  height:1em;
+  width: 1em;
+  border-radius: 1em;
+}
+.asset-list-tree .ant-tree-icon__customize svg.normal {
+  background-color: #28a745;
+}
+.asset-list-tree .ant-tree-icon__customize svg.info {
+  background-color: #526ecc;
+}
+.asset-list-tree .ant-tree-icon__customize svg.warn {
+  background-color: #ffc107;
+}
+.asset-list-tree .ant-tree-icon__customize svg.danger {
+  background-color: #dc3545;
+}
+.asset-list-tree .ant-tree-icon__customize svg.normal.focus {
+  background-color: #fff;
+  fill:#28a745
+}
+.asset-list-tree .ant-tree-icon__customize svg.info.focus {
+  background-color: #fff;
+  fill:#526ecc
+}
+.asset-list-tree .ant-tree-icon__customize svg.warn.focus {
+  background-color: #fff;
+  fill:#ffc107
+}
+.asset-list-tree .ant-tree-icon__customize svg.danger.focus {
+  background-color: #fff;
+  fill:#dc3545
 }

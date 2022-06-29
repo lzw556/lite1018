@@ -13,6 +13,7 @@ import {
 import { MeasurementRow } from './props';
 import { deleteMeasurement } from './services';
 import { combineFinalUrl } from '../../common/utils';
+import { sortMeasurementsByAttributes } from '../../measurementList/util';
 
 export const MeasurementOfFlangeList: React.FC<{
   flange?: AssetRow;
@@ -27,13 +28,7 @@ export const MeasurementOfFlangeList: React.FC<{
       return <Empty description='没有法兰或监测点' image={Empty.PRESENTED_IMAGE_SIMPLE} />;
     return (
       <Row gutter={[0, 16]}>
-        {generateTable(
-          flange.monitoringPoints.sort((prev, next) => {
-            const { index: prevIndex } = prev.attributes || { index: 5, type: 4 };
-            const { index: nextIndex } = next.attributes || { index: 5, type: 4 };
-            return prevIndex - nextIndex;
-          })
-        )}
+        {generateTable(sortMeasurementsByAttributes(flange.monitoringPoints))}
       </Row>
     );
   };

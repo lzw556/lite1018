@@ -3,6 +3,7 @@ import moment from 'moment';
 import { LineChartStyles } from '../../../constants/chart';
 import { ColorDanger, ColorHealth, ColorInfo, ColorWarn } from '../../../constants/color';
 import { AssetRow } from '../assetList/props';
+import { sortMeasurementsByAttributes } from '../measurementList/util';
 import { MeasurementRow, Property } from '../summary/measurement/props';
 import { MeasurementTypes } from './constants';
 import {
@@ -79,11 +80,7 @@ export function generateChartOptionsOfLastestData(
     const angleAxis: any = [];
     const radiusAxis: any = [];
     const series: any = [];
-    const sortedMeasurements = measurements.sort((prev, next) => {
-      const prevIndex = prev.attributes?.index || 5;
-      const nextIndex = next.attributes?.index || 5;
-      return prevIndex - nextIndex;
-    });
+    const sortedMeasurements = sortMeasurementsByAttributes(measurements);
     const outer = generateOuter(sortedMeasurements, isBig);
     polar.push(outer.radius);
     angleAxis.push(outer.angleAxis);
@@ -107,7 +104,7 @@ export function generateChartOptionsOfLastestData(
         attributes.normal,
         '额定值'
       );
-      legends.push({name: '额定值', itemStyle: {color: ColorHealth}});
+      legends.push({ name: '额定值', itemStyle: { color: ColorHealth } });
       polar.push(normal.radius);
       angleAxis.push(normal.angleAxis);
       radiusAxis.push(normal.radiusAxis);
@@ -122,7 +119,7 @@ export function generateChartOptionsOfLastestData(
         attributes.info,
         '次要报警'
       );
-      legends.push({name: '次要报警', itemStyle: {color: ColorInfo}});
+      legends.push({ name: '次要报警', itemStyle: { color: ColorInfo } });
       polar.push(info.radius);
       angleAxis.push(info.angleAxis);
       radiusAxis.push(info.radiusAxis);
@@ -137,7 +134,7 @@ export function generateChartOptionsOfLastestData(
         attributes.warn,
         '重要报警'
       );
-      legends.push({name: '重要报警', itemStyle: {color: ColorWarn}});
+      legends.push({ name: '重要报警', itemStyle: { color: ColorWarn } });
       polar.push(warn.radius);
       angleAxis.push(warn.angleAxis);
       radiusAxis.push(warn.radiusAxis);
@@ -152,7 +149,7 @@ export function generateChartOptionsOfLastestData(
         attributes.danger,
         '严重报警'
       );
-      legends.push({name: '严重报警', itemStyle: {color: ColorDanger}});
+      legends.push({ name: '严重报警', itemStyle: { color: ColorDanger } });
       polar.push(danger.radius);
       angleAxis.push(danger.angleAxis);
       radiusAxis.push(danger.radiusAxis);

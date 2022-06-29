@@ -4,17 +4,23 @@ import { defaultValidateMessages } from '../../../constants/validator';
 import { AssetTypes } from '../common/constants';
 import { EditContent } from './editContent';
 import { Asset, AssetRow, convertRow } from './props';
-import { addAsset, updateAsset } from './services';
+import { addAsset, getAsset, updateAsset } from './services';
 
 export const AssetEdit: React.FC<
-  ModalProps & { selectedRow?: AssetRow } & {
+  ModalProps & { id?: number } & {
     initialValues?: typeof AssetTypes.WindTurbind;
   } & { onSuccess: () => void }
 > = (props) => {
-  const { selectedRow, initialValues, onSuccess } = props;
-  const { id } = selectedRow || {};
+  const { id, initialValues, onSuccess } = props;
   const { label } = initialValues || {};
   const [form] = Form.useForm<Asset>();
+  const [selectedRow, setSelectedRow] = React.useState<AssetRow>();
+
+  React.useEffect(() => {
+    if (id) {
+      getAsset(id).then(setSelectedRow);
+    }
+  }, [id]);
 
   React.useEffect(() => {
     form.resetFields();
@@ -50,7 +56,7 @@ export const AssetEdit: React.FC<
       }}
     >
       <Form form={form} labelCol={{ span: 4 }} validateMessages={defaultValidateMessages}>
-        <EditContent initialValues={initialValues} id={id}/>
+        <EditContent initialValues={initialValues} id={id} />
       </Form>
     </Modal>
   );

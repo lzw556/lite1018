@@ -5,15 +5,14 @@ import { getFilename } from '../common/utils';
 import { AssetTypes } from '../common/constants';
 import { AssetEdit } from './edit';
 import { exportAssets, getAssets, importAssets } from './services';
-import { useLocation } from 'react-router-dom';
 import { SearchResultPage } from '../components/searchResultPage';
 import { filterEmptyChildren } from '../common/treeDataHelper';
 import { getProject } from '../../../utils/session';
-import { AssetTable } from './assetTable';
 import { AssetRow } from './props';
+import '../home.css';
+import { AssetTree } from './assetTree';
 
 const AssetManagement: React.FC = () => {
-  const { pathname, search } = useLocation();
   const [assets, setAssets] = React.useState<{
     loading: boolean;
     items: AssetRow[];
@@ -24,7 +23,6 @@ const AssetManagement: React.FC = () => {
   const [visible, setVisible] = React.useState(false);
   const [selectedRow, setSelectedRow] = React.useState<AssetRow>();
   const [initialValues, setInitialValues] = React.useState(AssetTypes.WindTurbind);
-  const [disabled, setDisabled] = React.useState(true);
   const [loading, setLoading] = React.useState(false);
 
   React.useEffect(() => {
@@ -41,7 +39,6 @@ const AssetManagement: React.FC = () => {
     setAssets((prev) => ({ ...prev, loading: true }));
     getAssets(filters).then((assets) => {
       setAssets({ loading: false, items: filterEmptyChildren(assets) });
-      setDisabled(assets.length === 0);
     });
   };
 
@@ -52,10 +49,6 @@ const AssetManagement: React.FC = () => {
           <Space>
             <Button type='primary' onClick={() => open(AssetTypes.WindTurbind)}>
               添加风机
-              <PlusOutlined />
-            </Button>
-            <Button type='primary' onClick={() => open(AssetTypes.Flange)} disabled={disabled}>
-              添加法兰
               <PlusOutlined />
             </Button>
             <Button
@@ -119,16 +112,7 @@ const AssetManagement: React.FC = () => {
             </Upload>
           </Space>
         ),
-        results: (
-          <AssetTable
-            dataSource={assets.items}
-            loading={assets.loading}
-            pathname={pathname}
-            search={search}
-            open={open}
-            fetchAssets={fetchAssets}
-          />
-        )
+        results: <AssetTree assets={assets.items} />
       }}
     >
       {visible && (
@@ -136,7 +120,7 @@ const AssetManagement: React.FC = () => {
           {...{
             visible,
             onCancel: () => setVisible(false),
-            selectedRow,
+            id: selectedRow?.id,
             initialValues,
             onSuccess: () => {
               fetchAssets({ type: AssetTypes.WindTurbind.id });

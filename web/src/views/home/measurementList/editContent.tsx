@@ -11,7 +11,7 @@ import { convertRow, MeasurementRow } from '../summary/measurement/props';
 export const EditContent: React.FC<
   { selectedRow?: MeasurementRow } & { onSuccess: () => void } & { assetId?: number } & {
     form: any;
-  }
+  } & { flangeId?: number }
 > = (props) => {
   const [types, setTypes] = React.useState([DeviceType.BoltLoosening, DeviceType.BoltElongation]);
   const [parents, setParents] = React.useState<AssetRow[]>([]);
@@ -82,7 +82,13 @@ export const EditContent: React.FC<
       >
         <DeviceSelect filters={{ types: types.join(',') }} disabled={disabled && !id} />
       </Form.Item>
-      <Form.Item label='法兰' name='asset_id' rules={[{ required: true, message: `请选择法兰` }]}>
+      <Form.Item
+        label='法兰'
+        name='asset_id'
+        rules={[{ required: true, message: `请选择法兰` }]}
+        hidden={!!props.flangeId && !id}
+        initialValue={props.flangeId}
+      >
         <Select placeholder='请选择法兰'>
           {parents.map(({ id, name }) => (
             <Select.Option key={id} value={id}>
