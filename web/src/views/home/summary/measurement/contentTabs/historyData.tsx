@@ -125,6 +125,7 @@ export const HistoryData: React.FC<MeasurementRow> = (props) => {
                   type='default'
                   danger
                   onClick={() => {
+                    const [from, to] = interval;
                     Modal.confirm({
                       title: '提示',
                       content: `确定要删除${props.name}从${from.format('YYYY-MM-DD')}到${to.format(
