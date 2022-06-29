@@ -233,6 +233,7 @@ const AlarmRuleGroupCreation = () => {
                     category: 2,
                     rules: values.rules.map((rule, index) => ({
                       ...rule,
+                      duration: Number(rule.duration),
                       threshold: Number(rule.threshold),
                       metric: metric[index],
                       index: [values.type, rule.index]
