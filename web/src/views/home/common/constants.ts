@@ -43,7 +43,7 @@ export const MeasurementTypes: Record<
     id: 10101,
     label: '松动角度',
     url: '/bolt',
-    firstClassFieldKeys: ['loosening_angle', 'attitude', 'motion', 'temperature'],
+    firstClassFieldKeys: ['loosening_angle', 'attitude', 'motion', 'temperature', 'measurement_index'],
     deviceType: DeviceType.BoltLoosening
   },
   preload: {
