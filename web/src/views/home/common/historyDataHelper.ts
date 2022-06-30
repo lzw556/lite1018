@@ -23,7 +23,7 @@ export function generateChartOptionsOfLastestData(
 ) {
   const count = measurements.length;
   if (!count) return null;
-  if (measurements.every(({ data }) => !data)) return null;
+  // if (measurements.every(({ data }) => !data)) return null;
   if (false) {
     const firstClassFields = getFirstClassFields(measurements[0]);
     let field: any = null;
@@ -248,7 +248,7 @@ function generateOuter(measurements: MeasurementRow[], isBig: boolean = false) {
     if (firstClassFields.length > 0) {
       field = firstClassFields[0];
     }
-    let value = 0;
+    let value = NaN;
     if (field && data) {
       value = data.values[field.key];
       if (value) {
