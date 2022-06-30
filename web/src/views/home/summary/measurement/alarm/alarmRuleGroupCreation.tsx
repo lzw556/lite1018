@@ -89,10 +89,10 @@ const AlarmRuleGroupCreation = () => {
             </Select>
           </Form.Item>
           <Form.Item label='名称' name='name' rules={[Rules.range(4, 16)]}>
-            <Input placeholder={`请填写名称`} style={{ width: 435 }}/>
+            <Input placeholder={`请填写名称`} style={{ width: 435 }} />
           </Form.Item>
           <Form.Item label='描述' name='description' initialValue=''>
-            <Input placeholder={`请填写描述`} style={{ width: 435 }}/>
+            <Input placeholder={`请填写描述`} style={{ width: 435 }} />
           </Form.Item>
           <Divider />
           <Form.List name='rules' initialValue={[0]}>
@@ -107,7 +107,7 @@ const AlarmRuleGroupCreation = () => {
                       rules={[Rules.range(4, 16), { validator: onNameValidator }]}
                       dependencies={index === 0 ? undefined : ['user', index - 1, 'name']}
                     >
-                      <Input placeholder={`请填写名称`} style={{ width: 435 }}/>
+                      <Input placeholder={`请填写名称`} style={{ width: 435 }} />
                     </Form.Item>
                     {properties && properties.length > 0 && (
                       <Form.Item
@@ -122,14 +122,26 @@ const AlarmRuleGroupCreation = () => {
                           onChange={(e) => {
                             const property = properties.find(({ key }) => e === key);
                             if (property && property.fields && property.fields.length > 0) {
-                              setMetric((prev) => [
-                                ...prev,
-                                {
-                                  key: property.key + '.' + property.fields[0].key,
-                                  name: property.name,
-                                  unit: property.unit
+                              const metric = {
+                                key: property.key + '.' + property.fields[0].key,
+                                name: property.name,
+                                unit: property.unit
+                              };
+                              setMetric((prev) => {
+                                if (prev.length === 0) {
+                                  return [metric];
+                                } else if (prev.length < index + 1){
+                                  return [...prev, metric];
+                                } else {
+                                  return prev.map((item, n) => {
+                                    if (n === index) {
+                                      return metric;
+                                    } else {
+                                      return item;
+                                    }
+                                  });
                                 }
-                              ]);
+                              });
                             }
                           }}
                         >
@@ -147,11 +159,15 @@ const AlarmRuleGroupCreation = () => {
                         name={[name, 'duration']}
                         rules={[Rules.number]}
                         initialValue={1}
-                        style={{display:'inline-flex', marginRight: 20, marginBottom: 0}}
+                        style={{ display: 'inline-flex', marginRight: 20, marginBottom: 0 }}
                       >
                         <Input style={{ width: 80 }} />
                       </Form.Item>
-                      <Form.Item label='条件' style={{display:'inline-flex', marginRight: 20, marginBottom: 0}} required>
+                      <Form.Item
+                        label='条件'
+                        style={{ display: 'inline-flex', marginRight: 20, marginBottom: 0 }}
+                        required
+                      >
                         <Input.Group compact>
                           <Form.Item
                             {...restFields}
@@ -192,7 +208,7 @@ const AlarmRuleGroupCreation = () => {
                         {...restFields}
                         name={[name, 'level']}
                         initialValue={3}
-                        style={{display:'inline-flex', marginBottom: 0}}
+                        style={{ display: 'inline-flex', marginBottom: 0 }}
                       >
                         <Select style={{ width: 80 }}>
                           <Select.Option key={1} value={1}>
