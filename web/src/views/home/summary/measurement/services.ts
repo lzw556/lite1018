@@ -75,7 +75,7 @@ export function getAlarmRule(id: number) {
 }
 
 export function updateAlarmRule(id: number, rule: AlarmRule) {
-  return request.put(`alarmRuleGroups/${id}`, rule).then(PostResponse);
+  return request.put(`alarmRuleGroups/${id}`, rule).then(PutResponse);
 }
 
 export function deleteAlarmRule(id: number) {

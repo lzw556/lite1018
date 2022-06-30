@@ -247,13 +247,15 @@ const AlarmRuleGroupCreation = () => {
                   const final = {
                     ...values,
                     category: 2,
-                    rules: values.rules.map((rule, index) => ({
-                      ...rule,
-                      duration: Number(rule.duration),
-                      threshold: Number(rule.threshold),
-                      metric: metric[index],
-                      index: [values.type, rule.index]
-                    }))
+                    rules: values.rules.map((rule, index) => {
+                      delete rule.index;
+                      return {
+                        ...rule,
+                        duration: Number(rule.duration),
+                        threshold: Number(rule.threshold),
+                        metric: metric[index]
+                      }
+                    })
                   };
                   console.log(final);
                   addAlarmRule(final).then(() =>

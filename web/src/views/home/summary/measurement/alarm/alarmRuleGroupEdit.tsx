@@ -95,6 +95,7 @@ const AlarmRuleGroupEdit = () => {
                     >
                       <Input placeholder={`请填写名称`} readOnly={index < rule.rules.length} style={{ width: 435 }} disabled={true}/>
                     </Form.Item>
+                    <Form.Item label='指标名称'><Input disabled={true} value={rule.rules[index].metric.name} style={{ width: 435 }}/></Form.Item>
                     <Form.Item required label='周期'>
                       <Form.Item
                         {...restFields}
