@@ -20,8 +20,20 @@ func (r monitoringPointRouter) create(ctx *gin.Context) (interface{}, error) {
 }
 
 func (r monitoringPointRouter) get(ctx *gin.Context) (interface{}, error) {
-	id := cast.ToUint(ctx.Param("id"))
-	return r.service.GetMonitoringPointByID(id)
+	// id := cast.ToUint(ctx.Param("id"))
+	// return r.service.GetMonitoringPointByID(id)
+	filters := request.NewFilters(ctx)
+	filters["id"] = cast.ToUint(ctx.Param("id"))
+	mps, err := r.service.FindMonitoringPoints(filters)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(mps) == 0 {
+		return nil, response.InvalidParameterError("")
+	} else {
+		return mps[0], nil
+	}
 }
 
 func (r monitoringPointRouter) update(ctx *gin.Context) (interface{}, error) {

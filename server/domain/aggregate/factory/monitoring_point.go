@@ -105,6 +105,8 @@ func (factory MonitoringPoint) buildSpecs(filters request.Filters) []spec.Specif
 			specs = append(specs, spec.NameEqSpec(cast.ToString(v)))
 		case "asset_id":
 			specs = append(specs, spec.AssetEqSpec(cast.ToUint(v)))
+		case "id":
+			specs = append(specs, spec.IDEqSpec(cast.ToUint(v)))
 		}
 	}
 	return specs
