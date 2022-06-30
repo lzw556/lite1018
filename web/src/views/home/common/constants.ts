@@ -61,3 +61,5 @@ export const MeasurementTypes: Record<
     deviceType: DeviceType.BoltElongation
   }
 };
+
+export const AssetViews = ['WindTurbineOverview', 'FlangeOverview', 'BoltOverview']
