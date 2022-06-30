@@ -78,8 +78,9 @@ func (mp *MonitoringPoint) GetAlarmRuleState(id uint) AlarmRuleState {
 func (mp MonitoringPoint) AlertNotify(m AlarmRuleMetric, value float64, level uint8) {
 	eventbus.Publish(eventbus.SocketEmit, "socket::monitoringPointAlertStateEvent", map[string]interface{}{
 		"monitoringPoint": map[string]interface{}{
-			"name": mp.Name,
-			"id":   mp.ID,
+			"name":    mp.Name,
+			"id":      mp.ID,
+			"project": mp.ProjectID,
 		},
 		"metric": m,
 		"level":  level,
