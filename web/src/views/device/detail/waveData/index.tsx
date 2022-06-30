@@ -142,7 +142,7 @@ const WaveDataChart: React.FC<{ device: Device }> = ({device}) => {
     const onDownload = (timestamp: number) => {
         DownloadDeviceDataByTimestampRequest(device.id, timestamp, {
             calculate,
-            data_type: 16842753
+            data_type: dataType
         }).then((res) => {
             if (res.status === 200) {
                 const url = window.URL.createObjectURL(new Blob([res.data]));

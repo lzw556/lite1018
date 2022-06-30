@@ -170,6 +170,7 @@ func (query DeviceQuery) FindDataByID(id uint, sensorType uint, from, to time.Ti
 	}
 	switch sensorType {
 	case devicetype.KxSensor,
+		devicetype.AdvancedKxSensor,
 		devicetype.DynamicLengthAttitudeSensor,
 		devicetype.DynamicSCL3300Sensor:
 		return query.findRawData(device, from, to, sensorType)
@@ -434,10 +435,10 @@ func (query DeviceQuery) downloadKxSensorData(device entity.Device, dataType uin
 		if err := mapstructure.Decode(v, &e); err != nil {
 			return nil, err
 		}
-		_ = result.File.SetCellValue("Sheet1", fmt.Sprintf("%s1", string(rune(col))), k)
-		for i, value := range getKxSensorData(e, calculate).Values {
-			_ = result.File.SetCellValue("Sheet1", fmt.Sprintf("%s%d", string(rune(col)), i+2), value)
-		}
+		//_ = result.File.SetCellValue("Sheet1", fmt.Sprintf("%s1", string(rune(col))), k)
+		//for i, value := range getKxSensorData(e, calculate).Values {
+		//	_ = result.File.SetCellValue("Sheet1", fmt.Sprintf("%s%d", string(rune(col)), i+2), value)
+		//}
 		_ = result.File.SetCellValue("Raw", fmt.Sprintf("%s1", string(rune(col))), k)
 		for i, value := range e.Values {
 			_ = result.File.SetCellValue("Raw", fmt.Sprintf("%s%d", string(rune(col)), i+2), value)
