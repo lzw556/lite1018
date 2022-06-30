@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { FilterableAlarmRecordTable } from '../../../../../components/alarm/filterableAlarmRecordTable';
 import ShadowCard from '../../../../../components/shadowCard';
-import { MeasurementTypes } from '../../../common/constants';
 import { MeasurementRow } from '../props';
 import { DynamicData } from './dynamicData';
 import { HistoryData } from './historyData';
@@ -22,10 +21,7 @@ export const MeasurementContents: React.FC<MeasurementRow & { onUpdate?: () => v
       { key: 'monitor', tab: '监控' },
       { key: 'history', tab: '历史数据' }
     ];
-
-    if (measurement.type === MeasurementTypes.dynamicPreload.id) {
-      tabList.push({ key: 'dynamicData', tab: '动态数据' });
-    }
+    tabList.push({ key: 'dynamicData', tab: '动态数据' });
     tabList.push({ key: 'setting', tab: '配置信息' });
     tabList.push({ key: 'alarmRecord', tab: '报警记录' });
     return tabList;
