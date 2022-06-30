@@ -248,8 +248,6 @@ func (factory Alarm) NewAlarmRuleGroupQuery(filters request.Filters) (*query.Ala
 			for _, mpID := range ids {
 				q.MonitoringPointIDs = append(q.MonitoringPointIDs, cast.ToUint(mpID))
 			}
-		case "id":
-			specs = append(specs, spec.IDEqSpec(cast.ToUint(v)))
 		}
 	}
 	return &q, nil
