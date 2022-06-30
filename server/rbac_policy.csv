@@ -112,8 +112,8 @@ p, 平台管理员, alarmRecords, GET
 p, 平台管理员, alarmRecords/*, GET
 p, 平台管理员, assets, GET
 p, 平台管理员, assets/*, GET
-p, 项目管理员, monitoringPoints, GET
-p, 项目管理员, monitoringPoints/*, GET
+p, 平台管理员, monitoringPoints, GET
+p, 平台管理员, monitoringPoints/*, GET
 p, 平台管理员, networks, POST
 p, 平台管理员, networks/*, POST
 p, 平台管理员, networks/*, PUT
