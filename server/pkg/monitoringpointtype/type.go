@@ -30,7 +30,6 @@ const (
 var types = []Typer{
 	BoltAngle{},
 	Preload{},
-	DynamicPreload{},
 }
 
 type Typer interface {
