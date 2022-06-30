@@ -263,7 +263,8 @@ const AlarmRuleGroupCreation = () => {
               }}
             >
               创建
-            </Button>
+            </Button>&nbsp;&nbsp;&nbsp;
+            <Button type='primary' onClick={() => history.go(-1)}>取消</Button>
           </Form.Item>
         </Form>
       </ShadowCard>
