@@ -15,22 +15,24 @@ func NewKx122Decoder() RawDataDecoder {
 
 func (s Kx122Decoder) Decode(data []byte) (map[string]interface{}, error) {
 	// decode metadata
-	metadata := [3]struct {
+	metadata := make([]struct {
 		dataType   uint8
 		axis       uint8
 		ranges     uint8
 		odr        uint32
 		number     uint32
 		dataLength uint32
-	}{}
+	}, 3)
 	metadataBytes := data[:72]
-	for i := 0; i < len(metadataBytes); i += 24 {
-		axis := metadataBytes[i+1]
-		metadata[axis].dataType = metadataBytes[i]
-		metadata[axis].ranges = metadataBytes[i+2]
-		metadata[axis].odr = binary.LittleEndian.Uint32(metadataBytes[i+4 : i+8])
-		metadata[axis].number = binary.LittleEndian.Uint32(metadataBytes[i+8 : i+12])
-		metadata[axis].dataLength = binary.LittleEndian.Uint32(metadataBytes[i+12 : i+16])
+	offset := 0
+	for i := range metadata {
+		metadata[i].dataType = metadataBytes[offset]
+		metadata[i].axis = metadataBytes[offset+1]
+		metadata[i].ranges = metadataBytes[offset+2]
+		metadata[i].odr = binary.LittleEndian.Uint32(metadataBytes[offset+4 : offset+8])
+		metadata[i].number = binary.LittleEndian.Uint32(metadataBytes[offset+8 : offset+12])
+		metadata[i].dataLength = binary.LittleEndian.Uint32(metadataBytes[offset+12 : offset+16])
+		offset += 24
 	}
 
 	// decode raw data
@@ -39,14 +41,14 @@ func (s Kx122Decoder) Decode(data []byte) (map[string]interface{}, error) {
 	if len(valueBytes) == totalLength {
 		svtRawData := entity.SvtRawData{}
 		rawDataOffset := 0 //metadata length
-		for i, m := range metadata {
+		for _, m := range metadata {
 			axisData := valueBytes[rawDataOffset : rawDataOffset+int(m.dataLength)]
-			svtRawData.SetMetadata(i, m.ranges, m.odr, m.number)
+			svtRawData.SetMetadata(int(m.axis), m.ranges, m.odr, m.number)
 			switch m.dataType {
 			case 3: // int16
-				svtRawData.SetValues(i, decodeInt16(axisData))
+				svtRawData.SetValues(int(m.axis), decodeInt16(axisData))
 			case 6: // uint24
-				svtRawData.SetValues(i, decodeUint24(axisData))
+				svtRawData.SetValues(int(m.axis), decodeUint24(axisData))
 			}
 			rawDataOffset += int(m.dataLength)
 		}
@@ -74,8 +76,10 @@ func decodeUint24(data []byte) []float64 {
 	j := 0
 	values := make([]float64, 0)
 	for j < len(data) {
-		var value = binary.LittleEndian.Uint32(append(data[j:j+3], 0))
-		values = append(values, float64(value))
+		fmt.Println(append(data[j:j+3], 0))
+		value := int32(binary.LittleEndian.Uint32(append(data[j:j+3], 0)))
+		fmt.Println(value)
+		values = append(values, float64(value-131072))
 		j += 3
 	}
 	return values
