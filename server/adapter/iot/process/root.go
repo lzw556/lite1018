@@ -42,9 +42,6 @@ func (r root) Process(ctx *iot.Context, msg iot.Message) error {
 	if err != nil {
 		return fmt.Errorf("device %s not found: %v", msg.Body.Device, err)
 	}
-	if device.NetworkID == 0 {
-		return fmt.Errorf("device %s unregistered", device.MacAddress)
-	}
 	gateway, err := r.deviceRepo.GetBySpecs(c, spec.DeviceMacEqSpec(msg.Body.Gateway))
 	if err != nil {
 		return fmt.Errorf("gateway %s not found: %v", msg.Body.Gateway, err)
