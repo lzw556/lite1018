@@ -86,5 +86,10 @@ func (r projectRouter) importProject(ctx *gin.Context) (interface{}, error) {
 		return nil, err
 	}
 	id := cast.ToUint(ctx.Param("id"))
-	return nil, r.service.ImportProject(id, req)
+	err := r.service.ImportProject(id, req)
+	if err != nil {
+		return nil, response.InvalidParameterErrorWithDetail(err.Error())
+	} else {
+		return nil, nil
+	}
 }
