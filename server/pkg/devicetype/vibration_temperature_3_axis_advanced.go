@@ -367,17 +367,17 @@ func (v VibrationTemperature3AxisAdvanced) Properties(sensorID uint) Properties 
 					{
 						Name:      "X轴",
 						Key:       "fft_frequency_x",
-						DataIndex: 52,
+						DataIndex: 61,
 					},
 					{
 						Name:      "Y轴",
 						Key:       "fft_frequency_y",
-						DataIndex: 60,
+						DataIndex: 62,
 					},
 					{
 						Name:      "Z轴",
 						Key:       "fft_frequency_z",
-						DataIndex: 68,
+						DataIndex: 63,
 					},
 				},
 			},
@@ -707,6 +707,31 @@ func (v VibrationTemperature3AxisAdvanced) Properties(sensorID uint) Properties 
 				},
 			},
 			{
+				Key:       "acc_var",
+				Name:      "方差",
+				Unit:      "",
+				Precision: 3,
+				Sort:      17,
+				IsShow:    true,
+				Fields: []Field{
+					{
+						Name:      "X轴",
+						Key:       "acc_var_x",
+						DataIndex: 76,
+					},
+					{
+						Name:      "Y轴",
+						Key:       "acc_var_y",
+						DataIndex: 77,
+					},
+					{
+						Name:      "Z轴",
+						Key:       "acc_var_z",
+						DataIndex: 78,
+					},
+				},
+			},
+			{
 				Key:       "spectrum_variance",
 				Name:      "谱方差",
 				Unit:      "",
@@ -821,6 +846,30 @@ func (v VibrationTemperature3AxisAdvanced) Properties(sensorID uint) Properties 
 						Name:      "翻滚角",
 						Key:       "roll",
 						DataIndex: 3,
+					},
+				},
+			},
+			{
+				Name:      "位移",
+				Key:       "displacement",
+				Unit:      "μm",
+				Precision: 3,
+				Sort:      23,
+				Fields: []Field{
+					{
+						Name:      "X轴",
+						Key:       "displacement_x",
+						DataIndex: 10,
+					},
+					{
+						Name:      "Y轴",
+						Key:       "displacement_y",
+						DataIndex: 11,
+					},
+					{
+						Name:      "Z轴",
+						Key:       "displacement_z",
+						DataIndex: 12,
 					},
 				},
 			},
