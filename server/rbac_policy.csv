@@ -47,7 +47,7 @@ p, 操作员, alarmRuleGroups/*, PUT
 p, 操作员, alarmRecords/*, POST
 p, 操作员, alarmRecords/*, PUT
 p, 操作员, assets, POST
-p, 操作员, assets/*, put
+p, 操作员, assets/*, PUT
 p, 操作员, monitoringPoints, POST
 p, 操作员, monitoringPoints/*, POST
 p, 操作员, monitoringPoints, PUT
@@ -92,7 +92,7 @@ p, 项目管理员, alarmRules/*, DELETE
 p, 项目管理员, alarmRuleGroups/*, DELETE
 p, 项目管理员, alarmRecords/*, DELETE
 p, 项目管理员, assets, POST
-p, 项目管理员, assets/*, put
+p, 项目管理员, assets/*, PUT
 p, 项目管理员, assets/*, DELETE
 p, 项目管理员, monitoringPoints, POST
 p, 项目管理员, monitoringPoints/*, POST
@@ -156,7 +156,7 @@ p, 平台管理员, users/*, DELETE
 p, 平台管理员, roles, GET
 p, 平台管理员, roles/*, GET
 p, 平台管理员, assets, POST
-p, 平台管理员, assets/*, put
+p, 平台管理员, assets/*, PUT
 p, 平台管理员, assets/*, DELETE
 p, 平台管理员, monitoringPoints, POST
 p, 平台管理员, monitoringPoints/*, POST
