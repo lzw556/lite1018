@@ -50,10 +50,12 @@ func GetStruct(key string, v interface{}) error {
 }
 
 func Set(key string, value []byte) error {
+
 	return cache.Set(key, value)
 }
 
 func SetStruct(key string, v interface{}) error {
+
 	bytes, err := json.Marshal(v)
 	if err != nil {
 		return err
@@ -62,13 +64,16 @@ func SetStruct(key string, v interface{}) error {
 }
 
 func Append(key string, value []byte) error {
+
 	return cache.Append(key, value)
 }
 
 func Delete(key string) error {
+
 	return cache.Delete(key)
 }
 
 func Reset() error {
+
 	return cache.Reset()
 }

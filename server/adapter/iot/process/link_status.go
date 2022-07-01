@@ -14,6 +14,8 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/json"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/xlog"
 	"github.com/thetasensors/theta-cloud-lite/server/worker"
+	"sync"
+	"time"
 )
 
 type LinkStatus struct {
@@ -55,12 +57,13 @@ func (p LinkStatus) Process(ctx *iot.Context, msg iot.Message) error {
 		return err
 	}
 
-	go p.addLinkStatusLog(linkStatus)
+	//go p.addLinkStatusLog(linkStatus)
 
 	isOnline, _, _ := cache.GetConnection(device.MacAddress)
 	// 2 offline 4 reconnecting failed
 	if linkStatus.State != "online" {
 		cache.SetOffline(linkStatus.Address)
+		go p.UpdateChildrenConnectionState(linkStatus.Address, false)
 	}
 
 	// 此处不记录设备上线事件, 设备上线事件在deviceStatus中记录
@@ -97,4 +100,23 @@ func (p LinkStatus) addLinkStatusLog(linkStatus entity.LinkStatus) {
 	if err := p.deviceLinkStatusRepo.Create(context.TODO(), &e); err != nil {
 		xlog.Errorf("create device link status failed: %v => [%s]", err, linkStatus.Address)
 	}
+}
+
+func (p LinkStatus) UpdateChildrenConnectionState(parent string, isOnline bool) {
+	devices, _ := p.deviceRepo.FindBySpecs(context.TODO(), spec.ParentEqSpec(parent))
+	var wg sync.WaitGroup
+	for i := range devices {
+		wg.Add(1)
+		go func(device entity.Device) {
+			if isOnline {
+				cache.SetOnline(device.MacAddress)
+				device.NotifyConnectionState(true, time.Now().Unix())
+			} else {
+				cache.SetOffline(device.MacAddress)
+				device.NotifyConnectionState(false, time.Now().Unix())
+			}
+			wg.Done()
+		}(devices[i])
+	}
+	wg.Wait()
 }

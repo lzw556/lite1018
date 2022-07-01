@@ -7,7 +7,7 @@ import (
 	pd "github.com/thetasensors/theta-cloud-lite/server/adapter/iot/proto"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/utils"
-	"sort"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/xlog"
 )
 
 type updateDevicesCmd struct {
@@ -47,13 +47,18 @@ func (cmd updateDevicesCmd) Payload() ([]byte, error) {
 		Items:     make([]*pd.DeviceItem, 0),
 	}
 	m.Items = append(m.Items, toDeviceItem(cmd.gateway))
-	sort.Sort(cmd.children)
-	for _, child := range cmd.children {
-		if cmd.gateway.MacAddress != child.MacAddress {
-			m.Items = append(m.Items, toDeviceItem(child))
+	addChildren(&m.Items, cmd.gateway, cmd.children)
+	xlog.Infof("update %d devices to gateway => [%s]", len(m.Items), cmd.gateway.MacAddress)
+	return proto.Marshal(&m)
+}
+
+func addChildren(items *[]*pd.DeviceItem, parent entity.Device, children []entity.Device) {
+	for _, child := range children {
+		if child.Parent == parent.MacAddress {
+			*items = append(*items, toDeviceItem(child))
+			addChildren(items, child, children)
 		}
 	}
-	return proto.Marshal(&m)
 }
 
 func toDeviceItem(e entity.Device) *pd.DeviceItem {

@@ -170,6 +170,7 @@ func (query DeviceQuery) FindDataByID(id uint, sensorType uint, from, to time.Ti
 	}
 	switch sensorType {
 	case devicetype.KxSensor,
+		devicetype.AdvancedKxSensor,
 		devicetype.DynamicLengthAttitudeSensor,
 		devicetype.DynamicSCL3300Sensor:
 		return query.findRawData(device, from, to, sensorType)
@@ -229,6 +230,7 @@ func (query DeviceQuery) GetDataByIDAndTimestamp(id uint, sensorType uint, time 
 	result := vo.NewDeviceData(data.Time)
 	switch sensorType {
 	case devicetype.KxSensor:
+	case devicetype.AdvancedKxSensor:
 		var e entity.SvtRawData
 		if err := mapstructure.Decode(data.Values, &e); err != nil {
 			return nil, err
@@ -355,7 +357,8 @@ func (query DeviceQuery) DownloadLargeSensorData(id uint, sensorType uint, time 
 	}
 	switch sensorType {
 	case devicetype.KxSensor:
-		return query.downloadKxSensorData(device, time, cast.ToString(filters["calculate"]))
+	case devicetype.AdvancedKxSensor:
+		return query.downloadKxSensorData(device, sensorType, time, cast.ToString(filters["calculate"]))
 	case devicetype.DynamicSCL3300Sensor:
 		return query.downloadSqRawData(device, time)
 	case devicetype.DynamicLengthAttitudeSensor:
@@ -416,8 +419,8 @@ func (query DeviceQuery) downloadSqRawData(device entity.Device, time time.Time)
 	return &result, nil
 }
 
-func (query DeviceQuery) downloadKxSensorData(device entity.Device, time time.Time, calculate string) (*vo.ExcelFile, error) {
-	data, err := query.sensorDataRepo.Get(device.MacAddress, devicetype.KxSensor, time)
+func (query DeviceQuery) downloadKxSensorData(device entity.Device, dataType uint, time time.Time, calculate string) (*vo.ExcelFile, error) {
+	data, err := query.sensorDataRepo.Get(device.MacAddress, dataType, time)
 	if err != nil {
 		return nil, err
 	}
@@ -425,15 +428,20 @@ func (query DeviceQuery) downloadKxSensorData(device entity.Device, time time.Ti
 		Name: fmt.Sprintf("%s_%s.xlsx", device.MacAddress, time.Format("20060102")),
 		File: excelize.NewFile(),
 	}
+	_ = result.File.NewSheet("Raw")
 	col := 65
 	for k, v := range data.Values {
 		var e entity.AxisSensorData
 		if err := mapstructure.Decode(v, &e); err != nil {
 			return nil, err
 		}
-		_ = result.File.SetCellValue("Sheet1", fmt.Sprintf("%s1", string(rune(col))), k)
-		for i, value := range getKxSensorData(e, calculate).Values {
-			_ = result.File.SetCellValue("Sheet1", fmt.Sprintf("%s%d", string(rune(col)), i+2), value)
+		//_ = result.File.SetCellValue("Sheet1", fmt.Sprintf("%s1", string(rune(col))), k)
+		//for i, value := range getKxSensorData(e, calculate).Values {
+		//	_ = result.File.SetCellValue("Sheet1", fmt.Sprintf("%s%d", string(rune(col)), i+2), value)
+		//}
+		_ = result.File.SetCellValue("Raw", fmt.Sprintf("%s1", string(rune(col))), k)
+		for i, value := range e.Values {
+			_ = result.File.SetCellValue("Raw", fmt.Sprintf("%s%d", string(rune(col)), i+2), value)
 		}
 		col += 1
 	}
