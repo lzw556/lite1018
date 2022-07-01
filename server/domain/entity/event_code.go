@@ -40,6 +40,6 @@ func (e EventCode) String() string {
 	case EventCodeCalibration:
 		return "设备校准"
 	default:
-		return "未知错误"
+		return "传感器内部事件"
 	}
 }
