@@ -23,13 +23,22 @@ func (NormalTemperatureCorrosion) Settings() Settings {
 			Sort:     0,
 		},
 		{
+			Name:     "采集延时",
+			Key:      "sample_offset",
+			Type:     Uint32ValueType,
+			Value:    0,
+			Category: SensorsSettingCategory,
+			Group:    SettingGroupGeneral,
+			Sort:     1,
+		},
+		{
 			Name:     "波速",
 			Key:      "speed_object",
 			Type:     FloatValueType,
 			Value:    6000,
 			Category: SensorsSettingCategory,
 			Group:    SettingGroupCorrosion,
-			Sort:     1,
+			Sort:     2,
 		},
 		{
 			Name:     "腐蚀率短周期",
@@ -39,7 +48,7 @@ func (NormalTemperatureCorrosion) Settings() Settings {
 			Unit:     "天",
 			Category: SensorsSettingCategory,
 			Group:    SettingGroupCorrosion,
-			Sort:     2,
+			Sort:     3,
 		},
 		{
 			Name:     "腐蚀率长周期",
@@ -49,7 +58,7 @@ func (NormalTemperatureCorrosion) Settings() Settings {
 			Unit:     "天",
 			Category: SensorsSettingCategory,
 			Group:    SettingGroupCorrosion,
-			Sort:     3,
+			Sort:     4,
 		},
 	}
 }
@@ -133,6 +142,7 @@ func (NormalTemperatureCorrosion) Properties(sensorID uint) Properties {
 				Unit:      "",
 				Precision: 3,
 				Sort:      5,
+				IsShow:    true,
 				Fields: []Field{
 					{
 						Name:      "信号强度",
@@ -147,6 +157,7 @@ func (NormalTemperatureCorrosion) Properties(sensorID uint) Properties {
 				Unit:      "",
 				Precision: 3,
 				Sort:      6,
+				IsShow:    true,
 				Fields: []Field{
 					{
 						Name:      "信号质量",

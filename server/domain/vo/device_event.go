@@ -8,12 +8,12 @@ import (
 )
 
 type DeviceEvent struct {
-	ID        uint      `json:"id"`
-	Name      string    `json:"name"`
-	Message   string    `json:"message"`
-	Content   string    `json:"content"`
-	Timestamp int64     `json:"timestamp"`
-	CreatedAt time.Time `json:"-"`
+	ID        uint        `json:"id"`
+	Name      string      `json:"name"`
+	Message   interface{} `json:"message"`
+	Content   string      `json:"content"`
+	Timestamp int64       `json:"timestamp"`
+	CreatedAt time.Time   `json:"-"`
 }
 
 func NewDeviceEvent(e entity.Event) DeviceEvent {
@@ -28,18 +28,15 @@ func NewDeviceEvent(e entity.Event) DeviceEvent {
 		Code int         `json:"code"`
 		Data interface{} `json:"data"`
 	}{}
+	fmt.Println(e.Content)
 	if err := json.Unmarshal([]byte(e.Content), &content); err != nil {
 		return event
 	}
+	fmt.Println(content.Data)
 	if message, ok := eventMessage[e.Code][content.Code]; ok {
-		if content.Data != nil {
-			data, _ := json.Marshal(content.Data)
-			event.Message = fmt.Sprintf("%s: %s", message, string(data))
-		} else {
-			event.Message = message
-		}
+		event.Message = message
 	} else {
-		event.Message = fmt.Sprintf("%s", content.Data)
+		event.Message = content.Data
 	}
 	return event
 }

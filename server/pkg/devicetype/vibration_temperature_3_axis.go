@@ -23,6 +23,15 @@ func (VibrationTemperature3Axis) Settings() Settings {
 			Sort:     0,
 		},
 		{
+			Name:     "采集延时",
+			Key:      "sample_offset",
+			Type:     Uint32ValueType,
+			Value:    0,
+			Category: SensorsSettingCategory,
+			Group:    SettingGroupGeneral,
+			Sort:     1,
+		},
+		{
 			Name:  "是否启用自动增益",
 			Key:   "acc3_is_auto",
 			Type:  BoolValueType,
@@ -33,7 +42,7 @@ func (VibrationTemperature3Axis) Settings() Settings {
 			},
 			Category: SensorsSettingCategory,
 			Group:    SettingGroupGeneral,
-			Sort:     1,
+			Sort:     2,
 		},
 		{
 			Name:  "量程",
@@ -47,7 +56,7 @@ func (VibrationTemperature3Axis) Settings() Settings {
 			},
 			Category: SensorsSettingCategory,
 			Group:    SettingGroupGeneral,
-			Sort:     2,
+			Sort:     3,
 		},
 		{
 			Name:  "采样频率",
@@ -62,7 +71,7 @@ func (VibrationTemperature3Axis) Settings() Settings {
 			},
 			Category: SensorsSettingCategory,
 			Group:    SettingGroupGeneral,
-			Sort:     3,
+			Sort:     4,
 		},
 		{
 			Name:  "采样点数",
@@ -78,7 +87,7 @@ func (VibrationTemperature3Axis) Settings() Settings {
 			},
 			Category: SensorsSettingCategory,
 			Group:    SettingGroupGeneral,
-			Sort:     4,
+			Sort:     5,
 		},
 		{
 			Name:     "FFT运算基础频率",
@@ -88,7 +97,7 @@ func (VibrationTemperature3Axis) Settings() Settings {
 			Unit:     "Hz",
 			Category: SensorsSettingCategory,
 			Group:    SettingGroupGeneral,
-			Sort:     5,
+			Sort:     6,
 		},
 		{
 			Name:     "是否启用原始数据采样",
@@ -97,7 +106,7 @@ func (VibrationTemperature3Axis) Settings() Settings {
 			Value:    false,
 			Category: SensorsSettingCategory,
 			Group:    SettingGroupAcceleration,
-			Sort:     6,
+			Sort:     7,
 		},
 		{
 			Name:     "原始数据采样周期",
@@ -110,7 +119,7 @@ func (VibrationTemperature3Axis) Settings() Settings {
 			Show:     true,
 			Category: SensorsSettingCategory,
 			Group:    SettingGroupAcceleration,
-			Sort:     7,
+			Sort:     8,
 		},
 		{
 			Name:     "原始数据采样延时",
@@ -122,7 +131,7 @@ func (VibrationTemperature3Axis) Settings() Settings {
 			Show:     true,
 			Category: SensorsSettingCategory,
 			Group:    SettingGroupAcceleration,
-			Sort:     8,
+			Sort:     9,
 		},
 		{
 			Name:  "原始数据采样量程",
@@ -138,7 +147,7 @@ func (VibrationTemperature3Axis) Settings() Settings {
 			Show:     true,
 			Category: SensorsSettingCategory,
 			Group:    SettingGroupAcceleration,
-			Sort:     9,
+			Sort:     10,
 		},
 		{
 			Name:  "原始数据采样频率",
@@ -155,7 +164,7 @@ func (VibrationTemperature3Axis) Settings() Settings {
 			Show:     true,
 			Category: SensorsSettingCategory,
 			Group:    SettingGroupAcceleration,
-			Sort:     10,
+			Sort:     11,
 		},
 		{
 			Name:  "原始数据采样时间",
@@ -177,7 +186,7 @@ func (VibrationTemperature3Axis) Settings() Settings {
 			Show:     true,
 			Category: SensorsSettingCategory,
 			Group:    SettingGroupAcceleration,
-			Sort:     11,
+			Sort:     12,
 		},
 	}
 }
@@ -623,6 +632,31 @@ func (VibrationTemperature3Axis) Properties(sensorID uint) Properties {
 						Name:      "Z轴",
 						Key:       "fft_value_0_z",
 						DataIndex: 54,
+					},
+				},
+			},
+			{
+				Key:       "acc_var",
+				Name:      "方差",
+				Unit:      "",
+				Precision: 3,
+				Sort:      17,
+				IsShow:    true,
+				Fields: []Field{
+					{
+						Name:      "X轴",
+						Key:       "acc_var_x",
+						DataIndex: 76,
+					},
+					{
+						Name:      "Y轴",
+						Key:       "acc_var_y",
+						DataIndex: 77,
+					},
+					{
+						Name:      "Z轴",
+						Key:       "acc_var_z",
+						DataIndex: 78,
 					},
 				},
 			},
