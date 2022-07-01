@@ -159,6 +159,7 @@ func (HighTemperatureCorrosion) Properties(sensorID uint) Properties {
 				Unit:      "",
 				Precision: 3,
 				Sort:      5,
+				IsShow:    true,
 				Fields: []Field{
 					{
 						Name:      "信号强度",
@@ -173,6 +174,7 @@ func (HighTemperatureCorrosion) Properties(sensorID uint) Properties {
 				Unit:      "",
 				Precision: 3,
 				Sort:      6,
+				IsShow:    true,
 				Fields: []Field{
 					{
 						Name:      "信号质量",
