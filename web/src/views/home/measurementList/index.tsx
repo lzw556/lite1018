@@ -105,11 +105,7 @@ const MeasurementManagement: React.FC = () => {
       {...{
         filters: generateFilters(),
         actions: (
-          <Button
-            type='primary'
-            style={{ position: 'fixed', top: 75, right: 25, zIndex: 10 }}
-            onClick={() => open()}
-          >
+          <Button type='primary' onClick={() => open()}>
             添加监测点
             <PlusOutlined />
           </Button>
