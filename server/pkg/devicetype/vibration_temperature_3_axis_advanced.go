@@ -268,7 +268,7 @@ func (v VibrationTemperature3AxisAdvanced) Properties(sensorID uint) Properties 
 		return Properties{
 			{
 				Key:       "vibration_severity",
-				Name:      "振动烈度",
+				Name:      "速度有效值",
 				Unit:      "mm/s",
 				Precision: 3,
 				Sort:      0,
