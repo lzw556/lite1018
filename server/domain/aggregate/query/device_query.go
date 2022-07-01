@@ -229,8 +229,7 @@ func (query DeviceQuery) GetDataByIDAndTimestamp(id uint, sensorType uint, time 
 	}
 	result := vo.NewDeviceData(data.Time)
 	switch sensorType {
-	case devicetype.KxSensor:
-	case devicetype.AdvancedKxSensor:
+	case devicetype.KxSensor, devicetype.AdvancedKxSensor:
 		var e entity.SvtRawData
 		if err := mapstructure.Decode(data.Values, &e); err != nil {
 			return nil, err
@@ -356,8 +355,7 @@ func (query DeviceQuery) DownloadLargeSensorData(id uint, sensorType uint, time 
 		return nil, err
 	}
 	switch sensorType {
-	case devicetype.KxSensor:
-	case devicetype.AdvancedKxSensor:
+	case devicetype.KxSensor, devicetype.AdvancedKxSensor:
 		return query.downloadKxSensorData(device, sensorType, time, cast.ToString(filters["calculate"]))
 	case devicetype.DynamicSCL3300Sensor:
 		return query.downloadSqRawData(device, time)
