@@ -20,6 +20,8 @@ type Adapter struct {
 	serverEnabled bool
 	dispatchers   map[string]Dispatcher
 	publishChan   chan PublishMessage
+	msgChan       chan Message
+	closeChan     chan struct{}
 }
 
 func NewAdapter(conf config.IoT) *Adapter {
@@ -30,6 +32,8 @@ func NewAdapter(conf config.IoT) *Adapter {
 		serverEnabled: conf.Server.Enabled,
 		dispatchers:   map[string]Dispatcher{},
 		publishChan:   make(chan PublishMessage, 0),
+		msgChan:       make(chan Message, 10000),
+		closeChan:     make(chan struct{}),
 	}
 	opts := mqtt.NewClientOptions()
 	opts.SetUsername(conf.Username).
@@ -101,12 +105,32 @@ func (a Adapter) onPublish(c mqtt.Client, msg mqtt.Message) {
 }
 
 func (a *Adapter) onConnect(c mqtt.Client) {
+	go func() {
+		for {
+			select {
+			case msg := <-a.msgChan:
+				if dispatcher, ok := a.dispatchers[msg.Header.Type]; ok {
+					dispatcher.Dispatch(msg)
+				}
+			case <-a.closeChan:
+				close(a.msgChan)
+				close(a.publishChan)
+				close(a.closeChan)
+				return
+			}
+		}
+	}()
+
 	xlog.Info("connected to MQTT broker")
 	t := c.Subscribe("iot/v2/gw/+/dev/+/msg/+/", 0, func(c mqtt.Client, message mqtt.Message) {
 		msg := parse(message)
 		if dispatcher, ok := a.dispatchers[msg.Header.Type]; ok {
-			xlog.Debugf("receive %s message => [%s]", dispatcher.Name(), msg.Body.Device)
-			go dispatcher.Dispatch(msg)
+			xlog.Debugf("receive %s message => [%s], msgChan len %d", dispatcher.Name(), msg.Body.Device, len(a.msgChan))
+			if dispatcher.Name() != "sensorData" {
+				go dispatcher.Dispatch(msg)
+			} else {
+				a.msgChan <- msg
+			}
 		}
 	})
 	if t.Wait() && t.Error() != nil {
@@ -145,5 +169,6 @@ func (a *Adapter) Close() {
 			xlog.Error("shutdown mqtt server failed", err)
 		}
 	}
+	a.closeChan <- struct{}{}
 	xlog.Info("shutdown iot server")
 }
