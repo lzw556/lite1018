@@ -18,7 +18,6 @@ export const MonitorTabContent: React.FC<{
   asset?: AssetRow;
 }> = ({ measurements, pathname, search, asset }) => {
   const history = useHistory();
-  debugger
   const measurementType = Object.values(MeasurementTypes).find(
     (type) => type.id === measurements[0].type
   );

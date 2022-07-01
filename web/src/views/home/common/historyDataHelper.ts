@@ -90,71 +90,34 @@ export function generateChartOptionsOfLastestData(
     const actuals = generateActuals(sortedMeasurements, isBig);
     polar.push(actuals.radius);
     angleAxis.push(actuals.angleAxis);
-    radiusAxis.push(actuals.radiusAxis);
+    const max = getMax(actuals.max, attributes);
+    const min = actuals.min < 0 ? -max : max / 2;
+    radiusAxis.push({ ...actuals.radiusAxis, max, min });
     series.push(actuals.series);
-    let startIndex = 2;
 
     const legends = [];
-    const scale = actuals.radius.radius / actuals.max;
-    if (attributes?.normal) {
-      const normal = getLine(
-        attributes?.normal * scale,
-        startIndex,
-        ColorHealth,
-        attributes.normal,
-        '额定值'
-      );
+    if (attributes?.normal && attributes.normal > min) {
+      const normal = getSeries(ColorHealth, attributes.normal, '额定值');
       legends.push({ name: '额定值', itemStyle: { color: ColorHealth } });
-      polar.push(normal.radius);
-      angleAxis.push(normal.angleAxis);
-      radiusAxis.push(normal.radiusAxis);
       series.push(normal.series);
-      startIndex++;
     }
-    if (attributes?.info) {
-      const info = getLine(
-        attributes?.info * scale,
-        startIndex,
-        ColorInfo,
-        attributes.info,
-        '次要报警'
-      );
+
+    if (attributes?.info && attributes.info > min) {
+      const info = getSeries(ColorInfo, attributes.info, '次要报警');
       legends.push({ name: '次要报警', itemStyle: { color: ColorInfo } });
-      polar.push(info.radius);
-      angleAxis.push(info.angleAxis);
-      radiusAxis.push(info.radiusAxis);
       series.push(info.series);
-      startIndex++;
     }
-    if (attributes?.warn) {
-      const warn = getLine(
-        attributes?.warn * scale,
-        startIndex,
-        ColorWarn,
-        attributes.warn,
-        '重要报警'
-      );
+    if (attributes?.warn && attributes.warn > min) {
+      const warn = getSeries(ColorWarn, attributes.warn, '重要报警');
       legends.push({ name: '重要报警', itemStyle: { color: ColorWarn } });
-      polar.push(warn.radius);
-      angleAxis.push(warn.angleAxis);
-      radiusAxis.push(warn.radiusAxis);
       series.push(warn.series);
-      startIndex++;
     }
-    if (attributes?.danger) {
-      const danger = getLine(
-        attributes?.danger * scale,
-        startIndex,
-        ColorDanger,
-        attributes.danger,
-        '严重报警'
-      );
+    if (attributes?.danger && attributes.danger > min) {
+      const danger = getSeries(ColorDanger, attributes.danger, '严重报警');
       legends.push({ name: '严重报警', itemStyle: { color: ColorDanger } });
-      polar.push(danger.radius);
-      angleAxis.push(danger.angleAxis);
-      radiusAxis.push(danger.radiusAxis);
       series.push(danger.series);
     }
+
     return {
       radar,
       polar,
@@ -183,6 +146,23 @@ function getMarkLines(attributes?: AssetRow['attributes']) {
     }
   }
   return values;
+}
+
+function getMax(max: number, attributes: AssetRow['attributes']) {
+  let final = max;
+  if (attributes?.normal && Math.abs(attributes.normal) > final) {
+    final = Math.abs(attributes.normal);
+  }
+  if (attributes?.info && Math.abs(attributes.info) > final) {
+    final = Math.abs(attributes.info);
+  }
+  if (attributes?.warn && Math.abs(attributes.warn) > final) {
+    final = Math.abs(attributes.warn);
+  }
+  if (attributes?.danger && Math.abs(attributes.danger) > final) {
+    final = Math.abs(attributes.danger);
+  }
+  return final;
 }
 
 function generateRowOfTooltip(marker: string, seriesName: string, text: string) {
@@ -299,6 +279,7 @@ function generateActuals(measurements: MeasurementRow[], isBig: boolean = false)
     field = firstClassFields[0];
   }
   let max = 0;
+  let min = 0;
   measurements.forEach(({ data, name }, index) => {
     let value = 0;
     if (field && data) {
@@ -306,6 +287,7 @@ function generateActuals(measurements: MeasurementRow[], isBig: boolean = false)
       if (value) {
         value = roundValue(value, field.precision);
         if (Math.abs(value) > max) max = Math.abs(value);
+        if (value < min) min = value;
       }
     }
     seriesData.push([value, (index * 360) / measurements.length]);
@@ -330,7 +312,8 @@ function generateActuals(measurements: MeasurementRow[], isBig: boolean = false)
     axisTick: { show: false },
     axisLabel: { show: false },
     splitLine: { show: false },
-    max
+    max,
+    min: max / 2
   };
   const series = {
     type: 'line',
@@ -343,42 +326,29 @@ function generateActuals(measurements: MeasurementRow[], isBig: boolean = false)
     polarIndex: 1,
     smooth: false
   };
-  return { series, max, radius, angleAxis, radiusAxis };
+  return { series, max, radius, angleAxis, radiusAxis, min };
 }
 
-function getLine(rd: number, startIndex: number = 0, color: string, value: number, name: string) {
-  const radius = { radius: rd };
-  const angleAxis = {
-    // axisLine: { show: true, lineStyle: { type: 'dashed', color } },
-    axisLine: { show: false },
-    axisTick: { show: false },
-    axisLabel: { show: false },
-    splitLine: { show: false },
-    polarIndex: startIndex
-  };
-  const radiusAxis = {
-    axisLine: { show: false },
-    axisTick: { show: false },
-    axisLabel: { show: false, formatter: 'ok' },
-    splitLine: { show: false },
-    polarIndex: startIndex
-    // name: value,
-    // nameGap: 0
-  };
+function getSeries(color: string, value: number, name: string) {
   const data = [];
-  for (let index = 0; index < 360; index = index + 5) {
+  for (let index = 0; index < 360; index++) {
     data.push([value, index]);
   }
   const series = {
     type: 'line',
     coordinateSystem: 'polar',
-    polarIndex: startIndex,
+    polarIndex: 1,
     data,
     symbol: 'none',
+    symbolSize: 0.01,
     name,
-    lineStyle: { type: 'dashed', color }
+    lineStyle: { type: 'dashed', color, opacity: 0.6 },
+    // label: {show: true, formatter:(para:any)=>{
+    //   if(para.dataIndex === 0) return para.value[0];
+    //   return ''
+    // }}
   };
-  return { radius, angleAxis, radiusAxis, series };
+  return { series };
 }
 
 export function getHistoryDatas(data: HistoryData, propertyName?: string) {

@@ -80,7 +80,7 @@ export const EditContent: React.FC<{
         <Form.Item
           label='额定值'
           name={['attributes', 'normal']}
-          initialValue={0}
+          initialValue=''
           rules={[{ type: 'number', transform: (value: string) => Number(value) }]}
         >
           <Input />
@@ -90,7 +90,7 @@ export const EditContent: React.FC<{
         <Form.Item
           label='次要'
           name={['attributes', 'info']}
-          initialValue={0}
+          initialValue=''
           rules={[{ type: 'number', transform: (value: string) => Number(value) }]}
         >
           <Input />
@@ -100,7 +100,7 @@ export const EditContent: React.FC<{
         <Form.Item
           label='重要'
           name={['attributes', 'warn']}
-          initialValue={0}
+          initialValue=''
           rules={[{ type: 'number', transform: (value: string) => Number(value) }]}
         >
           <Input />
@@ -110,7 +110,7 @@ export const EditContent: React.FC<{
         <Form.Item
           label='严重'
           name={['attributes', 'danger']}
-          initialValue={0}
+          initialValue=''
           rules={[{ type: 'number', transform: (value: string) => Number(value) }]}
         >
           <Input />
