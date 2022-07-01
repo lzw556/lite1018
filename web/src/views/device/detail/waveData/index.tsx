@@ -163,7 +163,7 @@ const WaveDataChart: React.FC<{ device: Device }> = ({device}) => {
             return <EmptyLayout description='数据不足'/>;
         } else {
             let option: any = {...defaultChartOption};
-            if (deviceData) {
+            if (deviceData && deviceData.values && deviceData.values.length) {
                 const data = deviceData.values;
                 const legends = ['X轴', 'Y轴', 'Z轴'];
                 let series: any[] = [
