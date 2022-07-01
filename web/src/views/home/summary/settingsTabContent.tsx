@@ -23,7 +23,7 @@ export const SettingsTabContent: React.FC<{
           id={asset?.id}
           initialValues={Object.values(AssetTypes).find((type) => type.id === asset?.type)}
         />
-        <Form.Item wrapperCol={{ offset: 2 }}>
+        <Form.Item wrapperCol={{ offset: 4 }}>
           <Button
             type='primary'
             onClick={() => {

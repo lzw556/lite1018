@@ -3,12 +3,15 @@ import ShadowCard from '../../../../../components/shadowCard';
 import { Device } from '../../../../../types/device';
 import { SingleDeviceInfo } from './singleDeviceInfo';
 
-export const MeasurementDevices: React.FC<{ devices: Device[] }> = ({ devices }) => {
+export const MeasurementDevices: React.FC<{ devices: Device[]; alertLevel?: number }> = ({
+  devices,
+  alertLevel
+}) => {
   const [key, setKey] = React.useState(devices[0].macAddress);
-  if (devices.length === 1) return <SingleDeviceInfo {...devices[0]} />;
+  if (devices.length === 1) return <SingleDeviceInfo {...devices[0]} alertLevel={alertLevel}/>;
   const contents: Record<string, JSX.Element> = {};
   devices.forEach((device) => {
-    contents[device.macAddress] = <SingleDeviceInfo {...device} />;
+    contents[device.macAddress] = <SingleDeviceInfo {...device} alertLevel={alertLevel}/>;
   });
 
   return (

@@ -108,21 +108,6 @@ const FlangeOverview: React.FC = () => {
               )
             },
             {
-              key: 'settings',
-              tab: '配置信息',
-              content: (
-                <SettingsTabContent
-                  asset={asset}
-                  form={form}
-                  onSubmit={(values) => {
-                    updateAsset(id, values).then(() => {
-                      setIsForceRefresh((prev) => ++prev);
-                    });
-                  }}
-                />
-              )
-            },
-            {
               key: 'list',
               tab: '监测点列表',
               content: (
@@ -159,6 +144,21 @@ const FlangeOverview: React.FC = () => {
                     />
                   )}
                 </>
+              )
+            },
+            {
+              key: 'settings',
+              tab: '配置信息',
+              content: (
+                <SettingsTabContent
+                  asset={asset}
+                  form={form}
+                  onSubmit={(values) => {
+                    updateAsset(id, values).then(() => {
+                      setIsForceRefresh((prev) => ++prev);
+                    });
+                  }}
+                />
               )
             }
           ]

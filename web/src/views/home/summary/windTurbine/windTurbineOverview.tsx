@@ -90,21 +90,6 @@ const WindTurbineOverview: React.FC = () => {
               content: <MonitorTabContent asset={asset} pathname={pathname} search={search} />
             },
             {
-              key: 'settings',
-              tab: '配置信息',
-              content: (
-                <SettingsTabContent
-                  asset={asset}
-                  form={form}
-                  onSubmit={(values) => {
-                    updateAsset(id, values).then(() => {
-                      setIsForceRefresh((prev) => ++prev);
-                    });
-                  }}
-                />
-              )
-            },
-            {
               key: 'list',
               tab: '监测点列表',
               content: (
@@ -147,6 +132,21 @@ const WindTurbineOverview: React.FC = () => {
                     </Col>
                   </Row>
                 </ShadowCard>
+              )
+            },
+            {
+              key: 'settings',
+              tab: '配置信息',
+              content: (
+                <SettingsTabContent
+                  asset={asset}
+                  form={form}
+                  onSubmit={(values) => {
+                    updateAsset(id, values).then(() => {
+                      setIsForceRefresh((prev) => ++prev);
+                    });
+                  }}
+                />
               )
             }
           ]

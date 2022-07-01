@@ -272,10 +272,7 @@ function generateOuter(measurements: MeasurementRow[], isBig: boolean = false) {
       },
       itemStyle: {
         opacity: 1,
-        color:
-          !alertLevel || alertLevel === 0
-            ? '#555'
-            : getAlarmLevelColor(convertAlarmLevelToState(alertLevel))
+        color: getAlarmLevelColor(convertAlarmLevelToState(alertLevel || 0))
       }
     };
   });
@@ -533,4 +530,24 @@ function getFirstClassFields(measurement: MeasurementRow) {
     }
   });
   return fields;
+}
+
+export function generateDatasOfMeasurement(measurement: MeasurementRow) {
+  const properties = getFirstClassFields(measurement);
+  const { data } = measurement;
+  if (properties.length > 0) {
+    return properties
+      .map(({ name, key, unit, precision }) => {
+        let value = NaN;
+        if (data && data.values) {
+          value = data.values[key];
+        }
+        return { name, value: getDisplayValue(value, precision, unit) };
+      })
+      .concat({
+        name: '采集时间',
+        value: data ? moment(data.timestamp * 1000).format('YYYY-MM-DD HH:mm:ss') : '-'
+      });
+  }
+  return [];
 }

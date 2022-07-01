@@ -21,7 +21,7 @@ const BoltOverview: React.FC = () => {
       setMeasurement(measurement);
       setLoading(false);
     });
-  }
+  };
   React.useEffect(() => {
     fetchMeasurement(id);
   }, [id]);
@@ -62,14 +62,17 @@ const BoltOverview: React.FC = () => {
       />
       <Row gutter={[0, 16]}>
         <Col span={24}>
-          <MeasurementDevices devices={measurement.bindingDevices} />
+          <MeasurementDevices
+            devices={measurement.bindingDevices}
+            alertLevel={measurement.alertLevel}
+          />
         </Col>
         <Col span={24}>
           <MeasurementContents
             {...measurement}
             onUpdate={() => {
               fetchMeasurement(id);
-              setIsForceRefresh(prev => ++prev);
+              setIsForceRefresh((prev) => ++prev);
             }}
           />
         </Col>

@@ -25,23 +25,17 @@ export const MeasurementOfWindList: React.FC<{
 }> = ({ wind, pathname, search, open, fetchAssets }) => {
   const generateTables = () => {
     if (!wind) return null;
-    if (
-      !wind.children ||
-      wind.children.length === 0 ||
-      (wind.children.length > 0 && wind.children.every(({ monitoringPoints }) => !monitoringPoints))
-    )
-      return <Empty description='没有法兰或监测点' image={Empty.PRESENTED_IMAGE_SIMPLE} />;
+    if (!wind.children || wind.children.length === 0)
+      return <Empty description='没有法兰' image={Empty.PRESENTED_IMAGE_SIMPLE} />;
     return (
       <Row gutter={[0, 16]}>
-        {sortFlangesByAttributes(wind.children)
-          .filter(({ monitoringPoints }) => monitoringPoints && monitoringPoints.length > 0)
-          .map(({ id, name, monitoringPoints }) =>
-            generateTable(
-              id,
-              name,
-              monitoringPoints ? sortMeasurementsByAttributes(monitoringPoints) : []
-            )
-          )}
+        {sortFlangesByAttributes(wind.children).map(({ id, name, monitoringPoints }) =>
+          generateTable(
+            id,
+            name,
+            monitoringPoints ? sortMeasurementsByAttributes(monitoringPoints) : []
+          )
+        )}
       </Row>
     );
   };
@@ -105,7 +99,7 @@ export const MeasurementOfWindList: React.FC<{
                       ))
                     : ''
               },
-              ...generatePropertyColumns(dataSource ? dataSource[0] : []),
+              ...generatePropertyColumns(dataSource && dataSource.length > 0 ? dataSource[0] : []),
               {
                 title: '操作',
                 key: 'action',

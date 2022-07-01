@@ -1,17 +1,17 @@
-import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
+import { ArrowRightOutlined, DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
 import { Button, Popconfirm, Space, Tree } from 'antd';
 import { cloneDeep } from 'lodash';
 import * as React from 'react';
-import { AssetTypes } from '../common/constants';
-import {
-  convertAlarmLevelToState,
-  getAlarmLevelColor,
-  getAlarmStateText
-} from '../common/statisticsHelper';
+import { Link } from 'react-router-dom';
+import { AssetTypes, MeasurementTypes } from '../common/constants';
+import { generateDatasOfMeasurement } from '../common/historyDataHelper';
+import { convertAlarmLevelToState } from '../common/statisticsHelper';
 import { mapTreeNode } from '../common/treeDataHelper';
+import { combineFinalUrl } from '../common/utils';
 import { MeasurementEdit } from '../measurementList/edit';
 import { sortMeasurementsByAttributes } from '../measurementList/util';
 import { FlangeIcon } from '../summary/flange/icon';
+import { MeasurementIcon } from '../summary/measurement/icon';
 import { MeasurementRow } from '../summary/measurement/props';
 import { deleteMeasurement } from '../summary/measurement/services';
 import { WindTurbineIcon } from '../summary/windTurbine/icon';
@@ -20,7 +20,11 @@ import { AssetRow } from './props';
 import { deleteAsset, getAssets } from './services';
 import { sortFlangesByAttributes } from './util';
 
-export const AssetTree: React.FC<{ assets: AssetRow[] }> = ({ assets }) => {
+export const AssetTree: React.FC<{ assets: AssetRow[]; pathname: string; search: string }> = ({
+  assets,
+  pathname,
+  search
+}) => {
   const [treedata, setTreedata] = React.useState<any>();
   const [selectedNode, setSelectedNode] = React.useState<any>();
   const [visible, setVisible] = React.useState(false);
@@ -61,9 +65,9 @@ export const AssetTree: React.FC<{ assets: AssetRow[] }> = ({ assets }) => {
               if (props.type === AssetTypes.WindTurbind.id) {
                 return <WindTurbineIcon className={alarmState} />;
               } else if (props.type === AssetTypes.Flange.id) {
-                return <FlangeIcon className={`${alarmState}`} />;
+                return <FlangeIcon className={`${alarmState} focus`} />;
               } else {
-                return null;
+                return <MeasurementIcon className={`${alarmState} focus`} />;
               }
             }
           }))
@@ -108,18 +112,21 @@ export const AssetTree: React.FC<{ assets: AssetRow[] }> = ({ assets }) => {
           const name = `${props.name}`;
           let alarmText = null;
           if (props.type > 10000) {
-            const alarmState = convertAlarmLevelToState(props.alertLevel);
-            alarmText = (
-              <span
-                style={{
-                  fontSize: 14,
-                  paddingLeft: '1em',
-                  color: getAlarmLevelColor(alarmState)
-                }}
-              >
-                {getAlarmStateText(alarmState)}
-              </span>
-            );
+            const nameValues = generateDatasOfMeasurement(props);
+            if (nameValues.length > 0) {
+              alarmText = (
+                <Space style={{ fontSize: 14, color: '#8a8e99' }}>
+                  {nameValues.map(({ name, value }) => `${name}: ${value}`)}
+                </Space>
+              );
+            }
+          }
+          let subpath = '';
+          const assetType = getAssetType(selectedNode?.type);
+          if (selectedNode?.type < 10000) {
+            if (assetType) subpath = assetType.url;
+          } else {
+            subpath = MeasurementTypes.preload.url;
           }
           return (
             <Space>
@@ -168,6 +175,11 @@ export const AssetTree: React.FC<{ assets: AssetRow[] }> = ({ assets }) => {
                       />
                     </Button>
                   )}
+                  <Link to={combineFinalUrl(pathname, search, subpath, selectedNode?.id)}>
+                    <Button type='text' size='small'>
+                      <ArrowRightOutlined />
+                    </Button>
+                  </Link>
                 </>
               )}
             </Space>

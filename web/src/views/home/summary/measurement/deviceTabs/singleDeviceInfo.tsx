@@ -1,17 +1,21 @@
-import { Col, Row } from 'antd';
+import { Col, Row, Tag } from 'antd';
 import moment from 'moment';
 import * as React from 'react';
 import ShadowCard from '../../../../../components/shadowCard';
 import { Device } from '../../../../../types/device';
 import { DeviceType } from '../../../../../types/device_type';
-import { SingleDeviceStatus } from '../../../../device/SingleDeviceStatus';
 import { generateColProps } from '../../../common/utils';
 import '../../../../../string-extension';
 import { Link } from 'react-router-dom';
+import {
+  convertAlarmLevelToState,
+  getAlarmLevelColor,
+  getAlarmStateText
+} from '../../../common/statisticsHelper';
 
-export const SingleDeviceInfo: React.FC<Device> = (props) => {
+export const SingleDeviceInfo: React.FC<Device & { alertLevel?: number }> = (props) => {
   const colProps = generateColProps({ xxl: 8, xl: 8, lg: 12, md: 12 });
-  const { id, name, typeId, information, alertStates, state, macAddress, data } = props;
+  const { id, name, typeId, information, state, macAddress, data, alertLevel } = props;
   const { batteryVoltage, signalLevel, connectedAt } = state;
   return (
     <ShadowCard>
@@ -20,7 +24,9 @@ export const SingleDeviceInfo: React.FC<Device> = (props) => {
           <dl className='name-value-groups'>
             <div className='name-value'>
               <dt>设备名称</dt>
-              <dd><Link to={`/device-management?locale=devices/deviceDetail&id=${id}`}>{name}</Link></dd>
+              <dd>
+                <Link to={`/device-management?locale=devices/deviceDetail&id=${id}`}>{name}</Link>
+              </dd>
             </div>
           </dl>
         </Col>
@@ -37,16 +43,6 @@ export const SingleDeviceInfo: React.FC<Device> = (props) => {
             <div className='name-value'>
               <dt>型号</dt>
               <dd>{information && information.model ? information.model : '-'}</dd>
-            </div>
-          </dl>
-        </Col>
-        <Col {...colProps}>
-          <dl className='name-value-groups'>
-            <div className='name-value'>
-              <dt>状态</dt>
-              <dd>
-                <SingleDeviceStatus alertStates={alertStates} state={state} />
-              </dd>
             </div>
           </dl>
         </Col>
@@ -71,6 +67,18 @@ export const SingleDeviceInfo: React.FC<Device> = (props) => {
             <div className='name-value'>
               <dt>信号强度(dB)</dt>
               <dd>{state && typeId !== DeviceType.Gateway ? signalLevel : '-'}</dd>
+            </div>
+          </dl>
+        </Col>
+        <Col {...colProps}>
+          <dl className='name-value-groups'>
+            <div className='name-value'>
+              <dt>状态</dt>
+              <dd>
+                <Tag color={getAlarmLevelColor(convertAlarmLevelToState(alertLevel || 0))}>
+                  {getAlarmStateText(convertAlarmLevelToState(alertLevel || 0))}
+                </Tag>
+              </dd>
             </div>
           </dl>
         </Col>

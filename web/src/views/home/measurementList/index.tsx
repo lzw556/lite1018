@@ -1,5 +1,5 @@
 import { PlusOutlined } from '@ant-design/icons';
-import { Button, Empty, Select, Spin } from 'antd';
+import { Button, Empty, Select, Space, Spin } from 'antd';
 import * as React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { AssetTypes } from '../common/constants';
@@ -10,6 +10,7 @@ import Label from '../../../components/label';
 import { SearchResultPage } from '../components/searchResultPage';
 import { MeasurementOfWindList } from './measurementOfWindList';
 import { AssetRow } from '../assetList/props';
+import { AssetEdit } from '../assetList/edit';
 
 const MeasurementManagement: React.FC = () => {
   const { pathname, search } = useLocation();
@@ -27,7 +28,10 @@ const MeasurementManagement: React.FC = () => {
   );
   const [wind, setWind] = React.useState<AssetRow>();
   const [visible, setVisible] = React.useState(false);
+  const [visibleAsset, setVisibleAsset] = React.useState(false);
   const [selectedRow, setSelectedRow] = React.useState<MeasurementRow>();
+  const [initialValues, setInitialValues] = React.useState(AssetTypes.WindTurbind);
+  const [disabled, setDisabled] = React.useState(true);
 
   React.useEffect(() => {
     fetchAssets({ type: AssetTypes.WindTurbind.id });
@@ -43,15 +47,21 @@ const MeasurementManagement: React.FC = () => {
     }
   }, [filters, assets]);
 
-  const open = (selectedRow?: MeasurementRow) => {
+  const open = (selectedRow?: MeasurementRow, initialValues?: typeof AssetTypes.WindTurbind) => {
     setSelectedRow(selectedRow);
-    setVisible(true);
+    if(initialValues){
+      setInitialValues(initialValues);
+      setVisibleAsset(true)
+    }else{
+      setVisible(true);
+    }
   };
 
   const fetchAssets = (filters?: Pick<AssetRow, 'type'>) => {
     setAssets((prev) => ({ ...prev, loading: true }));
     getAssets(filters).then((assets) => {
       setAssets({ loading: false, items: assets });
+      setDisabled(assets.length === 0);
     });
   };
 
@@ -105,10 +115,20 @@ const MeasurementManagement: React.FC = () => {
       {...{
         filters: generateFilters(),
         actions: (
-          <Button type='primary' onClick={() => open()}>
-            添加监测点
-            <PlusOutlined />
-          </Button>
+          <Space>
+            <Button type='primary' onClick={() => open(undefined, AssetTypes.WindTurbind)}>
+              添加风机
+              <PlusOutlined />
+            </Button>
+            <Button type='primary' onClick={() => open(undefined, AssetTypes.Flange)} disabled={disabled}>
+              添加法兰
+              <PlusOutlined />
+            </Button>
+            <Button type='primary' onClick={() => open()}>
+              添加监测点
+              <PlusOutlined />
+            </Button>
+          </Space>
         ),
         results: (
           <MeasurementOfWindList
@@ -131,6 +151,19 @@ const MeasurementManagement: React.FC = () => {
             onSuccess: () => {
               fetchAssets({ type: AssetTypes.WindTurbind.id });
               setVisible(false);
+            }
+          }}
+        />
+      )}
+      {visibleAsset && (
+        <AssetEdit
+          {...{
+            visible: visibleAsset,
+            onCancel: () => setVisibleAsset(false),
+            initialValues,
+            onSuccess: () => {
+              fetchAssets({ type: AssetTypes.WindTurbind.id });
+              setVisibleAsset(false);
             }
           }}
         />

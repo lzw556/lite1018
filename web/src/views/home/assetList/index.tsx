@@ -11,8 +11,10 @@ import { getProject } from '../../../utils/session';
 import { AssetRow } from './props';
 import '../home.css';
 import { AssetTree } from './assetTree';
+import { useLocation } from 'react-router-dom';
 
 const AssetManagement: React.FC = () => {
+  const { pathname, search } = useLocation();
   const [assets, setAssets] = React.useState<{
     loading: boolean;
     items: AssetRow[];
@@ -24,6 +26,7 @@ const AssetManagement: React.FC = () => {
   const [selectedRow, setSelectedRow] = React.useState<AssetRow>();
   const [initialValues, setInitialValues] = React.useState(AssetTypes.WindTurbind);
   const [loading, setLoading] = React.useState(false);
+  const [disabled, setDisabled] = React.useState(true);
 
   React.useEffect(() => {
     fetchAssets({ type: AssetTypes.WindTurbind.id });
@@ -39,6 +42,7 @@ const AssetManagement: React.FC = () => {
     setAssets((prev) => ({ ...prev, loading: true }));
     getAssets(filters).then((assets) => {
       setAssets({ loading: false, items: filterEmptyChildren(assets) });
+      setDisabled(assets.length === 0);
     });
   };
 
@@ -49,6 +53,10 @@ const AssetManagement: React.FC = () => {
           <Space>
             <Button type='primary' onClick={() => open(AssetTypes.WindTurbind)}>
               添加风机
+              <PlusOutlined />
+            </Button>
+            <Button type='primary' onClick={() => open(AssetTypes.Flange)} disabled={disabled}>
+              添加法兰
               <PlusOutlined />
             </Button>
             <Button
@@ -112,7 +120,7 @@ const AssetManagement: React.FC = () => {
             </Upload>
           </Space>
         ),
-        results: <AssetTree assets={assets.items} />
+        results: <AssetTree assets={assets.items} pathname={pathname} search={search} />
       }}
     >
       {visible && (
