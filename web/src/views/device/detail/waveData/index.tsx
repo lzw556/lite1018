@@ -57,21 +57,24 @@ const WaveDataChart: React.FC<{ device: Device }> = ({device}) => {
     const [isLoadingPage, setIsLoadingPage] = React.useState(false);
     const [isShowEnvelope, setIsShowEnvelope] = React.useState(false);
     const [dataType] = useState(device.typeId === DeviceType.VibrationTemperature3AxisAdvanced ? 16842758 : 16842753)
+    const [timestamp, setTimestamp] = useState<number>()
     const {hasPermission} = usePermission();
 
     const fetchDeviceDataByTimestamp = useCallback(
-        (timestamp: number) => {
-            setIsLoading(true);
-            GetDeviceDataRequest(device.id, timestamp, {calculate, dimension, data_type: dataType})
-                .then((data) => {
-                    setIsLoading(false);
-                    setDeviceData(data);
-                })
-                .catch((e) => {
-                    setIsLoading(false);
-                });
+        () => {
+            if (timestamp) {
+                setIsLoading(true);
+                GetDeviceDataRequest(device.id, timestamp, {calculate, dimension, data_type: dataType})
+                    .then((data) => {
+                        setIsLoading(false);
+                        setDeviceData(data);
+                    })
+                    .catch((e) => {
+                        setIsLoading(false);
+                    });
+            }
         },
-        [calculate, dimension]
+        [calculate, dimension, timestamp]
     );
 
     const fetchDeviceWaveDataTimestamps = useCallback(() => {
@@ -83,7 +86,7 @@ const WaveDataChart: React.FC<{ device: Device }> = ({device}) => {
                 setIsLoadingPage(false);
                 setDataSource(data);
                 if (data.length > 0) {
-                    fetchDeviceDataByTimestamp(data[0].timestamp);
+                    setTimestamp(data[0].timestamp);
                 }
             })
             .catch((_) => {
@@ -96,9 +99,7 @@ const WaveDataChart: React.FC<{ device: Device }> = ({device}) => {
     }, [fetchDeviceWaveDataTimestamps]);
 
     React.useEffect(() => {
-        if (deviceData) {
-            fetchDeviceDataByTimestamp(deviceData.timestamp);
-        }
+        fetchDeviceDataByTimestamp();
     }, [fetchDeviceDataByTimestamp]);
 
     const getChartTitle = () => {
@@ -159,80 +160,75 @@ const WaveDataChart: React.FC<{ device: Device }> = ({device}) => {
     };
 
     const renderChart = () => {
-        if (deviceData === undefined && !isLoading) {
-            return <EmptyLayout description='数据不足'/>;
-        } else {
-            let option: any = {...defaultChartOption};
-            if (deviceData && deviceData.values && deviceData.values.length) {
-                const data = deviceData.values;
-                const legends = ['X轴', 'Y轴', 'Z轴'];
-                let series: any[] = [
+        if (deviceData && deviceData.values) {
+            const data = deviceData.values;
+            const legends = ['X轴', 'Y轴', 'Z轴'];
+            let series: any[] = [
+                {
+                    name: legends[dimension],
+                    type: 'line',
+                    data: data.values,
+                    itemStyle: LineChartStyles[dimension].itemStyle,
+                    showSymbol: false
+                }
+            ];
+            if (isShowEnvelope) {
+                series = [
                     {
                         name: legends[dimension],
                         type: 'line',
-                        data: data.values,
-                        itemStyle: LineChartStyles[dimension].itemStyle,
-                        showSymbol: false
-                    }
+                        data: data.highEnvelopes,
+                        lineStyle: {
+                            opacity: 0
+                        },
+                        areaStyle: {
+                            color: '#ccc'
+                        },
+                        stack: 'confidence-band',
+                        symbol: 'none'
+                    },
+                    {
+                        name: legends[dimension],
+                        type: 'line',
+                        data: data.lowEnvelopes,
+                        lineStyle: {
+                            opacity: 0
+                        },
+                        areaStyle: {
+                            color: '#ccc'
+                        },
+                        stack: 'confidence-band',
+                        symbol: 'none'
+                    },
+                    ...series
                 ];
-                if (isShowEnvelope) {
-                    series = [
-                        {
-                            name: legends[dimension],
-                            type: 'line',
-                            data: data.highEnvelopes,
-                            lineStyle: {
-                                opacity: 0
-                            },
-                            areaStyle: {
-                                color: '#ccc'
-                            },
-                            stack: 'confidence-band',
-                            symbol: 'none'
-                        },
-                        {
-                            name: legends[dimension],
-                            type: 'line',
-                            data: data.lowEnvelopes,
-                            lineStyle: {
-                                opacity: 0
-                            },
-                            areaStyle: {
-                                color: '#ccc'
-                            },
-                            stack: 'confidence-band',
-                            symbol: 'none'
-                        },
-                        ...series
-                    ];
-                }
-                option = {
-                    ...defaultChartOption,
-                    legend: {
-                        data: [legends[dimension]],
-                        itemStyle: {
-                            color: LineChartStyles[dimension].itemStyle.normal.color
+            }
+            const option = {
+                ...defaultChartOption,
+                legend: {
+                    data: [legends[dimension]],
+                    itemStyle: {
+                        color: LineChartStyles[dimension].itemStyle.normal.color
+                    }
+                },
+                title: {text: `${getChartTitle()} ${data.frequency / 1000}KHz`, top: 0},
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'cross',
+                        crossStyle: {
+                            color: '#999'
                         }
                     },
-                    title: {text: `${getChartTitle()} ${data.frequency / 1000}KHz`, top: 0},
-                    tooltip: {
-                        trigger: 'axis',
-                        axisPointer: {
-                            type: 'cross',
-                            crossStyle: {
-                                color: '#999'
-                            }
-                        },
-                        formatter: `{b} ${data.xAxisUnit}<br/>${legends[dimension]}: {c}`
-                    },
-                    xAxis: {
-                        type: 'category',
-                        data: data.xAxis,
-                        name: data.xAxisUnit
-                    },
-                    series: series
-                };
-            }
+                    formatter: `{b} ${data.xAxisUnit}<br/>${legends[dimension]}: {c}`
+                },
+                xAxis: {
+                    type: 'category',
+                    data: data.xAxis,
+                    name: data.xAxisUnit
+                },
+                series
+            };
             return (
                 <EChartsReact
                     loadingOption={{text: '正在加载数据, 请稍等...'}}
@@ -242,6 +238,8 @@ const WaveDataChart: React.FC<{ device: Device }> = ({device}) => {
                     notMerge={true}
                 />
             );
+        }else {
+            return <EmptyLayout description='数据不足'/>;
         }
     };
 
@@ -291,7 +289,7 @@ const WaveDataChart: React.FC<{ device: Device }> = ({device}) => {
         </Select>
     );
     if (isMobile) {
-        if (!deviceData?.timestamp) {
+        if (!timestamp) {
             return <EmptyLayout description={'波形数据列表为空'}/>;
         }
 
@@ -318,7 +316,7 @@ const WaveDataChart: React.FC<{ device: Device }> = ({device}) => {
                             defaultValue={deviceData?.timestamp}
                             onChange={(value) => {
                                 if (value !== deviceData?.timestamp) {
-                                    fetchDeviceDataByTimestamp(value);
+                                    setDeviceData(deviceData);
                                 }
                             }}
                         >
@@ -383,12 +381,12 @@ const WaveDataChart: React.FC<{ device: Device }> = ({device}) => {
                                     pagination={false}
                                     dataSource={dataSource}
                                     rowClassName={(record) =>
-                                        record.timestamp === deviceData?.timestamp ? 'ant-table-row-selected' : ''
+                                        record.timestamp === timestamp ? 'ant-table-row-selected' : ''
                                     }
                                     onRow={(record) => ({
                                         onClick: () => {
-                                            if (record.timestamp !== deviceData?.timestamp) {
-                                                fetchDeviceDataByTimestamp(record.timestamp);
+                                            if (record.timestamp !== timestamp) {
+                                                setTimestamp(record.timestamp);
                                             }
                                         },
                                         onMouseLeave: () => (window.document.body.style.cursor = 'default'),

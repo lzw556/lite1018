@@ -70,5 +70,6 @@ export const FIRST_CLASS_PROPERTIES = [
     { typeId: DeviceType.HighTemperatureCorrosion, properties:['thickness', 'temperature', 'annualized_corrosion_rate'] },
     { typeId: DeviceType.NormalTemperatureCorrosion, properties:['thickness', 'temperature', 'annualized_corrosion_rate'] },
     { typeId: DeviceType.PressureTemperature, properties:['loosening_angle', 'attitude', 'motion'] },
-    { typeId: DeviceType.AngleDip, properties:['inclination', 'pitch', 'roll'] }
+    { typeId: DeviceType.AngleDip, properties:['inclination', 'pitch', 'roll'] },
+    { typeId: DeviceType.VibrationTemperature3AxisAdvanced, properties:['vibration_severity_y', 'enveloping_pk2pk_y', 'temperature'] }
 ]
