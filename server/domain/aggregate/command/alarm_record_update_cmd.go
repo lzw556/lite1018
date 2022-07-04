@@ -47,6 +47,11 @@ func (cmd AlarmRecordUpdateCmd) AcknowledgeBy(req request.AcknowledgeAlarmRecord
 			switch cmd.AlarmRecord.Category {
 			case entity.AlarmRuleCategoryDevice:
 				if device, err := cmd.deviceRepo.Get(txCtx, cmd.AlarmRecord.SourceID); err == nil {
+					if state, err := cmd.deviceAlertStateRepo.Get(device.MacAddress, cmd.AlarmRecord.AlarmRuleID); err == nil {
+						if state.Record.ID == cmd.AlarmRecord.ID {
+							device.RemoveAlarmRuleState(cmd.AlarmRecord.AlarmRuleID)
+						}
+					}
 					return cmd.deviceAlertStateRepo.Delete(device.MacAddress, cmd.AlarmRecord.AlarmRuleID)
 				}
 			}

@@ -78,9 +78,6 @@ func (d *Device) UpdateAlarmRuleState(e AlarmRule) {
 		state.Duration += 1
 		d.AlarmRuleStates[e.ID] = state
 	} else {
-		if d.AlarmRuleStates[e.ID].Duration == e.Duration {
-
-		}
 		d.AlarmRuleStates[e.ID] = AlarmRuleState{
 			Level:    e.Level,
 			Duration: 1,
