@@ -1,6 +1,6 @@
 package devicetype
 
-type VibrationTemperature3Axis struct {
+type VibrationTemperature3AxisAdvance struct {
 	SamplePeriod  Setting `json:"sample_period"`
 	SampleOffset  Setting `json:"sample_offset"`
 	SamplePeriod2 Setting `json:"sample_period_2"`
@@ -13,18 +13,22 @@ type VibrationTemperature3Axis struct {
 	Acc3Range2    Setting `json:"acc3_range_2"`
 	Acc3Odr2      Setting `json:"acc3_odr_2"`
 	Acc3Samples2  Setting `json:"acc3_samples_2"`
+	Acc1Odr       Setting `json:"acc1_odr"`
+	Acc1Samples   Setting `json:"acc1_samples"`
+	Acc1Odr2      Setting `json:"acc1_odr_2"`
+	Acc1Samples2  Setting `json:"acc1_samples_2"`
 	BaseFrequency Setting `json:"base_frequency"`
 }
 
-func (VibrationTemperature3Axis) ID() uint {
-	return VibrationTemperature3AxisType
+func (VibrationTemperature3AxisAdvance) ID() uint {
+	return VibrationTemperature3AxisAdvancedType
 }
 
-func (VibrationTemperature3Axis) SensorID() uint {
+func (VibrationTemperature3AxisAdvance) SensorID() uint {
 	return VibrationRmsFFTXYZTemperatureSensor
 }
 
-func (d VibrationTemperature3Axis) Settings() Settings {
+func (d VibrationTemperature3AxisAdvance) Settings() Settings {
 	d.SamplePeriod = samplePeriodSetting()
 	d.SampleOffset = sampleOffsetSetting()
 	d.IsEnabled2 = Setting{
@@ -57,20 +61,20 @@ func (d VibrationTemperature3Axis) Settings() Settings {
 		Parent:   d.IsEnabled2.Key,
 		Show:     true,
 		Category: SensorsSettingCategory,
-		Group:    SettingGroupAcceleration,
+		Group:    SettingGroupGeneral,
 		Sort:     5,
 	}
 	d.Acc3IsAuto = Setting{
-		Name:     "自动增益",
+		Name:     "自动增益(X,Z)",
 		Key:      "acc3_is_auto",
 		Type:     BoolValueType,
 		Value:    true,
 		Category: SensorsSettingCategory,
-		Group:    SettingGroupGeneral,
+		Group:    SettingGroupAcceleration,
 		Sort:     6,
 	}
 	d.Acc3Range = Setting{
-		Name:  "量程",
+		Name:  "量程(X,Z)",
 		Key:   "acc3_range",
 		Type:  Uint8ValueType,
 		Value: 0,
@@ -86,7 +90,7 @@ func (d VibrationTemperature3Axis) Settings() Settings {
 		Sort:     7,
 	}
 	d.Acc3Odr = Setting{
-		Name:  "采样频率",
+		Name:  "采样频率(X,Z)",
 		Key:   "acc3_odr",
 		Type:  Uint8ValueType,
 		Value: 15,
@@ -99,11 +103,11 @@ func (d VibrationTemperature3Axis) Settings() Settings {
 		Parent:   d.Acc3IsAuto.Key,
 		Show:     true,
 		Category: SensorsSettingCategory,
-		Group:    SettingGroupGeneral,
+		Group:    SettingGroupAcceleration,
 		Sort:     8,
 	}
 	d.Acc3Samples = Setting{
-		Name:  "采样点数",
+		Name:  "采样点数(X,Z)",
 		Key:   "acc3_samples",
 		Type:  Uint32ValueType,
 		Value: 1024,
@@ -117,11 +121,11 @@ func (d VibrationTemperature3Axis) Settings() Settings {
 		Parent:   d.Acc3IsAuto.Key,
 		Show:     true,
 		Category: SensorsSettingCategory,
-		Group:    SettingGroupGeneral,
+		Group:    SettingGroupAcceleration,
 		Sort:     9,
 	}
 	d.Acc3Range2 = Setting{
-		Name:  "原始数据量程",
+		Name:  "原始数据量程(X,Z)",
 		Key:   "acc3_range_2",
 		Type:  Uint8ValueType,
 		Value: 2,
@@ -137,7 +141,7 @@ func (d VibrationTemperature3Axis) Settings() Settings {
 		Sort:     10,
 	}
 	d.Acc3Odr2 = Setting{
-		Name:  "原始数据采样频率",
+		Name:  "原始数据采样频率(X,Z)",
 		Key:   "acc3_odr_2",
 		Type:  Uint8ValueType,
 		Value: 12,
@@ -154,7 +158,7 @@ func (d VibrationTemperature3Axis) Settings() Settings {
 		Sort:     11,
 	}
 	d.Acc3Samples2 = Setting{
-		Name:  "原始数据采样时间",
+		Name:  "原始数据采样时间(X,Z)",
 		Key:   "acc3_samples_2",
 		Type:  Uint32ValueType,
 		Value: 10000,
@@ -178,6 +182,76 @@ func (d VibrationTemperature3Axis) Settings() Settings {
 		Group:    SettingGroupAcceleration,
 		Sort:     12,
 	}
+	d.Acc1Odr = Setting{
+		Name:  "采样频率(Y)",
+		Key:   "acc1_odr",
+		Type:  Uint8ValueType,
+		Value: 5,
+		Options: map[int]string{
+			0: "4KHz",
+			1: "8KHz",
+			2: "16KHz",
+			3: "25.6KHz",
+			4: "32KHz",
+			5: "64KHz",
+		},
+		Category: SensorsSettingCategory,
+		Group:    SettingGroupAcceleration,
+		Sort:     13,
+	}
+	d.Acc1Samples = Setting{
+		Name:  "采样点数(Y)",
+		Key:   "acc1_samples",
+		Type:  Uint32ValueType,
+		Value: 2048,
+		Options: map[int]string{
+			2048: "2048",
+			4096: "4096",
+		},
+		Category: SensorsSettingCategory,
+		Group:    SettingGroupAcceleration,
+		Sort:     14,
+	}
+	d.Acc1Odr2 = Setting{
+		Name:  "原始数据采样频率(Y)",
+		Key:   "acc1_odr_2",
+		Type:  Uint8ValueType,
+		Value: 5,
+		Options: map[int]string{
+			0: "4KHz",
+			1: "8KHz",
+			2: "16KHz",
+			3: "25.6KHz",
+			4: "32KHz",
+			5: "64KHz",
+		},
+		Category: SensorsSettingCategory,
+		Group:    SettingGroupAcceleration,
+		Sort:     15,
+	}
+	d.Acc1Samples2 = Setting{
+		Name:  "原始数据采样时间(Y)",
+		Key:   "acc1_samples_2",
+		Type:  Uint32ValueType,
+		Value: 10000,
+		Options: map[int]string{
+			100:   "0.1秒",
+			500:   "0.5秒",
+			1000:  "1秒",
+			1500:  "1.5秒",
+			2000:  "2秒",
+			3000:  "3秒",
+			5000:  "5秒",
+			10000: "10秒",
+			20000: "20秒",
+			25000: "25秒",
+			30000: "30秒",
+			60000: "60秒",
+		},
+		Category: SensorsSettingCategory,
+		Group:    SettingGroupAcceleration,
+		Sort:     16,
+	}
 	d.BaseFrequency = Setting{
 		Name:     "FFT运算基础频率",
 		Key:      "base_frequency",
@@ -186,8 +260,9 @@ func (d VibrationTemperature3Axis) Settings() Settings {
 		Unit:     "Hz",
 		Category: SensorsSettingCategory,
 		Group:    SettingGroupOther,
-		Sort:     13,
+		Sort:     17,
 	}
+
 	return []Setting{
 		d.SamplePeriod,
 		d.SampleOffset,
@@ -201,10 +276,14 @@ func (d VibrationTemperature3Axis) Settings() Settings {
 		d.Acc3Range2,
 		d.Acc3Odr2,
 		d.Acc3Samples2,
+		d.Acc1Odr,
+		d.Acc1Samples,
+		d.Acc1Odr2,
+		d.Acc1Samples2,
 		d.BaseFrequency,
 	}
 }
 
-func (VibrationTemperature3Axis) Properties(sensorID uint) Properties {
+func (d VibrationTemperature3AxisAdvance) Properties(sensorID uint) Properties {
 	return properties[int(sensorID)]
 }
