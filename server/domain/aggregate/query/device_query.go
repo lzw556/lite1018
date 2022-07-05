@@ -349,14 +349,14 @@ func (query DeviceQuery) DownloadCharacteristicData(id uint, pids []string, from
 	return nil, response.BusinessErr(errcode.UnknownDeviceTypeError, "")
 }
 
-func (query DeviceQuery) DownloadLargeSensorData(id uint, sensorType uint, time time.Time, filters request.Filters) (*vo.ExcelFile, error) {
+func (query DeviceQuery) DownloadLargeSensorData(id uint, sensorType uint, time time.Time, filters request.Filters) (response.FileWriter, error) {
 	device, err := query.check(id)
 	if err != nil {
 		return nil, err
 	}
 	switch sensorType {
 	case devicetype.KxSensor, devicetype.AdvancedKxSensor:
-		return query.downloadKxSensorData(device, sensorType, time, cast.ToString(filters["calculate"]))
+		return query.downloadKxSensorData(device, sensorType, time)
 	case devicetype.DynamicSCL3300Sensor:
 		return query.downloadSqRawData(device, time)
 	case devicetype.DynamicLengthAttitudeSensor:
@@ -417,31 +417,36 @@ func (query DeviceQuery) downloadSqRawData(device entity.Device, time time.Time)
 	return &result, nil
 }
 
-func (query DeviceQuery) downloadKxSensorData(device entity.Device, dataType uint, time time.Time, calculate string) (*vo.ExcelFile, error) {
+func (query DeviceQuery) downloadKxSensorData(device entity.Device, dataType uint, time time.Time) (*vo.CsvFile, error) {
 	data, err := query.sensorDataRepo.Get(device.MacAddress, dataType, time)
 	if err != nil {
 		return nil, err
 	}
-	result := vo.ExcelFile{
-		Name: fmt.Sprintf("%s_%s.xlsx", device.MacAddress, time.Format("20060102")),
-		File: excelize.NewFile(),
+	max := 0
+	axis := make(map[string][]float64)
+	result := vo.CsvFile{
+		Name: fmt.Sprintf("%s.csv", time.Format("2006-01-02_15-04-05")),
 	}
-	_ = result.File.NewSheet("Raw")
-	col := 65
 	for k, v := range data.Values {
 		var e entity.AxisSensorData
 		if err := mapstructure.Decode(v, &e); err != nil {
 			return nil, err
 		}
-		//_ = result.File.SetCellValue("Sheet1", fmt.Sprintf("%s1", string(rune(col))), k)
-		//for i, value := range getKxSensorData(e, calculate).Values {
-		//	_ = result.File.SetCellValue("Sheet1", fmt.Sprintf("%s%d", string(rune(col)), i+2), value)
-		//}
-		_ = result.File.SetCellValue("Raw", fmt.Sprintf("%s1", string(rune(col))), k)
-		for i, value := range e.Values {
-			_ = result.File.SetCellValue("Raw", fmt.Sprintf("%s%d", string(rune(col)), i+2), value)
+		result.Title = append(result.Title, k)
+		axis[k] = e.Values
+		if max < len(e.Values) {
+			max = len(e.Values)
 		}
-		col += 1
+	}
+	result.Data = make([][]string, max)
+	for i := 0; i < max; i++ {
+		result.Data[i] = make([]string, len(result.Title))
+		for j, k := range result.Title {
+			values := axis[k]
+			if i < len(values) {
+				result.Data[i][j] = fmt.Sprintf("%f", values[i])
+			}
+		}
 	}
 	return &result, nil
 }

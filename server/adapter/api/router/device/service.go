@@ -2,6 +2,7 @@ package device
 
 import (
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/request"
+	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/response"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/vo"
 )
 
@@ -26,7 +27,7 @@ type Service interface {
 	GetDeviceDataByIDAndTimestamp(id uint, sensorType uint, timestamp int64, filters request.Filters) (*vo.DeviceData, error)
 	GetRuntimeDataByID(id uint, from, to int64) ([]vo.SensorRuntimeData, error)
 	DownloadDeviceDataByID(id uint, pids []string, from, to int64, timezone string) (*vo.ExcelFile, error)
-	DownloadDeviceDataByIDAndTimestamp(id uint, sensorType uint, timestamp int64, filters request.Filters) (*vo.ExcelFile, error)
+	DownloadDeviceDataByIDAndTimestamp(id uint, sensorType uint, timestamp int64, filters request.Filters) (response.FileWriter, error)
 	RemoveDataByID(id uint, sensorType uint, from, to int64) error
 
 	FindDeviceEventsByID(id uint, from, to int64) ([]vo.DeviceEvent, error)
