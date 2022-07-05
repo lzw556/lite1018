@@ -1,6 +1,9 @@
 package devicetype
 
-type BoltLoosening struct{}
+type BoltLoosening struct {
+	SamplePeriod Setting `json:"sample_period"`
+	SampleOffset Setting `json:"sample_offset"`
+}
 
 func (BoltLoosening) ID() uint {
 	return BoltLooseningType
@@ -10,27 +13,12 @@ func (BoltLoosening) SensorID() uint {
 	return BoltAngleSensor
 }
 
-func (BoltLoosening) Settings() Settings {
+func (d BoltLoosening) Settings() Settings {
+	d.SamplePeriod = samplePeriodSetting()
+	d.SampleOffset = sampleOffsetSetting()
 	return []Setting{
-		{
-			Name:     "采样周期",
-			Key:      "sample_period",
-			Type:     Uint32ValueType,
-			Value:    1200000, // 20 minutes
-			Options:  samplePeriodOption1,
-			Category: SensorsSettingCategory,
-			Group:    SettingGroupGeneral,
-			Sort:     0,
-		},
-		{
-			Name:     "采集延时",
-			Key:      "sample_offset",
-			Type:     Uint32ValueType,
-			Value:    0,
-			Category: SensorsSettingCategory,
-			Group:    SettingGroupGeneral,
-			Sort:     1,
-		},
+		d.SamplePeriod,
+		d.SampleOffset,
 	}
 }
 
