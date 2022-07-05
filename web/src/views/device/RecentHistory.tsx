@@ -1,4 +1,4 @@
-import { Card, Col, Empty, Row, Typography } from 'antd';
+import {Card, Col, Empty, message, Row, Spin, Typography} from 'antd';
 import * as React from 'react';
 import moment from 'moment';
 import ReactECharts from 'echarts-for-react';
@@ -9,14 +9,17 @@ import { isMobile } from '../../utils/deviceDetection';
 
 export const RecentHistory: React.FC<{ device: Device }> = ({ device }) => {
   const [historyOptions, setHistoryOptions] = React.useState<any>();
+  const [isLoading, setIsLoading] = React.useState<boolean>(false);
 
   React.useEffect(() => {
+    setIsLoading(true);
     FindDeviceDataRequest(
       device.id,
       moment().startOf('day').subtract(13, 'd').utc().unix(),
       moment().endOf('day').utc().unix(),
       {}
     ).then((data) => {
+      setIsLoading(false);
       setHistoryOptions(
         device.properties.map((property: any) => {
           const fields = new Map<string, number[]>();
@@ -76,11 +79,13 @@ export const RecentHistory: React.FC<{ device: Device }> = ({ device }) => {
           };
         })
       );
+    }).catch(e => {
+      message.error("数据加载超时").then()
     });
   }, [device]);
 
   const renderDeviceHistoryDataChart = () => {
-    if (historyOptions && historyOptions.length) {
+    if (!isLoading && historyOptions && historyOptions.length) {
       return historyOptions.map((item: any, index: number) => {
         return (
           <Card.Grid key={index} style={{ boxShadow: 'none', border: 'none', width: isMobile ? '100%' : '25%' }}>
@@ -88,8 +93,11 @@ export const RecentHistory: React.FC<{ device: Device }> = ({ device }) => {
           </Card.Grid>
         );
       });
+    }else if (isLoading) {
+      return <Spin tip={"数据加载中..."}></Spin>
+    }else {
+      return <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={'数据不足'} />;
     }
-    return <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={'数据不足'} />;
   };
 
   // React.useEffect(() => {
