@@ -84,7 +84,7 @@ func (d VibrationTemperature3AxisAdvance) Settings() Settings {
 			2: "32g",
 		},
 		Parent:   d.Acc3IsAuto.Key,
-		Show:     true,
+		Show:     false,
 		Category: SensorsSettingCategory,
 		Group:    SettingGroupAcceleration,
 		Sort:     7,
