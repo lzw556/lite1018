@@ -56,15 +56,23 @@ type WaveDataList []KxData
 
 func (list WaveDataList) ToCsvFile() (*CsvFile, error) {
 	filename := fmt.Sprintf("%s.csv", time.Now().Format("2006-01-02_15-04-05"))
-	data := make([][]string, 0)
-	if len(list) > 0 {
-		for i := range list[0].Values {
-			cell := make([]string, len(list))
-			for j := range list {
-				cell[j] = fmt.Sprintf("%f", list[j].Values[i])
-			}
-			data = append(data, cell)
+	data := make([][]string, len(list))
+	max := 0
+	for _, kxData := range list {
+		fmt.Println(len(kxData.Values))
+		if max <= len(kxData.Values) {
+			max = len(kxData.Values)
 		}
+	}
+	fmt.Println(max)
+	for i := 0; i < max; i++ {
+		cell := make([]string, len(list))
+		for j, kxData := range list {
+			if i < len(kxData.Values) {
+				cell[j] = fmt.Sprintf("%f", kxData.Values[i])
+			}
+		}
+		data = append(data, cell)
 	}
 	return &CsvFile{
 		Name: filename,

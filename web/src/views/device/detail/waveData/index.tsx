@@ -13,7 +13,7 @@ import {
     GetDeviceDataRequest
 } from '../../../../apis/device';
 import {isMobile} from '../../../../utils/deviceDetection';
-import {DownloadOutlined} from '@ant-design/icons';
+import {DownloadOutlined, LoadingOutlined} from '@ant-design/icons';
 import usePermission, {Permission} from "../../../../permission/permission";
 import {DeviceType} from "../../../../types/device_type";
 
@@ -141,7 +141,7 @@ const WaveDataChart: React.FC<{ device: Device }> = ({device}) => {
         }
     ];
     const onDownload = (timestamp: number) => {
-        let modal = Modal.info({title: "数据下载", content: "数据下载中....", okText:"保存", okButtonProps: {disabled: true}})
+        let modal = Modal.info({title: "数据下载", content: "数据下载中...", okText:"保存", okButtonProps: {disabled: true}})
         DownloadDeviceDataByTimestampRequest(device.id, timestamp, {
             calculate,
             data_type: dataType
