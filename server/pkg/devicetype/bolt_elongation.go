@@ -186,6 +186,8 @@ func (d BoltElongation) Settings() Settings {
 		Sort:     17,
 	}
 	return []Setting{
+		d.SamplePeriod,
+		d.SampleOffset,
 		d.SensorFlags,
 		d.SpeedObject,
 		d.ScanMode,
