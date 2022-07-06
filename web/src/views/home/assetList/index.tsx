@@ -121,6 +121,7 @@ const AssetManagement: React.FC = () => {
                     } catch (error) {
                       message.error('文件内部格式不正确');
                     } finally {
+                      setLoading(false);
                       return false;
                     }
                   };
