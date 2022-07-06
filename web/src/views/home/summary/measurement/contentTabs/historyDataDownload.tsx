@@ -1,12 +1,11 @@
-import { DatePicker, Form, Modal, ModalProps, Select } from 'antd';
-import { FC, useEffect, useState } from 'react';
-import moment from 'moment';
+import { Form, Modal, ModalProps, Select } from 'antd';
+import * as React from 'react';
 import { MeasurementRow } from '../props';
 import { downloadHistory } from '../services';
 import { defaultValidateMessages } from '../../../../../constants/validator';
 import { getFilename } from '../../../common/utils';
+import { RangeDatePicker } from '../../../../../components/rangeDatePicker';
 
-const { RangePicker } = DatePicker;
 const { Option } = Select;
 
 export interface DownloadModalProps extends ModalProps {
@@ -15,15 +14,12 @@ export interface DownloadModalProps extends ModalProps {
   onSuccess: () => void;
 }
 
-export const HistoryDataDownload: FC<DownloadModalProps> = (props) => {
+export const HistoryDataDownload: React.FC<DownloadModalProps> = (props) => {
   const { visible, measurement, property, onSuccess } = props;
-  const [startDate, setStartDate] = useState<moment.Moment>(
-    moment().startOf('day').subtract(7, 'd')
-  );
-  const [endDate, setEndDate] = useState<moment.Moment>(moment().endOf('day'));
+  const [range, setRange] = React.useState<[number, number]>();
   const [form] = Form.useForm();
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (visible) {
       form.setFieldsValue({
         properties: property ? [property.key] : []
@@ -33,16 +29,19 @@ export const HistoryDataDownload: FC<DownloadModalProps> = (props) => {
 
   const onDownload = () => {
     form.validateFields().then((values) => {
-      console.log(values)
-      downloadHistory(measurement.id, startDate.utc().unix(), endDate.utc().unix(), JSON.stringify(values.properties)).then((res) => {
-        const url = window.URL.createObjectURL(new Blob([res.data]));
-        const link = document.createElement('a');
-        link.href = url;
-        link.setAttribute('download', getFilename(res));
-        document.body.appendChild(link);
-        link.click();
-        onSuccess();
-      });
+      console.log(values);
+      if (range) {
+        const [from, to] = range;
+        downloadHistory(measurement.id, from, to, JSON.stringify(values.properties)).then((res) => {
+          const url = window.URL.createObjectURL(new Blob([res.data]));
+          const link = document.createElement('a');
+          link.href = url;
+          link.setAttribute('download', getFilename(res));
+          document.body.appendChild(link);
+          link.click();
+          onSuccess();
+        });
+      }
     });
   };
 
@@ -55,8 +54,12 @@ export const HistoryDataDownload: FC<DownloadModalProps> = (props) => {
       onOk={onDownload}
       cancelText={'取消'}
     >
-      <Form form={form} labelCol={{span:6}} validateMessages={defaultValidateMessages}>
-        <Form.Item label={'属性'} name={'properties'} rules={[{required:true, message:'请选择属性'}]}>
+      <Form form={form} labelCol={{ span: 6 }} validateMessages={defaultValidateMessages}>
+        <Form.Item
+          label={'属性'}
+          name={'properties'}
+          rules={[{ required: true, message: '请选择属性' }]}
+        >
           <Select placeholder={'请选择属性'} mode={'multiple'} maxTagCount={2}>
             {measurement.properties.map((item) => (
               <Option key={item.key} value={item.key}>
@@ -66,16 +69,8 @@ export const HistoryDataDownload: FC<DownloadModalProps> = (props) => {
           </Select>
         </Form.Item>
         <Form.Item label={'时间范围'} required>
-          <RangePicker
-            allowClear={false}
-            style={{ width: '252px' }}
-            value={[startDate, endDate]}
-            onChange={(_, dateString) => {
-              if (dateString) {
-                setStartDate(moment(dateString[0]).startOf('day'));
-                setEndDate(moment(dateString[1]).endOf('day'));
-              }
-            }}
+          <RangeDatePicker
+            onChange={React.useCallback((range: [number, number]) => setRange(range), [])}
           />
         </Form.Item>
       </Form>

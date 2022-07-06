@@ -1,8 +1,9 @@
-import { Col, DatePicker, Empty, Row, Select, Space, Spin, Table } from 'antd';
+import { Col, Empty, Row, Select, Space, Spin, Table } from 'antd';
 import EChartsReact from 'echarts-for-react';
 import moment from 'moment';
 import * as React from 'react';
 import Label from '../../../../../components/label';
+import { RangeDatePicker } from '../../../../../components/rangeDatePicker';
 import ShadowCard from '../../../../../components/shadowCard';
 import { LineChartStyles } from '../../../../../constants/chart';
 import usePermission, { Permission } from '../../../../../permission/permission';
@@ -18,10 +19,7 @@ import { MeasurementRow } from '../props';
 import { downloadRawHistory, getData, getDynamicData } from '../services';
 
 export const DynamicData: React.FC<MeasurementRow> = (props) => {
-  const [range, setRange] = React.useState<[moment.Moment, moment.Moment]>([
-    moment().subtract(7, 'days').startOf('day'),
-    moment().endOf('day')
-  ]);
+  const [range, setRange] = React.useState<[number, number]>();
   const [timestamps, setTimestamps] = React.useState<{ timestamp: number }[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [timestamp, setTimestamp] = React.useState<number>();
@@ -32,11 +30,13 @@ export const DynamicData: React.FC<MeasurementRow> = (props) => {
   const [field, setField] = React.useState(fields[0]);
 
   React.useEffect(() => {
-    const [from, to] = range;
-    getData(props.id, from.utc().unix(), to.utc().unix(), true).then((data) => {
-      setTimestamps(data);
-      setLoading(false);
-    });
+    if (range) {
+      const [from, to] = range;
+      getData(props.id, from, to, true).then((data) => {
+        setTimestamps(data);
+        setLoading(false);
+      });
+    }
   }, [range, props.id]);
 
   React.useEffect(() => {
@@ -188,7 +188,7 @@ export const DynamicData: React.FC<MeasurementRow> = (props) => {
           {
             type: 'line',
             name: field.label,
-            data: (items as number[]).map((item) => item ? item.toFixed(3) : item),
+            data: (items as number[]).map((item) => (item ? item.toFixed(3) : item)),
             itemStyle: { color: LineChartStyles[0].itemStyle.normal.color }
           }
         ];
@@ -198,7 +198,7 @@ export const DynamicData: React.FC<MeasurementRow> = (props) => {
           name: axis.label,
           data: (items as Fields_be_axis[])
             .map((item) => item[axis.value])
-            .map((item) => item ? item.toFixed(3) : item),
+            .map((item) => (item ? item.toFixed(3) : item)),
           itemStyle: { color: LineChartStyles[index].itemStyle.normal.color }
         }));
       }
@@ -240,72 +240,68 @@ export const DynamicData: React.FC<MeasurementRow> = (props) => {
     }
   };
 
-  if (loading) return <Spin />;
-
   return (
     <Row gutter={[0, 16]}>
       <Col span={24}>
-        <DatePicker.RangePicker
-          allowClear={false}
-          value={range}
-          onChange={(date, dateString) => {
-            if (dateString)
-              setRange([moment(dateString[0]).startOf('day'), moment(dateString[1]).endOf('day')]);
-          }}
+        <RangeDatePicker
+          onChange={React.useCallback((range: [number, number]) => setRange(range), [])}
         />
       </Col>
       <Col span={24}>
-        <Row>
-          {timestamps.length === 0 && (
-            <Col span={24}>
-              <Empty description='暂无数据' />
-            </Col>
-          )}
-          {timestamps.length > 0 && <Col span={6}>{renderTimestampsList()}</Col>}
-          {timestamp && (
-            <Col span={18} style={{ backgroundColor: '#f0f2f5' }}>
-              <Row gutter={[0, 12]}>
-                <Col span={24}>
-                  <ShadowCard>{renderMeta()}</ShadowCard>
-                </Col>
-                <Col span={24}>
-                  <ShadowCard>
-                    <Row gutter={[0, 8]}>
-                      <Col span={24}>
-                        <Row justify='end'>
-                          <Col>
-                            <Label name={'属性'}>
-                              <Select
-                                bordered={false}
-                                defaultValue={fields[0].value}
-                                placeholder={'请选择属性'}
-                                style={{ width: '120px' }}
-                                onChange={(value, option: any) =>
-                                  setField({
-                                    label: option.children,
-                                    value: option.key,
-                                    unit: option.props['data-unit']
-                                  } as any)
-                                }
-                              >
-                                {fields.map(({ label, value, unit }) => (
-                                  <Select.Option key={value} value={value} data-unit={unit}>
-                                    {label}
-                                  </Select.Option>
-                                ))}
-                              </Select>
-                            </Label>
-                          </Col>
-                        </Row>
-                      </Col>
-                      <Col span={24}>{renderChart()}</Col>
-                    </Row>
-                  </ShadowCard>
-                </Col>
-              </Row>
-            </Col>
-          )}
-        </Row>
+        {loading && <Spin />}
+        {!loading && (
+          <Row>
+            {timestamps.length === 0 && (
+              <Col span={24}>
+                <Empty description='暂无数据' />
+              </Col>
+            )}
+            {timestamps.length > 0 && <Col span={6}>{renderTimestampsList()}</Col>}
+            {timestamp && (
+              <Col span={18} style={{ backgroundColor: '#f0f2f5' }}>
+                <Row gutter={[0, 12]}>
+                  <Col span={24}>
+                    <ShadowCard>{renderMeta()}</ShadowCard>
+                  </Col>
+                  <Col span={24}>
+                    <ShadowCard>
+                      <Row gutter={[0, 8]}>
+                        <Col span={24}>
+                          <Row justify='end'>
+                            <Col>
+                              <Label name={'属性'}>
+                                <Select
+                                  bordered={false}
+                                  defaultValue={fields[0].value}
+                                  placeholder={'请选择属性'}
+                                  style={{ width: '120px' }}
+                                  onChange={(value, option: any) =>
+                                    setField({
+                                      label: option.children,
+                                      value: option.key,
+                                      unit: option.props['data-unit']
+                                    } as any)
+                                  }
+                                >
+                                  {fields.map(({ label, value, unit }) => (
+                                    <Select.Option key={value} value={value} data-unit={unit}>
+                                      {label}
+                                    </Select.Option>
+                                  ))}
+                                </Select>
+                              </Label>
+                            </Col>
+                          </Row>
+                        </Col>
+                        <Col span={24}>{renderChart()}</Col>
+                      </Row>
+                    </ShadowCard>
+                  </Col>
+                </Row>
+              </Col>
+            )}
+          </Row>
+        )}
       </Col>
     </Row>
   );

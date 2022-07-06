@@ -1,8 +1,9 @@
 import { DeleteOutlined, DownloadOutlined } from '@ant-design/icons';
-import { Button, Col, DatePicker, Empty, Modal, Row, Select, Space, Spin } from 'antd';
+import { Button, Col, Empty, Modal, Row, Select, Space, Spin } from 'antd';
 import moment from 'moment';
 import * as React from 'react';
 import Label from '../../../../../components/label';
+import { RangeDatePicker } from '../../../../../components/rangeDatePicker';
 import HasPermission from '../../../../../permission';
 import { Permission } from '../../../../../permission/permission';
 import { generateChartOptionsOfHistoryDatas } from '../../../common/historyDataHelper';
@@ -15,43 +16,40 @@ export const HistoryData: React.FC<MeasurementRow> = (props) => {
   const { id, properties } = props;
   const [loading, setLoading] = React.useState(true);
   const [historyOptions, setHistoryOptions] = React.useState<any>();
-  const from = moment().startOf('day').subtract(7, 'd');
-  const to = moment().endOf('day');
-  const [interval, setInterval] = React.useState<[moment.Moment, moment.Moment]>([from, to]);
+  const [range, setRange] = React.useState<[number, number]>();
   const [property, setProperty] = React.useState(properties[0].key);
   const [visible, setVisible] = React.useState(false);
   React.useEffect(() => {
-    const [from, to] = interval;
-    setLoading(true);
-    getData(id, from.utc().unix(), to.utc().unix()).then((data) => {
-      setLoading(false);
-      if (data.length > 0) {
-        setHistoryOptions(generateChartOptionsOfHistoryDatas(data, property));
-      } else {
-        setHistoryOptions(null);
-      }
-    });
-  }, [id, interval, property]);
+    if (range) {
+      const [from, to] = range;
+      setLoading(true);
+      getData(id, from, to).then((data) => {
+        setLoading(false);
+        if (data.length > 0) {
+          setHistoryOptions(generateChartOptionsOfHistoryDatas(data, property));
+        } else {
+          setHistoryOptions(null);
+        }
+      });
+    }
+  }, [id, range, property]);
 
   const renderChart = (options: any) => {
-    if (!loading) {
-      if (!options || options.length === 0) {
-        return (
-          <Col span={24}>
-            <Empty description='暂无数据' image={Empty.PRESENTED_IMAGE_SIMPLE} />
-          </Col>
-        );
-      } else {
-        return historyOptions.map((ops: any, index: number) => (
-          <Col span={24} key={index}>
-            <ChartContainer title='' options={ops} style={{ height: '500px' }} />
-          </Col>
-        ));
-      }
+    if (loading) return <Spin />;
+    if (!options || options.length === 0) {
+      return (
+        <Col span={24}>
+          <Empty description='暂无数据' image={Empty.PRESENTED_IMAGE_SIMPLE} />
+        </Col>
+      );
+    } else {
+      return historyOptions.map((ops: any, index: number) => (
+        <Col span={24} key={index}>
+          <ChartContainer title='' options={ops} style={{ height: '500px' }} />
+        </Col>
+      ));
     }
   };
-
-  if (loading) return <Spin />;
 
   return (
     <Row gutter={[32, 32]}>
@@ -77,38 +75,9 @@ export const HistoryData: React.FC<MeasurementRow> = (props) => {
                   ))}
                 </Select>
               </Label>
-              <DatePicker.RangePicker
-                allowClear={false}
-                value={interval}
-                renderExtraFooter={() => {
-                  const calculateInterval = (months: number): [moment.Moment, moment.Moment] => {
-                    return [
-                      moment().startOf('day').subtract(months, 'months'),
-                      moment().endOf('day')
-                    ];
-                  };
-                  return (
-                    <Space>
-                      <Button type='text' onClick={() => setInterval(calculateInterval(1))}>
-                        最近一个月
-                      </Button>
-                      <Button type='text' onClick={() => setInterval(calculateInterval(3))}>
-                        最近三个月
-                      </Button>
-                      <Button type='text' onClick={() => setInterval(calculateInterval(6))}>
-                        最近半年
-                      </Button>
-                      <Button type='text' onClick={() => setInterval(calculateInterval(12))}>
-                        最近一年
-                      </Button>
-                    </Space>
-                  );
-                }}
-                onChange={(date, dateString) => {
-                  if (date) {
-                    setInterval([moment(date[0]), moment(date[1])]);
-                  }
-                }}
+              <RangeDatePicker
+                onChange={React.useCallback((range: [number, number]) => setRange(range), [])}
+                showFooter={true}
               />
               <HasPermission value={Permission.DeviceDataDownload}>
                 <Button
@@ -125,18 +94,24 @@ export const HistoryData: React.FC<MeasurementRow> = (props) => {
                   type='default'
                   danger
                   onClick={() => {
-                    const [from, to] = interval;
-                    Modal.confirm({
-                      title: '提示',
-                      content: `确定要删除${props.name}从${from.format('YYYY-MM-DD')}到${to.format(
-                        'YYYY-MM-DD'
-                      )}的数据吗？`,
-                      okText: '确定',
-                      cancelText: '取消',
-                      onOk: (close) => {
-                        clearHistory(id, from.utc().unix(), to.utc().unix()).then((_) => close());
-                      }
-                    });
+                    if (range) {
+                      const [from, to] = range;
+                      Modal.confirm({
+                        title: '提示',
+                        content: `确定要删除${props.name}从${moment
+                          .unix(from)
+                          .local()
+                          .format('YYYY-MM-DD')}到${moment
+                          .unix(to)
+                          .local()
+                          .format('YYYY-MM-DD')}的数据吗？`,
+                        okText: '确定',
+                        cancelText: '取消',
+                        onOk: (close) => {
+                          clearHistory(id, from, to).then((_) => close());
+                        }
+                      });
+                    }
                   }}
                 >
                   <DeleteOutlined />
