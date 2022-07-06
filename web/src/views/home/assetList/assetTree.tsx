@@ -20,11 +20,12 @@ import { AssetRow } from './props';
 import { deleteAsset, getAssets } from './services';
 import { sortFlangesByAttributes } from './util';
 
-export const AssetTree: React.FC<{ assets: AssetRow[]; pathname: string; search: string }> = ({
-  assets,
-  pathname,
-  search
-}) => {
+export const AssetTree: React.FC<{
+  assets: AssetRow[];
+  pathname: string;
+  search: string;
+  onDelete?: () => void;
+}> = ({ assets, pathname, search, onDelete }) => {
   const [treedata, setTreedata] = React.useState<any>();
   const [selectedNode, setSelectedNode] = React.useState<any>();
   const [visible, setVisible] = React.useState(false);
@@ -99,8 +100,6 @@ export const AssetTree: React.FC<{ assets: AssetRow[]; pathname: string; search:
     });
   };
 
-  if (!treedata) return null;
-
   return (
     <>
       <Tree
@@ -151,7 +150,9 @@ export const AssetTree: React.FC<{ assets: AssetRow[]; pathname: string; search:
                     title={`确定要删除${name}吗?`}
                     onConfirm={() => {
                       if (selectedNode?.type < 10000) {
-                        deleteAsset(selectedNode?.id).then(() => refresh());
+                        deleteAsset(selectedNode?.id).then(() => {
+                          if (onDelete) onDelete();
+                        });
                       } else {
                         deleteMeasurement(selectedNode?.id).then(() => refresh());
                       }

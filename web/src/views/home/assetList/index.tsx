@@ -1,5 +1,5 @@
 import { ExportOutlined, ImportOutlined, PlusOutlined } from '@ant-design/icons';
-import { Button, message, Space, Upload } from 'antd';
+import { Button, Empty, message, Space, Spin, Upload } from 'antd';
 import * as React from 'react';
 import { getFilename } from '../common/utils';
 import { AssetTypes } from '../common/constants';
@@ -44,6 +44,20 @@ const AssetManagement: React.FC = () => {
       setAssets({ loading: false, items: filterEmptyChildren(assets) });
       setDisabled(assets.length === 0);
     });
+  };
+
+  const renderResult = () => {
+    if (assets.loading) return <Spin />;
+    if (assets.items.length === 0)
+      return <Empty description='没有资产' image={Empty.PRESENTED_IMAGE_SIMPLE} />;
+    return (
+      <AssetTree
+        assets={assets.items}
+        pathname={pathname}
+        search={search}
+        onDelete={() => fetchAssets({ type: AssetTypes.WindTurbind.id })}
+      />
+    );
   };
 
   return (
@@ -120,7 +134,7 @@ const AssetManagement: React.FC = () => {
             </Upload>
           </Space>
         ),
-        results: <AssetTree assets={assets.items} pathname={pathname} search={search} />
+        results: renderResult()
       }}
     >
       {visible && (
