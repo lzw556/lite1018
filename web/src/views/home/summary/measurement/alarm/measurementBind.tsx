@@ -42,42 +42,44 @@ export const MeasurementBind: React.FC<
   const renderModalContent = () => {
     if (loading) return <Spin />;
     if (!winds || winds.length === 0) return <Empty description='暂无数据' />;
-    return winds.map(({ id, name, children }) => (
-      <React.Fragment key={id}>
-        <div>{name}</div>
-        <Divider />
-        <Form.Item name='monitoring_point_ids'>
-          <Checkbox.Group style={{ width: '100%' }}>
-            {children &&
-              children
-                .filter(({ monitoringPoints }) =>
-                  monitoringPoints?.some(({ type }) => type === props.selectedRow.type)
-                )
-                .map(({ id, name, monitoringPoints }) => (
-                  <Row key={id} gutter={[0, 16]} style={{ marginBottom: 16 }}>
-                    <Col span={24}>{name}</Col>
-                    <Col span={24}>
-                      <Row>
-                        {monitoringPoints &&
-                          monitoringPoints.map(({ id, name, type }) => {
-                            if (type === props.selectedRow.type) {
-                              return (
-                                <Col key={id} span={8}>
-                                  <Checkbox value={id}>{name}</Checkbox>
-                                </Col>
-                              );
-                            } else {
-                              return null;
-                            }
-                          })}
-                      </Row>
-                    </Col>
-                  </Row>
-                ))}
-          </Checkbox.Group>
-        </Form.Item>
-      </React.Fragment>
-    ));
+    return (
+      <Form.Item name='monitoring_point_ids'>
+        <Checkbox.Group style={{ width: '100%' }}>
+          {winds.map(({ id, name, children }) => (
+            <React.Fragment key={id}>
+              <div>{name}</div>
+              <Divider />
+              {children &&
+                children
+                  .filter(({ monitoringPoints }) =>
+                    monitoringPoints?.some(({ type }) => type === props.selectedRow.type)
+                  )
+                  .map(({ id, name, monitoringPoints }) => (
+                    <Row key={id} gutter={[0, 16]} style={{ marginBottom: 16 }}>
+                      <Col span={24}>{name}</Col>
+                      <Col span={24}>
+                        <Row>
+                          {monitoringPoints &&
+                            monitoringPoints.map(({ id, name, type }) => {
+                              if (type === props.selectedRow.type) {
+                                return (
+                                  <Col key={id} span={8}>
+                                    <Checkbox value={id}>{name}</Checkbox>
+                                  </Col>
+                                );
+                              } else {
+                                return null;
+                              }
+                            })}
+                        </Row>
+                      </Col>
+                    </Row>
+                  ))}
+            </React.Fragment>
+          ))}
+        </Checkbox.Group>
+      </Form.Item>
+    );
   };
 
   return (
