@@ -36,7 +36,11 @@ func defaultFFTOutputGet(pr []float64, n int, frequency int) (output [][2]float6
 	sz := len(frequencyArr) / 2
 	output = make([][2]float64, sz)
 	for i := 0; i < sz; i++ {
-		output[i][0] = pr[i] / float64(sz)
+		if i == 0 {
+			output[i][0] = pr[i] / (float64(sz) * 2) // 第一个值除以N, 其他除以N/2
+		} else {
+			output[i][0] = pr[i] / float64(sz)
+		}
 		output[i][1] = frequencyArr[i]
 	}
 
@@ -462,21 +466,21 @@ func FFTFrequencyCalc(data []float64, sampleNum int, paramFrequency int) (output
 	return
 }
 
-func AccelerationCalc(raw []float64, sigLen int, fs int, rangeVal int) []float64 {
+func AccelerationCalc(raw []float64, sigLen int, fs int, rangeVal int, fullScale float64) []float64 {
 	raw = raw[:sigLen]
-	return DataConvert(removeMean(raw), fs, rangeVal)
+	return DataConvert(removeMean(raw), fs, rangeVal, fullScale)
 }
 
-func AccelerationFrequencyCalc(raw []float64, sigLen int, fs int, rangeVal int) [][2]float64 {
+func AccelerationFrequencyCalc(raw []float64, sigLen int, fs int, rangeVal int, fullScale float64) [][2]float64 {
 	raw = raw[:sigLen]
-	data := DataConvert(removeMean(raw), fs, rangeVal)
+	data := DataConvert(removeMean(raw), fs, rangeVal, fullScale)
 	accFreq := FFTFrequencyCalc(data, len(data), fs)
 	return accFreq
 }
 
-func VelocityCalc(raw []float64, sigLen int, fs int, rangeVal int) []float64 {
+func VelocityCalc(raw []float64, sigLen int, fs int, rangeVal int, fullScale float64) []float64 {
 	raw = raw[:sigLen]
-	data := DataConvert(raw, fs, rangeVal)
+	data := DataConvert(raw, fs, rangeVal, fullScale)
 	velX1 := velocityCalc(data, sigLen, fs)
 	for i := range velX1 {
 		velX1[i] = velX1[i] * 1000.0
@@ -484,15 +488,15 @@ func VelocityCalc(raw []float64, sigLen int, fs int, rangeVal int) []float64 {
 	return velX1
 }
 
-func VelocityFrequencyCalc(raw []float64, sigLen int, fs int, rangeVal int) [][2]float64 {
-	velX1 := VelocityCalc(raw, sigLen, fs, rangeVal)
+func VelocityFrequencyCalc(raw []float64, sigLen int, fs int, rangeVal int, fullScale float64) [][2]float64 {
+	velX1 := VelocityCalc(raw, sigLen, fs, rangeVal, fullScale)
 	velFreq := FFTFrequencyCalc(velX1, len(velX1), fs)
 	return velFreq
 }
 
-func DisplacementCalc(raw []float64, sigLen int, fs int, rangeVal int) []float64 {
+func DisplacementCalc(raw []float64, sigLen int, fs int, rangeVal int, fullScale float64) []float64 {
 	raw = raw[:sigLen]
-	data := DataConvert(raw, fs, rangeVal)
+	data := DataConvert(raw, fs, rangeVal, fullScale)
 	disX1 := displacementCalc(data, sigLen, fs)
 	for i := range disX1 {
 		disX1[i] = disX1[i] * 1000.0 * 1000.0
@@ -500,8 +504,8 @@ func DisplacementCalc(raw []float64, sigLen int, fs int, rangeVal int) []float64
 	return disX1
 }
 
-func DisplacementFrequencyCalc(raw []float64, sigLen int, fs int, rangeVal int) [][2]float64 {
-	disX1 := DisplacementCalc(raw, sigLen, fs, rangeVal)
+func DisplacementFrequencyCalc(raw []float64, sigLen int, fs int, rangeVal int, fullScale float64) [][2]float64 {
+	disX1 := DisplacementCalc(raw, sigLen, fs, rangeVal, fullScale)
 	disFreq := FFTFrequencyCalc(disX1, len(disX1), fs)
 	return disFreq
 }
@@ -720,15 +724,16 @@ func EnvelopCalc(data []float64) (highEnvelop []float64, lowEnvelop []float64) {
 	return
 }
 
-func DataConvert(fdataArr []float64, fs int, rangeVal int) (output []float64) {
-	var fullScale float64
-	switch fs {
-	case 3200, 6400, 12800, 25600:
-		fullScale = 65536 / 2
-	case 4000, 8000, 16000, 32000, 64000:
-		fullScale = 262144 / 2
-	default:
-		fullScale = 65536 / 2
+func DataConvert(fdataArr []float64, fs int, rangeVal int, fullScale float64) (output []float64) {
+	if fullScale == 0 {
+		switch fs {
+		case 3200, 6400, 12800, 25600:
+			fullScale = 65536 / 2
+		case 4000, 8000, 16000, 32000, 64000:
+			fullScale = 262144 / 2
+		default:
+			fullScale = 65536 / 2
+		}
 	}
 	gravityScale := fullScale / float64(rangeVal)
 

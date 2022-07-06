@@ -23,6 +23,7 @@ func (s Kx122Decoder) Decode(data []byte) (map[string]interface{}, error) {
 		odr        uint32
 		number     uint32
 		dataLength uint32
+		fullScale  uint32
 		offset     float32
 	}, 3)
 	metadataBytes := data[:72]
@@ -34,6 +35,7 @@ func (s Kx122Decoder) Decode(data []byte) (map[string]interface{}, error) {
 		metadata[i].odr = binary.LittleEndian.Uint32(metadataBytes[offset+4 : offset+8])
 		metadata[i].number = binary.LittleEndian.Uint32(metadataBytes[offset+8 : offset+12])
 		metadata[i].dataLength = binary.LittleEndian.Uint32(metadataBytes[offset+12 : offset+16])
+		metadata[i].fullScale = binary.LittleEndian.Uint32(metadataBytes[offset+16 : offset+20])
 		metadata[i].offset = math.Float32frombits(binary.LittleEndian.Uint32(metadataBytes[offset+20 : offset+24]))
 		offset += 24
 	}
@@ -48,7 +50,7 @@ func (s Kx122Decoder) Decode(data []byte) (map[string]interface{}, error) {
 		rawDataOffset := 0 //metadata length
 		for _, m := range metadata {
 			axisData := valueBytes[rawDataOffset : rawDataOffset+int(m.dataLength)]
-			svtRawData.SetMetadata(int(m.axis), m.ranges, m.odr, m.number)
+			svtRawData.SetMetadata(int(m.axis), m.ranges, m.odr, m.number, m.fullScale)
 			switch m.dataType {
 			case 3: // int16
 				svtRawData.SetValues(int(m.axis), decodeInt16(axisData, m.offset))
