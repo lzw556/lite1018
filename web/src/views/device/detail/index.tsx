@@ -119,11 +119,10 @@ const DeviceDetailPage = () => {
         if (hasPermission(Permission.DeviceRuntimeDataGet)) {
             tabs.push({key: 'ta', tab: '状态历史'})
         }
-        const title = {key: 'alarm', tab: '报警记录'};
         switch (device.typeId) {
             case DeviceType.VibrationTemperature3Axis:
                 if (hasPermission(Permission.DeviceData)) {
-                    tabs.unshift(...tabTitleList, {key: 'waveData', tab: '波形数据'}, title);
+                    tabs.unshift(...tabTitleList, {key: 'waveData', tab: '波形数据'});
                 }
                 break;
             case DeviceType.Gateway:
@@ -132,12 +131,12 @@ const DeviceDetailPage = () => {
             case DeviceType.BoltElongation:
             case DeviceType.AngleDip:
                 if (hasPermission(Permission.DeviceData)) {
-                    tabs.unshift(...tabTitleList, {key: 'dynamicData', tab: '动态数据'}, title);
+                    tabs.unshift(...tabTitleList, {key: 'dynamicData', tab: '动态数据'});
                 }
                 break;
             default:
                 if (hasPermission(Permission.DeviceData)) {
-                    tabs.unshift(...tabTitleList, title);
+                    tabs.unshift(...tabTitleList);
                 }
                 break;
         }
