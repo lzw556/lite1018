@@ -155,6 +155,7 @@ const FlangeOverview: React.FC = () => {
                   form={form}
                   onSubmit={(values) => {
                     updateAsset(id, values).then(() => {
+                      fetchAsset(id);
                       setIsForceRefresh((prev) => ++prev);
                     });
                   }}
