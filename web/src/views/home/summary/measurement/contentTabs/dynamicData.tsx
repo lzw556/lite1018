@@ -253,7 +253,7 @@ export const DynamicData: React.FC<MeasurementRow> = (props) => {
           <Row>
             {timestamps.length === 0 && (
               <Col span={24}>
-                <Empty description='暂无数据' />
+                <Empty description='暂无数据' image={Empty.PRESENTED_IMAGE_SIMPLE}/>
               </Col>
             )}
             {timestamps.length > 0 && <Col span={6}>{renderTimestampsList()}</Col>}

@@ -1,19 +1,22 @@
 import * as React from 'react';
 import { FilterableAlarmRecordTable } from '../../../../../components/alarm/filterableAlarmRecordTable';
 import ShadowCard from '../../../../../components/shadowCard';
+import { MeasurementTypes } from '../../../common/constants';
 import { MeasurementRow } from '../props';
 import { DynamicData } from './dynamicData';
 import { HistoryData } from './historyData';
 import { Monitor } from './monitor';
 import { MeasurementSettings } from './settings';
 
-export const MeasurementContents: React.FC<MeasurementRow & { onUpdate?: () => void }> = (measurement) => {
+export const MeasurementContents: React.FC<MeasurementRow & { onUpdate?: () => void }> = (
+  measurement
+) => {
   const contents: Record<string, JSX.Element> = {
     monitor: <Monitor {...measurement} />,
     history: <HistoryData {...measurement} />,
     dynamicData: <DynamicData {...measurement} />,
     setting: <MeasurementSettings {...measurement} />,
-    alarmRecord: <FilterableAlarmRecordTable sourceId={measurement.id}/>
+    alarmRecord: <FilterableAlarmRecordTable sourceId={measurement.id} />
   };
   const [key, setKey] = React.useState('monitor');
   const getTabList = () => {
@@ -21,7 +24,8 @@ export const MeasurementContents: React.FC<MeasurementRow & { onUpdate?: () => v
       { key: 'monitor', tab: '监控' },
       { key: 'history', tab: '历史数据' }
     ];
-    tabList.push({ key: 'dynamicData', tab: '动态数据' });
+    if (measurement.type === MeasurementTypes.preload.id)
+      tabList.push({ key: 'dynamicData', tab: '动态数据' });
     tabList.push({ key: 'setting', tab: '配置信息' });
     tabList.push({ key: 'alarmRecord', tab: '报警记录' });
     return tabList;
