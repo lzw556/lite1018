@@ -20,6 +20,10 @@ export const HistoryData: React.FC<MeasurementRow> = (props) => {
   const [property, setProperty] = React.useState(properties[0].key);
   const [visible, setVisible] = React.useState(false);
   React.useEffect(() => {
+    if (range) fetchData(id, range, property);
+  }, [id, range, property]);
+
+  const fetchData = (id: number, range: [number, number], property: string) => {
     if (range) {
       const [from, to] = range;
       setLoading(true);
@@ -32,7 +36,7 @@ export const HistoryData: React.FC<MeasurementRow> = (props) => {
         }
       });
     }
-  }, [id, range, property]);
+  };
 
   const renderChart = (options: any) => {
     if (loading) return <Spin />;
@@ -108,7 +112,10 @@ export const HistoryData: React.FC<MeasurementRow> = (props) => {
                         okText: '确定',
                         cancelText: '取消',
                         onOk: (close) => {
-                          clearHistory(id, from, to).then((_) => close());
+                          clearHistory(id, from, to).then((_) => {
+                            close();
+                            if (range) fetchData(id, range, property);
+                          });
                         }
                       });
                     }
