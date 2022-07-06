@@ -11,6 +11,7 @@ import { SearchResultPage } from '../components/searchResultPage';
 import { MeasurementOfWindList } from './measurementOfWindList';
 import { AssetRow } from '../assetList/props';
 import { AssetEdit } from '../assetList/edit';
+import { getProject } from '../../../utils/session';
 
 const MeasurementManagement: React.FC = () => {
   const { pathname, search } = useLocation();
@@ -34,6 +35,7 @@ const MeasurementManagement: React.FC = () => {
   const [disabled, setDisabled] = React.useState(true);
 
   React.useEffect(() => {
+    localStorage.setItem('prevProjectId', getProject());
     fetchAssets({ type: AssetTypes.WindTurbind.id });
   }, []);
 

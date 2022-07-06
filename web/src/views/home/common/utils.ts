@@ -1,6 +1,21 @@
-import moment from "moment";
+import moment from 'moment';
+import { AssetTypes, MeasurementTypes } from './constants';
 
-export function generateColProps({ xs, sm, md, lg, xl, xxl }: { xs?: number; sm?: number; md?: number; lg?: number; xl?: number; xxl?: number }) {
+export function generateColProps({
+  xs,
+  sm,
+  md,
+  lg,
+  xl,
+  xxl
+}: {
+  xs?: number;
+  sm?: number;
+  md?: number;
+  lg?: number;
+  xl?: number;
+  xxl?: number;
+}) {
   const colCount = 24;
   return {
     xs: { span: xs ?? colCount },
@@ -41,3 +56,13 @@ export const getFilename = (res: any) => {
   }
   return filename;
 };
+
+export function verifyAssetOverview(search: string) {
+  if (Object.values(AssetTypes).find((type) => search.indexOf(type.url) > -1)) {
+    return true;
+  }
+  if (Object.values(MeasurementTypes).find((type) => search.indexOf(type.url) > -1)) {
+    return true;
+  }
+  return false;
+}

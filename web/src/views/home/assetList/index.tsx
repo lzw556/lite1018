@@ -29,6 +29,7 @@ const AssetManagement: React.FC = () => {
   const [disabled, setDisabled] = React.useState(true);
 
   React.useEffect(() => {
+    localStorage.setItem('prevProjectId', getProject());
     fetchAssets({ type: AssetTypes.WindTurbind.id });
   }, []);
 
