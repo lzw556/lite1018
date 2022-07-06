@@ -99,7 +99,8 @@ export const AssetTree: React.FC<{
       getTreedata(assets);
     });
   };
-
+  
+  if (!treedata) return null;
   return (
     <>
       <Tree
