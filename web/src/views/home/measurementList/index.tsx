@@ -1,17 +1,15 @@
-import { PlusOutlined } from '@ant-design/icons';
-import { Button, Empty, Select, Space, Spin } from 'antd';
+import { Empty, Select, Spin } from 'antd';
 import * as React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { AssetTypes } from '../common/constants';
 import { getAssets } from '../assetList/services';
-import { MeasurementEdit } from './edit';
-import { MeasurementRow } from '../summary/measurement/props';
 import Label from '../../../components/label';
 import { SearchResultPage } from '../components/searchResultPage';
 import { MeasurementOfWindList } from './measurementOfWindList';
 import { AssetRow } from '../assetList/props';
-import { AssetEdit } from '../assetList/edit';
 import { getProject } from '../../../utils/session';
+import { ActionBar } from '../components/actionBar';
+import { useActionBarStatus } from '../common/useActionBarStatus';
 
 const MeasurementManagement: React.FC = () => {
   const { pathname, search } = useLocation();
@@ -28,11 +26,7 @@ const MeasurementManagement: React.FC = () => {
     localObj ? localObj : undefined
   );
   const [wind, setWind] = React.useState<AssetRow>();
-  const [visible, setVisible] = React.useState(false);
-  const [visibleAsset, setVisibleAsset] = React.useState(false);
-  const [selectedRow, setSelectedRow] = React.useState<MeasurementRow>();
-  const [initialValues, setInitialValues] = React.useState(AssetTypes.WindTurbind);
-  const [disabled, setDisabled] = React.useState(true);
+  const actionStatus = useActionBarStatus();
 
   React.useEffect(() => {
     localStorage.setItem('prevProjectId', getProject());
@@ -42,28 +36,18 @@ const MeasurementManagement: React.FC = () => {
   React.useEffect(() => {
     if (assets.items.length > 0) {
       if (filters) {
-        setWind(assets.items.find((asset) => asset.id === filters.windTurbineId));
+        const asset = assets.items.find((asset) => asset.id === filters.windTurbineId);
+        setWind(asset ? asset : assets.items[0]);
       } else {
         setWind(assets.items[0]);
       }
     }
   }, [filters, assets]);
 
-  const open = (selectedRow?: MeasurementRow, initialValues?: typeof AssetTypes.WindTurbind) => {
-    setSelectedRow(selectedRow);
-    if(initialValues){
-      setInitialValues(initialValues);
-      setVisibleAsset(true)
-    }else{
-      setVisible(true);
-    }
-  };
-
   const fetchAssets = (filters?: Pick<AssetRow, 'type'>) => {
     setAssets((prev) => ({ ...prev, loading: true }));
     getAssets(filters).then((assets) => {
       setAssets({ loading: false, items: assets });
-      setDisabled(assets.length === 0);
     });
   };
 
@@ -78,6 +62,7 @@ const MeasurementManagement: React.FC = () => {
   };
 
   const generateFilters = () => {
+    if (assets.items.length === 0) return undefined;
     return [
       <Label name='风机'>
         <Select
@@ -98,79 +83,37 @@ const MeasurementManagement: React.FC = () => {
     ];
   };
 
-  if (assets.loading) {
-    return <Spin />;
-  } else if (assets.items.length === 0) {
+  const renderResult = () => {
+    if (assets.loading) return <Spin />;
+    if (assets.items.length === 0)
+      return <Empty description='没有资产' image={Empty.PRESENTED_IMAGE_SIMPLE} />;
     return (
-      <Empty
-        description={
-          <p>
-            还没有风机, 去<Link to='/asset-management?locale=asset-management'>创建</Link>
-          </p>
-        }
+      <MeasurementOfWindList
+        wind={wind}
+        pathname={pathname}
+        search={search}
+        open={actionStatus.handleEdit}
+        fetchAssets={fetchAssets}
       />
     );
-  }
+  };
 
   return (
     <SearchResultPage
       {...{
         filters: generateFilters(),
         actions: (
-          <Space>
-            <Button type='primary' onClick={() => open(undefined, AssetTypes.WindTurbind)}>
-              添加风机
-              <PlusOutlined />
-            </Button>
-            <Button type='primary' onClick={() => open(undefined, AssetTypes.Flange)} disabled={disabled}>
-              添加法兰
-              <PlusOutlined />
-            </Button>
-            <Button type='primary' onClick={() => open()}>
-              添加监测点
-              <PlusOutlined />
-            </Button>
-          </Space>
-        ),
-        results: (
-          <MeasurementOfWindList
-            wind={wind}
-            pathname={pathname}
-            search={search}
-            open={open}
-            fetchAssets={fetchAssets}
+          <ActionBar
+            assets={assets.items}
+            {...actionStatus}
+            onEdit={actionStatus.handleEdit}
+            // assetId={filters?.windTurbineId}
+            onSuccess={() => fetchAssets({ type: AssetTypes.WindTurbind.id })}
           />
-        )
+        ),
+        results: renderResult()
       }}
-    >
-      {visible && (
-        <MeasurementEdit
-          {...{
-            visible,
-            onCancel: () => setVisible(false),
-            id: selectedRow?.id,
-            assetId: filters?.windTurbineId,
-            onSuccess: () => {
-              fetchAssets({ type: AssetTypes.WindTurbind.id });
-              setVisible(false);
-            }
-          }}
-        />
-      )}
-      {visibleAsset && (
-        <AssetEdit
-          {...{
-            visible: visibleAsset,
-            onCancel: () => setVisibleAsset(false),
-            initialValues,
-            onSuccess: () => {
-              fetchAssets({ type: AssetTypes.WindTurbind.id });
-              setVisibleAsset(false);
-            }
-          }}
-        />
-      )}
-    </SearchResultPage>
+    />
   );
 };
 
