@@ -254,7 +254,7 @@ function generateActuals(measurements: MeasurementRow[], isBig: boolean = false)
   let max = 0;
   let min = 0;
   measurements.forEach(({ data, name }, index) => {
-    let value = 0;
+    let value = NaN;
     if (field && data) {
       value = data.values[field.key];
       if (value) {
@@ -263,7 +263,7 @@ function generateActuals(measurements: MeasurementRow[], isBig: boolean = false)
         if (value < min) min = value;
       }
     }
-    seriesData.push([value, (index * 360) / measurements.length]);
+    if(!Number.isNaN(value)) seriesData.push([value, (index * 360) / measurements.length]);
   });
   const angleAxis = {
     polarIndex: 1,
