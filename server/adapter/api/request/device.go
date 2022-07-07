@@ -16,7 +16,7 @@ type CreateDevice struct {
 type UpdateDevice struct {
 	Name       string `json:"name" binding:"max=20,min=2"`
 	MacAddress string `json:"mac_address" binding:"required,lowercase,len=12"`
-	NetworkID  uint   `json:"network" binding:"omitempty"`
+	NetworkID  uint   `json:"network" binding:"required"`
 	Parent     string `json:"parent" binding:"omitempty"`
 }
 
