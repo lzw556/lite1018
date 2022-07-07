@@ -44,7 +44,7 @@ axios.interceptors.response.use(<T>(response:AxiosResponse<T>) => {
 
 
 function request<T>(method: Method, url: string, params: any) {
-    if (params) {
+    if (params !== null && params !== undefined) {
         params = filterNull(params)
     }
     return new Promise<AxiosResponse<T>>((resolve, reject) => {
