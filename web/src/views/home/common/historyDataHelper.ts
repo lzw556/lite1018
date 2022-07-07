@@ -91,7 +91,7 @@ export function generateChartOptionsOfLastestData(
     polar.push(actuals.radius);
     angleAxis.push(actuals.angleAxis);
     const max = getMax(actuals.max, attributes);
-    const min = actuals.min < 0 ? -max : max / 2;
+    const min = measurements[0].type === MeasurementTypes.loosening_angle.id ? -max : max / 2;
     radiusAxis.push({ ...actuals.radiusAxis, max, min });
     series.push(actuals.series);
 
@@ -342,7 +342,7 @@ function getSeries(color: string, value: number, name: string) {
     symbol: 'none',
     symbolSize: 0.01,
     name,
-    lineStyle: { type: 'dashed', color, opacity: 0.6 },
+    lineStyle: { type: 'dashed', color, opacity: 0.6 }
     // label: {show: true, formatter:(para:any)=>{
     //   if(para.dataIndex === 0) return para.value[0];
     //   return ''
