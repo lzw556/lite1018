@@ -86,6 +86,9 @@ func (repo DeviceAlertState) DeleteAll(mac string) error {
 		if err != nil {
 			return err
 		}
-		return bucket.DeleteBucket([]byte(mac))
+		if err = bucket.DeleteBucket([]byte(mac)); err != nil && err != bbolt.ErrBucketNotFound {
+			return err
+		}
+		return nil
 	})
 }

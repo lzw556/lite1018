@@ -1,5 +1,5 @@
-export const ColorHealth = "#28A745"
-export const ColorInfo = "#FFC107"
-export const ColorDanger = "#DC3545"
-export const ColorWarn = "#FE6D2C"
+export const ColorHealth = "#00FF00"
+export const ColorInfo = "#FFFF00"
+export const ColorDanger = "#FF0000"
+export const ColorWarn = "#FFBF00"
 export const ColorOffline = '#bfbfbf'
