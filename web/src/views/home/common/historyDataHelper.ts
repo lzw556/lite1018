@@ -23,144 +23,117 @@ export function generateChartOptionsOfLastestData(
 ) {
   const count = measurements.length;
   if (!count) return null;
-  // if (measurements.every(({ data }) => !data)) return null;
-  if (false) {
-    const firstClassFields = getFirstClassFields(measurements[0]);
-    let field: any = null;
-    if (firstClassFields.length > 0) {
-      field = firstClassFields[0];
-    }
-    return {
-      title: {
-        text: '',
-        left: 'center'
-      },
-      legend: {
-        bottom: 0
-      },
-      tooltip: {
-        trigger: 'axis',
-        formatter: (paras: any) => {
-          let text = '';
-          paras.forEach(
-            ({ seriesName, marker, value }: any) =>
-              (text += `${generateRowOfTooltip(
-                marker,
-                seriesName,
-                getDisplayValue(value, field.precision, field.unit)
-              )}`)
-          );
-          return text;
-        }
-      },
-      grid: { top: 80, bottom: '100' },
-      xAxis: {
-        type: 'category',
-        show: false
-      },
-      yAxis: { type: 'value' },
-      series: measurements.map((point) => {
-        let data = NaN;
-        if (field && point.data) {
-          data = point.data.values[field.key];
-          if (data) data = roundValue(data, field.precision);
-        }
-        return {
-          type: 'bar',
-          name: point.name,
-          data: [data],
-          barMaxWidth: 50,
-          markLine: { symbol: 'none', data: getMarkLines(attributes) }
-        };
-      })
-    };
-  } else {
-    let radar: any = [];
-    const polar: { radius: number }[] = [];
-    const angleAxis: any = [];
-    const radiusAxis: any = [];
-    const series: any = [];
-    const sortedMeasurements = sortMeasurementsByAttributes(measurements);
-    const outer = generateOuter(sortedMeasurements, isBig);
-    polar.push(outer.radius);
-    angleAxis.push(outer.angleAxis);
-    radiusAxis.push(outer.radiusAxis);
-    series.push(outer.series);
+  let radar: any = [];
+  const polar: { radius: number }[] = [];
+  const angleAxis: any = [];
+  const radiusAxis: any = [];
+  const series: any = [];
+  const sortedMeasurements = sortMeasurementsByAttributes(measurements);
+  const outer = generateOuter(sortedMeasurements, isBig);
+  polar.push(outer.radius);
+  angleAxis.push(outer.angleAxis);
+  radiusAxis.push(outer.radiusAxis);
+  series.push(outer.series);
 
-    const actuals = generateActuals(sortedMeasurements, isBig);
-    polar.push(actuals.radius);
-    angleAxis.push(actuals.angleAxis);
-    const max = getMax(actuals.max, attributes);
-    const min = measurements[0].type === MeasurementTypes.loosening_angle.id ? -max : max / 2;
-    radiusAxis.push({ ...actuals.radiusAxis, max, min });
-    series.push(actuals.series);
+  const actuals = generateActuals(sortedMeasurements, isBig);
+  polar.push(actuals.radius);
+  angleAxis.push(actuals.angleAxis);
+  const max = getMax(actuals.max, attributes, measurements[0].type);
+  const min = measurements[0].type === MeasurementTypes.loosening_angle.id ? -max : max / 2;
+  radiusAxis.push({ ...actuals.radiusAxis, max, min });
+  series.push(actuals.series);
 
-    const legends = [];
-    if (attributes?.normal && attributes.normal > min) {
-      const normal = getSeries(ColorHealth, attributes.normal, '额定值');
-      legends.push({ name: '额定值', itemStyle: { color: ColorHealth } });
-      series.push(normal.series);
-    }
-
-    if (attributes?.info && attributes.info > min) {
-      const info = getSeries(ColorInfo, attributes.info, '次要报警');
-      legends.push({ name: '次要报警', itemStyle: { color: ColorInfo } });
-      series.push(info.series);
-    }
-    if (attributes?.warn && attributes.warn > min) {
-      const warn = getSeries(ColorWarn, attributes.warn, '重要报警');
-      legends.push({ name: '重要报警', itemStyle: { color: ColorWarn } });
-      series.push(warn.series);
-    }
-    if (attributes?.danger && attributes.danger > min) {
-      const danger = getSeries(ColorDanger, attributes.danger, '严重报警');
-      legends.push({ name: '严重报警', itemStyle: { color: ColorDanger } });
-      series.push(danger.series);
-    }
-
-    return {
-      radar,
-      polar,
-      angleAxis,
-      radiusAxis,
-      legend: {
-        data: legends,
-        bottom: 0
-      },
-      series
-    };
+  const legends = [];
+  if (
+    measurements[0].type === MeasurementTypes.preload.id &&
+    checkValidAttr(attributes, 'normal', min)
+  ) {
+    const normal = getSeries(ColorHealth, attributes?.normal?.value, '额定值');
+    legends.push({ name: '额定值', itemStyle: { color: ColorHealth } });
+    series.push(normal.series);
   }
+
+  if (
+    measurements[0].type === MeasurementTypes.loosening_angle.id &&
+    checkValidAttr(attributes, 'initial', min)
+  ) {
+    const initial = getSeries(ColorHealth, attributes?.initial?.value, '初始值');
+    legends.push({ name: '初始值', itemStyle: { color: ColorHealth } });
+    series.push(initial.series);
+  }
+
+  if (checkValidAttr(attributes, 'info', min)) {
+    const info = getSeries(ColorInfo, attributes?.info?.value, '次要报警');
+    legends.push({ name: '次要报警', itemStyle: { color: ColorInfo } });
+    series.push(info.series);
+  }
+
+  if (checkValidAttr(attributes, 'warn', min)) {
+    const warn = getSeries(ColorWarn, attributes?.warn?.value, '重要报警');
+    legends.push({ name: '重要报警', itemStyle: { color: ColorWarn } });
+    series.push(warn.series);
+  }
+
+  if (checkValidAttr(attributes, 'danger', min)) {
+    const danger = getSeries(ColorDanger, attributes?.danger?.value, '严重报警');
+    legends.push({ name: '严重报警', itemStyle: { color: ColorDanger } });
+    series.push(danger.series);
+  }
+
+  return {
+    radar,
+    polar,
+    angleAxis,
+    radiusAxis,
+    legend: {
+      data: legends,
+      bottom: 0
+    },
+    series
+  };
 }
 
-function getMarkLines(attributes?: AssetRow['attributes']) {
-  const values: { yAxis: number; lineStyle: { color: string } }[] = [];
+function checkValidAttr(
+  attributes: AssetRow['attributes'],
+  key: keyof Pick<
+    Required<Required<AssetRow>['attributes']>,
+    'normal' | 'initial' | 'info' | 'warn' | 'danger'
+  >,
+  reference: number,
+  abs?: boolean
+) {
   if (attributes) {
-    if (attributes.info && Number(attributes.info)) {
-      values.push({ yAxis: attributes.info, lineStyle: { color: ColorInfo } });
+    const item = attributes[key];
+    if (item) {
+      if (abs) {
+        return item.enabled && item.value !== '' && Math.abs(item.value as number) > reference;
+      }
+      return item.enabled && item.value !== '' && item.value > reference;
     }
-    if (attributes.warn && Number(attributes.warn)) {
-      values.push({ yAxis: attributes.warn, lineStyle: { color: ColorWarn } });
-    }
-    if (attributes.danger && Number(attributes.danger)) {
-      values.push({ yAxis: attributes.danger, lineStyle: { color: ColorDanger } });
-    }
+    return false;
   }
-  return values;
+  return false;
 }
 
-function getMax(max: number, attributes: AssetRow['attributes']) {
+function getMax(max: number, attributes: AssetRow['attributes'], type: number) {
   let final = max;
-  if (attributes?.normal && Math.abs(attributes.normal) > final) {
-    final = Math.abs(attributes.normal);
+  if (type === MeasurementTypes.preload.id && checkValidAttr(attributes, 'normal', final, true)) {
+    final = Math.abs(attributes?.normal?.value as number);
   }
-  if (attributes?.info && Math.abs(attributes.info) > final) {
-    final = Math.abs(attributes.info);
+  if (
+    type === MeasurementTypes.loosening_angle.id &&
+    checkValidAttr(attributes, 'initial', final, true)
+  ) {
+    final = Math.abs(attributes?.initial?.value as number);
   }
-  if (attributes?.warn && Math.abs(attributes.warn) > final) {
-    final = Math.abs(attributes.warn);
+  if (checkValidAttr(attributes, 'info', final, true)) {
+    final = Math.abs(attributes?.info?.value as number);
   }
-  if (attributes?.danger && Math.abs(attributes.danger) > final) {
-    final = Math.abs(attributes.danger);
+  if (checkValidAttr(attributes, 'warn', final, true)) {
+    final = Math.abs(attributes?.warn?.value as number);
+  }
+  if (checkValidAttr(attributes, 'danger', final, true)) {
+    final = Math.abs(attributes?.danger?.value as number);
   }
   return final;
 }
@@ -329,7 +302,7 @@ function generateActuals(measurements: MeasurementRow[], isBig: boolean = false)
   return { series, max, radius, angleAxis, radiusAxis, min };
 }
 
-function getSeries(color: string, value: number, name: string) {
+function getSeries(color: string, value: number | string | undefined, name: string) {
   const data = [];
   for (let index = 0; index < 360; index++) {
     data.push([value, index]);

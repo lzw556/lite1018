@@ -9,10 +9,11 @@ export type Asset = {
   attributes?: {
     index: number;
     type: number;
-    normal?: number;
-    info?: number;
-    warn?: number;
-    danger?: number;
+    normal?: { enabled: boolean; value: number | string };
+    initial?: { enabled: boolean; value: number | string };
+    info?: { enabled: boolean; value: number | string };
+    warn?: { enabled: boolean; value: number | string };
+    danger?: { enabled: boolean; value: number | string };
   };
 };
 
@@ -30,10 +31,11 @@ export type AssetRow = {
   attributes?: {
     index: number;
     type: number;
-    normal?: number;
-    info?: number;
-    warn?: number;
-    danger?: number;
+    normal?: { enabled: boolean; value: number | string };
+    initial?: { enabled: boolean; value: number | string };
+    info?: { enabled: boolean; value: number | string };
+    warn?: { enabled: boolean; value: number | string };
+    danger?: { enabled: boolean; value: number | string };
   };
 };
 

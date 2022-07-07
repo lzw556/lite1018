@@ -4,6 +4,7 @@ import { Rules } from '../../../constants/validator';
 import { getAssets } from './services';
 import { AssetTypes } from '../common/constants';
 import { AssetRow } from './props';
+import { AttributeFormItem } from './attributeFormItem';
 
 export const EditContent: React.FC<{
   initialValues?: typeof AssetTypes.WindTurbind;
@@ -77,44 +78,19 @@ export const EditContent: React.FC<{
         </Form.Item>
       )}
       {AssetTypes.Flange.categories && assetTypeId !== AssetTypes.WindTurbind.id && (
-        <Form.Item
-          label='额定值'
-          name={['attributes', 'normal']}
-          initialValue=''
-          rules={[{ type: 'number', transform: (value: string) => Number(value) }]}
-        >
-          <Input />
-        </Form.Item>
+        <AttributeFormItem label='额定值' name='normal' />
       )}
       {AssetTypes.Flange.categories && assetTypeId !== AssetTypes.WindTurbind.id && (
-        <Form.Item
-          label='次要'
-          name={['attributes', 'info']}
-          initialValue=''
-          rules={[{ type: 'number', transform: (value: string) => Number(value) }]}
-        >
-          <Input />
-        </Form.Item>
+        <AttributeFormItem label='初始值' name='initial' />
       )}
       {AssetTypes.Flange.categories && assetTypeId !== AssetTypes.WindTurbind.id && (
-        <Form.Item
-          label='重要'
-          name={['attributes', 'warn']}
-          initialValue=''
-          rules={[{ type: 'number', transform: (value: string) => Number(value) }]}
-        >
-          <Input />
-        </Form.Item>
+        <AttributeFormItem label='次要' name='info' />
       )}
       {AssetTypes.Flange.categories && assetTypeId !== AssetTypes.WindTurbind.id && (
-        <Form.Item
-          label='严重'
-          name={['attributes', 'danger']}
-          initialValue=''
-          rules={[{ type: 'number', transform: (value: string) => Number(value) }]}
-        >
-          <Input />
-        </Form.Item>
+        <AttributeFormItem label='重要' name='warn' />
+      )}
+      {AssetTypes.Flange.categories && assetTypeId !== AssetTypes.WindTurbind.id && (
+        <AttributeFormItem label='严重' name='danger' />
       )}
     </>
   );
