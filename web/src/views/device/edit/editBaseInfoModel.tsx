@@ -70,7 +70,7 @@ const EditBaseInfoModel = (props: any) => {
                 {
                     device && (device.parent !== '' && device.parent !== device.macAddress) && <Form.Item label={'设备父节点'} name={'parent'}>
                         <DeviceSelect
-                            filters={{network_id: network }}
+                            filters={{network_id: network ? network : 0 }}
                             placeholder={'请选择设备所属父节点'}
                             dispalyField='macAddress'
                         />

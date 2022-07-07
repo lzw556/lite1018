@@ -13,7 +13,6 @@ const NetworkSelect: FC<NetworkSelectProps> = (props) => {
     const [dataSource, setDataSource] = useState<Network[]>([]);
 
     useEffect(() => {
-        console.log("123")
         GetNetworksRequest().then(setDataSource);
     }, [])
 

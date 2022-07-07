@@ -98,7 +98,7 @@ function typeOf(t:any) {
 
 function filterNull(params:any) {
     Object.keys(params).map(key => {
-        if (params[key] === null) {
+        if (params[key] === null || params[key] === undefined) {
             delete params[key]
         }
         if (typeOf(params[key]) === 'string') {
