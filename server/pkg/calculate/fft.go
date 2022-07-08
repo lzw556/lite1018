@@ -734,6 +734,8 @@ func DataConvert(fdataArr []float64, fs int, rangeVal int, fullScale float64) (o
 		default:
 			fullScale = 65536 / 2
 		}
+	} else {
+		fullScale = fullScale / 2
 	}
 	gravityScale := fullScale / float64(rangeVal)
 
