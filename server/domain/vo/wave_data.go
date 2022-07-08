@@ -9,6 +9,8 @@ import (
 
 type KxData struct {
 	Frequency     uint32    `json:"frequency"`
+	Range         uint8     `json:"range"`
+	FullScale     uint32    `json:"fullScale"`
 	Values        []float64 `json:"values,omitempty"`
 	XAxis         []float64 `json:"xAxis,omitempty"`
 	HighEnvelopes []float64 `json:"highEnvelopes,omitempty"`
@@ -19,6 +21,8 @@ type KxData struct {
 func NewKxData(axis entity.AxisSensorData) KxData {
 	m := KxData{
 		Frequency: axis.Metadata.Odr,
+		Range:     axis.Metadata.Range,
+		FullScale: axis.Metadata.FullScale,
 	}
 	return m
 }
