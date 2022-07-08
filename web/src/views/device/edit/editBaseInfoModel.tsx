@@ -53,7 +53,7 @@ const EditBaseInfoModel = (props: any) => {
         >
           <Input placeholder={'请输入设备MAC地址'} />
         </Form.Item>
-        {device && device.typeId !== DeviceType.Gateway && (
+        {device && (
           <>
             <Form.Item label={'所属网络'} name={'network'} rules={[Rules.required]}>
               <NetworkSelect
@@ -64,7 +64,7 @@ const EditBaseInfoModel = (props: any) => {
                 }}
               />
             </Form.Item>
-            {network && (
+            {network && device.typeId !== DeviceType.Gateway && (
               <Form.Item label={'设备父节点'} name={'parent'} rules={[Rules.required]}>
                 <DeviceSelect
                   filters={{ network_id: network }}
