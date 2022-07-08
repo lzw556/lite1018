@@ -63,12 +63,10 @@ func (list WaveDataList) ToCsvFile() (*CsvFile, error) {
 	data := make([][]string, len(list))
 	max := 0
 	for _, kxData := range list {
-		fmt.Println(len(kxData.Values))
 		if max <= len(kxData.Values) {
 			max = len(kxData.Values)
 		}
 	}
-	fmt.Println(max)
 	for i := 0; i < max; i++ {
 		cell := make([]string, len(list))
 		for j, kxData := range list {
