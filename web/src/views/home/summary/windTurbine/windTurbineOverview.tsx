@@ -14,6 +14,8 @@ import ShadowCard from '../../../../components/shadowCard';
 import { Asset, AssetRow, convertRow } from '../../assetList/props';
 import { MonitorTabContent } from './monitorTabContent';
 import { SettingsTabContent } from '../settingsTabContent';
+import usePermission, { Permission } from '../../../../permission/permission';
+import HasPermission from '../../../../permission';
 
 const WindTurbineOverview: React.FC = () => {
   const { pathname, search } = useLocation();
@@ -26,6 +28,7 @@ const WindTurbineOverview: React.FC = () => {
   const [selectedRow, setSelectedRow] = React.useState<MeasurementRow>();
   const [form] = Form.useForm<Asset>();
   const [isForceRefresh, setIsForceRefresh] = React.useState(0);
+  const { hasPermission } = usePermission();
 
   const fetchAsset = (id: number, form?: any) => {
     getAsset(id).then((asset) => {
@@ -75,6 +78,61 @@ const WindTurbineOverview: React.FC = () => {
       />
     );
 
+  const tabs = [
+    {
+      key: 'monitor',
+      tab: '监控',
+      content: <MonitorTabContent asset={asset} pathname={pathname} search={search} />
+    },
+    {
+      key: 'list',
+      tab: '监测点列表',
+      content: (
+        <ShadowCard>
+          <Row>
+            <Col span={24}>
+              <HasPermission value={Permission.MeasurementAdd}>
+                <Button
+                  type='primary'
+                  style={{ position: 'fixed', top: 240, right: 25, zIndex: 10 }}
+                  onClick={() => open()}
+                >
+                  添加监测点
+                  <PlusOutlined />
+                </Button>
+              </HasPermission>
+            </Col>
+            <Col span={24}>
+              <MeasurementOfWindList
+                wind={asset}
+                pathname={pathname}
+                search={search}
+                open={open}
+                fetchAssets={() => {
+                  fetchAsset(id);
+                }}
+              />
+              {visible && (
+                <MeasurementEdit
+                  {...{
+                    visible,
+                    onCancel: () => setVisible(false),
+                    id: selectedRow?.id,
+                    assetId: asset.id,
+                    onSuccess: () => {
+                      fetchAsset(id);
+                      setVisible(false);
+                    }
+                  }}
+                />
+              )}
+            </Col>
+          </Row>
+        </ShadowCard>
+      )
+    }
+  ];
+
   return (
     <>
       {asset && (
@@ -83,73 +141,25 @@ const WindTurbineOverview: React.FC = () => {
       <OverviewPage
         {...{
           statistics,
-          tabs: [
-            {
-              key: 'monitor',
-              tab: '监控',
-              content: <MonitorTabContent asset={asset} pathname={pathname} search={search} />
-            },
-            {
-              key: 'list',
-              tab: '监测点列表',
-              content: (
-                <ShadowCard>
-                  <Row>
-                    <Col span={24}>
-                      <Button
-                        type='primary'
-                        style={{ position: 'fixed', top: 240, right: 25, zIndex: 10 }}
-                        onClick={() => open()}
-                      >
-                        添加监测点
-                        <PlusOutlined />
-                      </Button>
-                    </Col>
-                    <Col span={24}>
-                      <MeasurementOfWindList
-                        wind={asset}
-                        pathname={pathname}
-                        search={search}
-                        open={open}
-                        fetchAssets={() => {
-                          fetchAsset(id);
-                        }}
-                      />
-                      {visible && (
-                        <MeasurementEdit
-                          {...{
-                            visible,
-                            onCancel: () => setVisible(false),
-                            id: selectedRow?.id,
-                            assetId: asset.id,
-                            onSuccess: () => {
-                              fetchAsset(id);
-                              setVisible(false);
-                            }
-                          }}
-                        />
-                      )}
-                    </Col>
-                  </Row>
-                </ShadowCard>
-              )
-            },
-            {
-              key: 'settings',
-              tab: '配置信息',
-              content: (
-                <SettingsTabContent
-                  asset={asset}
-                  form={form}
-                  onSubmit={(values) => {
-                    updateAsset(id, values).then(() => {
-                      setIsForceRefresh((prev) => ++prev);
-                    });
-                  }}
-                />
-              )
-            }
-          ]
+          tabs: hasPermission(Permission.AssetEdit)
+            ? tabs.concat([
+                {
+                  key: 'settings',
+                  tab: '配置信息',
+                  content: (
+                    <SettingsTabContent
+                      asset={asset}
+                      form={form}
+                      onSubmit={(values) => {
+                        updateAsset(id, values).then(() => {
+                          setIsForceRefresh((prev) => ++prev);
+                        });
+                      }}
+                    />
+                  )
+                }
+              ])
+            : tabs
         }}
       />
     </>

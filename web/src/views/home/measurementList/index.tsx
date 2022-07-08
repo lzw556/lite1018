@@ -10,6 +10,7 @@ import { AssetRow } from '../assetList/props';
 import { getProject } from '../../../utils/session';
 import { ActionBar } from '../components/actionBar';
 import { useActionBarStatus } from '../common/useActionBarStatus';
+import usePermission, { Permission } from '../../../permission/permission';
 
 const MeasurementManagement: React.FC = () => {
   const { pathname, search } = useLocation();
@@ -27,6 +28,7 @@ const MeasurementManagement: React.FC = () => {
   );
   const [wind, setWind] = React.useState<AssetRow>();
   const actionStatus = useActionBarStatus();
+  const { hasPermission } = usePermission();
 
   React.useEffect(() => {
     localStorage.setItem('prevProjectId', getProject());
@@ -102,7 +104,7 @@ const MeasurementManagement: React.FC = () => {
     <SearchResultPage
       {...{
         filters: generateFilters(),
-        actions: (
+        actions: hasPermission(Permission.AssetAdd) && (
           <ActionBar
             assets={assets.items}
             {...actionStatus}

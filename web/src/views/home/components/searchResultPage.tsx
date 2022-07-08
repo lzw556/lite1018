@@ -4,7 +4,7 @@ import MyBreadcrumb from '../../../components/myBreadcrumb';
 import ShadowCard from '../../../components/shadowCard';
 
 export type SearchResult = {
-  actions?: JSX.Element;
+  actions?: React.ReactNode;
   filters?: JSX.Element[];
   results: React.ReactNode;
   uploads?: UploadProps[];

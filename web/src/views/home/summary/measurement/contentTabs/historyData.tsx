@@ -93,7 +93,7 @@ export const HistoryData: React.FC<MeasurementRow> = (props) => {
                   <DownloadOutlined />
                 </Button>
               </HasPermission>
-              <HasPermission value={Permission.DeviceDataDelete}>
+              <HasPermission value={Permission.MeasurementDataDelete}>
                 <Button
                   type='default'
                   danger

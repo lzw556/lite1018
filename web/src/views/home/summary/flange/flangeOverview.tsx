@@ -13,6 +13,8 @@ import { AssetRow, convertRow } from '../../assetList/props';
 import { MonitorTabContent } from './monitorTabContent';
 import { SettingsTabContent } from '../settingsTabContent';
 import { PlusOutlined } from '@ant-design/icons';
+import HasPermission from '../../../../permission';
+import usePermission, { Permission } from '../../../../permission/permission';
 
 const FlangeOverview: React.FC = () => {
   const { search, pathname } = useLocation();
@@ -26,6 +28,7 @@ const FlangeOverview: React.FC = () => {
   const [selectedRow, setSelectedRow] = React.useState<MeasurementRow>();
   const [form] = Form.useForm<any>();
   const [isForceRefresh, setIsForceRefresh] = React.useState(0);
+  const { hasPermission } = usePermission();
 
   React.useEffect(() => {
     fetchAsset(id, form);
@@ -86,6 +89,62 @@ const FlangeOverview: React.FC = () => {
       />
     );
 
+  const tabs = [
+    {
+      key: 'monitor',
+      tab: '监控',
+      content: (
+        <MonitorTabContent
+          measurements={measurements}
+          pathname={pathname}
+          search={search}
+          asset={asset}
+        />
+      )
+    },
+    {
+      key: 'list',
+      tab: '监测点列表',
+      content: (
+        <>
+          <HasPermission value={Permission.MeasurementAdd}>
+            <Button
+              type='primary'
+              style={{ position: 'fixed', top: 240, right: 25, zIndex: 10 }}
+              onClick={() => open()}
+            >
+              添加监测点
+              <PlusOutlined />
+            </Button>
+          </HasPermission>
+          <MeasurementOfFlangeList
+            flange={asset}
+            pathname={pathname}
+            search={search}
+            open={open}
+            fetchAssets={() => {
+              fetchAsset(id);
+            }}
+          />
+          {visible && (
+            <MeasurementEdit
+              {...{
+                visible,
+                onCancel: () => setVisible(false),
+                id: selectedRow?.id,
+                assetId: asset?.parentId,
+                onSuccess: () => {
+                  fetchAsset(id);
+                  setVisible(false);
+                }
+              }}
+            />
+          )}
+        </>
+      )
+    }
+  ];
+
   return (
     <>
       {asset && (
@@ -94,75 +153,26 @@ const FlangeOverview: React.FC = () => {
       <OverviewPage
         {...{
           statistics,
-          tabs: [
-            {
-              key: 'monitor',
-              tab: '监控',
-              content: (
-                <MonitorTabContent
-                  measurements={measurements}
-                  pathname={pathname}
-                  search={search}
-                  asset={asset}
-                />
-              )
-            },
-            {
-              key: 'list',
-              tab: '监测点列表',
-              content: (
-                <>
-                  <Button
-                    type='primary'
-                    style={{ position: 'fixed', top: 240, right: 25, zIndex: 10 }}
-                    onClick={() => open()}
-                  >
-                    添加监测点
-                    <PlusOutlined />
-                  </Button>
-                  <MeasurementOfFlangeList
-                    flange={asset}
-                    pathname={pathname}
-                    search={search}
-                    open={open}
-                    fetchAssets={() => {
-                      fetchAsset(id);
-                    }}
-                  />
-                  {visible && (
-                    <MeasurementEdit
-                      {...{
-                        visible,
-                        onCancel: () => setVisible(false),
-                        id: selectedRow?.id,
-                        assetId: asset?.parentId,
-                        onSuccess: () => {
+          tabs: hasPermission(Permission.AssetEdit)
+            ? tabs.concat([
+                {
+                  key: 'settings',
+                  tab: '配置信息',
+                  content: (
+                    <SettingsTabContent
+                      asset={asset}
+                      form={form}
+                      onSubmit={(values) => {
+                        updateAsset(id, values).then(() => {
                           fetchAsset(id);
-                          setVisible(false);
-                        }
+                          setIsForceRefresh((prev) => ++prev);
+                        });
                       }}
                     />
-                  )}
-                </>
-              )
-            },
-            {
-              key: 'settings',
-              tab: '配置信息',
-              content: (
-                <SettingsTabContent
-                  asset={asset}
-                  form={form}
-                  onSubmit={(values) => {
-                    updateAsset(id, values).then(() => {
-                      fetchAsset(id);
-                      setIsForceRefresh((prev) => ++prev);
-                    });
-                  }}
-                />
-              )
-            }
-          ]
+                  )
+                }
+              ])
+            : tabs
         }}
       />
     </>

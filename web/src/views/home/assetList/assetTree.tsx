@@ -3,6 +3,8 @@ import { Button, Popconfirm, Space, Tree } from 'antd';
 import { cloneDeep } from 'lodash';
 import * as React from 'react';
 import { Link } from 'react-router-dom';
+import HasPermission from '../../../permission';
+import { Permission } from '../../../permission/permission';
 import { AssetTypes, MeasurementTypes } from '../common/constants';
 import { generateDatasOfMeasurement } from '../common/historyDataHelper';
 import { convertAlarmLevelToState } from '../common/statisticsHelper';
@@ -113,55 +115,57 @@ export const AssetTree: React.FC<{
             {alarmText}
             {selectedNode?.key === props.key && (
               <>
-                <Button type='text' size='small'>
-                  <EditOutlined
-                    onClick={() => {
-                      const type = selectedNode?.type;
-                      const assetType = getAssetType(type);
-                      if (type < 10000) {
-                        if (onEdit) onEdit(undefined, selectedNode, assetType);
-                      } else {
-                        if (onEdit) onEdit(selectedNode, undefined, undefined);
-                      }
-                    }}
-                  />
-                </Button>
-                <Popconfirm
-                  title={`确定要删除${name}吗?`}
-                  onConfirm={() => {
-                    if (selectedNode?.type < 10000) {
-                      deleteAsset(selectedNode?.id).then(() => {
-                        if (onsuccess) onsuccess();
-                      });
-                    } else {
-                      deleteMeasurement(selectedNode?.id).then(() => {
-                        if (onsuccess) onsuccess();
-                      });
-                    }
-                  }}
-                >
-                  <Button type='text' danger={true} size='small' title={`删除${name}`}>
-                    <DeleteOutlined />
-                  </Button>
-                </Popconfirm>
-                {selectedNode?.type < 10000 && (
+                <HasPermission value={Permission.AssetAdd}>
                   <Button type='text' size='small'>
-                    <PlusOutlined
+                    <EditOutlined
                       onClick={() => {
                         const type = selectedNode?.type;
-                        if (type === AssetTypes.WindTurbind.id) {
-                          if (onEdit)
-                            onEdit(undefined, undefined, {
-                              ...AssetTypes.Flange,
-                              parent_id: selectedNode?.id
-                            });
-                        } else if (type === AssetTypes.Flange.id) {
-                          if (onEdit) onEdit(undefined, undefined, undefined, selectedNode?.id);
+                        const assetType = getAssetType(type);
+                        if (type < 10000) {
+                          if (onEdit) onEdit(undefined, selectedNode, assetType);
+                        } else {
+                          if (onEdit) onEdit(selectedNode, undefined, undefined);
                         }
                       }}
                     />
                   </Button>
-                )}
+                  <Popconfirm
+                    title={`确定要删除${name}吗?`}
+                    onConfirm={() => {
+                      if (selectedNode?.type < 10000) {
+                        deleteAsset(selectedNode?.id).then(() => {
+                          if (onsuccess) onsuccess();
+                        });
+                      } else {
+                        deleteMeasurement(selectedNode?.id).then(() => {
+                          if (onsuccess) onsuccess();
+                        });
+                      }
+                    }}
+                  >
+                    <Button type='text' danger={true} size='small' title={`删除${name}`}>
+                      <DeleteOutlined />
+                    </Button>
+                  </Popconfirm>
+                  {selectedNode?.type < 10000 && (
+                    <Button type='text' size='small'>
+                      <PlusOutlined
+                        onClick={() => {
+                          const type = selectedNode?.type;
+                          if (type === AssetTypes.WindTurbind.id) {
+                            if (onEdit)
+                              onEdit(undefined, undefined, {
+                                ...AssetTypes.Flange,
+                                parent_id: selectedNode?.id
+                              });
+                          } else if (type === AssetTypes.Flange.id) {
+                            if (onEdit) onEdit(undefined, undefined, undefined, selectedNode?.id);
+                          }
+                        }}
+                      />
+                    </Button>
+                  )}
+                </HasPermission>
                 <Link to={combineFinalUrl(pathname, search, subpath, selectedNode?.id)}>
                   <Button type='text' size='small'>
                     <ArrowRightOutlined />

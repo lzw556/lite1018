@@ -11,6 +11,7 @@ import { AssetTree } from './assetTree';
 import { useLocation } from 'react-router-dom';
 import { ActionBar } from '../components/actionBar';
 import { useActionBarStatus } from '../common/useActionBarStatus';
+import usePermission, { Permission } from '../../../permission/permission';
 
 const AssetManagement: React.FC = () => {
   const { pathname, search } = useLocation();
@@ -22,6 +23,7 @@ const AssetManagement: React.FC = () => {
     items: []
   });
   const actionStatus = useActionBarStatus();
+  const { hasPermission } = usePermission();
 
   React.useEffect(() => {
     localStorage.setItem('prevProjectId', getProject());
@@ -53,7 +55,7 @@ const AssetManagement: React.FC = () => {
   return (
     <SearchResultPage
       {...{
-        actions: (
+        actions: hasPermission(Permission.AssetAdd) && (
           <ActionBar
             assets={assets.items}
             {...actionStatus}

@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { FilterableAlarmRecordTable } from '../../../../../components/alarm/filterableAlarmRecordTable';
 import ShadowCard from '../../../../../components/shadowCard';
+import usePermission, { Permission } from '../../../../../permission/permission';
 import { MeasurementTypes } from '../../../common/constants';
 import { MeasurementRow } from '../props';
 import { DynamicData } from './dynamicData';
@@ -19,6 +20,7 @@ export const MeasurementContents: React.FC<MeasurementRow & { onUpdate?: () => v
     alarmRecord: <FilterableAlarmRecordTable sourceId={measurement.id} />
   };
   const [key, setKey] = React.useState('monitor');
+  const { hasPermission } = usePermission();
   const getTabList = () => {
     const tabList: { key: string; tab: string }[] = [
       { key: 'monitor', tab: '监控' },
@@ -26,7 +28,8 @@ export const MeasurementContents: React.FC<MeasurementRow & { onUpdate?: () => v
     ];
     if (measurement.type === MeasurementTypes.preload.id)
       tabList.push({ key: 'dynamicData', tab: '动态数据' });
-    tabList.push({ key: 'setting', tab: '配置信息' });
+    if (hasPermission(Permission.MeasurementEdit))
+      tabList.push({ key: 'setting', tab: '配置信息' });
     tabList.push({ key: 'alarmRecord', tab: '报警记录' });
     return tabList;
   };
