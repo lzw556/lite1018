@@ -36,6 +36,7 @@ func (cmd DeviceUpdateCmd) UpdateBaseInfo(req request.UpdateDevice) error {
 	ctx := context.TODO()
 	cmd.Device.Name = req.Name
 	cmd.Device.NetworkID = req.NetworkID
+	oldMac := cmd.Device.MacAddress
 	err := transaction.Execute(ctx, func(txCtx context.Context) error {
 		if parent, _ := cmd.deviceRepo.GetBySpecs(txCtx, spec.DeviceMacEqSpec(req.Parent)); parent.ID == 0 {
 			return response.BusinessErr(errcode.DeviceNotFoundError, "")
@@ -61,7 +62,7 @@ func (cmd DeviceUpdateCmd) UpdateBaseInfo(req request.UpdateDevice) error {
 	go func() {
 		if network, err := cmd.networkRepo.Get(ctx, cmd.Device.NetworkID); err == nil {
 			if gateway, err := cmd.deviceRepo.Get(ctx, network.GatewayID); err == nil {
-				go command.UpdateDevice(gateway, cmd.Device)
+				go command.UpdateDevice(gateway, cmd.Device, oldMac)
 			}
 		}
 	}()
