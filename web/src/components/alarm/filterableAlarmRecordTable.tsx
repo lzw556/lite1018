@@ -121,7 +121,10 @@ export const FilterableAlarmRecordTable: React.FC<{ sourceId?: number }> = ({ so
       title: '报警名称',
       dataIndex: 'alarmRuleGroupName',
       key: 'alarmRuleGroupName',
-      width: '15%'
+      width: '15%',
+      render: (name: string, record: any) => {
+        return record.alarmRuleGroupId === 0 ? '已删除' : name;
+      }
     },
     {
       title: '报警级别',

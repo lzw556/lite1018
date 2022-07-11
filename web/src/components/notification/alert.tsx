@@ -1,6 +1,7 @@
 import useSocket, {SocketTopic} from "../../socket";
 import {notification, Space} from "antd";
 import {useEffect} from "react";
+import { getProject } from "../../utils/session";
 
 const AlertMessageNotification = () => {
     const {PubSub} = useSocket()
@@ -9,7 +10,7 @@ const AlertMessageNotification = () => {
     useEffect(() => {
         PubSub.subscribe(SocketTopic.monitoringPointAlert, (msg: string, data: any) => {
             console.log(data)
-            renderNotification(data)
+            if(data && data.monitoringPoint && data.monitoringPoint.project && data.monitoringPoint.project === getProject()) renderNotification(data)
         })
         return () => {
             PubSub.unsubscribe(SocketTopic.monitoringPointAlert)
