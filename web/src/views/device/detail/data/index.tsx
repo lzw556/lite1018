@@ -76,7 +76,8 @@ const HistoryDataPage: FC<DeviceDataProps> = ({ device }) => {
           formatter: function (params: any) {
             let relVal = params[0].name;
             for (let i = 0; i < params.length; i++) {
-              let value = Number(params[i].value).toFixed(3);
+              let value: any = Number(params[i].value);
+              value = value ? value.toFixed(3) : value;
               relVal += `<br/> ${params[i].marker} ${params[i].seriesName}: ${value}${property.unit}`;
             }
             return relVal;

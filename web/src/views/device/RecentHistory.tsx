@@ -51,6 +51,9 @@ export const RecentHistory: React.FC<{ device: Device }> = ({ device }) => {
             if (value) {
               subText += `${field.name} ${value.toFixed(property.precision)} `;
             }
+            if (value === 0 || value === '0') {
+              subText += `${field.name} ${value} `;
+            }
           });
           const title = `${property.name}` + (property.unit ? `(${property.unit})` : '');
           return {
@@ -60,7 +63,8 @@ export const RecentHistory: React.FC<{ device: Device }> = ({ device }) => {
               formatter: function (params: any) {
                 let relVal = params[0].name;
                 for (let i = 0; i < params.length; i++) {
-                  let value = Number(params[i].value).toFixed(3);
+                  let value: any = Number(params[i].value);
+                  value = value ? value.toFixed(3) : value;
                   relVal += `<br/> ${params[i].marker} ${params[i].seriesName}: ${value}${property.unit}`;
                 }
                 return relVal;
