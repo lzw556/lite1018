@@ -21,7 +21,7 @@ func (s *SvtRawData) SetMetadata(i int, r uint8, o uint32, n uint32, scale uint3
 		s.YAxis.Metadata.Range = r
 		s.YAxis.Metadata.Odr = o
 		s.YAxis.Metadata.Number = n
-		s.XAxis.Metadata.FullScale = scale
+		s.YAxis.Metadata.FullScale = scale
 	case 2:
 		s.ZAxis.Metadata.Range = r
 		s.ZAxis.Metadata.Odr = o
