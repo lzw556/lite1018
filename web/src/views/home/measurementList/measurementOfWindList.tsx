@@ -16,6 +16,7 @@ import { combineFinalUrl } from '../common/utils';
 import { sortMeasurementsByAttributes } from './util';
 import { sortFlangesByAttributes } from '../assetList/util';
 import usePermission, { Permission } from '../../../permission/permission';
+import HasPermission from '../../../permission';
 
 export const MeasurementOfWindList: React.FC<{
   wind?: AssetRow;
@@ -99,18 +100,20 @@ export const MeasurementOfWindList: React.FC<{
               <Button type='text' size='small' title='编辑监测点'>
                 <EditOutlined onClick={() => open(row)} />
               </Button>
-              <Popconfirm
-                title={'确定要删除该监测点吗?'}
-                onConfirm={() => {
-                  deleteMeasurement(row.id).then(() => {
-                    fetchAssets({ type: AssetTypes.WindTurbind.id });
-                  });
-                }}
-              >
-                <Button type='text' danger={true} size='small' title='删除监测点'>
-                  <DeleteOutlined />
-                </Button>
-              </Popconfirm>
+              <HasPermission value={Permission.MeasurementDelete}>
+                <Popconfirm
+                  title={'确定要删除该监测点吗?'}
+                  onConfirm={() => {
+                    deleteMeasurement(row.id).then(() => {
+                      fetchAssets({ type: AssetTypes.WindTurbind.id });
+                    });
+                  }}
+                >
+                  <Button type='text' danger={true} size='small' title='删除监测点'>
+                    <DeleteOutlined />
+                  </Button>
+                </Popconfirm>
+              </HasPermission>
             </Space>
           ),
           width: 120

@@ -41,7 +41,7 @@ export const MeasurementBind: React.FC<
   }, [props, form]);
   const renderModalContent = () => {
     if (loading) return <Spin />;
-    if (!winds || winds.length === 0) return <Empty description='暂无数据' />;
+    if (!winds || winds.length === 0) return <Empty description='暂无数据' image={Empty.PRESENTED_IMAGE_SIMPLE} />;
     return (
       <Form.Item name='monitoring_point_ids'>
         <Checkbox.Group style={{ width: '100%' }}>

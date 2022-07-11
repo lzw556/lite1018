@@ -129,24 +129,26 @@ export const AssetTree: React.FC<{
                       }}
                     />
                   </Button>
-                  <Popconfirm
-                    title={`确定要删除${name}吗?`}
-                    onConfirm={() => {
-                      if (selectedNode?.type < 10000) {
-                        deleteAsset(selectedNode?.id).then(() => {
-                          if (onsuccess) onsuccess();
-                        });
-                      } else {
-                        deleteMeasurement(selectedNode?.id).then(() => {
-                          if (onsuccess) onsuccess();
-                        });
-                      }
-                    }}
-                  >
-                    <Button type='text' danger={true} size='small' title={`删除${name}`}>
-                      <DeleteOutlined />
-                    </Button>
-                  </Popconfirm>
+                  <HasPermission value={Permission.AssetDelete}>
+                    <Popconfirm
+                      title={`确定要删除${name}吗?`}
+                      onConfirm={() => {
+                        if (selectedNode?.type < 10000) {
+                          deleteAsset(selectedNode?.id).then(() => {
+                            if (onsuccess) onsuccess();
+                          });
+                        } else {
+                          deleteMeasurement(selectedNode?.id).then(() => {
+                            if (onsuccess) onsuccess();
+                          });
+                        }
+                      }}
+                    >
+                      <Button type='text' danger={true} size='small' title={`删除${name}`}>
+                        <DeleteOutlined />
+                      </Button>
+                    </Popconfirm>
+                  </HasPermission>
                   {selectedNode?.type < 10000 && (
                     <Button type='text' size='small'>
                       <PlusOutlined
