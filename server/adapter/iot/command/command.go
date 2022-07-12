@@ -293,8 +293,8 @@ func AddDevice(gateway entity.Device, device entity.Device) {
 	return
 }
 
-func UpdateDevice(gateway entity.Device, device entity.Device) {
-	cmd := newUpdateDeviceCmd(device)
+func UpdateDevice(gateway entity.Device, device entity.Device, oldMac string) {
+	cmd := newUpdateDeviceCmd(device.Name, oldMac, device.MacAddress, device.Parent, int32(device.Type))
 	if _, err := cmd.Execute(gateway.MacAddress, gateway.MacAddress); err != nil {
 		xlog.Errorf("execute device command %s failed: %v => [%s]", cmd.Name(), err, gateway.MacAddress)
 		return
