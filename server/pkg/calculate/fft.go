@@ -603,12 +603,12 @@ func displacementCalc(data []float64, sigLen int, fs int) []float64 {
 
 	w1 := make([]float64, 0)
 	w2 := make([]float64, 0)
-	var next float64
-	for next = 0; next <= 0.5*float64(sigLen)*dw-dw; next = next + dw {
-		w1 = append(w1, next)
+	for i := 0; i <= sigLen/2-1; i++ {
+		w1 = append(w1, float64(i)*dw)
 	}
-	for next = -(0.5*float64(sigLen)*dw - dw); next <= 0; next = next + dw {
-		w2 = append(w2, next)
+
+	for i := 0; i <= sigLen/2-1; i++ {
+		w2 = append(w2, -(float64(sigLen/2)*dw-dw)+float64(i)*dw)
 	}
 	w := append(w1, w2...)
 
@@ -781,12 +781,12 @@ func velocityCalc(data []float64, sigLen int, fs int) []float64 {
 
 	w1 := make([]float64, 0)
 	w2 := make([]float64, 0)
-	var next float64
-	for next = 0; next <= 0.5*float64(sigLen)*dw-dw; next = next + dw {
-		w1 = append(w1, next)
+	for i := 0; i <= sigLen/2-1; i++ {
+		w1 = append(w1, float64(i)*dw)
 	}
-	for next = -(0.5*float64(sigLen)*dw - dw); next <= 0; next = next + dw {
-		w2 = append(w2, next)
+
+	for i := 0; i <= sigLen/2-1; i++ {
+		w2 = append(w2, -(float64(sigLen/2)*dw-dw)+float64(i)*dw)
 	}
 	w := append(w1, w2...)
 
