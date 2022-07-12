@@ -8,7 +8,7 @@ import (
 	gofft "github.com/mjibson/go-dsp/fft"
 )
 
-var pi float64 = 3.1415926
+var PI float64 = 3.1415926
 
 func powerExponentGet(num int) int {
 	var i int = 0
@@ -479,8 +479,9 @@ func AccelerationFrequencyCalc(raw []float64, sigLen int, fs int, rangeVal int, 
 }
 
 func VelocityCalc(raw []float64, sigLen int, fs int, rangeVal int, fullScale float64) []float64 {
+	sigLen = sampleNumGet(sigLen)
 	raw = raw[:sigLen]
-	data := DataConvert(raw, fs, rangeVal, fullScale)
+	data := DataConvert(removeMean(raw), fs, rangeVal, fullScale)
 	velX1 := velocityCalc(data, sigLen, fs)
 	for i := range velX1 {
 		velX1[i] = velX1[i] * 1000.0
@@ -495,8 +496,9 @@ func VelocityFrequencyCalc(raw []float64, sigLen int, fs int, rangeVal int, full
 }
 
 func DisplacementCalc(raw []float64, sigLen int, fs int, rangeVal int, fullScale float64) []float64 {
+	sigLen = sampleNumGet(sigLen)
 	raw = raw[:sigLen]
-	data := DataConvert(raw, fs, rangeVal, fullScale)
+	data := DataConvert(removeMean(raw), fs, rangeVal, fullScale)
 	disX1 := displacementCalc(data, sigLen, fs)
 	for i := range disX1 {
 		disX1[i] = disX1[i] * 1000.0 * 1000.0
@@ -591,68 +593,73 @@ func vibrationDataProcess(data []complex128, s1 int, e1 int, s2 int, e2 int) []c
 }
 
 func displacementCalc(data []float64, sigLen int, fs int) []float64 {
-	sigLen = sampleNumGet(sigLen)
-	data = data[:sigLen]
-	data = removeMean(data)
-
-	res := gofft.FFTReal(data)
-	tmp := make([]float64, sigLen)
-
 	var fmin float64 = 1.0 * float64(fs) / 340
 	var fmax float64 = 2000.0
 	var df float64 = 1.0 * float64(fs) / float64(sigLen)
-	var dw float64 = 2 * pi * df
-
-	for i := 0; i < sigLen/2; i++ {
-		tmp[i] = float64(i) * dw
-	}
-
-	for i := 0; i < sigLen/2; i++ {
-		tmp[i+int(sigLen/2)] = -1.0 * dw * (0.5*float64(sigLen) - 1.0 - float64(i))
-	}
-
-	re := make([]float64, sigLen)
-	im := make([]float64, sigLen)
-	for i := 2; i < sigLen; i++ {
-		re[i] = -real(res[i]) / tmp[i] / tmp[i]
-		im[i] = -imag(res[i]) / tmp[i] / tmp[i]
-	}
-
-	for i := 0; i < sigLen; i++ {
-		res[i] = complex(re[i], im[i])
-	}
-
-	// for i := 0; i < 10; i++ {
-	// 	fmt.Printf("%d=%f\n", i, real(res[i]))
-	// }
-
-	// for i := 0; i < 10; i++ {
-	// 	fmt.Printf("imag %d=%f\n", i, imag(res[i]))
-	// }
+	var dw float64 = 2 * PI * df
 
 	HPStop := round(fmin/df + 0.5)
 	LPStop := round(fmax/df+0.5) - 1
-	// st1 := HPStop - 1
-	// en1 := LPStop
-	// st2 := sigLen - LPStop
-	// en2 := sigLen - HPStop + 1
 
-	// res = vibrationDataProcess(res, st1, en1, st2, en2)
+	w1 := make([]float64, 0)
+	w2 := make([]float64, 0)
+	var next float64
+	for next = 0; next <= 0.5*float64(sigLen)*dw-dw; next = next + dw {
+		w1 = append(w1, next)
+	}
+	for next = -(0.5*float64(sigLen)*dw - dw); next <= 0; next = next + dw {
+		w2 = append(w2, next)
+	}
+	w := append(w1, w2...)
+
+	res := gofft.FFTReal(data)
+
 	tmpre := make([]float64, sigLen)
 	tmpim := make([]float64, sigLen)
-
-	for i := HPStop; i < LPStop; i++ {
+	for i := 0; i < len(res); i++ {
 		tmpre[i] = real(res[i])
-		tmpim[i] = imag(res[i])
+		tmpim[i] = -imag(res[i])
 	}
 
-	for i := sigLen - LPStop + 1; i < sigLen-HPStop+1; i++ {
-		tmpre[i] = real(res[i])
-		tmpim[i] = imag(res[i])
+	are := make([]float64, len(res))
+	aim := make([]float64, len(res))
+	for i := 1; i < len(res); i++ {
+		are[i] = tmpre[i] / w[i]
+		aim[i] = tmpim[i] / w[i]
+	}
+
+	for i := 0; i < len(res); i++ {
+		tmpre[i] = aim[i]
+		tmpim[i] = -are[i]
+	}
+
+	for i := 1; i < len(res); i++ {
+		are[i] = tmpre[i] / w[i]
+		aim[i] = tmpim[i] / w[i]
+	}
+
+	for i := 0; i < len(res); i++ {
+		tmpre[i] = aim[i]
+		tmpim[i] = -are[i]
 	}
 
 	for i := 0; i < sigLen; i++ {
-		res[i] = complex(tmpre[i], tmpim[i])
+		are[i] = 0
+		aim[i] = 0
+	}
+
+	for i := HPStop - 1; i <= LPStop-1; i++ {
+		are[i] = tmpre[i]
+		aim[i] = tmpim[i]
+	}
+
+	for i := sigLen - LPStop; i <= sigLen-HPStop; i++ {
+		are[i] = tmpre[i]
+		aim[i] = tmpim[i]
+	}
+
+	for i := 0; i < sigLen; i++ {
+		res[i] = complex(are[i], aim[i])
 	}
 
 	res2 := gofft.IFFT(res)
@@ -663,6 +670,7 @@ func displacementCalc(data []float64, sigLen int, fs int) []float64 {
 	}
 
 	disp = removeMean(disp)
+
 	return disp
 }
 
@@ -763,73 +771,63 @@ func printCurve(filename string, data []float64) {
 }
 
 func velocityCalc(data []float64, sigLen int, fs int) []float64 {
-	sigLen = sampleNumGet(sigLen)
-	data = data[:sigLen]
-	data = removeMean(data)
-
-	// var gravity float64 = 9.8 / ((65536 / 2) / 4)
-	for i := range data {
-		data[i] = data[i]
-	}
-
-	res := gofft.FFTReal(data)
-	tmp := make([]float64, sigLen)
-
 	var fmin float64 = 1.0 * float64(fs) / 340
 	var fmax float64 = 2000.0
 	var df float64 = 1.0 * float64(fs) / float64(sigLen)
-	var dw float64 = 2 * pi * df
-	for i := 0; i < sigLen/2; i++ {
-		tmp[i] = float64(i) * dw
-	}
-
-	for i := 0; i < sigLen/2; i++ {
-		tmp[i+sigLen/2] = -1.0 * dw * (0.5*float64(sigLen) - 1.0 - float64(i))
-	}
-
-	// for i := 2; i < sigLen; i++ {
-	// 	res[i] = complex(imag(res[i])/tmp[i], -(real(res[i]) / tmp[i]))
-	// }
-	re := make([]float64, sigLen)
-	im := make([]float64, sigLen)
-	for i := 2; i < sigLen; i++ {
-		re[i] = real(res[i]) / tmp[i]
-		im[i] = imag(res[i]) / tmp[i]
-	}
-
-	for i := 0; i < sigLen; i++ {
-		t := re[i]
-		re[i] = im[i]
-		im[i] = -t
-	}
-
-	for i := 0; i < sigLen; i++ {
-		res[i] = complex(re[i], im[i])
-	}
+	var dw float64 = 2 * PI * df
 
 	HPStop := round(fmin/df + 0.5)
 	LPStop := round(fmax/df+0.5) - 1
-	// st1 := HPStop - 1
-	// en1 := LPStop
-	// st2 := sigLen - LPStop
-	// en2 := sigLen - HPStop + 1
 
-	// res = vibrationDataProcess(res, st1, en1, st2, en2)
+	w1 := make([]float64, 0)
+	w2 := make([]float64, 0)
+	var next float64
+	for next = 0; next <= 0.5*float64(sigLen)*dw-dw; next = next + dw {
+		w1 = append(w1, next)
+	}
+	for next = -(0.5*float64(sigLen)*dw - dw); next <= 0; next = next + dw {
+		w2 = append(w2, next)
+	}
+	w := append(w1, w2...)
+
+	res := gofft.FFTReal(data)
+
 	tmpre := make([]float64, sigLen)
 	tmpim := make([]float64, sigLen)
-
-	for i := HPStop; i < LPStop; i++ {
+	for i := 0; i < len(res); i++ {
 		tmpre[i] = real(res[i])
-		tmpim[i] = imag(res[i])
+		tmpim[i] = -imag(res[i])
 	}
 
-	for i := sigLen - LPStop + 1; i < sigLen-HPStop+1; i++ {
-		tmpre[i] = real(res[i])
-		tmpim[i] = imag(res[i])
+	are := make([]float64, len(res))
+	aim := make([]float64, len(res))
+	for i := 1; i < len(res); i++ {
+		are[i] = tmpre[i] / w[i]
+		aim[i] = tmpim[i] / w[i]
+	}
+
+	for i := 0; i < len(res); i++ {
+		tmpre[i] = aim[i]
+		tmpim[i] = -are[i]
 	}
 
 	for i := 0; i < sigLen; i++ {
-		res[i] = complex(tmpre[i], tmpim[i])
+		are[i] = 0
+		aim[i] = 0
+	}
+
+	for i := HPStop - 1; i <= LPStop-1; i++ {
+		are[i] = tmpre[i]
+		aim[i] = tmpim[i]
+	}
+
+	for i := sigLen - LPStop; i <= sigLen-HPStop; i++ {
+		are[i] = tmpre[i]
+		aim[i] = tmpim[i]
+	}
+
+	for i := 0; i < sigLen; i++ {
+		res[i] = complex(are[i], aim[i])
 	}
 
 	res2 := gofft.IFFT(res)
@@ -840,18 +838,8 @@ func velocityCalc(data []float64, sigLen int, fs int) []float64 {
 	}
 
 	vel = removeMean(vel)
-	return vel
 
-	// accX1 := FilterRMS(data, sigLen, fs)
-	// velX := make([]float64, sigLen)
-	// velX[0] = accX1[0] / 2.0
-	// for i := 1; i < sigLen; i++ {
-	// 	velX[i] = velX[i-1] + accX1[i]
-	// }
-	// for i := range velX {
-	// 	velX[i] = velX[i] * 1000 / float64(fs)
-	// }
-	// velX1 = FilterRMS(velX, sigLen, fs)
+	return vel
 }
 
 //
