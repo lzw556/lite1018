@@ -65,7 +65,7 @@ dl.name-value-groups.horizontal {
 }
 
 .introduction.normal .introduction-icon {
-  background-color: #00FF00;
+  background-color: #28A745;
 }
 .introduction.info .introduction-icon {
   background-color: #FFFF00;
@@ -91,7 +91,7 @@ dl.name-value-groups.horizontal {
   background-color: #fff;
 }
 .introduction.normal.focus .introduction-icon .icon-svg {
-  fill: #00FF00;
+  fill: #28A745;
 }
 .introduction.info.focus .introduction-icon .icon-svg {
   fill: #FFFF00;
@@ -132,7 +132,7 @@ dl.name-value-groups.horizontal {
   border-radius: 1em;
 }
 .asset-list-tree .ant-tree-icon__customize svg.normal {
-  background-color: #00FF00;
+  background-color: #28A745;
 }
 .asset-list-tree .ant-tree-icon__customize svg.info {
   background-color: #FFFF00;
@@ -145,7 +145,7 @@ dl.name-value-groups.horizontal {
 }
 .asset-list-tree .ant-tree-icon__customize svg.normal.focus {
   background-color: #fff;
-  fill:#00FF00
+  fill:#28A745
 }
 .asset-list-tree .ant-tree-icon__customize svg.info.focus {
   background-color: #fff;
