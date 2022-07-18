@@ -27,6 +27,9 @@ const (
 	SettingGroupPreload      = "preload"
 	SettingGroupCorrosion    = "corrosion"
 	SettingGroupAcceleration = "acceleration"
+	SettingGroupInclinometer = "inclinometer"
+	SettingGroupThickness    = "thickness"
+	SettingGroupOther        = "other"
 )
 
 type Setting struct {
@@ -59,6 +62,44 @@ func (s Setting) Convert(value interface{}) interface{} {
 		return cast.ToFloat32(value)
 	default:
 		return cast.ToString(value)
+	}
+}
+
+func samplePeriodSetting() Setting {
+	return Setting{
+		Name:     "采集周期",
+		Key:      "sample_period",
+		Category: SensorsSettingCategory,
+		Value:    3600000, // 1 hour
+		Type:     Uint32ValueType,
+		Options:  samplePeriodOption1,
+		Group:    SettingGroupGeneral,
+		Sort:     0,
+	}
+}
+
+func sampleOffsetSetting() Setting {
+	return Setting{
+		Name:     "采集延迟",
+		Key:      "sample_offset",
+		Category: SensorsSettingCategory,
+		Value:    0,
+		Type:     Uint32ValueType,
+		Options:  sampleOffsetOptions1,
+		Group:    SettingGroupGeneral,
+		Sort:     1,
+	}
+}
+
+func temperatureKSetting(name, key string, v interface{}, sort int, group string) Setting {
+	return Setting{
+		Name:     name,
+		Key:      key,
+		Category: SensorsSettingCategory,
+		Value:    v,
+		Type:     FloatValueType,
+		Group:    group,
+		Sort:     sort,
 	}
 }
 
