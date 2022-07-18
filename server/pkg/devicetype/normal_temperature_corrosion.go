@@ -54,7 +54,7 @@ func (d NormalTemperatureCorrosion) Settings() Settings {
 		Unit:     "天",
 		Category: SensorsSettingCategory,
 		Group:    SettingGroupThickness,
-		Sort:     5,
+		Sort:     9,
 	}
 
 	return []Setting{
