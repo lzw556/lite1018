@@ -2,7 +2,7 @@ import {Checkbox, Col, ConfigProvider, DatePicker, Row, Select, Space, Table} fr
 import EChartsReact from 'echarts-for-react';
 import moment from 'moment';
 import * as React from 'react';
-import {useCallback} from 'react';
+import {useCallback, useState} from 'react';
 import {LineChartStyles} from '../../../../constants/chart';
 import '../../../../index.css';
 import {EmptyLayout} from '../../../layout';
@@ -15,6 +15,7 @@ import {
 import {isMobile} from '../../../../utils/deviceDetection';
 import {DownloadOutlined} from '@ant-design/icons';
 import usePermission, {Permission} from "../../../../permission/permission";
+import {DeviceType} from "../../../../types/device_type";
 
 const {Option} = Select;
 
@@ -55,12 +56,13 @@ const WaveDataChart: React.FC<{ device: Device }> = ({device}) => {
     const [isLoading, setIsLoading] = React.useState(false);
     const [isLoadingPage, setIsLoadingPage] = React.useState(false);
     const [isShowEnvelope, setIsShowEnvelope] = React.useState(false);
+    const [dataType] = useState(device.typeId === DeviceType.VibrationTemperature3AxisAdvanced ? 16842758 : 16842753)
     const {hasPermission} = usePermission();
 
     const fetchDeviceDataByTimestamp = useCallback(
         (timestamp: number) => {
             setIsLoading(true);
-            GetDeviceDataRequest(device.id, timestamp, {calculate, dimension, data_type: 16842753})
+            GetDeviceDataRequest(device.id, timestamp, {calculate, dimension, data_type: dataType})
                 .then((data) => {
                     setIsLoading(false);
                     setDeviceData(data);
@@ -75,7 +77,7 @@ const WaveDataChart: React.FC<{ device: Device }> = ({device}) => {
     const fetchDeviceWaveDataTimestamps = useCallback(() => {
         setIsLoadingPage(true);
         FindDeviceDataRequest(device.id, beginDate.utc().unix(), endDate.utc().unix(), {
-            data_type: 16842753
+            data_type: dataType
         })
             .then((data) => {
                 setIsLoadingPage(false);
@@ -140,7 +142,7 @@ const WaveDataChart: React.FC<{ device: Device }> = ({device}) => {
     const onDownload = (timestamp: number) => {
         DownloadDeviceDataByTimestampRequest(device.id, timestamp, {
             calculate,
-            data_type: 16842753
+            data_type: dataType
         }).then((res) => {
             if (res.status === 200) {
                 const url = window.URL.createObjectURL(new Blob([res.data]));

@@ -55,17 +55,14 @@ func (query AlarmRuleGroupQuery) Get(id uint) (*vo.AlarmRuleGroup, error) {
 
 		if result.Category == uint(entity.AlarmRuleCategoryMonitoringPoint) && i == 0 {
 			alarmRuleSources, err := query.alarmSourceRepo.FindBySpecs(ctx, spec.AlarmRuleEqSpec(binding.AlarmRuleID))
-			if err != nil {
-				return &result, err
-			}
-
-			for _, ruleSource := range alarmRuleSources {
-				mpQuery := NewMonitoringPointQuery()
-				mp, err := mpQuery.Get(ruleSource.SourceID)
-				if err != nil {
-					return &result, err
+			if err == nil {
+				for _, ruleSource := range alarmRuleSources {
+					mpQuery := NewMonitoringPointQuery()
+					mp, err := mpQuery.Get(ruleSource.SourceID)
+					if err == nil {
+						result.MonitoringPoints = append(result.MonitoringPoints, &mp)
+					}
 				}
-				result.MonitoringPoints = append(result.MonitoringPoints, &mp)
 			}
 		}
 	}

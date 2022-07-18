@@ -3,6 +3,7 @@ package command
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/request"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/response"
@@ -100,7 +101,75 @@ func (cmd ProjectImportCmd) convertNet(netImported request.NetworkImported) requ
 	return result
 }
 
+func (cmd ProjectImportCmd) checkDevices(networks []request.NetworkImported) ([]string, error) {
+	macs := make([]string, 0)
+	for _, network := range networks {
+		for _, dev := range network.DeviceList {
+			if _, err := cmd.deviceRepo.GetBySpecs(context.TODO(), spec.DeviceMacEqSpec(dev.Address)); err == nil {
+				return macs, fmt.Errorf("设备(%s)已存在", dev.Address)
+			} else {
+				macs = append(macs, dev.Address)
+			}
+		}
+	}
+
+	return macs, nil
+}
+
+func (cmd ProjectImportCmd) checkAssets(assets []request.AssetImported, macs []string) error {
+	for _, asset := range assets {
+		if err := cmd.iterCheckAsset(asset, macs); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (cmd ProjectImportCmd) iterCheckAsset(asset request.AssetImported, macs []string) error {
+	if asset.MonitoringPoints != nil {
+		for _, mp := range asset.MonitoringPoints {
+			if mp.Devices != nil {
+				for _, dev := range mp.Devices {
+					if !cmd.checkDeviceExisted(dev.Address, macs) {
+						return fmt.Errorf("监测点(%s)绑定设备(%s)不存在", mp.Name, dev.Address)
+					}
+				}
+			}
+		}
+	}
+
+	if asset.Children != nil {
+		for _, child := range asset.Children {
+			if err := cmd.iterCheckAsset(*child, macs); err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
+}
+
+func (cmd ProjectImportCmd) checkDeviceExisted(mac string, macs []string) bool {
+	for _, m := range macs {
+		if mac == m {
+			return true
+		}
+	}
+
+	return false
+}
+
 func (cmd ProjectImportCmd) ImportProject(req request.ProjectImported) error {
+	macs, err := cmd.checkDevices(req.Networks)
+	if err != nil {
+		return err
+	}
+
+	if err := cmd.checkAssets(req.Assets, macs); err != nil {
+		return err
+	}
+
 	for _, network := range req.Networks {
 		netImported := cmd.convertNet(network)
 		netImported.ProjectID = cmd.Project.ID

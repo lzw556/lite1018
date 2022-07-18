@@ -42,6 +42,7 @@ func (cmd updateDeviceCmd) Payload() ([]byte, error) {
 		Timestamp: int32(cmd.request.timestamp),
 		ReqId:     cmd.request.id,
 		Mac:       utils.StringToBytes(binary.BigEndian, cmd.device.MacAddress),
+		NewMac:    utils.StringToBytes(binary.BigEndian, cmd.device.MacAddress),
 		ParentMac: utils.StringToBytes(binary.BigEndian, cmd.device.Parent),
 		Name:      utils.StringToBytes(binary.BigEndian, fmt.Sprintf("%x", cmd.device.Name)),
 		Type:      int32(cmd.device.Type),

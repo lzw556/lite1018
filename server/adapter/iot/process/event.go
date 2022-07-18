@@ -36,14 +36,28 @@ func (p Event) Process(ctx *iot.Context, msg iot.Message) error {
 			if err := proto.Unmarshal(msg.Body.Payload, &m); err != nil {
 				return fmt.Errorf("unmarshal [Event] message failed: %v", err)
 			}
-			event := entity.Event{
-				Code:      entity.EventCodeDataAcquisitionFailed,
-				Category:  entity.EventCategoryDevice,
-				SourceID:  device.ID,
-				Timestamp: int64(m.Timestamp),
-				Content:   string(m.Data),
-				ProjectID: device.ProjectID,
+			var event entity.Event
+			if m.Type == 1 {
+				event = entity.Event{
+					Code:      entity.EventCodeDataAcquisitionFailed,
+					Category:  entity.EventCategoryDevice,
+					SourceID:  device.ID,
+					Timestamp: int64(m.Timestamp),
+					Content:   fmt.Sprintf(`{"code": %d, "data": "%s"}`, m.Code, m.Message),
+					ProjectID: device.ProjectID,
+				}
+			} else {
+				event = entity.Event{
+					Code:      entity.EventCodeDataAcquisitionMessage,
+					Category:  entity.EventCategoryDevice,
+					SourceID:  device.ID,
+					Timestamp: int64(m.Timestamp),
+					Content:   fmt.Sprintf(`{"code": %d, "data": "%s"}`, m.Code, m.Message),
+					ProjectID: device.ProjectID,
+				}
 			}
+			fmt.Println(m.Message)
+
 			if err := p.eventRepo.Create(context.TODO(), &event); err != nil {
 				return fmt.Errorf("create [Event] message failed: %v", err)
 			}

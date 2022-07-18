@@ -17,6 +17,9 @@ type MonitoringPointRemoveCmd struct {
 	monitoringPointRepo              dependency.MonitoringPointRepository
 	monitoringPointDeviceBindingRepo dependency.MonitoringPointDeviceBindingRepository
 	monitoringPointDataRepo          dependency.MonitoringPointDataRepository
+	monitoringPointAlertStateRepo    dependency.MonitoringPointAlertStateRepository
+	alarmSourceRepo                  dependency.AlarmSourceRepository
+	alarmRecordRepo                  dependency.AlarmRecordRepository
 }
 
 func NewMonitoringPointRemoveCmd() MonitoringPointRemoveCmd {
@@ -24,11 +27,37 @@ func NewMonitoringPointRemoveCmd() MonitoringPointRemoveCmd {
 		monitoringPointRepo:              repository.MonitoringPoint{},
 		monitoringPointDeviceBindingRepo: repository.MonitoringPointDeviceBinding{},
 		monitoringPointDataRepo:          repository.MonitoringPointData{},
+		monitoringPointAlertStateRepo:    repository.MonitoringPointAlertState{},
+		alarmSourceRepo:                  repository.AlarmSource{},
+		alarmRecordRepo:                  repository.AlarmRecord{},
 	}
 }
 
 func (cmd MonitoringPointRemoveCmd) Run() error {
 	return transaction.Execute(context.TODO(), func(txCtx context.Context) error {
+		if err := cmd.alarmSourceRepo.DeleteBySpecs(txCtx, spec.SourceEqSpec(cmd.MonitoringPoint.ID)); err != nil {
+			return err
+		}
+
+		records, err := cmd.alarmRecordRepo.FindBySpecs(txCtx, spec.SourceEqSpec(cmd.MonitoringPoint.ID))
+		if err != nil {
+			return err
+		}
+
+		for _, record := range records {
+			if state, err := cmd.monitoringPointAlertStateRepo.Get(cmd.MonitoringPoint.ID, record.AlarmRuleID); err == nil {
+				if state.Record.ID == record.ID {
+					if err := cmd.monitoringPointAlertStateRepo.Delete(cmd.MonitoringPoint.ID, record.AlarmRuleID); err != nil {
+						return err
+					}
+				}
+			}
+
+			if err := cmd.alarmRecordRepo.Delete(txCtx, record.ID); err != nil {
+				return err
+			}
+		}
+
 		if err := cmd.monitoringPointDeviceBindingRepo.DeleteBySpecs(txCtx, spec.MonitoringPointIDEqSpec(cmd.MonitoringPoint.ID)); err != nil {
 			return err
 		}

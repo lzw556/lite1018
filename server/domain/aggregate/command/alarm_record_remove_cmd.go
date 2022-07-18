@@ -47,6 +47,7 @@ func (cmd AlarmRecordRemoveCmd) Run() error {
 			if mp, err := cmd.monitoringPointRepo.Get(txCtx, cmd.AlarmRecord.SourceID); err == nil {
 				if state, err := cmd.monitoringPointAlertStateRepo.Get(mp.ID, cmd.AlarmRecord.AlarmRuleID); err == nil {
 					if state.Record.ID == cmd.AlarmRecord.ID {
+						mp.RemoveAlarmRuleState(cmd.AlarmRecord.AlarmRuleID)
 						return cmd.monitoringPointAlertStateRepo.Delete(mp.ID, cmd.AlarmRecord.AlarmRuleID)
 					}
 				}

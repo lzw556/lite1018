@@ -63,7 +63,6 @@ func (factory Network) NewNetworkCreateCmd(req request.CreateNetwork) (*command.
 func (factory Network) NewNetworkImportCmd(req request.ImportNetwork) (*command.NetworkImportCmd, error) {
 	ctx := context.TODO()
 	cmd := command.NewNetworkImportCmd()
-	fmt.Println(req)
 	// 构建网络实体
 	cmd.Network = entity.Network{
 		CommunicationPeriod:     req.Wsn.CommunicationPeriod,

@@ -18,8 +18,21 @@ func (r assetRouter) create(ctx *gin.Context) (interface{}, error) {
 }
 
 func (r assetRouter) get(ctx *gin.Context) (interface{}, error) {
-	id := cast.ToUint(ctx.Param("id"))
-	return r.service.GetAssetByID(id)
+	// id := cast.ToUint(ctx.Param("id"))
+	// return r.service.GetAssetByID(id)
+
+	filters := request.NewFilters(ctx)
+	filters["id"] = cast.ToUint(ctx.Param("id"))
+	mps, err := r.service.FindAssets(filters)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(mps) == 0 {
+		return nil, response.InvalidParameterError("")
+	} else {
+		return mps[0], nil
+	}
 }
 
 func (r assetRouter) update(ctx *gin.Context) (interface{}, error) {

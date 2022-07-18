@@ -8,6 +8,8 @@ import (
 	uuid "github.com/satori/go.uuid"
 	"github.com/thetasensors/theta-cloud-lite/server/config"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/xlog"
+	"log"
+	"os"
 	"time"
 )
 
@@ -20,9 +22,14 @@ type Adapter struct {
 	serverEnabled bool
 	dispatchers   map[string]Dispatcher
 	publishChan   chan PublishMessage
+	msgChan       chan Message
+	closeChan     chan struct{}
 }
 
 func NewAdapter(conf config.IoT) *Adapter {
+	mqtt.ERROR = log.New(os.Stdout, "[MQTT ERROR] ", 0)
+	mqtt.CRITICAL = log.New(os.Stdout, "[MQTT CRIT] ", 0)
+	mqtt.WARN = log.New(os.Stdout, "[MQTT WARN]  ", 0)
 	a := &Adapter{
 		username:      conf.Username,
 		password:      conf.Password,
@@ -30,6 +37,8 @@ func NewAdapter(conf config.IoT) *Adapter {
 		serverEnabled: conf.Server.Enabled,
 		dispatchers:   map[string]Dispatcher{},
 		publishChan:   make(chan PublishMessage, 0),
+		msgChan:       make(chan Message, 10000),
+		closeChan:     make(chan struct{}),
 	}
 	opts := mqtt.NewClientOptions()
 	opts.SetUsername(conf.Username).
@@ -101,12 +110,32 @@ func (a Adapter) onPublish(c mqtt.Client, msg mqtt.Message) {
 }
 
 func (a *Adapter) onConnect(c mqtt.Client) {
+	go func() {
+		for {
+			select {
+			case msg := <-a.msgChan:
+				if dispatcher, ok := a.dispatchers[msg.Header.Type]; ok {
+					dispatcher.Dispatch(msg)
+				}
+			case <-a.closeChan:
+				close(a.msgChan)
+				close(a.publishChan)
+				close(a.closeChan)
+				return
+			}
+		}
+	}()
+
 	xlog.Info("connected to MQTT broker")
 	t := c.Subscribe("iot/v2/gw/+/dev/+/msg/+/", 0, func(c mqtt.Client, message mqtt.Message) {
 		msg := parse(message)
 		if dispatcher, ok := a.dispatchers[msg.Header.Type]; ok {
-			xlog.Debugf("receive %s message => [%s]", dispatcher.Name(), msg.Body.Device)
-			go dispatcher.Dispatch(msg)
+			xlog.Debugf("receive %s message => [%s], msgChan len %d", dispatcher.Name(), msg.Body.Device, len(a.msgChan))
+			if dispatcher.Name() != "sensorData" {
+				go dispatcher.Dispatch(msg)
+			} else {
+				a.msgChan <- msg
+			}
 		}
 	})
 	if t.Wait() && t.Error() != nil {
@@ -128,11 +157,12 @@ func (a *Adapter) Run() error {
 		for msg := range a.publishChan {
 			xlog.Infof("publish message to topic: %s payload: %d", msg.Topic, len(msg.Payload))
 			t := a.client.Publish(msg.Topic, msg.Qos, false, msg.Payload)
-			if t.Wait() && t.Error() != nil {
-				xlog.Errorf("publish message error: %s", t.Error())
-				continue
-			}
-			xlog.Infof("publish message to topic: %s success", msg.Topic)
+			go func() {
+				if t.Wait() && t.Error() != nil {
+					xlog.Errorf("publish message error: %s", t.Error())
+					return
+				}
+			}()
 		}
 	}()
 	return nil
@@ -145,5 +175,6 @@ func (a *Adapter) Close() {
 			xlog.Error("shutdown mqtt server failed", err)
 		}
 	}
+	a.closeChan <- struct{}{}
 	xlog.Info("shutdown iot server")
 }
