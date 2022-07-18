@@ -68,8 +68,8 @@ func (d BoltElongation) Settings() Settings {
 	}
 	d.ObjTempK1 = temperatureKSetting("温度补偿系数1", "obj_temp_k1", 0, 5, SettingGroupPreload)
 	d.ObjTempK2 = temperatureKSetting("温度补偿系数2", "obj_temp_k2", 0.0155, 6, SettingGroupPreload)
-	d.RodTempK1 = temperatureKSetting("温度补偿系数3", "odr_temp_k1", 0, 7, SettingGroupPreload)
-	d.RodTempK2 = temperatureKSetting("温度补偿系数4", "odr_temp_k2", 0.1196, 8, SettingGroupPreload)
+	d.RodTempK1 = temperatureKSetting("温度补偿系数3", "rod_temp_k1", 0, 7, SettingGroupPreload)
+	d.RodTempK2 = temperatureKSetting("温度补偿系数4", "rod_temp_k2", 0.1196, 8, SettingGroupPreload)
 	d.PreloadIsEnabled = Setting{
 		Name:     "预紧力",
 		Key:      "preload_is_enabled",

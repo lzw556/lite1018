@@ -51,8 +51,8 @@ func (d HighTemperatureCorrosion) Settings() Settings {
 	}
 	d.ObjTempK1 = temperatureKSetting("温度补偿系数1", "obj_temp_k1", 0, 4, SettingGroupThickness)
 	d.ObjTempK2 = temperatureKSetting("温度补偿系数2", "obj_temp_k2", 0.025, 5, SettingGroupThickness)
-	d.RodTempK1 = temperatureKSetting("温度补偿系数3", "odr_temp_k1", 0, 6, SettingGroupThickness)
-	d.RodTempK2 = temperatureKSetting("温度补偿系数4", "odr_temp_k2", 0.078, 7, SettingGroupThickness)
+	d.RodTempK1 = temperatureKSetting("温度补偿系数3", "rod_temp_k1", 0, 6, SettingGroupThickness)
+	d.RodTempK2 = temperatureKSetting("温度补偿系数4", "rod_temp_k2", 0.078, 7, SettingGroupThickness)
 	d.RatePeriod = Setting{
 		Name:     "腐蚀率短周期",
 		Key:      "rate_period",
