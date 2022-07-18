@@ -7,7 +7,7 @@ export const AssetTypes: Record<
     label: string;
     parent_id?: number;
     url: string;
-    categories?: { label: string; value: number | string }[];
+    categories?: { label: string; value: number }[];
   }
 > = {
   WindTurbind: {
@@ -30,7 +30,7 @@ export const AssetTypes: Record<
 };
 
 export const MeasurementTypes: Record<
-  'loosening_angle' | 'preload' | 'dynamicPreload',
+  'loosening_angle' | 'preload',
   {
     id: number;
     label: string;
@@ -43,7 +43,13 @@ export const MeasurementTypes: Record<
     id: 10101,
     label: '松动角度',
     url: '/bolt',
-    firstClassFieldKeys: ['loosening_angle', 'attitude', 'motion', 'temperature'],
+    firstClassFieldKeys: [
+      'loosening_angle',
+      'attitude',
+      'motion',
+      'temperature',
+      'measurement_index'
+    ],
     deviceType: DeviceType.BoltLoosening
   },
   preload: {
@@ -52,12 +58,7 @@ export const MeasurementTypes: Record<
     url: '/bolt',
     firstClassFieldKeys: ['preload', 'pressure', 'tof', 'temperature'],
     deviceType: DeviceType.BoltElongation
-  },
-  dynamicPreload: {
-    id: 10302,
-    label: '动态预紧力',
-    url: '/bolt',
-    firstClassFieldKeys: ['preload', 'pressure', 'tof', 'temperature'],
-    deviceType: DeviceType.BoltElongation
   }
 };
+
+export const AssetViews = ['WindTurbineOverview', 'FlangeOverview', 'BoltOverview'];

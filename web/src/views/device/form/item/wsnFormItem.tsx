@@ -24,8 +24,8 @@ const WsnFormItem: FC<NetworkFormItemProps> = ({wsn}) => {
         <Form.Item label={"每组设备数"} name="group_size" initialValue={wsn.group_size}>
             <GroupSizeSelect placeholder={"请选择网络每组设备数"} />
         </Form.Item>
-        <Form.Item label={"每组通信间隔"} name="group_interval" initialValue={wsn.group_interval}>
-            <GroupIntervalSelect placeholder={"请选择网络每组通信间隔"}/>
+        <Form.Item label={"每组通讯间隔"} name="group_interval" initialValue={wsn.group_interval}>
+            <GroupIntervalSelect placeholder={"请选择网络每组通讯间隔"}/>
         </Form.Item>
     </div>
 }

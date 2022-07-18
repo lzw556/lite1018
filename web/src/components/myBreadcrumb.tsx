@@ -12,6 +12,7 @@ export interface MyBreadcrumbProps {
   children?: any;
   label?: string;
   firstBreadState?: { [propName: string]: any };
+  fixed?: boolean;
 }
 
 const flattenRoutes: any = (children: any) => {
@@ -23,12 +24,26 @@ const flattenRoutes: any = (children: any) => {
 
 const routes = flattenRoutes(getMenus()).concat(SecondaryRoutes);
 
-const MyBreadcrumb: FC<MyBreadcrumbProps> = ({ children, label, firstBreadState }) => {
+const MyBreadcrumb: FC<MyBreadcrumbProps> = ({ children, label, firstBreadState, fixed }) => {
   const location = useLocation();
   const paths = pickPathsFromLocation(location.search);
 
   return (
-    <Row justify={'space-between'} style={{ paddingBottom: '8px' }}>
+    <Row
+      justify={'space-between'}
+      style={
+        fixed
+          ? {
+              position: 'fixed',
+              top: 75,
+              left: 215,
+              right: 25,
+              zIndex: 10,
+              backgroundColor: 'rgb(238, 240, 245)'
+            }
+          : { paddingBottom: '8px' }
+      }
+    >
       <Col span={children ? 12 : 24}>
         <Breadcrumb style={{ fontSize: '16pt', fontWeight: 'bold' }}>
           {paths.map(({ search, name }, index: number) => {

@@ -1,5 +1,5 @@
 import { ColorDanger, ColorHealth, ColorInfo, ColorWarn } from '../../../constants/color';
-import { AssetChildrenStatistics } from '../asset/props';
+import { AssetChildrenStatistics } from '../assetList/props';
 
 export type NameValue = { name: string; value: string | number; className?: string };
 export type AlarmState = 'normal' | 'info' | 'warn' | 'danger' | 'anomalous';

@@ -11,6 +11,7 @@ export const SocketTopic = {
     connectionState: "connectionState",
     upgradeStatus: "upgradeStatus",
     deviceAlert: "deviceAlert",
+    monitoringPointAlert: 'monitoringPointAlert'
 }
 
 const useSocket = () => {
@@ -50,6 +51,16 @@ const useSocket = () => {
                 if (res.code === 200) {
                     PubSub.publish(SocketTopic.deviceAlert, {
                         device: res.data.device,
+                        metric: res.data.metric,
+                        value: res.data.value,
+                        level: res.data.level,
+                    })
+                }
+            })
+            socket.on("socket::monitoringPointAlertStateEvent", (res: ResponseResult<any>) => {
+                if (res.code === 200) {
+                    PubSub.publish(SocketTopic.monitoringPointAlert, {
+                        monitoringPoint: res.data.monitoringPoint,
                         metric: res.data.metric,
                         value: res.data.value,
                         level: res.data.level,

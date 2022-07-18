@@ -11,7 +11,12 @@ export type Introduction = Pick<Overview, 'statistics'> & {
   title: { name: string; path: string };
   icon: { svg: JSX.Element; small: boolean; focus?: boolean };
   alarmState: AlarmState;
-  chart?: { title: string; options: ChartOptions<unknown>; style?: React.CSSProperties };
+  chart?: {
+    title: string;
+    options: ChartOptions<unknown>;
+    style?: React.CSSProperties;
+    clickHandler?: (paras: any, instance: any) => void;
+  };
   colProps?: {
     xs: { span: number };
     sm: { span: number };
@@ -49,7 +54,12 @@ export const IntroductionPage: React.FC<Introduction> = (props) => {
           ))}
       </dl>
       {chart && (
-        <ChartContainer options={chart.options} title={chart.title} style={chart.style} />
+        <ChartContainer
+          options={chart.options}
+          title={chart.title}
+          style={chart.style}
+          clickHandler={chart.clickHandler}
+        />
       )}
       <div className={small ? `introduction-icon small` : `introduction-icon`}>{svg}</div>
     </div>

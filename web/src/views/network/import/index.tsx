@@ -212,8 +212,8 @@ const ImportNetworkPage = () => {
                                                rules={[{required: true}]}>
                                         <GroupSizeSelect placeholder={"请选择每组设备数"}/>
                                     </Form.Item>
-                                    <Form.Item label="每组通信间隔" name="group_interval" rules={[{required: true}]}>
-                                        <GroupIntervalSelect placeholder={"请选择通信间隔"}/>
+                                    <Form.Item label="每组通讯间隔" name="group_interval" rules={[{required: true}]}>
+                                        <GroupIntervalSelect placeholder={"请选择通讯间隔"}/>
                                     </Form.Item>
                                     <br/>
                                 </Card>

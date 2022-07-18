@@ -1,26 +1,23 @@
-import { Button, ButtonProps, Col, Row, Space, Upload, UploadProps } from 'antd';
+import { Col, Row, Space, UploadProps } from 'antd';
 import * as React from 'react';
 import MyBreadcrumb from '../../../components/myBreadcrumb';
 import ShadowCard from '../../../components/shadowCard';
 
 export type SearchResult = {
-  actions?: ButtonProps[];
+  actions?: React.ReactNode;
   filters?: JSX.Element[];
-  results: JSX.Element[];
+  results: React.ReactNode;
   uploads?: UploadProps[];
 };
 export const SearchResultPage: React.FC<SearchResult> = (props) => {
-  const { actions, filters, results, uploads } = props;
+  const { actions, filters, results } = props;
   return (
     <>
       {actions && (
-        <Row>
+        <Row style={{flex: '0 0 42px'}}>
           <Col span={24}>
-            <MyBreadcrumb>
-              <Space>
-                {actions && actions.map((action, index) => <Button key={`${index}-btn`} {...action} />)}
-                {uploads && uploads.map((upload, index) => <Upload key={`${index}-upload`} {...upload} />)}
-              </Space>
+            <MyBreadcrumb fixed={true}>
+              <Space>{actions}</Space>
             </MyBreadcrumb>
           </Col>
         </Row>
@@ -34,12 +31,7 @@ export const SearchResultPage: React.FC<SearchResult> = (props) => {
               ))}
             </Col>
           )}
-          {results &&
-            results.map((result, index) => (
-              <Col key={index} span={24}>
-                {result}
-              </Col>
-            ))}
+          {results && <Col span={24}>{results}</Col>}
         </Row>
       </ShadowCard>
       {props.children}

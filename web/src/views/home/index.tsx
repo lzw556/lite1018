@@ -2,8 +2,8 @@ import { Empty, Spin } from 'antd';
 import * as React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { AssetTypes } from './common/constants';
-import { AssetIcon } from './asset/icon';
-import { getAssets, getProjectStatistics } from './asset/services';
+import { WindTurbineIcon } from './summary/windTurbine/icon';
+import { getAssets, getProjectStatistics } from './assetList/services';
 import { ChartOptions } from './components/charts/common';
 import { Series_Pie } from './components/charts/pie';
 import './home.css';
@@ -13,6 +13,7 @@ import { Introduction } from './components/introductionPage';
 import { OverviewPage } from './components/overviewPage';
 import { generateProjectAlarmStatis, getAssetStatistics } from './common/statisticsHelper';
 import { AlarmStatisticOfProject } from './AlarmStatisticOfProject';
+import { getProject } from '../../utils/session';
 
 export type ProjectStatistics = {
   deviceOfflineNum: number;
@@ -38,6 +39,7 @@ const ProjectOverview: React.FC = () => {
     React.useState<ChartOptions<Series_Pie>>();
   const [statisticOfSensor, setStatisticOfSensor] = React.useState<ChartOptions<Series_Pie>>();
   React.useEffect(() => {
+    localStorage.setItem('prevProjectId', getProject());
     getProjectStatistics().then(
       ({
         rootAssetNum,
@@ -90,7 +92,7 @@ const ProjectOverview: React.FC = () => {
               path: combineFinalUrl(pathname, search, AssetTypes.WindTurbind.url, item.id)
             },
             alarmState,
-            icon: { svg: <AssetIcon />, small: true },
+            icon: { svg: <WindTurbineIcon />, small: true },
             statistics
           };
         })
@@ -106,18 +108,29 @@ const ProjectOverview: React.FC = () => {
       title: {
         text: title,
         left: 'center',
-        top: 'center'
+        top: 125
       },
       legend: {
         bottom: 20,
         itemWidth: 15,
         itemHeight: 14,
-        itemGap: 15,
+        itemGap: 5,
+        left: '30%',
         formatter: (itemName: string) => {
           const series = data.find(({ name }) => itemName === name);
-          return series ? `${itemName} ${series.value}` : itemName;
+          return series ? `${itemName} {value|${series.value}}` : itemName;
         },
-        width: '50%'
+        width: '60%',
+        textStyle: {
+          rich: {
+            value: {
+              display: 'inline-block',
+              // color: '#fff',
+              backgroundColor: '#fff',
+              width: 30
+            }
+          }
+        }
       },
       series: [
         {
@@ -152,7 +165,7 @@ const ProjectOverview: React.FC = () => {
           { title: '风机', colProps, options: statisticOfAsset },
           { title: '监测点', colProps, options: statisticOfMeasurement },
           { title: '传感器', colProps, options: statisticOfSensor },
-          { colProps: colProps2, render: <AlarmStatisticOfProject title='报警趋势'/> }
+          { colProps: colProps2, render: <AlarmStatisticOfProject title='报警趋势' /> }
         ],
         introductionList: windTurbines.items
       }}

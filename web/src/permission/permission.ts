@@ -66,6 +66,19 @@ export const Permission = {
     RoleAllocPermissions: {path: "roles/:id/permissions", method: "PATCH"},
     MenusTree: {path: "menus/tree", method: "GET"},
     PermissionsWithGroup: {path: "permissions/withGroup", method: "GET"},
+    AssetAdd: {path: "assets", method: "POST"},
+    AssetList: {path: "assets", method: "GET"},
+    AssetDetail: {path: "assets/:id", method: "GET"},
+    AssetEdit: {path: "assets/:id", method: "PUT"},
+    AssetDelete: {path: "assets/:id", method: "DELETE"},
+    AssetExport: {path: "my/projects/:id/exportFile", method: "GET"},
+    AssetImport: {path: "my/projects/:id/import", method: "POST"},
+    MeasurementAdd: {path: "monitoringPoints", method: "POST"},
+    MeasurementList: {path: "monitoringPoints", method: "GET"},
+    MeasurementDetail: {path: "monitoringPoints/:id", method: "GET"},
+    MeasurementEdit: {path: "monitoringPoints/:id", method: "PUT"},
+    MeasurementDelete: {path: "monitoringPoints/:id", method: "DELETE"},
+    MeasurementDataDelete: {path: "monitoringPoints/:id/data", method: "DELETE"},
 }
 
 let enforcer: Enforcer | null = null

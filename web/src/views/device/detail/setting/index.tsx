@@ -18,9 +18,9 @@ const SettingPage: React.FC<SettingPageProps> = ({ device, onUpdate }) => {
   const { typeId } = device;
   if (typeId !== DeviceType.Router) {
     options.push({ label: '基础信息', value: 'basic' }, { label: '设备配置', value: 'device' })
-    if (typeId !== DeviceType.Gateway) {
-      options.push({ label: '报警规则', value: 'alarm' })
-    }
+    // if (typeId !== DeviceType.Gateway) {
+    //   options.push({ label: '报警规则', value: 'alarm' })
+    // }
   }
   if (options.length === 0) {
     return <BasicSettings device={device} onUpdate={onUpdate}/>
