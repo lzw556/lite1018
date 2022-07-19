@@ -593,8 +593,14 @@ func vibrationDataProcess(data []complex128, s1 int, e1 int, s2 int, e2 int) []c
 }
 
 func displacementCalc(data []float64, sigLen int, fs int) []float64 {
-	var fmin float64 = 1.0 * float64(fs) / 340
-	var fmax float64 = 2000.0
+	var fmin float64 = float64(fs) / 340.0
+	if fmin < 8.0 {
+		fmin = 8.0
+	}
+	var fmax float64 = float64(fs) / 2.0
+	if fmax > 2000.0 {
+		fmax = 2000.0
+	}
 	var df float64 = 1.0 * float64(fs) / float64(sigLen)
 	var dw float64 = 2 * PI * df
 
@@ -771,8 +777,14 @@ func printCurve(filename string, data []float64) {
 }
 
 func velocityCalc(data []float64, sigLen int, fs int) []float64 {
-	var fmin float64 = 1.0 * float64(fs) / 340
-	var fmax float64 = 2000.0
+	var fmin float64 = float64(fs) / 340.0
+	if fmin < 8.0 {
+		fmin = 8.0
+	}
+	var fmax float64 = float64(fs) / 2.0
+	if fmax > 2000.0 {
+		fmax = 2000.0
+	}
 	var df float64 = 1.0 * float64(fs) / float64(sigLen)
 	var dw float64 = 2 * PI * df
 
