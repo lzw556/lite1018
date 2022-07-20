@@ -27,8 +27,14 @@ export function getProjectStatistics() {
   return request.get<ProjectStatistics>(`/statistics/all`).then(GetResponse);
 }
 
-export function exportAssets(id: number) {
-  return request.download<any>(`my/projects/${id}/exportFile`);
+export function exportAssets(projectId: number, asset_ids?: number[]) {
+  if (asset_ids && asset_ids.length > 0) {
+    return request.download<any>(
+      `my/projects/${projectId}/exportFile?asset_ids=${asset_ids.join(',')}`
+    );
+  } else {
+    return request.download<any>(`my/projects/${projectId}/exportFile`);
+  }
 }
 
 export function importAssets(id: number, data: any) {

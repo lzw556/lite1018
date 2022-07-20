@@ -75,7 +75,7 @@ export const ActionBar: React.FC<{
         添加监测点
         <PlusOutlined />
       </Button>
-      <AssetExport />
+      {assets.length > 0 && <AssetExport winds={assets} />}
       <AssetImport
         onSuccess={() => {
           if (onSuccess) onSuccess();
