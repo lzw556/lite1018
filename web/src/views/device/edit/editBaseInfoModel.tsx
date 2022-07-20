@@ -23,7 +23,7 @@ const EditBaseInfoModel = (props: any) => {
     };
 
     useEffect(() => {
-        if (device && visible) {
+        if (device && form) {
             if (device.network) setNetwork(device.network.id)
             form.setFieldsValue({
                 name: device.name,
@@ -32,7 +32,7 @@ const EditBaseInfoModel = (props: any) => {
                 parent: device.parent
             });
         }
-    }, [device, visible]);
+    }, [device, form]);
 
     return (
         <Modal
