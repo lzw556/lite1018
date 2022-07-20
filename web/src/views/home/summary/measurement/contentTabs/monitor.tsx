@@ -1,6 +1,7 @@
 import { Col, Empty, Row, Spin } from 'antd';
 import moment from 'moment';
 import * as React from 'react';
+import { isMobile } from '../../../../../utils/deviceDetection';
 import { generateChartOptionsOfHistoryDatas } from '../../../common/historyDataHelper';
 import { ChartContainer } from '../../../components/charts/chartContainer';
 import { MeasurementRow } from '../props';
@@ -25,7 +26,7 @@ export const Monitor: React.FC<MeasurementRow> = (props) => {
   return (
     <Row gutter={[32, 32]}>
       {historyOptions.map((ops: any, index: number) => (
-        <Col span={6} key={index}>
+        <Col span={isMobile ? 24 : 6} key={index}>
           <ChartContainer title='' options={ops} />
         </Col>
       ))}

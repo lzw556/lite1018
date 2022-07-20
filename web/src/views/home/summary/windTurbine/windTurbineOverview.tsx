@@ -16,6 +16,7 @@ import { MonitorTabContent } from './monitorTabContent';
 import { SettingsTabContent } from '../settingsTabContent';
 import usePermission, { Permission } from '../../../../permission/permission';
 import HasPermission from '../../../../permission';
+import { isMobile } from '../../../../utils/deviceDetection';
 
 const WindTurbineOverview: React.FC = () => {
   const { pathname, search } = useLocation();
@@ -94,7 +95,7 @@ const WindTurbineOverview: React.FC = () => {
               <HasPermission value={Permission.MeasurementAdd}>
                 <Button
                   type='primary'
-                  style={{ position: 'fixed', top: 240, right: 25, zIndex: 10 }}
+                  style={{ position: 'fixed', top: isMobile ? 550 : 240, right: 25, zIndex: 10 }}
                   onClick={() => open()}
                 >
                   添加监测点

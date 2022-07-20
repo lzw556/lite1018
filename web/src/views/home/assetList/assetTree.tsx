@@ -5,6 +5,7 @@ import * as React from 'react';
 import { Link } from 'react-router-dom';
 import HasPermission from '../../../permission';
 import { Permission } from '../../../permission/permission';
+import { isMobile } from '../../../utils/deviceDetection';
 import { AssetTypes, MeasurementTypes } from '../common/constants';
 import { generateDatasOfMeasurement } from '../common/historyDataHelper';
 import { convertAlarmLevelToState } from '../common/statisticsHelper';
@@ -112,7 +113,7 @@ export const AssetTree: React.FC<{
         return (
           <Space>
             {name}
-            {alarmText}
+            {!isMobile && alarmText}
             {selectedNode?.key === props.key && (
               <>
                 <HasPermission value={Permission.AssetAdd}>

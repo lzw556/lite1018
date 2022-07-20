@@ -2,6 +2,7 @@ import { round } from 'lodash';
 import moment from 'moment';
 import { LineChartStyles } from '../../../constants/chart';
 import { ColorDanger, ColorHealth, ColorInfo, ColorWarn } from '../../../constants/color';
+import { isMobile } from '../../../utils/deviceDetection';
 import { AssetRow } from '../assetList/props';
 import { sortMeasurementsByAttributes } from '../measurementList/util';
 import { MeasurementRow, Property } from '../summary/measurement/props';
@@ -87,7 +88,7 @@ export function generateChartOptionsOfLastestData(
     radiusAxis,
     legend: {
       data: legends,
-      bottom: 0
+      bottom: isMobile ? 50 : 0
     },
     series
   };
@@ -160,10 +161,11 @@ export function generateChartOptionsOfHistoryData(
   return {
     title: {
       text: '',
-      left: 80,
+      left: isMobile ? 0 : 80,
       subtext: crtProperty ? `${crtProperty.name}(${crtProperty.unit})` : ''
     },
     legend: { bottom: 0 },
+    grid: { bottom: isMobile ? 120 : 60 },
     tooltip: {
       trigger: 'axis',
       valueFormatter: (value: any) =>
@@ -176,7 +178,10 @@ export function generateChartOptionsOfHistoryData(
 }
 
 function generateOuter(measurements: MeasurementRow[], isBig: boolean = false) {
-  const radius = { radius: isBig ? 180 : 150 };
+  let radius: any = { radius: isBig ? 180 : 150 };
+  if(isMobile){
+    radius = { radius: isBig ? '90%' : '85%' };
+  }
   const angleAxis = {
     type: 'category',
     startAngle: 0,
@@ -244,7 +249,10 @@ function generateOuter(measurements: MeasurementRow[], isBig: boolean = false) {
 }
 
 function generateActuals(measurements: MeasurementRow[], isBig: boolean = false) {
-  const radius = { radius: isBig ? 150 : 120 };
+  let radius: any = { radius: isBig ? 150 : 120 };
+  if(isMobile){
+    radius = { radius: isBig ? '85%' : '80%' };
+  }
   const seriesData: any = [];
   const firstClassFields = getFirstClassFields(measurements[0]);
   let field: any = null;

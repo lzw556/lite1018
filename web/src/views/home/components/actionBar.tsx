@@ -1,6 +1,7 @@
 import { PlusOutlined } from '@ant-design/icons';
 import { Button, Space } from 'antd';
 import * as React from 'react';
+import { isMobile } from '../../../utils/deviceDetection';
 import { AssetEdit } from '../assetList/edit';
 import { AssetRow } from '../assetList/props';
 import { AssetTypes } from '../common/constants';

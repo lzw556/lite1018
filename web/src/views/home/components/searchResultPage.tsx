@@ -2,6 +2,7 @@ import { Col, Row, Space, UploadProps } from 'antd';
 import * as React from 'react';
 import MyBreadcrumb from '../../../components/myBreadcrumb';
 import ShadowCard from '../../../components/shadowCard';
+import { isMobile } from '../../../utils/deviceDetection';
 
 export type SearchResult = {
   actions?: React.ReactNode;
@@ -25,7 +26,7 @@ export const SearchResultPage: React.FC<SearchResult> = (props) => {
       <ShadowCard>
         <Row gutter={[0, 16]}>
           {filters && (
-            <Col span={8}>
+            <Col span={isMobile ? 20 : 8}>
               {filters.map((filter, index) => (
                 <React.Fragment key={index}>{filter}</React.Fragment>
               ))}

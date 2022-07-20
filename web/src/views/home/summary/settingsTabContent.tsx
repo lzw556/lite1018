@@ -2,6 +2,7 @@ import { Button, Form } from 'antd';
 import * as React from 'react';
 import ShadowCard from '../../../components/shadowCard';
 import { defaultValidateMessages } from '../../../constants/validator';
+import { isMobile } from '../../../utils/deviceDetection';
 import { EditContent } from '../assetList/editContent';
 import { AssetRow } from '../assetList/props';
 import { AssetTypes } from '../common/constants';
@@ -17,7 +18,7 @@ export const SettingsTabContent: React.FC<{
         form={form}
         validateMessages={defaultValidateMessages}
         labelCol={{ span: 4 }}
-        style={{ width: '50%' }}
+        style={{ width: isMobile ? '100%' : '50%' }}
       >
         <EditContent
           id={asset?.id}

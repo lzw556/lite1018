@@ -36,7 +36,7 @@ const MyBreadcrumb: FC<MyBreadcrumbProps> = ({ children, label, firstBreadState,
           ? {
               position: 'fixed',
               top: 75,
-              left: 215,
+              left: isMobile ? 10 : 215,
               right: 25,
               zIndex: 10,
               backgroundColor: 'rgb(238, 240, 245)'

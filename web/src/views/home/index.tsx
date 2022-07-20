@@ -14,6 +14,7 @@ import { OverviewPage } from './components/overviewPage';
 import { generateProjectAlarmStatis, getAssetStatistics } from './common/statisticsHelper';
 import { AlarmStatisticOfProject } from './AlarmStatisticOfProject';
 import { getProject } from '../../utils/session';
+import { isMobile } from '../../utils/deviceDetection';
 
 export type ProjectStatistics = {
   deviceOfflineNum: number;
@@ -115,7 +116,7 @@ const ProjectOverview: React.FC = () => {
         itemWidth: 15,
         itemHeight: 14,
         itemGap: 5,
-        left: '30%',
+        left: isMobile ? '25%': '30%',
         formatter: (itemName: string) => {
           const series = data.find(({ name }) => itemName === name);
           return series ? `${itemName} {value|${series.value}}` : itemName;

@@ -6,6 +6,7 @@ import Label from '../../../../../components/label';
 import { RangeDatePicker } from '../../../../../components/rangeDatePicker';
 import HasPermission from '../../../../../permission';
 import { Permission } from '../../../../../permission/permission';
+import { isMobile } from '../../../../../utils/deviceDetection';
 import { generateChartOptionsOfHistoryDatas } from '../../../common/historyDataHelper';
 import { ChartContainer } from '../../../components/charts/chartContainer';
 import { MeasurementRow } from '../props';
@@ -61,13 +62,13 @@ export const HistoryData: React.FC<MeasurementRow> = (props) => {
         <Row justify='space-between'>
           <Col></Col>
           <Col>
-            <Space>
+            <Space direction={isMobile ? 'vertical' : 'horizontal'}>
               <Label name={'属性'}>
                 <Select
                   bordered={false}
                   defaultValue={property}
                   placeholder={'请选择属性'}
-                  style={{ width: '120px' }}
+                  style={{ width: isMobile ? '100%' : '120px' }}
                   onChange={(value) => {
                     setProperty(value);
                   }}
@@ -83,47 +84,50 @@ export const HistoryData: React.FC<MeasurementRow> = (props) => {
                 onChange={React.useCallback((range: [number, number]) => setRange(range), [])}
                 showFooter={true}
               />
-              <HasPermission value={Permission.DeviceDataDownload}>
-                <Button
-                  type='primary'
-                  onClick={() => {
-                    setVisible(true);
-                  }}
-                >
-                  <DownloadOutlined />
-                </Button>
-              </HasPermission>
-              <HasPermission value={Permission.MeasurementDataDelete}>
-                <Button
-                  type='default'
-                  danger
-                  onClick={() => {
-                    if (range) {
-                      const [from, to] = range;
-                      Modal.confirm({
-                        title: '提示',
-                        content: `确定要删除${props.name}从${moment
-                          .unix(from)
-                          .local()
-                          .format('YYYY-MM-DD')}到${moment
-                          .unix(to)
-                          .local()
-                          .format('YYYY-MM-DD')}的数据吗？`,
-                        okText: '确定',
-                        cancelText: '取消',
-                        onOk: (close) => {
-                          clearHistory(id, from, to).then((_) => {
-                            close();
-                            if (range) fetchData(id, range, property);
-                          });
-                        }
-                      });
-                    }
-                  }}
-                >
-                  <DeleteOutlined />
-                </Button>
-              </HasPermission>
+              <div>
+                <HasPermission value={Permission.DeviceDataDownload}>
+                  <Button
+                    type='primary'
+                    onClick={() => {
+                      setVisible(true);
+                    }}
+                  >
+                    <DownloadOutlined />
+                  </Button>
+                </HasPermission>
+                <HasPermission value={Permission.MeasurementDataDelete}>
+                  &nbsp;&nbsp;
+                  <Button
+                    type='default'
+                    danger
+                    onClick={() => {
+                      if (range) {
+                        const [from, to] = range;
+                        Modal.confirm({
+                          title: '提示',
+                          content: `确定要删除${props.name}从${moment
+                            .unix(from)
+                            .local()
+                            .format('YYYY-MM-DD')}到${moment
+                            .unix(to)
+                            .local()
+                            .format('YYYY-MM-DD')}的数据吗？`,
+                          okText: '确定',
+                          cancelText: '取消',
+                          onOk: (close) => {
+                            clearHistory(id, from, to).then((_) => {
+                              close();
+                              if (range) fetchData(id, range, property);
+                            });
+                          }
+                        });
+                      }
+                    }}
+                  >
+                    <DeleteOutlined />
+                  </Button>
+                </HasPermission>
+              </div>
             </Space>
           </Col>
         </Row>

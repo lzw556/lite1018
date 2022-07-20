@@ -1,6 +1,7 @@
 import { Button, Empty, Space, Spin, Table, TableProps, Tag } from 'antd';
 import * as React from 'react';
 import { Link } from 'react-router-dom';
+import { isMobile } from '../../../../../../utils/deviceDetection';
 import { MeasurementTypes } from '../../../../common/constants';
 import {
   convertAlarmLevelToState,
@@ -54,7 +55,8 @@ export const AlarmRuleSetting: React.FC<MeasurementRow & { onUpdate?: () => void
       dataSource,
       pagination: false,
       size: 'small',
-      style: { marginLeft: 20, width: 770 }
+      style: { marginLeft: 20, width: 770 },
+      scroll: isMobile ? { x: 600 } : undefined
     };
   };
   const columns = [
@@ -192,6 +194,7 @@ export const AlarmRuleSetting: React.FC<MeasurementRow & { onUpdate?: () => void
       pagination={false}
       loading={loading}
       locale={{ emptyText: <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description='暂无数据' /> }}
+      scroll={isMobile ? { x: 600 } : undefined}
     />
   );
 };

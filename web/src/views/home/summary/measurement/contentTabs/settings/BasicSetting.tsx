@@ -3,6 +3,7 @@ import React from 'react';
 import DeviceSelect from '../../../../../../components/select/deviceSelect';
 import { defaultValidateMessages, Rules } from '../../../../../../constants/validator';
 import { DeviceType } from '../../../../../../types/device_type';
+import { isMobile } from '../../../../../../utils/deviceDetection';
 import { AssetRow } from '../../../../assetList/props';
 import { getAssets } from '../../../../assetList/services';
 import { AssetTypes, MeasurementTypes } from '../../../../common/constants';
@@ -37,7 +38,7 @@ export const BasicSetting: React.FC<MeasurementRow & { onUpdate?: () => void }> 
 
   return (
     <Row>
-      <Col span={8}>
+      <Col span={isMobile ? 16 :8}>
         <Form form={form} labelCol={{ span: 4 }} validateMessages={defaultValidateMessages}>
           <Form.Item label='id' name='id' hidden={true}>
             <Input />

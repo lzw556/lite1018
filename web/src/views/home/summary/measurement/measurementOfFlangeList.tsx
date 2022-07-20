@@ -16,6 +16,7 @@ import { combineFinalUrl } from '../../common/utils';
 import { sortMeasurementsByAttributes } from '../../measurementList/util';
 import usePermission, { Permission } from '../../../../permission/permission';
 import HasPermission from '../../../../permission';
+import { isMobile } from '../../../../utils/deviceDetection';
 
 export const MeasurementOfFlangeList: React.FC<{
   flange?: AssetRow;
@@ -42,7 +43,7 @@ export const MeasurementOfFlangeList: React.FC<{
         title: '名称',
         dataIndex: 'name',
         key: 'name',
-        // width: 300,
+        width: isMobile ? 300 : undefined,
         render: (name: string, row: MeasurementRow) => (
           <Link to={combineFinalUrl(pathname, search, MeasurementTypes.preload.url, row.id)}>
             {name}
@@ -129,7 +130,8 @@ export const MeasurementOfFlangeList: React.FC<{
             locale: {
               emptyText: <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description='暂无数据' />
             },
-            bordered: true
+            bordered: true,
+            scroll: isMobile ? { x: 1000 } : undefined
           }}
         />
       </Col>

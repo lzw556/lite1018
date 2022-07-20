@@ -15,6 +15,7 @@ import { SettingsTabContent } from '../settingsTabContent';
 import { PlusOutlined } from '@ant-design/icons';
 import HasPermission from '../../../../permission';
 import usePermission, { Permission } from '../../../../permission/permission';
+import { isMobile } from '../../../../utils/deviceDetection';
 
 const FlangeOverview: React.FC = () => {
   const { search, pathname } = useLocation();
@@ -110,7 +111,7 @@ const FlangeOverview: React.FC = () => {
           <HasPermission value={Permission.MeasurementAdd}>
             <Button
               type='primary'
-              style={{ position: 'fixed', top: 240, right: 25, zIndex: 10 }}
+              style={{ position: 'fixed', top: isMobile ? 550 : 240, right: 25, zIndex: 10 }}
               onClick={() => open()}
             >
               添加监测点

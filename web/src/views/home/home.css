@@ -34,11 +34,11 @@ dl.name-value-groups.horizontal {
   flex: 0 0 45%;
   margin: 0;
 }
-@media (max-width: 600px) {
+/* @media (max-width: 600px) {
   .name-value {
     flex-direction: column;
   }
-}
+} */
 
 .introduction {
   position: relative;
