@@ -2,35 +2,38 @@ package vo
 
 import (
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/devicetype"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/devicetype/validator"
 	"sort"
 )
 
 type DeviceSetting struct {
-	Name     string         `json:"name"`
-	Key      string         `json:"key"`
-	Category string         `json:"category"`
-	Value    interface{}    `json:"value"`
-	Type     string         `json:"type"`
-	Options  map[int]string `json:"options,omitempty"`
-	Unit     string         `json:"unit"`
-	Children DeviceSettings `json:"children"`
-	Show     interface{}    `json:"show"`
-	Sort     int            `json:"sort"`
-	Group    string         `json:"group"`
+	Name      string              `json:"name"`
+	Key       string              `json:"key"`
+	Category  string              `json:"category"`
+	Value     interface{}         `json:"value"`
+	Type      string              `json:"type"`
+	Options   map[int]string      `json:"options,omitempty"`
+	Unit      string              `json:"unit"`
+	Children  DeviceSettings      `json:"children"`
+	Show      interface{}         `json:"show"`
+	Sort      int                 `json:"sort"`
+	Group     string              `json:"group"`
+	Validator validator.Validator `json:"validator"`
 }
 
 func NewDeviceSetting(e devicetype.Setting) DeviceSetting {
 	return DeviceSetting{
-		Name:     e.Name,
-		Key:      e.Key,
-		Value:    e.Value,
-		Type:     e.Type,
-		Unit:     e.Unit,
-		Options:  e.Options,
-		Show:     e.Show,
-		Category: string(e.Category),
-		Sort:     e.Sort,
-		Group:    e.Group,
+		Name:      e.Name,
+		Key:       e.Key,
+		Value:     e.Value,
+		Type:      e.Type,
+		Unit:      e.Unit,
+		Options:   e.Options,
+		Show:      e.Show,
+		Category:  string(e.Category),
+		Sort:      e.Sort,
+		Group:     e.Group,
+		Validator: e.Validator,
 	}
 }
 

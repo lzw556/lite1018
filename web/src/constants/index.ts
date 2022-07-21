@@ -6,8 +6,16 @@ export const COMMUNICATION_PERIOD = [
         text: "4分钟"
     },
     {
+        value: 5 * 60 * millisecond,
+        text: "5分钟"
+    },
+    {
         value: 10 * 60 * millisecond,
         text: "10分钟"
+    },
+    {
+        value: 15 * 60 * millisecond,
+        text: "15分钟"
     },
     {
         value: 20 * 60 * millisecond,

@@ -7,6 +7,7 @@ export enum DeviceType {
     HighTemperatureCorrosion = 262401,
     VibrationTemperature3Axis = 327938,
     VibrationTemperature3AxisAdvanced = 327940,
+    Temperature = 393217,
     PressureTemperature = 524290,
     AngleDip = 589825
 }
@@ -30,6 +31,8 @@ export namespace DeviceType {
                 return "3轴振动温度"
             case DeviceType.VibrationTemperature3AxisAdvanced:
                 return "高端3轴振动温度"
+            case DeviceType.Temperature:
+                return "温度"
             case DeviceType.PressureTemperature:
                 return "压力温度"
             case DeviceType.AngleDip:
@@ -46,6 +49,7 @@ export namespace DeviceType {
             DeviceType.HighTemperatureCorrosion,
             DeviceType.VibrationTemperature3Axis,
             DeviceType.VibrationTemperature3AxisAdvanced,
+            DeviceType.Temperature,
             DeviceType.PressureTemperature,
             DeviceType.AngleDip
         ]
