@@ -14,7 +14,7 @@ import TableLayout from "../layout/TableLayout";
 import AddNetworkModal from "./modal/addNetworkModal";
 import {Button, Col, Dropdown, Menu, message, Popconfirm, Row, Space} from "antd";
 import {CodeOutlined, DeleteOutlined, EditOutlined, PlusOutlined} from "@ant-design/icons";
-import {Network} from "../../types/network";
+import {Network, NetworkProvisioningMode} from "../../types/network";
 import EditNetworkModal from "./modal/editNetworkModal";
 import moment from "moment";
 import {PageResult} from "../../types/page";
@@ -123,6 +123,14 @@ const NetworkPage = () => {
             }
         },
         {
+            title: '模式',
+            dataIndex: 'mode',
+            key: 'mode',
+            render: (mode: number) => {
+                return NetworkProvisioningMode.toString(mode)
+            }
+        },
+        {
             title: '通讯周期',
             dataIndex: 'communicationPeriod',
             key: 'communicationPeriod',
@@ -144,27 +152,6 @@ const NetworkPage = () => {
                 return moment.duration(text / 1000, 'seconds').humanize()
             }
         },
-        {
-            title: '每组设备数',
-            dataIndex: 'groupSize',
-            key: 'groupSize',
-        },
-        {
-            title: '每组通讯间隔',
-            dataIndex: 'groupInterval',
-            key: 'groupInterval',
-            render: (text: number) => {
-                return moment.duration(text / 1000, 'seconds').humanize()
-            }
-        },
-        // {
-        //     title: '模式',
-        //     dataIndex: 'mode',
-        //     key: 'mode',
-        //     render: (mode: number) => {
-        //         return mode === 1 ? '云端模式' : '本地模式'
-        //     }
-        // },
         {
             title: '操作',
             key: 'action',

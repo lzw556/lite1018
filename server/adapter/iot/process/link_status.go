@@ -61,7 +61,7 @@ func (p LinkStatus) Process(ctx *iot.Context, msg iot.Message) error {
 
 	isOnline, _, _ := cache.GetConnection(device.MacAddress)
 	// 2 offline 4 reconnecting failed
-	if linkStatus.State != "online" {
+	if linkStatus.State != "online" && linkStatus.State != "lost" {
 		cache.SetOffline(linkStatus.Address)
 		go p.UpdateChildrenConnectionState(linkStatus.Address, false)
 	}

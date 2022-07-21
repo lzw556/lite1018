@@ -1,5 +1,5 @@
-import {Network} from "../../../types/network";
-import {Form, Input, Modal, ModalProps, Radio} from "antd";
+import {Network, NetworkProvisioningMode} from "../../../types/network";
+import {Form, Input, Modal, ModalProps, Radio, Select} from "antd";
 import {FC, useEffect, useState} from "react";
 import {Rules} from "../../../constants/validator";
 import WsnFormItem from "../../../components/formItems/wsnFormItem";
@@ -10,21 +10,25 @@ export interface EditNetworkModalProps extends ModalProps{
   onSuccess: () => void;
 }
 
+const {Option} = Select;
+
 const EditNetworkModal:FC<EditNetworkModalProps> = (props) => {
     const {visible, network, onSuccess} = props
     const [form] = Form.useForm();
+    const [provisionMode, setProvisionMode] = useState<number>(NetworkProvisioningMode.Mode1);
     const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
         if (visible) {
+            setProvisionMode(network.mode)
             form.setFieldsValue({
                 name: network.name,
-                mode: network.mode,
+                mode: network.mode === 0 ? 1 : network.mode,
                 wsn: {
                     communication_period: network.communicationPeriod,
+                    communication_period_2: network.communicationPeriod2,
                     communication_offset: network.communicationOffset,
                     group_size: network.groupSize,
-                    group_interval: network.groupInterval,
                 }
             })
         }
@@ -49,13 +53,18 @@ const EditNetworkModal:FC<EditNetworkModalProps> = (props) => {
             <Form.Item label={"名称"} name={"name"} rules={[Rules.required]}>
                 <Input placeholder={"请输入网络名称"}/>
             </Form.Item>
-            {/*<Form.Item label={"模式"} name={"mode"}>*/}
-            {/*    <Radio.Group buttonStyle={"solid"}>*/}
-            {/*        <Radio.Button key={1} value={1}>云端模式</Radio.Button>*/}
-            {/*        <Radio.Button key={2} value={2}>本地模式</Radio.Button>*/}
-            {/*    </Radio.Group>*/}
-            {/*</Form.Item>*/}
-            <WsnFormItem/>
+            <Form.Item label={"组网模式"} name={"mode"} rules={[Rules.required]}>
+                <Select placeholder={"请选择组网模式"} onChange={value => {
+                    setProvisionMode(Number(value))
+                    form.setFieldsValue({wsn: {group_size: 4, communication_period: 2 * 60 * 60 * 1000, communication_offset: 0}})
+                }}>
+                    <Option key={1}
+                            value={NetworkProvisioningMode.Mode1}>{NetworkProvisioningMode.toString(NetworkProvisioningMode.Mode1)}</Option>
+                    <Option key={2}
+                            value={NetworkProvisioningMode.Mode2}>{NetworkProvisioningMode.toString(NetworkProvisioningMode.Mode2)}</Option>
+                </Select>
+            </Form.Item>
+            <WsnFormItem mode={provisionMode}/>
         </Form>
     </Modal>
 }

@@ -14,6 +14,7 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/devicetype"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/errcode"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/transaction"
+	"time"
 )
 
 type NetworkUpdateCmd struct {
@@ -35,11 +36,26 @@ func NewNetworkUpdateCmd() NetworkUpdateCmd {
 func (cmd NetworkUpdateCmd) Update(req request.Network) (*vo.Network, error) {
 	cmd.Network.CommunicationPeriod = req.WSN.CommunicationPeriod
 	cmd.Network.CommunicationTimeOffset = req.WSN.CommunicationOffset
-	cmd.Network.GroupInterval = req.WSN.GroupInterval
-	cmd.Network.GroupSize = req.WSN.GroupSize
 	cmd.Network.Name = req.Name
 	cmd.Network.ProjectID = req.ProjectID
-	cmd.Network.Mode = entity.NetworkMode(req.Mode)
+	cmd.Network.Mode = entity.ProvisioningMode(req.Mode)
+	switch cmd.Network.Mode {
+	case entity.NetworkProvisionMode2:
+		cmd.Network.Tempo = uint(150 * time.Second.Milliseconds())
+		cmd.Network.GroupInterval = uint(150 * time.Second.Milliseconds())
+		cmd.Network.CallPeriod = uint(150 * time.Second.Milliseconds())
+		cmd.Network.CommunicationPeriod2 = req.WSN.CommunicationPeriod2
+		cmd.Network.GroupSize = 63
+		cmd.Network.GroupSize2 = 1
+	default:
+		cmd.Network.Tempo = uint(120 * time.Second.Milliseconds())
+		cmd.Network.GroupInterval = uint(120 * time.Second.Milliseconds())
+		cmd.Network.CallPeriod = uint(120 * time.Second.Milliseconds())
+		cmd.Network.GroupSize = req.WSN.GroupSize
+		cmd.Network.GroupSize2 = 1
+	}
+
+	cmd.Network.Mode = entity.ProvisioningMode(req.Mode)
 	err := transaction.Execute(context.TODO(), func(txCtx context.Context) error {
 		if err := cmd.networkRepo.Save(txCtx, &cmd.Network); err != nil {
 			return err

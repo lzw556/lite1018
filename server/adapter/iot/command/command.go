@@ -88,7 +88,7 @@ func SyncNetworkLinkStates(network entity.Network) {
 	for i := range result {
 		r := result[i]
 		if r.Mac != gateway.MacAddress {
-			if r.State == 3 {
+			if r.State > 1 {
 				statusMap[r.Mac] = true
 			} else {
 				statusMap[r.Mac] = false
@@ -151,7 +151,6 @@ func SyncNetwork(network entity.Network, devices []entity.Device, timeout time.D
 			return err
 		}
 		SyncDeviceSettings(gateway, devices...)
-		network.SyncTimestamp = time.Now().Unix()
 		if err := networkRepo.Save(context.TODO(), &network); err != nil {
 			return err
 		}
