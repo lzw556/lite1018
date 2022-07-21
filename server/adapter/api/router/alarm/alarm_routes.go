@@ -182,20 +182,6 @@ func (r alarmRouter) updateAlarmRuleGroupBindings(ctx *gin.Context) (interface{}
 	return nil, r.service.UpdateAlarmRuleGroupBindings(id, req)
 }
 
-func (r alarmRouter) importAlarmRuleGroups(ctx *gin.Context) (interface{}, error) {
-	var req request.AlarmRuleGroupsImported
-	if err := ctx.ShouldBindJSON(&req); err != nil {
-		return nil, err
-	}
-	req.ProjectID = cast.ToUint(ctx.MustGet("project_id"))
-	err := r.service.ImportAlarmRuleGroups(req)
-	if err != nil {
-		return nil, response.InvalidParameterErrorWithDetail(err.Error())
-	} else {
-		return nil, nil
-	}
-}
-
 func (r alarmRouter) getAlarmRuleGroupsFile(ctx *gin.Context) (interface{}, error) {
 	projectID := cast.ToUint(ctx.MustGet("project_id"))
 	groupIDs := make([]uint, 0)
@@ -208,4 +194,18 @@ func (r alarmRouter) getAlarmRuleGroupsFile(ctx *gin.Context) (interface{}, erro
 	}
 
 	return r.service.GetAlarmRuleGroupsExportFileWithFilters(projectID, groupIDs)
+}
+
+func (r alarmRouter) importAlarmRuleGroups(ctx *gin.Context) (interface{}, error) {
+	var req request.AlarmRuleGroupsImported
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		return nil, err
+	}
+	req.ProjectID = cast.ToUint(ctx.MustGet("project_id"))
+	err := r.service.ImportAlarmRuleGroups(req)
+	if err != nil {
+		return nil, response.InvalidParameterError(err.Error())
+	} else {
+		return nil, nil
+	}
 }

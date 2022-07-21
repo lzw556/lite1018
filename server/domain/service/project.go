@@ -188,5 +188,6 @@ func (s Project) ImportProject(id uint, req request.ProjectImported) error {
 	if err != nil {
 		return err
 	}
+
 	return cmd.ImportProject(req)
 }

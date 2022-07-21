@@ -275,3 +275,8 @@ func (factory Alarm) NewAlarmRuleGroupExportCmd(id uint) (*command.AlarmRuleGrou
 	cmd.Project = e
 	return &cmd, nil
 }
+
+func (factory Alarm) NewAlarmRuleGroupImportCmd() (*command.AlarmRuleGroupImportCmd, error) {
+	cmd := command.NewAlarmRuleGroupImportCmd()
+	return &cmd, nil
+}

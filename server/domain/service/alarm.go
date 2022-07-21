@@ -288,5 +288,10 @@ func (s Alarm) GetAlarmRuleGroupsExportFileWithFilters(projectID uint, groupIDs 
 }
 
 func (s Alarm) ImportAlarmRuleGroups(req request.AlarmRuleGroupsImported) error {
-	return nil
+	cmd, err := s.factory.NewAlarmRuleGroupImportCmd()
+	if err != nil {
+		return err
+	}
+
+	return cmd.ImportAlarmRuleGroups(req)
 }
