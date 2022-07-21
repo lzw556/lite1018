@@ -32,8 +32,6 @@ const DeviceSettingFormItem: FC<DeviceSettingFormItemProps> = ({value, editable}
                 }
             </Select>
         }
-        let inputType: string;
-
         return <Input type={"number"} suffix={setting.unit} disabled={!editable}/>
     }
 
