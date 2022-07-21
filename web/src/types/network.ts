@@ -23,10 +23,10 @@ export enum NetworkProvisioningMode {
 export namespace NetworkProvisioningMode {
    export function toString(mode:NetworkProvisioningMode) {
         switch (mode) {
-            case NetworkProvisioningMode.Mode1:
-                return "组网模式1"
             case NetworkProvisioningMode.Mode2:
                 return "组网模式2"
+            default:
+                return "组网模式1"
         }
     }
 }
