@@ -81,3 +81,17 @@ type UpdateAlarmRuleGroup struct {
 type UpdateAlarmRuleGroupBindings struct {
 	MonitoringPointIDs []uint `json:"monitoring_point_ids"`
 }
+
+type AlarmRuleGroupImported struct {
+	Name        string      `json:"name"`
+	Description string      `json:"description"`
+	Category    uint        `json:"category"`
+	Type        uint        `json:"type"`
+	Rules       []AlarmRule `json:"rules"`
+}
+
+type AlarmRuleGroupsImported struct {
+	AlarmRuleGroups []AlarmRuleGroupImported `json:"alarmRuleGroups"`
+
+	ProjectID uint `json:"-"`
+}

@@ -31,4 +31,7 @@ type Service interface {
 
 	DeleteAlarmRecordByID(id uint) error
 	DeleteAlarmRuleGroupByID(id uint) error
+
+	GetAlarmRuleGroupsExportFileWithFilters(id uint, groupIDs []uint) (*vo.AlarmRuleGroupsExported, error)
+	ImportAlarmRuleGroups(req request.AlarmRuleGroupsImported) error
 }

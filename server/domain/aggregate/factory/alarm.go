@@ -24,6 +24,7 @@ type Alarm struct {
 	alarmRuleGroupRepo dependency.AlarmRuleGroupRepository
 	alarmSourceRepo    dependency.AlarmSourceRepository
 	alarmTemplateRepo  dependency.AlarmTemplateRepository
+	projectRepo        dependency.ProjectRepository
 }
 
 func NewAlarm() Alarm {
@@ -33,6 +34,7 @@ func NewAlarm() Alarm {
 		alarmSourceRepo:    repository.AlarmSource{},
 		alarmTemplateRepo:  repository.AlarmTemplate{},
 		alarmRuleGroupRepo: repository.AlarmRuleGroup{},
+		projectRepo:        repository.Project{},
 	}
 }
 
@@ -261,5 +263,15 @@ func (factory Alarm) NewAlarmRuleGroupBindingCmd(id uint) (*command.AlarmRuleGro
 
 	cmd := command.NewAlarmRuleGroupBindCmd()
 	cmd.AlarmRuleGroup = e
+	return &cmd, nil
+}
+
+func (factory Alarm) NewAlarmRuleGroupExportCmd(id uint) (*command.AlarmRuleGroupExportCmd, error) {
+	e, err := factory.projectRepo.Get(context.TODO(), id)
+	if err != nil {
+		return nil, response.BusinessErr(errcode.ProjectNotFoundError, "")
+	}
+	cmd := command.NewAlarmRuleGroupExportCmd()
+	cmd.Project = e
 	return &cmd, nil
 }

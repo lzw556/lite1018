@@ -17,7 +17,6 @@ type Service interface {
 	AllocUsersByID(id uint, req request.AllocUsers) error
 	GetMyProjectExportFile(id uint) (*vo.ProjectExported, error)
 	GetMyProjectExportFileWithFilters(id uint, monitoringPointIDs []uint) (*vo.ProjectExported, error)
-	GetAlarmRuleGroupsExportFileWithFilters(id uint, groupIDs []uint) (*vo.AlarmRuleGroupsExported, error)
 
 	ImportProject(id uint, req request.ProjectImported) error
 }

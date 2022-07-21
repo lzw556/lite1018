@@ -24,12 +24,14 @@ func (r *alarmRouter) initRoutes() {
 		router.NewPostRoute("alarmRuleGroups", r.createAlarmRuleGroup),
 		router.NewPostRoute("alarmRuleGroups/:id/bind", r.alarmRuleGroupBind),
 		router.NewPostRoute("alarmRuleGroups/:id/unbind", r.alarmRuleGroupUnbind),
+		router.NewPostRoute("alarmRuleGroups/import", r.importAlarmRuleGroups),
 
 		// GET
 		router.NewGetRoute("alarmRules", r.findAlarmRules),
 		router.NewGetRoute("alarmRules/:id", r.getAlarmRule),
 		router.NewGetRoute("alarmRuleGroups", r.findAlarmRuleGroups),
 		router.NewGetRoute("alarmRuleGroups/:id", r.getAlarmRuleGroup),
+		router.NewGetRoute("alarmRuleGroups/exportFile", r.getAlarmRuleGroupsFile),
 
 		router.NewGetRoute("alarmRecords", r.findAlarmRecords),
 		router.NewGetRoute("alarmRecords/:id", r.getAlarmRecord),

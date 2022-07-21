@@ -28,7 +28,6 @@ func (r *projectRouter) initRoutes() {
 		router.NewGetRoute("my/projects", r.getMyProjects),
 		router.NewGetRoute("my/projects/:id", r.getMyProject),
 		router.NewGetRoute("my/projects/:id/exportFile", r.getMyProjectExportFile),
-		router.NewGetRoute("my/projects/:id/exportAlarmRuleGroupsFile", r.getMyAlarmRuleGroupsFile),
 
 		// PUT
 		router.NewPutRoute("projects/:id", r.update),

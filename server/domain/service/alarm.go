@@ -259,3 +259,34 @@ func (s Alarm) UpdateAlarmRuleGroupBindings(id uint, req request.UpdateAlarmRule
 
 	return nil
 }
+
+func (s Alarm) GetAlarmRuleGroupsExportFileWithFilters(projectID uint, groupIDs []uint) (*vo.AlarmRuleGroupsExported, error) {
+	cmd, err := s.factory.NewAlarmRuleGroupExportCmd(projectID)
+	if err != nil {
+		return nil, err
+	}
+
+	all, err := cmd.Run()
+
+	if err != nil || len(groupIDs) == 0 {
+		return all, err
+	}
+
+	resultGroups := make([]*vo.AlarmRuleGroupExported, 0)
+
+	for i, group := range all.AlarmRuleGroups {
+		if isInArray(group.ID, groupIDs) {
+			resultGroups = append(resultGroups, all.AlarmRuleGroups[i])
+		}
+	}
+
+	return &vo.AlarmRuleGroupsExported{
+		ProjectID:       all.ProjectID,
+		ProjectName:     all.ProjectName,
+		AlarmRuleGroups: resultGroups,
+	}, nil
+}
+
+func (s Alarm) ImportAlarmRuleGroups(req request.AlarmRuleGroupsImported) error {
+	return nil
+}

@@ -90,20 +90,6 @@ func (r projectRouter) getMyProjectExportFile(ctx *gin.Context) (interface{}, er
 	return r.service.GetMyProjectExportFileWithFilters(id, mpIDs)
 }
 
-func (r projectRouter) getMyAlarmRuleGroupsFile(ctx *gin.Context) (interface{}, error) {
-	id := cast.ToUint(ctx.Param("id"))
-	groupIDs := make([]uint, 0)
-	param := ctx.Query("alarm_rule_group_ids")
-	if len(param) > 0 {
-		arr := strings.Split(param, ",")
-		for _, item := range arr {
-			groupIDs = append(groupIDs, cast.ToUint(item))
-		}
-	}
-
-	return r.service.GetAlarmRuleGroupsExportFileWithFilters(id, groupIDs)
-}
-
 func (r projectRouter) importProject(ctx *gin.Context) (interface{}, error) {
 	var req request.ProjectImported
 	if err := ctx.ShouldBindJSON(&req); err != nil {
