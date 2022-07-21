@@ -29,13 +29,13 @@ export const defaultValidateMessages = {
         len: "'${name}' must be exactly ${len} characters",
         min: "'${name}' must be at least ${min} characters",
         max: "'${name}' cannot be longer than ${max} characters",
-        range: "'${name}' must be between ${min} and ${max} characters",
+        range: "'${label}' must be between ${min} and ${max} characters",
     },
     number: {
         len: "'${name}' must equal ${len}",
         min: "'${name}' cannot be less than ${min}",
         max: "'${name}' cannot be greater than ${max}",
-        range: "'${name}' must be between ${min} and ${max}",
+        range: "${label}范围必须在 ${min} 到 ${max}",
     },
     array: {
         len: "'${name}' must be exactly ${len} in length",
@@ -53,8 +53,8 @@ export const Rules = {
     required: () => {
         return {required: true}
     },
-    range: (min:number, max:number) => {
-        return {required:true, min, max, message: `请输入${min}到${max}个字符`}
+    range: (min: number, max: number) => {
+        return {required: true, min, max, message: `请输入${min}到${max}个字符`}
     },
     number: (): any => {
         return {
@@ -76,7 +76,7 @@ export const Rules = {
             }
         }
     },
-    macAddress: ():any => {
+    macAddress: (): any => {
         return {
             required: true, transform(value: any) {
                 return value
@@ -102,6 +102,11 @@ export const Normalizes = {
     macAddress: (value: string) => {
         if (value) {
             return value.toLowerCase().replaceAll("-", "");
+        }
+    },
+    seconds: (value:number) => {
+        if (value) {
+            return value / 1000
         }
     }
 }

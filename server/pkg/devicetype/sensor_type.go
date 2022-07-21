@@ -14,6 +14,7 @@ const (
 	DynamicSCL3300Sensor                = 16842756
 	KxSensor                            = 16842753
 	AdvancedKxSensor                    = 16842758
+	TempMAX31865                        = 33619973
 )
 
 var properties = map[int]Properties{}
@@ -781,8 +782,8 @@ func init() {
 		},
 		{
 			Key:       "fft_value_1",
-			Name:      "一倍频",
-			Unit:      "",
+			Name:      "一倍频振幅",
+			Unit:      "m/s²",
 			Precision: 3,
 			Sort:      14,
 			IsShow:    true,
@@ -806,8 +807,8 @@ func init() {
 		},
 		{
 			Key:       "fft_value_2",
-			Name:      "二倍频",
-			Unit:      "",
+			Name:      "二倍频振幅",
+			Unit:      "m/s²",
 			Precision: 3,
 			Sort:      14,
 			IsShow:    true,
@@ -831,8 +832,8 @@ func init() {
 		},
 		{
 			Key:       "fft_value_3",
-			Name:      "三倍频",
-			Unit:      "",
+			Name:      "三倍频振幅",
+			Unit:      "m/s²",
 			Precision: 3,
 			Sort:      15,
 			IsShow:    true,
@@ -856,8 +857,8 @@ func init() {
 		},
 		{
 			Key:       "fft_value_0",
-			Name:      "半倍频",
-			Unit:      "",
+			Name:      "半倍频振幅",
+			Unit:      "m/s²",
 			Precision: 3,
 			Sort:      16,
 			IsShow:    true,
@@ -1045,6 +1046,23 @@ func init() {
 					Name:      "Z轴",
 					Key:       "displacement_z",
 					DataIndex: 12,
+				},
+			},
+		},
+	}
+	properties[TempMAX31865] = Properties{
+		{
+			Key:       "temperature",
+			Name:      "温度",
+			Unit:      "°C",
+			Precision: 3,
+			Sort:      3,
+			IsShow:    true,
+			Fields: []Field{
+				{
+					Name:      "温度",
+					Key:       "temperature",
+					DataIndex: 0,
 				},
 			},
 		},

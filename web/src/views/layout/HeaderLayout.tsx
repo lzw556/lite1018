@@ -13,6 +13,8 @@ import ProjectSelect from "../../components/select/projectSelect";
 import {getProject} from "../../utils/session";
 import { NavMenu } from "./NavMenu";
 import {GetMyProjectRequest} from "../../apis/project";
+import {useDispatch} from "redux-react-hook";
+import {setDeviceFilterAction} from "../../store/actions/deviceFilter";
 
 const {Text} = Typography;
 
@@ -21,6 +23,7 @@ const HeaderLayout = (props: any) => {
     const [currentUser] = useState<any>(store.getState().auth.data.user)
     const [now, setNow] = useState<string>(moment().format("YYYY-MM-DD HH:mm:ss"))
     const [visible, setVisible] = useState(false)
+    const dispatch = useDispatch();
 
     setInterval(() => {
         setNow(moment().format("YYYY-MM-DD HH:mm:ss"))
@@ -34,7 +37,7 @@ const HeaderLayout = (props: any) => {
 
     const onProjectChange = (value: any) => {
         GetMyProjectRequest(value).then(data => {
-            localStorage.removeItem('deviceListFilters');
+            dispatch(setDeviceFilterAction({networkId: 0}))
             store.dispatch({
                 type: "SET_PROJECT",
                 payload: data.id

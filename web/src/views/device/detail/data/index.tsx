@@ -12,7 +12,7 @@ import Label from "../../../../components/label";
 import {DefaultHistoryDataOption, LineChartStyles} from "../../../../constants/chart";
 import ReactECharts from "echarts-for-react";
 import DownloadModal from "./modal/downloadModal";
-import { isMobile } from "../../../../utils/deviceDetection";
+import {isMobile} from "../../../../utils/deviceDetection";
 
 const {Option} = Select
 const {RangePicker} = DatePicker
@@ -94,8 +94,8 @@ const HistoryDataPage: FC<DeviceDataProps> = ({device}) => {
                         return relVal;
                     }
                 },
-                title: {text: property.name},
-                legend: {data: legends, left: isMobile ? 'right':'center'},
+                title: {text: property.name + (property.unit ? `(${property.unit})`: ``)},
+                legend: {data: legends, left: isMobile ? 'right' : 'center'},
                 series,
                 xAxis: {
                     type: 'category',

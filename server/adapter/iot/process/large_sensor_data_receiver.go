@@ -1,7 +1,6 @@
 package process
 
 import (
-	"bytes"
 	"encoding/binary"
 	"fmt"
 	pd "github.com/thetasensors/theta-cloud-lite/server/adapter/iot/proto"
@@ -9,11 +8,11 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/devicetype"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/xlog"
-	"sort"
 	"time"
 )
 
 type LargeSensorDataReceiver struct {
+	MacAddress   string           `json:"mac_address"`
 	SessionID    int32            `json:"session_id"`
 	MetaLength   int32            `json:"meta_length"`
 	DataLength   uint32           `json:"data_length"`
@@ -21,8 +20,9 @@ type LargeSensorDataReceiver struct {
 	NumOfPackets int32            `json:"num_of_packets"`
 }
 
-func NewLargeSensorDataReceiver(m pd.LargeSensorDataMessage) LargeSensorDataReceiver {
+func NewLargeSensorDataReceiver(mac string, m pd.LargeSensorDataMessage) LargeSensorDataReceiver {
 	return LargeSensorDataReceiver{
+		MacAddress:   mac,
 		SessionID:    m.SessionId,
 		MetaLength:   m.MetaLength,
 		DataLength:   uint32(m.DataLength),
@@ -31,7 +31,8 @@ func NewLargeSensorDataReceiver(m pd.LargeSensorDataMessage) LargeSensorDataRece
 	}
 }
 
-func (r *LargeSensorDataReceiver) Reset(m pd.LargeSensorDataMessage) {
+func (r *LargeSensorDataReceiver) Reset(mac string, m pd.LargeSensorDataMessage) {
+	r.MacAddress = mac
 	r.SessionID = m.SessionId
 	r.Packets = map[int32]Packet{}
 	r.NumOfPackets = m.NumSegments
@@ -44,7 +45,11 @@ func (r *LargeSensorDataReceiver) Receive(m pd.LargeSensorDataMessage) {
 		SeqID: m.SegmentId,
 		Data:  m.Data,
 	}
-	xlog.Debugf("received large sensor data => [packet size = %d, total size = %d]", len(r.Packets), m.NumSegments)
+	if m.SegmentId == 0 {
+		xlog.Debugf("[%s] received meta length [%d]", r.MacAddress, m.MetaLength)
+		r.MetaLength = m.MetaLength
+	}
+	xlog.Debugf("[%s] received large sensor data => [packet size = %d, total size = %d]", r.MacAddress, len(r.Packets), m.NumSegments)
 }
 
 func (r LargeSensorDataReceiver) IsCompleted() bool {
@@ -55,14 +60,10 @@ func (r LargeSensorDataReceiver) SensorData() (entity.SensorData, error) {
 	var (
 		data = r.flatPackets()
 
-		sensorType uint32
-		timestamp  uint64
-		dataLength uint32
+		sensorType = binary.LittleEndian.Uint32(data[8:12])
+		timestamp  = binary.LittleEndian.Uint64(data[:8])
 	)
 
-	_ = binary.Read(bytes.NewBuffer(data[:8]), binary.LittleEndian, &timestamp)
-	_ = binary.Read(bytes.NewBuffer(data[8:12]), binary.LittleEndian, &sensorType)
-	_ = binary.Read(bytes.NewBuffer(data[12:16]), binary.LittleEndian, &dataLength)
 	e := entity.SensorData{
 		Time:       time.UnixMilli(int64(timestamp)),
 		SensorType: uint(sensorType),
@@ -80,22 +81,15 @@ func (r LargeSensorDataReceiver) SensorData() (entity.SensorData, error) {
 	default:
 		return entity.SensorData{}, fmt.Errorf("raw data decoder is nil")
 	}
-	values, err := decoder.Decode(data[16:])
+	values, err := decoder.Decode(data[16:], int(r.MetaLength-16))
 	e.Values = values
-	xlog.Debugf("received sensor data time: => [%v]", time.UnixMilli(int64(timestamp)))
 	return e, err
 }
 
 func (r LargeSensorDataReceiver) flatPackets() []byte {
-	packets := make(Packets, 0)
-	for _, packet := range r.Packets {
-		xlog.Debugf("packet segmentId: %d", packet.SeqID)
-		packets = append(packets, packet)
-	}
-	sort.Sort(packets)
 	data := make([]byte, 0)
-	for i := range packets {
-		data = append(data, packets[i].Data...)
+	for i := 0; i < len(r.Packets); i++ {
+		data = append(data, r.Packets[int32(i)].Data...)
 	}
 	return data
 }

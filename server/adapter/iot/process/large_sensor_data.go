@@ -45,14 +45,15 @@ func (p *LargeSensorData) Process(ctx *iot.Context, msg iot.Message) error {
 		var receiver LargeSensorDataReceiver
 		err := cache.GetStruct(device.MacAddress, &receiver)
 		if errors.Is(bigcache.ErrEntryNotFound, err) {
-			receiver = NewLargeSensorDataReceiver(m)
+			receiver = NewLargeSensorDataReceiver(msg.Body.Device, m)
 		}
 		p.mu.Lock()
 		defer p.mu.Unlock()
-		xlog.Debugf("p.receiver.SessionID: %v, pd.SessionId: %v", receiver.SessionID, m.SessionId)
+		xlog.Debugf("[%s] p.receiver.SessionID: %v, pd.SessionId: %v", msg.Body.Device, receiver.SessionID, m.SessionId)
 		if receiver.SessionID == m.SessionId {
 			if receiver.Receive(m); receiver.IsCompleted() {
 				if e, err := receiver.SensorData(); err == nil {
+					_ = cache.Delete(device.MacAddress)
 					e.MacAddress = device.MacAddress
 					if err := p.repository.Create(e); err != nil {
 						return fmt.Errorf("create large sensor data failed: %v", err)
@@ -62,7 +63,7 @@ func (p *LargeSensorData) Process(ctx *iot.Context, msg iot.Message) error {
 				}
 			}
 		} else {
-			receiver.Reset(m)
+			receiver.Reset(msg.Body.Device, m)
 			receiver.Receive(m)
 		}
 		if err := cache.SetStruct(device.MacAddress, receiver); err != nil {

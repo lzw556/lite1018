@@ -1,6 +1,9 @@
 package devicetype
 
-import "github.com/spf13/cast"
+import (
+	"github.com/spf13/cast"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/devicetype/validator"
+)
 
 const (
 	Uint8ValueType  = "uint8"
@@ -33,17 +36,18 @@ const (
 )
 
 type Setting struct {
-	Name     string          `json:"name"`
-	Key      string          `json:"key"`
-	Value    interface{}     `json:"value"`
-	Type     string          `json:"type"`
-	Unit     string          `json:"unit"`
-	Category SettingCategory `json:"category"`
-	Options  map[int]string  `json:"options"`
-	Group    string          `json:"group,omitempty"`
-	Sort     int             `json:"sort"`
-	Parent   string          `json:"parent,omitempty"`
-	Show     interface{}     `json:"show"`
+	Name      string              `json:"name"`
+	Key       string              `json:"key"`
+	Value     interface{}         `json:"value"`
+	Type      string              `json:"type"`
+	Unit      string              `json:"unit"`
+	Category  SettingCategory     `json:"category"`
+	Options   map[int]string      `json:"options"`
+	Group     string              `json:"group,omitempty"`
+	Sort      int                 `json:"sort"`
+	Parent    string              `json:"parent,omitempty"`
+	Show      interface{}         `json:"show"`
+	Validator validator.Validator `json:"validator"`
 }
 
 func (s Setting) Convert(value interface{}) interface{} {
@@ -63,6 +67,13 @@ func (s Setting) Convert(value interface{}) interface{} {
 	default:
 		return cast.ToString(value)
 	}
+}
+
+func (s Setting) Validate() bool {
+	if s.Validator != nil {
+		return s.Validator.Validate(s.Value)
+	}
+	return true
 }
 
 func samplePeriodSetting() Setting {

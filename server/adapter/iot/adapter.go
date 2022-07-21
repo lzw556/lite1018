@@ -110,7 +110,7 @@ func (a *Adapter) onConnect(c mqtt.Client) {
 	t := c.Subscribe("iot/v2/gw/+/dev/+/msg/+/", 0, func(c mqtt.Client, message mqtt.Message) {
 		msg := parse(message)
 		if dispatcher, ok := a.dispatchers[msg.Header.Type]; ok {
-			xlog.Debugf("receive %s message => [%s]", dispatcher.Name(), msg.Body.Device)
+			//xlog.Debugf("receive %s message => [%s]", dispatcher.Name(), msg.Body.Device)
 			go dispatcher.Dispatch(msg)
 		}
 	})

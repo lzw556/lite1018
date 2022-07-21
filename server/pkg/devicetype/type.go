@@ -35,6 +35,7 @@ var types = []Typer{
 	NormalTemperatureCorrosion{},
 	HighTemperatureCorrosion{},
 	AngleDip{},
+	Temperature{},
 }
 
 func Get(id uint) Typer {

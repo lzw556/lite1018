@@ -56,8 +56,6 @@ func (p Event) Process(ctx *iot.Context, msg iot.Message) error {
 					ProjectID: device.ProjectID,
 				}
 			}
-			fmt.Println(m.Message)
-
 			if err := p.eventRepo.Create(context.TODO(), &event); err != nil {
 				return fmt.Errorf("create [Event] message failed: %v", err)
 			}

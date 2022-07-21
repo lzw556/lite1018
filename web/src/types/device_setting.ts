@@ -40,4 +40,5 @@ export type DeviceSetting = {
     show: any;
     children?: DeviceSetting[];
     group?:keyof typeof SETTING_GROUPS;
+    validator: any;
 }
