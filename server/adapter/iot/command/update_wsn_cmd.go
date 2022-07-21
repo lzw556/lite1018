@@ -9,26 +9,35 @@ import (
 )
 
 type wsnSettings struct {
-	CommunicationPeriod uint `json:"communication_period"`
-	CommunicationOffset uint `json:"communication_offset"`
-	GroupSize           uint `json:"group_size"`
-	GroupInterval       uint `json:"group_interval"`
+	CommunicationPeriod  uint `json:"communication_period"`
+	CommunicationPeriod2 uint `json:"communication_period_2"`
+	CommunicationOffset  uint `json:"communication_offset"`
+	GroupSize            uint `json:"group_size"`
+	GroupSize2           uint `json:"group_size_2"`
+	GroupInterval        uint `json:"group_interval"`
+	Tempo                uint `json:"tempo"`
+	CallPeriod           uint `json:"call_period"`
+	ProvisioningMode     uint `json:"provisioning_mode"`
 }
 
 type updateWsnCmd struct {
 	request
-	settings     wsnSettings
-	routingTable entity.RoutingTables
+	settings wsnSettings
 }
 
 func newUpdateWsnSettingsCmd(network entity.Network) updateWsnCmd {
 	return updateWsnCmd{
 		request: newRequest(),
 		settings: wsnSettings{
-			CommunicationOffset: network.CommunicationTimeOffset,
-			CommunicationPeriod: network.CommunicationPeriod,
-			GroupInterval:       network.GroupInterval,
-			GroupSize:           network.GroupSize,
+			CommunicationOffset:  network.CommunicationTimeOffset,
+			CommunicationPeriod:  network.CommunicationPeriod,
+			CommunicationPeriod2: network.CommunicationPeriod2,
+			GroupInterval:        network.GroupInterval,
+			GroupSize:            network.GroupSize,
+			GroupSize2:           network.GroupSize2,
+			Tempo:                network.Tempo,
+			CallPeriod:           network.CallPeriod,
+			ProvisioningMode:     uint(network.Mode),
 		},
 	}
 }

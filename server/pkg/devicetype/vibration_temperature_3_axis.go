@@ -181,40 +181,28 @@ func (d VibrationTemperature3Axis) Settings() Settings {
 		Sort:     13,
 	}
 	d.VibrationKX = Setting{
-		Name:  "X轴加速度系数",
-		Key:   "vibration_k_x",
-		Type:  FloatValueType,
-		Value: 1,
-		Validator: validator.Range{
-			Min: 0,
-			Max: 1,
-		},
+		Name:     "X轴加速度系数",
+		Key:      "vibration_k_x",
+		Type:     FloatValueType,
+		Value:    1,
 		Category: SensorsSettingCategory,
 		Group:    SettingGroupOther,
 		Sort:     18,
 	}
 	d.VibrationKY = Setting{
-		Name:  "Y轴加速度系数",
-		Key:   "vibration_k_y",
-		Type:  FloatValueType,
-		Value: 1,
-		Validator: validator.Range{
-			Min: 0,
-			Max: 1,
-		},
+		Name:     "Y轴加速度系数",
+		Key:      "vibration_k_y",
+		Type:     FloatValueType,
+		Value:    1,
 		Category: SensorsSettingCategory,
 		Group:    SettingGroupOther,
 		Sort:     19,
 	}
 	d.VibrationKZ = Setting{
-		Name:  "Z轴加速度系数",
-		Key:   "vibration_k_z",
-		Type:  FloatValueType,
-		Value: 1,
-		Validator: validator.Range{
-			Min: 0,
-			Max: 1,
-		},
+		Name:     "Z轴加速度系数",
+		Key:      "vibration_k_z",
+		Type:     FloatValueType,
+		Value:    1,
 		Category: SensorsSettingCategory,
 		Group:    SettingGroupOther,
 		Sort:     20,

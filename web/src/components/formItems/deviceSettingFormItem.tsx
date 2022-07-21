@@ -32,7 +32,7 @@ const DeviceSettingFormItem: FC<DeviceSettingFormItemProps> = ({value, editable}
                 }
             </Select>
         }
-        return <Input type={"number"} suffix={setting.unit} disabled={!editable}/>
+        return <Input suffix={setting.unit} disabled={!editable}/>
     }
 
     const renderChildren = () => {

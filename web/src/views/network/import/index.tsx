@@ -11,6 +11,7 @@ import GroupIntervalSelect from "../../../components/groupIntervalSelect";
 import MyBreadcrumb from "../../../components/myBreadcrumb";
 import G6 from "@antv/g6";
 import "../../../components/shape/shape"
+import {COMMUNICATION_OFFSET, COMMUNICATION_PERIOD} from "../../../constants";
 
 const {Dragger} = Upload
 
@@ -202,18 +203,15 @@ const ImportNetworkPage = () => {
                                 <Card type="inner" size={"small"} title={"编辑"} style={{height: `${height}px`}}>
                                     <Form.Item label="通讯周期" name="communication_period"
                                                rules={[{required: true, message: "请选择网络通讯周期"}]}>
-                                        <CommunicationPeriodSelect placeholder={"请选择网络通讯周期"}/>
+                                        <CommunicationPeriodSelect periods={COMMUNICATION_PERIOD} placeholder={"请选择网络通讯周期"}/>
                                     </Form.Item>
                                     <Form.Item label="通讯延时" name="communication_offset"
                                                rules={[{required: true}]}>
-                                        <CommunicationTimeOffsetSelect placeholder={"请选择网络通讯延时"}/>
+                                        <CommunicationTimeOffsetSelect offsets={COMMUNICATION_OFFSET} placeholder={"请选择网络通讯延时"}/>
                                     </Form.Item>
                                     <Form.Item label="每组设备数" name="group_size" initialValue={4}
                                                rules={[{required: true}]}>
                                         <GroupSizeSelect placeholder={"请选择每组设备数"}/>
-                                    </Form.Item>
-                                    <Form.Item label="每组通信间隔" name="group_interval" rules={[{required: true}]}>
-                                        <GroupIntervalSelect placeholder={"请选择通信间隔"}/>
                                     </Form.Item>
                                     <br/>
                                 </Card>

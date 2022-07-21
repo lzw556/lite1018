@@ -49,7 +49,6 @@ func (factory Network) NewNetworkCreateCmd(req request.CreateNetwork) (*command.
 		CommunicationPeriod:     req.WSN.CommunicationPeriod,
 		CommunicationTimeOffset: req.WSN.CommunicationOffset,
 		GroupSize:               req.WSN.GroupSize,
-		GroupInterval:           req.WSN.GroupInterval,
 	}
 	cmd.Network.Gateway = entity.Device{
 		MacAddress: req.Gateway.MacAddress,
@@ -68,7 +67,6 @@ func (factory Network) NewNetworkImportCmd(req request.ImportNetwork) (*command.
 		CommunicationPeriod:     req.Wsn.CommunicationPeriod,
 		CommunicationTimeOffset: req.Wsn.CommunicationOffset,
 		GroupSize:               req.Wsn.GroupSize,
-		GroupInterval:           req.Wsn.GroupInterval,
 		ProjectID:               req.ProjectID,
 	}
 	// 构建网络中的设备实体

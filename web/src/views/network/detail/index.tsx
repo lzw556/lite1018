@@ -44,10 +44,11 @@ const NetworkDetail = () => {
           form.setFieldsValue({
             name: data.name,
             wsn: {
+              mode: data.mode,
               communication_period: data.communicationPeriod,
+              communication_period_2: data.communicationPeriod2,
               communication_offset: data.communicationOffset,
               group_size: data.groupSize,
-              group_interval: data.groupInterval
             }
           });
           setNetwork(data);
@@ -110,7 +111,7 @@ const NetworkDetail = () => {
                 <Form.Item label={'名称'} name={'name'} rules={[Rules.range(4, 16)]}>
                   <Input placeholder={'请输入网络名称'} />
                 </Form.Item>
-                <WsnFormItem/>
+                <WsnFormItem mode={network.mode}/>
                 <Form.Item wrapperCol={{ offset: 6, span: 18 }}>
                   <Row justify='end'>
                     <Col>

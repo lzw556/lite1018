@@ -1,10 +1,10 @@
 package request
 
 type WSN struct {
-	CommunicationPeriod uint `json:"communication_period"`
-	CommunicationOffset uint `json:"communication_offset"`
-	GroupSize           uint `json:"group_size"`
-	GroupInterval       uint `json:"group_interval"`
+	CommunicationPeriod  uint `json:"communication_period"`
+	CommunicationPeriod2 uint `json:"communication_period_2"`
+	CommunicationOffset  uint `json:"communication_offset"`
+	GroupSize            uint `json:"group_size"`
 }
 
 type Network struct {
