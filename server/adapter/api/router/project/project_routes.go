@@ -5,6 +5,7 @@ import (
 	"github.com/spf13/cast"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/request"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/response"
+	"strings"
 )
 
 func (r projectRouter) create(ctx *gin.Context) (interface{}, error) {
@@ -77,7 +78,30 @@ func (r projectRouter) allocUsers(ctx *gin.Context) (interface{}, error) {
 
 func (r projectRouter) getMyProjectExportFile(ctx *gin.Context) (interface{}, error) {
 	id := cast.ToUint(ctx.Param("id"))
-	return r.service.GetMyProjectExportFile(id)
+	mpIDs := make([]uint, 0)
+	param := ctx.Query("asset_ids")
+	if len(param) > 0 {
+		arr := strings.Split(param, ",")
+		for _, item := range arr {
+			mpIDs = append(mpIDs, cast.ToUint(item))
+		}
+	}
+
+	return r.service.GetMyProjectExportFileWithFilters(id, mpIDs)
+}
+
+func (r projectRouter) getMyAlarmRuleGroupsFile(ctx *gin.Context) (interface{}, error) {
+	id := cast.ToUint(ctx.Param("id"))
+	groupIDs := make([]uint, 0)
+	param := ctx.Query("alarm_rule_group_ids")
+	if len(param) > 0 {
+		arr := strings.Split(param, ",")
+		for _, item := range arr {
+			groupIDs = append(groupIDs, cast.ToUint(item))
+		}
+	}
+
+	return r.service.GetAlarmRuleGroupsExportFileWithFilters(id, groupIDs)
 }
 
 func (r projectRouter) importProject(ctx *gin.Context) (interface{}, error) {

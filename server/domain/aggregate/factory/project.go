@@ -89,3 +89,13 @@ func (factory Project) NewProjectImportCmd(id uint) (*command.ProjectImportCmd, 
 	cmd.Project = e
 	return &cmd, nil
 }
+
+func (factory Project) NewAlarmRuleGroupExportCmd(id uint) (*command.AlarmRuleGroupExportCmd, error) {
+	e, err := factory.projectRepo.Get(context.TODO(), id)
+	if err != nil {
+		return nil, response.BusinessErr(errcode.ProjectNotFoundError, "")
+	}
+	cmd := command.NewAlarmRuleGroupExportCmd()
+	cmd.Project = e
+	return &cmd, nil
+}
