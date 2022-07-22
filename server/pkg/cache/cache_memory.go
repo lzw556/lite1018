@@ -12,13 +12,13 @@ import (
 var cache *bigcache.BigCache
 var once sync.Once
 var config = bigcache.Config{
-	Shards:             256,
+	Shards:             128,
 	LifeWindow:         10 * time.Minute,
-	CleanWindow:        0,
+	CleanWindow:        5 * time.Minute,
 	MaxEntriesInWindow: 1000 * 10 * 60,
 	MaxEntrySize:       10485760, // 10MB
 	Verbose:            true,
-	HardMaxCacheSize:   2048, // 2GB
+	HardMaxCacheSize:   1024, // 1GB
 	OnRemoveWithReason: func(key string, entry []byte, reason bigcache.RemoveReason) {
 		xlog.Infof("[%s] removed from cache size [%d] reason [%v]", key, len(entry), reason)
 	},

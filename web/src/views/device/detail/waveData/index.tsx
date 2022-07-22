@@ -1,4 +1,19 @@
-import {Checkbox, Col, ConfigProvider, DatePicker, message, Modal, Row, Select, Space, Spin, Table} from 'antd';
+import {
+    Button,
+    Checkbox,
+    Col,
+    ConfigProvider,
+    DatePicker,
+    Dropdown,
+    Menu,
+    message,
+    Modal,
+    Row,
+    Select,
+    Space,
+    Spin,
+    Table
+} from 'antd';
 import EChartsReact from 'echarts-for-react';
 import moment from 'moment';
 import * as React from 'react';
@@ -10,10 +25,10 @@ import {Device} from '../../../../types/device';
 import {
     DownloadDeviceDataByTimestampRequest,
     FindDeviceDataRequest,
-    GetDeviceDataRequest
+    GetDeviceDataRequest, RemoveLargeDataRequest
 } from '../../../../apis/device';
 import {isMobile} from '../../../../utils/deviceDetection';
-import {DownloadOutlined, LoadingOutlined} from '@ant-design/icons';
+import {DownloadOutlined, LoadingOutlined, MenuOutlined} from '@ant-design/icons';
 import usePermission, {Permission} from "../../../../permission/permission";
 import {DeviceType} from "../../../../types/device_type";
 
@@ -120,6 +135,27 @@ const WaveDataChart: React.FC<{ device: Device }> = ({device}) => {
         return '';
     };
 
+    const onMenuClick = (key:any, timestamp:number) => {
+        if (key === "download") {
+            onDownload(timestamp)
+        }else if (key === "delete") {
+            onDelete(timestamp)
+        }
+    }
+
+    const renderMenus = (timestamp:number) => {
+        return <Menu onClick={e => onMenuClick(e.key, timestamp)}>
+            {
+                hasPermission(Permission.DeviceRawDataDownload) &&
+                <Menu.Item key={"download"}>下载</Menu.Item>
+            }
+            {
+                hasPermission(Permission.DeviceRawDataDelete) &&
+                <Menu.Item key={"delete"}>删除</Menu.Item>
+            }
+        </Menu>
+    }
+
     const columns = [
         {
             title: '时间',
@@ -130,16 +166,22 @@ const WaveDataChart: React.FC<{ device: Device }> = ({device}) => {
         },
         {
             title: '操作',
+            dataIndex: 'timestamp',
             key: 'action',
-            render: (text: any, record: any) => {
-                if (hasPermission(Permission.DeviceRawDataDownload)) {
-                    return <Space size='middle'>
-                        <a onClick={() => onDownload(record.timestamp)}>下载</a>
-                    </Space>
-                }
+            render: (timestamp: any, record: any) => {
+                return <Dropdown overlay={renderMenus(timestamp)}>
+                    <Button type={"link"}><MenuOutlined/></Button>
+                </Dropdown>
             }
         }
     ];
+
+    const onDelete = (timestamp: number) => {
+        RemoveLargeDataRequest(device.id, dataType, timestamp).then(_ => {
+            fetchDeviceWaveDataTimestamps()
+        })
+    }
+
     const onDownload = (timestamp: number) => {
         let modal = Modal.info({title: "数据下载", content: "数据下载中...", okText:"保存", okButtonProps: {disabled: true}})
         DownloadDeviceDataByTimestampRequest(device.id, timestamp, {

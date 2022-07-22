@@ -97,6 +97,10 @@ func (cmd DeviceRemoveCmd) RemoveData(sensorType uint, from, to time.Time) error
 	return cmd.deviceDataRepo.Delete(cmd.Device.MacAddress, sensorType, from, to)
 }
 
+func (cmd DeviceRemoveCmd) RemoveLargeData(sensorType uint, time time.Time) error {
+	return cmd.deviceDataRepo.DeleteByTime(cmd.Device.MacAddress, sensorType, time)
+}
+
 func (cmd DeviceRemoveCmd) RemoveEvents(ids []uint) error {
 	return cmd.eventRepo.DeleteBySpecs(context.TODO(), spec.SourceEqSpec(cmd.Device.ID), spec.PrimaryKeyInSpec(ids))
 }
