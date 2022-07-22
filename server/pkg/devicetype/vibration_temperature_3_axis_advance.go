@@ -165,7 +165,7 @@ func (d VibrationTemperature3AxisAdvance) Settings() Settings {
 		Key:   "acc3_samples_2",
 		Type:  Uint32ValueType,
 		Value: 10000,
-		Unit:  "秒",
+		Unit:  "毫秒",
 		Validator: validator.Range{
 			Min: 100,
 			Max: 20 * 1000,
@@ -232,6 +232,7 @@ func (d VibrationTemperature3AxisAdvance) Settings() Settings {
 		Key:   "acc1_samples_2",
 		Type:  Uint32ValueType,
 		Value: 10000,
+		Unit:  "毫秒",
 		Validator: validator.Range{
 			Min: 100,
 			Max: 20 * 1000,
