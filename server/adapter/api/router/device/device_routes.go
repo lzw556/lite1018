@@ -142,6 +142,13 @@ func (r deviceRouter) removeDataByID(ctx *gin.Context) (interface{}, error) {
 	return nil, r.service.RemoveDataByID(id, sensorType, from, to)
 }
 
+func (r deviceRouter) removeLargeDataByID(ctx *gin.Context) (interface{}, error) {
+	id := cast.ToUint(ctx.Param("id"))
+	timestamp := cast.ToInt64(ctx.Param("timestamp"))
+	sensorType := cast.ToUint(ctx.Query("data_type"))
+	return nil, r.service.RemoveLargeDataByID(id, sensorType, timestamp)
+}
+
 func (r deviceRouter) upgrade(ctx *gin.Context) (interface{}, error) {
 	id := cast.ToUint(ctx.Param("id"))
 	var req request.DeviceUpgrade

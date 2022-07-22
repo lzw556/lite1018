@@ -50,6 +50,7 @@ func (r *deviceRouter) initRoutes() {
 		// DELETE
 		router.NewDeleteRoute("devices/:id", r.delete),
 		router.NewDeleteRoute("devices/:id/data", r.removeDataByID),
+		router.NewDeleteRoute("devices/:id/data/:timestamp", r.removeLargeDataByID),
 		router.NewDeleteRoute("devices/:id/events", r.removeEventsByID),
 		router.NewDeleteRoute("devices/:id/alarmRules", r.removeAlarmRulesByID),
 	}

@@ -56,6 +56,10 @@ export function RemoveDeviceDataRequest(id: number, from: number, to: number) {
     return request.delete(`/devices/${id}/data?from=${from}&to=${to}`).then(DeleteResponse)
 }
 
+export function RemoveLargeDataRequest(id:number, dataType:number, timestamp:number) {
+    return request.delete(`/devices/${id}/data/${timestamp}?data_type=${dataType}`).then(DeleteResponse)
+}
+
 export function SendDeviceCommandRequest(id: number, cmd: any, params: any) {
     return request.post(`/devices/${id}/commands/${cmd}`, params).then(res => res.data)
 }

@@ -12,5 +12,6 @@ type SensorDataRepository interface {
 	Last(mac string, sensorType uint) (entity.SensorData, error)
 	Top(mac string, limit int) ([]entity.SensorData, error)
 	Delete(mac string, sensorType uint, from, to time.Time) error
+	DeleteByTime(mac string, sensorType uint, time time.Time) error
 	FindTimes(mac string, sensorType uint, from, to time.Time) ([]time.Time, error)
 }
