@@ -18,7 +18,7 @@ var config = bigcache.Config{
 	MaxEntriesInWindow: 1000 * 10 * 60,
 	MaxEntrySize:       10485760, // 10MB
 	Verbose:            true,
-	HardMaxCacheSize:   8192, // 2GB
+	HardMaxCacheSize:   2048, // 2GB
 	OnRemoveWithReason: func(key string, entry []byte, reason bigcache.RemoveReason) {
 		xlog.Infof("[%s] removed from cache size [%d] reason [%v]", key, len(entry), reason)
 	},
