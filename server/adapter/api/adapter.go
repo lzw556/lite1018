@@ -100,7 +100,7 @@ func (a *Adapter) errorWrapper(handler middleware.ErrorWrapperHandler) gin.Handl
 				return
 			}
 			switch data := data.(type) {
-			case *vo.NetworkExportFile, *vo.ExcelFile, *vo.ImageFile, *vo.CsvFile, *vo.ProjectExported:
+			case *vo.NetworkExportFile, *vo.ExcelFile, *vo.ImageFile, *vo.CsvFile, *vo.ProjectExported, *vo.AlarmRuleGroupsExported:
 				if writer, ok := data.(response.FileWriter); ok {
 					response.WriteFile(ctx, writer)
 					return
