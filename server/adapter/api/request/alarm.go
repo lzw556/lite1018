@@ -91,7 +91,7 @@ type AlarmRuleGroupImported struct {
 }
 
 type AlarmRuleGroupsImported struct {
-	AlarmRuleGroups []AlarmRuleGroupImported `json:"alarmRuleGroups"`
+	AlarmRuleGroups []AlarmRuleGroupImported `json:"alarmRuleGroups" binding:"required"`
 
 	ProjectID uint `json:"-"`
 }
