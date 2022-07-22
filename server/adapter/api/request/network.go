@@ -44,6 +44,7 @@ type ImportNetwork struct {
 type CreateNetwork struct {
 	Name    string `json:"name"`
 	WSN     WSN    `json:"wsn"`
+	Mode    uint8  `json:"mode"`
 	Gateway struct {
 		MacAddress string `json:"mac_address"`
 	}
