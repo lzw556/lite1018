@@ -25,7 +25,7 @@ export const Permission = {
     DeviceDataDelete: {path: "devices/:id/data", method: "DELETE"},
     DeviceDataDownload: {path: "devices/:id/download/data", method: "GET"},
     DeviceRawDataDownload: {path: "devices/:id/download/data/:timestamp", method: "GET"},
-    DeviceRawDataDelete: {path: "device/:id/data/:timestamp", method: "DELETE"},
+    DeviceRawDataDelete: {path: "devices/:id/data/:timestamp", method: "DELETE"},
     DeviceFirmwares: {path: "devices/:id/firmwares", method: "GET"},
     DeviceData: {path: "devices/:id/data", method: "GET"},
     DeviceEventList: {path: "devices/:id/events", method: "GET"},
@@ -85,7 +85,7 @@ g = _, _
 e = some(where (p.eft == allow))
 
 [matchers]
-m = g(r.sub, p.sub) && keyMatch2(r.obj, p.obj) && r.act == p.act || r.sub == "admin"`)
+m = g(r.sub, p.sub) && keyMatch2(r.obj, p.obj) && regexMatch(r.act, p.act) || r.sub == "admin"`)
 
 const data = getPermission()
 

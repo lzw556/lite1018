@@ -42,10 +42,15 @@ func NewNetworkExportFile(e entity.Network) NetworkExportFile {
 		GatewayID: e.GatewayID,
 		Name:      e.Name,
 		Wsn: map[string]interface{}{
-			"communication_period": e.CommunicationPeriod,
-			"communication_offset": e.CommunicationTimeOffset,
-			"group_interval":       e.GroupInterval,
-			"group_size":           e.GroupSize,
+			"communication_period":   e.CommunicationPeriod,
+			"communication_period_2": e.CommunicationPeriod2,
+			"communication_offset":   e.CommunicationTimeOffset,
+			"tempo":                  e.Tempo,
+			"call_period":            e.CallPeriod,
+			"group_interval":         e.GroupInterval,
+			"group_size":             e.GroupSize,
+			"group_size_2":           e.GroupSize2,
+			"provisioning_mode":      e.Mode,
 		},
 	}
 	return n

@@ -7,7 +7,6 @@ import ShadowCard from "../../../components/shadowCard";
 import CommunicationTimeOffsetSelect from "../../../components/communicationTimeOffsetSelect";
 import CommunicationPeriodSelect from "../../../components/communicationPeriodSelect";
 import GroupSizeSelect from "../../../components/groupSizeSelect";
-import GroupIntervalSelect from "../../../components/groupIntervalSelect";
 import MyBreadcrumb from "../../../components/myBreadcrumb";
 import G6 from "@antv/g6";
 import "../../../components/shape/shape"
@@ -20,7 +19,6 @@ export interface NetworkRequestForm {
         communication_period: number
         communication_offset: number
         group_size: number
-        group_interval: number
     }
     devices: any
 }
@@ -74,7 +72,6 @@ const ImportNetworkPage = () => {
                         communication_period: values.communication_period,
                         communication_offset: values.communication_offset,
                         group_size: values.group_size,
-                        group_interval: values.group_interval,
                     },
                     devices: nodes.map((n: any) => {
                         return {
@@ -95,7 +92,6 @@ const ImportNetworkPage = () => {
 
     const tree: any = (root: any) => {
         return network.devices.slice(1).filter((node:any) => node.parentAddress === root.address).map((item:any) => {
-            console.log(item.address)
             return {
                 id: item.address,
                 data: item,
