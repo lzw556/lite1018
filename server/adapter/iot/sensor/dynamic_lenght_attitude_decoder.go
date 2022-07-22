@@ -36,7 +36,7 @@ func (s DynamicLengthAttitudeDecoder) Decode(data []byte, metaLength int) (map[s
 	result.Metadata.MaxTof = math.Float32frombits(binary.LittleEndian.Uint32(data[64:68]))
 	result.Metadata.MaxPreload = math.Float32frombits(binary.LittleEndian.Uint32(data[68:72]))
 	result.Metadata.MaxIntensityPressure = math.Float32frombits(binary.LittleEndian.Uint32(data[72:76]))
-	result.Metadata.MaxAcceleration.XAxis = math.Float32frombits(binary.LittleEndian.Uint32(data[76:78]))
+	result.Metadata.MaxAcceleration.XAxis = math.Float32frombits(binary.LittleEndian.Uint32(data[76:80]))
 	result.Metadata.MaxAcceleration.YAxis = math.Float32frombits(binary.LittleEndian.Uint32(data[80:84]))
 	result.Metadata.MaxAcceleration.ZAxis = math.Float32frombits(binary.LittleEndian.Uint32(data[84:88]))
 
