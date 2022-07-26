@@ -50,7 +50,7 @@ func (d VibrationTemperature3AxisAdvance) Settings() Settings {
 		Key:      "sample_period_2",
 		Type:     Uint32ValueType,
 		Value:    1200000, // 20 minutes
-		Options:  samplePeriodOption1,
+		Options:  samplePeriod2Options,
 		Parent:   d.IsEnabled2.Key,
 		Show:     true,
 		Category: SensorsSettingCategory,
@@ -62,7 +62,7 @@ func (d VibrationTemperature3AxisAdvance) Settings() Settings {
 		Key:      "sample_offset_2",
 		Type:     Uint32ValueType,
 		Value:    10000,
-		Options:  sampleOffsetOptions1,
+		Options:  sampleOffset2Options,
 		Parent:   d.IsEnabled2.Key,
 		Show:     true,
 		Category: SensorsSettingCategory,

@@ -15,11 +15,8 @@ import {
 } from '../../../apis/network';
 import '../../../string-extension';
 import TopologyView from './topologyView';
-import { PlusOutlined } from '@ant-design/icons';
-import AddDeviceModal from './addDeviceModal';
 import '../index.css';
 import usePermission, { Permission } from '../../../permission/permission';
-import HasPermission from '../../../permission';
 import ButtonGroup from 'antd/lib/button/button-group';
 import { defaultValidateMessages, Rules } from '../../../constants/validator';
 import WsnFormItem from '../../../components/formItems/wsnFormItem';
