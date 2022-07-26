@@ -83,7 +83,7 @@ func samplePeriodSetting() Setting {
 		Category: SensorsSettingCategory,
 		Value:    3600000, // 1 hour
 		Type:     Uint32ValueType,
-		Options:  samplePeriodOption1,
+		Options:  samplePeriodOptions,
 		Group:    SettingGroupGeneral,
 		Sort:     0,
 	}
@@ -96,7 +96,7 @@ func sampleOffsetSetting() Setting {
 		Category: SensorsSettingCategory,
 		Value:    0,
 		Type:     Uint32ValueType,
-		Options:  sampleOffsetOptions1,
+		Options:  sampleOffsetOptions,
 		Group:    SettingGroupGeneral,
 		Sort:     1,
 	}
