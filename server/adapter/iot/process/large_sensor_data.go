@@ -53,11 +53,12 @@ func (p *LargeSensorData) Process(ctx *iot.Context, msg iot.Message) error {
 		if receiver.SessionID == m.SessionId {
 			if receiver.Receive(m); receiver.IsCompleted() {
 				if e, err := receiver.SensorData(); err == nil {
-					_ = cache.Delete(device.MacAddress)
 					e.MacAddress = device.MacAddress
 					if err := p.repository.Create(e); err != nil {
 						return fmt.Errorf("create large sensor data failed: %v", err)
 					}
+					xlog.Infof("[%s] insert ok large sensor data: %+v", e)
+					_ = cache.Delete(device.MacAddress)
 				} else {
 					return fmt.Errorf("decode large sensor data failed: %v", err)
 				}
