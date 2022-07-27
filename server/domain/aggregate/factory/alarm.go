@@ -170,7 +170,7 @@ func (factory Alarm) NewAlarmRecordRemoveCmd(id uint) (*command.AlarmRecordRemov
 
 func (factory Alarm) NewAlarmRuleGroupCreateCmd(req request.AlarmRuleGroup) (*command.AlarmRuleGroupCreateCmd, error) {
 	ctx := context.TODO()
-	e, err := factory.alarmRuleGroupRepo.GetBySpecs(ctx, spec.NameEqSpec(req.Name))
+	e, err := factory.alarmRuleGroupRepo.GetBySpecs(ctx, spec.ProjectEqSpec(req.ProjectID), spec.NameEqSpec(req.Name))
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, err
 	}

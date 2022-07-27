@@ -30,7 +30,7 @@ func NewAlarmRuleGroupImportCmd() AlarmRuleGroupImportCmd {
 
 func (importCmd AlarmRuleGroupImportCmd) newAlarmRuleGroupCreateCmd(req request.AlarmRuleGroup) (*AlarmRuleGroupCreateCmd, error) {
 	ctx := context.TODO()
-	e, err := importCmd.alarmRuleGroupRepo.GetBySpecs(ctx, spec.NameEqSpec(req.Name))
+	e, err := importCmd.alarmRuleGroupRepo.GetBySpecs(ctx, spec.ProjectEqSpec(req.ProjectID), spec.NameEqSpec(req.Name))
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, err
 	}
