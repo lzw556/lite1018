@@ -52,6 +52,7 @@ var samplePeriodOptions = map[int]string{
 	int(2 * time.Minute.Milliseconds()):  "2分钟",
 	int(5 * time.Minute.Milliseconds()):  "5分钟",
 	int(10 * time.Minute.Milliseconds()): "10分钟",
+	int(15 * time.Minute.Milliseconds()): "15分钟",
 	int(20 * time.Minute.Milliseconds()): "20分钟",
 	int(30 * time.Minute.Milliseconds()): "30分钟",
 	int(time.Hour.Milliseconds()):        "1小时",

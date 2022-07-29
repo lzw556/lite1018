@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/mitchellh/mapstructure"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/xlog"
 	"math"
 )
 
@@ -23,6 +24,8 @@ func (s DynamicInclinationDecoder) Decode(data []byte, metaLength int) (map[stri
 	result.Metadata.MeanPitch = math.Float32frombits(binary.LittleEndian.Uint32(data[16:20]))
 	result.Metadata.MeanRoll = math.Float32frombits(binary.LittleEndian.Uint32(data[20:24]))
 	result.Metadata.MeanWaggle = math.Float32frombits(binary.LittleEndian.Uint32(data[24:28]))
+
+	xlog.Infof("receive metadata %s", fmt.Sprintf("%+v", result.Metadata))
 
 	valueBytes := data[metaLength:]
 	if int(dataLength) == len(valueBytes) {
