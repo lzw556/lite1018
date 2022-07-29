@@ -52,17 +52,19 @@ func (p *LargeSensorData) Process(ctx *iot.Context, msg iot.Message) error {
 		xlog.Debugf("[%s] p.receiver.SessionID: %v, pd.SessionId: %v", msg.Body.Device, receiver.SessionID, m.SessionId)
 		if receiver.SessionID == m.SessionId {
 			if receiver.Receive(m); receiver.IsCompleted() {
+				xlog.Infof("[%s] received %d segments", msg.Body.Device, len(receiver.Packets))
 				if e, err := receiver.SensorData(); err == nil {
 					e.MacAddress = device.MacAddress
 					if err := p.repository.Create(e); err != nil {
 						return fmt.Errorf("create large sensor data failed: %v", err)
 					}
-					xlog.Infof("[%s] insert ok large sensor data: %+v", e)
+					xlog.Infof("[%s] insert ok large sensor data: %+v", msg.Body.Device, e)
 					_ = cache.Delete(device.MacAddress)
 				} else {
 					return fmt.Errorf("decode large sensor data failed: %v", err)
 				}
 			}
+			xlog.Warnf("[%s] received %d segments not match gave segment num %d", msg.Body.Device, len(receiver.Packets), receiver.NumOfPackets)
 		} else {
 			receiver.Reset(msg.Body.Device, m)
 			receiver.Receive(m)

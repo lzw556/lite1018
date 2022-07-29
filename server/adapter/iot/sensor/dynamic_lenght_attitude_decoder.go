@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/mitchellh/mapstructure"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/xlog"
 	"math"
 )
 
@@ -39,6 +40,8 @@ func (s DynamicLengthAttitudeDecoder) Decode(data []byte, metaLength int) (map[s
 	result.Metadata.MaxAcceleration.XAxis = math.Float32frombits(binary.LittleEndian.Uint32(data[76:80]))
 	result.Metadata.MaxAcceleration.YAxis = math.Float32frombits(binary.LittleEndian.Uint32(data[80:84]))
 	result.Metadata.MaxAcceleration.ZAxis = math.Float32frombits(binary.LittleEndian.Uint32(data[84:88]))
+
+	xlog.Infof("receive metadata %s", fmt.Sprintf("%+v", result.Metadata))
 
 	valueBytes := data[metaLength:]
 	if int(dataLength) == len(valueBytes) {

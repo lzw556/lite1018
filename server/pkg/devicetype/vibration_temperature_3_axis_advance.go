@@ -118,8 +118,6 @@ func (d VibrationTemperature3AxisAdvance) Settings() Settings {
 		Type:  Uint32ValueType,
 		Value: 1024,
 		Options: map[int]string{
-			300:  "300",
-			512:  "512",
 			1024: "1024",
 			2048: "2048",
 			4096: "4096",
