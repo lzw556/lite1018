@@ -88,6 +88,7 @@ p, 项目管理员, alarmRecords/*, POST
 p, 项目管理员, alarmRecords/*, PUT
 p, 项目管理员, networks/*, DELETE
 p, 项目管理员, devices/*, DELETE
+p, 项目管理员, devices/:id/data/*, DELETE
 p, 项目管理员, alarmRules/*, DELETE
 p, 项目管理员, alarmRuleGroups/*, DELETE
 p, 项目管理员, alarmRecords/*, DELETE
@@ -135,6 +136,7 @@ p, 平台管理员, alarmRecords/*, POST
 p, 平台管理员, alarmRecords/*, PUT
 p, 平台管理员, networks/*, DELETE
 p, 平台管理员, devices/*, DELETE
+p, 平台管理员, devices/:id/data/*, DELETE
 p, 平台管理员, alarmRules/*, DELETE
 p, 平台管理员, alarmRuleGroups/*, DELETE
 p, 平台管理员, alarmRecords/*, DELETE
