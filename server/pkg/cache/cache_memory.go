@@ -2,6 +2,7 @@ package cache
 
 import (
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/json"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/xlog"
 	"sync"
 	"time"
 
@@ -11,14 +12,16 @@ import (
 var cache *bigcache.BigCache
 var once sync.Once
 var config = bigcache.Config{
-	Shards:             1024,
+	Shards:             256,
 	LifeWindow:         10 * time.Minute,
 	CleanWindow:        0,
 	MaxEntriesInWindow: 1000 * 10 * 60,
-	MaxEntrySize:       500,
+	MaxEntrySize:       500, // 10MB
 	Verbose:            true,
-	HardMaxCacheSize:   2048, // 2GB
-	OnRemove:           nil,
+	HardMaxCacheSize:   2048, // 1GB
+	OnRemoveWithReason: func(key string, entry []byte, reason bigcache.RemoveReason) {
+		xlog.Infof("[%s] removed from cache size [%d] reason [%v]", key, len(entry), reason)
+	},
 }
 
 func Init(mode string) {
@@ -50,12 +53,10 @@ func GetStruct(key string, v interface{}) error {
 }
 
 func Set(key string, value []byte) error {
-
 	return cache.Set(key, value)
 }
 
 func SetStruct(key string, v interface{}) error {
-
 	bytes, err := json.Marshal(v)
 	if err != nil {
 		return err
@@ -64,16 +65,13 @@ func SetStruct(key string, v interface{}) error {
 }
 
 func Append(key string, value []byte) error {
-
 	return cache.Append(key, value)
 }
 
 func Delete(key string) error {
-
 	return cache.Delete(key)
 }
 
 func Reset() error {
-
 	return cache.Reset()
 }

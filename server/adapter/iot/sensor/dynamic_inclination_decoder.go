@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/mitchellh/mapstructure"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/xlog"
 	"math"
 )
 
@@ -14,7 +15,7 @@ func NewDynamicInclinationDecoder() RawDataDecoder {
 	return &DynamicInclinationDecoder{}
 }
 
-func (s DynamicInclinationDecoder) Decode(data []byte) (map[string]interface{}, error) {
+func (s DynamicInclinationDecoder) Decode(data []byte, metaLength int) (map[string]interface{}, error) {
 	result := entity.SqRawData{}
 	result.Metadata.Odr = binary.LittleEndian.Uint16(data[:2])
 	result.Metadata.Number = binary.LittleEndian.Uint16(data[2:4])
@@ -24,7 +25,9 @@ func (s DynamicInclinationDecoder) Decode(data []byte) (map[string]interface{}, 
 	result.Metadata.MeanRoll = math.Float32frombits(binary.LittleEndian.Uint32(data[20:24]))
 	result.Metadata.MeanWaggle = math.Float32frombits(binary.LittleEndian.Uint32(data[24:28]))
 
-	valueBytes := data[28:]
+	xlog.Infof("receive metadata %s", fmt.Sprintf("%+v", result.Metadata))
+
+	valueBytes := data[metaLength:]
 	if int(dataLength) == len(valueBytes) {
 		for i := 0; i < len(valueBytes); i += 16 {
 			b := valueBytes[i : i+16]

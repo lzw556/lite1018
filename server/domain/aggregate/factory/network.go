@@ -47,10 +47,11 @@ func (factory Network) NewNetworkCreateCmd(req request.CreateNetwork) (*command.
 		Name:                    req.Name,
 		ProjectID:               req.ProjectID,
 		CommunicationPeriod:     req.WSN.CommunicationPeriod,
+		CommunicationPeriod2:    req.WSN.CommunicationPeriod2,
 		CommunicationTimeOffset: req.WSN.CommunicationOffset,
 		GroupSize:               req.WSN.GroupSize,
-		GroupInterval:           req.WSN.GroupInterval,
 	}
+	cmd.Network.SwitchProvisioningMode(entity.ProvisioningMode(req.Mode))
 	cmd.Network.Gateway = entity.Device{
 		MacAddress: req.Gateway.MacAddress,
 		Name:       fmt.Sprintf("%s-网关", req.Name),
@@ -66,11 +67,12 @@ func (factory Network) NewNetworkImportCmd(req request.ImportNetwork) (*command.
 	// 构建网络实体
 	cmd.Network = entity.Network{
 		CommunicationPeriod:     req.Wsn.CommunicationPeriod,
+		CommunicationPeriod2:    req.Wsn.CommunicationPeriod2,
 		CommunicationTimeOffset: req.Wsn.CommunicationOffset,
 		GroupSize:               req.Wsn.GroupSize,
-		GroupInterval:           req.Wsn.GroupInterval,
 		ProjectID:               req.ProjectID,
 	}
+	cmd.Network.SwitchProvisioningMode(entity.NetworkProvisionMode1)
 	// 构建网络中的设备实体
 	cmd.Devices = make([]entity.Device, len(req.Devices))
 	for i, device := range req.Devices {

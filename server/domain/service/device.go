@@ -122,6 +122,14 @@ func (s Device) RemoveDataByID(id uint, sensorType uint, from, to int64) error {
 	return cmd.RemoveData(sensorType, time.Unix(from, 0), time.Unix(to, 0))
 }
 
+func (s Device) RemoveLargeDataByID(id uint, sensorType uint, timestamp int64) error {
+	cmd, err := s.factory.NewDeviceRemoveCmd(id)
+	if err != nil {
+		return err
+	}
+	return cmd.RemoveLargeData(sensorType, time.Unix(timestamp, 0))
+}
+
 func (s Device) ExecuteCommandByID(id uint, cmdType uint, req request.DeviceCommand) error {
 	cmd, err := s.factory.NewDeviceExecuteCommandCmd(id)
 	if err != nil {

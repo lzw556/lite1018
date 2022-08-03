@@ -42,8 +42,8 @@ func (cmd ProjectImportCmd) newNetworkImportCmd(req request.ImportNetwork) (*Net
 		CommunicationPeriod:     req.Wsn.CommunicationPeriod,
 		CommunicationTimeOffset: req.Wsn.CommunicationOffset,
 		GroupSize:               req.Wsn.GroupSize,
-		GroupInterval:           req.Wsn.GroupInterval,
-		ProjectID:               req.ProjectID,
+		// GroupInterval:           req.Wsn.GroupInterval,
+		ProjectID: req.ProjectID,
 	}
 	// 构建网络中的设备实体
 	netCmd.Devices = make([]entity.Device, len(req.Devices))

@@ -1,7 +1,6 @@
 package vo
 
 import (
-	"fmt"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/json"
 	"time"
@@ -28,11 +27,9 @@ func NewDeviceEvent(e entity.Event) DeviceEvent {
 		Code int         `json:"code"`
 		Data interface{} `json:"data"`
 	}{}
-	fmt.Println(e.Content)
 	if err := json.Unmarshal([]byte(e.Content), &content); err != nil {
 		return event
 	}
-	fmt.Println(content.Data)
 	if message, ok := eventMessage[e.Code][content.Code]; ok {
 		event.Message = message
 	} else {

@@ -390,3 +390,18 @@ message TunnelCommand {
   int32 duration = 4;
   string message = 5;
 }
+
+message SensorDataAckCommand {
+  int32 timestamp = 1;
+  string reqId = 2;
+  int32 subCommand = 3;
+  int32 sensorId = 4;
+}
+
+message LargeSensorDataAckCommand {
+  int32 timestamp = 1;
+  string reqId = 2;
+  int32 subCommand = 3;
+  int32 sessionId = 4;
+  int32 segmentId = 5;
+}

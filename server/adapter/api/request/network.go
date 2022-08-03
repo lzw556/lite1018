@@ -1,10 +1,10 @@
 package request
 
 type WSN struct {
-	CommunicationPeriod uint `json:"communication_period"`
-	CommunicationOffset uint `json:"communication_offset"`
-	GroupSize           uint `json:"group_size"`
-	GroupInterval       uint `json:"group_interval"`
+	CommunicationPeriod  uint `json:"communication_period"`
+	CommunicationPeriod2 uint `json:"communication_period_2"`
+	CommunicationOffset  uint `json:"communication_offset"`
+	GroupSize            uint `json:"group_size"`
 }
 
 type Network struct {
@@ -46,6 +46,7 @@ type ImportNetwork struct {
 type CreateNetwork struct {
 	Name    string `json:"name"`
 	WSN     WSN    `json:"wsn"`
+	Mode    uint8  `json:"mode"`
 	Gateway struct {
 		MacAddress string `json:"mac_address"`
 	}

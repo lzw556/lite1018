@@ -28,6 +28,7 @@ type Service interface {
 	DownloadDeviceDataByID(id uint, pids []string, from, to int64, timezone string) (*vo.ExcelFile, error)
 	DownloadDeviceDataByIDAndTimestamp(id uint, sensorType uint, timestamp int64, filters request.Filters) (*vo.ExcelFile, error)
 	RemoveDataByID(id uint, sensorType uint, from, to int64) error
+	RemoveLargeDataByID(id uint, sensorType uint, timestamp int64) error
 
 	FindDeviceEventsByID(id uint, from, to int64) ([]vo.DeviceEvent, error)
 	PagingDeviceEventsByID(id uint, from, to int64, page, size int) ([]vo.DeviceEvent, int64, error)

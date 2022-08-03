@@ -1,5 +1,7 @@
 package devicetype
 
+import "github.com/thetasensors/theta-cloud-lite/server/pkg/devicetype/validator"
+
 type VibrationTemperature3AxisAdvance struct {
 	SamplePeriod  Setting `json:"sample_period"`
 	SampleOffset  Setting `json:"sample_offset"`
@@ -18,6 +20,9 @@ type VibrationTemperature3AxisAdvance struct {
 	Acc1Odr2      Setting `json:"acc1_odr_2"`
 	Acc1Samples2  Setting `json:"acc1_samples_2"`
 	BaseFrequency Setting `json:"base_frequency"`
+	VibrationKX   Setting `json:"vibration_k_x"`
+	VibrationKY   Setting `json:"vibration_k_y"`
+	VibrationKZ   Setting `json:"vibration_k_z"`
 }
 
 func (VibrationTemperature3AxisAdvance) ID() uint {
@@ -45,7 +50,7 @@ func (d VibrationTemperature3AxisAdvance) Settings() Settings {
 		Key:      "sample_period_2",
 		Type:     Uint32ValueType,
 		Value:    1200000, // 20 minutes
-		Options:  samplePeriodOption1,
+		Options:  samplePeriod2Options,
 		Parent:   d.IsEnabled2.Key,
 		Show:     true,
 		Category: SensorsSettingCategory,
@@ -57,7 +62,7 @@ func (d VibrationTemperature3AxisAdvance) Settings() Settings {
 		Key:      "sample_offset_2",
 		Type:     Uint32ValueType,
 		Value:    10000,
-		Options:  sampleOffsetOptions1,
+		Options:  sampleOffset2Options,
 		Parent:   d.IsEnabled2.Key,
 		Show:     true,
 		Category: SensorsSettingCategory,
@@ -95,6 +100,9 @@ func (d VibrationTemperature3AxisAdvance) Settings() Settings {
 		Type:  Uint8ValueType,
 		Value: 15,
 		Options: map[int]string{
+			5:  "0.4kHz",
+			6:  "0.8kHz",
+			7:  "1.6kHz",
 			12: "3.2kHz",
 			13: "6.4kHz",
 			14: "12.8kHz",
@@ -110,8 +118,6 @@ func (d VibrationTemperature3AxisAdvance) Settings() Settings {
 		Type:  Uint32ValueType,
 		Value: 1024,
 		Options: map[int]string{
-			300:  "300",
-			512:  "512",
 			1024: "1024",
 			2048: "2048",
 			4096: "4096",
@@ -140,6 +146,9 @@ func (d VibrationTemperature3AxisAdvance) Settings() Settings {
 		Type:  Uint8ValueType,
 		Value: 12,
 		Options: map[int]string{
+			5:  "0.4kHz",
+			6:  "0.8kHz",
+			7:  "1.6kHz",
 			12: "3.2kHz",
 			13: "6.4kHz",
 			14: "12.8kHz",
@@ -154,19 +163,10 @@ func (d VibrationTemperature3AxisAdvance) Settings() Settings {
 		Key:   "acc3_samples_2",
 		Type:  Uint32ValueType,
 		Value: 10000,
-		Options: map[int]string{
-			100:   "0.1秒",
-			500:   "0.5秒",
-			1000:  "1秒",
-			1500:  "1.5秒",
-			2000:  "2秒",
-			3000:  "3秒",
-			5000:  "5秒",
-			10000: "10秒",
-			20000: "20秒",
-			25000: "25秒",
-			30000: "30秒",
-			60000: "60秒",
+		Unit:  "毫秒",
+		Validator: validator.Range{
+			Min: 100,
+			Max: 20 * 1000,
 		},
 		Category: SensorsSettingCategory,
 		Group:    SettingGroupAcceleration,
@@ -176,14 +176,17 @@ func (d VibrationTemperature3AxisAdvance) Settings() Settings {
 		Name:  "采样频率(Y)",
 		Key:   "acc1_odr",
 		Type:  Uint8ValueType,
-		Value: 5,
+		Value: 3,
 		Options: map[int]string{
-			0: "4KHz",
-			1: "8KHz",
-			2: "16KHz",
-			3: "25.6KHz",
-			4: "32KHz",
-			5: "64KHz",
+			0: "0.4kHz",
+			1: "0.8kHz",
+			2: "1.6kHz",
+			3: "3.2kHz",
+			4: "6.4kHz",
+			5: "12.8kHz",
+			6: "25.6kHz",
+			7: "51.2kHz",
+			8: "64kHz",
 		},
 		Category: SensorsSettingCategory,
 		Group:    SettingGroupAcceleration,
@@ -206,14 +209,17 @@ func (d VibrationTemperature3AxisAdvance) Settings() Settings {
 		Name:  "原始数据采样频率(Y)",
 		Key:   "acc1_odr_2",
 		Type:  Uint8ValueType,
-		Value: 5,
+		Value: 3,
 		Options: map[int]string{
-			0: "4KHz",
-			1: "8KHz",
-			2: "16KHz",
-			3: "25.6KHz",
-			4: "32KHz",
-			5: "64KHz",
+			0: "0.4kHz",
+			1: "0.8kHz",
+			2: "1.6kHz",
+			3: "3.2kHz",
+			4: "6.4kHz",
+			5: "12.8kHz",
+			6: "25.6kHz",
+			7: "51.2kHz",
+			8: "64kHz",
 		},
 		Category: SensorsSettingCategory,
 		Group:    SettingGroupAcceleration,
@@ -224,19 +230,10 @@ func (d VibrationTemperature3AxisAdvance) Settings() Settings {
 		Key:   "acc1_samples_2",
 		Type:  Uint32ValueType,
 		Value: 10000,
-		Options: map[int]string{
-			100:   "0.1秒",
-			500:   "0.5秒",
-			1000:  "1秒",
-			1500:  "1.5秒",
-			2000:  "2秒",
-			3000:  "3秒",
-			5000:  "5秒",
-			10000: "10秒",
-			20000: "20秒",
-			25000: "25秒",
-			30000: "30秒",
-			60000: "60秒",
+		Unit:  "毫秒",
+		Validator: validator.Range{
+			Min: 100,
+			Max: 20 * 1000,
 		},
 		Category: SensorsSettingCategory,
 		Group:    SettingGroupAcceleration,
@@ -251,6 +248,33 @@ func (d VibrationTemperature3AxisAdvance) Settings() Settings {
 		Category: SensorsSettingCategory,
 		Group:    SettingGroupOther,
 		Sort:     17,
+	}
+	d.VibrationKX = Setting{
+		Name:     "X轴加速度系数",
+		Key:      "vibration_k_x",
+		Type:     FloatValueType,
+		Value:    1,
+		Category: SensorsSettingCategory,
+		Group:    SettingGroupOther,
+		Sort:     18,
+	}
+	d.VibrationKY = Setting{
+		Name:     "Y轴加速度系数",
+		Key:      "vibration_k_y",
+		Type:     FloatValueType,
+		Value:    1,
+		Category: SensorsSettingCategory,
+		Group:    SettingGroupOther,
+		Sort:     19,
+	}
+	d.VibrationKZ = Setting{
+		Name:     "Z轴加速度系数",
+		Key:      "vibration_k_z",
+		Type:     FloatValueType,
+		Value:    1,
+		Category: SensorsSettingCategory,
+		Group:    SettingGroupOther,
+		Sort:     20,
 	}
 
 	return []Setting{
@@ -271,6 +295,9 @@ func (d VibrationTemperature3AxisAdvance) Settings() Settings {
 		d.Acc1Odr2,
 		d.Acc1Samples2,
 		d.BaseFrequency,
+		d.VibrationKX,
+		d.VibrationKY,
+		d.VibrationKZ,
 	}
 }
 

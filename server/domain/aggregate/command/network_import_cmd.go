@@ -46,7 +46,7 @@ func (cmd NetworkImportCmd) Run() error {
 		}
 		return nil
 	})
-	if err == nil && cmd.Network.Mode == entity.NetworkModePushing {
+	if err == nil {
 		go func() {
 			if err := command.SyncNetwork(cmd.Network, cmd.Devices, 3*time.Second); err != nil {
 				xlog.Errorf("sync network failed: %v", err)

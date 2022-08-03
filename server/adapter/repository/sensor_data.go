@@ -152,6 +152,25 @@ func (repo SensorData) Delete(mac string, sensorType uint, from, to time.Time) e
 	return err
 }
 
+func (repo SensorData) DeleteByTime(mac string, sensorType uint, time time.Time) error {
+	err := repo.BoltDB().Update(func(tx *bbolt.Tx) error {
+		bucket := tx.Bucket([]byte(entity.SensorData{}.BucketName()))
+		if bucket != nil {
+			if sensorBucket := bucket.Bucket([]byte(mac)); sensorBucket != nil {
+				if dataBucket := sensorBucket.Bucket(itob(sensorType)); dataBucket != nil {
+					c := dataBucket.Cursor()
+					current := []byte(time.UTC().Format("2006-01-02T15:04:05Z"))
+					if k, _ := c.Seek(current); k != nil {
+						return dataBucket.Delete(k)
+					}
+				}
+			}
+		}
+		return nil
+	})
+	return err
+}
+
 func (repo SensorData) FindTimes(mac string, sensorType uint, from, to time.Time) ([]time.Time, error) {
 	var es []time.Time
 	err := repo.BoltDB().View(func(tx *bbolt.Tx) error {

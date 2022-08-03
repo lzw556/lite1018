@@ -1,6 +1,9 @@
 package devicetype
 
-import "github.com/spf13/cast"
+import (
+	"github.com/spf13/cast"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/devicetype/validator"
+)
 
 const (
 	Uint8ValueType  = "uint8"
@@ -33,17 +36,18 @@ const (
 )
 
 type Setting struct {
-	Name     string          `json:"name"`
-	Key      string          `json:"key"`
-	Value    interface{}     `json:"value"`
-	Type     string          `json:"type"`
-	Unit     string          `json:"unit"`
-	Category SettingCategory `json:"category"`
-	Options  map[int]string  `json:"options"`
-	Group    string          `json:"group,omitempty"`
-	Sort     int             `json:"sort"`
-	Parent   string          `json:"parent,omitempty"`
-	Show     interface{}     `json:"show"`
+	Name      string              `json:"name"`
+	Key       string              `json:"key"`
+	Value     interface{}         `json:"value"`
+	Type      string              `json:"type"`
+	Unit      string              `json:"unit"`
+	Category  SettingCategory     `json:"category"`
+	Options   map[int]string      `json:"options"`
+	Group     string              `json:"group,omitempty"`
+	Sort      int                 `json:"sort"`
+	Parent    string              `json:"parent,omitempty"`
+	Show      interface{}         `json:"show"`
+	Validator validator.Validator `json:"validator"`
 }
 
 func (s Setting) Convert(value interface{}) interface{} {
@@ -65,6 +69,13 @@ func (s Setting) Convert(value interface{}) interface{} {
 	}
 }
 
+func (s Setting) Validate() bool {
+	if s.Validator != nil {
+		return s.Validator.Validate(s.Value)
+	}
+	return true
+}
+
 func samplePeriodSetting() Setting {
 	return Setting{
 		Name:     "采集周期",
@@ -72,7 +83,7 @@ func samplePeriodSetting() Setting {
 		Category: SensorsSettingCategory,
 		Value:    3600000, // 1 hour
 		Type:     Uint32ValueType,
-		Options:  samplePeriodOption1,
+		Options:  samplePeriodOptions,
 		Group:    SettingGroupGeneral,
 		Sort:     0,
 	}
@@ -85,7 +96,7 @@ func sampleOffsetSetting() Setting {
 		Category: SensorsSettingCategory,
 		Value:    0,
 		Type:     Uint32ValueType,
-		Options:  sampleOffsetOptions1,
+		Options:  sampleOffsetOptions,
 		Group:    SettingGroupGeneral,
 		Sort:     1,
 	}
