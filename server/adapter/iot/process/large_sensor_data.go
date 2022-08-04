@@ -63,8 +63,9 @@ func (p *LargeSensorData) Process(ctx *iot.Context, msg iot.Message) error {
 				} else {
 					return fmt.Errorf("decode large sensor data failed: %v", err)
 				}
+			} else {
+				xlog.Warnf("[%s] received %d segments not match gave segment num %d", msg.Body.Device, len(receiver.Packets), receiver.NumOfPackets)
 			}
-			xlog.Warnf("[%s] received %d segments not match gave segment num %d", msg.Body.Device, len(receiver.Packets), receiver.NumOfPackets)
 		} else {
 			receiver.Reset(msg.Body.Device, m)
 			receiver.Receive(m)

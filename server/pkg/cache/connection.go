@@ -27,6 +27,14 @@ func SetOffline(mac string) {
 	connections[mac] = fmt.Sprintf("offline,%d", time.Now().Unix())
 }
 
+func SetConnection(mac string, isOnline bool) {
+	if isOnline {
+		SetOnline(mac)
+	} else {
+		SetOffline(mac)
+	}
+}
+
 func BatchSetOnline(macs ...string) {
 	mu.Lock()
 	defer mu.Unlock()

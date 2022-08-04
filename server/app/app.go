@@ -88,6 +88,7 @@ func runIoTServer(conf config.IoT) {
 	adapter.IoT.RegisterDispatchers(
 		dispatcher.NewDeviceStatus(),
 		dispatcher.NewLinkStatus(),
+		dispatcher.NewLinkStates(),
 		dispatcher.NewRestartStatus(),
 		dispatcher.NewSensorData(),
 		dispatcher.NewLargeSensorData(),
