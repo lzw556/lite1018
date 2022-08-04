@@ -49,10 +49,10 @@ func (r *LargeSensorDataReceiver) Receive(m pd.LargeSensorDataMessage) {
 		xlog.Debugf("[%s] received meta length [%d]", r.MacAddress, m.MetaLength)
 		r.MetaLength = m.MetaLength
 	}
-	xlog.Debugf("[%s] received large sensor data => [packet size = %d, total size = %d]", r.MacAddress, len(r.Packets), m.NumSegments)
 }
 
 func (r LargeSensorDataReceiver) IsCompleted() bool {
+	xlog.Debugf("[%s] received large sensor data => [packet size = %d, total size = %d]", r.MacAddress, len(r.Packets), r.NumOfPackets)
 	return int(r.NumOfPackets) == len(r.Packets)
 }
 
