@@ -12,6 +12,47 @@ export const SingleDeviceDetail: React.FC<{ device: Device; upgradeStatus: any }
   device,
   upgradeStatus
 }) => {
+
+    const render = () => {
+        if (device.information.iccid_4g) {
+            return  <Col span={isMobile ? 12 : 9}>
+                <Row>
+                    <Col span={isMobile ? 24 : 8} className='ts-detail-label'>
+                        4G卡号
+                    </Col>
+                    <Col span={isMobile ? 24 : 16} className='ts-detail-content'>
+                        device.information.iccid_4g
+                    </Col>
+                </Row>
+            </Col>
+        }else {
+            return  <Col span={isMobile ? 12 : 9}>
+                <Row>
+                    <Col span={isMobile ? 24 : 8} className='ts-detail-label'>
+                        IP地址
+                    </Col>
+                    <Col span={isMobile ? 24 : 16} className='ts-detail-content'>
+                        {device.information.ip_address ? (
+                            <Space>
+                                {device.information.ip_address}{' '}
+                                <a
+                                    href={`http://${device.information.ip_address}`}
+                                    target={'_blank'}
+                                    style={{ fontSize: '10pt' }}
+                                >
+                                    访问管理界面
+                                </a>
+                            </Space>
+                        ) : (
+                            '-'
+                        )}
+                    </Col>
+                </Row>
+            </Col>
+        }
+    }
+
+
   return (
     <Row justify={'start'}>
       <Col span={isMobile ? 12 : 9}>
@@ -142,31 +183,7 @@ export const SingleDeviceDetail: React.FC<{ device: Device; upgradeStatus: any }
           </Row>
         </Col>
       )}
-      {device.typeId === DeviceType.Gateway && (
-        <Col span={isMobile ? 12 : 9}>
-          <Row>
-            <Col span={isMobile ? 24 : 8} className='ts-detail-label'>
-              IP地址
-            </Col>
-            <Col span={isMobile ? 24 : 16} className='ts-detail-content'>
-              {device.information.ip_address ? (
-                <Space>
-                  {device.information.ip_address}{' '}
-                  <a
-                    href={`http://${device.information.ip_address}`}
-                    target={'_blank'}
-                    style={{ fontSize: '10pt' }}
-                  >
-                    访问管理界面
-                  </a>
-                </Space>
-              ) : (
-                '-'
-              )}
-            </Col>
-          </Row>
-        </Col>
-      )}
+      {device.typeId === DeviceType.Gateway && render()}
     </Row>
   );
 };
