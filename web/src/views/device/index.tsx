@@ -74,7 +74,7 @@ const DevicePage = () => {
     const [upgradeVisible, setUpgradeVisible] = useState<boolean>(false);
     const [executeDevice, setExecuteDevice] = useState<Device>();
     const [dataSource, setDataSource] = useState<PageResult<any>>();
-    const [page, setPage] = useState<PageForm>(getPage);
+    const [page, setPage] = useState<PageForm>({...getPage(), current:1});
     const [deviceFilter, setDeviceFilter] = useState<DeviceFilterForm>(getDeviceFilter);
     const [filter, setFilter] = useState<any>({});
     const {hasPermission, hasPermissions} = usePermission();
@@ -88,6 +88,7 @@ const DevicePage = () => {
         if (deviceFilter.networkId > 0) {
           filters.network_id = deviceFilter.networkId
         }
+        console.log(page);
         PagingDevicesRequest(page.current, page.size, filters).then(setDataSource);
     }, [page, deviceFilter, refreshKey, filter]);
 
