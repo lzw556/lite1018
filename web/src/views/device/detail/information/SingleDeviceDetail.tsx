@@ -21,7 +21,7 @@ export const SingleDeviceDetail: React.FC<{ device: Device; upgradeStatus: any }
                         4G卡号
                     </Col>
                     <Col span={isMobile ? 24 : 16} className='ts-detail-content'>
-                        device.information.iccid_4g
+                        {device.information.iccid_4g}
                     </Col>
                 </Row>
             </Col>
