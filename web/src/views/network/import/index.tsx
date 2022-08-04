@@ -1,25 +1,22 @@
-import {Button, Card, Col, Form, message, Result, Row, Space, Upload} from "antd";
+import {Button, Card, Col, Form, message, Result, Row, Select, Space, Upload} from "antd";
 import {Content} from "antd/lib/layout/layout";
 import {useEffect, useState} from "react";
 import {ImportOutlined, InboxOutlined} from "@ant-design/icons";
 import {ImportNetworkRequest} from "../../../apis/network";
 import ShadowCard from "../../../components/shadowCard";
-import CommunicationTimeOffsetSelect from "../../../components/communicationTimeOffsetSelect";
-import CommunicationPeriodSelect from "../../../components/communicationPeriodSelect";
-import GroupSizeSelect from "../../../components/groupSizeSelect";
 import MyBreadcrumb from "../../../components/myBreadcrumb";
 import G6 from "@antv/g6";
 import "../../../components/shape/shape"
-import {COMMUNICATION_OFFSET, COMMUNICATION_PERIOD} from "../../../constants";
+import WsnFormItem from "../../../components/formItems/wsnFormItem";
+import {Rules} from "../../../constants/validator";
+import {NetworkProvisioningMode} from "../../../types/network";
 
-const {Dragger} = Upload
+const {Dragger} = Upload;
+const {Option} = Select;
 
 export interface NetworkRequestForm {
-    wsn: {
-        communication_period: number
-        communication_offset: number
-        group_size: number
-    }
+    mode: number
+    wsn: any
     devices: any
 }
 
@@ -27,6 +24,7 @@ const ImportNetworkPage = () => {
     const [height] = useState<number>(window.innerHeight - 190)
     const [network, setNetwork] = useState<any>()
     const [success, setSuccess] = useState<boolean>(false)
+    const [provisioningMode, setProvisioningMode] = useState<number>(1);
     const [form] = Form.useForm()
     let graph: any = null
 
@@ -53,13 +51,18 @@ const ImportNetworkPage = () => {
 
     useEffect(() => {
         if (network) {
+            if (network.wsn && network.wsn.provisioning_mode) {
+                setProvisioningMode(network.wsn.provisioning_mode)
+            }else {
+                network.wsn.provisioning_mode = NetworkProvisioningMode.Mode1
+                setProvisioningMode(NetworkProvisioningMode.Mode1)
+            }
             form.setFieldsValue(
                 {
-                    communication_period: network.wsn.communication_period,
-                    communication_offset: network.wsn.communication_offset,
-                    group_size: network.wsn.group_size,
-                    group_interval: network.wsn.group_interval
-                })
+                    mode: network.wsn.provisioning_mode,
+                    wsn: network.wsn
+                }
+            )
         }
     }, [network])
 
@@ -68,11 +71,8 @@ const ImportNetworkPage = () => {
         if (nodes && nodes.length) {
             form.validateFields().then(values => {
                 const req: NetworkRequestForm = {
-                    wsn: {
-                        communication_period: values.communication_period,
-                        communication_offset: values.communication_offset,
-                        group_size: values.group_size,
-                    },
+                    mode: provisioningMode,
+                    wsn: values.wsn,
                     devices: nodes.map((n: any) => {
                         return {
                             name: n.name,
@@ -91,7 +91,7 @@ const ImportNetworkPage = () => {
     }
 
     const tree: any = (root: any) => {
-        return network.devices.slice(1).filter((node:any) => node.parentAddress === root.address).map((item:any) => {
+        return network.devices.slice(1).filter((node: any) => node.parentAddress === root.address).map((item: any) => {
             return {
                 id: item.address,
                 data: item,
@@ -102,7 +102,7 @@ const ImportNetworkPage = () => {
 
     useEffect(() => {
         if (network?.devices && network?.devices.length) {
-            if (!graph){
+            if (!graph) {
                 graph = new G6.TreeGraph({
                     container: 'container',
                     width: document.querySelector("#container")?.clientWidth,
@@ -176,11 +176,12 @@ const ImportNetworkPage = () => {
                     !success ?
                         <Row justify="space-between">
                             <Col xl={16} xxl={18}>
-                                <Card type="inner" size={"small"} title={"预览"} style={{height: `${height}px`}} extra={renderAction()}>
+                                <Card type="inner" size={"small"} title={"预览"} style={{height: `${height}px`}}
+                                      extra={renderAction()}>
                                     <div className="graph" style={{height: `${height - 56}px`, width: "100%"}}>
                                         {
                                             network?.devices.length ?
-                                                <div id={"container"} style={{width: "100%", height: "100%"}}/>:
+                                                <div id={"container"} style={{width: "100%", height: "100%"}}/> :
                                                 <Dragger accept={".json"} beforeUpload={onBeforeUpload}
                                                          showUploadList={false}>
                                                     <p className="ant-upload-drag-icon">
@@ -197,19 +198,35 @@ const ImportNetworkPage = () => {
                             </Col>
                             <Col xl={8} xxl={6} style={{paddingLeft: "4px"}}>
                                 <Card type="inner" size={"small"} title={"编辑"} style={{height: `${height}px`}}>
-                                    <Form.Item label="通讯周期" name="communication_period"
-                                               rules={[{required: true, message: "请选择网络通讯周期"}]}>
-                                        <CommunicationPeriodSelect periods={COMMUNICATION_PERIOD} placeholder={"请选择网络通讯周期"}/>
+                                    {/*<Form.Item label="通讯周期" name="communication_period"*/}
+                                    {/*           rules={[{required: true, message: "请选择网络通讯周期"}]}>*/}
+                                    {/*    <CommunicationPeriodSelect periods={COMMUNICATION_PERIOD}*/}
+                                    {/*                               placeholder={"请选择网络通讯周期"}/>*/}
+                                    {/*</Form.Item>*/}
+                                    {/*<Form.Item label="通讯延时" name="communication_offset"*/}
+                                    {/*           rules={[{required: true}]}>*/}
+                                    {/*    <CommunicationTimeOffsetSelect offsets={COMMUNICATION_OFFSET}*/}
+                                    {/*                                   placeholder={"请选择网络通讯延时"}/>*/}
+                                    {/*</Form.Item>*/}
+                                    {/*<Form.Item label="每组设备数" name="group_size" initialValue={4}*/}
+                                    {/*           rules={[{required: true}]}>*/}
+                                    {/*    <GroupSizeSelect placeholder={"请选择每组设备数"}/>*/}
+                                    {/*</Form.Item>*/}
+                                    {/*<br/>*/}
+                                    <Form.Item label={"组网模式"} name={"mode"} rules={[Rules.required]}>
+                                        <Select placeholder={"请选择组网模式"} onChange={value => {
+                                            setProvisioningMode(Number(value))
+                                            form.setFieldsValue({wsn: {group_size: 4, communication_period: 2 * 60 * 60 * 1000, communication_offset: 0}})
+                                        }}>
+                                            <Option key={1}
+                                                    value={NetworkProvisioningMode.Mode1}>{NetworkProvisioningMode.toString(NetworkProvisioningMode.Mode1)}</Option>
+                                            <Option key={2}
+                                                    value={NetworkProvisioningMode.Mode2}>{NetworkProvisioningMode.toString(NetworkProvisioningMode.Mode2)}</Option>
+                                        </Select>
                                     </Form.Item>
-                                    <Form.Item label="通讯延时" name="communication_offset"
-                                               rules={[{required: true}]}>
-                                        <CommunicationTimeOffsetSelect offsets={COMMUNICATION_OFFSET} placeholder={"请选择网络通讯延时"}/>
-                                    </Form.Item>
-                                    <Form.Item label="每组设备数" name="group_size" initialValue={4}
-                                               rules={[{required: true}]}>
-                                        <GroupSizeSelect placeholder={"请选择每组设备数"}/>
-                                    </Form.Item>
-                                    <br/>
+                                    {
+                                        network && <WsnFormItem mode={provisioningMode}/>
+                                    }
                                 </Card>
                             </Col>
                         </Row> :

@@ -30,6 +30,7 @@ type RemoveDevices struct {
 
 type ImportNetwork struct {
 	Wsn     WSN `json:"wsn"`
+	Mode    int `json:"mode"`
 	Devices []struct {
 		Name          string                            `json:"name"`
 		MacAddress    string                            `json:"mac_address"`
