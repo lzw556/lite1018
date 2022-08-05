@@ -183,6 +183,7 @@ export const AssetTree: React.FC<{
         setSelectedNode(e.node);
       }}
       defaultExpandAll={true}
+      height={780}
     />
   );
 };
