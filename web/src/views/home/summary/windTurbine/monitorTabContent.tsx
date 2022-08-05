@@ -1,6 +1,7 @@
-import { Col, Row } from 'antd';
+import { Col, Empty, Row } from 'antd';
 import * as React from 'react';
 import { useHistory } from 'react-router-dom';
+import ShadowCard from '../../../../components/shadowCard';
 import { AssetRow } from '../../assetList/props';
 import { sortFlangesByAttributes } from '../../assetList/util';
 import { AssetTypes, MeasurementTypes } from '../../common/constants';
@@ -73,6 +74,13 @@ export const MonitorTabContent: React.FC<{
       );
     }
   }
+
+  if (flanges.length === 0)
+    return (
+      <ShadowCard>
+        <Empty description='没有法兰' image={Empty.PRESENTED_IMAGE_SIMPLE} />
+      </ShadowCard>
+    );
 
   return (
     <Col span={24}>

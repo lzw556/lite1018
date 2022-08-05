@@ -17,6 +17,7 @@ import { sortMeasurementsByAttributes } from '../../measurementList/util';
 import usePermission, { Permission } from '../../../../permission/permission';
 import HasPermission from '../../../../permission';
 import { isMobile } from '../../../../utils/deviceDetection';
+import ShadowCard from '../../../../components/shadowCard';
 
 export const MeasurementOfFlangeList: React.FC<{
   flange?: AssetRow;
@@ -29,7 +30,11 @@ export const MeasurementOfFlangeList: React.FC<{
   const generateTables = () => {
     if (!flange) return null;
     if (!flange.monitoringPoints || flange.monitoringPoints.length === 0)
-      return <Empty description='没有法兰或监测点' image={Empty.PRESENTED_IMAGE_SIMPLE} />;
+      return (
+        <ShadowCard>
+          <Empty description='没有监测点' image={Empty.PRESENTED_IMAGE_SIMPLE} />
+        </ShadowCard>
+      );
     return (
       <Row gutter={[0, 16]}>
         {generateTable(sortMeasurementsByAttributes(flange.monitoringPoints))}

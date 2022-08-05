@@ -1,6 +1,6 @@
-import { Button, Empty, Form, Spin } from 'antd';
+import { Button, Form, Spin } from 'antd';
 import * as React from 'react';
-import { Link, useLocation, useHistory } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { AssetNavigator } from '../../components/assetNavigator';
 import '../../home.css';
 import { MeasurementRow } from '../measurement/props';
@@ -19,7 +19,6 @@ import { isMobile } from '../../../../utils/deviceDetection';
 
 const FlangeOverview: React.FC = () => {
   const { search, pathname } = useLocation();
-  const history = useHistory();
   const id = Number(search.substring(search.lastIndexOf('id=') + 3));
   const [asset, setAsset] = React.useState<AssetRow>();
   const [loading, setLoading] = React.useState(true);
@@ -67,28 +66,6 @@ const FlangeOverview: React.FC = () => {
   };
 
   if (loading) return <Spin />;
-  //TODO
-  if (!measurements || measurements.length === 0)
-    return (
-      <Empty
-        description={
-          <p>
-            还没有监测点, 去
-            <Link to='/measurement-management?locale=measurement-management'>创建</Link>, 或
-            <a
-              href='#!'
-              onClick={(e) => {
-                history.go(-1);
-                e.preventDefault();
-              }}
-            >
-              返回
-            </a>
-          </p>
-        }
-        image={Empty.PRESENTED_IMAGE_SIMPLE}
-      />
-    );
 
   const tabs = [
     {
@@ -96,7 +73,7 @@ const FlangeOverview: React.FC = () => {
       tab: '监控',
       content: (
         <MonitorTabContent
-          measurements={measurements}
+          measurements={measurements || []}
           pathname={pathname}
           search={search}
           asset={asset}

@@ -1,11 +1,15 @@
-import { Col, Row } from 'antd';
+import { Col, Empty, Row } from 'antd';
 import moment from 'moment';
 import * as React from 'react';
 import { useHistory } from 'react-router-dom';
 import ShadowCard from '../../../../components/shadowCard';
 import { AssetRow } from '../../assetList/props';
 import { MeasurementTypes } from '../../common/constants';
-import { generateChartOptionsOfHistoryData, generateChartOptionsOfLastestData, HistoryData } from '../../common/historyDataHelper';
+import {
+  generateChartOptionsOfHistoryData,
+  generateChartOptionsOfLastestData,
+  HistoryData
+} from '../../common/historyDataHelper';
 import { combineFinalUrl, generateColProps } from '../../common/utils';
 import { ChartContainer } from '../../components/charts/chartContainer';
 import { MeasurementRow } from '../measurement/props';
@@ -18,9 +22,6 @@ export const MonitorTabContent: React.FC<{
   asset?: AssetRow;
 }> = ({ measurements, pathname, search, asset }) => {
   const history = useHistory();
-  const measurementType = Object.values(MeasurementTypes).find(
-    (type) => type.id === measurements[0].type
-  );
   const [statisticOfPreload, setStatisticOfPreload] = React.useState<any>();
   const [historyDatas, setHistoryDatas] = React.useState<
     { name: string; data: HistoryData; index: number }[]
@@ -41,15 +42,20 @@ export const MonitorTabContent: React.FC<{
   }, [measurements]);
 
   React.useEffect(() => {
-    if (historyDatas.length > 0 && measurementType) {
-      setStatisticOfPreload(
-        generateChartOptionsOfHistoryData(
-          historyDatas.sort((prev, next) => prev.index - next.index),
-          measurementType
-        )
+    if (historyDatas.length > 0) {
+      const measurementType = Object.values(MeasurementTypes).find(
+        (type) => type.id === measurements[0].type
       );
+      if (measurementType) {
+        setStatisticOfPreload(
+          generateChartOptionsOfHistoryData(
+            historyDatas.sort((prev, next) => prev.index - next.index),
+            measurementType
+          )
+        );
+      }
     }
-  }, [historyDatas, measurementType]);
+  }, [historyDatas, measurements]);
 
   const renderChart = ({ options, title, style, render, clickHandler }: any) => {
     if (render) return render;
@@ -63,6 +69,16 @@ export const MonitorTabContent: React.FC<{
     );
   };
 
+  if (measurements.length === 0)
+    return (
+      <ShadowCard>
+        <Empty description='没有监测点' image={Empty.PRESENTED_IMAGE_SIMPLE} />
+      </ShadowCard>
+    );
+
+  const measurementType = Object.values(MeasurementTypes).find(
+    (type) => type.id === measurements[0].type
+  );
   if (!measurementType) return null;
   return (
     <Col span={24}>
