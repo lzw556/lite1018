@@ -40,7 +40,7 @@ export function generateChartOptionsOfLastestData(
   polar.push(actuals.radius);
   angleAxis.push(actuals.angleAxis);
   const max = getMax(actuals.max, attributes, measurements[0].type);
-  const min = measurements[0].type === MeasurementTypes.loosening_angle.id ? -max : max / 2;
+  const min = measurements[0].type === MeasurementTypes.loosening_angle.id ? -(max * 1.5) : max / 2;
   radiusAxis.push({ ...actuals.radiusAxis, max, min });
   series.push(actuals.series);
 
