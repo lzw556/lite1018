@@ -5,7 +5,7 @@ export const AttributeFormItem: React.FC<{ label: string; name: string }> = ({ l
   return (
     <Form.Item label={label}>
       <Input.Group compact={true}>
-        <Form.Item noStyle={true} name={['attributes', name, 'enabled']} initialValue={true}>
+        <Form.Item noStyle={true} name={['attributes', name, 'enabled']} initialValue={false}>
           <Radio.Group optionType='button' buttonStyle='solid'>
             <Radio.Button key={0} value={true}>
               启用
