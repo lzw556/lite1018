@@ -18,7 +18,12 @@ export const AssetExport: React.FC<{ winds: AssetRow[] }> = ({ winds }) => {
         <ExportOutlined />
       </Button>
       {visible && (
-        <WindSelection visible={visible} onCancel={() => setVisible(false)} winds={winds} />
+        <WindSelection
+          visible={visible}
+          onCancel={() => setVisible(false)}
+          winds={winds}
+          onSuccess={() => setVisible(false)}
+        />
       )}
     </>
   );

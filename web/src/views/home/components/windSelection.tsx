@@ -6,7 +6,9 @@ import { AssetRow } from '../assetList/props';
 import { exportAssets } from '../assetList/services';
 import { getFilename } from '../common/utils';
 
-export const WindSelection: React.FC<{ winds: AssetRow[] } & ModalProps> = (props) => {
+export const WindSelection: React.FC<{ winds: AssetRow[]; onSuccess: () => void } & ModalProps> = (
+  props
+) => {
   const [form] = Form.useForm();
   const [selected, setSelected] = React.useState<CheckboxValueType[]>([]);
   const [loading, setLoading] = React.useState(false);
@@ -14,6 +16,7 @@ export const WindSelection: React.FC<{ winds: AssetRow[] } & ModalProps> = (prop
   const handleUpload = (windIds?: number[]) => {
     exportAssets(getProject(), windIds)
       .then((res) => {
+        if (!windIds) props.onSuccess();
         const url = window.URL.createObjectURL(new Blob([res.data]));
         const link = document.createElement('a');
         link.href = url;
