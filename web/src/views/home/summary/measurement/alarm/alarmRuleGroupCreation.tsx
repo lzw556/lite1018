@@ -113,7 +113,7 @@ const AlarmRuleGroupCreation = () => {
                       <Form.Item
                         {...restFields}
                         name={[name, 'index']}
-                        label='指标名称'
+                        label='指标'
                         rules={[{ required: true, message: '请选择指标名称' }]}
                       >
                         <Select
