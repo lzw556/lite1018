@@ -84,13 +84,13 @@ export const EditContent: React.FC<{
         <AttributeFormItem label='初始值' name='initial' />
       )}
       {AssetTypes.Flange.categories && assetTypeId !== AssetTypes.WindTurbind.id && (
-        <AttributeFormItem label='次要' name='info' />
+        <AttributeFormItem label='次要报警' name='info' />
       )}
       {AssetTypes.Flange.categories && assetTypeId !== AssetTypes.WindTurbind.id && (
-        <AttributeFormItem label='重要' name='warn' />
+        <AttributeFormItem label='重要报警' name='warn' />
       )}
       {AssetTypes.Flange.categories && assetTypeId !== AssetTypes.WindTurbind.id && (
-        <AttributeFormItem label='严重' name='danger' />
+        <AttributeFormItem label='严重报警' name='danger' />
       )}
     </>
   );
