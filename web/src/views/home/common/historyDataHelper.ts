@@ -45,12 +45,18 @@ export function generateChartOptionsOfLastestData(
   series.push(actuals.series);
 
   const legends = [];
+  const firstClassFields = getFirstClassFields(measurements[0]);
+  let field: any = null;
+  if (firstClassFields.length > 0) {
+    field = firstClassFields[0];
+  }
   if (
     measurements[0].type === MeasurementTypes.preload.id &&
     checkValidAttr(attributes, 'normal', min)
   ) {
-    const normal = getSeries(ColorHealth, attributes?.normal?.value, '额定值');
-    legends.push({ name: '额定值', itemStyle: { color: ColorHealth } });
+    const seriesName = `额定值 ${attributes?.normal?.value}${field?.unit}`
+    const normal = getSeries(ColorHealth, attributes?.normal?.value, seriesName);
+    legends.push({ name: seriesName, itemStyle: { color: ColorHealth } });
     series.push(normal.series);
   }
 
@@ -58,26 +64,30 @@ export function generateChartOptionsOfLastestData(
     measurements[0].type === MeasurementTypes.loosening_angle.id &&
     checkValidAttr(attributes, 'initial', min)
   ) {
-    const initial = getSeries(ColorHealth, attributes?.initial?.value, '初始值');
-    legends.push({ name: '初始值', itemStyle: { color: ColorHealth } });
+    const seriesName = `初始值 ${attributes?.initial?.value}${field?.unit}`
+    const initial = getSeries(ColorHealth, attributes?.initial?.value, seriesName);
+    legends.push({ name: seriesName, itemStyle: { color: ColorHealth } });
     series.push(initial.series);
   }
 
   if (checkValidAttr(attributes, 'info', min)) {
-    const info = getSeries(ColorInfo, attributes?.info?.value, '次要报警');
-    legends.push({ name: '次要报警', itemStyle: { color: ColorInfo } });
+    const seriesName = `次要报警 ${attributes?.info?.value}${field?.unit}`
+    const info = getSeries(ColorInfo, attributes?.info?.value, seriesName);
+    legends.push({ name: seriesName, itemStyle: { color: ColorInfo } });
     series.push(info.series);
   }
 
   if (checkValidAttr(attributes, 'warn', min)) {
-    const warn = getSeries(ColorWarn, attributes?.warn?.value, '重要报警');
-    legends.push({ name: '重要报警', itemStyle: { color: ColorWarn } });
+    const seriesName = `重要报警 ${attributes?.warn?.value}${field?.unit}`
+    const warn = getSeries(ColorWarn, attributes?.warn?.value, seriesName);
+    legends.push({ name: seriesName, itemStyle: { color: ColorWarn } });
     series.push(warn.series);
   }
 
   if (checkValidAttr(attributes, 'danger', min)) {
-    const danger = getSeries(ColorDanger, attributes?.danger?.value, '严重报警');
-    legends.push({ name: '严重报警', itemStyle: { color: ColorDanger } });
+    const seriesName = `严重报警 ${attributes?.danger?.value}${field?.unit}`
+    const danger = getSeries(ColorDanger, attributes?.danger?.value, seriesName);
+    legends.push({ name: seriesName, itemStyle: { color: ColorDanger } });
     series.push(danger.series);
   }
 
