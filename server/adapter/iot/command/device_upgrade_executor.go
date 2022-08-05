@@ -37,7 +37,7 @@ func NewDeviceUpgradeExecutor(firmware entity.Firmware) background.Executor {
 
 func (e DeviceUpgradeExecutor) Execute(ctx context.Context, gateway, device entity.Device) error {
 	cmd := newUpgradeFirmwareCmd(e.firmware)
-	resp, err := cmd.Execute(gateway.MacAddress, device.MacAddress)
+	resp, err := cmd.Execute(gateway.MacAddress, device.MacAddress, device.IsNB())
 	if err != nil {
 		return err
 	}
@@ -107,7 +107,7 @@ func (e DeviceUpgradeExecutor) loadFirmware(gateway string, device entity.Device
 
 func (e DeviceUpgradeExecutor) sendFirmwareData(gateway string, device entity.Device, seqID int, data []byte) (int, float32, error) {
 	cmd := newLoadFirmwareCmd(e.firmware.ID, seqID, data, int(e.firmware.Size))
-	resp, err := cmd.Execute(gateway, device.MacAddress)
+	resp, err := cmd.Execute(gateway, device.MacAddress, device.IsNB())
 	if err != nil {
 		return 0, 0, err
 	}

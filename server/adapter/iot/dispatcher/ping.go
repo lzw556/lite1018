@@ -33,5 +33,5 @@ func (d Ping) Dispatch(msg iot.Message) {
 		xlog.Errorf("generate [%s] command payload failed: %v => %s", d.Name(), err, msg.Body.Device)
 		return
 	}
-	adapter.IoT.Publish(topic, 1, payload)
+	adapter.IoT.Publish(topic, 1, false, payload)
 }

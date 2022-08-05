@@ -1,26 +1,52 @@
 package devicetype
 
-type AngleDip struct {
-	SamplePeriod Setting `json:"sample_period"`
-	SampleOffset Setting `json:"sample_offset"`
-	ObjectRadius Setting `json:"object_radius"`
-	ObjectLength Setting `json:"object_length"`
-	SensorFlags  Setting `json:"sensor_flags"`
-	Acc3Odr2     Setting `json:"acc3_odr_2"`
-	Acc3Samples2 Setting `json:"acc3_samples_2"`
+type AngleDipNB struct {
+	CommunicationPeriod Setting `json:"communication_period"`
+	CommunicationOffset Setting `json:"communication_offset"`
+	NtpIsEnabled        Setting `json:"ntp_is_enabled"`
+	NtpAddr             Setting `json:"ntp_addr"`
+	SamplePeriod        Setting `json:"sample_period"`
+	SampleOffset        Setting `json:"sample_offset"`
+	ObjectRadius        Setting `json:"object_radius"`
+	ObjectLength        Setting `json:"object_length"`
+	SensorFlags         Setting `json:"sensor_flags"`
+	Acc3Odr2            Setting `json:"acc3_odr_2"`
+	Acc3Samples2        Setting `json:"acc3_samples_2"`
 }
 
-func (AngleDip) ID() uint {
-	return AngleDipType
+func (AngleDipNB) ID() uint {
+	return AngleDipNBType
 }
 
-func (AngleDip) SensorID() uint {
+func (AngleDipNB) SensorID() uint {
 	return SCL3300Sensor
 }
 
-func (d AngleDip) Settings() Settings {
-	d.SamplePeriod = samplePeriodSetting(0)
-	d.SampleOffset = sampleOffsetSetting(1)
+func (d AngleDipNB) Settings() Settings {
+	d.CommunicationPeriod = communicationPeriodSetting(0)
+	d.CommunicationOffset = communicationOffsetSetting(1)
+	d.NtpIsEnabled = Setting{
+		Name:     "是否启用NTP",
+		Key:      "ntp_is_enabled",
+		Type:     BoolValueType,
+		Value:    true, // 0: Disable 1: Enable
+		Category: IpnSettingCategory,
+		Sort:     2,
+		Group:    SettingGroupNetwork,
+	}
+	d.NtpAddr = Setting{
+		Name:     "NTP服务器地址",
+		Key:      "ntp_addr",
+		Type:     StringValueType,
+		Value:    "ntp1.aliyun.com",
+		Category: IpnSettingCategory,
+		Sort:     3,
+		Parent:   d.NtpIsEnabled.Key,
+		Show:     true,
+		Group:    SettingGroupNetwork,
+	}
+	d.SamplePeriod = samplePeriodSetting(4)
+	d.SampleOffset = sampleOffsetSetting(5)
 	d.SensorFlags = Setting{
 		Name:     "采样模式",
 		Key:      "sensor_flags",
@@ -32,7 +58,7 @@ func (d AngleDip) Settings() Settings {
 			2: "动态模式",
 		},
 		Group: SettingGroupGeneral,
-		Sort:  2,
+		Sort:  6,
 	}
 	d.ObjectRadius = Setting{
 		Name:     "被测物半径",
@@ -41,7 +67,7 @@ func (d AngleDip) Settings() Settings {
 		Category: SensorsSettingCategory,
 		Value:    0,
 		Group:    SettingGroupInclinometer,
-		Sort:     3,
+		Sort:     7,
 	}
 	d.ObjectLength = Setting{
 		Name:     "被测物高度",
@@ -50,7 +76,7 @@ func (d AngleDip) Settings() Settings {
 		Category: SensorsSettingCategory,
 		Value:    0,
 		Group:    SettingGroupInclinometer,
-		Sort:     4,
+		Sort:     8,
 	}
 	d.Acc3Odr2 = Setting{
 		Name:     "动态模式采样频率",
@@ -71,7 +97,7 @@ func (d AngleDip) Settings() Settings {
 		Parent: d.SensorFlags.Key,
 		Show:   2,
 		Group:  SettingGroupAcceleration,
-		Sort:   5,
+		Sort:   9,
 	}
 	d.Acc3Samples2 = Setting{
 		Name:     "动态模式采样时间",
@@ -89,10 +115,13 @@ func (d AngleDip) Settings() Settings {
 		Parent: d.SensorFlags.Key,
 		Show:   2,
 		Group:  SettingGroupAcceleration,
-		Sort:   6,
+		Sort:   10,
 	}
-
 	return Settings{
+		d.CommunicationPeriod,
+		d.CommunicationOffset,
+		d.NtpIsEnabled,
+		d.NtpAddr,
 		d.SamplePeriod,
 		d.SampleOffset,
 		d.SensorFlags,
@@ -103,6 +132,6 @@ func (d AngleDip) Settings() Settings {
 	}
 }
 
-func (d AngleDip) Properties(sensorID uint) Properties {
+func (d AngleDipNB) Properties(sensorID uint) Properties {
 	return properties[int(sensorID)]
 }

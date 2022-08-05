@@ -140,6 +140,10 @@ func (d Device) IsSQ() bool {
 	return d.Type == devicetype.AngleDipType
 }
 
+func (d Device) IsNB() bool {
+	return d.Type == devicetype.AngleDipNBType || d.Type == devicetype.VibrationTemperature3AxisNBType || d.Type == devicetype.VibrationTemperature3AxisAdvancedNBType
+}
+
 func (d Device) NotifyConnectionState(isOnline bool, timestamp int64) {
 	eventbus.Publish(eventbus.SocketEmit, "socket::deviceStateChangedEvent", map[string]interface{}{
 		"macAddress": d.MacAddress,

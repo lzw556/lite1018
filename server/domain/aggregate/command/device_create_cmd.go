@@ -10,6 +10,7 @@ import (
 
 type DeviceCreateCmd struct {
 	entity.Device
+	Network entity.Network
 
 	deviceRepo  dependency.DeviceRepository
 	networkRepo dependency.NetworkRepository
@@ -27,14 +28,12 @@ func (cmd DeviceCreateCmd) Run() error {
 	if err := cmd.deviceRepo.Create(ctx, &cmd.Device); err != nil {
 		return err
 	}
-	network, err := cmd.networkRepo.Get(ctx, cmd.Device.NetworkID)
-	if err != nil {
-		return err
+	if !cmd.Device.IsNB() {
+		gateway, err := cmd.deviceRepo.Get(ctx, cmd.Network.GatewayID)
+		if err != nil {
+			return err
+		}
+		go command.AddDevice(gateway, cmd.Device)
 	}
-	gateway, err := cmd.deviceRepo.Get(ctx, network.GatewayID)
-	if err != nil {
-		return err
-	}
-	go command.AddDevice(gateway, cmd.Device)
 	return nil
 }

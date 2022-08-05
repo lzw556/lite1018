@@ -72,6 +72,6 @@ func (cmd updateWsnCmd) Payload() ([]byte, error) {
 	return proto.Marshal(&m)
 }
 
-func (cmd updateWsnCmd) Execute(gateway string, target string) (*Response, error) {
-	return cmd.request.do(gateway, target, cmd, 3)
+func (cmd updateWsnCmd) Execute(gateway string, target string, retained bool) (*Response, error) {
+	return cmd.request.do(gateway, target, cmd, retained, 3)
 }

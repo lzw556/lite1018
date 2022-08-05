@@ -67,10 +67,13 @@ export const FIRST_CLASS_PROPERTIES = [
     { typeId: DeviceType.BoltLoosening, properties:['loosening_angle', 'attitude', 'motion'] },
     { typeId: DeviceType.BoltElongation, properties:['preload', 'temperature', 'pressure'] },
     { typeId: DeviceType.VibrationTemperature3Axis, properties:['vibration_severity_y', 'enveloping_pk2pk_y', 'temperature'] },
+    { typeId: DeviceType.VibrationTemperature3AxisNB, properties:['vibration_severity_y', 'enveloping_pk2pk_y', 'temperature'] },
     { typeId: DeviceType.HighTemperatureCorrosion, properties:['thickness', 'temperature', 'annualized_corrosion_rate'] },
     { typeId: DeviceType.NormalTemperatureCorrosion, properties:['thickness', 'temperature', 'annualized_corrosion_rate'] },
     { typeId: DeviceType.PressureTemperature, properties:['loosening_angle', 'attitude', 'motion'] },
     { typeId: DeviceType.AngleDip, properties:['inclination', 'pitch', 'roll'] },
+    { typeId: DeviceType.AngleDipNB, properties:['inclination', 'pitch', 'roll'] },
     { typeId: DeviceType.VibrationTemperature3AxisAdvanced, properties:['vibration_severity_y', 'enveloping_pk2pk_y', 'temperature'] },
+    { typeId: DeviceType.VibrationTemperature3AxisAdvancedNB, properties:['vibration_severity_y', 'enveloping_pk2pk_y', 'temperature'] },
     { typeId: DeviceType.Temperature, properties: ['temperature']}
 ]

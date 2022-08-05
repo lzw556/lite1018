@@ -9,6 +9,7 @@ type CreateDevice struct {
 	IPN        map[string]interface{} `json:"ipn,omitempty"`
 	System     map[string]interface{} `json:"system,omitempty"`
 	Sensors    map[string]interface{} `json:"sensors,omitempty"`
+	Wsn        map[string]interface{} `json:"wsn,omitempty"`
 
 	ProjectID uint `json:"-"`
 }
