@@ -8,6 +8,8 @@ import {
 import { Button, Empty, message, Popconfirm, Space, Table, TableProps, Tag } from 'antd';
 import * as React from 'react';
 import { Link } from 'react-router-dom';
+import HasPermission from '../../../../../permission';
+import { Permission } from '../../../../../permission/permission';
 import { MeasurementTypes } from '../../../common/constants';
 import {
   convertAlarmLevelToState,
@@ -95,18 +97,20 @@ const AlarmRuleList = () => {
                   <EditOutlined />
                 </Link>
               </Button>
-              <Popconfirm
-                title={`确定要删除该规则吗?`}
-                onConfirm={() => {
-                  deleteAlarmRule(row.id).then(() => {
-                    fetchAlarmRules();
-                  });
-                }}
-              >
-                <Button type='text' danger={true} size='small' title={`删除`}>
-                  <DeleteOutlined />
-                </Button>
-              </Popconfirm>
+              <HasPermission value={Permission.AlarmRuleDelete}>
+                <Popconfirm
+                  title={`确定要删除该规则吗?`}
+                  onConfirm={() => {
+                    deleteAlarmRule(row.id).then(() => {
+                      fetchAlarmRules();
+                    });
+                  }}
+                >
+                  <Button type='text' danger={true} size='small' title={`删除`}>
+                    <DeleteOutlined />
+                  </Button>
+                </Popconfirm>
+              </HasPermission>
               <Button type='text' size='small' title='编辑监测点'>
                 <MoreOutlined
                   onClick={() => {
