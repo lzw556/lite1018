@@ -505,10 +505,10 @@ export function generateDatasOfMeasurement(measurement: MeasurementRow) {
         }
         return { name, value: getDisplayValue(value, precision, unit) };
       })
-      .concat({
-        name: '采集时间',
-        value: data ? moment(data.timestamp * 1000).format('YYYY-MM-DD HH:mm:ss') : '-'
-      });
+      // .concat({
+      //   name: '采集时间',
+      //   value: data ? moment(data.timestamp * 1000).format('YYYY-MM-DD HH:mm:ss') : '-'
+      // });
   }
   return [];
 }
