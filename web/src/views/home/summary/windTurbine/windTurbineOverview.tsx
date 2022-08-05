@@ -1,22 +1,21 @@
-import { Button, Col, Empty, Form, Row, Spin } from 'antd';
+import { Col, Form, Row, Spin } from 'antd';
 import * as React from 'react';
-import { Link, useLocation, useHistory } from 'react-router-dom';
+import { useLocation, useHistory } from 'react-router-dom';
 import { AssetNavigator } from '../../components/assetNavigator';
 import '../../home.css';
 import { getAsset, updateAsset } from '../../assetList/services';
-import { MeasurementRow } from '../measurement/props';
 import { OverviewPage } from '../../components/overviewPage';
 import { getAssetStatistics, NameValue } from '../../common/statisticsHelper';
 import { MeasurementOfWindList } from '../../measurementList/measurementOfWindList';
-import { MeasurementEdit } from '../../measurementList/edit';
-import { PlusOutlined } from '@ant-design/icons';
 import ShadowCard from '../../../../components/shadowCard';
 import { Asset, AssetRow, convertRow } from '../../assetList/props';
 import { MonitorTabContent } from './monitorTabContent';
 import { SettingsTabContent } from '../settingsTabContent';
 import usePermission, { Permission } from '../../../../permission/permission';
-import HasPermission from '../../../../permission';
 import { isMobile } from '../../../../utils/deviceDetection';
+import { ActionBar } from '../../components/actionBar';
+import { useActionBarStatus } from '../../common/useActionBarStatus';
+import { AssetTypes } from '../../common/constants';
 
 const WindTurbineOverview: React.FC = () => {
   const { pathname, search } = useLocation();
@@ -25,11 +24,10 @@ const WindTurbineOverview: React.FC = () => {
   const [asset, setAsset] = React.useState<AssetRow>();
   const [loading, setLoading] = React.useState(true);
   const [statistics, setStatistics] = React.useState<NameValue[]>();
-  const [visible, setVisible] = React.useState(false);
-  const [selectedRow, setSelectedRow] = React.useState<MeasurementRow>();
   const [form] = Form.useForm<Asset>();
   const [isForceRefresh, setIsForceRefresh] = React.useState(0);
   const { hasPermission } = usePermission();
+  const actionStatus = useActionBarStatus();
 
   const fetchAsset = (id: number, form?: any) => {
     getAsset(id).then((asset) => {
@@ -60,24 +58,7 @@ const WindTurbineOverview: React.FC = () => {
     }
   }, [asset, pathname, search, history]);
 
-  const open = (selectedRow?: MeasurementRow) => {
-    setSelectedRow(selectedRow);
-    setVisible(true);
-  };
-
   if (loading) return <Spin />;
-  if (!asset || !asset.children || asset.children.length === 0)
-    return (
-      <Empty
-        description={
-          <p>
-            还没有法兰, 去<Link to='/asset-management?locale=asset-management'>创建</Link>, 或
-            <Link to={`/project-overview?locale=project-overview`}>返回</Link>
-          </p>
-        }
-        image={Empty.PRESENTED_IMAGE_SIMPLE}
-      />
-    );
 
   const tabs = [
     {
@@ -90,43 +71,30 @@ const WindTurbineOverview: React.FC = () => {
       tab: '监测点列表',
       content: (
         <ShadowCard>
+          {asset && hasPermission(Permission.AssetAdd) && (
+            <div style={{ position: 'fixed', top: isMobile ? 550 : 240, right: 25, zIndex: 10 }}>
+              <ActionBar
+                assets={[asset]}
+                {...actionStatus}
+                onEdit={actionStatus.handleEdit}
+                initialValues={{ ...AssetTypes.Flange, parent_id: asset.id }}
+                assetId={asset.id}
+                onSuccess={() => fetchAsset(id)}
+                hides={[true, false, false, true, true]}
+              />
+            </div>
+          )}
           <Row>
-            <Col span={24}>
-              <HasPermission value={Permission.MeasurementAdd}>
-                <Button
-                  type='primary'
-                  style={{ position: 'fixed', top: isMobile ? 550 : 240, right: 25, zIndex: 10 }}
-                  onClick={() => open()}
-                >
-                  添加监测点
-                  <PlusOutlined />
-                </Button>
-              </HasPermission>
-            </Col>
             <Col span={24}>
               <MeasurementOfWindList
                 wind={asset}
                 pathname={pathname}
                 search={search}
-                open={open}
+                open={actionStatus.handleEdit}
                 fetchAssets={() => {
                   fetchAsset(id);
                 }}
               />
-              {visible && (
-                <MeasurementEdit
-                  {...{
-                    visible,
-                    onCancel: () => setVisible(false),
-                    id: selectedRow?.id,
-                    assetId: asset.id,
-                    onSuccess: () => {
-                      fetchAsset(id);
-                      setVisible(false);
-                    }
-                  }}
-                />
-              )}
             </Col>
           </Row>
         </ShadowCard>
