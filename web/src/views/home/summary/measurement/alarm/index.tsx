@@ -1,5 +1,11 @@
-import { DeleteOutlined, EditOutlined, MoreOutlined, PlusOutlined } from '@ant-design/icons';
-import { Button, Empty, Popconfirm, Space, Table, TableProps, Tag } from 'antd';
+import {
+  DeleteOutlined,
+  EditOutlined,
+  ExportOutlined,
+  MoreOutlined,
+  PlusOutlined
+} from '@ant-design/icons';
+import { Button, Empty, message, Popconfirm, Space, Table, TableProps, Tag } from 'antd';
 import * as React from 'react';
 import { Link } from 'react-router-dom';
 import { MeasurementTypes } from '../../../common/constants';
@@ -8,13 +14,16 @@ import {
   getAlarmLevelColor,
   getAlarmStateText
 } from '../../../common/statisticsHelper';
+import { FileInput } from '../../../components/fileInput';
 import { SearchResultPage } from '../../../components/searchResultPage';
 import { AlarmRule } from '../props';
-import { deleteAlarmRule, getAlarmRules } from '../services';
+import { deleteAlarmRule, getAlarmRules, importAlarmRules } from '../services';
 import { MeasurementBind } from './measurementBind';
+import { RuleSelection } from './ruleSelection';
 
 const AlarmRuleList = () => {
   const [visible, setVisible] = React.useState(false);
+  const [visibleExport, setVisibleExport] = React.useState(false);
   const [selectedRow, setSelectedRow] = React.useState<AlarmRule>();
   const getRules = (dataSource: AlarmRule['rules']): TableProps<any> => {
     return {
@@ -135,10 +144,43 @@ const AlarmRuleList = () => {
     <SearchResultPage
       {...{
         actions: (
-          <Button type='primary' href='#/alarm-management?locale=alarmRules/addAlarmRuleGroup'>
-            添加规则
-            <PlusOutlined />
-          </Button>
+          <>
+            <Button type='primary' href='#/alarm-management?locale=alarmRules/addAlarmRuleGroup'>
+              添加规则
+              <PlusOutlined />
+            </Button>
+            {result.dataSource && result.dataSource.length > 0 && (
+              <Button
+                type='primary'
+                onClick={() => {
+                  setVisibleExport(true);
+                }}
+              >
+                导出配置
+                <ExportOutlined />
+              </Button>
+            )}
+            <FileInput
+              onUpload={(data) => {
+                return importAlarmRules(data).then((res) => {
+                  if (res.data.code === 200) {
+                    message.success('导入成功');
+                    fetchAlarmRules();
+                  } else {
+                    message.error(`导入失败: ${res.data.msg}`);
+                  }
+                });
+              }}
+            />
+            {visibleExport && (
+              <RuleSelection
+                visible={visibleExport}
+                onCancel={() => setVisibleExport(false)}
+                rules={result.dataSource as AlarmRule[]}
+                onSuccess={() => setVisibleExport(false)}
+              />
+            )}
+          </>
         ),
         results: <Table {...result} />
       }}

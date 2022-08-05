@@ -122,3 +122,17 @@ export function downloadRawHistory(id: number, timestamp: number) {
     `/monitoringPoints/${id}/download/data/${timestamp}`
   );
 }
+
+export function exportAlarmRules(alarm_rule_group_ids?: number[]) {
+  if (alarm_rule_group_ids && alarm_rule_group_ids.length > 0) {
+    return request.download<any>(
+      `alarmRuleGroups/exportFile?alarm_rule_group_ids=${alarm_rule_group_ids.join(',')}`
+    );
+  } else {
+    return request.download<any>(`alarmRuleGroups/exportFile`);
+  }
+}
+
+export function importAlarmRules(data: any) {
+  return request.post<any>(`alarmRuleGroups/import`, data);
+}
