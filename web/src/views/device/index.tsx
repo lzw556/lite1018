@@ -371,7 +371,7 @@ const DevicePage = () => {
               <Label name={'网络'}>
                 <NetworkSelect bordered={false} onChange={(network) => {
                   setFilters(prev => ({...prev, network_id: network}));
-                  setPagedOptions(pagedOptions);
+                  setPagedOptions({...pagedOptions, index: 1});
                 }} allowClear defaultValue={filters?.network_id}/>
               </Label>
               <Label name='设备类型'>
@@ -381,7 +381,7 @@ const DevicePage = () => {
                   allowClear={true}
                   onChange={(val) => {
                     setFilters(prev => ({...prev, type: Number.isInteger(val) ? Number(val) : undefined}));
-                    setPagedOptions(pagedOptions);
+                    setPagedOptions({...pagedOptions, index: 1});
                   }}
                   defaultValue={filters?.type}
                 >
@@ -411,7 +411,7 @@ const DevicePage = () => {
                     setFilters(prev => {
                       return searchTarget === 0 ? {...prev, name: val} : {...prev, mac_address: val}
                     })
-                    setPagedOptions(pagedOptions);
+                    setPagedOptions({...pagedOptions, index: 1});
                   }}
                   allowClear
                   enterButton
