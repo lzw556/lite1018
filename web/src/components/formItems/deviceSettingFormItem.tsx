@@ -1,6 +1,7 @@
-import {Form, Input, Radio, Select} from "antd"
+import {Form, Input, InputNumber, Radio, Select} from "antd"
 import {DeviceSetting, DeviceSettingValueType} from "../../types/device_setting";
 import {FC, useState} from "react";
+import {Normalizes, Rules} from "../../constants/validator";
 
 export interface DeviceSettingFormItemProps {
     value: DeviceSetting
@@ -43,8 +44,27 @@ const DeviceSettingFormItem: FC<DeviceSettingFormItemProps> = ({value, editable}
         })
     }
 
+    const renderRules = (setting:DeviceSetting) => {
+        switch (setting.type) {
+            case DeviceSettingValueType.uint8:
+            case DeviceSettingValueType.uint16:
+            case DeviceSettingValueType.uint32:
+            case DeviceSettingValueType.uint64:
+            case DeviceSettingValueType.float:
+                if (setting.validator) {
+                    return [{...Rules.number(), ...setting.validator}]
+                }
+               return [Rules.number()]
+            default:
+                if (setting.validator) {
+                    return [setting.validator]
+                }
+                return []
+        }
+    }
+
     return <>
-        <Form.Item label={setting.name} name={[setting.category, setting.key]} initialValue={setting.value}>
+        <Form.Item label={setting.name} name={[setting.category, setting.key]}  initialValue={setting.value} rules={renderRules(setting)}>
             {
                 renderComponents()
             }

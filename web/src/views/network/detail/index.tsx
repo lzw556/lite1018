@@ -15,11 +15,8 @@ import {
 } from '../../../apis/network';
 import '../../../string-extension';
 import TopologyView from './topologyView';
-import { PlusOutlined } from '@ant-design/icons';
-import AddDeviceModal from './addDeviceModal';
 import '../index.css';
 import usePermission, { Permission } from '../../../permission/permission';
-import HasPermission from '../../../permission';
 import ButtonGroup from 'antd/lib/button/button-group';
 import { defaultValidateMessages, Rules } from '../../../constants/validator';
 import WsnFormItem from '../../../components/formItems/wsnFormItem';
@@ -44,10 +41,11 @@ const NetworkDetail = () => {
           form.setFieldsValue({
             name: data.name,
             wsn: {
+              mode: data.mode,
               communication_period: data.communicationPeriod,
+              communication_period_2: data.communicationPeriod2,
               communication_offset: data.communicationOffset,
               group_size: data.groupSize,
-              group_interval: data.groupInterval
             }
           });
           setNetwork(data);
@@ -110,7 +108,7 @@ const NetworkDetail = () => {
                 <Form.Item label={'名称'} name={'name'} rules={[Rules.range(4, 16)]}>
                   <Input placeholder={'请输入网络名称'} />
                 </Form.Item>
-                <WsnFormItem/>
+                <WsnFormItem mode={network.mode}/>
                 <Form.Item wrapperCol={{ offset: 6, span: 18 }}>
                   <Row justify='end'>
                     <Col>
