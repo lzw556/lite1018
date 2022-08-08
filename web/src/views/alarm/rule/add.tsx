@@ -33,7 +33,7 @@ const AddAlarmRule = () => {
             operation: ">=",
             level: 3,
         })
-        setOptions(DeviceType.Sensors().map(item => {
+        setOptions(DeviceType.sensors().map(item => {
             return {value: item, label: DeviceType.toString(item), isLeaf: false}
         }))
     }, [])

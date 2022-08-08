@@ -33,7 +33,7 @@ import { EmptyLayout } from '../layout';
 const { Option } = Select;
 
 const DeviceMonitor = () => {
-  const types = DeviceType.Sensors().join(",")
+  const types = DeviceType.sensors().join(",")
   const [networks, setNetworks] = React.useState<Network[]>([]);
   const { state } = useLocation<{filters: Filters; pagedOptions: PagedOption;}>();
   const pagedOptionsDefault = { index: 1, size: 12 };

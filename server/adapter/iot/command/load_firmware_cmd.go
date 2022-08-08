@@ -54,6 +54,6 @@ func (cmd loadFirmwareCmd) Payload() ([]byte, error) {
 	return proto.Marshal(&m)
 }
 
-func (cmd loadFirmwareCmd) Execute(gateway string, target string) (*Response, error) {
-	return cmd.request.do(gateway, target, cmd, 5*time.Second)
+func (cmd loadFirmwareCmd) Execute(gateway string, target string, retained bool) (*Response, error) {
+	return cmd.request.do(gateway, target, cmd, retained, 5*time.Second)
 }

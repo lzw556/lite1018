@@ -1,11 +1,9 @@
 package process
 
 import (
-	"context"
 	"fmt"
 	"github.com/gogo/protobuf/proto"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/iot"
-	"github.com/thetasensors/theta-cloud-lite/server/adapter/iot/command"
 	pd "github.com/thetasensors/theta-cloud-lite/server/adapter/iot/proto"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
@@ -61,11 +59,6 @@ func (p DeviceStatus) Process(ctx *iot.Context, msg iot.Message) error {
 			if !isOnline {
 				go p.addDeviceOnlineEvent(device)
 				device.NotifyConnectionState(true, time.Now().Unix())
-			}
-			if device.IsGateway() && !isOnline {
-				if network, err := p.networkRepo.Get(context.TODO(), device.NetworkID); err == nil {
-					go command.SyncNetworkLinkStates(network)
-				}
 			}
 		}
 	}

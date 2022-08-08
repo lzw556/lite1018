@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"github.com/allegro/bigcache/v3"
 	"github.com/gogo/protobuf/proto"
+	"github.com/thetasensors/theta-cloud-lite/server/adapter"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/iot"
+	"github.com/thetasensors/theta-cloud-lite/server/adapter/iot/command"
 	pd "github.com/thetasensors/theta-cloud-lite/server/adapter/iot/proto"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
@@ -43,13 +45,13 @@ func (p *LargeSensorData) Process(ctx *iot.Context, msg iot.Message) error {
 			return fmt.Errorf("unmarshal [LargeSensorData] message failed: %v", err)
 		}
 		var receiver LargeSensorDataReceiver
-		err := cache.GetStruct(device.MacAddress, &receiver)
+		key := fmt.Sprintf("%s-%d", device.MacAddress, m.SessionId)
+		err := cache.GetStruct(key, &receiver)
 		if errors.Is(bigcache.ErrEntryNotFound, err) {
 			receiver = NewLargeSensorDataReceiver(msg.Body.Device, m)
 		}
 		p.mu.Lock()
 		defer p.mu.Unlock()
-		xlog.Debugf("[%s] p.receiver.SessionID: %v, pd.SessionId: %v", msg.Body.Device, receiver.SessionID, m.SessionId)
 		if receiver.SessionID == m.SessionId {
 			if receiver.Receive(m); receiver.IsCompleted() {
 				xlog.Infof("[%s] received %d segments", msg.Body.Device, len(receiver.Packets))
@@ -59,7 +61,7 @@ func (p *LargeSensorData) Process(ctx *iot.Context, msg iot.Message) error {
 						return fmt.Errorf("create large sensor data failed: %v", err)
 					}
 					xlog.Infof("[%s] insert ok large sensor data: %+v", msg.Body.Device, e)
-					_ = cache.Delete(device.MacAddress)
+					_ = cache.Delete(key)
 				} else {
 					return fmt.Errorf("decode large sensor data failed: %v", err)
 				}
@@ -67,12 +69,22 @@ func (p *LargeSensorData) Process(ctx *iot.Context, msg iot.Message) error {
 				xlog.Warnf("[%s] received %d segments not match gave segment num %d", msg.Body.Device, len(receiver.Packets), receiver.NumOfPackets)
 			}
 		} else {
+			xlog.Warnf("[%s] cache session id: %d not match received session id: %d", msg.Body.Device, receiver.SessionID, m.SessionId)
+			_ = cache.Delete(key)
 			receiver.Reset(msg.Body.Device, m)
 			receiver.Receive(m)
 		}
-		if err := cache.SetStruct(device.MacAddress, receiver); err != nil {
+		if err := cache.SetStruct(key, receiver); err != nil {
 			return fmt.Errorf("set cache failed: %v", err)
 		}
+		cmd := command.NewLargeSensorDataAckCommand(m.SessionId, m.SegmentId)
+		topic := fmt.Sprintf("iot/v2/gw/%s/dev/%s/cmd/%s/", msg.Body.Gateway, msg.Body.Device, cmd.Name())
+		payload, err := cmd.Payload()
+		if err != nil {
+			xlog.Errorf("[%s] generate [%s] command payload failed: %v", msg.Body.Device, p.Name(), err)
+			return nil
+		}
+		adapter.IoT.Publish(topic, 1, false, payload)
 	}
 	return nil
 }
