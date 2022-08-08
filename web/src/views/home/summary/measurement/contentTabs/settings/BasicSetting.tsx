@@ -2,6 +2,7 @@ import { Button, Col, Form, Input, Row, Select } from 'antd';
 import React from 'react';
 import DeviceSelect from '../../../../../../components/select/deviceSelect';
 import { defaultValidateMessages, Rules } from '../../../../../../constants/validator';
+import { useStore } from '../../../../../../hooks/store';
 import { DeviceType } from '../../../../../../types/device_type';
 import { isMobile } from '../../../../../../utils/deviceDetection';
 import { AssetRow } from '../../../../assetList/props';
@@ -15,16 +16,15 @@ export const BasicSetting: React.FC<MeasurementRow & { onUpdate?: () => void }> 
   const { id, bindingDevices } = props;
   const [form] = Form.useForm<Measurement & { device_id: number }>();
   const [parents, setParents] = React.useState<AssetRow[]>([]);
+  const [store] = useStore('measurementListFilters');
 
   React.useEffect(() => {
     getAssets({ type: AssetTypes.Flange.id }).then((assets) => {
-      const local = localStorage.getItem('measurementListFilters');
-      const filters: { windTurbineId: number } = local ? JSON.parse(local) : null;
       setParents(
-        assets.filter((asset) => (filters ? filters.windTurbineId === asset.parentId : true))
+        assets.filter((asset) => (store.windTurbineId ? store.windTurbineId === asset.parentId : true))
       );
     });
-  }, []);
+  }, [store]);
 
   React.useEffect(() => {
     form.resetFields();

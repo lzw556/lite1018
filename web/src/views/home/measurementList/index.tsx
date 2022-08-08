@@ -11,6 +11,7 @@ import { getProject } from '../../../utils/session';
 import { ActionBar } from '../components/actionBar';
 import { useActionBarStatus } from '../common/useActionBarStatus';
 import usePermission, { Permission } from '../../../permission/permission';
+import { useStore } from '../../../hooks/store';
 
 const MeasurementManagement: React.FC = () => {
   const { pathname, search } = useLocation();
@@ -21,11 +22,8 @@ const MeasurementManagement: React.FC = () => {
     loading: true,
     items: []
   });
-  const local = localStorage.getItem('measurementListFilters');
-  const localObj: { windTurbineId: number } = local ? JSON.parse(local) : null;
-  const [filters, setFilters] = React.useState<{ windTurbineId: number } | undefined>(
-    localObj ? localObj : undefined
-  );
+  const [store, setStore] = useStore('measurementListFilters');
+  
   const [wind, setWind] = React.useState<AssetRow>();
   const actionStatus = useActionBarStatus();
   const { hasPermission } = usePermission();
@@ -37,14 +35,14 @@ const MeasurementManagement: React.FC = () => {
 
   React.useEffect(() => {
     if (assets.items.length > 0) {
-      if (filters) {
-        const asset = assets.items.find((asset) => asset.id === filters.windTurbineId);
+      if (store.windTurbineId) {
+        const asset = assets.items.find((asset) => asset.id === store.windTurbineId);
         setWind(asset ? asset : assets.items[0]);
       } else {
         setWind(assets.items[0]);
       }
     }
-  }, [filters, assets]);
+  }, [store, assets]);
 
   const fetchAssets = (filters?: Pick<AssetRow, 'type'>) => {
     setAssets((prev) => ({ ...prev, loading: true }));
@@ -55,8 +53,8 @@ const MeasurementManagement: React.FC = () => {
 
   const getSelectedWind = () => {
     if (assets.items.length > 0) {
-      if (filters?.windTurbineId) {
-        const wind = assets.items.find((asset) => asset.id === filters?.windTurbineId);
+      if (store.windTurbineId) {
+        const wind = assets.items.find((asset) => asset.id === store.windTurbineId);
         if (wind) return wind.id;
       }
       return assets.items[0].id;
@@ -70,8 +68,7 @@ const MeasurementManagement: React.FC = () => {
         <Select
           bordered={false}
           onChange={(val) => {
-            setFilters((prev) => ({ ...prev, windTurbineId: val }));
-            localStorage.setItem('measurementListFilters', JSON.stringify({ windTurbineId: val }));
+            setStore(prev => ({...prev, windTurbineId: val}));
           }}
           defaultValue={getSelectedWind()}
         >

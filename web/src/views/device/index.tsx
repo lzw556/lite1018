@@ -50,25 +50,18 @@ import NetworkSelect from '../../components/select/networkSelect';
 import DeviceUpgradeSpin from './spin/deviceUpgradeSpin';
 import './index.css';
 import { SingleDeviceStatus } from './SingleDeviceStatus';
-import { getValueOfFirstClassProperty, generateDeviceTypeCollections, omitSpecificKeys, Filters } from './util';
+import { getValueOfFirstClassProperty, generateDeviceTypeCollections, omitSpecificKeys } from './util';
 import { isMobile } from '../../utils/deviceDetection';
 import { Link } from 'react-router-dom';
-import { PagedOption } from '../../types/props';
 import EditCalibrateParas from './edit/editCalibrateParas';
 import { AlarmRuleSettings } from './detail/setting/alarmRuleSettings';
+import { Store, useStore } from '../../hooks/store';
 
 const { Search } = Input;
 const { Option } = Select;
 const { Text } = Typography;
-type RememberdState = {filters: Filters; pagedOptions: PagedOption; searchTarget: number;}
 
 const DevicePage = () => {
-  const local = localStorage.getItem('deviceListFilters');
-  const localObj :RememberdState = local ? JSON.parse(local) : null
-  const [searchTarget, setSearchTarget] = useState(localObj ? localObj.searchTarget :0);
-  const pagedOptionsDefault = { index: 1, size: 10 };
-  const [pagedOptions, setPagedOptions] = useState(localObj ? localObj.pagedOptions : pagedOptionsDefault);
-  const [filters, setFilters] = useState<Filters | undefined>(localObj ? localObj.filters: undefined);
   const [device, setDevice] = useState<Device>();
   const [editSettingVisible, setEditSettingVisible] = useState<boolean>(false);
   const [editBaseInfoVisible, setEditBaseInfoVisible] = useState<boolean>(false);
@@ -76,25 +69,21 @@ const DevicePage = () => {
   const [executeDevice, setExecuteDevice] = useState<Device>();
   const [dataSource, setDataSource] = useState<PageResult<any>>();
   const { hasPermission, hasPermissions } = usePermission();
-  const [refreshKey, setRefreshKey] = useState<number>(0);
   const [visibleCalibrate, setVisibleCalibrate] = useState(false);
   const [visibleAlarmRules, setVisibleAlarmRules] = useState(false);
+  const [store, setStore] = useStore('deviceList');
+  
+  const fetchDevices = (store: Store['deviceList']) => {
+    const {filters, pagedOptions: {index, size}} = store;
+    PagingDevicesRequest(index, size, omitSpecificKeys(filters ?? {}, [])).then(setDataSource);
+  }
 
   useEffect(() => {
-    const { index, size } = pagedOptions;
-    PagingDevicesRequest(index, size, omitSpecificKeys(filters ?? {}, [])).then(setDataSource);
-  }, [pagedOptions, filters, refreshKey]);
-
-  useEffect(()=> {
-    localStorage.setItem('deviceListFilters', JSON.stringify({filters, pagedOptions, searchTarget}))
-  }, [pagedOptions, filters, searchTarget])
-
-  const onRefresh = () => {
-    setRefreshKey(refreshKey + 1);
-  };
+    fetchDevices(store);
+  }, [store]);
 
   const onDelete = (id: number) => {
-    DeleteDeviceRequest(id).then((_) => onRefresh());
+    DeleteDeviceRequest(id).then((_) => fetchDevices(store));
   };
 
   const onCommand = (device: Device, key: any) => {
@@ -227,8 +216,7 @@ const DevicePage = () => {
               <Link
                 to={{
                   pathname: `device-management`,
-                  search: `?locale=devices/deviceDetail&id=${record.id}`,
-                  state: {filters, pagedOptions, searchTarget}
+                  search: `?locale=devices/deviceDetail&id=${record.id}`
                 }}
               >
                 {text}
@@ -369,10 +357,18 @@ const DevicePage = () => {
           <Col span={24}>
             <Space direction={isMobile ? 'vertical' : 'horizontal'}>
               <Label name={'网络'}>
-                <NetworkSelect bordered={false} onChange={(network) => {
-                  setFilters(prev => ({...prev, network_id: network}));
-                  setPagedOptions({...pagedOptions, index: 1});
-                }} allowClear defaultValue={filters?.network_id}/>
+                <NetworkSelect
+                  bordered={false}
+                  onChange={(network) => {
+                    setStore((prev) => ({
+                      ...prev,
+                      pagedOptions: { ...prev.pagedOptions, index: 1 },
+                      filters: { ...prev.filters, network_id: network }
+                    }));
+                  }}
+                  allowClear
+                  defaultValue={store.filters?.network_id}
+                />
               </Label>
               <Label name='设备类型'>
                 <Select
@@ -380,10 +376,13 @@ const DevicePage = () => {
                   bordered={false}
                   allowClear={true}
                   onChange={(val) => {
-                    setFilters(prev => ({...prev, type: Number.isInteger(val) ? Number(val) : undefined}));
-                    setPagedOptions({...pagedOptions, index: 1});
+                    setStore((prev) => ({
+                      ...prev,
+                      pagedOptions: { ...prev.pagedOptions, index: 1 },
+                      filters: { ...prev.filters, type: Number.isInteger(val) ? Number(val) : undefined }
+                    }));
                   }}
-                  defaultValue={filters?.type}
+                  defaultValue={store.filters?.type}
                 >
                   {generateDeviceTypeCollections().map(({ val, name }: any) => (
                     <Select.Option key={val} value={val}>
@@ -394,9 +393,9 @@ const DevicePage = () => {
               </Label>
               <Input.Group compact>
                 <Select
-                  defaultValue={searchTarget}
+                  defaultValue={store.searchTarget}
                   style={{ width: '80px' }}
-                  onChange={val => setSearchTarget(val)}
+                  onChange={(val) => setStore(prev => ({...prev, searchTarget: val}))}
                   suffixIcon={<CaretDownOutlined />}
                 >
                   <Option value={0}>名称</Option>
@@ -405,17 +404,18 @@ const DevicePage = () => {
                 <Search
                   style={{ width: isMobile ? 'calc(100% - 80px)' : '256px' }}
                   placeholder={
-                    searchTarget === 0 ? '请输入设备名称进行查询' : '请输入设备MAC进行查询'
+                    store.searchTarget === 0 ? '请输入设备名称进行查询' : '请输入设备MAC进行查询'
                   }
-                  onSearch={val => {
-                    setFilters(prev => {
-                      return searchTarget === 0 ? {...prev, name: val} : {...prev, mac_address: val}
-                    })
-                    setPagedOptions({...pagedOptions, index: 1});
+                  onSearch={(val) => {
+                    setStore((prev) => ({
+                      ...prev,
+                      pagedOptions: { ...prev.pagedOptions, index: 1 },
+                      filters: { ...prev.filters, [store.searchTarget === 0 ? 'name' : 'mac_address']: val }
+                    }));
                   }}
                   allowClear
                   enterButton
-                  defaultValue={filters?.mac_address || filters?.name}
+                  defaultValue={store.filters?.mac_address || store.filters?.name}
                 />
               </Input.Group>
             </Space>
@@ -433,7 +433,7 @@ const DevicePage = () => {
                 Permission.DeviceDelete
               ]}
               dataSource={dataSource}
-              onChange={(index: number, size: number) => setPagedOptions({ index, size })}
+              onChange={(index: number, size: number) => setStore(prev => ({...prev, pagedOptions: {index, size}}))}
             />
           </Col>
         </Row>
@@ -444,7 +444,7 @@ const DevicePage = () => {
         onSuccess={() => {
           setDevice(undefined);
           setEditBaseInfoVisible(false);
-          onRefresh();
+          fetchDevices(store);
         }}
         onCancel={() => {
           setDevice(undefined);
@@ -458,7 +458,7 @@ const DevicePage = () => {
           onSuccess={() => {
             setDevice(undefined);
             setEditSettingVisible(false);
-            onRefresh();
+            fetchDevices(store);
           }}
           onCancel={() => {
             setDevice(undefined);
@@ -500,7 +500,7 @@ const DevicePage = () => {
           }}
         />
       )}
-     {visibleAlarmRules && device && (
+      {visibleAlarmRules && device && (
         <Modal
           title='报警规则'
           visible={visibleAlarmRules}
