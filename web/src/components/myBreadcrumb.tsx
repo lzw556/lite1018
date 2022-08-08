@@ -35,16 +35,18 @@ const MyBreadcrumb: FC<MyBreadcrumbProps> = ({ children, label, firstBreadState,
         fixed
           ? {
               position: 'fixed',
-              top: 75,
+              top: 60,
               left: isMobile ? 10 : 215,
               right: 25,
               zIndex: 10,
+              paddingTop: 15,
+              paddingBottom: 8,
               backgroundColor: 'rgb(238, 240, 245)'
             }
           : { paddingBottom: '8px' }
       }
     >
-      <Col span={children ? 12 : 24}>
+      <Col>
         <Breadcrumb style={{ fontSize: '16pt', fontWeight: 'bold' }}>
           {paths.map(({ search, name }, index: number) => {
             const menu = findMenu(routes, name, location.pathname);
@@ -66,7 +68,7 @@ const MyBreadcrumb: FC<MyBreadcrumbProps> = ({ children, label, firstBreadState,
         </Breadcrumb>
       </Col>
       {children && (
-        <Col span={12}>
+        <Col>
           <Row justify={'end'}>
             <Col>{children}</Col>
           </Row>
