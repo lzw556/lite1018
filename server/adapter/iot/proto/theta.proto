@@ -102,6 +102,7 @@ message SensorDataMessage {
   int32 usec = 5;
   int32 length = 6;
   repeated float values = 7;
+  int32 sessionId = 8;
 }
 
 message LargeSensorDataMessage {
@@ -396,6 +397,7 @@ message SensorDataAckCommand {
   string reqId = 2;
   int32 subCommand = 3;
   int32 sensorId = 4;
+  int32 sessionId = 5;
 }
 
 message LargeSensorDataAckCommand {
