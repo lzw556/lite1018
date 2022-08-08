@@ -59,7 +59,7 @@ const AddUserModal = (props: AddUserProps) => {
         confirmLoading={isLoading}>
 
         <Form form={form} labelCol={{span: 6}}>
-            <Form.Item name="username" label={"用户名"} rules={[{required: true, message: "请输入用户名"}]}>
+            <Form.Item name="username" label={"用户名"} rules={[Rules.range(4, 16)]}>
                 <Input placeholder="用户名"/>
             </Form.Item>
             <Form.Item name="password" label={"密码"} rules={[{required: true, message: "请输入密码"}]}>
