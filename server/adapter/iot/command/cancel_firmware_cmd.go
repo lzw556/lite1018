@@ -42,3 +42,7 @@ func (cmd cancelFirmwareCmd) Payload() ([]byte, error) {
 func (cmd cancelFirmwareCmd) Execute(gateway string, target string, retained bool) (*Response, error) {
 	return cmd.request.do(gateway, target, cmd, retained, 5)
 }
+
+func (cmd cancelFirmwareCmd) AsyncExecute(gateway string, target string, retained bool) error {
+	return cmd.request.doAsync(gateway, target, cmd, retained, 3)
+}

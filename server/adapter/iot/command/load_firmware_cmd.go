@@ -57,3 +57,7 @@ func (cmd loadFirmwareCmd) Payload() ([]byte, error) {
 func (cmd loadFirmwareCmd) Execute(gateway string, target string, retained bool) (*Response, error) {
 	return cmd.request.do(gateway, target, cmd, retained, 5*time.Second)
 }
+
+func (cmd loadFirmwareCmd) AsyncExecute(gateway string, target string, retained bool) error {
+	return cmd.request.doAsync(gateway, target, cmd, retained, 3)
+}

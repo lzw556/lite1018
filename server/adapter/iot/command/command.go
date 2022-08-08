@@ -2,19 +2,14 @@ package command
 
 import (
 	"context"
-	"fmt"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/response"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/iot/background"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
-	spec "github.com/thetasensors/theta-cloud-lite/server/domain/specification"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/cache"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/devicetype"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/errcode"
-	"github.com/thetasensors/theta-cloud-lite/server/pkg/eventbus"
-	"github.com/thetasensors/theta-cloud-lite/server/pkg/json"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/xlog"
-	"github.com/thetasensors/theta-cloud-lite/server/worker"
 	"time"
 )
 
@@ -42,7 +37,7 @@ func Execute(gateway, device entity.Device, t Type) error {
 	}
 	if isOnline(gateway.MacAddress) {
 		xlog.Infof("execute command %s => [%s]", cmd.Name(), device.MacAddress)
-		_, err := cmd.Execute(gateway.MacAddress, device.MacAddress, device.IsNB())
+		err := cmd.AsyncExecute(gateway.MacAddress, device.MacAddress, false)
 		if err != nil {
 			xlog.Errorf("execute device [%s] command %s failed: %v", device.MacAddress, cmd.Name(), err)
 			return err
@@ -53,84 +48,6 @@ func Execute(gateway, device entity.Device, t Type) error {
 		xlog.Errorf("execute command %s failed: gateway offline => [%s]", cmd.Name(), gateway.MacAddress)
 	}
 	return response.BusinessErr(errcode.DeviceOfflineError, "")
-}
-
-func SyncNetworkLinkStates(network entity.Network) {
-	devices, err := deviceRepo.FindBySpecs(context.TODO(), spec.NetworkEqSpec(network.ID))
-	if err != nil {
-		xlog.Errorf("sync network link states failed: %v", err)
-		return
-	}
-	var gateway entity.Device
-	for _, device := range devices {
-		if network.GatewayID == device.ID {
-			gateway = device
-			break
-		}
-	}
-	xlog.Infof("starting sync devices link status => [%s]", gateway.MacAddress)
-	cmd := newGetLinkStatesCmd()
-	resp, err := cmd.Execute(gateway.MacAddress, gateway.MacAddress, false)
-	if err != nil {
-		xlog.Errorf("execute command %s failed: %v => [%s]", cmd.Name(), err, gateway.MacAddress)
-		return
-	}
-	var result []struct {
-		Mac   string `json:"mac"`
-		State int    `json:"state"`
-	}
-	if err := json.Unmarshal(resp.Payload, &result); err != nil {
-		xlog.Errorf("unmarshal [AllStatus] failed:%v", err)
-		return
-	}
-	statusMap := make(map[string]bool)
-	for i := range result {
-		r := result[i]
-		if r.Mac != gateway.MacAddress {
-			if r.State > 1 {
-				statusMap[r.Mac] = true
-			} else {
-				statusMap[r.Mac] = false
-			}
-		}
-	}
-	for i := range devices {
-		device := devices[i]
-		if device.MacAddress != gateway.MacAddress {
-			oldState, _, _ := cache.GetConnection(device.MacAddress)
-			newState, _ := statusMap[device.MacAddress]
-			if newState != oldState {
-				eventbus.Publish(eventbus.SocketEmit, "socket::deviceStateChangedEvent", map[string]interface{}{
-					"macAddress": device.MacAddress,
-					"state": map[string]interface{}{
-						"isOnline":    newState,
-						"connectedAt": time.Now().Unix(),
-					},
-				})
-				go func(isOnline bool) {
-					event := entity.Event{
-						Code:      entity.EventCodeStatus,
-						Category:  entity.EventCategoryDevice,
-						SourceID:  device.ID,
-						Timestamp: time.Now().Unix(),
-						ProjectID: device.ProjectID,
-					}
-					code := 0
-					if !isOnline {
-						code = 2
-					}
-					event.Content = fmt.Sprintf(`{"code": %d}`, code)
-					worker.EventsChan <- event
-				}(newState)
-				if newState {
-					cache.SetOnline(device.MacAddress)
-				} else {
-					cache.SetOffline(device.MacAddress)
-				}
-			}
-		}
-	}
-	xlog.Infof("sync devices link status successful=> [%s]", gateway.MacAddress)
 }
 
 func SyncNetwork(network entity.Network, devices []entity.Device, timeout time.Duration) error {
@@ -168,7 +85,7 @@ func SyncDeviceSettings(gateway entity.Device, devices ...entity.Device) {
 func UpdateDeviceSettings(gateway, device entity.Device) {
 	xlog.Infof("starting update device settings => [%s]", device.MacAddress)
 	cmd := newUpdateDeviceSettingsCmd(device.Settings)
-	if _, err := cmd.Execute(gateway.MacAddress, device.MacAddress, device.IsNB()); err != nil {
+	if _, err := cmd.Execute(gateway.MacAddress, device.MacAddress, false); err != nil {
 		xlog.Errorf("execute command %s failed: %v => [%s]", cmd.Name(), err, gateway.MacAddress)
 		return
 	}
@@ -233,7 +150,7 @@ func AddDevice(gateway entity.Device, device entity.Device) {
 
 func UpdateDevice(gateway entity.Device, device entity.Device, oldMac string) {
 	cmd := newUpdateDeviceCmd(device.Name, oldMac, device.MacAddress, device.Parent, int32(device.Type))
-	if _, err := cmd.Execute(gateway.MacAddress, gateway.MacAddress, device.IsNB()); err != nil {
+	if _, err := cmd.Execute(gateway.MacAddress, gateway.MacAddress, false); err != nil {
 		xlog.Errorf("execute device command %s failed: %v => [%s]", cmd.Name(), err, gateway.MacAddress)
 		return
 	}
@@ -281,7 +198,7 @@ func CancelDeviceUpgrade(gateway entity.Device, device entity.Device) error {
 	switch status.Code {
 	case entity.DeviceUpgradeLoading, entity.DeviceUpgradeUpgrading:
 		cmd := newCancelFirmwareCmd()
-		_, err := cmd.Execute(gateway.MacAddress, device.MacAddress, device.IsNB())
+		_, err := cmd.Execute(gateway.MacAddress, device.MacAddress, false)
 		if err != nil {
 			xlog.Errorf("execute device command %s failed: %v => [%s]", cmd.Name(), err, gateway.MacAddress)
 		}
@@ -299,7 +216,7 @@ func Calibrate(gateway entity.Device, device entity.Device, param float32) error
 	if isOnline(gateway.MacAddress) {
 		if t := devicetype.Get(device.Type); t != nil {
 			cmd := newCalibrateCmd(t.SensorID(), param)
-			if _, err := cmd.Execute(gateway.MacAddress, device.MacAddress, device.IsNB()); err != nil {
+			if _, err := cmd.Execute(gateway.MacAddress, device.MacAddress, false); err != nil {
 				xlog.Errorf("execute device command %s failed: %v => [%s]", cmd.Name(), err, gateway.MacAddress)
 				return err
 			}

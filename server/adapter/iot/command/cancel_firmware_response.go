@@ -4,6 +4,7 @@ import (
 	"github.com/gogo/protobuf/proto"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/iot"
 	pd "github.com/thetasensors/theta-cloud-lite/server/adapter/iot/proto"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/cache"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/eventbus"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/xlog"
 )
@@ -25,9 +26,12 @@ func (d CancelFirmwareResponse) Dispatch(msg iot.Message) {
 		xlog.Errorf("unmarshal [%s] message failed: %v", d.Name(), err)
 		return
 	}
-	response := Response{
-		Code:    int(m.Code),
-		Payload: []byte(m.TaskId),
+	if _, err := cache.Get(m.ReqId); err == nil {
+		xlog.Infof("[%s] cancelFirmware command executed successful req id %s", msg.Body.Device, m.ReqId)
+	} else {
+		response := Response{
+			Code: int(m.Code),
+		}
+		eventbus.Publish(m.ReqId, response)
 	}
-	eventbus.Publish(m.ReqId, response)
 }

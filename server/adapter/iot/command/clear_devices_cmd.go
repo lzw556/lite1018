@@ -43,3 +43,7 @@ func (cmd clearDevicesCmd) Payload() ([]byte, error) {
 func (cmd clearDevicesCmd) Execute(gateway string, target string, retained bool) (*Response, error) {
 	return cmd.request.do(gateway, target, cmd, retained, 5)
 }
+
+func (cmd clearDevicesCmd) AsyncExecute(gateway string, target string, retained bool) error {
+	return cmd.request.doAsync(gateway, target, cmd, retained, 3)
+}

@@ -8,13 +8,15 @@ import (
 
 type SensorDataAckCommand struct {
 	request
-	sensorID int32
+	sensorID  int32
+	sessionID int32
 }
 
-func NewSensorDataAckCommand(sensorID int32) SensorDataAckCommand {
+func NewSensorDataAckCommand(sessionID, sensorID int32) SensorDataAckCommand {
 	return SensorDataAckCommand{
-		request:  newRequest(),
-		sensorID: sensorID,
+		request:   newRequest(),
+		sessionID: sessionID,
+		sensorID:  sensorID,
 	}
 }
 
@@ -39,10 +41,15 @@ func (cmd SensorDataAckCommand) Payload() ([]byte, error) {
 		ReqId:     cmd.request.id,
 		Timestamp: int32(cmd.request.timestamp),
 		SensorId:  cmd.sensorID,
+		SessionId: cmd.sessionID,
 	}
 	return proto.Marshal(&m)
 }
 
 func (cmd SensorDataAckCommand) Execute(gateway string, target string, retained bool) (*Response, error) {
 	return cmd.request.do(gateway, target, cmd, retained, 3*time.Second)
+}
+
+func (cmd SensorDataAckCommand) AsyncExecute(gateway string, target string, retained bool) error {
+	return cmd.request.doAsync(gateway, target, cmd, retained, 3)
 }

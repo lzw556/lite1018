@@ -41,7 +41,7 @@ func NewAdapter(conf config.IoT) *Adapter {
 		SetPassword(conf.Password).
 		SetClientID(fmt.Sprintf("iot-%s", uuid.NewV1().String())).
 		SetAutoReconnect(true).
-		SetCleanSession(true).
+		SetCleanSession(false).
 		SetConnectRetry(true).
 		SetPingTimeout(10 * time.Second).
 		SetOrderMatters(false).
@@ -131,7 +131,7 @@ func (a *Adapter) Run() error {
 	xlog.Info("iot server start successful")
 	go func() {
 		for msg := range a.publishChan {
-			xlog.Infof("publish message to topic: %s retained: %s payload: %d", msg.Topic, msg.Retained, len(msg.Payload))
+			xlog.Infof("publish message to topic: %s retained: %v payload: %d", msg.Topic, msg.Retained, len(msg.Payload))
 			t := a.client.Publish(msg.Topic, msg.Qos, msg.Retained, msg.Payload)
 			go func() {
 				if t.Wait() && t.Error() != nil {
