@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/allegro/bigcache/v3"
 	"github.com/gogo/protobuf/proto"
-	"github.com/thetasensors/theta-cloud-lite/server/adapter"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/iot"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/iot/command"
 	pd "github.com/thetasensors/theta-cloud-lite/server/adapter/iot/proto"
@@ -78,13 +77,11 @@ func (p *LargeSensorData) Process(ctx *iot.Context, msg iot.Message) error {
 			return fmt.Errorf("set cache failed: %v", err)
 		}
 		cmd := command.NewLargeSensorDataAckCommand(m.SessionId, m.SegmentId)
-		topic := fmt.Sprintf("iot/v2/gw/%s/dev/%s/cmd/%s/", msg.Body.Gateway, msg.Body.Device, cmd.Name())
-		payload, err := cmd.Payload()
+		err = cmd.AsyncExecute(msg.Body.Gateway, msg.Body.Device, false)
 		if err != nil {
-			xlog.Errorf("[%s] generate [%s] command payload failed: %v", msg.Body.Device, p.Name(), err)
-			return nil
+			xlog.Errorf("[%s] send [%s] command failed: %v", msg.Body.Device, cmd.Name(), err)
+			return err
 		}
-		adapter.IoT.Publish(topic, 1, false, payload)
 	}
 	return nil
 }

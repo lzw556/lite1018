@@ -42,3 +42,7 @@ func (cmd rebootCmd) Payload() ([]byte, error) {
 func (cmd rebootCmd) Execute(gateway string, target string, retained bool) (*Response, error) {
 	return cmd.request.do(gateway, target, cmd, retained, 3)
 }
+
+func (cmd rebootCmd) AsyncExecute(gateway string, target string, retained bool) error {
+	return cmd.request.doAsync(gateway, target, cmd, retained, 3)
+}

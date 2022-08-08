@@ -44,3 +44,7 @@ func (cmd provisionCmd) Payload() ([]byte, error) {
 func (cmd provisionCmd) Execute(gateway string, target string, retained bool) (*Response, error) {
 	return cmd.request.do(gateway, target, cmd, retained, 3)
 }
+
+func (cmd provisionCmd) AsyncExecute(gateway string, target string, retained bool) error {
+	return cmd.request.doAsync(gateway, target, cmd, retained, 3)
+}

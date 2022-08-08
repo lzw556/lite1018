@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/gogo/protobuf/proto"
-	"github.com/thetasensors/theta-cloud-lite/server/adapter"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/iot"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/iot/command"
 	pd "github.com/thetasensors/theta-cloud-lite/server/adapter/iot/proto"
@@ -87,13 +86,10 @@ func (p *SensorData) Process(ctx *iot.Context, msg iot.Message) error {
 			}
 		}
 	}
-	cmd := command.NewSensorDataAckCommand(m.SensorId)
-	topic := fmt.Sprintf("iot/v2/gw/%s/dev/%s/cmd/%s/", msg.Body.Gateway, msg.Body.Device, cmd.Name())
-	payload, err := cmd.Payload()
-	if err != nil {
-		xlog.Errorf("[%s] generate [%s] command payload failed: %v", msg.Body.Device, p.Name(), err)
+	cmd := command.NewSensorDataAckCommand(m.SessionId, m.SensorId)
+	if err := cmd.AsyncExecute(msg.Body.Gateway, msg.Body.Device, false); err != nil {
+		xlog.Errorf("[%s] send [%s] command failed: %v", msg.Body.Device, cmd.Name(), err)
 		return err
 	}
-	adapter.IoT.Publish(topic, 1, false, payload)
 	return nil
 }

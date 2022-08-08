@@ -51,3 +51,7 @@ func (cmd calibrateCmd) Payload() ([]byte, error) {
 func (cmd calibrateCmd) Execute(gateway string, target string, retained bool) (*Response, error) {
 	return cmd.request.do(gateway, target, cmd, retained, 3)
 }
+
+func (cmd calibrateCmd) AsyncExecute(gateway string, target string, retained bool) error {
+	return cmd.request.doAsync(gateway, target, cmd, retained, 3)
+}
