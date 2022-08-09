@@ -1,7 +1,7 @@
 import {Button, Col, message, Popconfirm, Row, Space, Upload} from "antd";
 import {DeleteOutlined, UploadOutlined} from "@ant-design/icons";
 import {Content} from "antd/lib/layout/layout";
-import {useCallback, useEffect, useState} from "react";
+import { useEffect, useState} from "react";
 import TableLayout from "../layout/TableLayout";
 import {PagingFirmwaresRequest, RemoveFirmwareRequest, UploadFirmwareRequest} from "../../apis/firmware";
 import moment from "moment";
@@ -12,20 +12,22 @@ import {Permission} from "../../permission/permission";
 import {PageResult} from "../../types/page";
 import {Firmware} from "../../types/firmware";
 import { isMobile } from "../../utils/deviceDetection";
+import { Store, useStore } from "../../hooks/store";
 
 
 const FirmwarePage = () => {
     const [isUploading, setIsUploading] = useState<boolean>(false)
     const [dataSource, setDataSource] = useState<PageResult<Firmware[]>>()
-    const [refreshKey, setRefreshKey] = useState<number>(0)
+    const [store, setStore] = useStore('firmwareList');
 
-    const fetchFirmwares = useCallback((current: number, size: number) => {
-        PagingFirmwaresRequest(current, size).then(setDataSource);
-    }, [refreshKey])
+    const fetchFirmwares = (store: Store['firmwareList']) => {
+        const {pagedOptions: {index, size}} = store;
+        PagingFirmwaresRequest(index, size).then(setDataSource)
+    }
 
     useEffect(() => {
-        fetchFirmwares(1, 10)
-    }, [fetchFirmwares])
+        fetchFirmwares(store)
+    }, [store])
 
     const onFileChange = (info: any) => {
         if (info.file.status === 'uploading') {
@@ -40,19 +42,15 @@ const FirmwarePage = () => {
             setIsUploading(false)
             if (res.code === 200) {
                 message.success("固件上传成功").then()
-                onRefresh()
+                fetchFirmwares(store)
             } else {
                 message.error(`上传失败,${res.msg}`).then()
             }
         })
     }
 
-    const onRefresh = () => {
-        setRefreshKey(refreshKey + 1)
-    }
-
     const onDelete = (id: number) => {
-        RemoveFirmwareRequest(id).then(_ => onRefresh())
+        RemoveFirmwareRequest(id).then(_ => fetchFirmwares(store))
     }
 
     const columns = [
@@ -124,7 +122,7 @@ const FirmwarePage = () => {
                         columns={columns}
                         permissions={[Permission.FirmwareDelete]}
                         dataSource={dataSource}
-                        onPageChange={fetchFirmwares}
+                        onPageChange={(index,size) => setStore(prev => ({...prev, pagedOptions: {index, size}}))}
                         simple={isMobile}
                         scroll={isMobile ? {x: 900} : undefined}
                     />

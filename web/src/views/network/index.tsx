@@ -1,5 +1,5 @@
 import {Content} from "antd/lib/layout/layout";
-import {useCallback, useEffect, useState} from "react";
+import { useEffect, useState} from "react";
 import {
     DeleteNetworkRequest,
     ExportNetworkRequest,
@@ -21,32 +21,29 @@ import {PageResult} from "../../types/page";
 import usePermission, {Permission} from "../../permission/permission";
 import HasPermission from "../../permission";
 import { isMobile } from "../../utils/deviceDetection";
-import { Link, useLocation } from "react-router-dom";
-import { PagedOption } from "../../types/props";
+import { Link } from "react-router-dom";
+import { Store, useStore } from "../../hooks/store";
 
 const NetworkPage = () => {
-    const { state } = useLocation<{pagedOptions: PagedOption}>();
-    const pagedOptionsDefault = { index: 1, size: 10 };
-    const [pagedOptions, setPagedOptions] = useState(state ? state.pagedOptions : pagedOptionsDefault);
     const {hasPermission, hasPermissions} = usePermission();
     const [addVisible, setAddVisible] = useState<boolean>(false)
     const [editVisible, setEditVisible] = useState<boolean>(false)
     const [network, setNetwork] = useState<Network>()
     const [dataSource, setDataSource] = useState<PageResult<any>>()
-    const [refreshKey, setRefreshKey] = useState<number>(0)
+    const [store, setStore] = useStore('networkList');
+
+    const fetchNetworks = (store: Store['networkList']) => {
+        const {pagedOptions: {index, size}} = store;
+        PagingNetworksRequest({}, index, size).then(setDataSource)
+    }
 
     useEffect(() => {
-        const {index, size} = pagedOptions;
-        PagingNetworksRequest({}, index, size).then(setDataSource)
-    }, [pagedOptions, refreshKey])
-
-    const onRefresh = () => {
-        setRefreshKey(refreshKey + 1)
-    }
+        fetchNetworks(store)
+    }, [store])
 
     const onDelete = (id: number) => {
         DeleteNetworkRequest(id).then(() => {
-            onRefresh()
+            fetchNetworks(store);
         })
     }
 
@@ -117,7 +114,7 @@ const NetworkPage = () => {
             key: 'name',
             render: (text: string, record: Network) => {
                 if (hasPermission(Permission.NetworkDetail)) {
-                    return <Link to={{pathname:`network-management`, search: `?locale=networks/networkDetail&id=${record.id}` ,state: {pagedOptions}}}>{text}</Link>
+                    return <Link to={{pathname:`network-management`, search: `?locale=networks/networkDetail&id=${record.id}`}}>{text}</Link>
                 }
                 return text
             }
@@ -193,7 +190,7 @@ const NetworkPage = () => {
                                  permissions={[Permission.NetworkEdit, Permission.NetworkExport, Permission.NetworkDelete]}
                                  columns={columns}
                                  dataSource={dataSource}
-                                 onPageChange={(index, size) => setPagedOptions({index, size})}
+                                 onPageChange={(index, size) => setStore(prev => ({...prev, pagedOptions: {index, size}}))}
                                  simple={isMobile}
                                  scroll={isMobile ? {x: 800} : undefined}/>
                 </Col>
@@ -203,7 +200,7 @@ const NetworkPage = () => {
                          onCancel={() => setAddVisible(false)}
                          onSuccess={() => {
                              setAddVisible(false)
-                             onRefresh()
+                             fetchNetworks(store)
                          }}/>
         {
             network && <EditNetworkModal
@@ -212,7 +209,7 @@ const NetworkPage = () => {
                 onCancel={() => setEditVisible(false)}
                 onSuccess={() => {
                     setEditVisible(false)
-                    onRefresh()
+                    fetchNetworks(store)
                 }}/>
         }
     </Content>

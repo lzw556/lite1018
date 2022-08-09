@@ -1,5 +1,5 @@
 import {Button, Col, Popconfirm, Row, Space} from "antd";
-import {useCallback, useEffect, useState} from "react";
+import { useEffect, useState} from "react";
 import {Content} from "antd/lib/layout/layout";
 import {GetUserRequest, PagingUsersRequest, RemoveUserRequest} from "../../apis/user";
 import TableLayout from "../layout/TableLayout";
@@ -13,30 +13,27 @@ import HasPermission from "../../permission";
 import {Permission} from "../../permission/permission";
 import {PageResult} from "../../types/page";
 import { isMobile } from "../../utils/deviceDetection";
+import { Store, useStore } from "../../hooks/store";
 
 const UserPage = () => {
     const [addUserVisible, setAddUserVisible] = useState<boolean>(false)
     const [editUserVisible, setEditUserVisible] = useState<boolean>(false)
     const [user, setUser] = useState(InitializeUserState)
     const [dataSource, setDataSource] = useState<PageResult<User[]>>()
+    const [store, setStore] = useStore('accountList');
 
-    const fetchUsers = useCallback((current: number, size: number) => {
-        PagingUsersRequest(current, size).then(setDataSource)
-    }, [])
+    const fetchUsers = (store: Store['accountList']) => {
+        const {pagedOptions: {index, size}} = store;
+        PagingUsersRequest(index, size).then(setDataSource)
+    }
 
     useEffect(() => {
-        fetchUsers(1, 10)
-    }, [])
-
-    const onRefresh = () => {
-        if (dataSource) {
-            fetchUsers(dataSource.page, dataSource.size)
-        }
-    }
+        fetchUsers(store)
+    }, [store])
 
     const onAddUserSuccess = () => {
         setAddUserVisible(false)
-        onRefresh()
+        fetchUsers(store)
     }
 
     const onEdit = async (id: number) => {
@@ -48,11 +45,11 @@ const UserPage = () => {
 
     const onEditUserSuccess = () => {
         setEditUserVisible(false)
-        onRefresh()
+        fetchUsers(store)
     }
 
     const onDelete = (id: number) => {
-        RemoveUserRequest(id).then(_ => onRefresh())
+        RemoveUserRequest(id).then(_ => fetchUsers(store))
     }
 
     const columns = [
@@ -113,7 +110,7 @@ const UserPage = () => {
                         columns={columns}
                         permissions={[Permission.UserDelete, Permission.UserEdit]}
                         dataSource={dataSource}
-                        onPageChange={fetchUsers}
+                        onPageChange={(index,size) => setStore(prev => ({...prev, pagedOptions: {index, size}}))}
                         simple={isMobile}
                         scroll={isMobile ? {x: 600} : undefined}
                     />

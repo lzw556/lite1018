@@ -14,7 +14,7 @@ export const RangeDatePicker: React.FC<{
     if (range && onChange) {
       onChange([
         moment(range[0]).startOf('day').utc().unix(),
-        moment(range[1].endOf('day')).utc().unix()
+        moment(range[1]).endOf('day').utc().unix()
       ]);
     }
   }, [range, onChange]);

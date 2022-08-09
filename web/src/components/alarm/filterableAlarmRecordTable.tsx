@@ -17,54 +17,51 @@ import HasPermission from '../../permission';
 import { Permission } from '../../permission/permission';
 import Label from '../label';
 import { RangeDatePicker } from '../rangeDatePicker';
+import { Store, useStore } from '../../hooks/store';
 
 const { Option } = Select;
 
 export const FilterableAlarmRecordTable: React.FC<{ sourceId?: number }> = ({ sourceId }) => {
-  const [range, setRange] = React.useState<[number, number]>();
   const [dataSource, setDataSource] = React.useState<PageResult<any[]>>();
-  const [alertLevels, setAlertLevels] = React.useState<number[]>([1, 2, 3]);
-  const [refreshKey, setRefreshKey] = React.useState<number>(0);
   const [alarmRecord, setAlarmRecord] = React.useState<any>();
   const [acknowledge, setAcknowledge] = React.useState<any>();
   const [status, setStatus] = React.useState<any>([0, 1, 2]);
+  const [store, setStore] = useStore('alarmRecordList');
 
-  const fetchAlarmRecords = React.useCallback(
-    (current: number, size: number) => {
-      const filters: any = {
-        levels: alertLevels.join(','),
-        status: ''
-      };
-      if (status && status.length > 0) {
-        filters.status = status.join(',');
-      }
-      if (range) {
-        const [from, to] = range;
-        PagingAlarmRecordRequest(current, size, from, to, filters, sourceId).then((res) => {
-          setDataSource({
-            page: res.page,
-            size: res.size,
-            total: res.total,
-            result: res.result.sort(
-              (prev: any, next: any) => prev.alarmRuleGroupId - next.alarmRuleGroupId
-            )
-          });
+  const fetchAlarmRecords = (status: any, store: Store['alarmRecordList'], sourceId?: number) => {
+    const {
+      pagedOptions: { index, size },
+      alertLevels,
+      range
+    } = store;
+    const filters: any = {
+      levels: alertLevels.join(','),
+      status: ''
+    };
+    if (status && status.length > 0) {
+      filters.status = status.join(',');
+    }
+    if (range) {
+      const [from, to] = range;
+      PagingAlarmRecordRequest(index, size, from, to, filters, sourceId).then((res) => {
+        setDataSource({
+          page: res.page,
+          size: res.size,
+          total: res.total,
+          result: res.result.sort(
+            (prev: any, next: any) => prev.alarmRuleGroupId - next.alarmRuleGroupId
+          )
         });
-      }
-    },
-    [sourceId, range, alertLevels, status, refreshKey]
-  );
-
-  React.useEffect(() => {
-    fetchAlarmRecords(1, 10);
-  }, [fetchAlarmRecords]);
-
-  const onDelete = (id: number) => {
-    RemoveAlarmRecordRequest(id).then((_) => onRefresh());
+      });
+    }
   };
 
-  const onRefresh = () => {
-    setRefreshKey(refreshKey + 1);
+  React.useEffect(() => {
+    fetchAlarmRecords(status, store, sourceId);
+  }, [status, sourceId, store]);
+
+  const onDelete = (id: number) => {
+    RemoveAlarmRecordRequest(id).then((_) => fetchAlarmRecords(status, store, sourceId));
   };
 
   const onAcknowledge = (record: any) => {
@@ -272,13 +269,13 @@ export const FilterableAlarmRecordTable: React.FC<{ sourceId?: number }> = ({ so
               <Select
                 bordered={false}
                 mode={'multiple'}
-                value={alertLevels}
+                value={store.alertLevels}
                 style={{ width: '200px' }}
                 onChange={(value) => {
                   if (value.length) {
-                    setAlertLevels(value);
+                    setStore((prev) => ({ ...prev, alertLevels: value }));
                   } else {
-                    setAlertLevels([1, 2, 3]);
+                    setStore((prev) => ({ ...prev, alertLevels: [1, 2, 3] }));
                   }
                 }}
               >
@@ -294,8 +291,26 @@ export const FilterableAlarmRecordTable: React.FC<{ sourceId?: number }> = ({ so
               </Select>
             </Label>
             <RangeDatePicker
-              defaultRange={[moment().subtract(1, 'd'), moment()]}
-              onChange={React.useCallback((range: [number, number]) => setRange(range), [])}
+              defaultRange={[moment.unix(store.range[0]), moment.unix(store.range[1])]}
+              onChange={React.useCallback(
+                (range: [number, number]) => {
+                  setStore((prev) => {
+                    if (
+                      prev.range &&
+                      range &&
+                      prev.range.length === 2 &&
+                      range.length === prev.range.length &&
+                      range[1] === prev.range[1] &&
+                      range[0] === prev.range[0]
+                    ) {
+                      return prev;
+                    } else {
+                      return { ...prev, range };
+                    }
+                  });
+                },
+                [setStore]
+              )}
             />
           </Space>
         </Col>
@@ -307,7 +322,9 @@ export const FilterableAlarmRecordTable: React.FC<{ sourceId?: number }> = ({ so
             emptyText={'报警记录列表为空'}
             columns={columns}
             dataSource={dataSource}
-            onPageChange={fetchAlarmRecords}
+            onPageChange={(index, size) =>
+              setStore((prev) => ({ ...prev, pagedOptions: { index, size } }))
+            }
             simple={isMobile}
             scroll={isMobile ? { x: 1200 } : undefined}
           />
@@ -320,7 +337,7 @@ export const FilterableAlarmRecordTable: React.FC<{ sourceId?: number }> = ({ so
           onCancel={() => setAlarmRecord(undefined)}
           onSuccess={() => {
             setAlarmRecord(undefined);
-            onRefresh();
+            fetchAlarmRecords(status, store, sourceId);
           }}
         />
       )}
