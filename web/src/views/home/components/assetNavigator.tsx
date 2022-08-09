@@ -108,7 +108,7 @@ export const AssetNavigator: React.FC<
     const downIcon = <DownOutlined style={{ fontSize: '10px', cursor: 'pointer' }} />;
     if (isLast) {
       return (
-        <Dropdown overlay={menu} trigger={['click']}>
+        <Dropdown overlay={menu} trigger={['click']} overlayStyle={{overflow:'auto', maxHeight:600, minWidth: 200}}>
           <Space>
             <span>{asset.name}</span>
             {assets.length > 0 && downIcon}
@@ -120,7 +120,7 @@ export const AssetNavigator: React.FC<
         <Space>
           <Link to={pickUrlFromType(asset)}>{asset.name}</Link>
           {assets.length > 0 && (
-            <Dropdown overlay={menu} trigger={['click']} placement='bottomRight'>
+            <Dropdown overlay={menu} trigger={['click']} placement='bottomRight' overlayStyle={{overflow:'auto', maxHeight:600, minWidth: 200}}>
               {downIcon}
             </Dropdown>
           )}
