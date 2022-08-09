@@ -87,7 +87,7 @@ func initMenus(db *gorm.DB) error {
 		},
 		{
 			ID:       2002,
-			Title:    "资产列表",
+			Title:    "资产树",
 			Name:     "asset-management",
 			ParentID: 2001,
 			Icon:     "icon-device-monitor",
@@ -99,7 +99,7 @@ func initMenus(db *gorm.DB) error {
 		},
 		{
 			ID:       2003,
-			Title:    "监测点列表",
+			Title:    "资产列表",
 			Name:     "measurement-management",
 			ParentID: 2001,
 			Icon:     "icon-device-monitor",
