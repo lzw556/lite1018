@@ -64,7 +64,7 @@ const AlarmRuleList = () => {
       dataSource,
       pagination: false,
       size: 'small',
-      style: { marginLeft: 20, width: 770 }
+      style: { marginLeft: 40, width: 770 }
     };
   };
   const [result, setResult] = React.useState<TableProps<any>>({

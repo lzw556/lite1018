@@ -68,10 +68,10 @@ dl.name-value-groups.horizontal {
   background-color: #28A745;
 }
 .introduction.info .introduction-icon {
-  background-color: #FFFF00;
+  background-color: #FFC107;
 }
 .introduction.warn .introduction-icon {
-  background-color: #FFBF00;
+  background-color: #FE6D2C;
 }
 .introduction.danger .introduction-icon {
   background-color: #ff0000;
@@ -94,10 +94,10 @@ dl.name-value-groups.horizontal {
   fill: #28A745;
 }
 .introduction.info.focus .introduction-icon .icon-svg {
-  fill: #FFFF00;
+  fill: #FFC107;
 }
 .introduction.warn.focus .introduction-icon .icon-svg {
-  fill: #FFBF00;
+  fill: #FE6D2C;
 }
 .introduction.danger.focus .introduction-icon .icon-svg {
   fill: #ff0000;
@@ -113,13 +113,16 @@ dl.name-value-groups.horizontal {
   text-align: center;
 }
 .overview-statistic .ant-statistic.info .ant-statistic-content {
-  color: #FFFF00;
+  color: #FFC107;
 }
 .overview-statistic .ant-statistic.warn .ant-statistic-content {
-  color: #FFBF00;
+  color: #FE6D2C;
 }
 .overview-statistic .ant-statistic.danger .ant-statistic-content {
   color: #ff0000;
+}
+.overview-statistic .ant-statistic.offline .ant-statistic-content {
+  color: #bfbfbf;
 }
 .asset-list-tree {
   overflow: auto;
@@ -135,10 +138,10 @@ dl.name-value-groups.horizontal {
   background-color: #28A745;
 }
 .asset-list-tree .ant-tree-icon__customize svg.info {
-  background-color: #FFFF00;
+  background-color: #FFC107;
 }
 .asset-list-tree .ant-tree-icon__customize svg.warn {
-  background-color: #FFBF00;
+  background-color: #FE6D2C;
 }
 .asset-list-tree .ant-tree-icon__customize svg.danger {
   background-color: #ff0000;
@@ -149,11 +152,11 @@ dl.name-value-groups.horizontal {
 }
 .asset-list-tree .ant-tree-icon__customize svg.info.focus {
   background-color: #fff;
-  fill:#FFFF00
+  fill:#FFC107
 }
 .asset-list-tree .ant-tree-icon__customize svg.warn.focus {
   background-color: #fff;
-  fill:#FFBF00
+  fill:#FE6D2C
 }
 .asset-list-tree .ant-tree-icon__customize svg.danger.focus {
   background-color: #fff;

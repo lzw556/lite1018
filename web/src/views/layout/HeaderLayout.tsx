@@ -62,7 +62,7 @@ const HeaderLayout = (props: any) => {
       <Row justify='start' className='pc'>
         <Col span={12}>
           <Space className={'ts-title'}>
-            <img src={logo} width={100} alt='ThetaSensors' style={{ verticalAlign: 'middle' }} />
+            <img src={logo} width={100} alt='ThetaSensors' style={{ verticalAlign: 'middle', marginRight: 30 }} />
             风力发电螺栓监测系统
           </Space>
         </Col>

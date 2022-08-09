@@ -105,7 +105,7 @@ export const MonitorTabContent: React.FC<{
               }
             },
             {
-              title: `${measurementType.label}趋势`,
+              title: `${measurementType.label}趋势图`,
               colProps: generateColProps({ xl: 12, xxl: 15 }),
               options: statisticOfPreload,
               style: { height: 550 },

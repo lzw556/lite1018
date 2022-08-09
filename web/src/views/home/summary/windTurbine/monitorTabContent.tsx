@@ -30,7 +30,7 @@ export const MonitorTabContent: React.FC<{
             chart = {
               title: '',
               options: generateChartOptionsOfLastestData(item.monitoringPoints, item.attributes),
-              style: { left: '-24px', top: '-20px', height: 400 },
+              style: { left: '-24px', top: '-20px', height: 450 },
               clickHandler: (paras: any) => {
                 const index = paras.value[1];
                 if (item.monitoringPoints && item.monitoringPoints.length > index) {

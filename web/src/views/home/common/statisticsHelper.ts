@@ -34,7 +34,7 @@ function tranformVM_AssetStatistics(
     }
     const assetStatis = childrenStatis.get(key as keyof AssetChildrenStatistics);
     const alarmStatis = alarmStatisWithName.get(key as AlarmState);
-    let className = 'half'; // hardcode
+    let className = key === 'offlineDeviceNum' ? 'half offline' : 'half'; // hardcode
     if (assetStatis) {
       value = assetStatis.value;
       if (!name) name = assetStatis.name;

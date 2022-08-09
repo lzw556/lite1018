@@ -26,10 +26,19 @@ export const ChartContainer = <T,>({
 
   if (!options)
     return (
-      <>
+      <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
         <p style={{ textAlign: 'center' }}>{title}</p>
-        <Empty description='暂无数据' image={Empty.PRESENTED_IMAGE_SIMPLE} />
-      </>
+        <Empty
+          description='暂无数据'
+          image={Empty.PRESENTED_IMAGE_SIMPLE}
+          style={{
+            flex: '1 0 auto',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center'
+          }}
+        />
+      </div>
     );
   return (
     <div className='chart-container'>

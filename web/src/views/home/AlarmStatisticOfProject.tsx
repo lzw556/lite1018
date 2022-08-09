@@ -6,7 +6,7 @@ import { ColorDanger, ColorInfo, ColorWarn } from '../../constants/color';
 import { ChartContainer } from './components/charts/chartContainer';
 
 type Statistics = { timestamp: number; info: number; warn: number; critical: number };
-export const AlarmStatisticOfProject: React.FC<{ title: string }> = ({title}) => {
+export const AlarmStatisticOfProject: React.FC<{ title: string }> = ({ title }) => {
   const [loading, setLoading] = React.useState(true);
   const [countAlarm, setCountAlarm] = React.useState<Statistics[]>([]);
   React.useEffect(() => {
@@ -16,6 +16,17 @@ export const AlarmStatisticOfProject: React.FC<{ title: string }> = ({title}) =>
     });
   }, []);
 
+  const hasValidData = (data: Statistics[]) => {
+    if (data.length === 0) return false;
+    if (
+      data.map(({ info }) => info).every((n) => n === 0) &&
+      data.map(({ warn }) => warn).every((n) => n === 0) &&
+      data.map(({ critical }) => critical).every((n) => n === 0)
+    )
+      return false;
+    return true;
+  };
+
   const generateOptions = (data: Statistics[]) => {
     const xAxisData: any = [],
       info: any = [],
@@ -23,15 +34,16 @@ export const AlarmStatisticOfProject: React.FC<{ title: string }> = ({title}) =>
       danger: any = [];
     if (data.length > 0) {
       xAxisData.push(
-        ...countAlarm.map(({ timestamp }) => moment.unix(timestamp).local().format('MM/DD'))
+        ...data.map(({ timestamp }) => moment.unix(timestamp).local().format('MM/DD'))
       );
-      info.push(...countAlarm.map(({ info }) => info));
-      warn.push(...countAlarm.map(({ warn }) => warn));
-      danger.push(...countAlarm.map(({ critical }) => critical));
+      info.push(...data.map(({ info }) => info));
+      warn.push(...data.map(({ warn }) => warn));
+      danger.push(...data.map(({ critical }) => critical));
     }
+
     return {
       title: {
-        text: data.length === 0 ? '暂无数据' : '',
+        text: '',
         left: 'center',
         top: 'center'
       },
@@ -68,5 +80,10 @@ export const AlarmStatisticOfProject: React.FC<{ title: string }> = ({title}) =>
   };
 
   if (loading) return <Spin />;
-  return <ChartContainer title={title} options={generateOptions(countAlarm) as any}/>;
+  return (
+    <ChartContainer
+      title={title}
+      options={hasValidData(countAlarm) ? (generateOptions(countAlarm) as any) : null}
+    />
+  );
 };
