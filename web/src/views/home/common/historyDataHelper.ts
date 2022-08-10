@@ -179,7 +179,7 @@ export function generateChartOptionsOfHistoryData(
     tooltip: {
       trigger: 'axis',
       valueFormatter: (value: any) =>
-        `${getDisplayValue(value, crtProperty?.precision, crtProperty?.unit)}`
+        `${getDisplayValue(value, crtProperty?.unit)}`
     },
     xAxis: { type: 'time' },
     yAxis: { type: 'value' },
@@ -218,10 +218,7 @@ function generateOuter(measurements: MeasurementRow[], isBig: boolean = false) {
     }
     let value = NaN;
     if (field && data) {
-      value = data.values[field.key];
-      if (value) {
-        value = roundValue(value, field.precision);
-      }
+      value = roundValue(data.values[field.key], field.precision);
     }
     return {
       name,
@@ -236,7 +233,7 @@ function generateOuter(measurements: MeasurementRow[], isBig: boolean = false) {
           alertLevel && alertLevel > 0
             ? `${getAlarmStateText(convertAlarmLevelToState(alertLevel))}报警<br/>`
             : ''
-        }${generateRowOfTooltip('', name, getDisplayValue(value, undefined, field?.unit))}`
+        }${generateRowOfTooltip('', name, getDisplayValue(value, field?.unit))}`
       },
       itemStyle: {
         opacity: 1,
@@ -274,9 +271,8 @@ function generateActuals(measurements: MeasurementRow[], isBig: boolean = false)
   measurements.forEach(({ data, name }, index) => {
     let value = NaN;
     if (field && data) {
-      value = data.values[field.key];
+      value = roundValue(data.values[field.key], field.precision);
       if (value) {
-        value = roundValue(value, field.precision);
         if (Math.abs(value) > max) max = Math.abs(value);
         if (value < min) min = value;
       }
@@ -354,10 +350,7 @@ export function getHistoryDatas(data: HistoryData, propertyName?: string) {
           const crtProperty = values.find(({ key }) => key === property.key);
           if (crtProperty) {
             const crtField = crtProperty.fields.find(({ key }) => key === field.key);
-            if (crtField) value = crtProperty.data[field.name];
-          }
-          if (value) {
-            value = roundValue(value, property.precision);
+            if (crtField) value = roundValue(crtProperty.data[field.name], property.precision);
           }
           return value;
         });
@@ -375,10 +368,7 @@ function pickHistoryData(data: HistoryData, propertyName: string) {
       const field = property.fields.find(({ key }) => key === propertyName);
       if (field) {
         crtProperty = property;
-        value = property.data[field.name];
-        if (value) {
-          value = roundValue(value, property.precision);
-        }
+        value = roundValue(property.data[field.name], property.precision);
         break;
       }
     }
@@ -399,7 +389,6 @@ export function generateChartOptionsOfHistoryDatas(data: HistoryData, propertyNa
             let value = Number(params[i].value);
             relVal += `<br/> ${params[i].marker} ${params[i].seriesName}: ${getDisplayValue(
               value,
-              undefined,
               property.unit
             )}`;
           }
@@ -441,9 +430,9 @@ export function generatePropertyColumns(measurement: MeasurementRow) {
         render: ({ data }: MeasurementRow) => {
           let value = NaN;
           if (data && data.values) {
-            value = data.values[key];
+            value = roundValue(data.values[key], precision);
           }
-          return getDisplayValue(value, precision);
+          return getDisplayValue(value, unit);
         },
         width: 120
       }))
@@ -461,16 +450,13 @@ export function generatePropertyColumns(measurement: MeasurementRow) {
   return [];
 }
 
-function getDisplayValue(value: number | null | undefined, precision?: number, unit?: string) {
+function getDisplayValue(value: number | null | undefined, unit?: string) {
   if (Number.isNaN(value) || value === null || value === undefined) return '-';
-  let finalValue = value;
-  if (value) {
-    finalValue = roundValue(value, precision);
-  }
-  return `${finalValue}${unit ?? ''}`;
+  return `${value}${unit ?? ''}`;
 }
 
 function roundValue(value: number, precision?: number) {
+  if(Number.isNaN(value) || value === 0) return value;
   return round(value, precision ?? 3);
 }
 
@@ -501,9 +487,9 @@ export function generateDatasOfMeasurement(measurement: MeasurementRow) {
       .map(({ name, key, unit, precision }) => {
         let value = NaN;
         if (data && data.values) {
-          value = data.values[key];
+          value = roundValue(data.values[key], precision);
         }
-        return { name, value: getDisplayValue(value, precision, unit) };
+        return { name, value: getDisplayValue(value, unit) };
       })
       // .concat({
       //   name: '采集时间',
