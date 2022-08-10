@@ -257,7 +257,6 @@ const AlarmRuleGroupCreation = () => {
                       }
                     })
                   };
-                  console.log(final);
                   addAlarmRule(final).then(() =>
                     history.replace(`alarm-management?locale=alarmRules`)
                   );

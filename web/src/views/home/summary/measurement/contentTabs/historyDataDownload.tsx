@@ -29,7 +29,6 @@ export const HistoryDataDownload: React.FC<DownloadModalProps> = (props) => {
 
   const onDownload = () => {
     form.validateFields().then((values) => {
-      console.log(values);
       if (range) {
         const [from, to] = range;
         downloadHistory(measurement.id, from, to, JSON.stringify(values.properties)).then((res) => {

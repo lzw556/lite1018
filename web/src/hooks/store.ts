@@ -17,8 +17,6 @@ export function useStore<ReturnType extends keyof Store>(
   key: ReturnType
 ): [Store[typeof key], React.Dispatch<React.SetStateAction<Store[typeof key]>>] {
   const defaultPagedOptions = { pagedOptions: { index: 1, size: 10 } };
-  console.log(`moment().subtract(1, 'd').startOf('day').utc().unix()`, moment().subtract(1, 'd').startOf('day').utc().unix())
-  console.log(`moment().endOf('day').utc().unix()`, moment().endOf('day').utc().unix())
   const initial = JSON.stringify({
     deviceList: {
       ...defaultPagedOptions,
