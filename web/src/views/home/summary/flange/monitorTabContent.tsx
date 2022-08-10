@@ -42,18 +42,13 @@ export const MonitorTabContent: React.FC<{
   }, [measurements]);
 
   React.useEffect(() => {
-    if (historyDatas.length > 0) {
-      const measurementType = Object.values(MeasurementTypes).find(
-        (type) => type.id === measurements[0].type
+    if (historyDatas.length > 0 && measurements.length > 0) {
+      setStatisticOfPreload(
+        generateChartOptionsOfHistoryData(
+          historyDatas.sort((prev, next) => prev.index - next.index),
+          measurements[0].properties[0]
+        )
       );
-      if (measurementType) {
-        setStatisticOfPreload(
-          generateChartOptionsOfHistoryData(
-            historyDatas.sort((prev, next) => prev.index - next.index),
-            measurementType
-          )
-        );
-      }
     }
   }, [historyDatas, measurements]);
 

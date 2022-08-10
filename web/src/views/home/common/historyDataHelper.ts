@@ -155,16 +155,25 @@ function generateRowOfTooltip(marker: string, seriesName: string, text: string) 
 
 export function generateChartOptionsOfHistoryData(
   history: { name: string; data: HistoryData }[],
-  measurementType: typeof MeasurementTypes.loosening_angle
+  property: Property
 ) {
-  let crtProperty: any = null;
   const series = history.map(({ name, data }) => {
-    const { property, seriesData } = pickHistoryData(data, measurementType.firstClassFieldKeys[0]);
-    crtProperty = property;
+    const datas = getHistoryDatas(data, property.key);
+    let _data: [string, number][] = [];
+    datas.forEach(({ times, seriesData, property: _property }) => {
+      if (property.key === _property.key) {
+        const _series = seriesData.find(({ name }) => name === property.name);
+        if (_series) {
+          times.map((time, index) =>
+            _data.push([moment.unix(time).local().format('YYYY-MM-DD HH:mm:ss'), _series.data[index]])
+          );
+        }
+      }
+    });
     return {
       type: 'line',
       name,
-      data: seriesData
+      data: _data
     };
   });
 
@@ -172,14 +181,13 @@ export function generateChartOptionsOfHistoryData(
     title: {
       text: '',
       left: isMobile ? 0 : 80,
-      subtext: crtProperty ? `${crtProperty.name}(${crtProperty.unit})` : ''
+      subtext: property ? `${property.name}(${property.unit})` : ''
     },
     legend: { bottom: 0 },
     grid: { bottom: isMobile ? 120 : 60 },
     tooltip: {
       trigger: 'axis',
-      valueFormatter: (value: any) =>
-        `${getDisplayValue(value, crtProperty?.unit)}`
+      valueFormatter: (value: any) => `${getDisplayValue(value, property?.unit)}`
     },
     xAxis: { type: 'time' },
     yAxis: { type: 'value' },
@@ -338,47 +346,39 @@ function getSeries(color: string, value: number | string | undefined, name: stri
   return { series };
 }
 
-export function getHistoryDatas(data: HistoryData, propertyName?: string) {
+function getHistoryDatas(data: HistoryData, propertyKey?: string) {
   const firstValue = data[0].values;
   const times = data.map(({ timestamp }) => timestamp);
   return firstValue
-    .filter((property) => (propertyName ? property.key === propertyName : true))
+    .filter((property) => (propertyKey ? property.key === propertyKey : true))
     .map((property) => {
       const seriesData = property.fields.map((field) => {
-        const fieldData = data.map(({ values }) => {
-          let value = NaN;
-          const crtProperty = values.find(({ key }) => key === property.key);
-          if (crtProperty) {
-            const crtField = crtProperty.fields.find(({ key }) => key === field.key);
-            if (crtField) value = roundValue(crtProperty.data[field.name], property.precision);
-          }
-          return value;
-        });
-        return { name: field.name, data: fieldData };
+        const fieldValue = narrowSpecificProperty(data, property.key).map(({ value }) =>
+          takeFieldValue(value, field.key)
+        );
+        return { name: field.name, data: fieldValue };
       });
       return { times, seriesData, property };
     });
 }
 
-function pickHistoryData(data: HistoryData, propertyName: string) {
-  let crtProperty: any = null;
-  const seriesData = data.map(({ timestamp, values }) => {
-    let value = NaN;
-    for (const property of values) {
-      const field = property.fields.find(({ key }) => key === propertyName);
-      if (field) {
-        crtProperty = property;
-        value = roundValue(property.data[field.name], property.precision);
-        break;
-      }
-    }
-    return [moment.unix(timestamp).local().format('YYYY-MM-DD HH:mm:ss'), value];
-  });
-  return { property: crtProperty, seriesData };
+function narrowSpecificProperty(data: HistoryData, propertyKey: string) {
+  return data.map(({ timestamp, values }) => ({
+    timestamp,
+    value: values.find(({ key }) => key === propertyKey)
+  }));
 }
 
-export function generateChartOptionsOfHistoryDatas(data: HistoryData, propertyName?: string) {
-  const optionsData = getHistoryDatas(data, propertyName);
+function takeFieldValue(property: Property | undefined, fieldKey: string) {
+  if (property === undefined) return NaN;
+  let value = NaN;
+  const crtField = property.fields.find(({ key }) => key === fieldKey);
+  if (crtField) value = roundValue(property.data[crtField.name], property.precision);
+  return value;
+}
+
+export function generateChartOptionsOfHistoryDatas(data: HistoryData, propertyKey?: string) {
+  const optionsData = getHistoryDatas(data, propertyKey);
   return optionsData.map(({ times, seriesData, property }) => {
     return {
       tooltip: {
@@ -395,11 +395,11 @@ export function generateChartOptionsOfHistoryDatas(data: HistoryData, propertyNa
           return relVal;
         }
       },
-      legend: { show: !!propertyName },
+      legend: { show: !!propertyKey },
       grid: { bottom: 20, left: 50 },
       title: {
         text: `${property.name}${property.unit ? `(${property.unit})` : ''}`,
-        subtext: propertyName
+        subtext: propertyKey
           ? ''
           : `${seriesData.map(({ name, data }) => name + ' ' + data[data.length - 1])}`
       },
