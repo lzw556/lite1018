@@ -155,10 +155,11 @@ function generateRowOfTooltip(marker: string, seriesName: string, text: string) 
 
 export function generateChartOptionsOfHistoryData(
   history: { name: string; data: HistoryData }[],
-  property: Property
+  property: Property,
+  measurementType: number
 ) {
   const series = history.map(({ name, data }) => {
-    const datas = getHistoryDatas(data, property.key);
+    const datas = getHistoryDatas(data, getKeysOfFirstClassFields(measurementType), property.key);
     let _data: [string, number][] = [];
     datas.forEach(({ times, seriesData, property: _property }) => {
       if (property.key === _property.key) {
@@ -346,8 +347,8 @@ function getSeries(color: string, value: number | string | undefined, name: stri
   return { series };
 }
 
-function getHistoryDatas(data: HistoryData, propertyKey?: string) {
-  const firstValue = data[0].values;
+function getHistoryDatas(data: HistoryData, firstClassFieldKeys: string[], propertyKey?: string) {
+  const firstValue = sortProperties(data[0].values, firstClassFieldKeys);
   const times = data.map(({ timestamp }) => timestamp);
   return firstValue
     .filter((property) => (propertyKey ? property.key === propertyKey : true))
@@ -377,8 +378,8 @@ function takeFieldValue(property: Property | undefined, fieldKey: string) {
   return value;
 }
 
-export function generateChartOptionsOfHistoryDatas(data: HistoryData, propertyKey?: string) {
-  const optionsData = getHistoryDatas(data, propertyKey);
+export function generateChartOptionsOfHistoryDatas(data: HistoryData, measurementType: number, propertyKey?: string) {
+  const optionsData = getHistoryDatas(data, getKeysOfFirstClassFields(measurementType), propertyKey);
   return optionsData.map(({ times, seriesData, property }) => {
     return {
       tooltip: {
@@ -460,7 +461,7 @@ function roundValue(value: number, precision?: number) {
   return round(value, precision ?? 3);
 }
 
-function getKeysOfFirstClassFields(measurementType: number) {
+export function getKeysOfFirstClassFields(measurementType: number) {
   const type = Object.values(MeasurementTypes).find((type) => type.id === measurementType);
   return type ? type.firstClassFieldKeys : [];
 }
@@ -497,4 +498,18 @@ export function generateDatasOfMeasurement(measurement: MeasurementRow) {
       // });
   }
   return [];
+}
+
+export function sortProperties(properties: Property[], firstClassFieldKeys: string[]) {
+  const sorted: Property[] = [];
+  firstClassFieldKeys.forEach((fieldKey) => {
+    const property = properties.find(({ fields }) =>
+      fields.map(({ key }) => key).includes(fieldKey)
+    );
+    if (property) sorted.push(property);
+  });
+  properties.forEach((property) => {
+    if (!sorted.map(({ key }) => key).includes(property.key)) sorted.push(property);
+  });
+  return sorted;
 }

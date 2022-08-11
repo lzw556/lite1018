@@ -46,7 +46,8 @@ export const MonitorTabContent: React.FC<{
       setStatisticOfPreload(
         generateChartOptionsOfHistoryData(
           historyDatas.sort((prev, next) => prev.index - next.index),
-          measurements[0].properties[0]
+          measurements[0].properties[0],
+          measurements[0].type
         )
       );
     }

@@ -8,7 +8,7 @@ import { MeasurementRow } from '../props';
 import { getData } from '../services';
 
 export const Monitor: React.FC<MeasurementRow> = (props) => {
-  const { id } = props;
+  const { id, type } = props;
   const [loading, setLoading] = React.useState(true);
   const [historyOptions, setHistoryOptions] = React.useState<any>();
   React.useEffect(() => {
@@ -16,9 +16,9 @@ export const Monitor: React.FC<MeasurementRow> = (props) => {
     const to = moment().endOf('day').utc().unix();
     getData(id, from, to).then((data) => {
       setLoading(false)
-      if (data.length > 0) setHistoryOptions(generateChartOptionsOfHistoryDatas(data));
+      if (data.length > 0) setHistoryOptions(generateChartOptionsOfHistoryDatas(data, type));
     });
-  }, [id]);
+  }, [id, type]);
 
   if (loading) return <Spin />;
   if (!historyOptions || historyOptions.length === 0) return <Empty description='暂无数据' image={Empty.PRESENTED_IMAGE_SIMPLE} />;

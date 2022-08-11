@@ -7,31 +7,31 @@ import { RangeDatePicker } from '../../../../../components/rangeDatePicker';
 import HasPermission from '../../../../../permission';
 import { Permission } from '../../../../../permission/permission';
 import { isMobile } from '../../../../../utils/deviceDetection';
-import { generateChartOptionsOfHistoryDatas } from '../../../common/historyDataHelper';
+import { generateChartOptionsOfHistoryDatas, getKeysOfFirstClassFields, sortProperties } from '../../../common/historyDataHelper';
 import { ChartContainer } from '../../../components/charts/chartContainer';
 import { MeasurementRow } from '../props';
 import { clearHistory, getData } from '../services';
 import { HistoryDataDownload } from './historyDataDownload';
 
 export const HistoryData: React.FC<MeasurementRow> = (props) => {
-  const { id, properties } = props;
+  const { id, properties, type } = props;
   const [loading, setLoading] = React.useState(true);
   const [historyOptions, setHistoryOptions] = React.useState<any>();
   const [range, setRange] = React.useState<[number, number]>();
   const [property, setProperty] = React.useState(properties[0].key);
   const [visible, setVisible] = React.useState(false);
   React.useEffect(() => {
-    if (range) fetchData(id, range, property);
-  }, [id, range, property]);
+    if (range) fetchData(id, range, property, type);
+  }, [id, range, property, type]);
 
-  const fetchData = (id: number, range: [number, number], property: string) => {
+  const fetchData = (id: number, range: [number, number], property: string, type: number) => {
     if (range) {
       const [from, to] = range;
       setLoading(true);
       getData(id, from, to).then((data) => {
         setLoading(false);
         if (data.length > 0) {
-          setHistoryOptions(generateChartOptionsOfHistoryDatas(data, property));
+          setHistoryOptions(generateChartOptionsOfHistoryDatas(data, type, property));
         } else {
           setHistoryOptions(null);
         }
@@ -73,7 +73,7 @@ export const HistoryData: React.FC<MeasurementRow> = (props) => {
                     setProperty(value);
                   }}
                 >
-                  {properties.map(({ name, key }) => (
+                  {sortProperties(properties, getKeysOfFirstClassFields(type)).map(({ name, key }) => (
                     <Select.Option key={key} value={key}>
                       {name}
                     </Select.Option>
@@ -117,7 +117,7 @@ export const HistoryData: React.FC<MeasurementRow> = (props) => {
                           onOk: (close) => {
                             clearHistory(id, from, to).then((_) => {
                               close();
-                              if (range) fetchData(id, range, property);
+                              if (range) fetchData(id, range, property, type);
                             });
                           }
                         });
