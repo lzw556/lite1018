@@ -16,6 +16,7 @@ import { PlusOutlined } from '@ant-design/icons';
 import HasPermission from '../../../../permission';
 import usePermission, { Permission } from '../../../../permission/permission';
 import { isMobile } from '../../../../utils/deviceDetection';
+import { HistoryData } from './historyData';
 
 const FlangeOverview: React.FC = () => {
   const { search, pathname } = useLocation();
@@ -67,7 +68,7 @@ const FlangeOverview: React.FC = () => {
 
   if (loading) return <Spin />;
 
-  const tabs = [
+  let tabs = [
     {
       key: 'monitor',
       tab: '监控',
@@ -120,8 +121,10 @@ const FlangeOverview: React.FC = () => {
           )}
         </>
       )
-    }
+    },
   ];
+
+  if(asset) tabs = [...tabs, { key: 'history', tab: '历史数据', content: <HistoryData {...asset} /> }]
 
   return (
     <>
