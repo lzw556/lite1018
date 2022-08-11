@@ -9,6 +9,7 @@ type MPProperty struct {
 	Sort      int                    `json:"sort"`
 	Precision int                    `json:"precision"`
 	Fields    MPFields               `json:"fields"`
+	IsShow    bool                   `json:"isShow"`
 	Data      map[string]interface{} `json:"data,omitempty"`
 }
 
@@ -19,6 +20,7 @@ func NewMonitoringPointProperty(e monitoringpointtype.Property) MPProperty {
 		Unit:      e.Unit,
 		Precision: e.Precision,
 		Sort:      e.Sort,
+		IsShow:    e.IsShow,
 		Data:      map[string]interface{}{},
 	}
 	p.Fields = make(MPFields, len(e.Fields))
