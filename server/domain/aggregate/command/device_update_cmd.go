@@ -38,34 +38,39 @@ func (cmd DeviceUpdateCmd) UpdateBaseInfo(req request.UpdateDevice) error {
 	cmd.Device.NetworkID = req.NetworkID
 	oldMac := cmd.Device.MacAddress
 	err := transaction.Execute(ctx, func(txCtx context.Context) error {
-		if parent, _ := cmd.deviceRepo.GetBySpecs(txCtx, spec.DeviceMacEqSpec(req.Parent)); parent.ID == 0 {
-			return response.BusinessErr(errcode.DeviceNotFoundError, "")
-		}
-		cmd.Device.Parent = req.Parent
-
-		if cmd.MacAddress != req.MacAddress {
-			if _, err := cmd.deviceRepo.GetBySpecs(txCtx, spec.DeviceMacEqSpec(req.MacAddress)); err == nil {
-				return response.BusinessErr(errcode.DeviceMacExistsError, req.MacAddress)
+		if !cmd.Device.IsNB() {
+			if parent, _ := cmd.deviceRepo.GetBySpecs(txCtx, spec.DeviceMacEqSpec(req.Parent)); parent.ID == 0 {
+				return response.BusinessErr(errcode.DeviceNotFoundError, "")
 			}
-			if err := cmd.deviceRepo.UpdatesBySpecs(txCtx, map[string]interface{}{"parent": req.MacAddress}, spec.ParentEqSpec(cmd.Device.MacAddress)); err != nil {
-				return err
+			cmd.Device.Parent = req.Parent
+			if cmd.MacAddress != req.MacAddress {
+				if _, err := cmd.deviceRepo.GetBySpecs(txCtx, spec.DeviceMacEqSpec(req.MacAddress)); err == nil {
+					return response.BusinessErr(errcode.DeviceMacExistsError, req.MacAddress)
+				}
+				if err := cmd.deviceRepo.UpdatesBySpecs(txCtx, map[string]interface{}{"parent": req.MacAddress}, spec.ParentEqSpec(cmd.Device.MacAddress)); err != nil {
+					return err
+				}
+				cmd.Device.MacAddress = req.MacAddress
 			}
-			cmd.Device.MacAddress = req.MacAddress
 		}
-
 		return cmd.deviceRepo.Save(txCtx, &cmd.Device)
 	})
 	if err != nil {
 		return err
 	}
 
-	go func() {
-		if network, err := cmd.networkRepo.Get(ctx, cmd.Device.NetworkID); err == nil {
-			if gateway, err := cmd.deviceRepo.Get(ctx, network.GatewayID); err == nil {
-				go command.UpdateDevice(gateway, cmd.Device, oldMac)
+	if cmd.Device.IsNB() {
+		go command.UpdateDevice(cmd.Device, cmd.Device, oldMac)
+	} else {
+		go func() {
+			if network, err := cmd.networkRepo.Get(ctx, cmd.Device.NetworkID); err == nil {
+				if gateway, err := cmd.deviceRepo.Get(ctx, network.GatewayID); err == nil {
+					go command.UpdateDevice(gateway, cmd.Device, oldMac)
+				}
 			}
-		}
-	}()
+		}()
+	}
+
 	return nil
 }
 
@@ -81,6 +86,12 @@ func (cmd DeviceUpdateCmd) UpdateSettings(req request.DeviceSetting) error {
 			Category: string(setting.Category),
 		}
 		switch setting.Category {
+		case devicetype.WsnSettingCategory:
+			if value, ok := req.Wsn[s.Key]; ok {
+				s.Value = setting.Convert(value)
+			} else {
+				s.Value = setting.Convert(setting.Value)
+			}
 		case devicetype.IpnSettingCategory:
 			if value, ok := req.IPN[s.Key]; ok {
 				s.Value = setting.Convert(value)
@@ -101,9 +112,13 @@ func (cmd DeviceUpdateCmd) UpdateSettings(req request.DeviceSetting) error {
 	if err != nil {
 		return err
 	}
-	if network, err := cmd.networkRepo.Get(ctx, cmd.Device.NetworkID); err == nil {
-		if gateway, err := cmd.deviceRepo.Get(ctx, network.GatewayID); err == nil {
-			go command.UpdateDeviceSettings(gateway, cmd.Device)
+	if cmd.Device.IsNB() {
+		go command.UpdateDeviceSettings(cmd.Device, cmd.Device)
+	} else {
+		if network, err := cmd.networkRepo.Get(ctx, cmd.Device.NetworkID); err == nil {
+			if gateway, err := cmd.deviceRepo.Get(ctx, network.GatewayID); err == nil {
+				go command.UpdateDeviceSettings(gateway, cmd.Device)
+			}
 		}
 	}
 	return nil
