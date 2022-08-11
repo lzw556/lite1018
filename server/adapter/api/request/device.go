@@ -27,6 +27,7 @@ type DeviceSearch struct {
 }
 
 type DeviceSetting struct {
+	Wsn     map[string]interface{} `json:"wsn"`
 	IPN     map[string]interface{} `json:"ipn"`
 	Sensors map[string]interface{} `json:"sensors"`
 	System  map[string]interface{} `json:"system"`
