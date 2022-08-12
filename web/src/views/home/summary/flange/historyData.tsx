@@ -4,6 +4,7 @@ import ShadowCard from '../../../../components/shadowCard';
 import { AssetRow } from '../../assetList/props';
 import { getData } from '../measurement/services';
 import {
+  filterProperties,
   generateChartOptionsOfHistoryData,
   getKeysOfFirstClassFields,
   HistoryData as HistoryDatas,
@@ -71,12 +72,12 @@ export const HistoryData: React.FC<AssetRow> = (props) => {
                     defaultValue={property}
                     placeholder={'请选择属性'}
                     style={{ width: isMobile ? '100%' : '120px' }}
-                    onChange={(value) => {
+                    onChange={(value: string) => {
                       setProperty(value);
                     }}
                   >
                     {sortProperties(
-                      properties,
+                      filterProperties(properties),
                       getKeysOfFirstClassFields(measurements[0].type)
                     ).map(({ name, key }) => (
                       <Select.Option key={key} value={key}>

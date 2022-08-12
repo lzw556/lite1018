@@ -348,7 +348,7 @@ function getSeries(color: string, value: number | string | undefined, name: stri
 }
 
 function getHistoryDatas(data: HistoryData, firstClassFieldKeys: string[], propertyKey?: string) {
-  const firstValue = sortProperties(data[0].values, firstClassFieldKeys);
+  const firstValue = sortProperties(filterProperties(data[0].values), firstClassFieldKeys);
   const times = data.map(({ timestamp }) => timestamp);
   return firstValue
     .filter((property) => (propertyKey ? property.key === propertyKey : true))
@@ -512,4 +512,8 @@ export function sortProperties(properties: Property[], firstClassFieldKeys: stri
     if (!sorted.map(({ key }) => key).includes(property.key)) sorted.push(property);
   });
   return sorted;
+}
+
+export function filterProperties(properties: Property[]) {
+  return properties.filter(({ isShow }) => isShow);
 }

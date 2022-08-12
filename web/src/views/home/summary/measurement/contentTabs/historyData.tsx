@@ -7,7 +7,12 @@ import { RangeDatePicker } from '../../../../../components/rangeDatePicker';
 import HasPermission from '../../../../../permission';
 import { Permission } from '../../../../../permission/permission';
 import { isMobile } from '../../../../../utils/deviceDetection';
-import { generateChartOptionsOfHistoryDatas, getKeysOfFirstClassFields, sortProperties } from '../../../common/historyDataHelper';
+import {
+  filterProperties,
+  generateChartOptionsOfHistoryDatas,
+  getKeysOfFirstClassFields,
+  sortProperties
+} from '../../../common/historyDataHelper';
 import { ChartContainer } from '../../../components/charts/chartContainer';
 import { MeasurementRow } from '../props';
 import { clearHistory, getData } from '../services';
@@ -69,11 +74,14 @@ export const HistoryData: React.FC<MeasurementRow> = (props) => {
                   defaultValue={property}
                   placeholder={'请选择属性'}
                   style={{ width: isMobile ? '100%' : '120px' }}
-                  onChange={(value) => {
+                  onChange={(value: string) => {
                     setProperty(value);
                   }}
                 >
-                  {sortProperties(properties, getKeysOfFirstClassFields(type)).map(({ name, key }) => (
+                  {sortProperties(
+                    filterProperties(properties),
+                    getKeysOfFirstClassFields(type)
+                  ).map(({ name, key }) => (
                     <Select.Option key={key} value={key}>
                       {name}
                     </Select.Option>

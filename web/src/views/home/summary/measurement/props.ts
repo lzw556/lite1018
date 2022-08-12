@@ -17,6 +17,7 @@ export type Property = {
   unit: string;
   fields: { key: string; name: string; dataIndex: number; value: number }[];
   data: { [propName: string]: number };
+  isShow: boolean;
 };
 
 export type MeasurementRow = {
