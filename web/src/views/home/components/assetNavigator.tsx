@@ -81,7 +81,7 @@ export const AssetNavigator: React.FC<
   const renderBreadcrumbItemDDMenu = (assets: BreadcrumbItemData[]) => {
     if (assets.length > 0) {
       return (
-        <Menu>
+        <Menu style={{overflow:'auto', maxHeight:600, minWidth: 200}}>
           {assets.map((asset) => (
             <Menu.Item
               key={asset.id}
@@ -108,7 +108,7 @@ export const AssetNavigator: React.FC<
     const downIcon = <DownOutlined style={{ fontSize: '10px', cursor: 'pointer' }} />;
     if (isLast) {
       return (
-        <Dropdown overlay={menu} trigger={['click']} overlayStyle={{overflow:'auto', maxHeight:600, minWidth: 200}}>
+        <Dropdown overlay={menu} trigger={['click']}>
           <Space>
             <span>{asset.name}</span>
             {assets.length > 0 && downIcon}
@@ -120,7 +120,7 @@ export const AssetNavigator: React.FC<
         <Space>
           <Link to={pickUrlFromType(asset)}>{asset.name}</Link>
           {assets.length > 0 && (
-            <Dropdown overlay={menu} trigger={['click']} placement='bottomRight' overlayStyle={{overflow:'auto', maxHeight:600, minWidth: 200}}>
+            <Dropdown overlay={menu} trigger={['click']} placement='bottomRight'>
               {downIcon}
             </Dropdown>
           )}
