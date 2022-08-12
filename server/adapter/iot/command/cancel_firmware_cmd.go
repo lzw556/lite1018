@@ -43,6 +43,6 @@ func (cmd cancelFirmwareCmd) Execute(gateway string, target string, retained boo
 	return cmd.request.do(gateway, target, cmd, retained, 5)
 }
 
-func (cmd cancelFirmwareCmd) AsyncExecute(gateway string, target string, retained bool) error {
+func (cmd cancelFirmwareCmd) ExecuteAsync(gateway string, target string, retained bool) error {
 	return cmd.request.doAsync(gateway, target, cmd, retained, 3)
 }

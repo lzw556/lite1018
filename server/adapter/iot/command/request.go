@@ -19,7 +19,7 @@ type Request interface {
 	Qos() byte
 	Payload() ([]byte, error)
 	Execute(gateway string, target string, retained bool) (*Response, error)
-	AsyncExecute(gateway string, target string, retained bool) error
+	ExecuteAsync(gateway string, target string, retained bool) error
 }
 
 type Response struct {

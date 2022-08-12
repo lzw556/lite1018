@@ -43,6 +43,6 @@ func (cmd PongCommand) Execute(gateway string, target string, retained bool) (*R
 	return cmd.request.do(gateway, target, cmd, retained, 3*time.Second)
 }
 
-func (cmd PongCommand) AsyncExecute(gateway string, target string, retained bool) error {
+func (cmd PongCommand) ExecuteAsync(gateway string, target string, retained bool) error {
 	return cmd.request.doAsync(gateway, target, cmd, retained, 3)
 }

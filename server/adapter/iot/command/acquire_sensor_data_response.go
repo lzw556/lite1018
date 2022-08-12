@@ -9,33 +9,25 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/xlog"
 )
 
-type UpgradeFirmwareResponse struct {
+type AcquireSensorDataResponse struct {
 }
 
-func NewUpgradeFirmwareResponse() UpgradeFirmwareResponse {
-	return UpgradeFirmwareResponse{}
+func (d AcquireSensorDataResponse) Name() string {
+	return "acquireSensorDataResponse"
 }
 
-func (d UpgradeFirmwareResponse) Name() string {
-	return "upgradeFirmwareResponse"
-}
-
-func (d UpgradeFirmwareResponse) Dispatch(msg iot.Message) {
-	m := pd.FirmwareUpgradeResponseMessage{}
+func (d AcquireSensorDataResponse) Dispatch(msg iot.Message) {
+	m := pd.GeneralResponseMessage{}
 	if err := proto.Unmarshal(msg.Body.Payload, &m); err != nil {
 		xlog.Errorf("unmarshal [%s] message failed: %v", d.Name(), err)
 		return
 	}
-	if m.Code == 1 {
-
-	}
 	if _, err := cache.Get(m.ReqId); err == nil {
-		xlog.Infof("[%s] updateDevices command executed successful req id %s", msg.Body.Device, m.ReqId)
+		xlog.Infof("[%s] acquireSensorData command executed successful req id %s", msg.Body.Device, m.ReqId)
 		_ = cache.Delete(m.ReqId)
 	} else {
 		response := Response{
-			Code:    int(m.Code),
-			Payload: []byte(m.TaskId),
+			Code: int(m.Code),
 		}
 		eventbus.Publish(m.ReqId, response)
 	}

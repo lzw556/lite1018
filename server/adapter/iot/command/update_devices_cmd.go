@@ -75,6 +75,6 @@ func (cmd updateDevicesCmd) Execute(gateway string, target string, retained bool
 	return cmd.request.do(gateway, target, cmd, retained, 5)
 }
 
-func (cmd updateDevicesCmd) AsyncExecute(gateway string, target string, retained bool) error {
+func (cmd updateDevicesCmd) ExecuteAsync(gateway string, target string, retained bool) error {
 	return cmd.request.doAsync(gateway, target, cmd, retained, 3)
 }

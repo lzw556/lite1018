@@ -13,13 +13,7 @@ import (
 	"time"
 )
 
-var deviceRepo = repository.Device{}
 var networkRepo = repository.Network{}
-
-func isOnline(mac string) bool {
-	state, _, _ := cache.GetConnection(mac)
-	return state
-}
 
 func Execute(gateway, device entity.Device, t Type) error {
 	var cmd Request
@@ -32,12 +26,14 @@ func Execute(gateway, device entity.Device, t Type) error {
 		cmd = newResetDataCmd()
 	case ProvisionCmdType:
 		cmd = newProvisionCmd()
+	case AcquireSensorDataType:
+		cmd = newAcquireSensorDataCmd()
 	default:
 		return response.BusinessErr(errcode.UnknownDeviceTypeError, "")
 	}
-	if isOnline(gateway.MacAddress) {
+	if gateway.IsOnline() {
 		xlog.Infof("execute command %s => [%s]", cmd.Name(), device.MacAddress)
-		err := cmd.AsyncExecute(gateway.MacAddress, device.MacAddress, false)
+		err := cmd.ExecuteAsync(gateway.MacAddress, device.MacAddress, false)
 		if err != nil {
 			xlog.Errorf("execute device [%s] command %s failed: %v", device.MacAddress, cmd.Name(), err)
 			return err
@@ -58,7 +54,7 @@ func SyncNetwork(network entity.Network, devices []entity.Device, timeout time.D
 			break
 		}
 	}
-	if isOnline(gateway.MacAddress) {
+	if gateway.IsOnline() {
 		if err := UpdateWsnSettings(network, gateway); err != nil {
 			xlog.Errorf("update wsn settings failed: %v", err)
 			return err
@@ -93,7 +89,7 @@ func UpdateDeviceSettings(gateway, device entity.Device) {
 }
 
 func UpdateWsnSettings(network entity.Network, gateway entity.Device) error {
-	if isOnline(gateway.MacAddress) {
+	if gateway.IsOnline() {
 		xlog.Infof("starting update wsn settings => [%s]", gateway.MacAddress)
 		cmd := newUpdateWsnSettingsCmd(network)
 		if _, err := cmd.Execute(gateway.MacAddress, gateway.MacAddress, false); err != nil {
@@ -125,7 +121,7 @@ func SyncDeviceList(gateway entity.Device, devices []entity.Device) error {
 	}()
 
 	xlog.Infof("starting sync device list => [%s]", gateway.MacAddress)
-	if isOnline(gateway.MacAddress) {
+	if gateway.IsOnline() {
 		cmd := newUpdateDevicesCmd(gateway, devices)
 		if _, err := cmd.Execute(gateway.MacAddress, gateway.MacAddress, false); err != nil {
 			xlog.Errorf("execute device command %s failed: %v => [%s]", cmd.Name(), err, gateway.MacAddress)
@@ -213,7 +209,7 @@ func CancelDeviceUpgrade(gateway entity.Device, device entity.Device) error {
 }
 
 func Calibrate(gateway entity.Device, device entity.Device, param float32) error {
-	if isOnline(gateway.MacAddress) {
+	if gateway.IsOnline() {
 		if t := devicetype.Get(device.Type); t != nil {
 			cmd := newCalibrateCmd(t.SensorID(), param)
 			if _, err := cmd.Execute(gateway.MacAddress, device.MacAddress, false); err != nil {
@@ -224,6 +220,20 @@ func Calibrate(gateway entity.Device, device entity.Device, param float32) error
 		} else {
 			return response.BusinessErr(errcode.UnknownDeviceTypeError, "")
 		}
+	} else {
+		xlog.Errorf("calibrate failed: gateway offline => [%s]", gateway.MacAddress)
+		return response.BusinessErr(errcode.DeviceOfflineError, "")
+	}
+}
+
+func AcquireSensorData(gateway entity.Device, device entity.Device) error {
+	if gateway.IsOnline() {
+		cmd := newAcquireSensorDataCmd()
+		if err := cmd.ExecuteAsync(gateway.MacAddress, device.MacAddress, false); err != nil {
+			xlog.Errorf("execute device command %s failed: %v => [%s]", cmd.Name(), err, gateway.MacAddress)
+			return err
+		}
+		return nil
 	} else {
 		xlog.Errorf("calibrate failed: gateway offline => [%s]", gateway.MacAddress)
 		return response.BusinessErr(errcode.DeviceOfflineError, "")

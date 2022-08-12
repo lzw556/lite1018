@@ -50,6 +50,6 @@ func (cmd LargeSensorDataAckCommand) Execute(gateway string, target string, reta
 	return cmd.request.do(gateway, target, cmd, retained, 3*time.Second)
 }
 
-func (cmd LargeSensorDataAckCommand) AsyncExecute(gateway string, target string, retained bool) error {
+func (cmd LargeSensorDataAckCommand) ExecuteAsync(gateway string, target string, retained bool) error {
 	return cmd.request.doAsync(gateway, target, cmd, retained, 3)
 }

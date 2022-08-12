@@ -49,6 +49,6 @@ func (cmd deleteDeviceCmd) Execute(gateway string, target string, retained bool)
 	return cmd.do(gateway, target, cmd, retained, 3)
 }
 
-func (cmd deleteDeviceCmd) AsyncExecute(gateway string, target string, retained bool) error {
+func (cmd deleteDeviceCmd) ExecuteAsync(gateway string, target string, retained bool) error {
 	return cmd.request.doAsync(gateway, target, cmd, retained, 3)
 }

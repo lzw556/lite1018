@@ -43,6 +43,6 @@ func (cmd rebootCmd) Execute(gateway string, target string, retained bool) (*Res
 	return cmd.request.do(gateway, target, cmd, retained, 3)
 }
 
-func (cmd rebootCmd) AsyncExecute(gateway string, target string, retained bool) error {
+func (cmd rebootCmd) ExecuteAsync(gateway string, target string, retained bool) error {
 	return cmd.request.doAsync(gateway, target, cmd, retained, 3)
 }

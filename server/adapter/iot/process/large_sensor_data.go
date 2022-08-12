@@ -1,19 +1,21 @@
 package process
 
 import (
-	"errors"
+	"encoding/binary"
 	"fmt"
-	"github.com/allegro/bigcache/v3"
 	"github.com/gogo/protobuf/proto"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/iot"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/iot/command"
+	"github.com/thetasensors/theta-cloud-lite/server/adapter/iot/process/receiver"
 	pd "github.com/thetasensors/theta-cloud-lite/server/adapter/iot/proto"
+	"github.com/thetasensors/theta-cloud-lite/server/adapter/iot/sensor"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
-	"github.com/thetasensors/theta-cloud-lite/server/pkg/cache"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/devicetype"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/xlog"
 	"sync"
+	"time"
 )
 
 type LargeSensorData struct {
@@ -43,45 +45,60 @@ func (p *LargeSensorData) Process(ctx *iot.Context, msg iot.Message) error {
 		if err := proto.Unmarshal(msg.Body.Payload, &m); err != nil {
 			return fmt.Errorf("unmarshal [LargeSensorData] message failed: %v", err)
 		}
-		var receiver LargeSensorDataReceiver
 		key := fmt.Sprintf("%s-%d", device.MacAddress, m.SessionId)
-		err := cache.GetStruct(key, &receiver)
-		if errors.Is(bigcache.ErrEntryNotFound, err) {
-			receiver = NewLargeSensorDataReceiver(msg.Body.Device, m)
-		}
-		p.mu.Lock()
-		defer p.mu.Unlock()
-		if receiver.SessionID == m.SessionId {
-			if receiver.Receive(m); receiver.IsCompleted() {
-				xlog.Infof("[%s] received %d segments", msg.Body.Device, len(receiver.Packets))
-				if e, err := receiver.SensorData(); err == nil {
-					e.MacAddress = device.MacAddress
-					if err := p.repository.Create(e); err != nil {
-						return fmt.Errorf("create large sensor data failed: %v", err)
-					}
-					xlog.Infof("[%s] insert ok large sensor data: %+v", msg.Body.Device, e)
-					_ = cache.Delete(key)
-				} else {
-					return fmt.Errorf("decode large sensor data failed: %v", err)
+		if receiver.Receive(key, m); receiver.IsCompleted(key, int(m.NumSegments)) {
+			packets := receiver.Get(key)
+			if e, err := p.decodeToSensorData(flatPackets(packets), packets[0].MetaLength); err == nil {
+				e.MacAddress = device.MacAddress
+				if err := p.repository.Create(e); err != nil {
+					return fmt.Errorf("create large sensor data failed: %v", err)
 				}
-			} else {
-				xlog.Warnf("[%s] received %d segments not match gave segment num %d", msg.Body.Device, len(receiver.Packets), receiver.NumOfPackets)
+				xlog.Infof("[%s] insert ok large sensor data: %+v", msg.Body.Device, e)
 			}
-		} else {
-			xlog.Warnf("[%s] cache session id: %d not match received session id: %d", msg.Body.Device, receiver.SessionID, m.SessionId)
-			_ = cache.Delete(key)
-			receiver.Reset(msg.Body.Device, m)
-			receiver.Receive(m)
-		}
-		if err := cache.SetStruct(key, receiver); err != nil {
-			return fmt.Errorf("set cache failed: %v", err)
+			receiver.Clear(key)
 		}
 		cmd := command.NewLargeSensorDataAckCommand(m.SessionId, m.SegmentId)
-		err = cmd.AsyncExecute(msg.Body.Gateway, msg.Body.Device, false)
+		err := cmd.ExecuteAsync(msg.Body.Gateway, msg.Body.Device, false)
 		if err != nil {
 			xlog.Errorf("[%s] send [%s] command failed: %v", msg.Body.Device, cmd.Name(), err)
 			return err
 		}
 	}
 	return nil
+}
+
+func flatPackets(packets map[int32]pd.LargeSensorDataMessage) []byte {
+	data := make([]byte, 0)
+	for i := 0; i < len(packets); i++ {
+		data = append(data, packets[int32(i)].Data...)
+	}
+	return data
+}
+
+func (p *LargeSensorData) decodeToSensorData(data []byte, metaLength int32) (entity.SensorData, error) {
+	var (
+		sensorType = binary.LittleEndian.Uint32(data[8:12])
+		timestamp  = binary.LittleEndian.Uint64(data[:8])
+	)
+
+	e := entity.SensorData{
+		Time:       time.UnixMilli(int64(timestamp)),
+		SensorType: uint(sensorType),
+	}
+
+	var decoder sensor.RawDataDecoder
+	xlog.Debugf("sensor type: %d", sensorType)
+	switch sensorType {
+	case devicetype.KxSensor, devicetype.AdvancedKxSensor:
+		decoder = sensor.NewKx122Decoder()
+	case devicetype.DynamicLengthAttitudeSensor:
+		decoder = sensor.NewDynamicLengthAttitudeDecoder()
+	case devicetype.DynamicSCL3300Sensor:
+		decoder = sensor.NewDynamicInclinationDecoder()
+	default:
+		return entity.SensorData{}, fmt.Errorf("raw data decoder is nil")
+	}
+	values, err := decoder.Decode(data[16:], int(metaLength-16))
+	e.Values = values
+	return e, err
 }
