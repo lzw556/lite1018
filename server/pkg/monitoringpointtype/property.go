@@ -6,7 +6,7 @@ type Property struct {
 	Unit      string  `json:"unit"`
 	Precision int     `json:"precision"`
 	Sort      int     `json:"sort"`
-	IsShow    bool    `json:"-"`
+	IsShow    bool    `json:"isShow"`
 	Fields    []Field `json:"fields"`
 }
 
