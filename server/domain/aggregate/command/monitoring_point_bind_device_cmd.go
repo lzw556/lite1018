@@ -48,7 +48,7 @@ func (cmd MonitoringPointBindDeviceCmd) BindDevice(req request.BindDevice) error
 }
 
 func (cmd MonitoringPointBindDeviceCmd) UnbindDevice(req request.UnbindDevice) error {
-	if err := cmd.monitoringPointDeviceBindingRepo.DeleteBySpecs(context.TODO(), spec.DeviceIDEqSpec(req.DeviceID)); err != nil {
+	if err := cmd.monitoringPointDeviceBindingRepo.DeleteBySpecs(context.TODO(), spec.MonitoringPointIDEqSpec(cmd.MonitoringPoint.ID), spec.DeviceIDEqSpec(req.DeviceID)); err != nil {
 		return err
 	}
 
