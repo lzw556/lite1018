@@ -79,6 +79,12 @@ export const Permission = {
     MeasurementEdit: {path: "monitoringPoints/:id", method: "PUT"},
     MeasurementDelete: {path: "monitoringPoints/:id", method: "DELETE"},
     MeasurementDataDelete: {path: "monitoringPoints/:id/data", method: "DELETE"},
+    AlarmRuleGroupAdd: {path: "alarmRuleGroups", method: "POST"},
+    AlarmRuleGroupEdit: {path: "alarmRuleGroups/:id", method: "PUT"},
+    AlarmRuleGroupDelete: {path: "alarmRuleGroups/:id", method: "DELETE"},
+    AlarmRuleGroupBind: {path: "alarmRuleGroups/:id/bindings", method: "PUT"},
+    AlarmRuleGroupExport: {path: "alarmRuleGroups/exportFile", method: "GET"},
+    AlarmRuleGroupImport: {path: "alarmRuleGroups/import", method: "POST"},
 }
 
 let enforcer: Enforcer | null = null
