@@ -225,17 +225,3 @@ func Calibrate(gateway entity.Device, device entity.Device, param float32) error
 		return response.BusinessErr(errcode.DeviceOfflineError, "")
 	}
 }
-
-func AcquireSensorData(gateway entity.Device, device entity.Device) error {
-	if gateway.IsOnline() {
-		cmd := newAcquireSensorDataCmd()
-		if err := cmd.ExecuteAsync(gateway.MacAddress, device.MacAddress, false); err != nil {
-			xlog.Errorf("execute device command %s failed: %v => [%s]", cmd.Name(), err, gateway.MacAddress)
-			return err
-		}
-		return nil
-	} else {
-		xlog.Errorf("calibrate failed: gateway offline => [%s]", gateway.MacAddress)
-		return response.BusinessErr(errcode.DeviceOfflineError, "")
-	}
-}

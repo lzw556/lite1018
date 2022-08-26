@@ -57,7 +57,7 @@ func (p *LargeSensorData) Process(ctx *iot.Context, msg iot.Message) error {
 			}
 			receiver.Clear(key)
 		}
-		cmd := command.NewLargeSensorDataAckCommand(m.SessionId, m.SegmentId)
+		cmd := command.NewLargeSensorDataAckCmd(m.SessionId, m.SegmentId)
 		err := cmd.ExecuteAsync(msg.Body.Gateway, msg.Body.Device, false)
 		if err != nil {
 			xlog.Errorf("[%s] send [%s] command failed: %v", msg.Body.Device, cmd.Name(), err)

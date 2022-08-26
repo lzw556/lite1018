@@ -94,6 +94,14 @@ message PullWsnSettingsMessage {
   string reqId = 2;
 }
 
+message PullFirmwareMessage {
+  int32 timestamp = 1;
+  string reqId = 2;
+  int32 code = 3;
+  string crc = 4;
+  int32 seqId = 5;
+}
+
 message SensorDataMessage {
   int32 timestamp = 1;
   string reqId = 2;
@@ -141,6 +149,7 @@ message FirmwareUpgradeResponseMessage {
   string reqId = 2;
   int32 code = 3;
   string taskId = 4;
+  int32 blockSize = 5;
 }
 
 message FirmwareCancelResponseMessage {
@@ -362,6 +371,17 @@ message CancelFirmwareCommand {
 }
 
 message LoadFirmwareCommand {
+  int32 timestamp = 1;
+  string reqId = 2;
+  int32 subCommand = 3;
+  string taskId = 4;
+  int32 size = 5;
+  int32 seqId = 6;
+  int32 dataLength = 7;
+  bytes data = 8;
+}
+
+message PullFirmwareResponseCommand {
   int32 timestamp = 1;
   string reqId = 2;
   int32 subCommand = 3;

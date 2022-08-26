@@ -86,7 +86,7 @@ func (p *SensorData) Process(ctx *iot.Context, msg iot.Message) error {
 			}
 		}
 	}
-	cmd := command.NewSensorDataAckCommand(m.SessionId, m.SensorId)
+	cmd := command.NewSensorDataAckCmd(m.SessionId, m.SensorId)
 	if err := cmd.ExecuteAsync(msg.Body.Gateway, msg.Body.Device, false); err != nil {
 		xlog.Errorf("[%s] send [%s] command failed: %v", msg.Body.Device, cmd.Name(), err)
 		return err

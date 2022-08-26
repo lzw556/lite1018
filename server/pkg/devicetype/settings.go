@@ -85,7 +85,7 @@ func communicationPeriodSetting(sort int) Setting {
 		Value:    1200000,
 		Type:     Uint32ValueType,
 		Options: map[int]string{
-			int(4 * time.Minute.Milliseconds()):  "4分钟",
+			int(5 * time.Minute.Milliseconds()):  "5分钟",
 			int(10 * time.Minute.Milliseconds()): "10分钟",
 			int(20 * time.Minute.Milliseconds()): "20分钟",
 			int(30 * time.Minute.Milliseconds()): "30分钟",

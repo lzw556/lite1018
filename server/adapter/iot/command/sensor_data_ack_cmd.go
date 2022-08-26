@@ -12,7 +12,7 @@ type SensorDataAckCommand struct {
 	sessionID int32
 }
 
-func NewSensorDataAckCommand(sessionID, sensorID int32) SensorDataAckCommand {
+func NewSensorDataAckCmd(sessionID, sensorID int32) SensorDataAckCommand {
 	return SensorDataAckCommand{
 		request:   newRequest(),
 		sessionID: sessionID,

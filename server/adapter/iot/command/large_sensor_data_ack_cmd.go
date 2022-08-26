@@ -12,7 +12,7 @@ type LargeSensorDataAckCommand struct {
 	segmentID int32
 }
 
-func NewLargeSensorDataAckCommand(sessionID int32, segmentID int32) LargeSensorDataAckCommand {
+func NewLargeSensorDataAckCmd(sessionID int32, segmentID int32) LargeSensorDataAckCommand {
 	return LargeSensorDataAckCommand{
 		request:   newRequest(),
 		sessionID: sessionID,
