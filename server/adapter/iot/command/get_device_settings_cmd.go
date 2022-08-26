@@ -43,6 +43,6 @@ func (cmd getDeviceSettingsCmd) Execute(gateway string, target string, retained 
 	return cmd.request.do(gateway, target, cmd, retained, 3)
 }
 
-func (cmd getDeviceSettingsCmd) AsyncExecute(gateway string, target string, retained bool) error {
+func (cmd getDeviceSettingsCmd) ExecuteAsync(gateway string, target string, retained bool) error {
 	return cmd.request.doAsync(gateway, target, cmd, retained, 3)
 }

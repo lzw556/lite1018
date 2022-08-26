@@ -53,6 +53,6 @@ func (cmd upgradeFirmwareCmd) Execute(gateway string, target string, retained bo
 	return cmd.request.do(gateway, target, cmd, retained, 3)
 }
 
-func (cmd upgradeFirmwareCmd) AsyncExecute(gateway string, target string, retained bool) error {
+func (cmd upgradeFirmwareCmd) ExecuteAsync(gateway string, target string, retained bool) error {
 	return cmd.request.doAsync(gateway, target, cmd, retained, 3)
 }

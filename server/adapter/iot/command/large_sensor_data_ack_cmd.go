@@ -12,7 +12,7 @@ type LargeSensorDataAckCommand struct {
 	segmentID int32
 }
 
-func NewLargeSensorDataAckCommand(sessionID int32, segmentID int32) LargeSensorDataAckCommand {
+func NewLargeSensorDataAckCmd(sessionID int32, segmentID int32) LargeSensorDataAckCommand {
 	return LargeSensorDataAckCommand{
 		request:   newRequest(),
 		sessionID: sessionID,
@@ -50,6 +50,6 @@ func (cmd LargeSensorDataAckCommand) Execute(gateway string, target string, reta
 	return cmd.request.do(gateway, target, cmd, retained, 3*time.Second)
 }
 
-func (cmd LargeSensorDataAckCommand) AsyncExecute(gateway string, target string, retained bool) error {
+func (cmd LargeSensorDataAckCommand) ExecuteAsync(gateway string, target string, retained bool) error {
 	return cmd.request.doAsync(gateway, target, cmd, retained, 3)
 }

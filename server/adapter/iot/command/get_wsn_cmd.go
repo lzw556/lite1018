@@ -43,6 +43,6 @@ func (cmd getWsnCmd) Execute(gateway string, target string, retained bool) (*Res
 	return cmd.request.do(gateway, target, cmd, retained, 3)
 }
 
-func (cmd getWsnCmd) AsyncExecute(gateway string, target string, retained bool) error {
+func (cmd getWsnCmd) ExecuteAsync(gateway string, target string, retained bool) error {
 	return cmd.request.doAsync(gateway, target, cmd, retained, 3)
 }

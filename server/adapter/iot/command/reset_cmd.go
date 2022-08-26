@@ -43,6 +43,6 @@ func (cmd resetCmd) Execute(gateway string, target string, retained bool) (*Resp
 	return cmd.request.do(gateway, target, cmd, retained, 3)
 }
 
-func (cmd resetCmd) AsyncExecute(gateway string, target string, retained bool) error {
+func (cmd resetCmd) ExecuteAsync(gateway string, target string, retained bool) error {
 	return cmd.request.doAsync(gateway, target, cmd, retained, 3)
 }

@@ -98,6 +98,8 @@ func runIoTServer(conf config.IoT) {
 		dispatcher.NewBye(),
 		dispatcher.NewEvent(),
 		dispatcher.NewCalibrationStatus(),
+		dispatcher.NewPullFirmware(),
+		dispatcher.NewFirmwareUpgradeStatus(),
 		command.NewAddDeviceResponse(),
 		command.NewCalibrateResponse(),
 		command.NewCancelFirmwareResponse(),
