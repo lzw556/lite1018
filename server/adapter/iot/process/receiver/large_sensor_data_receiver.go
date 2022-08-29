@@ -5,32 +5,35 @@ import (
 	"sync"
 )
 
-var receiver map[string]map[int32]pd.LargeSensorDataMessage
+var receiver map[string]map[int32]map[int32]pd.LargeSensorDataMessage
 var mu sync.RWMutex
 
 func init() {
-	receiver = make(map[string]map[int32]pd.LargeSensorDataMessage)
+	receiver = make(map[string]map[int32]map[int32]pd.LargeSensorDataMessage)
 }
 
-func Receive(key string, m pd.LargeSensorDataMessage) {
+func Receive(key string, sessionID int32, m pd.LargeSensorDataMessage) {
 	mu.Lock()
 	defer mu.Unlock()
 	if _, ok := receiver[key]; !ok {
-		receiver[key] = map[int32]pd.LargeSensorDataMessage{}
+		receiver[key] = map[int32]map[int32]pd.LargeSensorDataMessage{}
 	}
-	receiver[key][m.SegmentId] = m
+	if _, ok := receiver[key][sessionID]; !ok {
+		receiver[key][sessionID] = map[int32]pd.LargeSensorDataMessage{}
+	}
+	receiver[key][sessionID][m.SegmentId] = m
 }
 
-func IsCompleted(key string, segments int) bool {
+func IsCompleted(key string, sessionID int32, segments int) bool {
 	mu.RLock()
 	defer mu.RUnlock()
-	return len(receiver[key]) == segments
+	return len(receiver[key][sessionID]) == segments
 }
 
-func Get(key string) map[int32]pd.LargeSensorDataMessage {
+func Get(key string, sessionID int32) map[int32]pd.LargeSensorDataMessage {
 	mu.RLock()
 	defer mu.RUnlock()
-	return receiver[key]
+	return receiver[key][sessionID]
 }
 
 func Clear(key string) {
