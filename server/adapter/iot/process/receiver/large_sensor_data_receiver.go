@@ -31,6 +31,9 @@ func Receive(key string, m pd.LargeSensorDataMessage) {
 			},
 		}
 	} else {
+		if _, ok := sessions[m.SessionId]; !ok {
+			sessions[m.SessionId] = map[int32]LargeSensorData{}
+		}
 		sessions[m.SessionId][m.SegmentId] = LargeSensorData{
 			MetaLength: m.MetaLength,
 			Payload:    m.Data,
