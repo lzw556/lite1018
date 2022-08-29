@@ -45,8 +45,8 @@ func (p *LargeSensorData) Process(ctx *iot.Context, msg iot.Message) error {
 		if err := proto.Unmarshal(msg.Body.Payload, &m); err != nil {
 			return fmt.Errorf("unmarshal [LargeSensorData] message failed: %v", err)
 		}
-		if receiver.Receive(device.MacAddress, m.SessionId, m); receiver.IsCompleted(device.MacAddress, m.SessionId, int(m.NumSegments)) {
-			packets := receiver.Get(device.MacAddress, m.SessionId)
+		receiver.Receive(device.MacAddress, m)
+		if packets, ok := receiver.IsCompleted(device.MacAddress, m.SessionId, int(m.NumSegments)); ok {
 			if e, err := p.decodeToSensorData(flatPackets(packets), packets[0].MetaLength); err == nil {
 				e.MacAddress = device.MacAddress
 				if err := p.repository.Create(e); err != nil {
@@ -66,10 +66,10 @@ func (p *LargeSensorData) Process(ctx *iot.Context, msg iot.Message) error {
 	return nil
 }
 
-func flatPackets(packets map[int32]pd.LargeSensorDataMessage) []byte {
+func flatPackets(packets map[int32]receiver.LargeSensorData) []byte {
 	data := make([]byte, 0)
 	for i := 0; i < len(packets); i++ {
-		data = append(data, packets[int32(i)].Data...)
+		data = append(data, packets[int32(i)].Payload...)
 	}
 	return data
 }
