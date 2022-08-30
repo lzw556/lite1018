@@ -36,7 +36,9 @@ func (p Bye) Next() Processor {
 func (p Bye) Process(ctx *iot.Context, msg iot.Message) error {
 	if value, ok := ctx.Get(msg.Body.Device); ok {
 		if device, ok := value.(entity.Device); ok {
-			go p.updateChildrenConnectionState(device)
+			if !device.IsNB() {
+				go p.updateChildrenConnectionState(device)
+			}
 		}
 	}
 	return nil

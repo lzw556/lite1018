@@ -3,19 +3,22 @@ package devicetype
 import "time"
 
 const (
-	GatewayType                           = 1
-	RouterType                            = 257
-	BoltLooseningType                     = 131073
-	BoltElongationType                    = 196609
-	VibrationTemperature3AxisType         = 327938
-	VibrationTemperature3AxisAdvancedType = 327940
-	VibrationTemperature1AxisType         = 327682
-	CurrentType                           = 458753
-	TemperatureType                       = 393217
-	NormalTemperatureCorrosionType        = 262145
-	HighTemperatureCorrosionType          = 262401
-	PressureTemperatureType               = 524290
-	AngleDipType                          = 589825
+	GatewayType                             = 1
+	RouterType                              = 257
+	BoltLooseningType                       = 131073
+	BoltElongationType                      = 196609
+	VibrationTemperature3AxisType           = 327938
+	VibrationTemperature3AxisAdvancedType   = 327940
+	VibrationTemperature3AxisNBType         = 327941
+	VibrationTemperature3AxisAdvancedNBType = 327942
+	VibrationTemperature1AxisType           = 327682
+	CurrentType                             = 458753
+	TemperatureType                         = 393217
+	NormalTemperatureCorrosionType          = 262145
+	HighTemperatureCorrosionType            = 262401
+	PressureTemperatureType                 = 524290
+	AngleDipType                            = 589825
+	AngleDipNBType                          = 589826
 )
 
 type Typer interface {
@@ -31,10 +34,13 @@ var types = []Typer{
 	BoltLoosening{},
 	BoltElongation{},
 	VibrationTemperature3Axis{},
+	VibrationTemperature3AxisNB{},
 	VibrationTemperature3AxisAdvance{},
+	VibrationTemperature3AxisAdvanceNB{},
 	NormalTemperatureCorrosion{},
 	HighTemperatureCorrosion{},
 	AngleDip{},
+	AngleDipNB{},
 	Temperature{},
 }
 

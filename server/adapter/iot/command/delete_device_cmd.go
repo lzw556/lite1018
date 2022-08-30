@@ -45,6 +45,10 @@ func (cmd deleteDeviceCmd) Payload() ([]byte, error) {
 	return proto.Marshal(&m)
 }
 
-func (cmd deleteDeviceCmd) Execute(gateway string, target string) (*Response, error) {
-	return cmd.do(gateway, target, cmd, 3)
+func (cmd deleteDeviceCmd) Execute(gateway string, target string, retained bool) (*Response, error) {
+	return cmd.do(gateway, target, cmd, retained, 3)
+}
+
+func (cmd deleteDeviceCmd) ExecuteAsync(gateway string, target string, retained bool) error {
+	return cmd.request.doAsync(gateway, target, cmd, retained, 3)
 }

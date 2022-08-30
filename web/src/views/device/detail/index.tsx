@@ -1,5 +1,5 @@
 import {useCallback, useEffect, useState} from 'react';
-import {useHistory, useLocation} from 'react-router-dom';
+import {useLocation} from 'react-router-dom';
 import {GetParamValue} from '../../../utils/path';
 import {Button, Col, Dropdown, Menu, message, Row, Space} from 'antd';
 import {Device} from '../../../types/device';
@@ -23,8 +23,8 @@ import {IsUpgrading} from '../../../types/device_upgrade_status';
 import UpgradeModal from '../upgrade';
 import DeviceEvent from './event';
 import {isMobile} from '../../../utils/deviceDetection';
-import { FilterableAlarmRecordTable } from '../../../components/alarm/filterableAlarmRecordTable';
-import { DynamicData } from './dynamicData';
+import {FilterableAlarmRecordTable} from '../../../components/alarm/filterableAlarmRecordTable';
+import {DynamicData} from './dynamicData';
 import EditCalibrateParas from '../edit/editCalibrateParas';
 
 const tabTitleList = [
@@ -53,7 +53,7 @@ const DeviceDetailPage = () => {
 
     const contents = new Map<string, any>([
         ['settings', device && <SettingPage device={device} onUpdate={() => {
-          if(device) fetchDevice()
+            if (device) fetchDevice()
         }}/>],
         ['historyData', device && <HistoryDataPage device={device}/>],
         ['waveData', device && <WaveDataChart device={device}/>],
@@ -121,7 +121,9 @@ const DeviceDetailPage = () => {
         }
         switch (device.typeId) {
             case DeviceType.VibrationTemperature3Axis:
+            case DeviceType.VibrationTemperature3AxisNB:
             case DeviceType.VibrationTemperature3AxisAdvanced:
+            case DeviceType.VibrationTemperature3AxisAdvancedNB:
                 if (hasPermission(Permission.DeviceData)) {
                     tabs.unshift(...tabTitleList, {key: 'waveData', tab: '波形数据'});
                 }
@@ -131,6 +133,7 @@ const DeviceDetailPage = () => {
                 return tabs;
             case DeviceType.BoltElongation:
             case DeviceType.AngleDip:
+            case DeviceType.AngleDipNB:
                 if (hasPermission(Permission.DeviceData)) {
                     tabs.unshift(...tabTitleList, {key: 'dynamicData', tab: '动态数据'});
                 }
@@ -163,7 +166,7 @@ const DeviceDetailPage = () => {
                 case DeviceCommand.Calibrate:
                     setDevice(device);
                     setVisibleCalibrate(true);
-                    break;    
+                    break;
                 default:
                     SendDeviceCommandRequest(device.id, key, {}).then((res) => {
                         if (res.code === 200) {
@@ -186,9 +189,14 @@ const DeviceDetailPage = () => {
                     重启
                 </Menu.Item>
                 {device && device.typeId !== DeviceType.Router && device.typeId !== DeviceType.Gateway && (
-                    <Menu.Item key={DeviceCommand.ResetData} disabled={!isOnline} hidden={isUpgrading}>
-                        重置数据
-                    </Menu.Item>
+                    <>
+                        <Menu.Item key={DeviceCommand.AcquireSensorData} disabled={!isOnline} hidden={isUpgrading}>
+                            采集数据
+                        </Menu.Item>
+                        <Menu.Item key={DeviceCommand.ResetData} disabled={!isOnline} hidden={isUpgrading}>
+                            重置数据
+                        </Menu.Item>
+                    </>
                 )}
                 <Menu.Item key={DeviceCommand.Reset} disabled={!isOnline} hidden={isUpgrading}>
                     恢复出厂设置
@@ -266,11 +274,11 @@ const DeviceDetailPage = () => {
                     onUpdate={(paras) => {
                         setVisibleCalibrate(false);
                         SendDeviceCommandRequest(device.id, DeviceCommand.Calibrate, paras).then((res) => {
-                        if (res.code === 200) {
-                            message.success('命令发送成功').then();
-                        } else {
-                            message.error(res.msg).then();
-                        }
+                            if (res.code === 200) {
+                                message.success('命令发送成功').then();
+                            } else {
+                                message.error(res.msg).then();
+                            }
                         });
                     }}
                 />

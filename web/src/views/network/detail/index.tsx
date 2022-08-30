@@ -98,7 +98,7 @@ const NetworkDetail = () => {
       return (
         <Row style={{flexGrow:1}}>
           <Col xl={16} xxl={18} id={"topologyView"}>
-            <ShadowCard style={{height: '100%'}} bodyStyle={{height:'100%'}}>
+            <ShadowCard style={{height: '100%'}} bodyStyle={{height:'100%', minWidth: "500px"}}>
               <TopologyView network={network} />
             </ShadowCard>
           </Col>

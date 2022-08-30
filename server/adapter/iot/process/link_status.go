@@ -50,7 +50,7 @@ func (p LinkStatus) Process(ctx *iot.Context, msg iot.Message) error {
 	if err := json.Unmarshal([]byte(m.Status), &linkStatus); err != nil {
 		return err
 	}
-	xlog.Debugf("received [LinkStatus] message: %+v", linkStatus)
+	xlog.Debugf("[%s] received [LinkStatus] message: %+v", linkStatus, msg.Body.Gateway)
 
 	device, err := p.deviceRepo.GetBySpecs(context.TODO(), spec.DeviceMacEqSpec(linkStatus.Address))
 	if err != nil {

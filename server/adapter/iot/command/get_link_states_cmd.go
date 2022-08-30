@@ -40,6 +40,10 @@ func (cmd getLinkStatesCmd) Payload() ([]byte, error) {
 	return proto.Marshal(&m)
 }
 
-func (cmd getLinkStatesCmd) Execute(gateway string, target string) (*Response, error) {
-	return cmd.request.do(gateway, target, cmd, 10)
+func (cmd getLinkStatesCmd) Execute(gateway string, target string, retained bool) (*Response, error) {
+	return cmd.request.do(gateway, target, cmd, retained, 10)
+}
+
+func (cmd getLinkStatesCmd) ExecuteAsync(gateway string, target string, retained bool) error {
+	return cmd.request.doAsync(gateway, target, cmd, retained, 3)
 }

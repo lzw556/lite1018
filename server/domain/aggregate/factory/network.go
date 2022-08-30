@@ -72,7 +72,7 @@ func (factory Network) NewNetworkImportCmd(req request.ImportNetwork) (*command.
 		GroupSize:               req.Wsn.GroupSize,
 		ProjectID:               req.ProjectID,
 	}
-	cmd.Network.SwitchProvisioningMode(entity.NetworkProvisionMode1)
+	cmd.Network.SwitchProvisioningMode(entity.ProvisioningMode(req.Mode))
 	// 构建网络中的设备实体
 	cmd.Devices = make([]entity.Device, len(req.Devices))
 	for i, device := range req.Devices {

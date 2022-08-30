@@ -91,6 +91,7 @@ func runIoTServer(conf config.IoT) {
 	adapter.IoT.RegisterDispatchers(
 		dispatcher.NewDeviceStatus(),
 		dispatcher.NewLinkStatus(),
+		dispatcher.NewLinkStates(),
 		dispatcher.NewRestartStatus(),
 		dispatcher.NewSensorData(),
 		dispatcher.NewLargeSensorData(),
@@ -100,6 +101,8 @@ func runIoTServer(conf config.IoT) {
 		dispatcher.NewBye(),
 		dispatcher.NewEvent(),
 		dispatcher.NewCalibrationStatus(),
+		dispatcher.NewPullFirmware(),
+		dispatcher.NewFirmwareUpgradeStatus(),
 		command.NewAddDeviceResponse(),
 		command.NewCalibrateResponse(),
 		command.NewCancelFirmwareResponse(),

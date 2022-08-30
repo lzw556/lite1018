@@ -36,18 +36,12 @@ func (factory Device) NewDeviceCreateCmd(req request.CreateDevice) (*command.Dev
 	if !errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, response.BusinessErr(errcode.DeviceMacExistsError, req.MacAddress)
 	}
-
-	e.Name = req.Name
-	e.MacAddress = req.MacAddress
-	e.Type = req.TypeID
-	e.ProjectID = req.ProjectID
-	e.NetworkID = req.NetworkID
-	parent, err := factory.deviceRepo.Get(ctx, req.ParentID)
-	if err != nil || parent.NetworkID != req.NetworkID {
-		return nil, response.BusinessErr(errcode.DeviceNotFoundError, "")
-	}
-	e.Parent = parent.MacAddress
 	if t := devicetype.Get(req.TypeID); t != nil {
+		cmd := command.NewDeviceCreateCmd()
+		e.Name = req.Name
+		e.MacAddress = req.MacAddress
+		e.Type = req.TypeID
+		e.ProjectID = req.ProjectID
 		e.Settings = make(entity.DeviceSettings, len(t.Settings()))
 		for i, setting := range t.Settings() {
 			s := entity.DeviceSetting{
@@ -60,6 +54,8 @@ func (factory Device) NewDeviceCreateCmd(req request.CreateDevice) (*command.Dev
 				settings = req.Sensors
 			case devicetype.IpnSettingCategory:
 				settings = req.IPN
+			case devicetype.WsnSettingCategory:
+				settings = req.Wsn
 			}
 			if value, ok := settings[setting.Key]; ok {
 				s.Value = setting.Convert(value)
@@ -68,7 +64,19 @@ func (factory Device) NewDeviceCreateCmd(req request.CreateDevice) (*command.Dev
 			}
 			e.Settings[i] = s
 		}
-		cmd := command.NewDeviceCreateCmd()
+		if !e.IsNB() {
+			network, err := factory.networkRepo.Get(ctx, req.NetworkID)
+			if err != nil {
+				return nil, response.BusinessErr(errcode.NetworkNotFoundError, "")
+			}
+			cmd.Network = network
+			e.NetworkID = network.ID
+			parent, err := factory.deviceRepo.Get(ctx, req.ParentID)
+			if err != nil || parent.NetworkID != network.ID {
+				return nil, response.BusinessErr(errcode.DeviceNotFoundError, "")
+			}
+			e.Parent = parent.MacAddress
+		}
 		cmd.Device = e
 		return &cmd, nil
 	}
@@ -113,15 +121,19 @@ func (factory Device) NewDeviceExecuteCommandCmd(deviceID uint) (*command.Device
 	}
 	cmd := command.NewDeviceExecuteCommandCmd()
 	cmd.Device = device
-	network, err := factory.networkRepo.Get(ctx, device.NetworkID)
-	if err != nil {
-		return nil, response.BusinessErr(errcode.NetworkNotFoundError, "")
+	if device.IsNB() {
+		cmd.Gateway = device
+	} else {
+		network, err := factory.networkRepo.Get(ctx, device.NetworkID)
+		if err != nil {
+			return nil, response.BusinessErr(errcode.NetworkNotFoundError, "")
+		}
+		gateway, err := factory.deviceRepo.Get(ctx, network.GatewayID)
+		if err != nil {
+			return nil, response.BusinessErr(errcode.DeviceNotFoundError, "")
+		}
+		cmd.Gateway = gateway
 	}
-	gateway, err := factory.deviceRepo.Get(ctx, network.GatewayID)
-	if err != nil {
-		return nil, response.BusinessErr(errcode.DeviceNotFoundError, "")
-	}
-	cmd.Gateway = gateway
 	return &cmd, nil
 }
 
@@ -131,17 +143,21 @@ func (factory Device) NewDeviceUpgradeCmd(deviceID uint) (*command.DeviceUpgrade
 	if err != nil {
 		return nil, response.BusinessErr(errcode.DeviceNotFoundError, "")
 	}
-	network, err := factory.networkRepo.Get(ctx, e.NetworkID)
-	if err != nil {
-		return nil, err
-	}
-	gateway, err := factory.deviceRepo.Get(ctx, network.GatewayID)
-	if err != nil {
-		return nil, err
-	}
 	cmd := command.NewDeviceUpgradeCmd()
 	cmd.Device = e
-	cmd.Gateway = gateway
+	if e.IsNB() {
+		cmd.Gateway = e
+	} else {
+		network, err := factory.networkRepo.Get(ctx, e.NetworkID)
+		if err != nil {
+			return nil, err
+		}
+		gateway, err := factory.deviceRepo.Get(ctx, network.GatewayID)
+		if err != nil {
+			return nil, err
+		}
+		cmd.Gateway = gateway
+	}
 	return &cmd, nil
 }
 

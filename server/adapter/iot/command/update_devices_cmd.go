@@ -71,6 +71,10 @@ func toDeviceItem(e entity.Device) *pd.DeviceItem {
 	return item
 }
 
-func (cmd updateDevicesCmd) Execute(gateway string, target string) (*Response, error) {
-	return cmd.request.do(gateway, target, cmd, 5)
+func (cmd updateDevicesCmd) Execute(gateway string, target string, retained bool) (*Response, error) {
+	return cmd.request.do(gateway, target, cmd, retained, 5)
+}
+
+func (cmd updateDevicesCmd) ExecuteAsync(gateway string, target string, retained bool) error {
+	return cmd.request.doAsync(gateway, target, cmd, retained, 3)
 }

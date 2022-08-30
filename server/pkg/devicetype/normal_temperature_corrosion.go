@@ -21,8 +21,8 @@ func (NormalTemperatureCorrosion) SensorID() uint {
 }
 
 func (d NormalTemperatureCorrosion) Settings() Settings {
-	d.SamplePeriod = samplePeriodSetting()
-	d.SampleOffset = sampleOffsetSetting()
+	d.SamplePeriod = samplePeriodSetting(0)
+	d.SampleOffset = sampleOffsetSetting(1)
 	d.SpeedObject = Setting{
 		Name:     "波速",
 		Key:      "speed_object",
