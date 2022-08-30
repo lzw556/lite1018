@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/request"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/response"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/iot/command"
@@ -46,6 +47,9 @@ func (cmd NetworkUpdateCmd) Update(req request.Network) (*vo.Network, error) {
 		}
 		return nil
 	})
+	if err != nil {
+		return nil, err
+	}
 	gateway, err := cmd.deviceRepo.Get(context.TODO(), cmd.Network.GatewayID)
 	if err != nil {
 		return nil, err

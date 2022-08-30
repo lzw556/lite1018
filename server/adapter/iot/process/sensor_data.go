@@ -13,6 +13,7 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	spec "github.com/thetasensors/theta-cloud-lite/server/domain/specification"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/devicetype"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/process"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/xlog"
 	"sync"
 	"time"
@@ -82,6 +83,11 @@ func (p *SensorData) Process(ctx *iot.Context, msg iot.Message) error {
 					if alarmRules, err := p.alarmRuleRepo.FindBySpecs(context.TODO(), spec.PrimaryKeyInSpec(ids)); err == nil {
 						ruleengine.ExecuteSelectedRules(device.ID, alarmRules...)
 					}
+				}
+
+				proc := process.NewProcess()
+				if err := proc.ProcessDeviceSensorData(device, e); err != nil {
+					return fmt.Errorf("Save monitoring point data failed: %v", err)
 				}
 			}
 		}

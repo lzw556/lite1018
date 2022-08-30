@@ -28,6 +28,14 @@ type RemoveDevices struct {
 	DeviceIDs []uint `json:"device_ids"`
 }
 
+type ImportDevice struct {
+	Name          string                            `json:"name"`
+	MacAddress    string                            `json:"mac_address"`
+	ParentAddress string                            `json:"parent_address"`
+	TypeID        uint                              `json:"type_id"`
+	Settings      map[string]map[string]interface{} `json:"settings,omitempty"`
+}
+
 type ImportNetwork struct {
 	Wsn     WSN `json:"wsn"`
 	Mode    int `json:"mode"`
@@ -38,7 +46,6 @@ type ImportNetwork struct {
 		TypeID        uint                              `json:"type_id"`
 		Settings      map[string]map[string]interface{} `json:"settings,omitempty"`
 	} `json:"devices"`
-
 	ProjectID uint `json:"-"`
 }
 

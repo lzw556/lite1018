@@ -44,7 +44,9 @@ const getFirstClassProperties = (typeId: number, properties: Property[]) => {
 
 export const generateDeviceTypeCollections = () => {
   const origin: any = Object.values(DeviceType);
-  const values: number[] = origin.filter((val: any) => Number.isInteger(Number(val)));
+  const values: number[] = origin
+    .filter((val: any) => Number.isInteger(Number(val)))
+    .filter((val: any) => val <= DeviceType.BoltElongation);
   return values.map((val) => ({ val, name: DeviceType.toString(val) }));
 };
 

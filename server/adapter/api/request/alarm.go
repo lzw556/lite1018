@@ -10,6 +10,7 @@ type AlarmTemplate struct {
 }
 
 type AlarmRule struct {
+	ID          uint   `josn:"id,omitempty"`
 	Name        string `json:"name,omitempty" binding:"omitempty,max=16,min=4"`
 	Description string `json:"description"`
 	SourceIDs   []uint `json:"source_ids"`
@@ -42,4 +43,55 @@ type AcknowledgeAlarmRecord struct {
 	UserID uint `json:"-"`
 
 	Note string `json:"note"`
+}
+
+type AlarmRuleGroup struct {
+	Name        string      `json:"name"`
+	Description string      `json:"description"`
+	Rules       []AlarmRule `json:"rules"`
+	Category    uint        `json:"category"`
+	Type        uint        `json:"type"`
+
+	ProjectID uint `json:"-"`
+}
+
+type AlarmRuleGroupBinding struct {
+	AlarmRuleID uint `json:"alarm_rule_id"`
+	SourceID    uint `json:"source_id"`
+}
+
+type AlarmRuleGroupBind struct {
+	MonitoringPointIDs []uint `json:"monitoring_point_ids"`
+}
+
+type AlarmRuleGroupUnbind struct {
+	MonitoringPointIDs []uint `json:"monitoring_point_ids"`
+}
+
+type UpdateAlarmRuleGroup struct {
+	Name        string      `json:"name"`
+	Description string      `json:"description"`
+	Rules       []AlarmRule `json:"rules"`
+	Category    uint        `json:"category"`
+	Type        uint        `json:"type"`
+
+	ProjectID uint `json:"-"`
+}
+
+type UpdateAlarmRuleGroupBindings struct {
+	MonitoringPointIDs []uint `json:"monitoring_point_ids"`
+}
+
+type AlarmRuleGroupImported struct {
+	Name        string      `json:"name"`
+	Description string      `json:"description"`
+	Category    uint        `json:"category"`
+	Type        uint        `json:"type"`
+	Rules       []AlarmRule `json:"rules"`
+}
+
+type AlarmRuleGroupsImported struct {
+	AlarmRuleGroups []AlarmRuleGroupImported `json:"alarmRuleGroups" binding:"required"`
+
+	ProjectID uint `json:"-"`
 }

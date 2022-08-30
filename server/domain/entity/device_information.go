@@ -12,7 +12,6 @@ type DeviceInformation struct {
 	Gateway           string `json:"gateway"`
 	ProductID         uint   `json:"product_id"`
 	Timestamp         int64  `json:"timestamp"`
-	IccID4G           string `json:"iccid_4g"`
 }
 
 func (DeviceInformation) BucketName() string {

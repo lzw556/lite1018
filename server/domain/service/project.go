@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"errors"
+
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/request"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/response"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/project"
@@ -98,4 +99,95 @@ func (s Project) DeleteProjectByID(id uint) error {
 		return err
 	}
 	return cmd.Run()
+}
+
+func (s Project) GetMyProjectExportFile(id uint) (*vo.ProjectExported, error) {
+	cmd, err := s.factory.NewProjectExportCmd(id)
+	if err != nil {
+		return nil, err
+	}
+	return cmd.Run()
+}
+
+func isInArray(target uint, arr []uint) bool {
+	for _, x := range arr {
+		if x == target {
+			return true
+		}
+	}
+
+	return false
+}
+
+func getOneDevice(asset *vo.AssetExported) string {
+	for _, mp := range asset.MonitoringPoints {
+		for _, dev := range mp.Devices {
+			return dev.Address
+		}
+	}
+
+	for _, child := range asset.Children {
+		return getOneDevice(child)
+	}
+
+	return ""
+}
+
+func findDeviceNetwork(mac string, networks []*vo.NetworkExportFile) *vo.NetworkExportFile {
+	for i, network := range networks {
+		for _, dev := range network.DeviceList {
+			if dev.Address == mac {
+				return networks[i]
+			}
+		}
+	}
+
+	return nil
+}
+
+func (s Project) GetMyProjectExportFileWithFilters(id uint, monitoringPointIDs []uint) (*vo.ProjectExported, error) {
+	cmd, err := s.factory.NewProjectExportCmd(id)
+	if err != nil {
+		return nil, err
+	}
+	all, err := cmd.Run()
+
+	if err != nil || len(monitoringPointIDs) == 0 {
+		return all, err
+	}
+
+	resultAssets := make([]*vo.AssetExported, 0)
+	resultNetworks := make([]*vo.NetworkExportFile, 0)
+
+	for i, asset := range all.Assets {
+		if isInArray(asset.ID, monitoringPointIDs) {
+			resultAssets = append(resultAssets, all.Assets[i])
+		}
+	}
+
+	for _, asset := range resultAssets {
+		devMac := getOneDevice(asset)
+		if len(devMac) > 0 {
+			network := findDeviceNetwork(devMac, all.Networks)
+			if network != nil {
+				resultNetworks = append(resultNetworks, network)
+			}
+		}
+	}
+
+	return &vo.ProjectExported{
+		ID:       all.ID,
+		Name:     all.Name,
+		Assets:   resultAssets,
+		Networks: resultNetworks,
+	}, nil
+}
+
+func (s Project) ImportProject(id uint, req request.ProjectImported) error {
+	cmd, err := s.factory.NewProjectImportCmd(id)
+	if err != nil {
+		return err
+	}
+
+	return cmd.ImportProject(req)
 }

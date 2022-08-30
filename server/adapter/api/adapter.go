@@ -3,6 +3,7 @@ package api
 import (
 	"context"
 	"embed"
+	"fmt"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/gzip"
 	"github.com/gin-contrib/static"
@@ -89,6 +90,8 @@ func (a *Adapter) errorWrapper(handler middleware.ErrorWrapperHandler) gin.Handl
 		switch err := err.(type) {
 		case response.InvalidParameterError:
 			response.BadRequest(ctx, "无效的参数", err)
+		case response.InvalidParameterErrorWithDetail:
+			response.BadRequest(ctx, fmt.Sprintf("无效的参数:%s", err.Error()), err)
 		case response.BusinessError:
 			response.SuccessWithBusinessError(ctx, err)
 		default:
@@ -97,7 +100,7 @@ func (a *Adapter) errorWrapper(handler middleware.ErrorWrapperHandler) gin.Handl
 				return
 			}
 			switch data := data.(type) {
-			case *vo.NetworkExportFile, *vo.ExcelFile, *vo.ImageFile, *vo.CsvFile:
+			case *vo.NetworkExportFile, *vo.ExcelFile, *vo.ImageFile, *vo.CsvFile, *vo.ProjectExported, *vo.AlarmRuleGroupsExported:
 				if writer, ok := data.(response.FileWriter); ok {
 					response.WriteFile(ctx, writer)
 					return

@@ -20,6 +20,7 @@ func (r *statisticRouter) initRoutes() {
 		// GET
 		router.NewGetRoute("statistics/devices", r.getDeviceStatistics),
 		router.NewGetRoute("statistics/alerts", r.getAlertStatistics),
+		router.NewGetRoute("statistics/all", r.getAllStatistics),
 	}
 }
 

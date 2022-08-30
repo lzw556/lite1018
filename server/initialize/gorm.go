@@ -22,6 +22,11 @@ func InitTables(db *gorm.DB) error {
 		&entity.AlarmRecord{},
 		&entity.AlarmRecordAcknowledge{},
 		&entity.Event{},
+		&entity.Asset{},
+		&entity.MonitoringPoint{},
+		&entity.MonitoringPointDeviceBinding{},
+		&entity.AlarmRuleGroup{},
+		&entity.AlarmRuleGroupSource{},
 		&entity.DeviceLinkStatus{},
 	}
 

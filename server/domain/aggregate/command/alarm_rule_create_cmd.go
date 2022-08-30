@@ -40,3 +40,19 @@ func (cmd AlarmRuleCreateCmd) Run() error {
 		return ruleengine.UpdateRules(cmd.AlarmRule)
 	})
 }
+
+func (cmd *AlarmRuleCreateCmd) RunWithContext(ctx context.Context) error {
+	if err := cmd.alarmRuleRepo.Create(ctx, &cmd.AlarmRule); err != nil {
+		return err
+	}
+	if len(cmd.AlarmSources) > 0 {
+		for i := range cmd.AlarmSources {
+			cmd.AlarmSources[i].AlarmRuleID = cmd.AlarmRule.ID
+		}
+		if err := cmd.alarmSourceRepo.Create(ctx, cmd.AlarmSources...); err != nil {
+			return err
+		}
+	}
+
+	return ruleengine.UpdateRules(cmd.AlarmRule)
+}

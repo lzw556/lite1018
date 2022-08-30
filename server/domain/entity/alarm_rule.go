@@ -11,7 +11,7 @@ type AlarmRuleCategory uint8
 
 const (
 	AlarmRuleCategoryDevice AlarmRuleCategory = iota + 1
-	AlarmRuleCategoryAsset
+	AlarmRuleCategoryMonitoringPoint
 )
 
 type AlarmRule struct {

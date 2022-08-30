@@ -36,7 +36,6 @@ func (cmd DeviceUpdateCmd) UpdateBaseInfo(req request.UpdateDevice) error {
 	ctx := context.TODO()
 	cmd.Device.Name = req.Name
 	cmd.Device.NetworkID = req.NetworkID
-	oldMac := cmd.Device.MacAddress
 	err := transaction.Execute(ctx, func(txCtx context.Context) error {
 		if !cmd.Device.IsNB() {
 			if parent, _ := cmd.deviceRepo.GetBySpecs(txCtx, spec.DeviceMacEqSpec(req.Parent)); parent.ID == 0 {

@@ -3,6 +3,8 @@ package service
 import (
 	"context"
 	"errors"
+	"time"
+
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/request"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/alarm"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
@@ -11,7 +13,6 @@ import (
 	spec "github.com/thetasensors/theta-cloud-lite/server/domain/specification"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/vo"
 	"gorm.io/gorm"
-	"time"
 )
 
 type Alarm struct {
@@ -146,4 +147,151 @@ func (s Alarm) DeleteAlarmRecordByID(id uint) error {
 		return err
 	}
 	return cmd.Run()
+}
+
+func (s Alarm) CreateAlarmRuleGroup(req request.AlarmRuleGroup) error {
+	cmd, err := s.factory.NewAlarmRuleGroupCreateCmd(req)
+	if err != nil {
+		return err
+	}
+
+	return cmd.Run()
+}
+
+func (s Alarm) UpdateAlarmRuleGroup(id uint, req request.UpdateAlarmRuleGroup) error {
+	cmd, err := s.factory.NewAlarmRuleGroupUpdateCmd(id)
+	if err != nil {
+		return err
+	}
+
+	return cmd.Update(req)
+}
+
+func (s Alarm) DeleteAlarmRuleGroupByID(id uint) error {
+	cmd, err := s.factory.NewAlarmRuleGroupRemoveCmd(id)
+	if err != nil {
+		return err
+	}
+
+	return cmd.Run()
+}
+
+func (s Alarm) GetAlarmRuleGroupByID(id uint) (*vo.AlarmRuleGroup, error) {
+	query, err := s.factory.NewAlarmRuleGroupQuery(nil)
+	if err != nil {
+		return nil, err
+	}
+	return query.Get(id)
+}
+
+func (s Alarm) FindAlarmRuleGroups(filters request.Filters) ([]vo.AlarmRuleGroup, error) {
+	query, err := s.factory.NewAlarmRuleGroupQuery(filters)
+	if err != nil {
+		return nil, err
+	}
+	return query.List()
+}
+
+func (s Alarm) AlarmRuleGroupBind(id uint, req request.AlarmRuleGroupBind) error {
+	cmd, err := s.factory.NewAlarmRuleGroupBindingCmd(id)
+	if err != nil {
+		return err
+	}
+
+	return cmd.Bind(req)
+}
+
+func (s Alarm) AlarmRuleGroupUnbind(id uint, req request.AlarmRuleGroupUnbind) error {
+	cmd, err := s.factory.NewAlarmRuleGroupBindingCmd(id)
+	if err != nil {
+		return err
+	}
+
+	return cmd.Unbind(req)
+}
+
+func (s Alarm) UpdateAlarmRuleGroupBindings(id uint, req request.UpdateAlarmRuleGroupBindings) error {
+	ag, err := s.GetAlarmRuleGroupByID(id)
+	if err != nil {
+		return err
+	}
+
+	addGroup := make([]uint, 0)
+	delGroup := make([]uint, 0)
+	for _, mp := range ag.MonitoringPoints {
+		inNew := false
+		for _, mpID := range req.MonitoringPointIDs {
+			if mpID == mp.ID {
+				inNew = true
+			}
+		}
+
+		if !inNew {
+			delGroup = append(delGroup, mp.ID)
+		}
+	}
+
+	for _, mpID := range req.MonitoringPointIDs {
+		inOld := false
+		for _, mp := range ag.MonitoringPoints {
+			if mp.ID == mpID {
+				inOld = true
+				break
+			}
+		}
+
+		if !inOld {
+			addGroup = append(addGroup, mpID)
+		}
+	}
+
+	if err := s.AlarmRuleGroupBind(id, request.AlarmRuleGroupBind{
+		MonitoringPointIDs: addGroup,
+	}); err != nil {
+		return err
+	}
+
+	if err := s.AlarmRuleGroupUnbind(id, request.AlarmRuleGroupUnbind{
+		MonitoringPointIDs: delGroup,
+	}); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s Alarm) GetAlarmRuleGroupsExportFileWithFilters(projectID uint, groupIDs []uint) (*vo.AlarmRuleGroupsExported, error) {
+	cmd, err := s.factory.NewAlarmRuleGroupExportCmd(projectID)
+	if err != nil {
+		return nil, err
+	}
+
+	all, err := cmd.Run()
+
+	if err != nil || len(groupIDs) == 0 {
+		return all, err
+	}
+
+	resultGroups := make([]*vo.AlarmRuleGroupExported, 0)
+
+	for i, group := range all.AlarmRuleGroups {
+		if isInArray(group.ID, groupIDs) {
+			resultGroups = append(resultGroups, all.AlarmRuleGroups[i])
+		}
+	}
+
+	return &vo.AlarmRuleGroupsExported{
+		ProjectID:       all.ProjectID,
+		ProjectName:     all.ProjectName,
+		AlarmRuleGroups: resultGroups,
+	}, nil
+}
+
+func (s Alarm) ImportAlarmRuleGroups(req request.AlarmRuleGroupsImported) error {
+	cmd, err := s.factory.NewAlarmRuleGroupImportCmd()
+	if err != nil {
+		return err
+	}
+
+	return cmd.ImportAlarmRuleGroups(req)
 }

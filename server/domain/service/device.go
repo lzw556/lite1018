@@ -109,7 +109,7 @@ func (s Device) DownloadDeviceDataByID(id uint, pids []string, from, to int64, t
 	return query.DownloadCharacteristicData(id, pids, time.Unix(from, 0), time.Unix(to, 0), timezone)
 }
 
-func (s Device) DownloadDeviceDataByIDAndTimestamp(id uint, sensorType uint, timestamp int64, filters request.Filters) (response.FileWriter, error) {
+func (s Device) DownloadDeviceDataByIDAndTimestamp(id uint, sensorType uint, timestamp int64, filters request.Filters) (*vo.ExcelFile, error) {
 	query := s.factory.NewDeviceQuery(nil)
 	return query.DownloadLargeSensorData(id, sensorType, time.Unix(timestamp, 0), filters)
 }

@@ -21,11 +21,3 @@ export const getProject = () => {
 export const getPermission = () => {
     return store.getState().permission.data
 }
-
-export const getPage = () => {
-    return store.getState().page.data
-}
-
-export const getDeviceFilter = () => {
-    return store.getState().deviceFilter.data
-}
