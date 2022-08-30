@@ -5,19 +5,26 @@ import (
 	"fmt"
 	"github.com/gogo/protobuf/proto"
 	pd "github.com/thetasensors/theta-cloud-lite/server/adapter/iot/proto"
-	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/utils"
 )
 
 type updateDeviceCmd struct {
 	request
-	device entity.Device
+	name      string
+	mac       string
+	newMac    string
+	parentMac string
+	typ       int32
 }
 
-func newUpdateDeviceCmd(device entity.Device) updateDeviceCmd {
+func newUpdateDeviceCmd(name string, mac, newMac, parentMac string, typ int32) updateDeviceCmd {
 	return updateDeviceCmd{
-		request: newRequest(),
-		device:  device,
+		request:   newRequest(),
+		name:      name,
+		mac:       mac,
+		newMac:    newMac,
+		parentMac: parentMac,
+		typ:       typ,
 	}
 }
 
@@ -41,11 +48,11 @@ func (cmd updateDeviceCmd) Payload() ([]byte, error) {
 	m := pd.UpdateDeviceCommand{
 		Timestamp: int32(cmd.request.timestamp),
 		ReqId:     cmd.request.id,
-		Mac:       utils.StringToBytes(binary.BigEndian, cmd.device.MacAddress),
-		NewMac:    utils.StringToBytes(binary.BigEndian, cmd.device.MacAddress),
-		ParentMac: utils.StringToBytes(binary.BigEndian, cmd.device.Parent),
-		Name:      utils.StringToBytes(binary.BigEndian, fmt.Sprintf("%x", cmd.device.Name)),
-		Type:      int32(cmd.device.Type),
+		Mac:       utils.StringToBytes(binary.BigEndian, cmd.mac),
+		NewMac:    utils.StringToBytes(binary.BigEndian, cmd.newMac),
+		ParentMac: utils.StringToBytes(binary.BigEndian, cmd.parentMac),
+		Name:      utils.StringToBytes(binary.BigEndian, fmt.Sprintf("%x", cmd.name)),
+		Type:      cmd.typ,
 	}
 	return proto.Marshal(&m)
 }
