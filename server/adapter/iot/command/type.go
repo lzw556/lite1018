@@ -10,4 +10,5 @@ const (
 	RebootCmdType
 	ProvisionCmdType
 	CalibrateCmdType
+	AcquireSensorDataType
 )

@@ -93,9 +93,11 @@ func (query DeviceQuery) Get(id uint) (*vo.Device, error) {
 	}
 	result := query.newDevice(device)
 
-	ctx := context.TODO()
-	if network, err := query.networkRepo.Get(ctx, device.NetworkID); err == nil {
-		result.SetNetwork(network)
+	if device.NetworkID > 0 {
+		ctx := context.TODO()
+		if network, err := query.networkRepo.Get(ctx, device.NetworkID); err == nil {
+			result.SetNetwork(network)
+		}
 	}
 
 	if err != nil {

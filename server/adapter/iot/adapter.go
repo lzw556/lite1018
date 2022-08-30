@@ -49,7 +49,6 @@ func NewAdapter(conf config.IoT) *Adapter {
 		SetConnectRetry(true).
 		SetPingTimeout(10 * time.Second).
 		SetOrderMatters(false).
-		SetCleanSession(true).
 		AddBroker(conf.Broker).
 		SetDefaultPublishHandler(a.onPublish).
 		SetOnConnectHandler(a.onConnect).
@@ -97,11 +96,12 @@ func (a *Adapter) Unsubscribe(topic string) {
 	a.client.Unsubscribe(topic)
 }
 
-func (a *Adapter) Publish(topic string, qos byte, payload []byte) {
+func (a *Adapter) Publish(topic string, qos byte, retained bool, payload []byte) {
 	a.publishChan <- PublishMessage{
-		Topic:   topic,
-		Qos:     qos,
-		Payload: payload,
+		Topic:    topic,
+		Qos:      qos,
+		Retained: retained,
+		Payload:  payload,
 	}
 }
 
@@ -155,8 +155,8 @@ func (a *Adapter) Run() error {
 	xlog.Info("iot server start successful")
 	go func() {
 		for msg := range a.publishChan {
-			xlog.Infof("publish message to topic: %s payload: %d", msg.Topic, len(msg.Payload))
-			t := a.client.Publish(msg.Topic, msg.Qos, false, msg.Payload)
+			xlog.Infof("publish message to topic: %s retained: %v payload: %d", msg.Topic, msg.Retained, len(msg.Payload))
+			t := a.client.Publish(msg.Topic, msg.Qos, msg.Retained, msg.Payload)
 			go func() {
 				if t.Wait() && t.Error() != nil {
 					xlog.Errorf("publish message error: %s", t.Error())

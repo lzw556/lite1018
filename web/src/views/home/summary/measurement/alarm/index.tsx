@@ -9,7 +9,7 @@ import { Button, Empty, message, Popconfirm, Space, Table, TableProps, Tag } fro
 import * as React from 'react';
 import { Link } from 'react-router-dom';
 import HasPermission from '../../../../../permission';
-import { Permission } from '../../../../../permission/permission';
+import usePermission, { Permission } from '../../../../../permission/permission';
 import { MeasurementTypes } from '../../../common/constants';
 import {
   convertAlarmLevelToState,
@@ -24,9 +24,71 @@ import { MeasurementBind } from './measurementBind';
 import { RuleSelection } from './ruleSelection';
 
 const AlarmRuleList = () => {
+  const { hasPermission } = usePermission();
   const [visible, setVisible] = React.useState(false);
   const [visibleExport, setVisibleExport] = React.useState(false);
   const [selectedRow, setSelectedRow] = React.useState<AlarmRule>();
+  let columns: any = [
+    {
+      title: '名称',
+      dataIndex: 'name',
+      key: 'name',
+      width: 400
+    },
+    {
+      title: '监测点类型',
+      dataIndex: 'type',
+      key: 'type',
+      width: 120,
+      render: (typeId: number) => {
+        const type = Object.values(MeasurementTypes).find(({ id }) => id === typeId);
+        return type ? type.label : '-';
+      }
+    }
+  ];
+  if (hasPermission(Permission.AlarmRuleGroupEdit)) {
+    columns.push({
+      title: '操作',
+      key: 'action',
+      render: (x: any, row: AlarmRule) => {
+        return (
+          <Space>
+            <HasPermission value={Permission.AlarmRuleGroupEdit}>
+              <Button type='text' size='small' title={`编辑`}>
+                <Link to={`alarm-management?locale=alarmRules/editAlarmRuleGroup&id=${row.id}`}>
+                  <EditOutlined />
+                </Link>
+              </Button>
+            </HasPermission>
+            <HasPermission value={Permission.AlarmRuleDelete}>
+              <Popconfirm
+                title={`确定要删除该规则吗?`}
+                onConfirm={() => {
+                  deleteAlarmRule(row.id).then(() => {
+                    fetchAlarmRules();
+                  });
+                }}
+              >
+                <Button type='text' danger={true} size='small' title={`删除`}>
+                  <DeleteOutlined />
+                </Button>
+              </Popconfirm>
+            </HasPermission>
+            <HasPermission value={Permission.AlarmRuleGroupBind}>
+              <Button type='text' size='small' title='编辑监测点'>
+                <MoreOutlined
+                  onClick={() => {
+                    setSelectedRow(row);
+                    setVisible(true);
+                  }}
+                />
+              </Button>
+            </HasPermission>
+          </Space>
+        );
+      }
+    });
+  }
   const getRules = (dataSource: AlarmRule['rules']): TableProps<any> => {
     return {
       rowKey: 'id',
@@ -64,66 +126,13 @@ const AlarmRuleList = () => {
       dataSource,
       pagination: false,
       size: 'small',
-      style: { marginLeft: 40, width: 770 }
+      style: { marginLeft: 40, width: columns.length === 2 ? 'auto' : 770 }
     };
   };
+
   const [result, setResult] = React.useState<TableProps<any>>({
     rowKey: 'id',
-    columns: [
-      {
-        title: '名称',
-        dataIndex: 'name',
-        key: 'name',
-        width: 400
-      },
-      {
-        title: '监测点类型',
-        dataIndex: 'type',
-        key: 'type',
-        width: 120,
-        render: (typeId: number) => {
-          const type = Object.values(MeasurementTypes).find(({ id }) => id === typeId);
-          return type ? type.label : '-';
-        }
-      },
-      {
-        title: '操作',
-        key: 'action',
-        render: (x, row: AlarmRule) => {
-          return (
-            <Space>
-              <Button type='text' size='small' title={`编辑`}>
-                <Link to={`alarm-management?locale=alarmRules/editAlarmRuleGroup&id=${row.id}`}>
-                  <EditOutlined />
-                </Link>
-              </Button>
-              <HasPermission value={Permission.AlarmRuleDelete}>
-                <Popconfirm
-                  title={`确定要删除该规则吗?`}
-                  onConfirm={() => {
-                    deleteAlarmRule(row.id).then(() => {
-                      fetchAlarmRules();
-                    });
-                  }}
-                >
-                  <Button type='text' danger={true} size='small' title={`删除`}>
-                    <DeleteOutlined />
-                  </Button>
-                </Popconfirm>
-              </HasPermission>
-              <Button type='text' size='small' title='编辑监测点'>
-                <MoreOutlined
-                  onClick={() => {
-                    setSelectedRow(row);
-                    setVisible(true);
-                  }}
-                />
-              </Button>
-            </Space>
-          );
-        }
-      }
-    ],
+    columns,
     expandable: {
       expandedRowRender: (record: AlarmRule) => <Table {...getRules(record.rules)} />
     },
@@ -149,33 +158,39 @@ const AlarmRuleList = () => {
       {...{
         actions: (
           <>
-            <Button type='primary' href='#/alarm-management?locale=alarmRules/addAlarmRuleGroup'>
-              添加规则
-              <PlusOutlined />
-            </Button>
-            {result.dataSource && result.dataSource.length > 0 && (
-              <Button
-                type='primary'
-                onClick={() => {
-                  setVisibleExport(true);
-                }}
-              >
-                导出配置
-                <ExportOutlined />
+            <HasPermission value={Permission.AlarmRuleGroupAdd}>
+              <Button type='primary' href='#/alarm-management?locale=alarmRules/addAlarmRuleGroup'>
+                添加规则
+                <PlusOutlined />
               </Button>
-            )}
-            <FileInput
-              onUpload={(data) => {
-                return importAlarmRules(data).then((res) => {
-                  if (res.data.code === 200) {
-                    message.success('导入成功');
-                    fetchAlarmRules();
-                  } else {
-                    message.error(`导入失败: ${res.data.msg}`);
-                  }
-                });
-              }}
-            />
+            </HasPermission>
+            <HasPermission value={Permission.AlarmRuleGroupExport}>
+              {result.dataSource && result.dataSource.length > 0 && (
+                <Button
+                  type='primary'
+                  onClick={() => {
+                    setVisibleExport(true);
+                  }}
+                >
+                  导出配置
+                  <ExportOutlined />
+                </Button>
+              )}
+            </HasPermission>
+            <HasPermission value={Permission.AlarmRuleGroupImport}>
+              <FileInput
+                onUpload={(data) => {
+                  return importAlarmRules(data).then((res) => {
+                    if (res.data.code === 200) {
+                      message.success('导入成功');
+                      fetchAlarmRules();
+                    } else {
+                      message.error(`导入失败: ${res.data.msg}`);
+                    }
+                  });
+                }}
+              />
+            </HasPermission>
             {visibleExport && (
               <RuleSelection
                 visible={visibleExport}

@@ -41,6 +41,10 @@ func (cmd provisionCmd) Payload() ([]byte, error) {
 	return proto.Marshal(&m)
 }
 
-func (cmd provisionCmd) Execute(gateway string, target string) (*Response, error) {
-	return cmd.request.do(gateway, target, cmd, 3)
+func (cmd provisionCmd) Execute(gateway string, target string, retained bool) (*Response, error) {
+	return cmd.request.do(gateway, target, cmd, retained, 3)
+}
+
+func (cmd provisionCmd) ExecuteAsync(gateway string, target string, retained bool) error {
+	return cmd.request.doAsync(gateway, target, cmd, retained, 3)
 }

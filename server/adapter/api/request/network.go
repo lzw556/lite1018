@@ -37,9 +37,15 @@ type ImportDevice struct {
 }
 
 type ImportNetwork struct {
-	Wsn     WSN            `json:"wsn"`
-	Devices []ImportDevice `json:"devices"`
-
+	Wsn     WSN `json:"wsn"`
+	Mode    int `json:"mode"`
+	Devices []struct {
+		Name          string                            `json:"name"`
+		MacAddress    string                            `json:"mac_address"`
+		ParentAddress string                            `json:"parent_address"`
+		TypeID        uint                              `json:"type_id"`
+		Settings      map[string]map[string]interface{} `json:"settings,omitempty"`
+	} `json:"devices"`
 	ProjectID uint `json:"-"`
 }
 

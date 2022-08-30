@@ -41,11 +41,18 @@ const NetworkPage = () => {
         fetchNetworks(store)
     }, [store])
 
-    const onDelete = (id: number) => {
-        DeleteNetworkRequest(id).then(() => {
-            fetchNetworks(store);
-        })
-    }
+    const onDelete = (id: number, index: number) => {
+      DeleteNetworkRequest(id).then(() => {
+        if (index === 0) {
+          setStore((prev) => ({
+            ...prev,
+            pagedOptions: { index: (prev.pagedOptions.index - 1 || 1), size: prev.pagedOptions.size }
+          }));
+        } else {
+          fetchNetworks(store);
+        }
+      });
+    };
 
     const onCommand = (record: Network, key: any) => {
         switch (key) {
@@ -152,7 +159,7 @@ const NetworkPage = () => {
         {
             title: '操作',
             key: 'action',
-            render: (text: any, record: any) => (
+            render: (text: any, record: any, index: number) => (
                 <Space size={"middle"}>
                     {
                         hasPermission(Permission.NetworkEdit) &&
@@ -165,7 +172,7 @@ const NetworkPage = () => {
                     }
                     {
                         hasPermission(Permission.NetworkDelete) &&
-                        <Popconfirm placement="left" title="确认要删除该设备吗?" onConfirm={() => onDelete(record.id)}
+                        <Popconfirm placement="left" title="确认要删除该设备吗?" onConfirm={() => onDelete(record.id, index)}
                                     okText="删除" cancelText="取消">
                             <Button type="text" size="small" icon={<DeleteOutlined/>} danger/>
                         </Popconfirm>

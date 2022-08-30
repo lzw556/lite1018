@@ -14,8 +14,8 @@ func (Temperature) SensorID() uint {
 }
 
 func (d Temperature) Settings() Settings {
-	d.SamplePeriod = samplePeriodSetting()
-	d.SampleOffset = sampleOffsetSetting()
+	d.SamplePeriod = samplePeriodSetting(0)
+	d.SampleOffset = sampleOffsetSetting(1)
 	return []Setting{
 		d.SamplePeriod,
 		d.SampleOffset,

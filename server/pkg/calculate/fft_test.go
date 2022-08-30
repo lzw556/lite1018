@@ -24,14 +24,6 @@ func Test_AccelerationFrequencyCalc(t *testing.T) {
 		v, _ := strconv.ParseFloat(record[0], 64)
 		rawData = append(rawData, v)
 	}
-	fftOutput := AccelerationFrequencyCalc(rawData, len(rawData), 3200, 8)
-	maxIndex := 0
-	maxValue := 0.0
-	for i, output := range fftOutput {
-		if maxValue < output.FFTValue {
-			maxValue = output.FFTValue
-			maxIndex = i
-		}
-	}
-	fmt.Println(fmt.Sprintf("max frequency: %f, max value: %f", fftOutput[maxIndex].Frequency, fftOutput[maxIndex].FFTValue))
+	fftOutput := AccelerationFrequencyCalc(rawData, len(rawData), 3200, 8, 10)
+	fmt.Println(fmt.Sprintf("fftOutput: %+v", fftOutput))
 }

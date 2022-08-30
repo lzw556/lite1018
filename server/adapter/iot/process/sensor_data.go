@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/gogo/protobuf/proto"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/iot"
+	"github.com/thetasensors/theta-cloud-lite/server/adapter/iot/command"
 	pd "github.com/thetasensors/theta-cloud-lite/server/adapter/iot/proto"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/ruleengine"
@@ -90,6 +91,11 @@ func (p *SensorData) Process(ctx *iot.Context, msg iot.Message) error {
 				}
 			}
 		}
+	}
+	cmd := command.NewSensorDataAckCmd(m.SessionId, m.SensorId)
+	if err := cmd.ExecuteAsync(msg.Body.Gateway, msg.Body.Device, false); err != nil {
+		xlog.Errorf("[%s] send [%s] command failed: %v", msg.Body.Device, cmd.Name(), err)
+		return err
 	}
 	return nil
 }

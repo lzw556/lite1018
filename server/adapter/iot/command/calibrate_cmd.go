@@ -48,6 +48,10 @@ func (cmd calibrateCmd) Payload() ([]byte, error) {
 	return proto.Marshal(&m)
 }
 
-func (cmd calibrateCmd) Execute(gateway string, target string) (*Response, error) {
-	return cmd.request.do(gateway, target, cmd, 3)
+func (cmd calibrateCmd) Execute(gateway string, target string, retained bool) (*Response, error) {
+	return cmd.request.do(gateway, target, cmd, retained, 3)
+}
+
+func (cmd calibrateCmd) ExecuteAsync(gateway string, target string, retained bool) error {
+	return cmd.request.doAsync(gateway, target, cmd, retained, 3)
 }

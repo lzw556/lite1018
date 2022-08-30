@@ -30,8 +30,8 @@ func (BoltElongation) SensorID() uint {
 }
 
 func (d BoltElongation) Settings() Settings {
-	d.SamplePeriod = samplePeriodSetting()
-	d.SampleOffset = sampleOffsetSetting()
+	d.SamplePeriod = samplePeriodSetting(0)
+	d.SampleOffset = sampleOffsetSetting(1)
 	d.SensorFlags = Setting{
 		Name:  "采样模式",
 		Key:   "sensor_flags",

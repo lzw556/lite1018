@@ -3,6 +3,7 @@ package devicetype
 import (
 	"github.com/spf13/cast"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/devicetype/validator"
+	"time"
 )
 
 const (
@@ -76,7 +77,46 @@ func (s Setting) Validate() bool {
 	return true
 }
 
-func samplePeriodSetting() Setting {
+func communicationPeriodSetting(sort int) Setting {
+	return Setting{
+		Name:     "通讯周期",
+		Key:      "communication_period",
+		Category: WsnSettingCategory,
+		Value:    1200000,
+		Type:     Uint32ValueType,
+		Options: map[int]string{
+			int(5 * time.Minute.Milliseconds()):  "5分钟",
+			int(10 * time.Minute.Milliseconds()): "10分钟",
+			int(20 * time.Minute.Milliseconds()): "20分钟",
+			int(30 * time.Minute.Milliseconds()): "30分钟",
+			int(1 * time.Hour.Milliseconds()):    "1小时",
+			int(2 * time.Hour.Milliseconds()):    "2小时",
+			int(4 * time.Hour.Milliseconds()):    "4小时",
+			int(8 * time.Hour.Milliseconds()):    "8小时",
+			int(12 * time.Hour.Milliseconds()):   "12小时",
+			int(16 * time.Hour.Milliseconds()):   "16小时",
+			int(20 * time.Hour.Milliseconds()):   "20小时",
+			int(24 * time.Hour.Milliseconds()):   "24小时",
+		},
+		Group: SettingGroupNetwork,
+		Sort:  sort,
+	}
+}
+
+func communicationOffsetSetting(sort int) Setting {
+	return Setting{
+		Name:     "通讯延迟",
+		Key:      "communication_offset",
+		Category: WsnSettingCategory,
+		Value:    10000,
+		Unit:     "毫秒",
+		Type:     Uint32ValueType,
+		Group:    SettingGroupNetwork,
+		Sort:     sort,
+	}
+}
+
+func samplePeriodSetting(sort int) Setting {
 	return Setting{
 		Name:     "采集周期",
 		Key:      "sample_period",
@@ -85,11 +125,11 @@ func samplePeriodSetting() Setting {
 		Type:     Uint32ValueType,
 		Options:  samplePeriodOptions,
 		Group:    SettingGroupGeneral,
-		Sort:     0,
+		Sort:     sort,
 	}
 }
 
-func sampleOffsetSetting() Setting {
+func sampleOffsetSetting(sort int) Setting {
 	return Setting{
 		Name:     "采集延迟",
 		Key:      "sample_offset",
@@ -98,7 +138,7 @@ func sampleOffsetSetting() Setting {
 		Type:     Uint32ValueType,
 		Options:  sampleOffsetOptions,
 		Group:    SettingGroupGeneral,
-		Sort:     1,
+		Sort:     sort,
 	}
 }
 
