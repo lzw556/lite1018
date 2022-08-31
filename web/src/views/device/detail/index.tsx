@@ -40,7 +40,6 @@ const tabTitleList = [
 
 const DeviceDetailPage = () => {
     const location = useLocation<any>();
-    const history = useHistory();
     const {PubSub} = useSocket();
     const [device, setDevice] = useState<Device>();
     const [isLoading, setIsLoading] = useState<boolean>(false);

@@ -62,31 +62,25 @@ const { Option } = Select;
 const { Text } = Typography;
 
 const DevicePage = () => {
-    const [searchTarget, setSearchTarget] = useState(0);
-    const [device, setDevice] = useState<Device>();
-    const [editSettingVisible, setEditSettingVisible] = useState<boolean>(false);
-    const [editBaseInfoVisible, setEditBaseInfoVisible] = useState<boolean>(false);
-    const [upgradeVisible, setUpgradeVisible] = useState<boolean>(false);
-    const [executeDevice, setExecuteDevice] = useState<Device>();
-    const [dataSource, setDataSource] = useState<PageResult<any>>();
-    const [page, setPage] = useState<PageForm>({...getPage(), current:1});
-    const [deviceFilter, setDeviceFilter] = useState<DeviceFilterForm>(getDeviceFilter);
-    const [filter, setFilter] = useState<any>({});
-    const {hasPermission, hasPermissions} = usePermission();
-    const [refreshKey, setRefreshKey] = useState<number>(0);
-    const [visibleCalibrate, setVisibleCalibrate] = useState(false);
-    const [visibleAlarmRules, setVisibleAlarmRules] = useState(false);
-    const dispatch = useDispatch();
+  const [device, setDevice] = useState<Device>();
+  const [editSettingVisible, setEditSettingVisible] = useState<boolean>(false);
+  const [editBaseInfoVisible, setEditBaseInfoVisible] = useState<boolean>(false);
+  const [upgradeVisible, setUpgradeVisible] = useState<boolean>(false);
+  const [executeDevice, setExecuteDevice] = useState<Device>();
+  const [dataSource, setDataSource] = useState<PageResult<any>>();
+  const { hasPermission, hasPermissions } = usePermission();
+  const [visibleCalibrate, setVisibleCalibrate] = useState(false);
+  const [visibleAlarmRules, setVisibleAlarmRules] = useState(false);
+  const [store, setStore] = useStore('deviceList');
+  
+  const fetchDevices = (store: Store['deviceList']) => {
+    const {filters, pagedOptions: {index, size}} = store;
+    PagingDevicesRequest(index, size, omitSpecificKeys(filters ?? {}, [])).then(setDataSource);
+  }
 
-    useEffect(() => {
-        const filters = filter;
-        if (deviceFilter.networkId > 0) {
-          filters.network_id = deviceFilter.networkId
-        }
-        console.log(page);
-        PagingDevicesRequest(page.current, page.size, filters).then(setDataSource);
-    }, [page, deviceFilter, refreshKey, filter]);
-
+  useEffect(() => {
+    fetchDevices(store);
+  }, [store]);
 
   const onDelete = (id: number) => {
     DeleteDeviceRequest(id).then((_) => fetchDevices(store));
@@ -224,45 +218,14 @@ const DevicePage = () => {
                   pathname: `device-management`,
                   search: `?locale=devices/deviceDetail&id=${record.id}`
                 }}
-            >
-                {hasPermission(Permission.DeviceCommand) && (
-                    <>
-                        <Menu.Item key={DeviceCommand.Reboot} disabled={!disabled} hidden={isUpgrading}>
-                            重启
-                        </Menu.Item>
-                        {record.typeId !== DeviceType.Gateway && record.typeId !== DeviceType.Router && (
-                           <>
-                               <Menu.Item key={DeviceCommand.AcquireSensorData} disabled={!disabled} hidden={isUpgrading}>
-                                   采集数据
-                               </Menu.Item>
-                               <Menu.Item key={DeviceCommand.ResetData} disabled={!disabled} hidden={isUpgrading}>
-                                   重置数据
-                               </Menu.Item>
-                           </>
-                        )}
-                        <Menu.Item key={DeviceCommand.Reset} disabled={!disabled} hidden={isUpgrading}>
-                            恢复出厂设置
-                        </Menu.Item>
-                        {(record.typeId === DeviceType.HighTemperatureCorrosion ||
-                            record.typeId === DeviceType.NormalTemperatureCorrosion ||
-                            record.typeId === DeviceType.BoltElongation) && (
-                            <Menu.Item key={DeviceCommand.Calibrate} disabled={!disabled} hidden={isUpgrading}>
-                                校准
-                            </Menu.Item>
-                        )}
-                    </>
-                )}
-                {hasPermissions(Permission.DeviceUpgrade, Permission.DeviceFirmwares) && (
-                    <>
-                        <Menu.Item key={DeviceCommand.Upgrade} disabled={!disabled} hidden={isUpgrading}>
-                            固件升级
-                        </Menu.Item>
-                        <Menu.Item key={DeviceCommand.CancelUpgrade} hidden={!isUpgrading}>
-                            取消升级
-                        </Menu.Item>
-                    </>
-                )}
-            </Menu>
+              >
+                {text}
+              </Link>
+            ) : (
+              text
+            )}
+            {record.upgradeStatus && <DeviceUpgradeSpin status={record.upgradeStatus} />}
+          </Space>
         );
       }
     },
