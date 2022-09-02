@@ -186,7 +186,6 @@ const DevicePage = () => {
         {hasPermission(Permission.DeviceSettingsEdit) && record.typeId !== DeviceType.Router && (
           <Menu.Item key={2}>更新设备配置</Menu.Item>
         )}
-        {record.typeId !== DeviceType.Gateway && record.typeId !== DeviceType.Router && <Menu.Item key={3}>编辑报警规则</Menu.Item>}
       </Menu>
     );
   };
