@@ -1,6 +1,7 @@
 import { Checkbox, Form, Modal, ModalProps, Row, Col, Button } from 'antd';
 import { CheckboxValueType } from 'antd/lib/checkbox/Group';
 import * as React from 'react';
+import { isMobile } from '../../../../../utils/deviceDetection';
 import { getFilename } from '../../../common/utils';
 import { AlarmRule } from '../props';
 import { exportAlarmRules } from '../services';
@@ -34,7 +35,7 @@ export const RuleSelection: React.FC<{ rules: AlarmRule[]; onSuccess: () => void
     <Modal
       {...props}
       title='选择规则'
-      width='50%'
+      width={isMobile ? '80%' : '50%'}
       footer={[
         <Button key='back' onClick={(e) => props.onCancel && props.onCancel(e)}>
           取消

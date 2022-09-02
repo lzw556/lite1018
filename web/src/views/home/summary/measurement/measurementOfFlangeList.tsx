@@ -48,7 +48,7 @@ export const MeasurementOfFlangeList: React.FC<{
         title: '名称',
         dataIndex: 'name',
         key: 'name',
-        width: isMobile ? 300 : undefined,
+        width: isMobile ? 300 : 400,
         render: (name: string, row: MeasurementRow) => (
           <Link to={combineFinalUrl(pathname, search, MeasurementTypes.preload.url, row.id)}>
             {name}
@@ -136,7 +136,7 @@ export const MeasurementOfFlangeList: React.FC<{
               emptyText: <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description='暂无数据' />
             },
             bordered: true,
-            scroll: isMobile ? { x: 1000 } : undefined
+            scroll: isMobile ? { x: 1000 } : { x: 1300 }
           }}
         />
       </Col>

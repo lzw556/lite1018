@@ -6,6 +6,7 @@ import { CheckAlarmRuleNameRequest } from '../../../../../apis/alarm';
 import MyBreadcrumb from '../../../../../components/myBreadcrumb';
 import ShadowCard from '../../../../../components/shadowCard';
 import { defaultValidateMessages, Rules } from '../../../../../constants/validator';
+import { isMobile } from '../../../../../utils/deviceDetection';
 import { MeasurementTypes } from '../../../common/constants';
 import { AlarmRule } from '../props';
 import { addAlarmRule, getPropertiesByMeasurementType } from '../services';
@@ -60,7 +61,7 @@ const AlarmRuleGroupCreation = () => {
             rules={[{ required: true, message: '请选择监测点类型' }]}
           >
             <Select
-              style={{ width: 435 }}
+              style={{ width: isMobile ? '75%' : 435 }}
               onChange={(e) => {
                 getPropertiesByMeasurementType(e).then((res) => {
                   const measurementType = Object.values(MeasurementTypes).find(
@@ -94,10 +95,10 @@ const AlarmRuleGroupCreation = () => {
             </Select>
           </Form.Item>
           <Form.Item label='名称' name='name' rules={[Rules.range(4, 16)]}>
-            <Input placeholder={`请填写名称`} style={{ width: 435 }} />
+            <Input placeholder={`请填写名称`} style={{ width: isMobile ? '75%' : 435 }} />
           </Form.Item>
           <Form.Item label='描述' name='description' initialValue=''>
-            <Input placeholder={`请填写描述`} style={{ width: 435 }} />
+            <Input placeholder={`请填写描述`} style={{ width: isMobile ? '75%' : 435 }} />
           </Form.Item>
           <Divider />
           <Form.List name='rules' initialValue={[0]}>
@@ -243,7 +244,7 @@ const AlarmRuleGroupCreation = () => {
                           rules={[Rules.range(4, 16), { validator: onNameValidator }]}
                           dependencies={index === 0 ? undefined : ['user', index - 1, 'name']}
                         >
-                          <Input placeholder={`请填写名称`} style={{ width: 435 }} />
+                          <Input placeholder={`请填写名称`} style={{ width: isMobile ? '75%' : 435 }} />
                         </Form.Item>
                         {properties && properties.length > 0 && (
                           <Form.Item
@@ -254,7 +255,7 @@ const AlarmRuleGroupCreation = () => {
                           >
                             <Select
                               disabled={disabled}
-                              style={{ width: 435 }}
+                              style={{ width: isMobile ? '75%' : 435 }}
                               onChange={(e) => {
                                 const property = properties.find(({ key }) => e === key);
                                 if (property && property.fields && property.fields.length > 0) {

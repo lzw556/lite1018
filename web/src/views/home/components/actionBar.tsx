@@ -64,7 +64,7 @@ export const ActionBar: React.FC<{
   const isHideImportBtn = hides && hides.length === 5 && hides[4];
 
   return (
-    <Space>
+    <Space wrap={true}>
       {!isHideWindAddBtn && (
         <Button
           type='primary'

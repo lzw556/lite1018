@@ -5,6 +5,7 @@ import { CheckAlarmRuleNameRequest } from '../../../../../apis/alarm';
 import MyBreadcrumb from '../../../../../components/myBreadcrumb';
 import ShadowCard from '../../../../../components/shadowCard';
 import { defaultValidateMessages, Normalizes, Rules } from '../../../../../constants/validator';
+import { isMobile } from '../../../../../utils/deviceDetection';
 import { MeasurementTypes } from '../../../common/constants';
 import { AlarmRule } from '../props';
 import { getAlarmRule, updateAlarmRule } from '../services';
@@ -68,7 +69,7 @@ const AlarmRuleGroupEdit = () => {
             name='type'
             rules={[{ required: true, message: '请选择监测点类型' }]}
           >
-            <Select disabled={true} style={{ width: 435 }}>
+            <Select disabled={true} style={{ width: isMobile ? '75%' : 435 }}>
               {Object.values(MeasurementTypes).map(({ label, id }) => (
                 <Select.Option key={id} value={id}>
                   {label}
@@ -77,10 +78,10 @@ const AlarmRuleGroupEdit = () => {
             </Select>
           </Form.Item>
           <Form.Item label='名称' name='name'>
-            <Input placeholder={`请填写名称`} style={{ width: 435 }} />
+            <Input placeholder={`请填写名称`} style={{ width: isMobile ? '75%' : 435 }} />
           </Form.Item>
           <Form.Item label='描述' name='description'>
-            <Input placeholder={`请填写描述`} style={{ width: 435 }} />
+            <Input placeholder={`请填写描述`} style={{ width: isMobile ? '75%' : 435 }} />
           </Form.Item>
           <Divider />
           <Form.List name='rules'>
@@ -103,7 +104,7 @@ const AlarmRuleGroupEdit = () => {
                           <Input
                             placeholder={`请填写名称`}
                             readOnly={index < rule.rules.length}
-                            style={{ width: 435 }}
+                            style={{ width: isMobile ? '75%' : 435 }}
                             disabled={true}
                           />
                         </Form.Item>
@@ -111,7 +112,7 @@ const AlarmRuleGroupEdit = () => {
                           <Input
                             disabled={true}
                             value={rule.rules[index].metric.name}
-                            style={{ width: 435 }}
+                            style={{ width: isMobile ? '75%' : 435 }}
                           />
                         </Form.Item>
                         <Form.Item required label='周期'>
