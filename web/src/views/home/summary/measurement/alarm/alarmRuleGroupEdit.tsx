@@ -15,6 +15,11 @@ const AlarmRuleGroupEdit = () => {
   const id = Number(search.substring(search.lastIndexOf('id=') + 3));
   const [form] = Form.useForm();
   const [rule, setRule] = React.useState<AlarmRule>();
+  const [smallSize, setSmallSize] = React.useState(window.innerWidth < 1300);
+
+  React.useEffect(() => {
+    window.addEventListener('resize', (e) => setSmallSize(window.innerWidth < 1300));
+  }, []);
   React.useEffect(() => {
     getAlarmRule(id).then(setRule);
   }, [id]);
@@ -72,10 +77,10 @@ const AlarmRuleGroupEdit = () => {
             </Select>
           </Form.Item>
           <Form.Item label='名称' name='name'>
-            <Input placeholder={`请填写名称`} style={{ width: 435 }}/>
+            <Input placeholder={`请填写名称`} style={{ width: 435 }} />
           </Form.Item>
           <Form.Item label='描述' name='description'>
-            <Input placeholder={`请填写描述`} style={{ width: 435 }}/>
+            <Input placeholder={`请填写描述`} style={{ width: 435 }} />
           </Form.Item>
           <Divider />
           <Form.List name='rules'>
@@ -83,90 +88,211 @@ const AlarmRuleGroupEdit = () => {
               <>
                 {fields.map(({ key, name, ...restFields }, index) => (
                   <div key={key} style={{ position: 'relative' }}>
-                    <Form.Item
-                      label='名称'
-                      {...restFields}
-                      name={[name, 'name']}
-                      rules={
-                        index < rule.rules.length
-                          ? undefined
-                          : [Rules.range(4, 16), { validator: onNameValidator }]
-                      }
-                    >
-                      <Input placeholder={`请填写名称`} readOnly={index < rule.rules.length} style={{ width: 435 }} disabled={true}/>
-                    </Form.Item>
-                    <Form.Item label='指标'><Input disabled={true} value={rule.rules[index].metric.name} style={{ width: 435 }}/></Form.Item>
-                    <Form.Item required label='周期'>
-                      <Form.Item
-                        {...restFields}
-                        name={[name, 'duration']}
-                        normalize={Normalizes.number}
-                        rules={[Rules.number]}
-                        initialValue={1}
-                        style={{display:'inline-flex', marginRight: 20}}
-                      >
-                        <Input style={{ width: 80 }} />
-                      </Form.Item>
-                      <Form.Item label='条件' style={{display:'inline-flex', marginRight: 20}} required>
-                        <Input.Group compact>
+                    {smallSize && (
+                      <>
+                        <Form.Item
+                          label='名称'
+                          {...restFields}
+                          name={[name, 'name']}
+                          rules={
+                            index < rule.rules.length
+                              ? undefined
+                              : [Rules.range(4, 16), { validator: onNameValidator }]
+                          }
+                        >
+                          <Input
+                            placeholder={`请填写名称`}
+                            readOnly={index < rule.rules.length}
+                            style={{ width: 435 }}
+                            disabled={true}
+                          />
+                        </Form.Item>
+                        <Form.Item label='指标'>
+                          <Input
+                            disabled={true}
+                            value={rule.rules[index].metric.name}
+                            style={{ width: 435 }}
+                          />
+                        </Form.Item>
+                        <Form.Item required label='周期'>
                           <Form.Item
                             {...restFields}
-                            name={[name, 'operation']}
-                            noStyle
-                            initialValue='>='
+                            name={[name, 'duration']}
+                            normalize={Normalizes.number}
+                            rules={[Rules.number]}
+                            initialValue={1}
+                            style={{ display: 'inline-flex', marginRight: 20 }}
                           >
-                            <Select style={{ width: 65 }}>
-                              <Select.Option key={'>'} value={'>'}>
-                                &gt;
+                            <Input style={{ width: 80 }} />
+                          </Form.Item>
+                          <Form.Item
+                            label='条件'
+                            style={{ display: 'inline-flex', marginRight: 20 }}
+                            required
+                          >
+                            <Input.Group compact>
+                              <Form.Item
+                                {...restFields}
+                                name={[name, 'operation']}
+                                noStyle
+                                initialValue='>='
+                              >
+                                <Select style={{ width: 65 }}>
+                                  <Select.Option key={'>'} value={'>'}>
+                                    &gt;
+                                  </Select.Option>
+                                  <Select.Option key={'>='} value={'>='}>
+                                    &gt;=
+                                  </Select.Option>
+                                  <Select.Option key={'<'} value={'<'}>
+                                    &lt;
+                                  </Select.Option>
+                                  <Select.Option key={'<='} value={'<='}>
+                                    &lt;=
+                                  </Select.Option>
+                                </Select>
+                              </Form.Item>
+                              <Form.Item
+                                {...restFields}
+                                name={[name, 'threshold']}
+                                rules={[Rules.number]}
+                                noStyle
+                              >
+                                <Input
+                                  style={{ width: 80 }}
+                                  suffix={
+                                    rule.rules.length > 0 && rule.rules[index]
+                                      ? rule.rules[index].metric.unit
+                                      : ''
+                                  }
+                                />
+                              </Form.Item>
+                            </Input.Group>
+                          </Form.Item>
+                          <Form.Item
+                            label='等级'
+                            {...restFields}
+                            name={[name, 'level']}
+                            initialValue={3}
+                            style={{ display: 'inline-flex' }}
+                          >
+                            <Select style={{ width: 80 }}>
+                              <Select.Option key={1} value={1}>
+                                次要
                               </Select.Option>
-                              <Select.Option key={'>='} value={'>='}>
-                                &gt;=
+                              <Select.Option key={2} value={2}>
+                                重要
                               </Select.Option>
-                              <Select.Option key={'<'} value={'<'}>
-                                &lt;
-                              </Select.Option>
-                              <Select.Option key={'<='} value={'<='}>
-                                &lt;=
+                              <Select.Option key={3} value={3}>
+                                紧急
                               </Select.Option>
                             </Select>
                           </Form.Item>
-                          <Form.Item
-                            {...restFields}
-                            name={[name, 'threshold']}
-                            rules={[Rules.number]}
-                            noStyle
-                          >
-                            <Input
-                              style={{ width: 80 }}
-                              suffix={
-                                rule.rules.length > 0 && rule.rules[index]
-                                  ? rule.rules[index].metric.unit
-                                  : ''
-                              }
-                            />
-                          </Form.Item>
-                        </Input.Group>
+                        </Form.Item>
+                      </>
+                    )}
+                    {!smallSize && (
+                      <Form.Item label='名称'>
+                        <Form.Item
+                          {...restFields}
+                          name={[name, 'name']}
+                          rules={
+                            index < rule.rules.length
+                              ? undefined
+                              : [Rules.range(4, 16), { validator: onNameValidator }]
+                          }
+                          style={{ display: 'inline-flex', marginRight: 20, marginBottom: 0 }}
+                        >
+                          <Input
+                            placeholder={`请填写名称`}
+                            readOnly={index < rule.rules.length}
+                            style={{ width: 200 }}
+                            disabled={true}
+                          />
+                        </Form.Item>
+                        <Form.Item label='指标' style={{ display: 'inline-flex', marginRight: 20, marginBottom: 0 }}>
+                          <Input
+                            disabled={true}
+                            value={rule.rules[index].metric.name}
+                            style={{ width: 100 }}
+                          />
+                        </Form.Item>
+                        <Form.Item
+                          label='周期'
+                          {...restFields}
+                          name={[name, 'duration']}
+                          normalize={Normalizes.number}
+                          rules={[Rules.number]}
+                          initialValue={1}
+                          style={{ display: 'inline-flex', marginRight: 20, marginBottom: 0 }}
+                        >
+                          <Input style={{ width: 70 }} />
+                        </Form.Item>
+                        <Form.Item
+                          label='条件'
+                          style={{ display: 'inline-flex', marginRight: 20, marginBottom: 0 }}
+                          required
+                        >
+                          <Input.Group compact>
+                            <Form.Item
+                              {...restFields}
+                              name={[name, 'operation']}
+                              noStyle
+                              initialValue='>='
+                            >
+                              <Select style={{ width: 65 }}>
+                                <Select.Option key={'>'} value={'>'}>
+                                  &gt;
+                                </Select.Option>
+                                <Select.Option key={'>='} value={'>='}>
+                                  &gt;=
+                                </Select.Option>
+                                <Select.Option key={'<'} value={'<'}>
+                                  &lt;
+                                </Select.Option>
+                                <Select.Option key={'<='} value={'<='}>
+                                  &lt;=
+                                </Select.Option>
+                              </Select>
+                            </Form.Item>
+                            <Form.Item
+                              {...restFields}
+                              name={[name, 'threshold']}
+                              rules={[Rules.number]}
+                              noStyle
+                            >
+                              <Input
+                                style={{ width: 80 }}
+                                suffix={
+                                  rule.rules.length > 0 && rule.rules[index]
+                                    ? rule.rules[index].metric.unit
+                                    : ''
+                                }
+                              />
+                            </Form.Item>
+                          </Input.Group>
+                        </Form.Item>
+                        <Form.Item
+                          label='等级'
+                          {...restFields}
+                          name={[name, 'level']}
+                          initialValue={3}
+                          style={{ display: 'inline-flex', marginBottom: 0 }}
+                        >
+                          <Select style={{ width: 80 }}>
+                            <Select.Option key={1} value={1}>
+                              次要
+                            </Select.Option>
+                            <Select.Option key={2} value={2}>
+                              重要
+                            </Select.Option>
+                            <Select.Option key={3} value={3}>
+                              紧急
+                            </Select.Option>
+                          </Select>
+                        </Form.Item>
                       </Form.Item>
-                      <Form.Item
-                        label='等级'
-                        {...restFields}
-                        name={[name, 'level']}
-                        initialValue={3}
-                        style={{display:'inline-flex'}}
-                      >
-                        <Select style={{ width: 80 }}>
-                          <Select.Option key={1} value={1}>
-                            次要
-                          </Select.Option>
-                          <Select.Option key={2} value={2}>
-                            重要
-                          </Select.Option>
-                          <Select.Option key={3} value={3}>
-                            紧急
-                          </Select.Option>
-                        </Select>
-                      </Form.Item>
-                    </Form.Item>
+                    )}
                     <Divider />
                   </div>
                 ))}
@@ -194,8 +320,11 @@ const AlarmRuleGroupEdit = () => {
               }}
             >
               保存
-            </Button>&nbsp;&nbsp;&nbsp;
-            <Button type='primary' onClick={() => history.go(-1)}>取消</Button>
+            </Button>
+            &nbsp;&nbsp;&nbsp;
+            <Button type='primary' onClick={() => history.go(-1)}>
+              取消
+            </Button>
           </Form.Item>
         </Form>
       </ShadowCard>
