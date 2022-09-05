@@ -90,7 +90,7 @@ export const EditContent: React.FC<{
         <AttributeFormItem label='重要报警' name='warn' />
       )}
       {AssetTypes.Flange.categories && assetTypeId !== AssetTypes.WindTurbind.id && (
-        <AttributeFormItem label='严重报警' name='danger' />
+        <AttributeFormItem label='紧急报警' name='danger' />
       )}
     </>
   );

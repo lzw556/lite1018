@@ -85,7 +85,7 @@ export function generateChartOptionsOfLastestData(
   }
 
   if (checkValidAttr(attributes, 'danger', min)) {
-    const seriesName = `严重报警 ${attributes?.danger?.value}${field?.unit}`
+    const seriesName = `紧急报警 ${attributes?.danger?.value}${field?.unit}`
     const danger = getSeries(ColorDanger, attributes?.danger?.value, seriesName);
     legends.push({ name: seriesName, itemStyle: { color: ColorDanger } });
     series.push(danger.series);

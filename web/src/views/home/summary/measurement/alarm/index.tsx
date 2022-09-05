@@ -93,7 +93,7 @@ const AlarmRuleList = () => {
     return {
       rowKey: 'id',
       columns: [
-        { title: '名称', dataIndex: 'name', key: 'name', width: 400 },
+        { title: '子规则名称', dataIndex: 'name', key: 'name', width: 400 },
         {
           title: '资源指标',
           dataIndex: 'metric',
