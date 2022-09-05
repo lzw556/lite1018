@@ -204,7 +204,7 @@ func (r alarmRouter) importAlarmRuleGroups(ctx *gin.Context) (interface{}, error
 	req.ProjectID = cast.ToUint(ctx.MustGet("project_id"))
 	err := r.service.ImportAlarmRuleGroups(req)
 	if err != nil {
-		return nil, response.InvalidParameterError(err.Error())
+		return nil, response.InvalidParameterErrorWithDetail(err.Error())
 	} else {
 		return nil, nil
 	}
