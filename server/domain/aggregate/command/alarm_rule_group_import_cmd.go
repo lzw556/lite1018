@@ -4,27 +4,26 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"time"
 
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/request"
-	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/response"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	spec "github.com/thetasensors/theta-cloud-lite/server/domain/specification"
-	"github.com/thetasensors/theta-cloud-lite/server/pkg/errcode"
 	"gorm.io/gorm"
 )
 
 type AlarmRuleGroupImportCmd struct {
 	alarmRuleGroupRepo dependency.AlarmRuleGroupRepository
 	alarmRuleRepo      dependency.AlarmRuleRepository
+	projectRepo        dependency.ProjectRepository
 }
 
 func NewAlarmRuleGroupImportCmd() AlarmRuleGroupImportCmd {
 	return AlarmRuleGroupImportCmd{
 		alarmRuleGroupRepo: repository.AlarmRuleGroup{},
 		alarmRuleRepo:      repository.AlarmRule{},
+		projectRepo:        repository.Project{},
 	}
 }
 
@@ -35,7 +34,7 @@ func (importCmd AlarmRuleGroupImportCmd) newAlarmRuleGroupCreateCmd(req request.
 		return nil, err
 	}
 	if e.ID != 0 {
-		return nil, response.BusinessErr(errcode.AlarmRuleGroupNameExists, "")
+		return nil, fmt.Errorf("报警规则 %s 已存在", req.Name)
 	}
 	e.Name = req.Name
 	e.Description = req.Description
@@ -53,15 +52,6 @@ func (importCmd AlarmRuleGroupImportCmd) newAlarmRuleGroupCreateCmd(req request.
 		r.SourceType = req.Type
 		r.Category = uint8(req.Category)
 		r.ProjectID = req.ProjectID
-
-		e, err := importCmd.alarmRuleRepo.GetBySpecs(ctx, spec.NameEqSpec(r.Name))
-		if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, err
-		}
-		if e.ID != 0 {
-			return nil, response.BusinessErr(errcode.AlarmRuleNameExists, "")
-		}
-
 		c, err := importCmd.newAlarmRuleCreateCmd(r)
 		if err != nil {
 			return &cmd, err
@@ -79,7 +69,7 @@ func (importCmd AlarmRuleGroupImportCmd) newAlarmRuleCreateCmd(req request.Alarm
 		return nil, err
 	}
 	if e.ID != 0 {
-		return nil, response.BusinessErr(errcode.AlarmRuleNameExists, "")
+		return nil, fmt.Errorf("报警子规则 %s 已存在", req.Name)
 	}
 	e.Name = req.Name
 	e.Description = req.Description
@@ -106,9 +96,14 @@ func (importCmd AlarmRuleGroupImportCmd) newAlarmRuleCreateCmd(req request.Alarm
 	return &cmd, nil
 }
 
-func convertAlarmRuleGroup(projectID uint, group request.AlarmRuleGroupImported) request.AlarmRuleGroup {
+func (cmd AlarmRuleGroupImportCmd) convertAlarmRuleGroup(projectID uint, group request.AlarmRuleGroupImported) request.AlarmRuleGroup {
+	projectName := "报警规则导入"
+	if proj, err := cmd.projectRepo.Get(context.TODO(), projectID); err == nil {
+		projectName = proj.Name
+	}
+
 	result := request.AlarmRuleGroup{
-		Name:        group.Name,
+		Name:        fmt.Sprintf("%s(%s)", group.Name, projectName),
 		Description: group.Description,
 		Category:    group.Category,
 		Type:        group.Type,
@@ -117,7 +112,7 @@ func convertAlarmRuleGroup(projectID uint, group request.AlarmRuleGroupImported)
 	}
 
 	for i := range result.Rules {
-		result.Rules[i].Name = fmt.Sprintf("%s (%d)", result.Rules[i].Name, time.Now().Unix())
+		result.Rules[i].Name = fmt.Sprintf("%s(%s)", result.Rules[i].Name, projectName)
 	}
 
 	return result
@@ -125,7 +120,7 @@ func convertAlarmRuleGroup(projectID uint, group request.AlarmRuleGroupImported)
 
 func (cmd AlarmRuleGroupImportCmd) ImportAlarmRuleGroups(req request.AlarmRuleGroupsImported) error {
 	for _, group := range req.AlarmRuleGroups {
-		g := convertAlarmRuleGroup(req.ProjectID, group)
+		g := cmd.convertAlarmRuleGroup(req.ProjectID, group)
 
 		importCmd, err := cmd.newAlarmRuleGroupCreateCmd(g)
 		if err != nil {
