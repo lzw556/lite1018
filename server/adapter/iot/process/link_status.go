@@ -3,6 +3,9 @@ package process
 import (
 	"context"
 	"fmt"
+	"sync"
+	"time"
+
 	"github.com/gogo/protobuf/proto"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/iot"
 	pd "github.com/thetasensors/theta-cloud-lite/server/adapter/iot/proto"
@@ -14,8 +17,6 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/json"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/xlog"
 	"github.com/thetasensors/theta-cloud-lite/server/worker"
-	"sync"
-	"time"
 )
 
 type LinkStatus struct {
@@ -57,8 +58,6 @@ func (p LinkStatus) Process(ctx *iot.Context, msg iot.Message) error {
 		return err
 	}
 
-	//go p.addLinkStatusLog(linkStatus)
-
 	isOnline, _, _ := cache.GetConnection(device.MacAddress)
 	// 2 offline 4 reconnecting failed
 	if linkStatus.State != "online" && linkStatus.State != "lost" {
@@ -77,28 +76,12 @@ func (p LinkStatus) Process(ctx *iot.Context, msg iot.Message) error {
 
 func (p LinkStatus) addEvent(device entity.Device, timestamp int64, code int32) {
 	worker.EventsChan <- entity.Event{
-		Code:      entity.EventCodeStatus,
+		Type:      entity.EventTypeDeviceStatus,
+		Code:      int(code),
 		SourceID:  device.ID,
 		Category:  entity.EventCategoryDevice,
 		Timestamp: timestamp,
 		ProjectID: device.ProjectID,
-		Content:   fmt.Sprintf(`{"code": %d}`, code),
-	}
-}
-
-func (p LinkStatus) addLinkStatusLog(linkStatus entity.LinkStatus) {
-	e := entity.DeviceLinkStatus{
-		MacAddress:             linkStatus.Address,
-		LastCall:               linkStatus.LastCall,
-		LastConnection:         uint(linkStatus.LastConnection),
-		LastProvisioning:       linkStatus.LastProvisioning,
-		NumProvisioningRetries: linkStatus.NumProvisioningRetries,
-		State:                  linkStatus.State,
-		StateUpdateTime:        linkStatus.StateUpdateTime,
-		Status:                 linkStatus.Param,
-	}
-	if err := p.deviceLinkStatusRepo.Create(context.TODO(), &e); err != nil {
-		xlog.Errorf("create device link status failed: %v => [%s]", err, linkStatus.Address)
 	}
 }
 

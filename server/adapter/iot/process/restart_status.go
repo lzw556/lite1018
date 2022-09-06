@@ -2,6 +2,7 @@ package process
 
 import (
 	"fmt"
+
 	"github.com/gogo/protobuf/proto"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/iot"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/iot/background"
@@ -42,11 +43,12 @@ func (p RestartStatus) Process(ctx *iot.Context, msg iot.Message) error {
 
 			// add event
 			worker.EventsChan <- entity.Event{
-				Code:      entity.EventCodeReboot,
+				Type:      entity.EventTypeDeviceReboot,
+				Code:      int(m.Code),
 				SourceID:  device.ID,
 				Category:  entity.EventCategoryDevice,
 				Timestamp: int64(m.Timestamp),
-				Content:   fmt.Sprintf(`{"code":%d}`, m.Code),
+				Message:   fmt.Sprintf(`{"code":%d}`, m.Code),
 				ProjectID: device.ProjectID,
 			}
 			if queue := background.GetTaskQueue(device.MacAddress); queue != nil && !queue.IsRunning() {

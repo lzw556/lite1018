@@ -3,13 +3,14 @@ package process
 import (
 	"context"
 	"fmt"
+	"time"
+
 	"github.com/gogo/protobuf/proto"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/iot"
 	pd "github.com/thetasensors/theta-cloud-lite/server/adapter/iot/proto"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
-	"time"
 )
 
 type FirmwareUpgradeStatus struct {
@@ -57,12 +58,13 @@ func (p FirmwareUpgradeStatus) Process(ctx *iot.Context, msg iot.Message) error 
 
 func (p FirmwareUpgradeStatus) addEvent(device entity.Device, code int32) {
 	event := entity.Event{
-		Code:      entity.EventCodeUpgrade,
+		Type:      entity.EventTypeDeviceUpgrade,
+		Code:      int(code),
 		Category:  entity.EventCategoryDevice,
 		SourceID:  device.ID,
 		Timestamp: time.Now().UTC().Unix(),
 		ProjectID: device.ProjectID,
-		Content:   fmt.Sprintf(`{"code":%d}`, code),
+		Message:   fmt.Sprintf(`{"code":%d}`, code),
 	}
 	_ = p.eventRepo.Create(context.TODO(), &event)
 }

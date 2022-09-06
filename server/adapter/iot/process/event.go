@@ -3,6 +3,7 @@ package process
 import (
 	"context"
 	"fmt"
+
 	"github.com/gogo/protobuf/proto"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/iot"
 	pd "github.com/thetasensors/theta-cloud-lite/server/adapter/iot/proto"
@@ -36,25 +37,13 @@ func (p Event) Process(ctx *iot.Context, msg iot.Message) error {
 			if err := proto.Unmarshal(msg.Body.Payload, &m); err != nil {
 				return fmt.Errorf("unmarshal [Event] message failed: %v", err)
 			}
-			var event entity.Event
-			if m.Type == 1 {
-				event = entity.Event{
-					Code:      entity.EventCodeDataAcquisitionFailed,
-					Category:  entity.EventCategoryDevice,
-					SourceID:  device.ID,
-					Timestamp: int64(m.Timestamp),
-					Content:   fmt.Sprintf(`{"code": %d, "data": "%s"}`, m.Code, m.Message),
-					ProjectID: device.ProjectID,
-				}
-			} else {
-				event = entity.Event{
-					Code:      entity.EventCodeDataAcquisitionMessage,
-					Category:  entity.EventCategoryDevice,
-					SourceID:  device.ID,
-					Timestamp: int64(m.Timestamp),
-					Content:   fmt.Sprintf(`{"code": %d, "data": "%s"}`, m.Code, m.Message),
-					ProjectID: device.ProjectID,
-				}
+			event := entity.Event{
+				Type:      m.Type,
+				Code:      int(m.Code),
+				Category:  entity.EventCategoryDevice,
+				Timestamp: int64(m.Timestamp),
+				Message:   m.Message,
+				ProjectID: device.ProjectID,
 			}
 			if err := p.eventRepo.Create(context.TODO(), &event); err != nil {
 				return fmt.Errorf("create [Event] message failed: %v", err)

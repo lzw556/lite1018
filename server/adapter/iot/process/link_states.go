@@ -2,7 +2,8 @@ package process
 
 import (
 	"context"
-	"fmt"
+	"time"
+
 	"github.com/gogo/protobuf/proto"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/iot"
 	pd "github.com/thetasensors/theta-cloud-lite/server/adapter/iot/proto"
@@ -15,7 +16,6 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/json"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/xlog"
 	"github.com/thetasensors/theta-cloud-lite/server/worker"
-	"time"
 )
 
 type LinkStates struct {
@@ -66,17 +66,16 @@ func (p LinkStates) Process(ctx *iot.Context, msg iot.Message) error {
 				go func(isOnline bool) {
 					if device, err := p.deviceRepo.GetBySpecs(context.TODO(), spec.DeviceMacEqSpec(r.Mac)); err == nil {
 						event := entity.Event{
-							Code:      entity.EventCodeStatus,
+							Type:      entity.EventTypeDeviceStatus,
 							Category:  entity.EventCategoryDevice,
 							SourceID:  device.ID,
 							Timestamp: time.Now().Unix(),
 							ProjectID: device.ProjectID,
 						}
-						code := 0
+						event.Code = 0
 						if !isOnline {
-							code = 2
+							event.Code = 2
 						}
-						event.Content = fmt.Sprintf(`{"code": %d}`, code)
 						worker.EventsChan <- event
 					}
 				}(newState)

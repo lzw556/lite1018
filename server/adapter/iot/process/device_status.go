@@ -2,6 +2,8 @@ package process
 
 import (
 	"fmt"
+	"time"
+
 	"github.com/gogo/protobuf/proto"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/iot"
 	pd "github.com/thetasensors/theta-cloud-lite/server/adapter/iot/proto"
@@ -11,7 +13,6 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/cache"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/json"
 	"github.com/thetasensors/theta-cloud-lite/server/worker"
-	"time"
 )
 
 type DeviceStatus struct {
@@ -67,11 +68,11 @@ func (p DeviceStatus) Process(ctx *iot.Context, msg iot.Message) error {
 
 func (p DeviceStatus) addDeviceOnlineEvent(device entity.Device) {
 	worker.EventsChan <- entity.Event{
-		Code:      entity.EventCodeStatus,
+		Type:      entity.EventTypeDeviceStatus,
+		Code:      0,
 		SourceID:  device.ID,
 		Category:  entity.EventCategoryDevice,
 		Timestamp: time.Now().Unix(),
 		ProjectID: device.ProjectID,
-		Content:   fmt.Sprintf(`{"code": %d}`, 0),
 	}
 }
