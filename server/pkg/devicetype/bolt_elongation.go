@@ -1,5 +1,7 @@
 package devicetype
 
+import "github.com/thetasensors/theta-cloud-lite/server/pkg/devicetype/validator"
+
 type BoltElongation struct {
 	SamplePeriod     Setting `json:"sample_period"`
 	SampleOffset     Setting `json:"sample_offset"`
@@ -168,18 +170,16 @@ func (d BoltElongation) Settings() Settings {
 		Sort:     16,
 	}
 	d.Samples = Setting{
-		Name:  "动态模式采样时间",
-		Key:   "samples",
-		Type:  Uint32ValueType,
-		Value: 16000,
-		Options: map[int]string{
-			1000:  "1秒",
-			2000:  "2秒",
-			4000:  "4秒",
-			8000:  "8秒",
-			16000: "16秒",
+		Name:   "动态模式采样时间",
+		Key:    "samples",
+		Type:   Uint32ValueType,
+		Value:  16000,
+		Parent: d.SensorFlags.Key,
+		Unit:   "毫秒",
+		Validator: validator.Range{
+			Min: 1000,
+			Max: 20 * 1000,
 		},
-		Parent:   d.SensorFlags.Key,
 		Show:     2,
 		Category: SensorsSettingCategory,
 		Group:    SettingGroupGeneral,
