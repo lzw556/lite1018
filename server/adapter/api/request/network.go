@@ -4,7 +4,12 @@ type WSN struct {
 	CommunicationPeriod  uint `json:"communication_period"`
 	CommunicationPeriod2 uint `json:"communication_period_2"`
 	CommunicationOffset  uint `json:"communication_offset"`
+	Tempo                uint `json:"tempo"`
+	CallPeriod           uint `json:"call_period"`
+	GroupInterval        uint `json:"group_interval"`
 	GroupSize            uint `json:"group_size"`
+	GroupSize2           uint `json:"group_size_2"`
+	Mode                 uint `json:"provisioning_mode"`
 }
 
 type Network struct {

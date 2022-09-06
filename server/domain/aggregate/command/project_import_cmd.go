@@ -40,10 +40,15 @@ func (cmd ProjectImportCmd) newNetworkImportCmd(req request.ImportNetwork) (*Net
 	// 构建网络实体
 	netCmd.Network = entity.Network{
 		CommunicationPeriod:     req.Wsn.CommunicationPeriod,
+		CommunicationPeriod2:    req.Wsn.CommunicationPeriod2,
 		CommunicationTimeOffset: req.Wsn.CommunicationOffset,
+		Tempo:                   req.Wsn.Tempo,
+		CallPeriod:              req.Wsn.CallPeriod,
+		GroupInterval:           req.Wsn.GroupInterval,
 		GroupSize:               req.Wsn.GroupSize,
-		// GroupInterval:           req.Wsn.GroupInterval,
-		ProjectID: req.ProjectID,
+		GroupSize2:              req.Wsn.GroupSize2,
+		Mode:                    entity.ProvisioningMode(req.Wsn.Mode),
+		ProjectID:               req.ProjectID,
 	}
 	// 构建网络中的设备实体
 	netCmd.Devices = make([]entity.Device, len(req.Devices))
