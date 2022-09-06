@@ -16,16 +16,21 @@ import { RangeDatePicker } from '../../../../components/rangeDatePicker';
 import { ChartContainer } from '../../components/charts/chartContainer';
 
 export const HistoryData: React.FC<AssetRow> = (props) => {
-  const [measurements] = React.useState(props.monitoringPoints || []);
-  const properties = measurements[0].properties;
+  const properties =
+    props.monitoringPoints && props.monitoringPoints.length > 0
+      ? props.monitoringPoints[0].properties
+      : [];
   const [historyOptions, setHistoryOptions] = React.useState<any>();
   const [range, setRange] = React.useState<[number, number]>();
-  const [property, setProperty] = React.useState(properties[0].key);
+  const [property, setProperty] = React.useState(
+    properties.length > 0 ? properties[0].key : undefined
+  );
   const [historyDatas, setHistoryDatas] = React.useState<
     { name: string; data: HistoryDatas; index: number }[]
   >([]);
 
   React.useEffect(() => {
+    const measurements = props.monitoringPoints || [];
     if (measurements.length > 0 && range) {
       const [from, to] = range;
       measurements.forEach(({ id, name, attributes }) => {
@@ -35,9 +40,10 @@ export const HistoryData: React.FC<AssetRow> = (props) => {
         });
       });
     }
-  }, [measurements, range]);
+  }, [props, range]);
 
   React.useEffect(() => {
+    const measurements = props.monitoringPoints || [];
     if (historyDatas.length > 0 && measurements.length > 0) {
       setHistoryOptions(
         generateChartOptionsOfHistoryData(
@@ -48,11 +54,11 @@ export const HistoryData: React.FC<AssetRow> = (props) => {
         )
       );
     }
-  }, [historyDatas, measurements, property]);
+  }, [historyDatas, props, property]);
 
   const handleChange = React.useCallback((range: [number, number]) => setRange(range), []);
 
-  if (measurements.length === 0)
+  if (!props.monitoringPoints || props.monitoringPoints.length === 0)
     return (
       <ShadowCard>
         <Empty description='没有监测点' image={Empty.PRESENTED_IMAGE_SIMPLE} />
@@ -78,7 +84,7 @@ export const HistoryData: React.FC<AssetRow> = (props) => {
                   >
                     {sortProperties(
                       filterProperties(properties),
-                      getKeysOfFirstClassFields(measurements[0].type)
+                      getKeysOfFirstClassFields(props.monitoringPoints[0].type)
                     ).map(({ name, key }) => (
                       <Select.Option key={key} value={key}>
                         {name}
