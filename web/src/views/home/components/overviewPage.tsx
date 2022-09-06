@@ -37,9 +37,11 @@ export type Overview = {
   introductionList?: Introduction[];
   tabelList?: TableListItem<any>[];
   tabs?: { key: string; tab: string; content: JSX.Element }[];
+  tabBarExtraContent?: React.ReactNode;
+  onTabChange?: (key: string) => void;
 };
 export const OverviewPage: React.FC<Overview> = (props) => {
-  const { statistics, chartList, introductionList, tabs } = props;
+  const { statistics, chartList, introductionList, tabs, tabBarExtraContent, onTabChange } = props;
   const colProps = generateColProps({ md: 12, lg: 12, xl: 4, xxl: 4 });
   const colProps2 = generateColProps({ md: 12, lg: 12, xl: 8, xxl: 6 });
 
@@ -58,7 +60,7 @@ export const OverviewPage: React.FC<Overview> = (props) => {
   return (
     <>
       {statistics && (
-        <Row style={{marginBottom: 8}}>
+        <Row style={{ marginBottom: 8 }}>
           <Col span={24} className='overview-statistic'>
             <ShadowCard>
               <Row>
@@ -101,7 +103,7 @@ export const OverviewPage: React.FC<Overview> = (props) => {
         )}
         {tabs && tabs.length > 0 && (
           <Col span={24}>
-            <Tabs size='small'>
+            <Tabs size='small' tabBarExtraContent={tabBarExtraContent} onChange={onTabChange}>
               {tabs.map(({ key, tab, content }) => (
                 <Tabs.TabPane key={key} tab={tab}>
                   {content}

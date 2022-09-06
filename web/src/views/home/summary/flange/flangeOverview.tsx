@@ -15,7 +15,6 @@ import { SettingsTabContent } from '../settingsTabContent';
 import { PlusOutlined } from '@ant-design/icons';
 import HasPermission from '../../../../permission';
 import usePermission, { Permission } from '../../../../permission/permission';
-import { isMobile } from '../../../../utils/deviceDetection';
 import { HistoryData } from './historyData';
 
 const FlangeOverview: React.FC = () => {
@@ -30,6 +29,58 @@ const FlangeOverview: React.FC = () => {
   const [form] = Form.useForm<any>();
   const [isForceRefresh, setIsForceRefresh] = React.useState(0);
   const { hasPermission } = usePermission();
+
+  const open = (selectedRow?: MeasurementRow) => {
+    setSelectedRow(selectedRow);
+    setVisible(true);
+  };
+
+  let tabs = [
+    {
+      key: 'monitor',
+      tab: '监控',
+      content: (
+        <MonitorTabContent
+          measurements={measurements || []}
+          pathname={pathname}
+          search={search}
+          asset={asset}
+        />
+      )
+    },
+    {
+      key: 'list',
+      tab: '监测点列表',
+      content: (
+        <>
+          <MeasurementOfFlangeList
+            flange={asset}
+            pathname={pathname}
+            search={search}
+            open={open}
+            fetchAssets={() => {
+              fetchAsset(id);
+            }}
+          />
+          {visible && (
+            <MeasurementEdit
+              {...{
+                visible,
+                onCancel: () => setVisible(false),
+                id: selectedRow?.id,
+                assetId: asset?.parentId,
+                onSuccess: () => {
+                  fetchAsset(id);
+                  setVisible(false);
+                }
+              }}
+            />
+          )}
+        </>
+      )
+    }
+  ];
+  const [tabKey, setTabKey] = React.useState(tabs[0].key);
 
   React.useEffect(() => {
     fetchAsset(id, form);
@@ -61,70 +112,10 @@ const FlangeOverview: React.FC = () => {
     });
   };
 
-  const open = (selectedRow?: MeasurementRow) => {
-    setSelectedRow(selectedRow);
-    setVisible(true);
-  };
-
   if (loading) return <Spin />;
 
-  let tabs = [
-    {
-      key: 'monitor',
-      tab: '监控',
-      content: (
-        <MonitorTabContent
-          measurements={measurements || []}
-          pathname={pathname}
-          search={search}
-          asset={asset}
-        />
-      )
-    },
-    {
-      key: 'list',
-      tab: '监测点列表',
-      content: (
-        <>
-          <HasPermission value={Permission.MeasurementAdd}>
-            <Button
-              type='primary'
-              style={{ position: 'fixed', top: isMobile ? 550 : 240, right: 25, zIndex: 10 }}
-              onClick={() => open()}
-            >
-              添加监测点
-              <PlusOutlined />
-            </Button>
-          </HasPermission>
-          <MeasurementOfFlangeList
-            flange={asset}
-            pathname={pathname}
-            search={search}
-            open={open}
-            fetchAssets={() => {
-              fetchAsset(id);
-            }}
-          />
-          {visible && (
-            <MeasurementEdit
-              {...{
-                visible,
-                onCancel: () => setVisible(false),
-                id: selectedRow?.id,
-                assetId: asset?.parentId,
-                onSuccess: () => {
-                  fetchAsset(id);
-                  setVisible(false);
-                }
-              }}
-            />
-          )}
-        </>
-      )
-    },
-  ];
-
-  if(asset) tabs = [...tabs, { key: 'history', tab: '历史数据', content: <HistoryData {...asset} /> }]
+  if (asset)
+    tabs = [...tabs, { key: 'history', tab: '历史数据', content: <HistoryData {...asset} /> }];
 
   return (
     <>
@@ -153,7 +144,16 @@ const FlangeOverview: React.FC = () => {
                   )
                 }
               ])
-            : tabs
+            : tabs,
+          tabBarExtraContent: tabKey === 'list' && (
+            <HasPermission value={Permission.MeasurementAdd}>
+              <Button type='primary' onClick={() => open()}>
+                添加监测点
+                <PlusOutlined />
+              </Button>
+            </HasPermission>
+          ),
+          onTabChange: (key) => setTabKey(key)
         }}
       />
     </>

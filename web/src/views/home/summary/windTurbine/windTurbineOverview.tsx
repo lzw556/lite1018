@@ -12,7 +12,6 @@ import { Asset, AssetRow, convertRow } from '../../assetList/props';
 import { MonitorTabContent } from './monitorTabContent';
 import { SettingsTabContent } from '../settingsTabContent';
 import usePermission, { Permission } from '../../../../permission/permission';
-import { isMobile } from '../../../../utils/deviceDetection';
 import { ActionBar } from '../../components/actionBar';
 import { useActionBarStatus } from '../../common/useActionBarStatus';
 import { AssetTypes } from '../../common/constants';
@@ -28,6 +27,35 @@ const WindTurbineOverview: React.FC = () => {
   const [isForceRefresh, setIsForceRefresh] = React.useState(0);
   const { hasPermission } = usePermission();
   const actionStatus = useActionBarStatus();
+  const tabs = [
+    {
+      key: 'monitor',
+      tab: '监控',
+      content: <MonitorTabContent asset={asset} pathname={pathname} search={search} />
+    },
+    {
+      key: 'list',
+      tab: '监测点列表',
+      content: (
+        <ShadowCard>
+          <Row>
+            <Col span={24}>
+              <MeasurementOfWindList
+                wind={asset}
+                pathname={pathname}
+                search={search}
+                open={actionStatus.handleEdit}
+                fetchAssets={() => {
+                  fetchAsset(id);
+                }}
+              />
+            </Col>
+          </Row>
+        </ShadowCard>
+      )
+    }
+  ];
+  const [tabKey, setTabKey] = React.useState(tabs[0].key);
 
   const fetchAsset = (id: number, form?: any) => {
     getAsset(id).then((asset) => {
@@ -60,48 +88,6 @@ const WindTurbineOverview: React.FC = () => {
 
   if (loading) return <Spin />;
 
-  const tabs = [
-    {
-      key: 'monitor',
-      tab: '监控',
-      content: <MonitorTabContent asset={asset} pathname={pathname} search={search} />
-    },
-    {
-      key: 'list',
-      tab: '监测点列表',
-      content: (
-        <ShadowCard>
-          {asset && hasPermission(Permission.AssetAdd) && (
-            <div style={{ position: 'fixed', top: isMobile ? 550 : 240, right: 25, zIndex: 10 }}>
-              <ActionBar
-                assets={[asset]}
-                {...actionStatus}
-                onEdit={actionStatus.handleEdit}
-                initialValues={{ ...AssetTypes.Flange, parent_id: asset.id }}
-                assetId={asset.id}
-                onSuccess={() => fetchAsset(id)}
-                hides={[true, false, false, true, true]}
-              />
-            </div>
-          )}
-          <Row>
-            <Col span={24}>
-              <MeasurementOfWindList
-                wind={asset}
-                pathname={pathname}
-                search={search}
-                open={actionStatus.handleEdit}
-                fetchAssets={() => {
-                  fetchAsset(id);
-                }}
-              />
-            </Col>
-          </Row>
-        </ShadowCard>
-      )
-    }
-  ];
-
   return (
     <>
       {asset && (
@@ -128,7 +114,19 @@ const WindTurbineOverview: React.FC = () => {
                   )
                 }
               ])
-            : tabs
+            : tabs,
+          tabBarExtraContent: asset && tabKey === 'list' && hasPermission(Permission.AssetAdd) && (
+            <ActionBar
+              assets={[asset]}
+              {...actionStatus}
+              onEdit={actionStatus.handleEdit}
+              initialValues={{ ...AssetTypes.Flange, parent_id: asset.id }}
+              assetId={asset.id}
+              onSuccess={() => fetchAsset(id)}
+              hides={[true, false, false, true, true]}
+            />
+          ),
+          onTabChange: (key) => setTabKey(key)
         }}
       />
     </>
