@@ -16,16 +16,18 @@ import (
 )
 
 type Alarm struct {
-	factory factory.Alarm
-	rule    dependency.AlarmRuleRepository
-	record  dependency.AlarmRecordRepository
+	factory       factory.Alarm
+	rule          dependency.AlarmRuleRepository
+	ruleGroupRepo dependency.AlarmRuleGroupRepository
+	record        dependency.AlarmRecordRepository
 }
 
 func NewAlarm() alarm.Service {
 	return &Alarm{
-		factory: factory.NewAlarm(),
-		rule:    repository.AlarmRule{},
-		record:  repository.AlarmRecord{},
+		factory:       factory.NewAlarm(),
+		rule:          repository.AlarmRule{},
+		ruleGroupRepo: repository.AlarmRuleGroup{},
+		record:        repository.AlarmRecord{},
 	}
 }
 
@@ -101,12 +103,20 @@ func (s Alarm) DeleteAlarmRuleByID(id uint) error {
 	return cmd.Delete()
 }
 
-func (s Alarm) CheckAlarmRuleName(name string) (bool, error) {
-	_, err := s.rule.GetBySpecs(context.TODO(), spec.NameEqSpec(name))
-	if errors.Is(err, gorm.ErrRecordNotFound) {
-		return true, nil
+func (s Alarm) CheckAlarmRuleName(name string, isGroup bool, projectID uint) (bool, error) {
+	if !isGroup {
+		_, err := s.rule.GetBySpecs(context.TODO(), spec.NameEqSpec(name))
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return true, nil
+		}
+		return false, err
+	} else {
+		_, err := s.ruleGroupRepo.GetBySpecs(context.TODO(), spec.NameEqSpec(name), spec.ProjectEqSpec(projectID))
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return true, nil
+		}
+		return false, err
 	}
-	return false, err
 }
 
 func (s Alarm) FindAlarmRecordByPaginate(page, size int, from, to int64, filters request.Filters) ([]vo.AlarmRecord, int64, error) {

@@ -2,14 +2,18 @@ package command
 
 import (
 	"context"
+	"errors"
 
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/request"
+	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/response"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/ruleengine"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 	spec "github.com/thetasensors/theta-cloud-lite/server/domain/specification"
+	"github.com/thetasensors/theta-cloud-lite/server/pkg/errcode"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/transaction"
+	"gorm.io/gorm"
 )
 
 type AlarmRuleGroupUpdateCmd struct {
@@ -30,6 +34,14 @@ func NewAlarmRuleGroupUpdateCmd() AlarmRuleGroupUpdateCmd {
 
 func (cmd AlarmRuleGroupUpdateCmd) Update(req request.UpdateAlarmRuleGroup) error {
 	return transaction.Execute(context.TODO(), func(txCtx context.Context) error {
+		e, err := cmd.alarmRuleGroupRepo.GetBySpecs(txCtx, spec.ProjectEqSpec(req.ProjectID), spec.NameEqSpec(req.Name))
+		if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+			return err
+		}
+		if e.ID != 0 {
+			return response.BusinessErr(errcode.AlarmRuleGroupNameExists, "")
+		}
+
 		cmd.AlarmRuleGroup.Name = req.Name
 		cmd.AlarmRuleGroup.Description = req.Description
 		cmd.AlarmRuleGroup.Category = req.Category

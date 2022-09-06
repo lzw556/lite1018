@@ -14,7 +14,7 @@ type Service interface {
 	UpdateAlarmRuleByID(id uint, req request.AlarmRule) error
 	UpdateAlarmRuleStatusByID(id uint, status uint8) error
 	DeleteAlarmRuleByID(id uint) error
-	CheckAlarmRuleName(name string) (bool, error)
+	CheckAlarmRuleName(name string, isGroup bool, projectID uint) (bool, error)
 	AddSourcesToAlarmRule(id uint, sources []uint) error
 	RemoveSourcesFromAlarmRule(id uint, sources []uint) error
 	AlarmRuleGroupBind(id uint, req request.AlarmRuleGroupBind) error

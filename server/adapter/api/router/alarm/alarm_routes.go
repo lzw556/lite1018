@@ -39,7 +39,8 @@ func (r alarmRouter) getAlarmRule(ctx *gin.Context) (interface{}, error) {
 
 func (r alarmRouter) checkAlarmRuleName(ctx *gin.Context) (interface{}, error) {
 	name := ctx.Param("name")
-	return r.service.CheckAlarmRuleName(name)
+	qtype := ctx.Query("type")
+	return r.service.CheckAlarmRuleName(name, qtype == "group", cast.ToUint(ctx.MustGet("project_id")))
 }
 
 func (r alarmRouter) updateAlarmRule(ctx *gin.Context) (interface{}, error) {
@@ -170,6 +171,7 @@ func (r alarmRouter) updateAlarmRuleGroup(ctx *gin.Context) (interface{}, error)
 		return nil, response.InvalidParameterError(err.Error())
 	}
 	id := cast.ToUint(ctx.Param("id"))
+	req.ProjectID = cast.ToUint(ctx.MustGet("project_id"))
 	return nil, r.service.UpdateAlarmRuleGroup(id, req)
 }
 
