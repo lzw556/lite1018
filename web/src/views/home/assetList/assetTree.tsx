@@ -10,11 +10,11 @@ import { AssetTypes, MeasurementTypes } from '../common/constants';
 import { generateDatasOfMeasurement } from '../common/historyDataHelper';
 import { convertAlarmLevelToState } from '../common/statisticsHelper';
 import { mapTreeNode } from '../common/treeDataHelper';
+import { EditFormPayload } from '../common/useActionBarStatus';
 import { combineFinalUrl } from '../common/utils';
 import { sortMeasurementsByAttributes } from '../measurementList/util';
 import { FlangeIcon } from '../summary/flange/icon';
 import { MeasurementIcon } from '../summary/measurement/icon';
-import { MeasurementRow } from '../summary/measurement/props';
 import { deleteMeasurement } from '../summary/measurement/services';
 import { WindTurbineIcon } from '../summary/windTurbine/icon';
 import { AssetRow } from './props';
@@ -26,13 +26,18 @@ export const AssetTree: React.FC<{
   pathname: string;
   search: string;
   onsuccess?: () => void;
-  onEdit?: (
-    selectedMeasurement?: MeasurementRow,
-    selectedAsset?: AssetRow,
-    initialValues?: typeof AssetTypes.WindTurbind,
-    flangeId?: number
-  ) => void;
-}> = ({ assets, pathname, search, onsuccess, onEdit }) => {
+  handleWindEdit?: (data?: EditFormPayload) => void;
+  handleFlangeEdit?: (data?: EditFormPayload) => void;
+  handleMeasurementEdit?: (data?: EditFormPayload) => void;
+}> = ({
+  assets,
+  pathname,
+  search,
+  onsuccess,
+  handleFlangeEdit,
+  handleWindEdit,
+  handleMeasurementEdit
+}) => {
   const [treedata, setTreedata] = React.useState<any>();
   const [selectedNode, setSelectedNode] = React.useState<any>();
 
@@ -121,11 +126,12 @@ export const AssetTree: React.FC<{
                     <EditOutlined
                       onClick={() => {
                         const type = selectedNode?.type;
-                        const assetType = getAssetType(type);
-                        if (type < 10000) {
-                          if (onEdit) onEdit(undefined, selectedNode, assetType);
-                        } else {
-                          if (onEdit) onEdit(selectedNode, undefined, undefined);
+                        if (type === AssetTypes.WindTurbind.id) {
+                          handleWindEdit && handleWindEdit({ asset: selectedNode });
+                        } else if (type === AssetTypes.Flange.id) {
+                          handleFlangeEdit && handleFlangeEdit({ asset: selectedNode });
+                        } else if (type > 10000) {
+                          handleMeasurementEdit && handleMeasurementEdit({ measurement: selectedNode });
                         }
                       }}
                     />
@@ -156,13 +162,9 @@ export const AssetTree: React.FC<{
                         onClick={() => {
                           const type = selectedNode?.type;
                           if (type === AssetTypes.WindTurbind.id) {
-                            if (onEdit)
-                              onEdit(undefined, undefined, {
-                                ...AssetTypes.Flange,
-                                parent_id: selectedNode?.id
-                              });
+                            handleFlangeEdit && handleFlangeEdit({ asset: selectedNode });
                           } else if (type === AssetTypes.Flange.id) {
-                            if (onEdit) onEdit(undefined, undefined, undefined, selectedNode?.id);
+                            handleMeasurementEdit && handleMeasurementEdit({ asset: selectedNode });
                           }
                         }}
                       />

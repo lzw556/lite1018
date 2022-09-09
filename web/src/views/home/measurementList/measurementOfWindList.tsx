@@ -18,14 +18,15 @@ import { sortFlangesByAttributes } from '../assetList/util';
 import usePermission, { Permission } from '../../../permission/permission';
 import HasPermission from '../../../permission';
 import { isMobile } from '../../../utils/deviceDetection';
+import { EditFormPayload } from '../common/useActionBarStatus';
 
 export const MeasurementOfWindList: React.FC<{
   wind?: AssetRow;
   pathname: string;
   search: string;
-  open: (selectedRow?: MeasurementRow) => void;
+  handleMeasurementEdit: (data?: EditFormPayload) => void;
   fetchAssets: (filters?: Pick<AssetRow, 'type'>) => void;
-}> = ({ wind, pathname, search, open, fetchAssets }) => {
+}> = ({ wind, pathname, search, handleMeasurementEdit, fetchAssets }) => {
   const { hasPermission } = usePermission();
 
   const generateTables = () => {
@@ -99,7 +100,7 @@ export const MeasurementOfWindList: React.FC<{
           render: (row: MeasurementRow) => (
             <Space>
               <Button type='text' size='small' title='编辑监测点'>
-                <EditOutlined onClick={() => open(row)} />
+                <EditOutlined onClick={() => handleMeasurementEdit({ measurement: row })} />
               </Button>
               <HasPermission value={Permission.MeasurementDelete}>
                 <Popconfirm

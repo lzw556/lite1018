@@ -18,14 +18,15 @@ import usePermission, { Permission } from '../../../../permission/permission';
 import HasPermission from '../../../../permission';
 import { isMobile } from '../../../../utils/deviceDetection';
 import ShadowCard from '../../../../components/shadowCard';
+import { EditFormPayload } from '../../common/useActionBarStatus';
 
 export const MeasurementOfFlangeList: React.FC<{
   flange?: AssetRow;
   pathname: string;
   search: string;
-  open: (selectedRow?: MeasurementRow) => void;
+  handleMeasurementEdit: (data?: EditFormPayload) => void;
   fetchAssets: (filters?: Pick<AssetRow, 'type'>) => void;
-}> = ({ flange, pathname, search, open, fetchAssets }) => {
+}> = ({ flange, pathname, search, handleMeasurementEdit, fetchAssets }) => {
   const { hasPermission } = usePermission();
   const generateTables = () => {
     if (!flange) return null;
@@ -96,7 +97,7 @@ export const MeasurementOfFlangeList: React.FC<{
           render: (row: MeasurementRow) => (
             <Space>
               <Button type='text' size='small' title='编辑监测点'>
-                <EditOutlined onClick={() => open(row)} />
+                <EditOutlined onClick={() => handleMeasurementEdit({ measurement: row })} />
               </Button>
               <HasPermission value={Permission.MeasurementDelete}>
                 <Popconfirm

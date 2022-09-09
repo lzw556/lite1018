@@ -1,49 +1,49 @@
 import { Form, Modal, ModalProps } from 'antd';
 import * as React from 'react';
 import { defaultValidateMessages } from '../../../constants/validator';
-import { Measurement, MeasurementRow } from '../summary/measurement/props';
+import { EditFormPayload } from '../common/useActionBarStatus';
+import { convertRow, Measurement } from '../summary/measurement/props';
 import {
   addMeasurement,
   bindDevice,
-  getMeasurement,
   unbindDevice,
   updateMeasurement
 } from '../summary/measurement/services';
 import { EditContent } from './editContent';
 
 export const MeasurementEdit: React.FC<
-  ModalProps & { id?: number } & { onSuccess: () => void } & {
-    assetId?: number;
-  } & { flangeId?: number }
+  ModalProps & { payload?: EditFormPayload; onSuccess: () => void }
 > = (props) => {
-  const { id, onSuccess } = props;
+  const { payload, onSuccess } = props;
+  const asset = payload?.asset;
+  const measurement = payload?.measurement;
   const [form] = Form.useForm<Measurement & { device_id: number }>();
-  const [selectedRow, setSelectedRow] = React.useState<MeasurementRow>();
-
+  const doUpdating = !!measurement;
   React.useEffect(() => {
-    if (id) {
-      getMeasurement(id).then(setSelectedRow);
+    if (measurement && doUpdating) {
+      form.resetFields();
+      const values = convertRow(measurement);
+      if (values) form.setFieldsValue(values);
     }
-  }, [id]);
+  }, [measurement, form, doUpdating]);
 
   return (
     <Modal
       {...{
-        title: id ? `监测点编辑` : `监测点添加`,
+        title: `监测点${doUpdating ? '编辑' : '添加'}`,
         cancelText: '取消',
-        okText: id ? '更新' : '添加',
+        okText: doUpdating ? '更新' : '添加',
         ...props,
         onOk: () => {
           form.validateFields().then((values) => {
-            const { id } = values;
-            const { bindingDevices } = selectedRow || {};
             try {
-              if (!id) {
+              if (!doUpdating) {
                 addMeasurement(values).then((measurement) => {
                   bindDevice(measurement.id, values.device_id);
                   onSuccess();
                 });
-              } else {
+              } else if (measurement) {
+                const { id, bindingDevices } = measurement;
                 if (
                   bindingDevices &&
                   bindingDevices.length > 0 &&
@@ -66,7 +66,7 @@ export const MeasurementEdit: React.FC<
       }}
     >
       <Form form={form} labelCol={{ span: 4 }} validateMessages={defaultValidateMessages}>
-        <EditContent {...{ ...props, selectedRow }} form={form} />
+        <EditContent asset={asset} form={form} />
       </Form>
     </Modal>
   );

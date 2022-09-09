@@ -1,4 +1,4 @@
-import { Col, Form, Row, Spin } from 'antd';
+import { Button, Col, Form, Row, Spin } from 'antd';
 import * as React from 'react';
 import { useLocation, useHistory } from 'react-router-dom';
 import { AssetNavigator } from '../../components/assetNavigator';
@@ -14,7 +14,7 @@ import { SettingsTabContent } from '../settingsTabContent';
 import usePermission, { Permission } from '../../../../permission/permission';
 import { ActionBar } from '../../components/actionBar';
 import { useActionBarStatus } from '../../common/useActionBarStatus';
-import { AssetTypes } from '../../common/constants';
+import { PlusOutlined } from '@ant-design/icons';
 
 const WindTurbineOverview: React.FC = () => {
   const { pathname, search } = useLocation();
@@ -44,7 +44,7 @@ const WindTurbineOverview: React.FC = () => {
                 wind={asset}
                 pathname={pathname}
                 search={search}
-                open={actionStatus.handleEdit}
+                handleMeasurementEdit={actionStatus.handleMeasurementEdit}
                 fetchAssets={() => {
                   fetchAsset(id);
                 }}
@@ -117,13 +117,22 @@ const WindTurbineOverview: React.FC = () => {
             : tabs,
           tabBarExtraContent: asset && tabKey === 'list' && hasPermission(Permission.AssetAdd) && (
             <ActionBar
-              assets={[asset]}
+              actions={[
+                <Button type='primary' onClick={() => actionStatus.handleFlangeEdit({ asset })}>
+                  添加法兰
+                  <PlusOutlined />
+                </Button>,
+                <Button
+                  type='primary'
+                  onClick={() => actionStatus.handleMeasurementEdit({ asset })}
+                  disabled={!asset.children || asset.children.length === 0}
+                >
+                  添加监测点
+                  <PlusOutlined />
+                </Button>
+              ]}
               {...actionStatus}
-              onEdit={actionStatus.handleEdit}
-              initialValues={{ ...AssetTypes.Flange, parent_id: asset.id }}
-              assetId={asset.id}
               onSuccess={() => fetchAsset(id)}
-              hides={[true, false, false, true, true]}
             />
           ),
           onTabChange: (key) => setTabKey(key)

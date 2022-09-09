@@ -1,7 +1,7 @@
-import { Button, Form } from 'antd';
+import { Button, Form, Input } from 'antd';
 import * as React from 'react';
 import ShadowCard from '../../../components/shadowCard';
-import { defaultValidateMessages } from '../../../constants/validator';
+import { defaultValidateMessages, Rules } from '../../../constants/validator';
 import { isMobile } from '../../../utils/deviceDetection';
 import { EditContent } from '../assetList/editContent';
 import { AssetRow } from '../assetList/props';
@@ -12,6 +12,29 @@ export const SettingsTabContent: React.FC<{
   form: any;
   onSubmit: (values: any) => void;
 }> = ({ asset, form, onSubmit }) => {
+  const renderFormItems = () => {
+    if (asset) {
+      if (asset.type === AssetTypes.WindTurbind.id) {
+        return (
+          <>
+            <Form.Item label='名称' name='name' rules={[Rules.range(4, 50)]}>
+              <Input placeholder={`请填写${AssetTypes.WindTurbind.label}名称`} />
+            </Form.Item>
+            <Form.Item
+              name='type'
+              hidden={true}
+              initialValue={AssetTypes.WindTurbind.id}
+            ></Form.Item>
+          </>
+        );
+      } else {
+        return <EditContent />;
+      }
+    } else {
+      return null;
+    }
+  };
+
   return (
     <ShadowCard>
       <Form
@@ -20,10 +43,7 @@ export const SettingsTabContent: React.FC<{
         labelCol={{ span: 4 }}
         style={{ width: isMobile ? '100%' : '50%' }}
       >
-        <EditContent
-          id={asset?.id}
-          initialValues={Object.values(AssetTypes).find((type) => type.id === asset?.type)}
-        />
+        {renderFormItems()}
         <Form.Item wrapperCol={{ offset: 4 }}>
           <Button
             type='primary'

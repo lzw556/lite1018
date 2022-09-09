@@ -8,7 +8,6 @@ import { getAsset, updateAsset } from '../../assetList/services';
 import { OverviewPage } from '../../components/overviewPage';
 import { getAssetStatistics, NameValue } from '../../common/statisticsHelper';
 import { MeasurementOfFlangeList } from '../measurement/measurementOfFlangeList';
-import { MeasurementEdit } from '../../measurementList/edit';
 import { AssetRow, convertRow } from '../../assetList/props';
 import { MonitorTabContent } from './monitorTabContent';
 import { SettingsTabContent } from '../settingsTabContent';
@@ -16,6 +15,8 @@ import { PlusOutlined } from '@ant-design/icons';
 import HasPermission from '../../../../permission';
 import usePermission, { Permission } from '../../../../permission/permission';
 import { HistoryData } from './historyData';
+import { ActionBar } from '../../components/actionBar';
+import { useActionBarStatus } from '../../common/useActionBarStatus';
 
 const FlangeOverview: React.FC = () => {
   const { search, pathname } = useLocation();
@@ -24,16 +25,10 @@ const FlangeOverview: React.FC = () => {
   const [loading, setLoading] = React.useState(true);
   const [measurements, setMeasurements] = React.useState<MeasurementRow[]>();
   const [statistics, setStatistics] = React.useState<NameValue[]>();
-  const [visible, setVisible] = React.useState(false);
-  const [selectedRow, setSelectedRow] = React.useState<MeasurementRow>();
   const [form] = Form.useForm<any>();
   const [isForceRefresh, setIsForceRefresh] = React.useState(0);
   const { hasPermission } = usePermission();
-
-  const open = (selectedRow?: MeasurementRow) => {
-    setSelectedRow(selectedRow);
-    setVisible(true);
-  };
+  const actionStatus = useActionBarStatus();
 
   let tabs = [
     {
@@ -52,31 +47,15 @@ const FlangeOverview: React.FC = () => {
       key: 'list',
       tab: '监测点列表',
       content: (
-        <>
-          <MeasurementOfFlangeList
-            flange={asset}
-            pathname={pathname}
-            search={search}
-            open={open}
-            fetchAssets={() => {
-              fetchAsset(id);
-            }}
-          />
-          {visible && (
-            <MeasurementEdit
-              {...{
-                visible,
-                onCancel: () => setVisible(false),
-                id: selectedRow?.id,
-                assetId: asset?.parentId,
-                onSuccess: () => {
-                  fetchAsset(id);
-                  setVisible(false);
-                }
-              }}
-            />
-          )}
-        </>
+        <MeasurementOfFlangeList
+          flange={asset}
+          pathname={pathname}
+          search={search}
+          handleMeasurementEdit={actionStatus.handleMeasurementEdit}
+          fetchAssets={() => {
+            fetchAsset(id);
+          }}
+        />
       )
     }
   ];
@@ -147,10 +126,19 @@ const FlangeOverview: React.FC = () => {
             : tabs,
           tabBarExtraContent: tabKey === 'list' && (
             <HasPermission value={Permission.MeasurementAdd}>
-              <Button type='primary' onClick={() => open()}>
-                添加监测点
-                <PlusOutlined />
-              </Button>
+              <ActionBar
+                actions={[
+                  <Button
+                    type='primary'
+                    onClick={() => actionStatus.handleMeasurementEdit({ asset })}
+                  >
+                    添加监测点
+                    <PlusOutlined />
+                  </Button>
+                ]}
+                {...actionStatus}
+                onSuccess={() => fetchAsset(id)}
+              />
             </HasPermission>
           ),
           onTabChange: (key) => setTabKey(key)

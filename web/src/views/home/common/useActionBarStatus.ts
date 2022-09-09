@@ -1,71 +1,39 @@
 import * as React from 'react';
 import { AssetRow } from '../assetList/props';
 import { MeasurementRow } from '../summary/measurement/props';
-import { AssetTypes } from './constants';
+
+export type EditFormPayload = { asset?: AssetRow; measurement?: MeasurementRow };
 
 export function useActionBarStatus() {
   const [visible, setVisible] = React.useState(false);
-  const [visibleAsset, setVisibleAsset] = React.useState(false);
-  const [selectedMeasurement, setSelectedMeasurement] = React.useState<MeasurementRow>();
-  const [selectedAsset, setSelectedAsset] = React.useState<AssetRow>();
-  const [initialValues, setInitialValues] = React.useState<
-    typeof AssetTypes.WindTurbind | undefined
-  >(AssetTypes.WindTurbind);
-  const [flangeId, setFlangeId] = React.useState<number | undefined>();
+  const [target, setTarget] = React.useState<number | undefined>();
+  const [payload, setPayload] = React.useState<EditFormPayload>();
 
-  const handleEdit = (
-    selectedMeasurement?: MeasurementRow,
-    selectedAsset?: AssetRow,
-    initialValues?: typeof AssetTypes.WindTurbind,
-    flangeId?: number
-  ) => {
-    if (selectedMeasurement) {
-      setSelectedMeasurement(selectedMeasurement);
-      setSelectedAsset(undefined);
-      setInitialValues(undefined);
-      setVisible(true);
-      setVisibleAsset(false);
-      setFlangeId(undefined);
-    } else if (selectedAsset) {
-      setSelectedAsset(selectedAsset);
-      setSelectedMeasurement(undefined);
-      setInitialValues(initialValues);
-      setVisibleAsset(true);
-      setVisible(false);
-      setFlangeId(undefined);
-    } else if (initialValues) {
-      setSelectedMeasurement(undefined);
-      setSelectedAsset(undefined);
-      setInitialValues(initialValues);
-      setVisibleAsset(true);
-      setVisible(false);
-      setFlangeId(undefined);
-    } else if (flangeId) {
-      setFlangeId(flangeId);
-      setSelectedMeasurement(undefined);
-      setSelectedAsset(undefined);
-      setInitialValues(undefined);
-      setVisible(true);
-      setVisibleAsset(false);
-    } else {
-      setSelectedMeasurement(undefined);
-      setSelectedAsset(undefined);
-      setInitialValues(undefined);
-      setVisible(true);
-      setVisibleAsset(false);
-      setFlangeId(undefined);
-    }
+  const handleWindEdit = (data?: EditFormPayload) => {
+    setPayload(data);
+    setVisible(true);
+    setTarget(1);
+  };
+
+  const handleFlangeEdit = (data?: EditFormPayload) => {
+    setPayload(data);
+    setVisible(true);
+    setTarget(2);
+  };
+
+  const handleMeasurementEdit = (data?: EditFormPayload) => {
+    setPayload(data);
+    setVisible(true);
+    setTarget(3);
   };
 
   return {
     visible,
     setVisible,
-    visibleAsset,
-    setVisibleAsset,
-    selectedMeasurement,
-    selectedAsset,
-    initialValues,
-    handleEdit,
-    flangeId
+    target,
+    payload,
+    handleWindEdit,
+    handleFlangeEdit,
+    handleMeasurementEdit
   };
 }

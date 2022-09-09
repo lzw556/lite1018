@@ -1,8 +1,8 @@
-import { Empty, Select, Spin } from 'antd';
+import { Button, Empty, message, Select, Spin } from 'antd';
 import * as React from 'react';
 import { useLocation } from 'react-router-dom';
 import { AssetTypes } from '../common/constants';
-import { getAssets } from '../assetList/services';
+import { getAssets, importAssets } from '../assetList/services';
 import Label from '../../../components/label';
 import { SearchResultPage } from '../components/searchResultPage';
 import { MeasurementOfWindList } from './measurementOfWindList';
@@ -12,6 +12,9 @@ import { ActionBar } from '../components/actionBar';
 import { useActionBarStatus } from '../common/useActionBarStatus';
 import usePermission, { Permission } from '../../../permission/permission';
 import { useStore } from '../../../hooks/store';
+import { PlusOutlined } from '@ant-design/icons';
+import { AssetExport } from '../components/assetExport';
+import { FileInput } from '../components/fileInput';
 
 const MeasurementManagement: React.FC = () => {
   const { pathname, search } = useLocation();
@@ -23,7 +26,7 @@ const MeasurementManagement: React.FC = () => {
     items: []
   });
   const [store, setStore] = useStore('measurementListFilters');
-  
+
   const [wind, setWind] = React.useState<AssetRow>();
   const actionStatus = useActionBarStatus();
   const { hasPermission } = usePermission();
@@ -68,7 +71,7 @@ const MeasurementManagement: React.FC = () => {
         <Select
           bordered={false}
           onChange={(val) => {
-            setStore(prev => ({...prev, windTurbineId: val}));
+            setStore((prev) => ({ ...prev, windTurbineId: val }));
           }}
           defaultValue={getSelectedWind()}
         >
@@ -91,10 +94,21 @@ const MeasurementManagement: React.FC = () => {
         wind={wind}
         pathname={pathname}
         search={search}
-        open={actionStatus.handleEdit}
+        handleMeasurementEdit={actionStatus.handleMeasurementEdit}
         fetchAssets={fetchAssets}
       />
     );
+  };
+
+  const handleUpload = (data: any) => {
+    return importAssets(getProject(), data).then((res) => {
+      if (res.data.code === 200) {
+        message.success('导入成功');
+        fetchAssets({ type: AssetTypes.WindTurbind.id });
+      } else {
+        message.error(`导入失败: ${res.data.msg}`);
+      }
+    });
   };
 
   return (
@@ -103,9 +117,34 @@ const MeasurementManagement: React.FC = () => {
         filters: generateFilters(),
         actions: hasPermission(Permission.AssetAdd) && (
           <ActionBar
-            assets={assets.items}
+            actions={[
+              <Button type='primary' onClick={() => actionStatus.handleWindEdit()}>
+                添加风机
+                <PlusOutlined />
+              </Button>,
+              <Button
+                type='primary'
+                onClick={() => actionStatus.handleFlangeEdit()}
+                disabled={assets.items.length === 0}
+              >
+                添加法兰
+                <PlusOutlined />
+              </Button>,
+              <Button
+                type='primary'
+                onClick={() => actionStatus.handleMeasurementEdit()}
+                disabled={
+                  assets.items.filter((asset) => asset.children && asset.children.length > 0)
+                    .length === 0
+                }
+              >
+                添加监测点
+                <PlusOutlined />
+              </Button>,
+              assets.items.length > 0 && <AssetExport winds={assets.items} />,
+              <FileInput onUpload={handleUpload} />
+            ]}
             {...actionStatus}
-            onEdit={actionStatus.handleEdit}
             // assetId={filters?.windTurbineId}
             onSuccess={() => fetchAssets({ type: AssetTypes.WindTurbind.id })}
           />

@@ -6,44 +6,26 @@ import { DeviceType } from '../../../types/device_type';
 import { AssetRow } from '../assetList/props';
 import { getAssets } from '../assetList/services';
 import { AssetTypes, MeasurementTypes } from '../common/constants';
-import { convertRow, MeasurementRow } from '../summary/measurement/props';
 
-export const EditContent: React.FC<
-  { selectedRow?: MeasurementRow } & { onSuccess: () => void } & { assetId?: number } & {
-    form: any;
-  } & { flangeId?: number }
-> = (props) => {
+export const EditContent: React.FC<{ form: any; asset?: AssetRow; doUpdating?: boolean }> = ({
+  asset,
+  form,
+  doUpdating
+}) => {
   const [types, setTypes] = React.useState([DeviceType.BoltLoosening, DeviceType.BoltElongation]);
   const [parents, setParents] = React.useState<AssetRow[]>([]);
   const [disabled, setDisabled] = React.useState(true);
-  const { selectedRow, form } = props;
-  const { id } = selectedRow || {};
+  const parentId = asset && asset.type === AssetTypes.Flange.id ? asset.id : undefined;
+  const grandParentId = asset && asset.type === AssetTypes.WindTurbind.id ? asset.id : undefined;
 
   React.useEffect(() => {
     getAssets({ type: AssetTypes.Flange.id }).then((assets) => {
-      setParents(
-        assets.filter((asset) => (props.assetId ? props.assetId === asset.parentId : true))
-      );
+      setParents(assets.filter((asset) => (grandParentId ? grandParentId === asset.parentId : true)));
     });
-  }, [props.assetId]);
-
-  React.useEffect(() => {
-    form.resetFields();
-    const values = convertRow(selectedRow);
-    if (values) {
-      const type = Object.values(MeasurementTypes).find((type) => type.id === values.type);
-      if (type) setTypes([type.deviceType]);
-      form.setFieldsValue(values);
-    }
-  }, [form, selectedRow]);
+  }, [grandParentId]);
 
   return (
     <>
-      {id && (
-        <Form.Item label='id' name='id' hidden={true}>
-          <Input />
-        </Form.Item>
-      )}
       <Form.Item label='名称' name='name' rules={[Rules.range(4, 50)]}>
         <Input placeholder={`请填写监测点名称`} />
       </Form.Item>
@@ -51,7 +33,7 @@ export const EditContent: React.FC<
         <Select
           placeholder='请选择类型'
           onChange={(e) => {
-            if (!id) {
+            if (!doUpdating) {
               const type = Object.values(MeasurementTypes).find((type) => type.id === e);
               if (type) {
                 setTypes([type.deviceType]);
@@ -62,7 +44,7 @@ export const EditContent: React.FC<
               setDisabled(false);
             }
           }}
-          disabled={!!id}
+          disabled={doUpdating}
         >
           {Object.values(MeasurementTypes).map(({ id, label }) => (
             <Select.Option key={id} value={id}>
@@ -71,23 +53,19 @@ export const EditContent: React.FC<
           ))}
         </Select>
       </Form.Item>
-      {/* TODO */}
-      {/* <Form.Item label='法兰' name='asset_id' rules={[{ required: true, message: `请选择法兰` }]}>
-      <Cascader options={parents} fieldNames={{ label: 'name', value: 'id' }} />
-    </Form.Item> */}
       <Form.Item
         label='传感器'
         name='device_id'
         rules={[{ required: true, message: `请选择传感器` }]}
       >
-        <DeviceSelect filters={{ types: types.join(',') }} disabled={disabled && !id} />
+        <DeviceSelect filters={{ types: types.join(',') }} disabled={disabled && !doUpdating} />
       </Form.Item>
       <Form.Item
         label='法兰'
         name='asset_id'
         rules={[{ required: true, message: `请选择法兰` }]}
-        hidden={!!props.flangeId && !id}
-        initialValue={props.flangeId}
+        hidden={!doUpdating && !!parentId}
+        initialValue={parentId}
       >
         <Select placeholder='请选择法兰'>
           {parents.map(({ id, name }) => (
