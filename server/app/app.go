@@ -22,6 +22,7 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/menu"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/monitoringpoint"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/network"
+	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/openapi"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/permission"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/project"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/property"
@@ -159,6 +160,9 @@ func runApiServer(mode string, dist embed.FS) {
 		statistic.NewRouter(service.NewStatistic()),
 		asset.NewRouter(service.NewAsset()),
 		monitoringpoint.NewRouter(service.NewMonitoringPoint()),
+	)
+	adapter.Api.RegisterOpenApis(
+		openapi.NewRouter(service.NewOpenApi()),
 	)
 
 	go func() {

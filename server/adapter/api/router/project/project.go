@@ -19,6 +19,7 @@ func (r *projectRouter) initRoutes() {
 	r.routes = []router.Route{
 		// POST
 		router.NewPostRoute("projects", r.create),
+		router.NewPostRoute("projects/:id/token", r.genAccessToken),
 		router.NewPostRoute("my/projects/:id/import", r.importProject),
 
 		// GET

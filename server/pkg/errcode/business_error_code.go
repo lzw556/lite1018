@@ -80,8 +80,13 @@ const (
 )
 
 const (
-	MonitoringPointNotFoundError BusinessErrorCode = iota + 20001
+  MonitoringPointNotFoundError BusinessErrorCode = iota + 20001
 	MonitoringPointTypeUnknownError
+)
+
+const (
+	OpenApiProjectNotFoundError BusinessErrorCode = iota + 1000
+	OpenApiDeviceNotFoundError
 )
 
 var businessErrorMap = map[BusinessErrorCode]string{

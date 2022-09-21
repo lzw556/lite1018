@@ -1067,4 +1067,36 @@ func init() {
 			},
 		},
 	}
+	properties[PressureTemperatureSensor] = Properties{
+		{
+			Key:       "pressure",
+			Name:      "压力",
+			Unit:      "",
+			Precision: 3,
+			Sort:      0,
+			IsShow:    true,
+			Fields: []Field{
+				{
+					Name:      "压力",
+					Key:       "pressure",
+					DataIndex: 0,
+				},
+			},
+		},
+		{
+			Key:       "temperature",
+			Name:      "温度",
+			Unit:      "°C",
+			Precision: 3,
+			Sort:      3,
+			IsShow:    true,
+			Fields: []Field{
+				{
+					Name:      "温度",
+					Key:       "temperature",
+					DataIndex: 1,
+				},
+			},
+		},
+	}
 }

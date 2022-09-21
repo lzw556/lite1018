@@ -2,7 +2,8 @@ package process
 
 import (
 	"context"
-	"fmt"
+	"time"
+
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/iot"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
@@ -10,7 +11,6 @@ import (
 	spec "github.com/thetasensors/theta-cloud-lite/server/domain/specification"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/cache"
 	"github.com/thetasensors/theta-cloud-lite/server/worker"
-	"time"
 )
 
 type Bye struct {
@@ -50,13 +50,13 @@ func (p Bye) updateChildrenConnectionState(gateway entity.Device) {
 	for _, device := range devices {
 		macs = append(macs, device.MacAddress)
 		event := entity.Event{
-			Code:      entity.EventCodeStatus,
+			Type:      entity.EventTypeDeviceStatus,
+			Code:      2,
 			Category:  entity.EventCategoryDevice,
 			SourceID:  device.ID,
 			Timestamp: time.Now().Unix(),
 			ProjectID: device.ProjectID,
 		}
-		event.Content = fmt.Sprintf(`{"code": %d}`, 2)
 		worker.EventsChan <- event
 		device.NotifyConnectionState(false, time.Now().Unix())
 	}

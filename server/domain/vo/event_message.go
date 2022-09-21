@@ -2,14 +2,15 @@ package vo
 
 import "github.com/thetasensors/theta-cloud-lite/server/domain/entity"
 
-var eventMessage = map[entity.EventCode]map[int]string{
-	entity.EventCodeReboot: {
+var eventContent = map[int32]map[int]string{
+	entity.EventTypeDeviceReboot: {
 		0: "设备未知原因重启",
 		1: "设备硬件重启",
 		2: "设备软件重启",
 		3: "设备看门狗重启",
 		4: "设备NFC重启",
 	},
+
 	entity.EventCodeUpgrade: {
 		0:   "设备升级成功",
 		1:   "设备升级取消",
@@ -33,15 +34,16 @@ var eventMessage = map[entity.EventCode]map[int]string{
 		-19: "设备升级失败, 固件型号错误",
 		-20: "设备升级失败, 固件CRC错误",
 	},
-	entity.EventCodeStatus: {
-		0:   "设备上线",
-		1:   "设备丢失",
-		2:   "设备离线",
-		3:   "设备丢失状态下重连失败",
-		4:   "设备离线状态下重连失败",
-		102: "设备更新为离线状态(上级设备离线)",
+  
+	entity.EventTypeDeviceStatus: {
+		0: "设备上线",
+		1: "设备丢失",
+		2: "设备离线",
+		3: "设备丢失状态下重连失败",
+		4: "设备离线状态下重连失败",
 	},
-	entity.EventCodeDataAcquisitionFailed: {
+  
+	entity.EventTypeDataQcquisition: {
 		33619969:   "温度传感器通讯错误",
 		33619970:   "温度传感器温度获取失败",
 		50397185:   "电流传感器通讯错误",
@@ -65,8 +67,10 @@ var eventMessage = map[entity.EventCode]map[int]string{
 		1074003969: "加速度传感器通讯错误",
 		1074003970: "加速度传感器计算错误",
 	},
-	entity.EventCodeCalibration: {
+	entity.EventTypeSensorCalibrate: {
 		0:  "校准成功",
 		-1: "校准失败",
 	},
+	entity.EventTypeDeviceLowPower:    {},
+	entity.EventTypeSensorQcquisition: {},
 }

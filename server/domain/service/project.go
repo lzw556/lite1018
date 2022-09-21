@@ -101,6 +101,13 @@ func (s Project) DeleteProjectByID(id uint) error {
 	return cmd.Run()
 }
 
+func (s Project) GenProjectAccessToken(id uint) error {
+	cmd, err := s.factory.NewProjectUpdateCmd(id)
+	if err != nil {
+		return err
+	}
+	return cmd.GenAccessToken()
+  
 func (s Project) GetMyProjectExportFile(id uint) (*vo.ProjectExported, error) {
 	cmd, err := s.factory.NewProjectExportCmd(id)
 	if err != nil {
