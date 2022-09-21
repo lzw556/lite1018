@@ -21,6 +21,7 @@ type OpenApiQuery struct {
 	deviceInformationRepo dependency.DeviceInformationRepository
 	deviceStateRepo       dependency.DeviceStateRepository
 	sensorDataRepo        dependency.SensorDataRepository
+	networkRepo           dependency.NetworkRepository
 }
 
 func NewOpenApiQuery() OpenApiQuery {
@@ -29,6 +30,7 @@ func NewOpenApiQuery() OpenApiQuery {
 		deviceInformationRepo: repository.DeviceInformation{},
 		deviceStateRepo:       repository.DeviceState{},
 		sensorDataRepo:        repository.SensorData{},
+		networkRepo:           repository.Network{},
 	}
 }
 
@@ -38,6 +40,7 @@ func (query OpenApiQuery) FindDevices() []openapivo.Device {
 	if err != nil {
 		return []openapivo.Device{}
 	}
+	networks := make(map[uint]entity.Network)
 	result := make([]openapivo.Device, len(devices))
 	for i, device := range devices {
 		r := openapivo.NewDevice(device)
@@ -56,6 +59,14 @@ func (query OpenApiQuery) FindDevices() []openapivo.Device {
 		if state, err := query.deviceStateRepo.Get(device.MacAddress); err == nil {
 			r.BatteryVoltage = state.BatteryVoltage
 			r.SignalLevel = state.SignalLevel
+		}
+		if _, ok := networks[device.NetworkID]; !ok {
+			if network, err := query.networkRepo.Get(ctx, device.NetworkID); err == nil {
+				networks[network.ID] = network
+			}
+		}
+		if network, ok := networks[device.NetworkID]; ok {
+			r.Network = network.Name
 		}
 		result[i] = r
 	}
@@ -84,6 +95,9 @@ func (query OpenApiQuery) GetDevice(mac string) (*openapivo.Device, error) {
 	if state, err := query.deviceStateRepo.Get(device.MacAddress); err == nil {
 		result.BatteryVoltage = state.BatteryVoltage
 		result.SignalLevel = state.SignalLevel
+	}
+	if network, err := query.networkRepo.Get(ctx, device.NetworkID); err == nil {
+		result.Network = network.Name
 	}
 	return &result, nil
 }

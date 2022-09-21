@@ -11,6 +11,7 @@ type Device struct {
 	Mac            string                 `json:"mac,omitempty"`
 	Name           string                 `json:"name,omitempty"`
 	Type           uint                   `json:"type"`
+	Network        string                 `json:"network,omitempty"`
 	Settings       map[string]interface{} `json:"settings,omitempty"`
 	Properties     []DeviceProperty       `json:"properties,omitempty"`
 	Information    DeviceInformation      `json:"information,omitempty"`
