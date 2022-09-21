@@ -106,15 +106,13 @@ func (query OpenApiQuery) FindDeviceData(mac, property string, from, to int64) (
 				Values:    map[string]interface{}{},
 			}
 			for _, prop := range t.Properties(t.SensorID()) {
-				if prop.IsShow {
-					for _, field := range prop.Fields {
-						if len(property) > 0 {
-							if property == field.Key {
-								r.Values[field.Key] = d.Values[field.Key]
-							}
-						} else {
+				for _, field := range prop.Fields {
+					if len(property) > 0 {
+						if property == field.Key {
 							r.Values[field.Key] = d.Values[field.Key]
 						}
+					} else {
+						r.Values[field.Key] = d.Values[field.Key]
 					}
 				}
 			}
