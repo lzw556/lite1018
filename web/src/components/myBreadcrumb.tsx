@@ -12,6 +12,7 @@ export interface MyBreadcrumbProps {
   children?: any;
   label?: string;
   firstBreadState?: { [propName: string]: any };
+  fixed?: boolean;
 }
 
 const flattenRoutes: any = (children: any) => {
@@ -23,40 +24,51 @@ const flattenRoutes: any = (children: any) => {
 
 const routes = flattenRoutes(getMenus()).concat(SecondaryRoutes);
 
-const MyBreadcrumb: FC<MyBreadcrumbProps> = ({ children, label, firstBreadState }) => {
+const MyBreadcrumb: FC<MyBreadcrumbProps> = ({ children, label, firstBreadState, fixed }) => {
   const location = useLocation();
   const paths = pickPathsFromLocation(location.search);
 
   return (
-    <Row justify={'space-between'} style={{ paddingBottom: '8px' }}>
-      <Col span={children ? 12 : 24}>
+    <Row
+      justify={'space-between'}
+      style={
+        fixed
+          ? {
+              position: 'fixed',
+              top: 60,
+              left: isMobile ? 10 : 215,
+              right: 25,
+              zIndex: 10,
+              paddingTop: 15,
+              paddingBottom: 8,
+              backgroundColor: 'rgb(238, 240, 245)'
+            }
+          : { paddingBottom: '8px' }
+      }
+    >
+      <Col>
         <Breadcrumb style={{ fontSize: '16pt', fontWeight: 'bold' }}>
           {paths.map(({ search, name }, index: number) => {
-            const menu = findMenu(routes, name, location.pathname)
+            const menu = findMenu(routes, name, location.pathname);
             if (paths.length - 1 === index) {
               return <Breadcrumb.Item key={index}>{label ? label : menu?.title}</Breadcrumb.Item>;
             }
-            return (
-              <Link
-                to={{
-                  pathname: menu?.path,
-                  search,
-                  state: firstBreadState
-                }}
-                key={index}
-              >
-                {isMobile ? (
-                  <ArrowLeftOutlined style={{ paddingRight: 8, fontSize: '16pt' }} />
-                ) : (
-                  <Breadcrumb.Item>{menu?.title}</Breadcrumb.Item>
-                )}
-              </Link>
-            );
+            if (isMobile) {
+              <Link to={{ pathname: menu?.path, search }}>
+                <ArrowLeftOutlined style={{ paddingRight: 8, fontSize: '16pt' }} />
+              </Link>;
+            } else {
+              return (
+                <Breadcrumb.Item>
+                  <Link to={{ pathname: menu?.path, search }}>{menu?.title}</Link>
+                </Breadcrumb.Item>
+              );
+            }
           })}
         </Breadcrumb>
       </Col>
       {children && (
-        <Col span={12}>
+        <Col>
           <Row justify={'end'}>
             <Col>{children}</Col>
           </Row>

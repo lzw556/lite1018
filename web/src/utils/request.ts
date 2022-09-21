@@ -44,7 +44,7 @@ axios.interceptors.response.use(<T>(response:AxiosResponse<T>) => {
 
 
 function request<T>(method: Method, url: string, params: any) {
-    if (params !== null && params !== undefined) {
+    if (params) {
         params = filterNull(params)
     }
     return new Promise<AxiosResponse<T>>((resolve, reject) => {
@@ -98,7 +98,7 @@ function typeOf(t:any) {
 
 function filterNull(params:any) {
     Object.keys(params).map(key => {
-        if (params[key] === null || params[key] === undefined) {
+        if (params[key] === null) {
             delete params[key]
         }
         if (typeOf(params[key]) === 'string') {

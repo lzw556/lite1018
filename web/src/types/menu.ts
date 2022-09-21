@@ -8,4 +8,5 @@ export type Menu = {
     icon: string
     view: string
     children: Menu[]
+    sort?: number
 }

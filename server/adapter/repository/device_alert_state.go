@@ -17,6 +17,10 @@ func (repo DeviceAlertState) Create(mac string, e entity.DeviceAlertState) error
 			return err
 		}
 		dataBucket, err := bucket.CreateBucketIfNotExists([]byte(mac))
+		if err != nil {
+			return err
+		}
+
 		bytes, err := json.Marshal(e)
 		if err != nil {
 			return err
@@ -86,9 +90,10 @@ func (repo DeviceAlertState) DeleteAll(mac string) error {
 		if err != nil {
 			return err
 		}
-		if err = bucket.DeleteBucket([]byte(mac)); err != nil && err != bbolt.ErrBucketNotFound {
+		if err = bucket.DeleteBucket([]byte(mac)); err != nil && err.Error() != "bucket not found" {
 			return err
+		} else {
+			return nil
 		}
-		return nil
 	})
 }

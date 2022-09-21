@@ -69,3 +69,23 @@ func (factory Project) buildSpecs(filters request.Filters) []spec.Specification 
 	}
 	return specs
 }
+
+func (factory Project) NewProjectExportCmd(id uint) (*command.ProjectExportCmd, error) {
+	e, err := factory.projectRepo.Get(context.TODO(), id)
+	if err != nil {
+		return nil, response.BusinessErr(errcode.ProjectNotFoundError, "")
+	}
+	cmd := command.NewProjectExportCmd()
+	cmd.Project = e
+	return &cmd, nil
+}
+
+func (factory Project) NewProjectImportCmd(id uint) (*command.ProjectImportCmd, error) {
+	e, err := factory.projectRepo.Get(context.TODO(), id)
+	if err != nil {
+		return nil, response.BusinessErr(errcode.ProjectNotFoundError, "")
+	}
+	cmd := command.NewProjectImportCmd()
+	cmd.Project = e
+	return &cmd, nil
+}

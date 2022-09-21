@@ -20,6 +20,7 @@ func (r *projectRouter) initRoutes() {
 		// POST
 		router.NewPostRoute("projects", r.create),
 		router.NewPostRoute("projects/:id/token", r.genAccessToken),
+		router.NewPostRoute("my/projects/:id/import", r.importProject),
 
 		// GET
 		router.NewGetRoute("projects", r.find),
@@ -27,6 +28,7 @@ func (r *projectRouter) initRoutes() {
 		router.NewGetRoute("projects/:id/users", r.getAllocUsers),
 		router.NewGetRoute("my/projects", r.getMyProjects),
 		router.NewGetRoute("my/projects/:id", r.getMyProject),
+		router.NewGetRoute("my/projects/:id/exportFile", r.getMyProjectExportFile),
 
 		// PUT
 		router.NewPutRoute("projects/:id", r.update),

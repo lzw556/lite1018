@@ -1,4 +1,4 @@
-import {Card, Col, Empty, message, Row, Spin, Typography} from 'antd';
+import { Card, Col, Empty, Row, Typography } from 'antd';
 import * as React from 'react';
 import moment from 'moment';
 import ReactECharts from 'echarts-for-react';
@@ -9,17 +9,14 @@ import { isMobile } from '../../utils/deviceDetection';
 
 export const RecentHistory: React.FC<{ device: Device }> = ({ device }) => {
   const [historyOptions, setHistoryOptions] = React.useState<any>();
-  const [isLoading, setIsLoading] = React.useState<boolean>(false);
 
   React.useEffect(() => {
-    setIsLoading(true);
     FindDeviceDataRequest(
       device.id,
       moment().startOf('day').subtract(13, 'd').utc().unix(),
       moment().endOf('day').utc().unix(),
       {}
     ).then((data) => {
-      setIsLoading(false);
       setHistoryOptions(
         device.properties.map((property: any) => {
           const fields = new Map<string, number[]>();
@@ -54,6 +51,9 @@ export const RecentHistory: React.FC<{ device: Device }> = ({ device }) => {
             if (value) {
               subText += `${field.name} ${value.toFixed(property.precision)} `;
             }
+            if (value === 0 || value === '0') {
+              subText += `${field.name} ${value} `;
+            }
           });
           const title = `${property.name}` + (property.unit ? `(${property.unit})` : '');
           return {
@@ -63,7 +63,8 @@ export const RecentHistory: React.FC<{ device: Device }> = ({ device }) => {
               formatter: function (params: any) {
                 let relVal = params[0].name;
                 for (let i = 0; i < params.length; i++) {
-                  let value = Number(params[i].value).toFixed(3);
+                  let value: any = Number(params[i].value);
+                  value = value ? value.toFixed(3) : value;
                   relVal += `<br/> ${params[i].marker} ${params[i].seriesName}: ${value}${property.unit}`;
                 }
                 return relVal;
@@ -74,18 +75,17 @@ export const RecentHistory: React.FC<{ device: Device }> = ({ device }) => {
             xAxis: {
               type: 'category',
               boundaryGap: false,
+              axisLabel: {show: false},
               data: times.map((item: any) => item.format('YYYY-MM-DD HH:mm:ss'))
             }
           };
         })
       );
-    }).catch(e => {
-      message.error("数据加载超时").then()
     });
   }, [device]);
 
   const renderDeviceHistoryDataChart = () => {
-    if (!isLoading && historyOptions && historyOptions.length) {
+    if (historyOptions && historyOptions.length) {
       return historyOptions.map((item: any, index: number) => {
         return (
           <Card.Grid key={index} style={{ boxShadow: 'none', border: 'none', width: isMobile ? '100%' : '25%' }}>
@@ -93,11 +93,8 @@ export const RecentHistory: React.FC<{ device: Device }> = ({ device }) => {
           </Card.Grid>
         );
       });
-    }else if (isLoading) {
-      return <Spin tip={"数据加载中..."}></Spin>
-    }else {
-      return <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={'数据不足'} />;
     }
+    return <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={'数据不足'} />;
   };
 
   // React.useEffect(() => {

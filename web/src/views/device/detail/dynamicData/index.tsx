@@ -1,5 +1,5 @@
-import {DownloadOutlined, MenuOutlined} from '@ant-design/icons';
-import {Button, Col, ConfigProvider, DatePicker, Dropdown, Menu, Row, Select, Space, Table} from 'antd';
+import { DownloadOutlined } from '@ant-design/icons';
+import { Col, ConfigProvider, DatePicker, Row, Select, Space, Table } from 'antd';
 import moment from 'moment';
 import * as React from 'react';
 import { Device } from '../../../../types/device';
@@ -11,7 +11,7 @@ import EChartsReact from 'echarts-for-react';
 import { Fields_ad, Fields_be, Fields_be_axis, fields_be_hasAxis, useGetingDeviceData, Values_ad, Values_be } from '../../hooks/useGetingDeviceData';
 import Label from '../../../../components/label';
 import { LineChartStyles } from '../../../../constants/chart';
-import {DownloadDeviceDataByTimestampRequest, RemoveLargeDataRequest} from '../../../../apis/device';
+import { DownloadDeviceDataByTimestampRequest } from '../../../../apis/device';
 import { DeviceType } from '../../../../types/device_type';
 import { AXIS_THREE, DYNAMIC_DATA_ANGLEDIP, DYNAMIC_DATA_BOLTELONGATION } from './constants';
 import ShadowCard from '../../../../components/shadowCard';
@@ -60,35 +60,6 @@ export const DynamicData: React.FC<Device> = ({ id, typeId }) => {
       }
     });
   };
-
-  const onDelete = (timestamp: number) => {
-    RemoveLargeDataRequest(id, data_type, timestamp).then(_ => {
-      fetchTimestamps(id, beginDate.utc().unix(), endDate.utc().unix(), {
-        data_type
-      });
-    })
-  }
-
-  const onMenuClick = (key:any, timestamp:number) => {
-    if (key === "download") {
-      onDownload(timestamp)
-    }else if (key === "delete") {
-      onDelete(timestamp)
-    }
-  }
-
-  const renderMenus = (timestamp:number) => {
-    return <Menu onClick={e => onMenuClick(e.key, timestamp)}>
-      {
-          hasPermission(Permission.DeviceRawDataDownload) &&
-          <Menu.Item key={"download"}>下载</Menu.Item>
-      }
-      {
-          hasPermission(Permission.DeviceRawDataDelete) &&
-          <Menu.Item key={"delete"}>删除</Menu.Item>
-      }
-    </Menu>
-  }
 
   const renderChart = () => {
     const defaultChartOption = {
@@ -335,12 +306,15 @@ export const DynamicData: React.FC<Device> = ({ id, typeId }) => {
                     },
                     {
                       title: '操作',
-                      dataIndex: 'timestamp',
                       key: 'action',
-                      render: (timestamp: any, record: any) => {
-                        return <Dropdown overlay={renderMenus(timestamp)}>
-                          <Button type={"link"}><MenuOutlined/></Button>
-                        </Dropdown>
+                      render: (text: any, record: any) => {
+                        if (hasPermission(Permission.DeviceRawDataDownload)) {
+                          return (
+                            <Space size='middle'>
+                              <a onClick={() => onDownload(timestamp)}>下载</a>
+                            </Space>
+                          );
+                        }
                       }
                     }
                   ]}

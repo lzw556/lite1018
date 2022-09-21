@@ -12,7 +12,7 @@ export const NavMenu: React.FC<{
   const locale = GetParamValue(search, 'locale');
   const { SubMenu } = Menu;
   const renderMenuItem = (children: []) => {
-    return children.map((item: any) => {
+    return children.sort(sortMenus).map((item: any) => {
       if (!item.hidden) {
         if (item.children && item.children.filter((item: any) => !item.hidden).length) {
           return (
@@ -45,7 +45,7 @@ export const NavMenu: React.FC<{
       defaultOpenKeys={[pathname.replace('/', '')]}
     >
       {menus &&
-        menus.map((item: any) => {
+        menus.sort(sortMenus).map((item: any) => {
           if (!item.hidden) {
             if (item.children && item.children.filter((item: any) => !item.hidden).length) {
               return (
@@ -63,11 +63,20 @@ export const NavMenu: React.FC<{
                 key={item.name}
                 icon={item.icon && <span className={`iconfont ${item.icon}`} />}
               >
-                <NavLink to={`${item.path}?locale=${item.name}`} onClick={() => setVisible && setVisible(false)}>{item.title}</NavLink>
+                <NavLink
+                  to={`${item.path}?locale=${item.name}`}
+                  onClick={() => setVisible && setVisible(false)}
+                >
+                  {item.title}
+                </NavLink>
               </Menu.Item>
             );
           }
         })}
     </Menu>
   );
+
+  function sortMenus(prev: MenuItem, next: MenuItem) {
+    return (prev.sort || 0) - (next.sort || 0);
+  }
 };

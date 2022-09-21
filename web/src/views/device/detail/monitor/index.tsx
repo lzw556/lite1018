@@ -21,7 +21,6 @@ const MonitorPage: FC<MonitorPageProps> = ({device}) => {
     const [devices, setDevices] = useState<Device[]>()
     const [options, setOptions] = useState<any>([])
     const [selectedDevice, setSelectedDevice] = useState<number>(0)
-    const [isLoading, setIsLoading] = useState<boolean>(false)
 
     useEffect(() => {
         if (device) {

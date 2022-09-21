@@ -14,3 +14,8 @@ func (r statisticRouter) getAlertStatistics(ctx *gin.Context) (interface{}, erro
 	filters := request.NewFilters(ctx)
 	return r.service.GetAlertStatistics(filters)
 }
+
+func (r statisticRouter) getAllStatistics(ctx *gin.Context) (interface{}, error) {
+	filters := request.NewFilters(ctx)
+	return r.service.GetAllStatistics(filters)
+}

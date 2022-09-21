@@ -1,19 +1,4 @@
-import {
-    Button,
-    Checkbox,
-    Col,
-    ConfigProvider,
-    DatePicker,
-    Dropdown,
-    Menu,
-    message,
-    Modal,
-    Row,
-    Select,
-    Space,
-    Spin,
-    Table
-} from 'antd';
+import {Checkbox, Col, ConfigProvider, DatePicker, Row, Select, Space, Table} from 'antd';
 import EChartsReact from 'echarts-for-react';
 import moment from 'moment';
 import * as React from 'react';
@@ -25,10 +10,10 @@ import {Device} from '../../../../types/device';
 import {
     DownloadDeviceDataByTimestampRequest,
     FindDeviceDataRequest,
-    GetDeviceDataRequest, RemoveLargeDataRequest
+    GetDeviceDataRequest
 } from '../../../../apis/device';
 import {isMobile} from '../../../../utils/deviceDetection';
-import {DownloadOutlined, LoadingOutlined, MenuOutlined} from '@ant-design/icons';
+import {DownloadOutlined} from '@ant-design/icons';
 import usePermission, {Permission} from "../../../../permission/permission";
 import {DeviceType} from "../../../../types/device_type";
 
@@ -72,24 +57,21 @@ const WaveDataChart: React.FC<{ device: Device }> = ({device}) => {
     const [isLoadingPage, setIsLoadingPage] = React.useState(false);
     const [isShowEnvelope, setIsShowEnvelope] = React.useState(false);
     const [dataType] = useState(device.typeId === DeviceType.VibrationTemperature3AxisAdvanced ? 16842758 : 16842753)
-    const [timestamp, setTimestamp] = useState<number>()
     const {hasPermission} = usePermission();
 
     const fetchDeviceDataByTimestamp = useCallback(
-        () => {
-            if (timestamp) {
-                setIsLoading(true);
-                GetDeviceDataRequest(device.id, timestamp, {calculate, dimension, data_type: dataType})
-                    .then((data) => {
-                        setIsLoading(false);
-                        setDeviceData(data);
-                    })
-                    .catch((e) => {
-                        setIsLoading(false);
-                    });
-            }
+        (timestamp: number) => {
+            setIsLoading(true);
+            GetDeviceDataRequest(device.id, timestamp, {calculate, dimension, data_type: dataType})
+                .then((data) => {
+                    setIsLoading(false);
+                    setDeviceData(data);
+                })
+                .catch((e) => {
+                    setIsLoading(false);
+                });
         },
-        [calculate, dimension, timestamp]
+        [calculate, dimension]
     );
 
     const fetchDeviceWaveDataTimestamps = useCallback(() => {
@@ -101,7 +83,7 @@ const WaveDataChart: React.FC<{ device: Device }> = ({device}) => {
                 setIsLoadingPage(false);
                 setDataSource(data);
                 if (data.length > 0) {
-                    setTimestamp(data[0].timestamp);
+                    fetchDeviceDataByTimestamp(data[0].timestamp);
                 }
             })
             .catch((_) => {
@@ -114,7 +96,9 @@ const WaveDataChart: React.FC<{ device: Device }> = ({device}) => {
     }, [fetchDeviceWaveDataTimestamps]);
 
     React.useEffect(() => {
-        fetchDeviceDataByTimestamp();
+        if (deviceData) {
+            fetchDeviceDataByTimestamp(deviceData.timestamp);
+        }
     }, [fetchDeviceDataByTimestamp]);
 
     const getChartTitle = () => {
@@ -135,27 +119,6 @@ const WaveDataChart: React.FC<{ device: Device }> = ({device}) => {
         return '';
     };
 
-    const onMenuClick = (key:any, timestamp:number) => {
-        if (key === "download") {
-            onDownload(timestamp)
-        }else if (key === "delete") {
-            onDelete(timestamp)
-        }
-    }
-
-    const renderMenus = (timestamp:number) => {
-        return <Menu onClick={e => onMenuClick(e.key, timestamp)}>
-            {
-                hasPermission(Permission.DeviceRawDataDownload) &&
-                <Menu.Item key={"download"}>下载</Menu.Item>
-            }
-            {
-                hasPermission(Permission.DeviceRawDataDelete) &&
-                <Menu.Item key={"delete"}>删除</Menu.Item>
-            }
-        </Menu>
-    }
-
     const columns = [
         {
             title: '时间',
@@ -166,135 +129,120 @@ const WaveDataChart: React.FC<{ device: Device }> = ({device}) => {
         },
         {
             title: '操作',
-            dataIndex: 'timestamp',
             key: 'action',
-            render: (timestamp: any, record: any) => {
-                return <Dropdown overlay={renderMenus(timestamp)}>
-                    <Button type={"link"}><MenuOutlined/></Button>
-                </Dropdown>
+            render: (text: any, record: any) => {
+                if (hasPermission(Permission.DeviceRawDataDownload)) {
+                    return <Space size='middle'>
+                        <a onClick={() => onDownload(record.timestamp)}>下载</a>
+                    </Space>
+                }
             }
         }
     ];
-
-    const onDelete = (timestamp: number) => {
-        RemoveLargeDataRequest(device.id, dataType, timestamp).then(_ => {
-            fetchDeviceWaveDataTimestamps()
-        })
-    }
-
     const onDownload = (timestamp: number) => {
-        let modal = Modal.info({title: "数据下载", content: "数据下载中...", okText:"保存", okButtonProps: {disabled: true}})
         DownloadDeviceDataByTimestampRequest(device.id, timestamp, {
             calculate,
             data_type: dataType
         }).then((res) => {
-            modal.update({
-                title: "下载成功",
-                content: `波形数据(${moment.unix(timestamp).local().format('YYYY-MM-DD_hh-mm-ss')}).csv`,
-                okButtonProps: {
-                    disabled: false
-                },
-                onOk: () => {
-                    if (res.status === 200) {
-                        const url = window.URL.createObjectURL(new Blob([res.data]));
-                        const link = document.createElement('a');
-                        link.href = url;
-                        link.setAttribute(
-                            'download',
-                            `波形数据(${moment.unix(timestamp).local().format('YYYY-MM-DD_hh-mm-ss')}).csv`
-                        );
-                        document.body.appendChild(link);
-                        link.click();
-                    }
-                }
-            })
-        }).catch(e => {
-            modal.destroy();
-            message.error("波形数据下载超时").then();
+            if (res.status === 200) {
+                const url = window.URL.createObjectURL(new Blob([res.data]));
+                const link = document.createElement('a');
+                link.href = url;
+                link.setAttribute(
+                    'download',
+                    `${moment.unix(timestamp).local().format('YYYY-MM-DD_hh-mm-ss')}${getChartTitle()}.csv`
+                );
+                document.body.appendChild(link);
+                link.click();
+            }
         });
     };
 
     const renderChart = () => {
-        let option = {};
-        if (deviceData && deviceData.values) {
-            const data = deviceData.values;
-            const legends = ['X轴', 'Y轴', 'Z轴'];
-            let series: any[] = [
-                {
-                    name: legends[dimension],
-                    type: 'line',
-                    data: data.values,
-                    itemStyle: LineChartStyles[dimension].itemStyle,
-                    showSymbol: false
-                }
-            ];
-            if (isShowEnvelope) {
-                series = [
+        if (deviceData === undefined && !isLoading) {
+            return <EmptyLayout description='数据不足'/>;
+        } else {
+            let option: any = {...defaultChartOption};
+            if (deviceData) {
+                const data = deviceData.values;
+                const legends = ['X轴', 'Y轴', 'Z轴'];
+                let series: any[] = [
                     {
                         name: legends[dimension],
                         type: 'line',
-                        data: data.highEnvelopes,
-                        lineStyle: {
-                            opacity: 0
-                        },
-                        areaStyle: {
-                            color: '#ccc'
-                        },
-                        stack: 'confidence-band',
-                        symbol: 'none'
-                    },
-                    {
-                        name: legends[dimension],
-                        type: 'line',
-                        data: data.lowEnvelopes,
-                        lineStyle: {
-                            opacity: 0
-                        },
-                        areaStyle: {
-                            color: '#ccc'
-                        },
-                        stack: 'confidence-band',
-                        symbol: 'none'
-                    },
-                    ...series
-                ];
-            }
-            option = {
-                ...defaultChartOption,
-                legend: {
-                    data: [legends[dimension]],
-                    itemStyle: {
-                        color: LineChartStyles[dimension].itemStyle.normal.color
+                        data: data.values,
+                        itemStyle: LineChartStyles[dimension].itemStyle,
+                        showSymbol: false
                     }
-                },
-                title: {text: `${getChartTitle()} ${data.frequency / 1000}KHz`, top: 0},
-                tooltip: {
-                    trigger: 'axis',
-                    axisPointer: {
-                        type: 'cross',
-                        crossStyle: {
-                            color: '#999'
+                ];
+                if (isShowEnvelope) {
+                    series = [
+                        {
+                            name: legends[dimension],
+                            type: 'line',
+                            data: data.highEnvelopes,
+                            lineStyle: {
+                                opacity: 0
+                            },
+                            areaStyle: {
+                                color: '#ccc'
+                            },
+                            stack: 'confidence-band',
+                            symbol: 'none'
+                        },
+                        {
+                            name: legends[dimension],
+                            type: 'line',
+                            data: data.lowEnvelopes,
+                            lineStyle: {
+                                opacity: 0
+                            },
+                            areaStyle: {
+                                color: '#ccc'
+                            },
+                            stack: 'confidence-band',
+                            symbol: 'none'
+                        },
+                        ...series
+                    ];
+                }
+                option = {
+                    ...defaultChartOption,
+                    legend: {
+                        data: [legends[dimension]],
+                        itemStyle: {
+                            color: LineChartStyles[dimension].itemStyle.normal.color
                         }
                     },
-                    formatter: `{b} ${data.xAxisUnit}<br/>${legends[dimension]}: {c}`
-                },
-                xAxis: {
-                    type: 'category',
-                    data: data.xAxis,
-                    name: data.xAxisUnit
-                },
-                series
-            };
+                    title: {text: `${getChartTitle()} ${data.frequency / 1000}KHz`, top: 0},
+                    tooltip: {
+                        trigger: 'axis',
+                        axisPointer: {
+                            type: 'cross',
+                            crossStyle: {
+                                color: '#999'
+                            }
+                        },
+                        formatter: `{b} ${data.xAxisUnit}<br/>${legends[dimension]}: {c}`
+                    },
+                    xAxis: {
+                        type: 'category',
+                        data: data.xAxis,
+                        name: data.xAxisUnit
+                    },
+                    series: series
+                };
+            }
+            return (
+                <EChartsReact
+                    loadingOption={{text: '正在加载数据, 请稍等...'}}
+                    showLoading={isLoading}
+                    style={{height: 500}}
+                    option={option}
+                    notMerge={true}
+                />
+            );
         }
-        return (
-            <EChartsReact
-                loadingOption={{text: '正在加载数据, 请稍等...'}}
-                showLoading={isLoading}
-                style={{height: 500}}
-                option={option}
-                notMerge={true}
-            />
-        );
     };
 
     const select_fields = (
@@ -343,9 +291,10 @@ const WaveDataChart: React.FC<{ device: Device }> = ({device}) => {
         </Select>
     );
     if (isMobile) {
-        if (!timestamp) {
+        if (!deviceData?.timestamp) {
             return <EmptyLayout description={'波形数据列表为空'}/>;
         }
+
         return (
             <>
                 <Row style={{marginBottom: 8}}>
@@ -369,7 +318,7 @@ const WaveDataChart: React.FC<{ device: Device }> = ({device}) => {
                             defaultValue={deviceData?.timestamp}
                             onChange={(value) => {
                                 if (value !== deviceData?.timestamp) {
-                                    setDeviceData(deviceData);
+                                    fetchDeviceDataByTimestamp(value);
                                 }
                             }}
                         >
@@ -407,80 +356,75 @@ const WaveDataChart: React.FC<{ device: Device }> = ({device}) => {
         );
     } else {
         return (
-            <>
-                <Row>
-                    <Col xl={6} xxl={4} style={{maxHeight: 500}}>
-                        <Row justify={'center'} style={{width: '100%'}}>
-                            <Col span={24}>
-                                <DatePicker.RangePicker
-                                    allowClear={false}
-                                    value={[beginDate, endDate]}
-                                    onChange={(date, dateString) => {
-                                        if (dateString) {
-                                            setBeginDate(moment(dateString[0]).startOf('day'));
-                                            setEndDate(moment(dateString[1]).endOf('day'));
-                                        }
-                                    }}
+            <Row>
+                <Col xl={6} xxl={4} style={{maxHeight: 500}}>
+                    <Row justify={'center'} style={{width: '100%'}}>
+                        <Col span={24}>
+                            <DatePicker.RangePicker
+                                allowClear={false}
+                                value={[beginDate, endDate]}
+                                onChange={(date, dateString) => {
+                                    if (dateString) {
+                                        setBeginDate(moment(dateString[0]).startOf('day'));
+                                        setEndDate(moment(dateString[1]).endOf('day'));
+                                    }
+                                }}
+                            />
+                        </Col>
+                    </Row>
+                    <Row justify={'space-between'} style={{paddingTop: '0px'}}>
+                        <Col span={24}>
+                            <ConfigProvider renderEmpty={() => <EmptyLayout description={'波形数据列表为空'}/>}>
+                                <Table
+                                    size={'middle'}
+                                    scroll={{y: 500}}
+                                    showHeader={false}
+                                    columns={columns}
+                                    pagination={false}
+                                    dataSource={dataSource}
+                                    rowClassName={(record) =>
+                                        record.timestamp === deviceData?.timestamp ? 'ant-table-row-selected' : ''
+                                    }
+                                    onRow={(record) => ({
+                                        onClick: () => {
+                                            if (record.timestamp !== deviceData?.timestamp) {
+                                                fetchDeviceDataByTimestamp(record.timestamp);
+                                            }
+                                        },
+                                        onMouseLeave: () => (window.document.body.style.cursor = 'default'),
+                                        onMouseEnter: () => (window.document.body.style.cursor = 'pointer')
+                                    })}
                                 />
-                            </Col>
-                        </Row>
-                        <Row justify={'space-between'} style={{paddingTop: '0px'}}>
-                            <Col span={24}>
-                                <ConfigProvider renderEmpty={() => <EmptyLayout description={'波形数据列表为空'}/>}>
-                                    <Table
-                                        size={'middle'}
-                                        scroll={{y: 500}}
-                                        showHeader={false}
-                                        columns={columns}
-                                        pagination={false}
-                                        dataSource={dataSource}
-                                        rowClassName={(record) =>
-                                            record.timestamp === timestamp ? 'ant-table-row-selected' : ''
-                                        }
-                                        onRow={(record) => ({
-                                            onClick: () => {
-                                                if (record.timestamp !== timestamp) {
-                                                    setTimestamp(record.timestamp);
-                                                }
-                                            },
-                                            onMouseLeave: () => (window.document.body.style.cursor = 'default'),
-                                            onMouseEnter: () => (window.document.body.style.cursor = 'pointer')
-                                        })}
-                                    />
-                                </ConfigProvider>
-                            </Col>
-                        </Row>
-                    </Col>
-                    <Col xl={18} xxl={20}>
-                        <Row justify={'start'}>
-                            <Col span={24}>
-                                <Row justify={'end'}>
-                                    <Col>
-                                        <Space wrap={true}>
-                                            {calculate.indexOf('TimeDomain') !== -1 && (
-                                                <Checkbox
-                                                    defaultChecked={isShowEnvelope}
-                                                    onChange={(e) => {
-                                                        setIsShowEnvelope(e.target.checked);
-                                                    }}
-                                                >
-                                                    显示包络
-                                                </Checkbox>
-                                            )}
-                                            {select_fields}
-                                            {select_axis}
-                                        </Space>
-                                    </Col>
-                                </Row>
-                            </Col>
-                            <Col span={24}>{renderChart()}</Col>
-                        </Row>
-                    </Col>
-                </Row>
-                <Modal title={"提示"}>
-                    <Spin tip={"数据下载中..."}/>
-                </Modal>
-            </>
+                            </ConfigProvider>
+                        </Col>
+                    </Row>
+                </Col>
+                <Col xl={18} xxl={20}>
+                    <Row justify={'start'}>
+                        <Col span={24}>
+                            <Row justify={'end'}>
+                                <Col>
+                                    <Space wrap={true}>
+                                        {calculate.indexOf('TimeDomain') !== -1 && (
+                                            <Checkbox
+                                                defaultChecked={isShowEnvelope}
+                                                onChange={(e) => {
+                                                    setIsShowEnvelope(e.target.checked);
+                                                }}
+                                            >
+                                                显示包络
+                                            </Checkbox>
+                                        )}
+                                        {select_fields}
+                                        {select_axis}
+                                    </Space>
+                                </Col>
+                            </Row>
+                        </Col>
+                        <Col span={24}>{renderChart()}</Col>
+                    </Row>
+                </Col>
+            </Row>
         );
     }
 };

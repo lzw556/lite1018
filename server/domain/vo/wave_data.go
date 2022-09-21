@@ -9,8 +9,6 @@ import (
 
 type KxData struct {
 	Frequency     uint32    `json:"frequency"`
-	Range         uint8     `json:"range"`
-	FullScale     uint32    `json:"fullScale"`
 	Values        []float64 `json:"values,omitempty"`
 	XAxis         []float64 `json:"xAxis,omitempty"`
 	HighEnvelopes []float64 `json:"highEnvelopes,omitempty"`
@@ -21,8 +19,6 @@ type KxData struct {
 func NewKxData(axis entity.AxisSensorData) KxData {
 	m := KxData{
 		Frequency: axis.Metadata.Odr,
-		Range:     axis.Metadata.Range,
-		FullScale: axis.Metadata.FullScale,
 	}
 	return m
 }
@@ -60,21 +56,15 @@ type WaveDataList []KxData
 
 func (list WaveDataList) ToCsvFile() (*CsvFile, error) {
 	filename := fmt.Sprintf("%s.csv", time.Now().Format("2006-01-02_15-04-05"))
-	data := make([][]string, len(list))
-	max := 0
-	for _, kxData := range list {
-		if max <= len(kxData.Values) {
-			max = len(kxData.Values)
-		}
-	}
-	for i := 0; i < max; i++ {
-		cell := make([]string, len(list))
-		for j, kxData := range list {
-			if i < len(kxData.Values) {
-				cell[j] = fmt.Sprintf("%f", kxData.Values[i])
+	data := make([][]string, 0)
+	if len(list) > 0 {
+		for i := range list[0].Values {
+			cell := make([]string, len(list))
+			for j := range list {
+				cell[j] = fmt.Sprintf("%f", list[j].Values[i])
 			}
+			data = append(data, cell)
 		}
-		data = append(data, cell)
 	}
 	return &CsvFile{
 		Name: filename,

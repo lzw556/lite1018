@@ -2,7 +2,7 @@ export const DYNAMIC_DATA_BOLTELONGATION = {
   data_type: 1073872901,
   fields: [
     { label: '预紧力', value: 'dynamic_preload', unit: 'kN' },
-    { label: '压力', value: 'dynamic_pressure', unit: 'MPa' },
+    { label: '应力', value: 'dynamic_pressure', unit: 'MPa' },
     { label: '长度', value: 'dynamic_length', unit: 'mm' },
     { label: '飞行时间', value: 'dynamic_tof', unit: 'ns' },
     { label: '加速度', value: 'dynamic_acceleration', unit: 'g' }

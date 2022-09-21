@@ -4,7 +4,12 @@ type WSN struct {
 	CommunicationPeriod  uint `json:"communication_period"`
 	CommunicationPeriod2 uint `json:"communication_period_2"`
 	CommunicationOffset  uint `json:"communication_offset"`
+	Tempo                uint `json:"tempo"`
+	CallPeriod           uint `json:"call_period"`
+	GroupInterval        uint `json:"group_interval"`
 	GroupSize            uint `json:"group_size"`
+	GroupSize2           uint `json:"group_size_2"`
+	Mode                 uint `json:"provisioning_mode"`
 }
 
 type Network struct {
@@ -28,18 +33,19 @@ type RemoveDevices struct {
 	DeviceIDs []uint `json:"device_ids"`
 }
 
-type ImportNetwork struct {
-	Wsn     WSN `json:"wsn"`
-	Mode    int `json:"mode"`
-	Devices []struct {
-		Name          string                            `json:"name"`
-		MacAddress    string                            `json:"mac_address"`
-		ParentAddress string                            `json:"parent_address"`
-		TypeID        uint                              `json:"type_id"`
-		Settings      map[string]map[string]interface{} `json:"settings,omitempty"`
-	} `json:"devices"`
+type ImportDevice struct {
+	Name          string                            `json:"name"`
+	MacAddress    string                            `json:"mac_address"`
+	ParentAddress string                            `json:"parent_address"`
+	TypeID        uint                              `json:"type_id"`
+	Settings      map[string]map[string]interface{} `json:"settings,omitempty"`
+}
 
-	ProjectID uint `json:"-"`
+type ImportNetwork struct {
+	Wsn       WSN            `json:"wsn"`
+	Mode      int            `json:"mode"`
+	Devices   []ImportDevice `json:"devices"`
+	ProjectID uint           `json:"-"`
 }
 
 type CreateNetwork struct {

@@ -14,8 +14,8 @@ export function GetResponse<T>(response:AxiosResponse<ResponseResult<T>>) {
     });
 }
 
-export function PostResponse(response:AxiosResponse<ResponseResult<any>>) {
-    return new Promise((resolve, reject) => {
+export function PostResponse<T>(response:AxiosResponse<ResponseResult<T>>) {
+    return new Promise<T>((resolve, reject) => {
         if (response.data.code === 200) {
             message.success("添加成功")
             resolve(response.data.data);

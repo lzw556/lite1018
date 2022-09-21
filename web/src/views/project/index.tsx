@@ -10,29 +10,27 @@ import { DeleteProjectRequest, GenProjectAccessTokenRequest, PagingProjectsReque
 import EditProjectModal from "./editProjectModal";
 import { Project } from "../../types/project";
 import AllocUserDrawer from "./allocUserDrawer";
-import { store } from "../../store";
 import HasPermission from "../../permission";
-import usePermission, { Permission } from "../../permission/permission";
+import usePermission, {Permission} from "../../permission/permission";
+import { Store, useStore } from "../../hooks/store";
+import {store as reduxStore} from "../../store";
 
 const ProjectPage = () => {
     const [visible, setVisible] = useState(false);
     const [allocVisible, setAllocVisible] = useState(false);
     const [dataSource, setDataSource] = useState<PageResult<any>>();
-    const [refreshKey, setRefreshKey] = useState(0);
     const [project, setProject] = useState<Project>();
-    const { hasPermissions } = usePermission();
+    const {hasPermissions} = usePermission();
+    const [store, setStore] = useStore('projectList');
 
-    const fetchProjects = useCallback((current: number, size: number) => {
-        PagingProjectsRequest(current, size).then(setDataSource);
-    }, [refreshKey]);
+    const fetchProjects = (store: Store['firmwareList']) => {
+        const {pagedOptions: {index, size}} = store;
+        PagingProjectsRequest(index, size).then(setDataSource)
+    }
 
     useEffect(() => {
-        fetchProjects(1, 10);
-    }, [fetchProjects]);
-
-    const onRefresh = () => {
-        setRefreshKey(refreshKey + 1);
-    };
+        fetchProjects(store);
+    }, [store]);
 
     const onAllocUser = (record: Project) => {
         setAllocVisible(true);
@@ -46,7 +44,7 @@ const ProjectPage = () => {
 
     const onDelete = (id: number) => {
         DeleteProjectRequest(id).then(() => {
-            store.dispatch({
+            reduxStore.dispatch({
                 type: "SET_PROJECT",
                 payload: 0
             });
@@ -137,21 +135,21 @@ const ProjectPage = () => {
                 emptyText={"项目列表为空"}
                 permissions={[Permission.ProjectEdit, Permission.ProjectDelete, Permission.ProjectAllocUserGet, Permission.ProjectAllocUser]}
                 dataSource={dataSource}
-                onPageChange={fetchProjects}
-                columns={columns} />
+                onPageChange={(index,size) => setStore(prev => ({...prev, pagedOptions: {index, size}}))}
+                columns={columns}/>
         </ShadowCard>
         {
             visible && <EditProjectModal visible={visible}
-                project={project}
-                onSuccess={() => {
-                    setVisible(false);
-                    setProject(undefined);
-                    onRefresh();
-                }}
-                onCancel={() => {
-                    setVisible(false);
-                    setProject(undefined);
-                }} />
+                                         project={project}
+                                         onSuccess={() => {
+                                             setVisible(false);
+                                             setProject(undefined);
+                                             fetchProjects(store);
+                                         }}
+                                         onCancel={() => {
+                                             setVisible(false);
+                                             setProject(undefined);
+                                         }}/>
         }
         {
             allocVisible && project && <AllocUserDrawer project={project}

@@ -23,7 +23,7 @@ const EditBaseInfoModel = (props: any) => {
     };
 
     useEffect(() => {
-        if (device && visible) {
+        if (device && form) {
             if (device.network) setNetwork(device.network.id)
             form.setFieldsValue({
                 name: device.name,
@@ -32,7 +32,7 @@ const EditBaseInfoModel = (props: any) => {
                 parent: device.parent
             });
         }
-    }, [device, visible]);
+    }, [device, form]);
 
     return (
         <Modal
@@ -70,7 +70,7 @@ const EditBaseInfoModel = (props: any) => {
                 {
                     device && (device.parent !== '' && device.parent !== device.macAddress) && <Form.Item label={'设备父节点'} name={'parent'}>
                         <DeviceSelect
-                            filters={{network_id: network ? network : 0 }}
+                            filters={{network_id: network }}
                             placeholder={'请选择设备所属父节点'}
                             dispalyField='macAddress'
                         />

@@ -45,7 +45,7 @@ const DeviceMacAddressSelect:FC<DeviceMacAddressSelectProps> = (props) => {
                     setVisible(true)
                 }}
                 value={bindingDevices.map((item: any) => item.value)}
-                onDeselect={value => {
+                onDeselect={(value: any) => {
                     onRemoveBindingDevice(value)
                 }}/>
         {

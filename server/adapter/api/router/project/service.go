@@ -17,4 +17,8 @@ type Service interface {
 	AllocUsersByID(id uint, req request.AllocUsers) error
 
 	GenProjectAccessToken(id uint) error
+	GetMyProjectExportFile(id uint) (*vo.ProjectExported, error)
+	GetMyProjectExportFileWithFilters(id uint, monitoringPointIDs []uint) (*vo.ProjectExported, error)
+
+	ImportProject(id uint, req request.ProjectImported) error
 }

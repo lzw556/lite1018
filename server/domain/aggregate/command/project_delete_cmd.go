@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/entity"
@@ -12,37 +13,55 @@ import (
 type ProjectDeleteCmd struct {
 	entity.Project
 
-	projectRepo                dependency.ProjectRepository
-	networkRepo                dependency.NetworkRepository
-	deviceRepo                 dependency.DeviceRepository
-	deviceStateRepo            dependency.DeviceStateRepository
-	deviceAlertStateRepo       dependency.DeviceAlertStateRepository
-	alarmRuleRepo              dependency.AlarmRuleRepository
-	alarmRecordRepo            dependency.AlarmRecordRepository
-	alarmRecordAcknowledgeRepo dependency.AlarmRecordAcknowledgeRepository
-	alarmSourceRepo            dependency.AlarmSourceRepository
-	eventRepo                  dependency.EventRepository
-	userProjectRelationRepo    dependency.UserProjectRelationRepository
+	projectRepo                      dependency.ProjectRepository
+	networkRepo                      dependency.NetworkRepository
+	deviceRepo                       dependency.DeviceRepository
+	deviceStateRepo                  dependency.DeviceStateRepository
+	deviceAlertStateRepo             dependency.DeviceAlertStateRepository
+	alarmRuleGroupRepo               dependency.AlarmRuleGroupRepository
+	alarmRuleGroupSourceRepo         dependency.AlarmRuleGroupSourceRepository
+	alarmRuleRepo                    dependency.AlarmRuleRepository
+	alarmRecordRepo                  dependency.AlarmRecordRepository
+	alarmRecordAcknowledgeRepo       dependency.AlarmRecordAcknowledgeRepository
+	alarmSourceRepo                  dependency.AlarmSourceRepository
+	eventRepo                        dependency.EventRepository
+	userProjectRelationRepo          dependency.UserProjectRelationRepository
+	monitoringPointRepo              dependency.MonitoringPointRepository
+	monitoringPointDeviceBindingRepo dependency.MonitoringPointDeviceBindingRepository
+	monitoringPointAlertStateRepo    dependency.MonitoringPointAlertStateRepository
+	assetRepo                        dependency.AssetRepository
 }
 
 func NewProjectDeleteCmd() ProjectDeleteCmd {
 	return ProjectDeleteCmd{
-		projectRepo:                repository.Project{},
-		networkRepo:                repository.Network{},
-		deviceRepo:                 repository.Device{},
-		deviceStateRepo:            repository.DeviceState{},
-		deviceAlertStateRepo:       repository.DeviceAlertState{},
-		alarmRuleRepo:              repository.AlarmRule{},
-		alarmSourceRepo:            repository.AlarmSource{},
-		alarmRecordRepo:            repository.AlarmRecord{},
-		alarmRecordAcknowledgeRepo: repository.AlarmRecordAcknowledge{},
-		eventRepo:                  repository.Event{},
-		userProjectRelationRepo:    repository.UserProjectRelation{},
+		projectRepo:                      repository.Project{},
+		networkRepo:                      repository.Network{},
+		deviceRepo:                       repository.Device{},
+		deviceStateRepo:                  repository.DeviceState{},
+		deviceAlertStateRepo:             repository.DeviceAlertState{},
+		alarmRuleGroupRepo:               repository.AlarmRuleGroup{},
+		alarmRuleGroupSourceRepo:         repository.AlarmRuleGroupSource{},
+		alarmRuleRepo:                    repository.AlarmRule{},
+		alarmSourceRepo:                  repository.AlarmSource{},
+		alarmRecordRepo:                  repository.AlarmRecord{},
+		alarmRecordAcknowledgeRepo:       repository.AlarmRecordAcknowledge{},
+		eventRepo:                        repository.Event{},
+		userProjectRelationRepo:          repository.UserProjectRelation{},
+		monitoringPointRepo:              repository.MonitoringPoint{},
+		monitoringPointDeviceBindingRepo: repository.MonitoringPointDeviceBinding{},
+		monitoringPointAlertStateRepo:    repository.MonitoringPointAlertState{},
+		assetRepo:                        repository.Asset{},
 	}
 }
 
 func (cmd ProjectDeleteCmd) Run() error {
 	return transaction.Execute(context.TODO(), func(txCtx context.Context) error {
+		if err := cmd.removeMonitoringPoints(txCtx); err != nil {
+			return err
+		}
+		if err := cmd.removeAssets(txCtx); err != nil {
+			return err
+		}
 		if err := cmd.removeDevices(txCtx); err != nil {
 			return err
 		}
@@ -59,7 +78,45 @@ func (cmd ProjectDeleteCmd) Run() error {
 	})
 }
 
+func (cmd ProjectDeleteCmd) removeMonitoringPoints(ctx context.Context) error {
+	mps, err := cmd.monitoringPointRepo.FindBySpecs(ctx, spec.ProjectEqSpec(cmd.Project.ID))
+	if err != nil {
+		return err
+	}
+
+	for _, mp := range mps {
+		if err := cmd.monitoringPointDeviceBindingRepo.DeleteBySpecs(ctx, spec.MonitoringPointIDEqSpec(mp.ID)); err != nil {
+			return err
+		}
+
+		if err := cmd.monitoringPointAlertStateRepo.DeleteAll(mp.ID); err != nil {
+			return err
+		}
+	}
+
+	return cmd.monitoringPointRepo.DeleteBySpecs(ctx, spec.ProjectEqSpec(cmd.Project.ID))
+}
+
+func (cmd ProjectDeleteCmd) removeAssets(ctx context.Context) error {
+	return cmd.assetRepo.DeleteBySpecs(ctx, spec.ProjectEqSpec(cmd.Project.ID))
+}
+
 func (cmd ProjectDeleteCmd) removeAlarms(ctx context.Context) error {
+	alarmRuleGroups, err := cmd.alarmRuleGroupRepo.FindBySpecs(ctx, spec.ProjectEqSpec(cmd.Project.ID))
+	if err != nil {
+		return err
+	}
+
+	for _, group := range alarmRuleGroups {
+		if err := cmd.alarmRuleGroupSourceRepo.DeleteBySpecs(ctx, spec.GroupIDEqSpec(group.ID)); err != nil {
+			return err
+		}
+	}
+
+	if err = cmd.alarmRuleGroupRepo.DeleteBySpecs(ctx, spec.ProjectEqSpec(cmd.Project.ID)); err != nil {
+		return err
+	}
+
 	alarmRules, err := cmd.alarmRuleRepo.FindBySpecs(ctx, spec.ProjectEqSpec(cmd.Project.ID))
 	if err != nil {
 		return err

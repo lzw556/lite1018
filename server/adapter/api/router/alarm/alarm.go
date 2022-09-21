@@ -21,10 +21,17 @@ func (r *alarmRouter) initRoutes() {
 		router.NewPostRoute("alarmRules", r.createAlarmRule),
 		router.NewPostRoute("alarmRules/:id/sources", r.addSourcesToAlarmRule),
 		router.NewPostRoute("alarmRecords/:id/acknowledge", r.acknowledgeAlarmRecord),
+		router.NewPostRoute("alarmRuleGroups", r.createAlarmRuleGroup),
+		router.NewPostRoute("alarmRuleGroups/:id/bind", r.alarmRuleGroupBind),
+		router.NewPostRoute("alarmRuleGroups/:id/unbind", r.alarmRuleGroupUnbind),
+		router.NewPostRoute("alarmRuleGroups/import", r.importAlarmRuleGroups),
 
 		// GET
 		router.NewGetRoute("alarmRules", r.findAlarmRules),
 		router.NewGetRoute("alarmRules/:id", r.getAlarmRule),
+		router.NewGetRoute("alarmRuleGroups", r.findAlarmRuleGroups),
+		router.NewGetRoute("alarmRuleGroups/:id", r.getAlarmRuleGroup),
+		router.NewGetRoute("alarmRuleGroups/exportFile", r.getAlarmRuleGroupsFile),
 
 		router.NewGetRoute("alarmRecords", r.findAlarmRecords),
 		router.NewGetRoute("alarmRecords/:id", r.getAlarmRecord),
@@ -35,11 +42,14 @@ func (r *alarmRouter) initRoutes() {
 		//PUT
 		router.NewPutRoute("alarmRules/:id", r.updateAlarmRule),
 		router.NewPutRoute("alarmRules/:id/status/:status", r.updateAlarmRuleStatus),
+		router.NewPutRoute("alarmRuleGroups/:id", r.updateAlarmRuleGroup),
+		router.NewPutRoute("alarmRuleGroups/:id/bindings", r.updateAlarmRuleGroupBindings),
 
 		//DELETE
 		router.NewDeleteRoute("alarmRules/:id", r.deleteAlarmRule),
 		router.NewDeleteRoute("alarmRules/:id/sources", r.removeSourcesFromAlarmRule),
 		router.NewDeleteRoute("alarmRecords/:id", r.deleteAlarmRecord),
+		router.NewDeleteRoute("alarmRuleGroups/:id", r.deleteAlarmRuleGroup),
 	}
 }
 

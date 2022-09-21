@@ -3,6 +3,8 @@ package factory
 import (
 	"context"
 	"errors"
+	"strings"
+
 	"github.com/spf13/cast"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/request"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/response"
@@ -14,22 +16,25 @@ import (
 	spec "github.com/thetasensors/theta-cloud-lite/server/domain/specification"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/errcode"
 	"gorm.io/gorm"
-	"strings"
 )
 
 type Alarm struct {
-	alarmRecordRepo   dependency.AlarmRecordRepository
-	alarmRuleRepo     dependency.AlarmRuleRepository
-	alarmSourceRepo   dependency.AlarmSourceRepository
-	alarmTemplateRepo dependency.AlarmTemplateRepository
+	alarmRecordRepo    dependency.AlarmRecordRepository
+	alarmRuleRepo      dependency.AlarmRuleRepository
+	alarmRuleGroupRepo dependency.AlarmRuleGroupRepository
+	alarmSourceRepo    dependency.AlarmSourceRepository
+	alarmTemplateRepo  dependency.AlarmTemplateRepository
+	projectRepo        dependency.ProjectRepository
 }
 
 func NewAlarm() Alarm {
 	return Alarm{
-		alarmRecordRepo:   repository.AlarmRecord{},
-		alarmRuleRepo:     repository.AlarmRule{},
-		alarmSourceRepo:   repository.AlarmSource{},
-		alarmTemplateRepo: repository.AlarmTemplate{},
+		alarmRecordRepo:    repository.AlarmRecord{},
+		alarmRuleRepo:      repository.AlarmRule{},
+		alarmSourceRepo:    repository.AlarmSource{},
+		alarmTemplateRepo:  repository.AlarmTemplate{},
+		alarmRuleGroupRepo: repository.AlarmRuleGroup{},
+		projectRepo:        repository.Project{},
 	}
 }
 
@@ -160,5 +165,118 @@ func (factory Alarm) NewAlarmRecordRemoveCmd(id uint) (*command.AlarmRecordRemov
 	}
 	cmd := command.NewAlarmRecordRemoveCmd()
 	cmd.AlarmRecord = e
+	return &cmd, nil
+}
+
+func (factory Alarm) NewAlarmRuleGroupCreateCmd(req request.AlarmRuleGroup) (*command.AlarmRuleGroupCreateCmd, error) {
+	ctx := context.TODO()
+	e, err := factory.alarmRuleGroupRepo.GetBySpecs(ctx, spec.ProjectEqSpec(req.ProjectID), spec.NameEqSpec(req.Name))
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, err
+	}
+	if e.ID != 0 {
+		return nil, response.BusinessErr(errcode.AlarmRuleGroupNameExists, "")
+	}
+	e.Name = req.Name
+	e.Description = req.Description
+	e.Type = req.Type
+	e.Category = req.Category
+	e.ProjectID = req.ProjectID
+	e.Status = 1
+
+	cmd := command.NewAlarmRuleGroupCreateCmd()
+
+	cmd.RuleCreateCmds = make([]*command.AlarmRuleCreateCmd, 0)
+	cmd.AlarmRuleGroup = e
+
+	for _, r := range req.Rules {
+		r.SourceType = req.Type
+		r.Category = uint8(req.Category)
+		r.ProjectID = req.ProjectID
+
+		e, err := factory.alarmRuleRepo.GetBySpecs(ctx, spec.NameEqSpec(r.Name))
+		if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, err
+		}
+		if e.ID != 0 {
+			return nil, response.BusinessErr(errcode.AlarmRuleNameExists, "")
+		}
+
+		c, err := factory.NewAlarmRuleCreateCmd(r)
+		if err != nil {
+			return &cmd, err
+		}
+		cmd.RuleCreateCmds = append(cmd.RuleCreateCmds, c)
+	}
+
+	return &cmd, nil
+}
+
+func (factory Alarm) NewAlarmRuleGroupUpdateCmd(id uint) (*command.AlarmRuleGroupUpdateCmd, error) {
+	ctx := context.TODO()
+	e, err := factory.alarmRuleGroupRepo.Get(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	cmd := command.NewAlarmRuleGroupUpdateCmd()
+	cmd.AlarmRuleGroup = e
+
+	return &cmd, nil
+}
+
+func (factory Alarm) NewAlarmRuleGroupRemoveCmd(id uint) (*command.AlarmRuleGroupRemoveCmd, error) {
+	e, err := factory.alarmRuleGroupRepo.Get(context.TODO(), id)
+	if err != nil {
+		return nil, response.BusinessErr(errcode.AlarmRuleGroupNotFoundError, "")
+	}
+	cmd := command.NewAlarmRuleGroupRemoveCmd()
+	cmd.AlarmRuleGroup = e
+
+	return &cmd, nil
+}
+
+func (factory Alarm) NewAlarmRuleGroupQuery(filters request.Filters) (*query.AlarmRuleGroupQuery, error) {
+	q := query.NewAlarmRuleGroupQuery()
+	for name, v := range filters {
+		switch name {
+		case "project_id":
+			q.Specs = append(q.Specs, spec.ProjectEqSpec(cast.ToUint(v)))
+		case "name":
+			q.Specs = append(q.Specs, spec.NameEqSpec(cast.ToString(v)))
+		case "monitoring_point_ids":
+			values := cast.ToString(v)
+			ids := strings.Split(values, ",")
+			for _, mpID := range ids {
+				q.MonitoringPointIDs = append(q.MonitoringPointIDs, cast.ToUint(mpID))
+			}
+		}
+	}
+	return &q, nil
+}
+
+func (factory Alarm) NewAlarmRuleGroupBindingCmd(id uint) (*command.AlarmRuleGroupBindCmd, error) {
+	e, err := factory.alarmRuleGroupRepo.Get(context.TODO(), id)
+	if err != nil {
+		return nil, response.BusinessErr(errcode.AlarmRuleGroupNotFoundError, "")
+	}
+
+	cmd := command.NewAlarmRuleGroupBindCmd()
+	cmd.AlarmRuleGroup = e
+	return &cmd, nil
+}
+
+func (factory Alarm) NewAlarmRuleGroupExportCmd(id uint) (*command.AlarmRuleGroupExportCmd, error) {
+	e, err := factory.projectRepo.Get(context.TODO(), id)
+	if err != nil {
+		return nil, response.BusinessErr(errcode.ProjectNotFoundError, "")
+	}
+	cmd := command.NewAlarmRuleGroupExportCmd()
+	cmd.Project = e
+	return &cmd, nil
+}
+
+func (factory Alarm) NewAlarmRuleGroupImportCmd() (*command.AlarmRuleGroupImportCmd, error) {
+	cmd := command.NewAlarmRuleGroupImportCmd()
 	return &cmd, nil
 }
