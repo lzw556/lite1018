@@ -1,11 +1,11 @@
 import request from "../utils/request";
-import {DeleteResponse, GetResponse, PostResponse, PutResponse} from "../utils/response";
-import {PageResult} from "../types/page";
-import {Project} from "../types/project";
-import {AllocUser} from "../types/alloc_user";
+import { DeleteResponse, GetResponse, PostResponse, PutResponse } from "../utils/response";
+import { PageResult } from "../types/page";
+import { Project } from "../types/project";
+import { AllocUser } from "../types/alloc_user";
 
 export function PagingProjectsRequest(page: number, size: number) {
-    return request.get<PageResult<Project[]>>('/projects', {page, size}).then(GetResponse)
+    return request.get<PageResult<Project[]>>('/projects', { page, size }).then(GetResponse)
 }
 
 export function GetProjectsRequest() {
@@ -32,7 +32,7 @@ export function GetMyProjectsRequest() {
     return request.get<Project[]>('/my/projects').then(GetResponse)
 }
 
-export function GetMyProjectRequest(id: number){
+export function GetMyProjectRequest(id: number) {
     return request.get<Project>(`/my/projects/${id}`).then(GetResponse)
 }
 
@@ -42,4 +42,8 @@ export function DeleteProjectRequest(id: number) {
 
 export function GetProjectRequest(id: number) {
     return request.get<Project>(`/projects/${id}`).then(GetResponse)
+}
+
+export function GenProjectAccessTokenRequest(id: number) {
+    return request.post<any>(`/projects/${id}/token`, null).then(PostResponse)
 }

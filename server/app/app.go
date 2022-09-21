@@ -4,6 +4,13 @@ import (
 	"context"
 	"embed"
 	"fmt"
+	"net/http"
+	"os"
+	"os/exec"
+	"os/signal"
+	"runtime"
+	"syscall"
+
 	"github.com/gin-gonic/gin"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api"
@@ -13,6 +20,7 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/firmware"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/menu"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/network"
+	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/openapi"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/permission"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/project"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/property"
@@ -32,12 +40,6 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/utils"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/xlog"
 	"github.com/thetasensors/theta-cloud-lite/server/worker"
-	"net/http"
-	"os"
-	"os/exec"
-	"os/signal"
-	"runtime"
-	"syscall"
 )
 
 func Start(mode string, dist embed.FS) {
@@ -154,6 +156,9 @@ func runApiServer(mode string, dist embed.FS) {
 		network.NewRouter(service.NewNetwork()),
 		system.NewRouter(service.NewSystem()),
 		statistic.NewRouter(service.NewStatistic()),
+	)
+	adapter.Api.RegisterOpenApis(
+		openapi.NewRouter(service.NewOpenApi()),
 	)
 
 	go func() {

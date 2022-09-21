@@ -76,6 +76,11 @@ const (
 	ProjectNotSelectedError
 )
 
+const (
+	OpenApiProjectNotFoundError BusinessErrorCode = iota + 1000
+	OpenApiDeviceNotFoundError
+)
+
 var businessErrorMap = map[BusinessErrorCode]string{
 	UnknownBusinessError:                "未知错误",
 	SystemNotReadyError:                 "系统未初始化完成",

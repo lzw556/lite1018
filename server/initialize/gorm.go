@@ -25,7 +25,7 @@ func InitTables(db *gorm.DB) error {
 		&entity.DeviceLinkStatus{},
 	}
 
-	//db.Migrator().DropTable(&entity.Menu{}, &entity.RoleMenuRelation{})
+	// db.Migrator().DropTable(&entity.Menu{}, &entity.RoleMenuRelation{})
 	if err := db.AutoMigrate(tables...); err != nil {
 		return err
 	}

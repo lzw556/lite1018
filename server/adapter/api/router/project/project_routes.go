@@ -15,6 +15,11 @@ func (r projectRouter) create(ctx *gin.Context) (interface{}, error) {
 	return nil, r.service.CreateProject(req)
 }
 
+func (r projectRouter) genAccessToken(ctx *gin.Context) (interface{}, error) {
+	id := cast.ToUint(ctx.Param("id"))
+	return nil, r.service.GenProjectAccessToken(id)
+}
+
 func (r projectRouter) find(ctx *gin.Context) (interface{}, error) {
 	filters := request.NewFilters(ctx)
 	if _, ok := ctx.GetQuery("page"); ok {

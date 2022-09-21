@@ -1,18 +1,18 @@
-import {Content} from "antd/es/layout/layout";
+import { Content } from "antd/es/layout/layout";
 import MyBreadcrumb from "../../components/myBreadcrumb";
 import ShadowCard from "../../components/shadowCard";
 import TableLayout from "../layout/TableLayout";
-import {Button, Popconfirm, Space} from "antd";
-import {DeleteOutlined, EditOutlined, PlusOutlined} from "@ant-design/icons";
-import {useCallback, useEffect, useState} from "react";
-import {PageResult} from "../../types/page";
-import {DeleteProjectRequest, PagingProjectsRequest} from "../../apis/project";
+import { Button, Card, Modal, Popconfirm, Space, Typography } from "antd";
+import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
+import { useCallback, useEffect, useState } from "react";
+import { PageResult } from "../../types/page";
+import { DeleteProjectRequest, GenProjectAccessTokenRequest, PagingProjectsRequest } from "../../apis/project";
 import EditProjectModal from "./editProjectModal";
-import {Project} from "../../types/project";
+import { Project } from "../../types/project";
 import AllocUserDrawer from "./allocUserDrawer";
-import {store} from "../../store";
+import { store } from "../../store";
 import HasPermission from "../../permission";
-import usePermission, {Permission} from "../../permission/permission";
+import usePermission, { Permission } from "../../permission/permission";
 
 const ProjectPage = () => {
     const [visible, setVisible] = useState(false);
@@ -20,7 +20,7 @@ const ProjectPage = () => {
     const [dataSource, setDataSource] = useState<PageResult<any>>();
     const [refreshKey, setRefreshKey] = useState(0);
     const [project, setProject] = useState<Project>();
-    const {hasPermissions} = usePermission();
+    const { hasPermissions } = usePermission();
 
     const fetchProjects = useCallback((current: number, size: number) => {
         PagingProjectsRequest(current, size).then(setDataSource);
@@ -54,11 +54,47 @@ const ProjectPage = () => {
         });
     };
 
+    const onGenAccessToken = (id: number) => {
+        GenProjectAccessTokenRequest(id).then(_ => {
+            onRefresh()
+        })
+    }
+
+    const onViewAccessToken = (token: string) => {
+        Modal.info({
+            title: '访问凭证',
+            content: <Card size={"small"} style={{ backgroundColor: "rgb(37, 43, 58)" }}>
+                <Typography.Text style={{ color: "#fff" }} copyable={{ text: token }}>{token}</Typography.Text>
+            </Card>,
+            icon: null,
+            okText: "确定"
+        })
+    }
+
     const columns = [
         {
             title: '项目名称',
             dataIndex: 'name',
             key: 'name',
+            width: '10%',
+        },
+        {
+            title: '访问凭证',
+            dataIndex: 'token',
+            key: 'token',
+            width: '20%',
+            render: (token: string, record: Project) => {
+                if (token) {
+                    return <Button type={"link"} onClick={() => {
+                        onViewAccessToken(token)
+                    }}>
+                        点击查看
+                    </Button>
+                }
+                return <Button type={"link"} onClick={() => {
+                    onGenAccessToken(record.id)
+                }}>点击生成访问凭证</Button>
+            }
         },
         {
             title: "描述",
@@ -68,7 +104,7 @@ const ProjectPage = () => {
         {
             title: '操作',
             key: 'action',
-            width: "20%",
+            width: '20%',
             render: (_: any, record: any) => {
                 return <Space>
                     {
@@ -76,11 +112,11 @@ const ProjectPage = () => {
                         <Button type={"link"} size={"small"} onClick={() => onAllocUser(record)}>分配用户</Button>
                     }
                     <HasPermission value={Permission.ProjectEdit}>
-                        <Button type={"text"} size={"small"} onClick={() => onEdit(record)}><EditOutlined/></Button>
+                        <Button type={"text"} size={"small"} onClick={() => onEdit(record)}><EditOutlined /></Button>
                     </HasPermission>
                     <HasPermission value={Permission.ProjectDelete}>
                         <Popconfirm title={"确定要删除该项目吗?"} onConfirm={() => onDelete(record.id)}>
-                            <Button type={"text"} size={"small"} danger><DeleteOutlined/></Button>
+                            <Button type={"text"} size={"small"} danger><DeleteOutlined /></Button>
                         </Popconfirm>
                     </HasPermission>
                 </Space>
@@ -92,7 +128,7 @@ const ProjectPage = () => {
         <MyBreadcrumb>
             <HasPermission value={Permission.ProjectAdd}>
                 <Space>
-                    <Button type={"primary"} onClick={() => setVisible(true)}>添加项目<PlusOutlined/></Button>
+                    <Button type={"primary"} onClick={() => setVisible(true)}>添加项目<PlusOutlined /></Button>
                 </Space>
             </HasPermission>
         </MyBreadcrumb>
@@ -102,32 +138,32 @@ const ProjectPage = () => {
                 permissions={[Permission.ProjectEdit, Permission.ProjectDelete, Permission.ProjectAllocUserGet, Permission.ProjectAllocUser]}
                 dataSource={dataSource}
                 onPageChange={fetchProjects}
-                columns={columns}/>
+                columns={columns} />
         </ShadowCard>
         {
             visible && <EditProjectModal visible={visible}
-                                         project={project}
-                                         onSuccess={() => {
-                                             setVisible(false);
-                                             setProject(undefined);
-                                             onRefresh();
-                                         }}
-                                         onCancel={() => {
-                                             setVisible(false);
-                                             setProject(undefined);
-                                         }}/>
+                project={project}
+                onSuccess={() => {
+                    setVisible(false);
+                    setProject(undefined);
+                    onRefresh();
+                }}
+                onCancel={() => {
+                    setVisible(false);
+                    setProject(undefined);
+                }} />
         }
         {
             allocVisible && project && <AllocUserDrawer project={project}
-                                                        visible={allocVisible}
-                                                        onSuccess={() => {
-                                                            setAllocVisible(false);
-                                                            setProject(undefined);
-                                                        }}
-                                                        onClose={() => {
-                                                            setAllocVisible(false);
-                                                            setProject(undefined);
-                                                        }}/>
+                visible={allocVisible}
+                onSuccess={() => {
+                    setAllocVisible(false);
+                    setProject(undefined);
+                }}
+                onClose={() => {
+                    setAllocVisible(false);
+                    setProject(undefined);
+                }} />
         }
     </Content>
 }

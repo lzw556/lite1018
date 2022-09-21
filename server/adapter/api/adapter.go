@@ -3,6 +3,8 @@ package api
 import (
 	"context"
 	"embed"
+	"net/http"
+
 	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/gzip"
 	"github.com/gin-contrib/static"
@@ -14,12 +16,12 @@ import (
 	"github.com/thetasensors/theta-cloud-lite/server/domain/vo"
 	"github.com/thetasensors/theta-cloud-lite/server/pkg/xlog"
 	"golang.org/x/sync/errgroup"
-	"net/http"
 )
 
 type Adapter struct {
 	engine      *gin.Engine
 	routers     []router.Router
+	openApis    []router.Router
 	middlewares []middleware.Middleware
 	server      *http.Server
 }
@@ -36,6 +38,10 @@ func NewAdapter() *Adapter {
 
 func (a *Adapter) RegisterRouters(routers ...router.Router) {
 	a.routers = append(a.routers, routers...)
+}
+
+func (a *Adapter) RegisterOpenApis(routers ...router.Router) {
+	a.openApis = append(a.openApis, routers...)
 }
 
 func (a *Adapter) StaticFS(dist embed.FS) {
@@ -58,6 +64,20 @@ func (a *Adapter) Run() error {
 		AllowAllOrigins: true,
 	}))
 	a.engine.Static("/res", "/resources")
+
+	a.addOpenApiRouter()
+
+	a.addInternalApiRouter()
+
+	a.server.Handler = a.engine
+	var eg errgroup.Group
+	eg.Go(func() error {
+		return a.server.ListenAndServe()
+	})
+	return eg.Wait()
+}
+
+func (a *Adapter) addInternalApiRouter() {
 	group := a.engine.Group("api")
 	for _, m := range a.middlewares {
 		group.Use(m.WrapHandler())
@@ -68,12 +88,16 @@ func (a *Adapter) Run() error {
 			group.Handle(route.Method(), route.Path(), a.errorWrapper(route.Handler()))
 		}
 	}
-	a.server.Handler = a.engine
-	var eg errgroup.Group
-	eg.Go(func() error {
-		return a.server.ListenAndServe()
-	})
-	return eg.Wait()
+}
+
+func (a *Adapter) addOpenApiRouter() {
+	group := a.engine.Group("openapi")
+	group.Use(middleware.NewOpenApi().WrapHandler())
+	for _, r := range a.openApis {
+		for _, route := range r.Routes() {
+			group.Handle(route.Method(), route.Path(), a.errorWrapper(route.Handler()))
+		}
+	}
 }
 
 func (a *Adapter) Close() {
@@ -91,6 +115,12 @@ func (a *Adapter) errorWrapper(handler middleware.ErrorWrapperHandler) gin.Handl
 			response.BadRequest(ctx, "无效的参数", err)
 		case response.BusinessError:
 			response.SuccessWithBusinessError(ctx, err)
+		case response.OpenApiError:
+			if err.Code > 1000 {
+				ctx.JSON(http.StatusOK, err)
+				return
+			}
+			ctx.JSON(err.Code, err)
 		default:
 			if err != nil {
 				response.SuccessWithBusinessError(ctx, response.UnknownBusinessErr(err))

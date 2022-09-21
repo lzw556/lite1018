@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"errors"
+
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/request"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/response"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/router/project"
@@ -98,4 +99,12 @@ func (s Project) DeleteProjectByID(id uint) error {
 		return err
 	}
 	return cmd.Run()
+}
+
+func (s Project) GenProjectAccessToken(id uint) error {
+	cmd, err := s.factory.NewProjectUpdateCmd(id)
+	if err != nil {
+		return err
+	}
+	return cmd.GenAccessToken()
 }
