@@ -11,7 +11,7 @@ var eventContent = map[int32]map[int]string{
 		4: "设备NFC重启",
 	},
 
-	entity.EventCodeUpgrade: {
+	entity.EventTypeDeviceUpgrade: {
 		0:   "设备升级成功",
 		1:   "设备升级取消",
 		-1:  "设备升级失败",
@@ -34,7 +34,7 @@ var eventContent = map[int32]map[int]string{
 		-19: "设备升级失败, 固件型号错误",
 		-20: "设备升级失败, 固件CRC错误",
 	},
-  
+
 	entity.EventTypeDeviceStatus: {
 		0: "设备上线",
 		1: "设备丢失",
@@ -42,7 +42,7 @@ var eventContent = map[int32]map[int]string{
 		3: "设备丢失状态下重连失败",
 		4: "设备离线状态下重连失败",
 	},
-  
+
 	entity.EventTypeDataQcquisition: {
 		33619969:   "温度传感器通讯错误",
 		33619970:   "温度传感器温度获取失败",

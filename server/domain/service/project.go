@@ -107,7 +107,8 @@ func (s Project) GenProjectAccessToken(id uint) error {
 		return err
 	}
 	return cmd.GenAccessToken()
-  
+}
+
 func (s Project) GetMyProjectExportFile(id uint) (*vo.ProjectExported, error) {
 	cmd, err := s.factory.NewProjectExportCmd(id)
 	if err != nil {
