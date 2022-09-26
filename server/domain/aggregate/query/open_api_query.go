@@ -2,8 +2,11 @@ package query
 
 import (
 	"context"
+	"encoding/json"
 	"time"
 
+	"github.com/spf13/cast"
+	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/request"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/response"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/repository"
 	"github.com/thetasensors/theta-cloud-lite/server/domain/dependency"
@@ -134,4 +137,76 @@ func (query OpenApiQuery) FindDeviceData(mac, property string, from, to int64) (
 		}
 	}
 	return result, nil
+}
+
+func (query OpenApiQuery) FindAssets() ([]openapivo.Asset, error) {
+	assetQuery := NewAssetQuery()
+	assetQuery.Specs = []spec.Specification{spec.ProjectEqSpec(query.Project.ID)}
+
+	assets, err := assetQuery.List()
+	if err != nil {
+		return nil, err
+	}
+
+	var result []openapivo.Asset
+	str, _ := json.Marshal(assets)
+	json.Unmarshal(str, &result)
+
+	return result, nil
+}
+
+func (query OpenApiQuery) GetAsset(mpID uint) (*openapivo.Asset, error) {
+	assetQuery := NewAssetQuery()
+	assetQuery.Specs = []spec.Specification{spec.ProjectEqSpec(query.Project.ID)}
+
+	asset, err := assetQuery.Get(mpID)
+	if err != nil {
+		return nil, err
+	}
+
+	var result openapivo.Asset
+	str, _ := json.Marshal(asset)
+	json.Unmarshal(str, &result)
+
+	return &result, nil
+}
+
+func (query OpenApiQuery) GetMonitoringPoints(filters request.Filters) ([]openapivo.MonitoringPoint, error) {
+	mpQuery := NewMonitoringPointQuery()
+	mpQuery.Specs = []spec.Specification{spec.ProjectEqSpec(query.Project.ID)}
+	for name, v := range filters {
+		switch name {
+		case "type":
+			mpQuery.Specs = append(mpQuery.Specs, spec.TypeEqSpec(cast.ToUint(v)))
+		case "asset_id":
+			mpQuery.Specs = append(mpQuery.Specs, spec.AssetEqSpec(cast.ToUint(v)))
+		}
+	}
+
+	mps, err := mpQuery.List()
+	if err != nil {
+		return nil, err
+	}
+
+	var result []openapivo.MonitoringPoint
+	str, _ := json.Marshal(mps)
+	json.Unmarshal(str, &result)
+
+	return result, nil
+}
+
+func (query OpenApiQuery) GetMonitoringPoint(mpID uint) (*openapivo.MonitoringPoint, error) {
+	mpQuery := NewMonitoringPointQuery()
+	mpQuery.Specs = []spec.Specification{spec.ProjectEqSpec(query.Project.ID)}
+
+	mp, err := mpQuery.Get(mpID)
+	if err != nil {
+		return nil, err
+	}
+
+	var result openapivo.MonitoringPoint
+	str, _ := json.Marshal(mp)
+	json.Unmarshal(str, &result)
+
+	return &result, nil
 }

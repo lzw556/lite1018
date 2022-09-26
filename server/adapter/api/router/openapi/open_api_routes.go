@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/cast"
+	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/request"
 	"github.com/thetasensors/theta-cloud-lite/server/adapter/api/response"
 )
 
@@ -32,4 +33,27 @@ func (r openApiRouter) findDeviceDataByMac(ctx *gin.Context) (interface{}, error
 	}
 	property := ctx.Query("property")
 	return r.service.FindDeviceDataByMac(context.Background(), projectID, mac, property, from, to)
+}
+
+func (r openApiRouter) findAssets(ctx *gin.Context) (interface{}, error) {
+	projectID := cast.ToUint(ctx.MustGet("project_id"))
+	return r.service.FindAssetsByProjectID(context.Background(), projectID)
+}
+
+func (r openApiRouter) getAsset(ctx *gin.Context) (interface{}, error) {
+	projectID := cast.ToUint(ctx.MustGet("project_id"))
+	id := ctx.Param("id")
+	return r.service.GetAsset(context.Background(), cast.ToUint(id), projectID)
+}
+
+func (r openApiRouter) findMonitoringPoints(ctx *gin.Context) (interface{}, error) {
+	projectID := cast.ToUint(ctx.MustGet("project_id"))
+	filters := request.NewFilters(ctx)
+	return r.service.FindMonitoringPointsByProjectID(context.Background(), projectID, filters)
+}
+
+func (r openApiRouter) getMonitoringPoint(ctx *gin.Context) (interface{}, error) {
+	projectID := cast.ToUint(ctx.MustGet("project_id"))
+	id := ctx.Param("id")
+	return r.service.GetMonitoringPoint(context.Background(), cast.ToUint(id), projectID)
 }
