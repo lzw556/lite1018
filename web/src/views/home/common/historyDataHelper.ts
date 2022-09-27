@@ -174,7 +174,8 @@ export function generateChartOptionsOfHistoryData(
     return {
       type: 'line',
       name,
-      data: _data
+      data: _data,
+      showSymbol: false
     };
   });
 
@@ -191,9 +192,27 @@ export function generateChartOptionsOfHistoryData(
       valueFormatter: (value: any) => `${getDisplayValue(value, property?.unit)}`
     },
     xAxis: { type: 'time' },
-    yAxis: { type: 'value' },
+    yAxis:
+      measurementType === MeasurementTypes.preload.id
+        ? { type: 'value' }
+        : {
+            type: 'value',
+            ...calculateRangeOfAngle(series.map(({ data }) => data.map((item) => item[1])))
+          },
     series
   };
+}
+
+function calculateRangeOfAngle(seriesData: number[][]) {
+  let max = 15;
+  let min = -5;
+  seriesData.forEach((series) => {
+    const maxSeries = Math.max(...series);
+    const minSeries = Math.min(...series);
+    if (maxSeries > max) max = maxSeries;
+    if (minSeries < min) min = minSeries;
+  });
+  return { max, min };
 }
 
 function generateOuter(measurements: MeasurementRow[], isBig: boolean = false) {
