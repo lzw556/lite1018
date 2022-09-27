@@ -210,3 +210,19 @@ func (query OpenApiQuery) GetMonitoringPoint(mpID uint) (*openapivo.MonitoringPo
 
 	return &result, nil
 }
+
+func (query OpenApiQuery) FindAlarmRecords(page int, size int, from int64, to int64) ([]openapivo.AlarmRecord, int64, error) {
+	arQuery := NewAlarmRecordQuery()
+	arQuery.Specs = []spec.Specification{spec.ProjectEqSpec(query.Project.ID)}
+
+	records, total, err := arQuery.Paging(page, size, from, to)
+	if err != nil {
+		return
+	}
+
+	var result []openapivo.AlarmRecord
+	str, _ = json.Marshal(recrods)
+	json.Unmarshal(str, &result)
+
+	return result, total, nil
+}

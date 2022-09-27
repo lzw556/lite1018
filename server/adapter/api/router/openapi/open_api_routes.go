@@ -37,23 +37,37 @@ func (r openApiRouter) findDeviceDataByMac(ctx *gin.Context) (interface{}, error
 
 func (r openApiRouter) findAssets(ctx *gin.Context) (interface{}, error) {
 	projectID := cast.ToUint(ctx.MustGet("project_id"))
-	return r.service.FindAssetsByProjectID(context.Background(), projectID)
+	return r.service.FindAssets(context.Background(), projectID)
 }
 
 func (r openApiRouter) getAsset(ctx *gin.Context) (interface{}, error) {
 	projectID := cast.ToUint(ctx.MustGet("project_id"))
 	id := ctx.Param("id")
-	return r.service.GetAsset(context.Background(), cast.ToUint(id), projectID)
+	return r.service.GetAsset(context.Background(), projectID, cast.ToUint(id))
 }
 
 func (r openApiRouter) findMonitoringPoints(ctx *gin.Context) (interface{}, error) {
 	projectID := cast.ToUint(ctx.MustGet("project_id"))
 	filters := request.NewFilters(ctx)
-	return r.service.FindMonitoringPointsByProjectID(context.Background(), projectID, filters)
+	return r.service.FindMonitoringPoints(context.Background(), projectID, filters)
 }
 
 func (r openApiRouter) getMonitoringPoint(ctx *gin.Context) (interface{}, error) {
 	projectID := cast.ToUint(ctx.MustGet("project_id"))
 	id := ctx.Param("id")
-	return r.service.GetMonitoringPoint(context.Background(), cast.ToUint(id), projectID)
+	return r.service.GetMonitoringPoint(context.Background(), projectID, cast.ToUint(id))
+}
+
+func (r openApiRouter) findAlarmRecords(ctx *gin.Context) (interface{}, error) {
+	projectID := cast.ToUint(ctx.MustGet("project_id"))
+	page := cast.ToInt(ctx.Query("page"))
+	size := cast.ToInt(ctx.Query("size"))
+	from := cast.ToInt64(ctx.Query("from"))
+	to := cast.ToInt64(ctx.Query("to"))
+	result, total, err := r.service.FindAlarmRecrods(context.Background(), projectID, page, size, from, to)
+	if err != nil {
+		return nil, err
+	}
+
+	return response.NewPageResult(page, size, total, result), nil
 }

@@ -43,7 +43,7 @@ func (s *OpenApi) FindDeviceDataByMac(ctx context.Context, projectID uint, mac s
 	return query.FindDeviceData(mac, property, from, to)
 }
 
-func (s *OpenApi) FindAssetsByProjectID(ctx context.Context, projectID uint) ([]openapivo.Asset, error) {
+func (s *OpenApi) FindAssets(ctx context.Context, projectID uint) ([]openapivo.Asset, error) {
 	query, err := s.factory.NewOpenApiQuery(projectID)
 	if err != nil {
 		return nil, err
@@ -61,7 +61,7 @@ func (s *OpenApi) GetAsset(ctx context.Context, id uint, projectID uint) (*opena
 	return query.GetAsset(id)
 }
 
-func (s *OpenApi) FindMonitoringPointsByProjectID(ctx context.Context, projectID uint, filters request.Filters) ([]openapivo.MonitoringPoint, error) {
+func (s *OpenApi) FindMonitoringPoints(ctx context.Context, projectID uint, filters request.Filters) ([]openapivo.MonitoringPoint, error) {
 	query, err := s.factory.NewOpenApiQuery(projectID)
 	if err != nil {
 		return nil, err
@@ -77,4 +77,13 @@ func (s *OpenApi) GetMonitoringPoint(ctx context.Context, id uint, projectID uin
 	}
 
 	return query.GetMonitoringPoint(id)
+}
+
+func (s *OpenApi) FindAlarmRecords(ctx context.Context, projectID uint, page int, size int, from int64, to int64) ([]openapivo.AlarmRecord, int64, error) {
+	query, err := s.factory.NewOpenApiQuery(projectID)
+	if err != nil {
+		return nil, err
+	}
+
+	return query.FindAlarmRecords(page, size, from, to)
 }

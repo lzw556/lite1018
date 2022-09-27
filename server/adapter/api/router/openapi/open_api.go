@@ -24,6 +24,7 @@ func (r *openApiRouter) initRoutes() {
 		router.NewGetRoute("v1/assets/:id", r.getAsset),
 		router.NewGetRoute("v1/monitoringPoints", r.findMonitoringPoints),
 		router.NewGetRoute("v1/monitoringPoints/:id", r.getMonitoringPoint),
+		router.NewGetRoute("v1/alarmRecords", r.findAlarmRecords),
 	}
 }
 
