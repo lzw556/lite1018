@@ -176,7 +176,7 @@ func (query OpenApiQuery) GetAsset(mpID uint) (*openapivo.Asset, error) {
 	return &result, nil
 }
 
-func (query OpenApiQuery) GetMonitoringPoints(filters request.Filters) ([]openapivo.MonitoringPoint, error) {
+func (query OpenApiQuery) FindMonitoringPoints(filters request.Filters) ([]openapivo.MonitoringPoint, error) {
 	mpQuery := NewMonitoringPointQuery()
 	mpQuery.Specs = []spec.Specification{spec.ProjectEqSpec(query.Project.ID)}
 	for name, v := range filters {
@@ -248,6 +248,38 @@ func (query OpenApiQuery) FindMonitoringPointData(mpID uint, property string, fr
 		}
 	}
 	return result, nil
+}
+
+func (query OpenApiQuery) FindAlarmRuleGroups() ([]openapivo.AlarmRuleGroup, error) {
+	agQuery := NewAlarmRuleGroupQuery()
+	agQuery.Specs = []spec.Specification{spec.ProjectEqSpec(query.Project.ID)}
+
+	groups, err := agQuery.List()
+	if err != nil {
+		return nil, err
+	}
+
+	var result []openapivo.AlarmRuleGroup
+	str, _ := json.Marshal(groups)
+	json.Unmarshal(str, &result)
+
+	return result, nil
+}
+
+func (query OpenApiQuery) GetAlarmRuleGroup(gID uint) (*openapivo.AlarmRuleGroup, error) {
+	agQuery := NewAlarmRuleGroupQuery()
+	agQuery.Specs = []spec.Specification{spec.ProjectEqSpec(query.Project.ID)}
+
+	group, err := agQuery.Get(gID)
+	if err != nil {
+		return nil, err
+	}
+
+	var result openapivo.AlarmRuleGroup
+	str, _ := json.Marshal(group)
+	json.Unmarshal(str, &result)
+
+	return &result, nil
 }
 
 func (query OpenApiQuery) FindAlarmRecords(page int, size int, from int64, to int64) ([]openapivo.AlarmRecord, int64, error) {

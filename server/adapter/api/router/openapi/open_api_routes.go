@@ -73,6 +73,17 @@ func (r openApiRouter) findMonitoringPointData(ctx *gin.Context) (interface{}, e
 	return r.service.FindMonitoringPointData(context.Background(), projectID, cast.ToUint(id), property, from, to)
 }
 
+func (r openApiRouter) findAlarmRuleGroups(ctx *gin.Context) (interface{}, error) {
+	projectID := cast.ToUint(ctx.MustGet("project_id"))
+	return r.service.FindAlarmRuleGroups(context.Background(), projectID)
+}
+
+func (r openApiRouter) getAlarmRuleGroup(ctx *gin.Context) (interface{}, error) {
+	projectID := cast.ToUint(ctx.MustGet("project_id"))
+	id := ctx.Param("id")
+	return r.service.GetAlarmRuleGroup(context.Background(), projectID, cast.ToUint(id))
+}
+
 func (r openApiRouter) findAlarmRecords(ctx *gin.Context) (interface{}, error) {
 	projectID := cast.ToUint(ctx.MustGet("project_id"))
 	page := cast.ToInt(ctx.Query("page"))

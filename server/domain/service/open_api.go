@@ -67,7 +67,7 @@ func (s *OpenApi) FindMonitoringPoints(ctx context.Context, projectID uint, filt
 		return nil, err
 	}
 
-	return query.GetMonitoringPoints(filters)
+	return query.FindMonitoringPoints(filters)
 }
 
 func (s *OpenApi) GetMonitoringPoint(ctx context.Context, id uint, projectID uint) (*openapivo.MonitoringPoint, error) {
@@ -85,6 +85,24 @@ func (s *OpenApi) FindMonitoringPointData(ctx context.Context, projectID uint, i
 		return nil, err
 	}
 	return query.FindMonitoringPointData(id, property, from, to)
+}
+
+func (s *OpenApi) FindAlarmRuleGroups(ctx context.Context, projectID uint) ([]openapivo.AlarmRuleGroup, error) {
+	query, err := s.factory.NewOpenApiQuery(projectID)
+	if err != nil {
+		return nil, err
+	}
+
+	return query.FindAlarmRuleGroups()
+}
+
+func (s *OpenApi) GetAlarmRuleGroup(ctx context.Context, id uint, projectID uint) (*openapivo.AlarmRuleGroup, error) {
+	query, err := s.factory.NewOpenApiQuery(projectID)
+	if err != nil {
+		return nil, err
+	}
+
+	return query.GetAlarmRuleGroup(id)
 }
 
 func (s *OpenApi) FindAlarmRecords(ctx context.Context, projectID uint, page int, size int, from int64, to int64) ([]openapivo.AlarmRecord, int64, error) {
