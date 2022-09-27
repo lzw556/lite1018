@@ -96,7 +96,7 @@ func (s *OpenApi) FindAlarmRuleGroups(ctx context.Context, projectID uint) ([]op
 	return query.FindAlarmRuleGroups()
 }
 
-func (s *OpenApi) GetAlarmRuleGroup(ctx context.Context, id uint, projectID uint) (*openapivo.AlarmRuleGroup, error) {
+func (s *OpenApi) GetAlarmRuleGroup(ctx context.Context, projectID uint, id uint) (*openapivo.AlarmRuleGroup, error) {
 	query, err := s.factory.NewOpenApiQuery(projectID)
 	if err != nil {
 		return nil, err

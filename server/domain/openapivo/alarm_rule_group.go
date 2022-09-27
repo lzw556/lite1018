@@ -6,7 +6,6 @@ type AlarmRuleGroup struct {
 	Description string `json:"description"`
 	Category    uint   `json:"category"`
 	Type        uint   `json:"type"`
-	Enabled     bool   `json:"Enabled"`
 
 	Rules []*AlarmRule `json:"rules"`
 }

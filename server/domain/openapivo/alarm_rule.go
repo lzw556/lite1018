@@ -15,7 +15,6 @@ type AlarmRule struct {
 	SourceType  uint                   `json:"sourceType"`
 	Metric      entity.AlarmRuleMetric `json:"metric"`
 	Description string                 `json:"description"`
-	Enabled     bool                   `json:"enabled"`
 	Category    uint8                  `json:"category"`
 	CreatedAt   int64                  `json:"createdAt"`
 }
