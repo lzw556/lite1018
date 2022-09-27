@@ -36,6 +36,12 @@ func (repo MonitoringPoint) Delete(ctx context.Context, id uint) error {
 	return repo.DB(ctx).Delete(&entity.MonitoringPoint{}, id).Error
 }
 
+func (repo MonitoringPoint) GetBySpecs(ctx context.Context, specs ...specification.Specification) (entity.MonitoringPoint, error) {
+	var e entity.MonitoringPoint
+	err := repo.DB(ctx).Scopes(specification.Scopes(specs)...).First(&e).Error
+	return e, err
+}
+
 func (repo MonitoringPoint) PagingBySpecs(ctx context.Context, page, size int, specs ...specification.Specification) (entity.MonitoringPoints, int64, error) {
 	db := repo.DB(ctx).Model(&entity.MonitoringPoint{}).Scopes(specification.Scopes(specs)...)
 	var total int64

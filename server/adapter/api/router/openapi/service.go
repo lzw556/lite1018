@@ -15,5 +15,8 @@ type Service interface {
 	GetAsset(ctx context.Context, projectID uint, id uint) (*openapivo.Asset, error)
 	FindMonitoringPoints(ctx context.Context, projectID uint, filters request.Filters) ([]openapivo.MonitoringPoint, error)
 	GetMonitoringPoint(ctx context.Context, projectID uint, id uint) (*openapivo.MonitoringPoint, error)
+	FindMonitoringPointData(ctx context.Context, projectID uint, id uint, property string, from, to int64) ([]openapivo.MonitoringPointData, error)
 	FindAlarmRecords(ctx context.Context, projectID uint, page int, size int, from int64, to int64) ([]openapivo.AlarmRecord, int64, error)
+	FindNetworks(ctx context.Context, projectID uint) ([]openapivo.Network, error)
+	GetNetwork(ctx context.Context, projectID uint, id uint) (*openapivo.NetworkDetail, error)
 }

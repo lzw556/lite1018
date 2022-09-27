@@ -79,11 +79,37 @@ func (s *OpenApi) GetMonitoringPoint(ctx context.Context, id uint, projectID uin
 	return query.GetMonitoringPoint(id)
 }
 
+func (s *OpenApi) FindMonitoringPointData(ctx context.Context, projectID uint, id uint, property string, from int64, to int64) ([]openapivo.MonitoringPointData, error) {
+	query, err := s.factory.NewOpenApiQuery(projectID)
+	if err != nil {
+		return nil, err
+	}
+	return query.FindMonitoringPointData(id, property, from, to)
+}
+
 func (s *OpenApi) FindAlarmRecords(ctx context.Context, projectID uint, page int, size int, from int64, to int64) ([]openapivo.AlarmRecord, int64, error) {
+	query, err := s.factory.NewOpenApiQuery(projectID)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	return query.FindAlarmRecords(page, size, from, to)
+}
+
+func (s *OpenApi) FindNetworks(ctx context.Context, projectID uint) ([]openapivo.Network, error) {
 	query, err := s.factory.NewOpenApiQuery(projectID)
 	if err != nil {
 		return nil, err
 	}
 
-	return query.FindAlarmRecords(page, size, from, to)
+	return query.FindNetworks()
+}
+
+func (s *OpenApi) GetNetwork(ctx context.Context, projectID uint, id uint) (*openapivo.NetworkDetail, error) {
+	query, err := s.factory.NewOpenApiQuery(projectID)
+	if err != nil {
+		return nil, err
+	}
+
+	return query.GetNetwork(id)
 }
