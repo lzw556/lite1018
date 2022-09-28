@@ -70,7 +70,7 @@ func (s *OpenApi) FindMonitoringPoints(ctx context.Context, projectID uint, filt
 	return query.FindMonitoringPoints(filters)
 }
 
-func (s *OpenApi) GetMonitoringPoint(ctx context.Context, id uint, projectID uint) (*openapivo.MonitoringPoint, error) {
+func (s *OpenApi) GetMonitoringPoint(ctx context.Context, projectID uint, id uint) (*openapivo.MonitoringPoint, error) {
 	query, err := s.factory.NewOpenApiQuery(projectID)
 	if err != nil {
 		return nil, err
