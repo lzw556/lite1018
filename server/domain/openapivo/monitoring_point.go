@@ -8,5 +8,6 @@ type MonitoringPoint struct {
 
 	Attributes  map[string]interface{} `json:"attributes,omitempty"`
 	AlertStates []AlertState           `json:"alertStates,omitempty"`
+	Properties  MPProperties           `json:"properties,omitempty"`
 	AlertLevel  uint                   `json:"alertLevel"`
 }
