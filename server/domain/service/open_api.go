@@ -52,7 +52,7 @@ func (s *OpenApi) FindAssets(ctx context.Context, projectID uint) ([]openapivo.A
 	return query.FindAssets()
 }
 
-func (s *OpenApi) GetAsset(ctx context.Context, id uint, projectID uint) (*openapivo.Asset, error) {
+func (s *OpenApi) GetAsset(ctx context.Context, projectID uint, id uint) (*openapivo.Asset, error) {
 	query, err := s.factory.NewOpenApiQuery(projectID)
 	if err != nil {
 		return nil, err
