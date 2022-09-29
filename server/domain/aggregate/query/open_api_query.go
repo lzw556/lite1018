@@ -157,7 +157,9 @@ func (query OpenApiQuery) FindAssets() ([]openapivo.Asset, error) {
 
 	var result []openapivo.Asset
 	str, _ := json.Marshal(assets)
-	json.Unmarshal(str, &result)
+	if err := json.Unmarshal(str, &result); err != nil {
+		return nil, err
+	}
 
 	return result, nil
 }
@@ -173,7 +175,9 @@ func (query OpenApiQuery) GetAsset(assetId uint) (*openapivo.Asset, error) {
 
 	var result openapivo.Asset
 	str, _ := json.Marshal(asset)
-	json.Unmarshal(str, &result)
+	if err := json.Unmarshal(str, &result); err != nil {
+		return nil, err
+	}
 
 	return &result, nil
 }
@@ -197,7 +201,9 @@ func (query OpenApiQuery) FindMonitoringPoints(filters request.Filters) ([]opena
 
 	var result []openapivo.MonitoringPoint
 	str, _ := json.Marshal(mps)
-	json.Unmarshal(str, &result)
+	if err := json.Unmarshal(str, &result); err != nil {
+		return nil, err
+	}
 
 	return result, nil
 }
@@ -213,7 +219,9 @@ func (query OpenApiQuery) GetMonitoringPoint(mpID uint) (*openapivo.MonitoringPo
 
 	var result openapivo.MonitoringPoint
 	str, _ := json.Marshal(mp)
-	json.Unmarshal(str, &result)
+	if err := json.Unmarshal(str, &result); err != nil {
+		return nil, err
+	}
 
 	return &result, nil
 }
@@ -263,7 +271,9 @@ func (query OpenApiQuery) FindAlarmRuleGroups() ([]openapivo.AlarmRuleGroup, err
 
 	var result []openapivo.AlarmRuleGroup
 	str, _ := json.Marshal(groups)
-	json.Unmarshal(str, &result)
+	if err := json.Unmarshal(str, &result); err != nil {
+		return nil, err
+	}
 
 	return result, nil
 }
@@ -279,7 +289,9 @@ func (query OpenApiQuery) GetAlarmRuleGroup(gID uint) (*openapivo.AlarmRuleGroup
 
 	var result openapivo.AlarmRuleGroup
 	str, _ := json.Marshal(group)
-	json.Unmarshal(str, &result)
+	if err := json.Unmarshal(str, &result); err != nil {
+		return nil, err
+	}
 
 	return &result, nil
 }
@@ -295,7 +307,9 @@ func (query OpenApiQuery) FindAlarmRecords(page int, size int, from int64, to in
 
 	var result []openapivo.AlarmRecord
 	str, _ := json.Marshal(records)
-	json.Unmarshal(str, &result)
+	if err := json.Unmarshal(str, &result); err != nil {
+		return nil, 0, err
+	}
 
 	return result, total, nil
 }
@@ -311,7 +325,9 @@ func (query OpenApiQuery) FindNetworks() ([]openapivo.Network, error) {
 
 	var result []openapivo.Network
 	str, _ := json.Marshal(nets)
-	json.Unmarshal(str, &result)
+	if err := json.Unmarshal(str, &result); err != nil {
+		return nil, err
+	}
 
 	return result, nil
 }
@@ -327,7 +343,9 @@ func (query OpenApiQuery) GetNetwork(id uint) (*openapivo.NetworkDetail, error) 
 
 	var result openapivo.NetworkDetail
 	str, _ := json.Marshal(net)
-	json.Unmarshal(str, &result)
+	if err := json.Unmarshal(str, &result); err != nil {
+		return nil, err
+	}
 
 	return &result, nil
 }
