@@ -26,6 +26,7 @@ type OpenApiQuery struct {
 	deviceStateRepo         dependency.DeviceStateRepository
 	sensorDataRepo          dependency.SensorDataRepository
 	networkRepo             dependency.NetworkRepository
+	assetRepo               dependency.AssetRepository
 	monitoringPointRepo     dependency.MonitoringPointRepository
 	monitoringPointDataRepo dependency.MonitoringPointDataRepository
 }
@@ -37,6 +38,7 @@ func NewOpenApiQuery() OpenApiQuery {
 		deviceStateRepo:         repository.DeviceState{},
 		sensorDataRepo:          repository.SensorData{},
 		networkRepo:             repository.Network{},
+		assetRepo:               repository.Asset{},
 		monitoringPointRepo:     repository.MonitoringPoint{},
 		monitoringPointDataRepo: repository.MonitoringPointData{},
 	}
@@ -160,13 +162,13 @@ func (query OpenApiQuery) FindAssets() ([]openapivo.Asset, error) {
 	return result, nil
 }
 
-func (query OpenApiQuery) GetAsset(mpID uint) (*openapivo.Asset, error) {
+func (query OpenApiQuery) GetAsset(assetId uint) (*openapivo.Asset, error) {
 	assetQuery := NewAssetQuery()
 	assetQuery.Specs = []spec.Specification{spec.ProjectEqSpec(query.Project.ID)}
 
-	asset, err := assetQuery.Get(mpID)
+	asset, err := assetQuery.Get(assetId)
 	if err != nil {
-		return nil, err
+		return nil, response.ErrOpenApiAssetNotFound()
 	}
 
 	var result openapivo.Asset
@@ -206,7 +208,7 @@ func (query OpenApiQuery) GetMonitoringPoint(mpID uint) (*openapivo.MonitoringPo
 
 	mp, err := mpQuery.Get(mpID)
 	if err != nil {
-		return nil, err
+		return nil, response.ErrOpenApiMonitoringPointNotFound()
 	}
 
 	var result openapivo.MonitoringPoint
