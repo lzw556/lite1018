@@ -42,7 +42,7 @@ const DeviceTypeSelect: FC<DeviceTypeSelectProps> = (props) => {
                 </OptGroup>
                 <OptGroup label={"传感器"} key={"sensor"}>
                     {
-                        DeviceType.sensors().map(item => (<Option key={item} value={item}>{DeviceType.toString(item)}</Option>))
+                        DeviceType.sensors().filter((item) => item <= DeviceType.BoltElongation).map(item => (<Option key={item} value={item}>{DeviceType.toString(item)}</Option>))
                     }
                 </OptGroup>
             </Select>
