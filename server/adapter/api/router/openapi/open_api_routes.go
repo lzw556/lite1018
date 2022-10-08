@@ -108,3 +108,8 @@ func (r openApiRouter) getNetwork(ctx *gin.Context) (interface{}, error) {
 	id := ctx.Param("id")
 	return r.service.GetNetwork(context.Background(), projectID, cast.ToUint(id))
 }
+
+func (r openApiRouter) getAllStatistics(ctx *gin.Context) (interface{}, error) {
+	projectID := cast.ToUint(ctx.MustGet("project_id"))
+	return r.service.GetAllStatistics(context.Background(), projectID)
+}

@@ -131,3 +131,12 @@ func (s *OpenApi) GetNetwork(ctx context.Context, projectID uint, id uint) (*ope
 
 	return query.GetNetwork(id)
 }
+
+func (s *OpenApi) GetAllStatistics(ctx context.Context, projectID uint) (*openapivo.AllStatistics, error) {
+	query, err := s.factory.NewOpenApiQuery(projectID)
+	if err != nil {
+		return nil, err
+	}
+
+	return query.GetAllStatistics()
+}

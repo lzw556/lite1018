@@ -21,4 +21,5 @@ type Service interface {
 	FindAlarmRecords(ctx context.Context, projectID uint, page int, size int, from int64, to int64) ([]openapivo.AlarmRecord, int64, error)
 	FindNetworks(ctx context.Context, projectID uint) ([]openapivo.Network, error)
 	GetNetwork(ctx context.Context, projectID uint, id uint) (*openapivo.NetworkDetail, error)
+	GetAllStatistics(ctx context.Context, projectID uint) (*openapivo.AllStatistics, error)
 }

@@ -349,3 +349,21 @@ func (query OpenApiQuery) GetNetwork(id uint) (*openapivo.NetworkDetail, error) 
 
 	return &result, nil
 }
+
+func (query OpenApiQuery) GetAllStatistics() (*openapivo.AllStatistics, error) {
+	statQuery := NewStatisticQuery()
+	statQuery.Specs = []spec.Specification{spec.ProjectEqSpec(query.Project.ID)}
+
+	stat, err := statQuery.GetAllStatistics()
+	if err != nil {
+		return nil, err
+	}
+
+	var result openapivo.AllStatistics
+	str, _ := json.Marshal(stat)
+	if err := json.Unmarshal(str, &result); err != nil {
+		return nil, err
+	}
+
+	return &result, nil
+}

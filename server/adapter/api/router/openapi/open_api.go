@@ -34,6 +34,8 @@ func (r *openApiRouter) initRoutes() {
 
 		router.NewGetRoute("v1/networks", r.findNetworks),
 		router.NewGetRoute("v1/networks/:id", r.getNetwork),
+
+		router.NewGetRoute("v1/statistics/all", r.getAllStatistics),
 	}
 }
 
