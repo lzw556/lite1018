@@ -64,7 +64,7 @@ func (a *Adapter) Run() error {
 	a.engine.Use(cors.New(cors.Config{
 		AllowAllOrigins: true,
 	}))
-	a.engine.Static("/res", "/resources")
+	a.engine.Static("/res", "./resources")
 
 	a.addOpenApiRouter()
 
