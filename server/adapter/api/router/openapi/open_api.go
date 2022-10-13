@@ -20,6 +20,22 @@ func (r *openApiRouter) initRoutes() {
 		router.NewGetRoute("v1/devices", r.findDevices),
 		router.NewGetRoute("v1/devices/:mac", r.getDeviceByMac),
 		router.NewGetRoute("v1/devices/:mac/data", r.findDeviceDataByMac),
+
+		router.NewGetRoute("v1/assets", r.findAssets),
+		router.NewGetRoute("v1/assets/:id", r.getAsset),
+
+		router.NewGetRoute("v1/monitoringPoints", r.findMonitoringPoints),
+		router.NewGetRoute("v1/monitoringPoints/:id", r.getMonitoringPoint),
+		router.NewGetRoute("v1/monitoringPoints/:id/data", r.findMonitoringPointData),
+
+		router.NewGetRoute("v1/alarmRuleGroups", r.findAlarmRuleGroups),
+		router.NewGetRoute("v1/alarmRuleGroups/:id", r.getAlarmRuleGroup),
+		router.NewGetRoute("v1/alarmRecords", r.findAlarmRecords),
+
+		router.NewGetRoute("v1/networks", r.findNetworks),
+		router.NewGetRoute("v1/networks/:id", r.getNetwork),
+
+		router.NewGetRoute("v1/statistics/all", r.getAllStatistics),
 	}
 }
 

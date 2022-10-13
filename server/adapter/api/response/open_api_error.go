@@ -9,17 +9,31 @@ func (e OpenApiError) Error() string {
 	return e.Msg
 }
 
-func ErrOpenApiDeviceNotFound() OpenApiError {
+func ErrOpenApiProjectNotFound() OpenApiError {
 	return OpenApiError{
 		Code: 1001,
+		Msg:  "项目不存在",
+	}
+}
+
+func ErrOpenApiDeviceNotFound() OpenApiError {
+	return OpenApiError{
+		Code: 1002,
 		Msg:  "设备不存在",
 	}
 }
 
-func ErrOpenApiProjectNotFound() OpenApiError {
+func ErrOpenApiAssetNotFound() OpenApiError {
 	return OpenApiError{
-		Code: 1002,
-		Msg:  "项目不存在",
+		Code: 1003,
+		Msg:  "资产不存在",
+	}
+}
+
+func ErrOpenApiMonitoringPointNotFound() OpenApiError {
+	return OpenApiError{
+		Code: 1004,
+		Msg:  "监测点不存在",
 	}
 }
 

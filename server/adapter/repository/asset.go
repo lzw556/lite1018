@@ -36,6 +36,12 @@ func (repo Asset) Delete(ctx context.Context, id uint) error {
 	return repo.DB(ctx).Delete(&entity.Asset{}, id).Error
 }
 
+func (repo Asset) GetBySpecs(ctx context.Context, specs ...specification.Specification) (entity.Asset, error) {
+	var e entity.Asset
+	err := repo.DB(ctx).Scopes(specification.Scopes(specs)...).First(&e).Error
+	return e, err
+}
+
 func (repo Asset) PagingBySpecs(ctx context.Context, page, size int, specs ...specification.Specification) (entity.Assets, int64, error) {
 	db := repo.DB(ctx).Model(&entity.Asset{}).Scopes(specification.Scopes(specs)...)
 	var total int64
