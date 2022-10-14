@@ -50,12 +50,13 @@ import NetworkSelect from '../../components/select/networkSelect';
 import DeviceUpgradeSpin from './spin/deviceUpgradeSpin';
 import './index.css';
 import { SingleDeviceStatus } from './SingleDeviceStatus';
-import { getValueOfFirstClassProperty, generateDeviceTypeCollections, omitSpecificKeys } from './util';
+import { getValueOfFirstClassProperty, omitSpecificKeys } from './util';
 import { isMobile } from '../../utils/deviceDetection';
 import { Link } from 'react-router-dom';
 import EditCalibrateParas from './edit/editCalibrateParas';
 import { AlarmRuleSettings } from './detail/setting/alarmRuleSettings';
 import { Store, useStore } from '../../hooks/store';
+import * as AppConfig from '../../config';
 
 const { Search } = Input;
 const { Option } = Select;
@@ -383,7 +384,7 @@ const DevicePage = () => {
                   }}
                   defaultValue={store.filters?.type}
                 >
-                  {generateDeviceTypeCollections().map(({ val, name }: any) => (
+                  {AppConfig.use(window.assetCategory).devTypes.map(({ val, name }: any) => (
                     <Select.Option key={val} value={val}>
                       {name}
                     </Select.Option>

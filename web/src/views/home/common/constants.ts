@@ -1,4 +1,5 @@
 import { DeviceType } from '../../../types/device_type';
+import * as AppConfig from '../../../config';
 
 export const AssetTypes: Record<
   'WindTurbind' | 'Flange',
@@ -12,7 +13,7 @@ export const AssetTypes: Record<
 > = {
   WindTurbind: {
     id: 101,
-    label: '风机',
+    label: AppConfig.use(window.assetCategory).topAsset.name,
     parent_id: 0,
     url: '/windturbine'
   },

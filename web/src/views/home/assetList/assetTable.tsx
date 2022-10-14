@@ -7,6 +7,7 @@ import { AssetTypes } from '../common/constants';
 import { getAssetStatistics } from '../common/statisticsHelper';
 import { combineFinalUrl } from '../common/utils';
 import { AssetRow } from './props';
+import * as AppConfig from '../../../config'
 
 export const AssetTable: React.FC<{
   dataSource?: any;
@@ -112,7 +113,7 @@ export const AssetTable: React.FC<{
             key: 'action',
             render: (x, row: AssetRow) => {
               const assetType = getAssetType(row.type);
-              const name = assetType ? assetType.label : '风机';
+              const name = assetType ? assetType.label : AppConfig.use(window.assetCategory).topAsset.name;
               return (
                 <Space>
                   <Button type='text' size='small' title={`编辑${name}`}>

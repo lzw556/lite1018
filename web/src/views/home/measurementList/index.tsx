@@ -15,8 +15,10 @@ import { useStore } from '../../../hooks/store';
 import { PlusOutlined } from '@ant-design/icons';
 import { AssetExport } from '../components/assetExport';
 import { FileInput } from '../components/fileInput';
+import * as AppConfig from '../../../config';
 
 const MeasurementManagement: React.FC = () => {
+  const topAssetName = AppConfig.use(window.assetCategory).topAsset.name;
   const { pathname, search } = useLocation();
   const [assets, setAssets] = React.useState<{
     loading: boolean;
@@ -67,7 +69,7 @@ const MeasurementManagement: React.FC = () => {
   const generateFilters = () => {
     if (assets.items.length === 0) return undefined;
     return [
-      <Label name='风机'>
+      <Label name={topAssetName}>
         <Select
           bordered={false}
           onChange={(val) => {

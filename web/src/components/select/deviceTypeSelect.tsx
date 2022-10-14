@@ -2,6 +2,7 @@ import {DeviceType} from "../../types/device_type";
 import {Select, SelectProps} from "antd";
 import {FC, useEffect} from "react";
 import {CaretDownOutlined} from "@ant-design/icons";
+import * as AppConfig from "../../config";
 
 const {Option, OptGroup} = Select
 
@@ -20,7 +21,7 @@ const DeviceTypeSelect: FC<DeviceTypeSelectProps> = (props) => {
     }, [])
 
     const renderSensors = () => {
-        return DeviceType.sensors().filter((item: DeviceType) => sensors?.includes(item)).map(item => (
+        return AppConfig.use(window.assetCategory).sensorTypes.filter((item: DeviceType) => sensors?.includes(item)).map(item => (
             <Option key={item} value={item}>{DeviceType.toString(item)}</Option>))
     }
 
@@ -42,7 +43,7 @@ const DeviceTypeSelect: FC<DeviceTypeSelectProps> = (props) => {
                 </OptGroup>
                 <OptGroup label={"传感器"} key={"sensor"}>
                     {
-                        DeviceType.sensors().filter((item) => item <= DeviceType.BoltElongation).map(item => (<Option key={item} value={item}>{DeviceType.toString(item)}</Option>))
+                        AppConfig.use(window.assetCategory).sensorTypes.map(item => (<Option key={item} value={item}>{DeviceType.toString(item)}</Option>))
                     }
                 </OptGroup>
             </Select>

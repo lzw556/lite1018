@@ -15,6 +15,7 @@ import { generateProjectAlarmStatis, getAssetStatistics } from './common/statist
 import { AlarmStatisticOfProject } from './AlarmStatisticOfProject';
 import { getProject } from '../../utils/session';
 import { isMobile } from '../../utils/deviceDetection';
+import * as AppConfig from '../../config';
 
 export type ProjectStatistics = {
   deviceOfflineNum: number;
@@ -152,7 +153,7 @@ const ProjectOverview: React.FC = () => {
       <Empty
         description={
           <p>
-            还没有风机, 去<Link to='/asset-management?locale=asset-management'>创建</Link>
+            还没有{AppConfig.use(window.assetCategory).topAsset.name}, 去<Link to='/asset-management?locale=asset-management'>创建</Link>
           </p>
         }
         image={Empty.PRESENTED_IMAGE_SIMPLE}
@@ -163,7 +164,7 @@ const ProjectOverview: React.FC = () => {
     <OverviewPage
       {...{
         chartList: [
-          { title: '风机', colProps, options: statisticOfAsset },
+          { title: AppConfig.use(window.assetCategory).topAsset.name, colProps, options: statisticOfAsset },
           { title: '监测点', colProps, options: statisticOfMeasurement },
           { title: '传感器', colProps, options: statisticOfSensor },
           { colProps: colProps2, render: <AlarmStatisticOfProject title='报警趋势' /> }

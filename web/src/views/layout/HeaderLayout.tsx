@@ -14,6 +14,7 @@ import { NavMenu } from './NavMenu';
 import { GetMyProjectRequest } from '../../apis/project';
 import { useLocation } from 'react-router-dom';
 import { verifyAssetOverview } from '../home/common/utils';
+import { Brand } from './brand';
 
 const { Text } = Typography;
 
@@ -61,10 +62,15 @@ const HeaderLayout = (props: any) => {
     <Header className='ts-header'>
       <Row justify='start' className='pc'>
         <Col span={12}>
-          <Space className={'ts-title'}>
-            <img src={logo} width={100} alt='ThetaSensors' style={{ verticalAlign: 'middle', marginRight: 30 }} />
-            风力发电螺栓监测系统
-          </Space>
+          <Brand
+            height={40}
+            brandNameStyle={{
+              fontSize: '14pt',
+              color: '#fff',
+              letterSpacing: '2pt',
+              verticalAlign: -2
+            }}
+          />
         </Col>
         <Col span={12} style={{ textAlign: 'right' }}>
           <Space>

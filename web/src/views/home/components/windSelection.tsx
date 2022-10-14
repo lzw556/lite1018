@@ -5,10 +5,12 @@ import { getProject } from '../../../utils/session';
 import { AssetRow } from '../assetList/props';
 import { exportAssets } from '../assetList/services';
 import { getFilename } from '../common/utils';
+import * as AppConfig from '../../../config';
 
 export const WindSelection: React.FC<{ winds: AssetRow[]; onSuccess: () => void } & ModalProps> = (
   props
 ) => {
+  const topAssetName = AppConfig.use(window.assetCategory).topAsset.name;
   const [form] = Form.useForm();
   const [selected, setSelected] = React.useState<CheckboxValueType[]>([]);
   const [loading, setLoading] = React.useState(false);
@@ -34,7 +36,7 @@ export const WindSelection: React.FC<{ winds: AssetRow[]; onSuccess: () => void 
   return (
     <Modal
       {...props}
-      title='选择风机'
+      title={`选择${topAssetName}`}
       footer={[
         <Button key='back' onClick={(e) => props.onCancel && props.onCancel(e)}>
           取消

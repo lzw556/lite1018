@@ -15,8 +15,10 @@ import usePermission, { Permission } from '../../../permission/permission';
 import { PlusOutlined } from '@ant-design/icons';
 import { FileInput } from '../components/fileInput';
 import { AssetExport } from '../components/assetExport';
+import * as AppConfig from '../../../config';
 
 const AssetManagement: React.FC = () => {
+  const topAssetName = AppConfig.use(window.assetCategory).topAsset.name;
   const { pathname, search } = useLocation();
   const [assets, setAssets] = React.useState<{
     loading: boolean;
@@ -73,7 +75,7 @@ const AssetManagement: React.FC = () => {
           <ActionBar
             actions={[
               <Button type='primary' onClick={() => actionStatus.handleWindEdit()}>
-                添加风机
+                添加{topAssetName}
                 <PlusOutlined />
               </Button>,
               <Button

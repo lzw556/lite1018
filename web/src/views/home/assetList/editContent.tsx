@@ -5,9 +5,11 @@ import { getAssets } from './services';
 import { AssetTypes } from '../common/constants';
 import { AssetRow } from './props';
 import { AttributeFormItem } from './attributeFormItem';
+import * as AppConfig from '../../../config';
 
 export const EditContent: React.FC<{ parentId?: number }> = ({ parentId }) => {
   const [parents, setParents] = React.useState<AssetRow[]>([]);
+  const topAssetName = AppConfig.use(window.assetCategory).topAsset.name;
 
   React.useEffect(() => {
     getAssets({ type: AssetTypes.WindTurbind.id }).then((assets) => setParents(assets));
@@ -20,13 +22,13 @@ export const EditContent: React.FC<{ parentId?: number }> = ({ parentId }) => {
       </Form.Item>
       <Form.Item name='type' hidden={true} initialValue={AssetTypes.Flange.id}></Form.Item>
       <Form.Item
-        label='风机'
+        label={topAssetName}
         name='parent_id'
         hidden={!!parentId}
         initialValue={parentId}
-        rules={[{ required: true, message: `请选择风机` }]}
+        rules={[{ required: true, message: `请选择${topAssetName}` }]}
       >
-        <Select placeholder='请选择风机'>
+        <Select placeholder={`请选择${topAssetName}`}>
           {parents.map(({ id, name }) => (
             <Select.Option key={id} value={id}>
               {name}

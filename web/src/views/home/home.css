@@ -62,6 +62,8 @@ dl.name-value-groups.horizontal {
   height: 36px;
   width: 36px;
   border-radius: 24px;
+  text-align: center;
+  padding-top: 4px;
 }
 
 .introduction.normal .introduction-icon {
@@ -76,7 +78,7 @@ dl.name-value-groups.horizontal {
 .introduction.danger .introduction-icon {
   background-color: #ff0000;
 }
-.introduction .introduction-icon .icon-svg {
+/* .introduction .introduction-icon .icon-svg {
   height: 36px;
   width: 36px;
 }
@@ -86,7 +88,7 @@ dl.name-value-groups.horizontal {
   left: 3px;
   width: 30px;
   height: 30px;
-}
+} */
 .introduction.focus .introduction-icon {
   background-color: #fff;
 }

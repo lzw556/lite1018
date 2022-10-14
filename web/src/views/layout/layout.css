@@ -3,6 +3,8 @@
     background-image: url("../../assets/images/head-bg.jpg");
     background-repeat: repeat-x;
     height: 60px;
+    padding-left: 30px;
+    line-height: 60px;
 }
 
 .ts-header .ts-title {
