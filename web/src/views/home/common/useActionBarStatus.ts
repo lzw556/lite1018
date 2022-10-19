@@ -9,6 +9,12 @@ export function useActionBarStatus() {
   const [target, setTarget] = React.useState<number | undefined>();
   const [payload, setPayload] = React.useState<EditFormPayload>();
 
+  const handleTopAssetEdit = (data?: EditFormPayload) => {
+    setPayload(data);
+    setVisible(true);
+    setTarget(0);
+  };
+
   const handleWindEdit = (data?: EditFormPayload) => {
     setPayload(data);
     setVisible(true);
@@ -32,6 +38,7 @@ export function useActionBarStatus() {
     setVisible,
     target,
     payload,
+    handleTopAssetEdit,
     handleWindEdit,
     handleFlangeEdit,
     handleMeasurementEdit

@@ -1,6 +1,7 @@
 import { Space } from 'antd';
 import * as React from 'react';
 import { AssetEdit } from '../assetList/edit';
+import { TopAssetEdit } from '../assetList/topAssetEdit';
 import { WindEdit } from '../assetList/windEdit';
 import { EditFormPayload } from '../common/useActionBarStatus';
 import { MeasurementEdit } from '../measurementList/edit';
@@ -18,6 +19,19 @@ export const ActionBar: React.FC<{
   return (
     <Space wrap={true}>
       {actions}
+      {visible && target === 0 && (
+        <TopAssetEdit
+          {...{
+            visible,
+            onCancel: () => setVisible && setVisible(false),
+            payload,
+            onSuccess: () => {
+              if (onSuccess) onSuccess();
+              setVisible && setVisible(false);
+            }
+          }}
+        />
+      )}
       {visible && target === 1 && (
         <WindEdit
           {...{
