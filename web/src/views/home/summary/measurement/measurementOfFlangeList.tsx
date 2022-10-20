@@ -3,7 +3,7 @@ import { Button, Col, Empty, Popconfirm, Row, Space, Table, TableProps, Tag } fr
 import * as React from 'react';
 import { Link } from 'react-router-dom';
 import { AssetRow } from '../../assetList/props';
-import { AssetTypes, MeasurementTypes } from '../../common/constants';
+import { MeasurementTypes } from '../../common/constants';
 import { generatePropertyColumns } from '../../common/historyDataHelper';
 import {
   convertAlarmLevelToState,
@@ -19,6 +19,7 @@ import HasPermission from '../../../../permission';
 import { isMobile } from '../../../../utils/deviceDetection';
 import ShadowCard from '../../../../components/shadowCard';
 import { EditFormPayload } from '../../common/useActionBarStatus';
+import * as AppConfig from '../../../../config';
 
 export const MeasurementOfFlangeList: React.FC<{
   flange?: AssetRow;
@@ -104,7 +105,7 @@ export const MeasurementOfFlangeList: React.FC<{
                   title={'确定要删除该监测点吗?'}
                   onConfirm={() => {
                     deleteMeasurement(row.id).then(() => {
-                      fetchAssets({ type: AssetTypes.WindTurbind.id });
+                      fetchAssets({ type: AppConfig.use('wind').assetType.id });
                     });
                   }}
                 >

@@ -5,7 +5,8 @@ import { Rules } from '../../../constants/validator';
 import { DeviceType } from '../../../types/device_type';
 import { AssetRow } from '../assetList/props';
 import { getAssets } from '../assetList/services';
-import { AssetTypes, MeasurementTypes } from '../common/constants';
+import { MeasurementTypes } from '../common/constants';
+import * as AppConfig from '../../../config';
 
 export const EditContent: React.FC<{ form: any; asset?: AssetRow; doUpdating?: boolean }> = ({
   asset,
@@ -15,14 +16,24 @@ export const EditContent: React.FC<{ form: any; asset?: AssetRow; doUpdating?: b
   const [types, setTypes] = React.useState([DeviceType.BoltLoosening, DeviceType.BoltElongation]);
   const [parents, setParents] = React.useState<AssetRow[]>([]);
   const [disabled, setDisabled] = React.useState(true);
-  const parentId = asset && asset.type === AssetTypes.Flange.id ? asset.id : undefined;
-  const grandParentId = asset && asset.type === AssetTypes.WindTurbind.id ? asset.id : undefined;
+  const configWind = AppConfig.use('wind');
+  const parentId =
+    asset && asset.type === configWind.assetType.secondAsset?.id ? asset.id : undefined;
+  const parentLabel =
+    AppConfig.use(window.assetCategory).assetType.secondAsset?.label ||
+    AppConfig.use(window.assetCategory).assetType.label;
 
   React.useEffect(() => {
-    getAssets({ type: AssetTypes.Flange.id }).then((assets) => {
-      setParents(assets.filter((asset) => (grandParentId ? grandParentId === asset.parentId : true)));
+    const configWind = AppConfig.use('wind');
+    const grandParentId = asset && asset.type === configWind.assetType.id ? asset.id : undefined;
+    let type = AppConfig.use('default').assetType.id;
+    if (window.assetCategory === 'wind') type = configWind.assetType.secondAsset?.id || 0;
+    getAssets({ type }).then((assets) => {
+      setParents(
+        assets.filter((asset) => (grandParentId ? grandParentId === asset.parentId : true))
+      );
     });
-  }, [grandParentId]);
+  }, [asset]);
 
   return (
     <>
@@ -61,13 +72,18 @@ export const EditContent: React.FC<{ form: any; asset?: AssetRow; doUpdating?: b
         <DeviceSelect filters={{ types: types.join(',') }} disabled={disabled && !doUpdating} />
       </Form.Item>
       <Form.Item
-        label='法兰'
+        label={parentLabel}
         name='asset_id'
-        rules={[{ required: true, message: `请选择法兰` }]}
+        rules={[
+          {
+            required: true,
+            message: `请选择${parentLabel}`
+          }
+        ]}
         hidden={!doUpdating && !!parentId}
         initialValue={parentId}
       >
-        <Select placeholder='请选择法兰'>
+        <Select placeholder={`请选择${parentLabel}`}>
           {parents.map(({ id, name }) => (
             <Select.Option key={id} value={id}>
               {name}

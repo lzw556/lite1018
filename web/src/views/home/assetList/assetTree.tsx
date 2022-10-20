@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 import HasPermission from '../../../permission';
 import { Permission } from '../../../permission/permission';
 import { isMobile } from '../../../utils/deviceDetection';
-import { AssetTypes, MeasurementTypes } from '../common/constants';
+import { MeasurementTypes } from '../common/constants';
 import { generateDatasOfMeasurement } from '../common/historyDataHelper';
 import { convertAlarmLevelToState } from '../common/statisticsHelper';
 import { mapTreeNode } from '../common/treeDataHelper';
@@ -20,12 +20,14 @@ import { WindTurbineIcon } from '../summary/windTurbine/icon';
 import { AssetRow } from './props';
 import { deleteAsset } from './services';
 import { sortFlangesByAttributes } from './util';
+import * as AppConfig from '../../../config';
 
 export const AssetTree: React.FC<{
   assets: AssetRow[];
   pathname: string;
   search: string;
   onsuccess?: () => void;
+  handleTopAssetEdit?: (data?: EditFormPayload) => void;
   handleWindEdit?: (data?: EditFormPayload) => void;
   handleFlangeEdit?: (data?: EditFormPayload) => void;
   handleMeasurementEdit?: (data?: EditFormPayload) => void;
@@ -34,6 +36,7 @@ export const AssetTree: React.FC<{
   pathname,
   search,
   onsuccess,
+  handleTopAssetEdit,
   handleFlangeEdit,
   handleWindEdit,
   handleMeasurementEdit
@@ -46,33 +49,41 @@ export const AssetTree: React.FC<{
   }, [assets]);
 
   const getTreedata = (assets: AssetRow[]) => {
+    const processNodeFn = (node: any) => {
+      if (node.children && node.children.length > 0) {
+        return { ...node, children: sortFlangesByAttributes(node.children as AssetRow[]) };
+      } else if (node.monitoringPoints && node.monitoringPoints.length > 0) {
+        return {
+          ...node,
+          children: sortMeasurementsByAttributes(node.monitoringPoints),
+          monitoringPoints: []
+        };
+      } else {
+        return node;
+      }
+    };
     if (assets.length > 0) {
       const copy = cloneDeep(assets);
       const treedata = copy
         .map((node) =>
           mapTreeNode(node, (node) => {
-            if (node.children && node.children.length > 0) {
-              return { ...node, children: sortFlangesByAttributes(node.children as AssetRow[]) };
-            } else if (node.monitoringPoints && node.monitoringPoints.length > 0) {
-              return {
-                ...node,
-                children: sortMeasurementsByAttributes(node.monitoringPoints),
-                monitoringPoints: []
-              };
+            if (node.children && node.monitoringPoints) {
+              return { ...node, children: [...node.children, ...node.monitoringPoints] };
             } else {
               return node;
             }
           })
         )
+        .map((node: any) => mapTreeNode(node, processNodeFn))
         .map((node) =>
           mapTreeNode(node, (node) => ({
             ...node,
             key: `${node.id}-${node.type}`,
             icon: (props: any) => {
               const alarmState = convertAlarmLevelToState(props.alertLevel);
-              if (props.type === AssetTypes.WindTurbind.id) {
+              if (props.type === AppConfig.use(window.assetCategory).assetType.id) {
                 return <WindTurbineIcon className={alarmState} />;
-              } else if (props.type === AssetTypes.Flange.id) {
+              } else if (props.type === AppConfig.use('wind').assetType.secondAsset?.id) {
                 return <FlangeIcon className={`${alarmState} focus`} />;
               } else {
                 return <MeasurementIcon className={`${alarmState} focus`} />;
@@ -85,7 +96,11 @@ export const AssetTree: React.FC<{
   };
 
   const getAssetType = (typeId: number) => {
-    return Object.values(AssetTypes).find((type) => type.id === typeId);
+    return Object.values([
+      AppConfig.use('default').assetType,
+      AppConfig.use('wind').assetType,
+      AppConfig.use('wind').assetType.secondAsset
+    ]).find((type) => type?.id === typeId);
   };
 
   if (!treedata) return null;
@@ -126,12 +141,15 @@ export const AssetTree: React.FC<{
                     <EditOutlined
                       onClick={() => {
                         const type = selectedNode?.type;
-                        if (type === AssetTypes.WindTurbind.id) {
+                        if (type === AppConfig.use('default').assetType.id) {
+                          handleTopAssetEdit && handleTopAssetEdit({ asset: selectedNode });
+                        } else if (type === AppConfig.use('wind').assetType.id) {
                           handleWindEdit && handleWindEdit({ asset: selectedNode });
-                        } else if (type === AssetTypes.Flange.id) {
+                        } else if (type === AppConfig.use('wind').assetType.secondAsset?.id) {
                           handleFlangeEdit && handleFlangeEdit({ asset: selectedNode });
                         } else if (type > 10000) {
-                          handleMeasurementEdit && handleMeasurementEdit({ measurement: selectedNode });
+                          handleMeasurementEdit &&
+                            handleMeasurementEdit({ measurement: selectedNode });
                         }
                       }}
                     />
@@ -161,9 +179,11 @@ export const AssetTree: React.FC<{
                       <PlusOutlined
                         onClick={() => {
                           const type = selectedNode?.type;
-                          if (type === AssetTypes.WindTurbind.id) {
+                          if (type === AppConfig.use(window.assetCategory).assetType.id) {
                             handleFlangeEdit && handleFlangeEdit({ asset: selectedNode });
-                          } else if (type === AssetTypes.Flange.id) {
+                          } else if (
+                            type === AppConfig.use(window.assetCategory).assetType.secondAsset?.id
+                          ) {
                             handleMeasurementEdit && handleMeasurementEdit({ asset: selectedNode });
                           }
                         }}

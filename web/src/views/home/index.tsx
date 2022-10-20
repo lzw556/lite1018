@@ -1,7 +1,6 @@
 import { Empty, Spin } from 'antd';
 import * as React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { AssetTypes } from './common/constants';
 import { WindTurbineIcon } from './summary/windTurbine/icon';
 import { getAssets, getProjectStatistics } from './assetList/services';
 import { ChartOptions } from './components/charts/common';
@@ -75,7 +74,7 @@ const ProjectOverview: React.FC = () => {
         );
       }
     );
-    getAssets({ type: AssetTypes.WindTurbind.id }).then((assets) =>
+    getAssets({ type: AppConfig.use(window.assetCategory).assetType.id }).then((assets) =>
       setWindTurbines({
         loading: false,
         items: assets.map((item) => {
@@ -91,7 +90,12 @@ const ProjectOverview: React.FC = () => {
             id: item.id,
             title: {
               name: item.name,
-              path: combineFinalUrl(pathname, search, AssetTypes.WindTurbind.url, item.id)
+              path: combineFinalUrl(
+                pathname,
+                search,
+                AppConfig.use(window.assetCategory).assetType.url,
+                item.id
+              )
             },
             alarmState,
             icon: { svg: <WindTurbineIcon />, small: true },
@@ -117,7 +121,7 @@ const ProjectOverview: React.FC = () => {
         itemWidth: 15,
         itemHeight: 14,
         itemGap: 5,
-        left: isMobile ? '25%': '30%',
+        left: isMobile ? '25%' : '30%',
         formatter: (itemName: string) => {
           const series = data.find(({ name }) => itemName === name);
           return series ? `${itemName} {value|${series.value}}` : itemName;
@@ -153,7 +157,8 @@ const ProjectOverview: React.FC = () => {
       <Empty
         description={
           <p>
-            还没有{AppConfig.use(window.assetCategory).topAsset.name}, 去<Link to='/asset-management?locale=asset-management'>创建</Link>
+            还没有{AppConfig.use(window.assetCategory).assetType.label}, 去
+            <Link to='/asset-management?locale=asset-management'>创建</Link>
           </p>
         }
         image={Empty.PRESENTED_IMAGE_SIMPLE}
@@ -164,7 +169,11 @@ const ProjectOverview: React.FC = () => {
     <OverviewPage
       {...{
         chartList: [
-          { title: AppConfig.use(window.assetCategory).topAsset.name, colProps, options: statisticOfAsset },
+          {
+            title: AppConfig.use(window.assetCategory).assetType.label,
+            colProps,
+            options: statisticOfAsset
+          },
           { title: '监测点', colProps, options: statisticOfMeasurement },
           { title: '传感器', colProps, options: statisticOfSensor },
           { colProps: colProps2, render: <AlarmStatisticOfProject title='报警趋势' /> }

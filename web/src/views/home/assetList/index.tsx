@@ -1,6 +1,5 @@
 import { Button, Empty, message, Spin } from 'antd';
 import * as React from 'react';
-import { AssetTypes } from '../common/constants';
 import { getAssets, importAssets } from './services';
 import { SearchResultPage } from '../components/searchResultPage';
 import { filterEmptyChildren } from '../common/treeDataHelper';
@@ -18,7 +17,8 @@ import { AssetExport } from '../components/assetExport';
 import * as AppConfig from '../../../config';
 
 const AssetManagement: React.FC = () => {
-  const topAssetName = AppConfig.use(window.assetCategory).topAsset.name;
+  const appConfig = AppConfig.use(window.assetCategory);
+  const isAssetWind = appConfig.category === 'wind';
   const { pathname, search } = useLocation();
   const [assets, setAssets] = React.useState<{
     loading: boolean;
@@ -32,13 +32,16 @@ const AssetManagement: React.FC = () => {
 
   React.useEffect(() => {
     localStorage.setItem('prevProjectId', getProject());
-    fetchAssets({ type: AssetTypes.WindTurbind.id });
-  }, []);
+    fetchAssets({ type: appConfig.assetType.id });
+  }, [appConfig.assetType.id]);
 
   const fetchAssets = (filters?: Pick<AssetRow, 'type'>) => {
     setAssets((prev) => ({ ...prev, loading: true }));
     getAssets(filters).then((assets) => {
-      setAssets({ loading: false, items: filterEmptyChildren(assets) });
+      setAssets({
+        loading: false,
+        items: filterEmptyChildren(assets).filter((asset) => asset.parentId === 0)
+      });
     });
   };
 
@@ -51,7 +54,7 @@ const AssetManagement: React.FC = () => {
         assets={assets.items}
         pathname={pathname}
         search={search}
-        onsuccess={() => fetchAssets({ type: AssetTypes.WindTurbind.id })}
+        onsuccess={() => fetchAssets({ type: appConfig.assetType.id })}
         {...actionStatus}
       />
     );
@@ -61,7 +64,7 @@ const AssetManagement: React.FC = () => {
     return importAssets(getProject(), data).then((res) => {
       if (res.data.code === 200) {
         message.success('导入成功');
-        fetchAssets({ type: AssetTypes.WindTurbind.id });
+        fetchAssets({ type: appConfig.assetType.id });
       } else {
         message.error(`导入失败: ${res.data.msg}`);
       }
@@ -74,19 +77,33 @@ const AssetManagement: React.FC = () => {
         actions: hasPermission(Permission.AssetAdd) && (
           <ActionBar
             actions={[
-              <Button type='primary' onClick={() => actionStatus.handleWindEdit()}>
-                添加{topAssetName}
-                <PlusOutlined />
-              </Button>,
               <Button
+                key='topAssetEdit'
                 type='primary'
-                onClick={() => actionStatus.handleFlangeEdit()}
-                disabled={assets.items.length === 0}
+                onClick={() => {
+                  if (isAssetWind) {
+                    actionStatus.handleWindEdit();
+                  } else {
+                    actionStatus.handleTopAssetEdit();
+                  }
+                }}
               >
-                添加法兰
+                添加{appConfig.assetType.label}
                 <PlusOutlined />
               </Button>,
+              isAssetWind && (
+                <Button
+                  key='flangeEidt'
+                  type='primary'
+                  onClick={() => actionStatus.handleFlangeEdit()}
+                  disabled={assets.items.length === 0}
+                >
+                  添加法兰
+                  <PlusOutlined />
+                </Button>
+              ),
               <Button
+                key='measurementEdit'
                 type='primary'
                 onClick={() => actionStatus.handleMeasurementEdit()}
                 disabled={
@@ -97,11 +114,11 @@ const AssetManagement: React.FC = () => {
                 添加监测点
                 <PlusOutlined />
               </Button>,
-              assets.items.length > 0 && <AssetExport winds={assets.items} />,
-              <FileInput onUpload={handleUpload} />
+              assets.items.length > 0 && <AssetExport winds={assets.items} key='export' />,
+              <FileInput onUpload={handleUpload} key='upload' />
             ]}
             {...actionStatus}
-            onSuccess={() => fetchAssets({ type: AssetTypes.WindTurbind.id })}
+            onSuccess={() => fetchAssets({ type: appConfig.assetType.id })}
           />
         ),
         results: renderResult()

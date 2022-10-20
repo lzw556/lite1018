@@ -1,26 +1,10 @@
-import {
-  Checkbox,
-  Col,
-  Divider,
-  Empty,
-  Form,
-  Input,
-  Modal,
-  ModalProps,
-  Row,
-  Select,
-  Spin
-} from 'antd';
+import { Checkbox, Col, Empty, Form, Input, Modal, ModalProps, Row, Select, Spin } from 'antd';
 import * as React from 'react';
+import * as AppConfig from '../../../../../config';
 import { AssetRow } from '../../../assetList/props';
 import { getAssets } from '../../../assetList/services';
-import { AssetTypes } from '../../../common/constants';
-import { AlarmRule, MeasurementRow } from '../props';
-import {
-  bindMeasurementsToAlarmRule,
-  bindMeasurementsToAlarmRule2,
-  unbindMeasurementsToAlarmRule
-} from '../services';
+import { AlarmRule } from '../props';
+import { bindMeasurementsToAlarmRule2 } from '../services';
 
 type MixinAssetRow = AssetRow & { pointIds: number[]; checked: boolean; indeterminate: boolean };
 
@@ -43,7 +27,7 @@ export const MeasurementBind: React.FC<
           monitoringPoints.some(({ type }) => type === props.selectedRow.type)
       );
 
-    getAssets({ type: AssetTypes.WindTurbind.id }).then((data) => {
+    getAssets({ type: AppConfig.use(window.assetCategory).assetType.id }).then((data) => {
       setLoading(false);
       const assets = data.filter(filterValidPoints).map((asset) => {
         const pointIds: number[] = [];

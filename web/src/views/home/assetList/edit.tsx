@@ -1,20 +1,21 @@
 import { Form, Modal, ModalProps } from 'antd';
 import * as React from 'react';
 import { defaultValidateMessages } from '../../../constants/validator';
-import { AssetTypes } from '../common/constants';
 import { EditFormPayload } from '../common/useActionBarStatus';
 import { EditContent } from './editContent';
 import { Asset, convertRow } from './props';
 import { addAsset, updateAsset } from './services';
+import * as AppConfig from '../../../config';
 
 export const AssetEdit: React.FC<
   ModalProps & { payload?: EditFormPayload; onSuccess: () => void }
 > = (props) => {
+  const windConfig = AppConfig.use('wind');
   const { payload, onSuccess } = props;
   const asset = payload?.asset;
   const [form] = Form.useForm<Asset>();
-  const doUpdating = asset && asset.type === AssetTypes.Flange.id ? true : false;
-  const parentId = asset && asset.type === AssetTypes.WindTurbind.id ? asset.id : undefined;
+  const doUpdating = asset && asset.type === windConfig.assetType.secondAsset?.id ? true : false;
+  const parentId = asset && asset.type === windConfig.assetType.id ? asset.id : undefined;
   React.useEffect(() => {
     if (asset && doUpdating) {
       form.resetFields();
@@ -26,7 +27,7 @@ export const AssetEdit: React.FC<
   return (
     <Modal
       {...{
-        title: `${AssetTypes.Flange.label}${doUpdating ? '编辑' : '添加'}`,
+        title: `${windConfig.assetType.secondAsset?.label}${doUpdating ? '编辑' : '添加'}`,
         cancelText: '取消',
         okText: doUpdating ? '更新' : '添加',
         ...props,

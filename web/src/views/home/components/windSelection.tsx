@@ -10,7 +10,7 @@ import * as AppConfig from '../../../config';
 export const WindSelection: React.FC<{ winds: AssetRow[]; onSuccess: () => void } & ModalProps> = (
   props
 ) => {
-  const topAssetName = AppConfig.use(window.assetCategory).topAsset.name;
+  const topAssetName = AppConfig.use(window.assetCategory).assetType.label;
   const [form] = Form.useForm();
   const [selected, setSelected] = React.useState<CheckboxValueType[]>([]);
   const [loading, setLoading] = React.useState(false);

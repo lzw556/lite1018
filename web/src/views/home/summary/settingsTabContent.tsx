@@ -5,7 +5,7 @@ import { defaultValidateMessages, Rules } from '../../../constants/validator';
 import { isMobile } from '../../../utils/deviceDetection';
 import { EditContent } from '../assetList/editContent';
 import { AssetRow } from '../assetList/props';
-import { AssetTypes } from '../common/constants';
+import * as AppConfig from '../../../config';
 
 export const SettingsTabContent: React.FC<{
   asset?: AssetRow;
@@ -14,16 +14,18 @@ export const SettingsTabContent: React.FC<{
 }> = ({ asset, form, onSubmit }) => {
   const renderFormItems = () => {
     if (asset) {
-      if (asset.type === AssetTypes.WindTurbind.id) {
+      if (asset.type === AppConfig.use(window.assetCategory).assetType.id) {
         return (
           <>
             <Form.Item label='名称' name='name' rules={[Rules.range(4, 50)]}>
-              <Input placeholder={`请填写${AssetTypes.WindTurbind.label}名称`} />
+              <Input
+                placeholder={`请填写${AppConfig.use(window.assetCategory).assetType.label}名称`}
+              />
             </Form.Item>
             <Form.Item
               name='type'
               hidden={true}
-              initialValue={AssetTypes.WindTurbind.id}
+              initialValue={AppConfig.use(window.assetCategory).assetType.id}
             ></Form.Item>
           </>
         );

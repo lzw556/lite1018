@@ -2,9 +2,10 @@ import { Col, Empty, Row } from 'antd';
 import * as React from 'react';
 import { useHistory } from 'react-router-dom';
 import ShadowCard from '../../../../components/shadowCard';
+import * as AppConfig from '../../../../config';
 import { AssetRow } from '../../assetList/props';
 import { sortFlangesByAttributes } from '../../assetList/util';
-import { AssetTypes, MeasurementTypes } from '../../common/constants';
+import { MeasurementTypes } from '../../common/constants';
 import { generateChartOptionsOfLastestData } from '../../common/historyDataHelper';
 import { getAssetStatistics } from '../../common/statisticsHelper';
 import { combineFinalUrl, generateColProps } from '../../common/utils';
@@ -61,7 +62,12 @@ export const MonitorTabContent: React.FC<{
             id: item.id,
             title: {
               name: item.name,
-              path: combineFinalUrl(pathname, search, AssetTypes.Flange.url, item.id)
+              path: combineFinalUrl(
+                pathname,
+                search,
+                AppConfig.use('wind').assetType.secondAsset?.url || '',
+                item.id
+              )
             },
             alarmState,
             icon: { svg: <FlangeIcon />, small: true, focus: true },

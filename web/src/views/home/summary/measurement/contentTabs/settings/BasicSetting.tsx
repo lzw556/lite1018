@@ -1,13 +1,14 @@
 import { Button, Col, Form, Input, Row, Select } from 'antd';
 import React from 'react';
 import DeviceSelect from '../../../../../../components/select/deviceSelect';
+import * as AppConfig from '../../../../../../config';
 import { defaultValidateMessages, Rules } from '../../../../../../constants/validator';
 import { useStore } from '../../../../../../hooks/store';
 import { DeviceType } from '../../../../../../types/device_type';
 import { isMobile } from '../../../../../../utils/deviceDetection';
 import { AssetRow } from '../../../../assetList/props';
 import { getAssets } from '../../../../assetList/services';
-import { AssetTypes, MeasurementTypes } from '../../../../common/constants';
+import { MeasurementTypes } from '../../../../common/constants';
 import { convertRow, Measurement, MeasurementRow } from '../../props';
 import { bindDevice, unbindDevice, updateMeasurement } from '../../services';
 
@@ -19,9 +20,11 @@ export const BasicSetting: React.FC<MeasurementRow & { onUpdate?: () => void }> 
   const [store] = useStore('measurementListFilters');
 
   React.useEffect(() => {
-    getAssets({ type: AssetTypes.Flange.id }).then((assets) => {
+    getAssets({ type: AppConfig.use('wind').assetType.secondAsset?.id }).then((assets) => {
       setParents(
-        assets.filter((asset) => (store.windTurbineId ? store.windTurbineId === asset.parentId : true))
+        assets.filter((asset) =>
+          store.windTurbineId ? store.windTurbineId === asset.parentId : true
+        )
       );
     });
   }, [store]);
@@ -38,7 +41,7 @@ export const BasicSetting: React.FC<MeasurementRow & { onUpdate?: () => void }> 
 
   return (
     <Row>
-      <Col span={isMobile ? 16 :8}>
+      <Col span={isMobile ? 16 : 8}>
         <Form form={form} labelCol={{ span: 4 }} validateMessages={defaultValidateMessages}>
           <Form.Item label='id' name='id' hidden={true}>
             <Input />

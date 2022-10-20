@@ -1,7 +1,7 @@
 import { Breadcrumb, Dropdown, Menu, Space } from 'antd';
 import * as React from 'react';
 import { Link, useHistory, useLocation } from 'react-router-dom';
-import { AssetTypes, MeasurementTypes } from '../common/constants';
+import { MeasurementTypes } from '../common/constants';
 import { getAssets } from '../assetList/services';
 import { combineFinalUrl } from '../common/utils';
 import { DownOutlined } from '@ant-design/icons';
@@ -10,6 +10,7 @@ import { getMenus } from '../../../utils/session';
 import { Menu as MenuPro } from '../../../types/menu';
 import { Node } from '../common/treeDataHelper';
 import { AssetRow } from '../assetList/props';
+import * as AppConfig from '../../../config';
 
 type BreadcrumbItemData = Node & { type?: number };
 export const AssetNavigator: React.FC<
@@ -39,7 +40,7 @@ export const AssetNavigator: React.FC<
     }
   }, [pathname]);
   React.useEffect(() => {
-    getAssets({ type: AssetTypes.WindTurbind.id }).then(setAssets);
+    getAssets({ type: AppConfig.use(window.assetCategory).assetType.id }).then(setAssets);
   }, [isForceRefresh]);
 
   React.useEffect(() => {
@@ -81,7 +82,7 @@ export const AssetNavigator: React.FC<
   const renderBreadcrumbItemDDMenu = (assets: BreadcrumbItemData[]) => {
     if (assets.length > 0) {
       return (
-        <Menu style={{overflow:'auto', maxHeight:600, minWidth: 200}}>
+        <Menu style={{ overflow: 'auto', maxHeight: 600, minWidth: 200 }}>
           {assets.map((asset) => (
             <Menu.Item
               key={asset.id}
@@ -130,8 +131,15 @@ export const AssetNavigator: React.FC<
   };
 
   const pickUrlFromType = (asset: BreadcrumbItemData) => {
-    const types = [...Object.values(AssetTypes), ...Object.values(MeasurementTypes)];
-    const assetType = types.find((_type) => _type.id === asset.type);
+    const types = [
+      ...Object.values([
+        AppConfig.use('default').assetType,
+        AppConfig.use('wind').assetType,
+        AppConfig.use('wind').assetType.secondAsset
+      ]),
+      ...Object.values(MeasurementTypes)
+    ];
+    const assetType = types.find((_type) => _type?.id === asset.type);
     return assetType
       ? combineFinalUrl(pathname, search, assetType.url, asset.id)
       : `${pathname}${search.split('/')[0]}`;

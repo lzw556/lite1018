@@ -1,11 +1,9 @@
-import { AssetTypes } from '../common/constants';
+import * as AppConfig from '../../../config';
 import { AssetRow } from './props';
 
 export function sortFlangesByAttributes(assets: AssetRow[]) {
-  const lastFlangeType =
-    AssetTypes.Flange.categories && AssetTypes.Flange.categories.length > 0
-      ? AssetTypes.Flange.categories[AssetTypes.Flange.categories.length - 1].value
-      : 0;
+  const categories = AppConfig.use('wind').assetType.secondAsset?.categories || [];
+  const lastFlangeType = categories.length > 0 ? categories[categories.length - 1].value : 0;
   return assets
     .sort((prev, next) => {
       const { index: prevIndex } = prev.attributes || { index: 5 };
@@ -16,5 +14,8 @@ export function sortFlangesByAttributes(assets: AssetRow[]) {
       const { type: prevType } = prev.attributes || { type: lastFlangeType };
       const { type: nextType } = next.attributes || { type: lastFlangeType };
       return prevType - nextType;
+    })
+    .sort((prev, next) => {
+      return prev.type - next.type;
     });
 }

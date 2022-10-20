@@ -1,7 +1,6 @@
 import { Button, Empty, message, Select, Spin } from 'antd';
 import * as React from 'react';
 import { useLocation } from 'react-router-dom';
-import { AssetTypes } from '../common/constants';
 import { getAssets, importAssets } from '../assetList/services';
 import Label from '../../../components/label';
 import { SearchResultPage } from '../components/searchResultPage';
@@ -18,7 +17,7 @@ import { FileInput } from '../components/fileInput';
 import * as AppConfig from '../../../config';
 
 const MeasurementManagement: React.FC = () => {
-  const topAssetName = AppConfig.use(window.assetCategory).topAsset.name;
+  const topAssetName = AppConfig.use(window.assetCategory).assetType.label;
   const { pathname, search } = useLocation();
   const [assets, setAssets] = React.useState<{
     loading: boolean;
@@ -35,7 +34,7 @@ const MeasurementManagement: React.FC = () => {
 
   React.useEffect(() => {
     localStorage.setItem('prevProjectId', getProject());
-    fetchAssets({ type: AssetTypes.WindTurbind.id });
+    fetchAssets({ type: AppConfig.use(window.assetCategory).assetType.id });
   }, []);
 
   React.useEffect(() => {
@@ -106,7 +105,7 @@ const MeasurementManagement: React.FC = () => {
     return importAssets(getProject(), data).then((res) => {
       if (res.data.code === 200) {
         message.success('导入成功');
-        fetchAssets({ type: AssetTypes.WindTurbind.id });
+        fetchAssets({ type: AppConfig.use(window.assetCategory).assetType.id });
       } else {
         message.error(`导入失败: ${res.data.msg}`);
       }
@@ -148,7 +147,9 @@ const MeasurementManagement: React.FC = () => {
             ]}
             {...actionStatus}
             // assetId={filters?.windTurbineId}
-            onSuccess={() => fetchAssets({ type: AssetTypes.WindTurbind.id })}
+            onSuccess={() =>
+              fetchAssets({ type: AppConfig.use(window.assetCategory).assetType.id })
+            }
           />
         ),
         results: renderResult()

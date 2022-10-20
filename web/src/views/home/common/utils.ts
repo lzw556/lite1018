@@ -1,5 +1,6 @@
 import moment from 'moment';
-import { AssetTypes, MeasurementTypes } from './constants';
+import { MeasurementTypes } from './constants';
+import * as AppConfig from '../../../config';
 
 export function generateColProps({
   xs,
@@ -58,7 +59,13 @@ export const getFilename = (res: any) => {
 };
 
 export function verifyAssetOverview(search: string) {
-  if (Object.values(AssetTypes).find((type) => search.indexOf(type.url) > -1)) {
+  if (
+    Object.values([
+      AppConfig.use('default').assetType,
+      AppConfig.use('wind').assetType,
+      AppConfig.use('wind').assetType.secondAsset
+    ]).find((type) => search.indexOf(type?.url || '') > -1)
+  ) {
     return true;
   }
   if (Object.values(MeasurementTypes).find((type) => search.indexOf(type.url) > -1)) {

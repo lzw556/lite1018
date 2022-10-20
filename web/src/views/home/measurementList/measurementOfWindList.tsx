@@ -3,7 +3,7 @@ import { Button, Col, Empty, Popconfirm, Row, Space, Table, TableProps, Tag } fr
 import * as React from 'react';
 import { Link } from 'react-router-dom';
 import { AssetRow } from '../assetList/props';
-import { AssetTypes, MeasurementTypes } from '../common/constants';
+import { MeasurementTypes } from '../common/constants';
 import { generatePropertyColumns } from '../common/historyDataHelper';
 import {
   convertAlarmLevelToState,
@@ -19,6 +19,7 @@ import usePermission, { Permission } from '../../../permission/permission';
 import HasPermission from '../../../permission';
 import { isMobile } from '../../../utils/deviceDetection';
 import { EditFormPayload } from '../common/useActionBarStatus';
+import * as AppConfig from '../../../config';
 
 export const MeasurementOfWindList: React.FC<{
   wind?: AssetRow;
@@ -107,7 +108,7 @@ export const MeasurementOfWindList: React.FC<{
                   title={'确定要删除该监测点吗?'}
                   onConfirm={() => {
                     deleteMeasurement(row.id).then(() => {
-                      fetchAssets({ type: AssetTypes.WindTurbind.id });
+                      fetchAssets({ type: AppConfig.use('wind').assetType.id });
                     });
                   }}
                 >
@@ -130,7 +131,12 @@ export const MeasurementOfWindList: React.FC<{
     return (
       <Col span={24} key={id}>
         <Link
-          to={combineFinalUrl(pathname, search, AssetTypes.Flange.url, id)}
+          to={combineFinalUrl(
+            pathname,
+            search,
+            AppConfig.use('wind').assetType.secondAsset?.url || '',
+            id
+          )}
           style={{ display: 'block', marginBottom: 8, marginTop: 8, fontSize: 16 }}
         >
           {title}
