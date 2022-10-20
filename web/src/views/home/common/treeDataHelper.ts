@@ -25,13 +25,14 @@ export function filterEmptyChildren<T extends Node>(nodes: T[]) {
 }
 
 export function mapTreeNode<N extends Node>(node: N, fn: <N extends Node>(node: N) => N): N {
-  if (node.children && node.children.length > 0) {
+  const newNode = fn(node);
+  if (newNode.children && newNode.children.length > 0) {
     return {
-      ...fn(node),
-      children: node.children.map((node) => mapTreeNode(node, fn))
+      ...newNode,
+      children: newNode.children.map((node) => mapTreeNode(node, fn))
     };
   } else {
-    return fn(node);
+    return newNode;
   }
 }
 
