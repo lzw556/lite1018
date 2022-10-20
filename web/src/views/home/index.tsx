@@ -77,7 +77,7 @@ const ProjectOverview: React.FC = () => {
     getAssets({ type: AppConfig.use(window.assetCategory).assetType.id }).then((assets) =>
       setWindTurbines({
         loading: false,
-        items: assets.map((item) => {
+        items: assets.filter(asset => asset.parentId === 0).map((item) => {
           const { alarmState, statistics } = getAssetStatistics(
             item.statistics,
             'monitoringPointNum',
