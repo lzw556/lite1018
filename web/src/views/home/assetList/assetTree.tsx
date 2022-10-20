@@ -31,6 +31,7 @@ export const AssetTree: React.FC<{
   handleWindEdit?: (data?: EditFormPayload) => void;
   handleFlangeEdit?: (data?: EditFormPayload) => void;
   handleMeasurementEdit?: (data?: EditFormPayload) => void;
+  handleChildAddition?: (data?: EditFormPayload) => void;
 }> = ({
   assets,
   pathname,
@@ -39,7 +40,8 @@ export const AssetTree: React.FC<{
   handleTopAssetEdit,
   handleFlangeEdit,
   handleWindEdit,
-  handleMeasurementEdit
+  handleMeasurementEdit,
+  handleChildAddition
 }) => {
   const [treedata, setTreedata] = React.useState<any>();
   const [selectedNode, setSelectedNode] = React.useState<any>();
@@ -179,12 +181,14 @@ export const AssetTree: React.FC<{
                       <PlusOutlined
                         onClick={() => {
                           const type = selectedNode?.type;
-                          if (type === AppConfig.use(window.assetCategory).assetType.id) {
+                          if (type === AppConfig.use('wind').assetType.id) {
                             handleFlangeEdit && handleFlangeEdit({ asset: selectedNode });
                           } else if (
                             type === AppConfig.use(window.assetCategory).assetType.secondAsset?.id
                           ) {
                             handleMeasurementEdit && handleMeasurementEdit({ asset: selectedNode });
+                          } else {
+                            handleChildAddition && handleChildAddition({ asset: selectedNode });
                           }
                         }}
                       />

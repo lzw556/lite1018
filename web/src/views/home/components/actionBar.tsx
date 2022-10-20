@@ -1,5 +1,6 @@
 import { Space } from 'antd';
 import * as React from 'react';
+import { ChildAddition } from '../assetList/childAddition';
 import { AssetEdit } from '../assetList/edit';
 import { TopAssetEdit } from '../assetList/topAssetEdit';
 import { WindEdit } from '../assetList/windEdit';
@@ -60,6 +61,19 @@ export const ActionBar: React.FC<{
       )}
       {visible && target === 3 && (
         <MeasurementEdit
+          {...{
+            visible,
+            onCancel: () => setVisible && setVisible(false),
+            payload,
+            onSuccess: () => {
+              if (onSuccess) onSuccess();
+              setVisible && setVisible(false);
+            }
+          }}
+        />
+      )}
+      {visible && target === 4 && (
+        <ChildAddition
           {...{
             visible,
             onCancel: () => setVisible && setVisible(false),

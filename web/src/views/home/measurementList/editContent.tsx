@@ -18,7 +18,7 @@ export const EditContent: React.FC<{ form: any; asset?: AssetRow; doUpdating?: b
   const [disabled, setDisabled] = React.useState(true);
   const configWind = AppConfig.use('wind');
   const parentId =
-    asset && asset.type === configWind.assetType.secondAsset?.id ? asset.id : undefined;
+    asset && asset.type !== configWind.assetType.id ? asset.id : undefined;
   const parentLabel =
     AppConfig.use(window.assetCategory).assetType.secondAsset?.label ||
     AppConfig.use(window.assetCategory).assetType.label;

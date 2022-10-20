@@ -33,6 +33,12 @@ export function useActionBarStatus() {
     setTarget(3);
   };
 
+  const handleChildAddition = (data?: EditFormPayload) => {
+    setPayload(data);
+    setVisible(true);
+    setTarget(4);
+  };
+
   return {
     visible,
     setVisible,
@@ -41,6 +47,7 @@ export function useActionBarStatus() {
     handleTopAssetEdit,
     handleWindEdit,
     handleFlangeEdit,
-    handleMeasurementEdit
+    handleMeasurementEdit,
+    handleChildAddition
   };
 }
