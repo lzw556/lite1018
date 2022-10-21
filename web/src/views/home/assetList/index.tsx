@@ -11,7 +11,7 @@ import { useLocation } from 'react-router-dom';
 import { ActionBar } from '../components/actionBar';
 import { useActionBarStatus } from '../common/useActionBarStatus';
 import usePermission, { Permission } from '../../../permission/permission';
-import { PlusOutlined } from '@ant-design/icons';
+import { PlusOutlined, WindowsFilled } from '@ant-design/icons';
 import { FileInput } from '../components/fileInput';
 import { AssetExport } from '../components/assetExport';
 import * as AppConfig from '../../../config';
@@ -107,8 +107,13 @@ const AssetManagement: React.FC = () => {
                 type='primary'
                 onClick={() => actionStatus.handleMeasurementEdit()}
                 disabled={
-                  assets.items.filter((asset) => asset.children && asset.children.length > 0)
-                    .length === 0
+                  assets.items.filter((asset) => {
+                    if (window.assetCategory === 'wind') {
+                      return asset.children && asset.children.length > 0;
+                    } else {
+                      return true;
+                    }
+                  }).length === 0
                 }
               >
                 添加监测点

@@ -32,6 +32,7 @@ export const BoltOverview = lazy(()=>import('./home/summary/measurement/boltOver
 export const AlarmRule = lazy(() => import('./home/summary/measurement/alarm'));
 export const AlarmRuleGroupCreation = lazy(() => import('./home/summary/measurement/alarm/alarmRuleGroupCreation'));
 export const AlarmRuleGroupEdit = lazy(() => import('./home/summary/measurement/alarm/alarmRuleGroupEdit'));
+export const AssetOverview = lazy(() => import('./home/summary/base/assetOverview'));
 
 export const Unauthorized = lazy(() => import('./403'));
 export const NotFound = lazy(() => import('./404'));

@@ -20,6 +20,6 @@ export const assetType = {
   id: 100,
   label: '资产',
   parent_id: 0,
-  url: '/windturbine',
+  url: '/asset',
   secondAsset: undefined
 };

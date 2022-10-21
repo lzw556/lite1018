@@ -54,7 +54,12 @@ export const AssetNavigator: React.FC<
       }
     };
     if (assets.length > 0) {
-      const node = { id: 0, name: menu?.title || '总览', parentId: -1, children: assets };
+      const node = {
+        id: 0,
+        name: menu?.title || '总览',
+        parentId: -1,
+        children: assets.filter((asset) => asset.parentId === 0)
+      };
       const arr: Node[] = [];
       forEachTreeNode(node, (node) => {
         arr.push(node);

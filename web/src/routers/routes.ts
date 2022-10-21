@@ -245,7 +245,40 @@ const SecondaryRoutes: Menu[] = [
     hidden: true,
     isAuth: true,
     children: []
-  }
+  },
+  {
+    id: 113,
+    name: 'asset',
+    path: '/project-overview',
+    title: '总览',
+    view: 'AssetOverview',
+    icon: '',
+    hidden: false,
+    isAuth: true,
+    children: []
+  },
+  {
+    id: 114,
+    name: 'asset',
+    path: '/asset-management',
+    title: '资产列表',
+    view: 'AssetOverview',
+    icon: '',
+    hidden: false,
+    isAuth: true,
+    children: []
+  },
+  {
+    id: 115,
+    name: 'asset',
+    path: '/measurement-management',
+    title: '监测点列表',
+    view: 'AssetOverview',
+    icon: '',
+    hidden: false,
+    isAuth: true,
+    children: []
+  },
 ];
 
 export { AppRoutes, SecondaryRoutes };
