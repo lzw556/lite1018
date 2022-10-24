@@ -486,6 +486,7 @@ export function getKeysOfFirstClassFields(measurementType: number) {
 }
 
 function getFirstClassFields(measurement: MeasurementRow) {
+  if(!measurement.properties) return []
   const fields: (Property['fields'][0] & Pick<Property, 'precision' | 'unit'>)[] = [];
   getKeysOfFirstClassFields(measurement.type).forEach((fieldKey) => {
     for (const property of measurement.properties) {

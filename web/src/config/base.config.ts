@@ -25,7 +25,7 @@ export const assetType = {
 };
 
 export const measurementTypes: Record<
-  'loosening_angle' | 'preload',
+  'loosening_angle' | 'preload' | 'thickness',
   {
     id: number;
     label: string;
@@ -53,5 +53,13 @@ export const measurementTypes: Record<
     url: '/bolt',
     firstClassFieldKeys: ['preload', 'pressure', 'tof', 'temperature'],
     deviceType: DeviceType.BoltElongation
+  },
+  
+  thickness: {
+    id: 10201,
+    label: '厚度',
+    url: '/bolt',
+    firstClassFieldKeys: ['thickness', 'temperature', 'annualized_corrosion_rate'],
+    deviceType: DeviceType.NormalTemperatureCorrosion
   }
 };
