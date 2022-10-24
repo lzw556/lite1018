@@ -74,4 +74,5 @@ export type AlarmRule = {
   bindedStatus?: boolean;
   bindingStatus?: boolean;
   alertLevel?:number;
+  editable: boolean;
 };

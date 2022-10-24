@@ -53,29 +53,40 @@ const AlarmRuleList = () => {
       render: (x: any, row: AlarmRule) => {
         return (
           <Space>
-            <HasPermission value={Permission.AlarmRuleGroupEdit}>
-              <Button type='text' size='small' title={`编辑`}>
-                <Link to={`alarm-management?locale=alarmRules/editAlarmRuleGroup&id=${row.id}`}>
-                  <EditOutlined />
-                </Link>
-              </Button>
-            </HasPermission>
-            <HasPermission value={Permission.AlarmRuleDelete}>
-              <Popconfirm
-                title={`确定要删除该规则吗?`}
-                onConfirm={() => {
-                  deleteAlarmRule(row.id).then(() => {
-                    fetchAlarmRules();
-                  });
-                }}
-              >
-                <Button type='text' danger={true} size='small' title={`删除`}>
-                  <DeleteOutlined />
-                </Button>
-              </Popconfirm>
-            </HasPermission>
+            {row.editable && (
+              <>
+                <HasPermission value={Permission.AlarmRuleGroupEdit}>
+                  <Button type="text" size="small" title={`编辑`}>
+                    <Link
+                      to={`alarm-management?locale=alarmRules/editAlarmRuleGroup&id=${row.id}`}
+                    >
+                      <EditOutlined />
+                    </Link>
+                  </Button>
+                </HasPermission>
+                <HasPermission value={Permission.AlarmRuleDelete}>
+                  <Popconfirm
+                    title={`确定要删除该规则吗?`}
+                    onConfirm={() => {
+                      deleteAlarmRule(row.id).then(() => {
+                        fetchAlarmRules();
+                      });
+                    }}
+                  >
+                    <Button
+                      type="text"
+                      danger={true}
+                      size="small"
+                      title={`删除`}
+                    >
+                      <DeleteOutlined />
+                    </Button>
+                  </Popconfirm>
+                </HasPermission>
+              </>
+            )}
             <HasPermission value={Permission.AlarmRuleGroupBind}>
-              <Button type='text' size='small' title='编辑监测点'>
+              <Button type="text" size="small" title="编辑监测点">
                 <MoreOutlined
                   onClick={() => {
                     setSelectedRow(row);
