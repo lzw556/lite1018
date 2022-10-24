@@ -31,7 +31,7 @@ export const measurementTypes: Record<
     label: string;
     url: string;
     firstClassFieldKeys: string[];
-    deviceType: number;
+    deviceType: number[];
   }
 > = {
   loosening_angle: {
@@ -45,14 +45,14 @@ export const measurementTypes: Record<
       'temperature',
       'measurement_index'
     ],
-    deviceType: DeviceType.BoltLoosening
+    deviceType: [DeviceType.BoltLoosening]
   },
   preload: {
     id: 10301,
     label: '预紧力',
     url: '/bolt',
     firstClassFieldKeys: ['preload', 'pressure', 'tof', 'temperature'],
-    deviceType: DeviceType.BoltElongation
+    deviceType: [DeviceType.BoltElongation]
   },
   
   thickness: {
@@ -60,6 +60,6 @@ export const measurementTypes: Record<
     label: '厚度',
     url: '/bolt',
     firstClassFieldKeys: ['thickness', 'temperature', 'annualized_corrosion_rate'],
-    deviceType: DeviceType.NormalTemperatureCorrosion
+    deviceType: [DeviceType.NormalTemperatureCorrosion, DeviceType.HighTemperatureCorrosion]
   }
 };

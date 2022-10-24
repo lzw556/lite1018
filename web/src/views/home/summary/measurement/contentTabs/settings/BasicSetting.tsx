@@ -33,7 +33,7 @@ export const BasicSetting: React.FC<MeasurementRow & { onUpdate?: () => void }> 
     const values = convertRow(props);
     if (values) {
       const type = Object.values(AppConfig.use(window.assetCategory).measurementTypes).find((type) => type.id === values.type);
-      if (type) setTypes([type.deviceType]);
+      if (type) setTypes(type.deviceType);
       form.setFieldsValue(values);
     }
   }, [form, props]);

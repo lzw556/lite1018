@@ -46,7 +46,7 @@ export const EditContent: React.FC<{ form: any; asset?: AssetRow; doUpdating?: b
             if (!doUpdating) {
               const type = Object.values(AppConfig.use(window.assetCategory).measurementTypes).find((type) => type.id === e);
               if (type) {
-                setTypes([type.deviceType]);
+                setTypes(type.deviceType);
                 if (form.getFieldValue('device_id')) {
                   form.setFieldsValue({ device_id: undefined });
                 }
