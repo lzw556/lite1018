@@ -1,15 +1,15 @@
-import { Form, Modal, ModalProps } from 'antd';
-import * as React from 'react';
-import { defaultValidateMessages } from '../../../constants/validator';
-import { EditFormPayload } from '../common/useActionBarStatus';
-import { convertRow, Measurement } from '../summary/measurement/props';
+import { Form, Modal, ModalProps } from "antd";
+import * as React from "react";
+import { defaultValidateMessages } from "../../../constants/validator";
+import { EditFormPayload } from "../common/useActionBarStatus";
+import { convertRow, Measurement } from "../summary/measurement/props";
 import {
-  addMeasurement,
+  addMeasurements,
   bindDevice,
   unbindDevice,
-  updateMeasurement
-} from '../summary/measurement/services';
-import { EditContent } from './editContent';
+  updateMeasurement,
+} from "../summary/measurement/services";
+import { EditContent } from "./editContent";
 
 export const MeasurementEdit: React.FC<
   ModalProps & { payload?: EditFormPayload; onSuccess: () => void }
@@ -30,16 +30,25 @@ export const MeasurementEdit: React.FC<
   return (
     <Modal
       {...{
-        title: `监测点${doUpdating ? '编辑' : '添加'}`,
-        cancelText: '取消',
-        okText: doUpdating ? '更新' : '添加',
+        title: `监测点${doUpdating ? "编辑" : "添加"}`,
+        cancelText: "取消",
+        okText: doUpdating ? "更新" : "添加",
         ...props,
         onOk: () => {
           form.validateFields().then((values) => {
             try {
               if (!doUpdating) {
-                addMeasurement(values).then((measurement) => {
-                  bindDevice(measurement.id, values.device_id);
+                addMeasurements({
+                  monitoring_points: [
+                    {
+                      asset_id: values.asset_id,
+                      name: values.name,
+                      type: values.type,
+                      attributes: values.attributes,
+                      device_binding: { device_id: values.device_id },
+                    },
+                  ],
+                }).then(() => {
                   onSuccess();
                 });
               } else if (measurement) {
@@ -62,10 +71,14 @@ export const MeasurementEdit: React.FC<
               console.log(error);
             }
           });
-        }
+        },
       }}
     >
-      <Form form={form} labelCol={{ span: 4 }} validateMessages={defaultValidateMessages}>
+      <Form
+        form={form}
+        labelCol={{ span: 4 }}
+        validateMessages={defaultValidateMessages}
+      >
         <EditContent asset={asset} form={form} />
       </Form>
     </Modal>

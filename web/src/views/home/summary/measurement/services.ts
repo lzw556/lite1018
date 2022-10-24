@@ -136,3 +136,15 @@ export function exportAlarmRules(alarm_rule_group_ids?: number[]) {
 export function importAlarmRules(data: any) {
   return request.post<any>(`alarmRuleGroups/import`, data);
 }
+
+export function addMeasurements(data: {
+  monitoring_points: {
+    asset_id: number;
+    name: string;
+    type: number;
+    attributes?: { index: number };
+    device_binding: { device_id: number };
+  }[];
+}) {
+  return request.post<any>(`monitoringPoints/batch`, data).then(PostResponse);
+}
