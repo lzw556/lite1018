@@ -5,7 +5,6 @@ import { Rules } from '../../../constants/validator';
 import { DeviceType } from '../../../types/device_type';
 import { AssetRow } from '../assetList/props';
 import { getAssets } from '../assetList/services';
-import { MeasurementTypes } from '../common/constants';
 import * as AppConfig from '../../../config';
 
 export const EditContent: React.FC<{ form: any; asset?: AssetRow; doUpdating?: boolean }> = ({
@@ -45,7 +44,7 @@ export const EditContent: React.FC<{ form: any; asset?: AssetRow; doUpdating?: b
           placeholder='请选择类型'
           onChange={(e) => {
             if (!doUpdating) {
-              const type = Object.values(MeasurementTypes).find((type) => type.id === e);
+              const type = Object.values(AppConfig.use(window.assetCategory).measurementTypes).find((type) => type.id === e);
               if (type) {
                 setTypes([type.deviceType]);
                 if (form.getFieldValue('device_id')) {
@@ -57,7 +56,7 @@ export const EditContent: React.FC<{ form: any; asset?: AssetRow; doUpdating?: b
           }}
           disabled={doUpdating}
         >
-          {Object.values(MeasurementTypes).map(({ id, label }) => (
+          {Object.values(AppConfig.use(window.assetCategory).measurementTypes).map(({ id, label }) => (
             <Select.Option key={id} value={id}>
               {label}
             </Select.Option>

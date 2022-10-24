@@ -6,12 +6,12 @@ import { isMobile } from '../../../utils/deviceDetection';
 import { AssetRow } from '../assetList/props';
 import { sortMeasurementsByAttributes } from '../measurementList/util';
 import { MeasurementRow, Property } from '../summary/measurement/props';
-import { MeasurementTypes } from './constants';
 import {
   convertAlarmLevelToState,
   getAlarmLevelColor,
   getAlarmStateText
 } from './statisticsHelper';
+import * as AppConfig from '../../../config';
 
 export type HistoryData = {
   timestamp: number;
@@ -40,7 +40,7 @@ export function generateChartOptionsOfLastestData(
   polar.push(actuals.radius);
   angleAxis.push(actuals.angleAxis);
   const max = getMax(actuals.max, attributes, measurements[0].type);
-  const min = measurements[0].type === MeasurementTypes.loosening_angle.id ? -(max * 1.5) : max / 2;
+  const min = measurements[0].type === AppConfig.use(window.assetCategory).measurementTypes.loosening_angle.id ? -(max * 1.5) : max / 2;
   radiusAxis.push({ ...actuals.radiusAxis, max, min });
   series.push(actuals.series);
 
@@ -51,7 +51,7 @@ export function generateChartOptionsOfLastestData(
     field = firstClassFields[0];
   }
   if (
-    measurements[0].type === MeasurementTypes.preload.id &&
+    measurements[0].type === AppConfig.use(window.assetCategory).measurementTypes.preload.id &&
     checkValidAttr(attributes, 'normal', min)
   ) {
     const seriesName = `额定值 ${attributes?.normal?.value}${field?.unit}`
@@ -61,7 +61,7 @@ export function generateChartOptionsOfLastestData(
   }
 
   if (
-    measurements[0].type === MeasurementTypes.loosening_angle.id &&
+    measurements[0].type === AppConfig.use(window.assetCategory).measurementTypes.loosening_angle.id &&
     checkValidAttr(attributes, 'initial', min)
   ) {
     const seriesName = `初始值 ${attributes?.initial?.value}${field?.unit}`
@@ -128,11 +128,11 @@ function checkValidAttr(
 
 function getMax(max: number, attributes: AssetRow['attributes'], type: number) {
   let final = max;
-  if (type === MeasurementTypes.preload.id && checkValidAttr(attributes, 'normal', final, true)) {
+  if (type === AppConfig.use(window.assetCategory).measurementTypes.preload.id && checkValidAttr(attributes, 'normal', final, true)) {
     final = Math.abs(attributes?.normal?.value as number);
   }
   if (
-    type === MeasurementTypes.loosening_angle.id &&
+    type === AppConfig.use(window.assetCategory).measurementTypes.loosening_angle.id &&
     checkValidAttr(attributes, 'initial', final, true)
   ) {
     final = Math.abs(attributes?.initial?.value as number);
@@ -193,7 +193,7 @@ export function generateChartOptionsOfHistoryData(
     },
     xAxis: { type: 'time' },
     yAxis:
-      measurementType === MeasurementTypes.preload.id
+      measurementType === AppConfig.use(window.assetCategory).measurementTypes.preload.id
         ? { type: 'value' }
         : {
             type: 'value',
@@ -481,7 +481,7 @@ function roundValue(value: number, precision?: number) {
 }
 
 export function getKeysOfFirstClassFields(measurementType: number) {
-  const type = Object.values(MeasurementTypes).find((type) => type.id === measurementType);
+  const type = Object.values(AppConfig.use(window.assetCategory).measurementTypes).find((type) => type.id === measurementType);
   return type ? type.firstClassFieldKeys : [];
 }
 

@@ -3,7 +3,6 @@ import { Button, Col, Empty, Popconfirm, Row, Space, Table, TableProps, Tag } fr
 import * as React from 'react';
 import { Link } from 'react-router-dom';
 import { AssetRow } from '../assetList/props';
-import { MeasurementTypes } from '../common/constants';
 import { generatePropertyColumns } from '../common/historyDataHelper';
 import {
   convertAlarmLevelToState,
@@ -55,7 +54,7 @@ export const MeasurementOfWindList: React.FC<{
         key: 'name',
         width: isMobile ? 300 : 400,
         render: (name: string, row: MeasurementRow) => (
-          <Link to={combineFinalUrl(pathname, search, MeasurementTypes.preload.url, row.id)}>
+          <Link to={combineFinalUrl(pathname, search, AppConfig.use(window.assetCategory).measurementTypes.preload.url, row.id)}>
             {name}
           </Link>
         )

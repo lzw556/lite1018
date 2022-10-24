@@ -8,7 +8,6 @@ import { DeviceType } from '../../../../../../types/device_type';
 import { isMobile } from '../../../../../../utils/deviceDetection';
 import { AssetRow } from '../../../../assetList/props';
 import { getAssets } from '../../../../assetList/services';
-import { MeasurementTypes } from '../../../../common/constants';
 import { convertRow, Measurement, MeasurementRow } from '../../props';
 import { bindDevice, unbindDevice, updateMeasurement } from '../../services';
 
@@ -33,7 +32,7 @@ export const BasicSetting: React.FC<MeasurementRow & { onUpdate?: () => void }> 
     form.resetFields();
     const values = convertRow(props);
     if (values) {
-      const type = Object.values(MeasurementTypes).find((type) => type.id === values.type);
+      const type = Object.values(AppConfig.use(window.assetCategory).measurementTypes).find((type) => type.id === values.type);
       if (type) setTypes([type.deviceType]);
       form.setFieldsValue(values);
     }
@@ -51,7 +50,7 @@ export const BasicSetting: React.FC<MeasurementRow & { onUpdate?: () => void }> 
           </Form.Item>
           <Form.Item label='类型' name='type' rules={[{ required: true, message: `请选择类型` }]}>
             <Select placeholder='请选择类型' disabled={!!id}>
-              {Object.values(MeasurementTypes).map(({ id, label }) => (
+              {Object.values(AppConfig.use(window.assetCategory).measurementTypes).map(({ id, label }) => (
                 <Select.Option key={id} value={id}>
                   {label}
                 </Select.Option>

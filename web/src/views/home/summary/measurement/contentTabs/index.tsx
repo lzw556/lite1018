@@ -2,12 +2,12 @@ import * as React from 'react';
 import { FilterableAlarmRecordTable } from '../../../../../components/alarm/filterableAlarmRecordTable';
 import ShadowCard from '../../../../../components/shadowCard';
 import usePermission, { Permission } from '../../../../../permission/permission';
-import { MeasurementTypes } from '../../../common/constants';
 import { MeasurementRow } from '../props';
 import { DynamicData } from './dynamicData';
 import { HistoryData } from './historyData';
 import { Monitor } from './monitor';
 import { MeasurementSettings } from './settings';
+import * as AppConfig from '../../../../../config';
 
 export const MeasurementContents: React.FC<MeasurementRow & { onUpdate?: () => void }> = (
   measurement
@@ -26,7 +26,7 @@ export const MeasurementContents: React.FC<MeasurementRow & { onUpdate?: () => v
       { key: 'monitor', tab: '监控' },
       { key: 'history', tab: '历史数据' }
     ];
-    if (measurement.type === MeasurementTypes.preload.id)
+    if (measurement.type === AppConfig.use(window.assetCategory).measurementTypes.preload.id)
       tabList.push({ key: 'dynamicData', tab: '动态数据' });
     if (hasPermission(Permission.MeasurementEdit))
       tabList.push({ key: 'setting', tab: '配置信息' });

@@ -7,9 +7,9 @@ import MyBreadcrumb from '../../../../../components/myBreadcrumb';
 import ShadowCard from '../../../../../components/shadowCard';
 import { defaultValidateMessages, Rules } from '../../../../../constants/validator';
 import { isMobile } from '../../../../../utils/deviceDetection';
-import { MeasurementTypes } from '../../../common/constants';
 import { AlarmRule } from '../props';
 import { addAlarmRule, getPropertiesByMeasurementType } from '../services';
+import * as AppConfig from '../../../../../config';
 
 const AlarmRuleGroupCreation = () => {
   const history = useHistory();
@@ -64,7 +64,7 @@ const AlarmRuleGroupCreation = () => {
               style={{ width: isMobile ? '75%' : 435 }}
               onChange={(e) => {
                 getPropertiesByMeasurementType(e).then((res) => {
-                  const measurementType = Object.values(MeasurementTypes).find(
+                  const measurementType = Object.values(AppConfig.use(window.assetCategory).measurementTypes).find(
                     ({ id }) => e === id
                   );
                   if (measurementType) {
@@ -87,7 +87,7 @@ const AlarmRuleGroupCreation = () => {
                 }
               }}
             >
-              {Object.values(MeasurementTypes).map(({ label, id }) => (
+              {Object.values(AppConfig.use(window.assetCategory).measurementTypes).map(({ label, id }) => (
                 <Select.Option key={id} value={id}>
                   {label}
                 </Select.Option>

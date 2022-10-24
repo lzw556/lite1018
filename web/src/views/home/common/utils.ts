@@ -1,5 +1,4 @@
 import moment from 'moment';
-import { MeasurementTypes } from './constants';
 import * as AppConfig from '../../../config';
 
 export function generateColProps({
@@ -68,7 +67,7 @@ export function verifyAssetOverview(search: string) {
   ) {
     return true;
   }
-  if (Object.values(MeasurementTypes).find((type) => search.indexOf(type.url) > -1)) {
+  if (Object.values(AppConfig.use(window.assetCategory).measurementTypes).find((type) => search.indexOf(type.url) > -1)) {
     return true;
   }
   return false;

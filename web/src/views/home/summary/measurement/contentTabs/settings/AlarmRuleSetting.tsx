@@ -2,7 +2,6 @@ import { Button, Empty, Space, Spin, Table, TableProps, Tag } from 'antd';
 import * as React from 'react';
 import { Link } from 'react-router-dom';
 import { isMobile } from '../../../../../../utils/deviceDetection';
-import { MeasurementTypes } from '../../../../common/constants';
 import {
   convertAlarmLevelToState,
   getAlarmLevelColor,
@@ -14,6 +13,7 @@ import {
   getAlarmRules,
   unbindMeasurementsToAlarmRule
 } from '../../services';
+import * as AppConfig from '../../../../../../config';
 
 export const AlarmRuleSetting: React.FC<MeasurementRow & { onUpdate?: () => void }> = (props) => {
   const [allRules, setAllRules] = React.useState<AlarmRule[]>();
@@ -81,7 +81,7 @@ export const AlarmRuleSetting: React.FC<MeasurementRow & { onUpdate?: () => void
       key: 'type',
       width: 120,
       render: (typeId: number) => {
-        const type = Object.values(MeasurementTypes).find(({ id }) => id === typeId);
+        const type = Object.values(AppConfig.use(window.assetCategory).measurementTypes).find(({ id }) => id === typeId);
         return type ? type.label : '-';
       }
     },

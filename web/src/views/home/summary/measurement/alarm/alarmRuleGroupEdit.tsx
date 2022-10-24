@@ -6,9 +6,9 @@ import MyBreadcrumb from '../../../../../components/myBreadcrumb';
 import ShadowCard from '../../../../../components/shadowCard';
 import { defaultValidateMessages, Normalizes, Rules } from '../../../../../constants/validator';
 import { isMobile } from '../../../../../utils/deviceDetection';
-import { MeasurementTypes } from '../../../common/constants';
 import { AlarmRule } from '../props';
 import { getAlarmRule, updateAlarmRule } from '../services';
+import * as AppConfig from '../../../../../config';
 
 const AlarmRuleGroupEdit = () => {
   const history = useHistory();
@@ -70,7 +70,7 @@ const AlarmRuleGroupEdit = () => {
             rules={[{ required: true, message: '请选择监测点类型' }]}
           >
             <Select disabled={true} style={{ width: isMobile ? '75%' : 435 }}>
-              {Object.values(MeasurementTypes).map(({ label, id }) => (
+              {Object.values(AppConfig.use(window.assetCategory).measurementTypes).map(({ label, id }) => (
                 <Select.Option key={id} value={id}>
                   {label}
                 </Select.Option>

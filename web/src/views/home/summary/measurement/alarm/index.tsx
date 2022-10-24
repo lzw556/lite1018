@@ -10,7 +10,6 @@ import * as React from 'react';
 import { Link } from 'react-router-dom';
 import HasPermission from '../../../../../permission';
 import usePermission, { Permission } from '../../../../../permission/permission';
-import { MeasurementTypes } from '../../../common/constants';
 import {
   convertAlarmLevelToState,
   getAlarmLevelColor,
@@ -22,6 +21,7 @@ import { AlarmRule } from '../props';
 import { deleteAlarmRule, getAlarmRules, importAlarmRules } from '../services';
 import { MeasurementBind } from './measurementBind';
 import { RuleSelection } from './ruleSelection';
+import * as AppConfig from '../../../../../config';
 
 const AlarmRuleList = () => {
   const { hasPermission } = usePermission();
@@ -41,7 +41,7 @@ const AlarmRuleList = () => {
       key: 'type',
       width: 120,
       render: (typeId: number) => {
-        const type = Object.values(MeasurementTypes).find(({ id }) => id === typeId);
+        const type = Object.values(AppConfig.use(window.assetCategory).measurementTypes).find(({ id }) => id === typeId);
         return type ? type.label : '-';
       }
     }

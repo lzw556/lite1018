@@ -1,7 +1,6 @@
 import { Breadcrumb, Dropdown, Menu, Space } from 'antd';
 import * as React from 'react';
 import { Link, useHistory, useLocation } from 'react-router-dom';
-import { MeasurementTypes } from '../common/constants';
 import { getAssets } from '../assetList/services';
 import { combineFinalUrl } from '../common/utils';
 import { DownOutlined } from '@ant-design/icons';
@@ -142,7 +141,7 @@ export const AssetNavigator: React.FC<
         AppConfig.use('wind').assetType,
         AppConfig.use('wind').assetType.secondAsset
       ]),
-      ...Object.values(MeasurementTypes)
+      ...Object.values(AppConfig.use(window.assetCategory).measurementTypes)
     ];
     const assetType = types.find((_type) => _type?.id === asset.type);
     return assetType

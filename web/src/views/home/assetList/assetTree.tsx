@@ -6,7 +6,6 @@ import { Link } from 'react-router-dom';
 import HasPermission from '../../../permission';
 import { Permission } from '../../../permission/permission';
 import { isMobile } from '../../../utils/deviceDetection';
-import { MeasurementTypes } from '../common/constants';
 import { generateDatasOfMeasurement } from '../common/historyDataHelper';
 import { convertAlarmLevelToState } from '../common/statisticsHelper';
 import { mapTreeNode } from '../common/treeDataHelper';
@@ -130,7 +129,7 @@ export const AssetTree: React.FC<{
         if (selectedNode?.type < 10000) {
           if (assetType) subpath = assetType.url;
         } else {
-          subpath = MeasurementTypes.preload.url;
+          subpath = AppConfig.use(window.assetCategory).measurementTypes.preload.url;
         }
         return (
           <Space>

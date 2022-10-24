@@ -4,7 +4,6 @@ import * as React from 'react';
 import { useHistory } from 'react-router-dom';
 import ShadowCard from '../../../../components/shadowCard';
 import { AssetRow } from '../../assetList/props';
-import { MeasurementTypes } from '../../common/constants';
 import {
   generateChartOptionsOfHistoryData,
   generateChartOptionsOfLastestData,
@@ -14,6 +13,7 @@ import { combineFinalUrl, generateColProps } from '../../common/utils';
 import { ChartContainer } from '../../components/charts/chartContainer';
 import { MeasurementRow } from '../measurement/props';
 import { getData } from '../measurement/services';
+import * as AppConfig from '../../../../config';
 
 export const MonitorTabContent: React.FC<{
   measurements: MeasurementRow[];
@@ -72,7 +72,7 @@ export const MonitorTabContent: React.FC<{
       </ShadowCard>
     );
 
-  const measurementType = Object.values(MeasurementTypes).find(
+  const measurementType = Object.values(AppConfig.use(window.assetCategory).measurementTypes).find(
     (type) => type.id === measurements[0].type
   );
   if (!measurementType) return null;
@@ -93,7 +93,7 @@ export const MonitorTabContent: React.FC<{
                     combineFinalUrl(
                       pathname,
                       search,
-                      MeasurementTypes.preload.url,
+                      AppConfig.use(window.assetCategory).measurementTypes.preload.url,
                       measurements[index].id
                     )
                   );
