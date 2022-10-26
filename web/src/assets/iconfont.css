@@ -1,10 +1,10 @@
 @font-face {
-  font-family: "iconfont"; /* Project id  */
+  font-family: 'iconfont'; /* Project id  */
   src: url('iconfont.ttf?t=1637809232464') format('truetype');
 }
 
 .iconfont {
-  font-family: "iconfont" !important;
+  font-family: 'iconfont' !important;
   font-size: 16px;
   font-style: normal;
   -webkit-font-smoothing: antialiased;
@@ -12,34 +12,33 @@
 }
 
 .icon-me:before {
-  content: "\e60b";
+  content: '\e60b';
 }
 
 .icon-device-management:before {
-  content: "\eb94";
+  content: '\eb94';
 }
 
 .icon-device-monitor:before {
-  content: "\e64b";
+  content: '\e64b';
 }
 
 .icon-project-management:before {
-  content: "\e623";
+  content: '\e623';
 }
 
 .icon-system:before {
-  content: "\e619";
+  content: '\e619';
 }
 
 .icon-alarm-management:before {
-  content: "\e601";
+  content: '\e601';
 }
 
 .icon-asset-management:before {
-  content: "\e9eb";
+  content: '\e9eb';
 }
 
 .icon-user-management:before {
-  content: "\e699";
+  content: '\e699';
 }
-

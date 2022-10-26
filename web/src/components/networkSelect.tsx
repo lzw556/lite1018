@@ -1,31 +1,35 @@
-import {FC, useEffect, useState} from "react";
-import {Select, SelectProps} from "antd";
-import {Network} from "../types/network";
-import {CaretDownOutlined} from "@ant-design/icons";
+import { FC, useEffect, useState } from 'react';
+import { Select, SelectProps } from 'antd';
+import { Network } from '../types/network';
+import { CaretDownOutlined } from '@ant-design/icons';
 
 export interface NetworkSelectProps extends SelectProps<any> {
-    asset: number
-    onDefaultSelect: (id: number) => void
+  asset: number;
+  onDefaultSelect: (id: number) => void;
 }
 
-const {Option} = Select
+const { Option } = Select;
 
 const NetworkSelect: FC<NetworkSelectProps> = (props) => {
-    const [networks, setNetworks] = useState<Network[]>([])
-    const {asset, onDefaultSelect} = props
+  const [networks, setNetworks] = useState<Network[]>([]);
+  const { asset, onDefaultSelect } = props;
 
-    useEffect(() => {
-        // GetNetworksRequest(asset).then(data => {
-        //     setNetworks(data)
-        //     onDefaultSelect(data[0]?.id)
-        // })
-    }, [asset])
+  useEffect(() => {
+    // GetNetworksRequest(asset).then(data => {
+    //     setNetworks(data)
+    //     onDefaultSelect(data[0]?.id)
+    // })
+  }, [asset]);
 
-    return <Select {...props} suffixIcon={<CaretDownOutlined/>}>
-        {
-            networks.map(item => (<Option key={item.id} value={item.id}>{item.name}</Option>))
-        }
+  return (
+    <Select {...props} suffixIcon={<CaretDownOutlined />}>
+      {networks.map((item) => (
+        <Option key={item.id} value={item.id}>
+          {item.name}
+        </Option>
+      ))}
     </Select>
-}
+  );
+};
 
-export default NetworkSelect
+export default NetworkSelect;

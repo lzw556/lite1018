@@ -32,7 +32,7 @@ const EditCalibrateParas = ({
         okText={'校准'}
         onOk={() => {
           form.validateFields().then((values) => {
-            onUpdate({...values, param: Number(values.param)});
+            onUpdate({ ...values, param: Number(values.param) });
           });
         }}
         cancelText={'取消'}
@@ -40,7 +40,7 @@ const EditCalibrateParas = ({
       >
         <Form form={form} labelCol={{ span: 8 }} validateMessages={defaultValidateMessages}>
           <Form.Item label={`${property.name}`} name='param' rules={[Rules.number]}>
-            <Input placeholder={`请输入${property.name}`} suffix={`${property.unit}`}/>
+            <Input placeholder={`请输入${property.name}`} suffix={`${property.unit}`} />
           </Form.Item>
         </Form>
       </Modal>

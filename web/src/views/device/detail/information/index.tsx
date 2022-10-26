@@ -30,7 +30,7 @@ const InformationCard: FC<GatewayInformationProps> = ({ device, isLoading }) => 
   return (
     <ShadowCard>
       <Skeleton loading={isLoading}>
-        <SingleDeviceDetail device={device} upgradeStatus={upgradeStatus}/>
+        <SingleDeviceDetail device={device} upgradeStatus={upgradeStatus} />
       </Skeleton>
     </ShadowCard>
   );

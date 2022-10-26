@@ -77,31 +77,33 @@ const ProjectOverview: React.FC = () => {
     getAssets({ type: AppConfig.use(window.assetCategory).assetType.id }).then((assets) =>
       setWindTurbines({
         loading: false,
-        items: assets.filter(asset => asset.parentId === 0).map((item) => {
-          const { alarmState, statistics } = getAssetStatistics(
-            item.statistics,
-            'monitoringPointNum',
-            ['anomalous', '异常监测点'],
-            'deviceNum',
-            'offlineDeviceNum'
-          );
-          return {
-            parentId: item.parentId,
-            id: item.id,
-            title: {
-              name: item.name,
-              path: combineFinalUrl(
-                pathname,
-                search,
-                AppConfig.use(window.assetCategory).assetType.url,
-                item.id
-              )
-            },
-            alarmState,
-            icon: { svg: <WindTurbineIcon />, small: true },
-            statistics
-          };
-        })
+        items: assets
+          .filter((asset) => asset.parentId === 0)
+          .map((item) => {
+            const { alarmState, statistics } = getAssetStatistics(
+              item.statistics,
+              'monitoringPointNum',
+              ['anomalous', '异常监测点'],
+              'deviceNum',
+              'offlineDeviceNum'
+            );
+            return {
+              parentId: item.parentId,
+              id: item.id,
+              title: {
+                name: item.name,
+                path: combineFinalUrl(
+                  pathname,
+                  search,
+                  AppConfig.use(window.assetCategory).assetType.url,
+                  item.id
+                )
+              },
+              alarmState,
+              icon: { svg: <WindTurbineIcon />, small: true },
+              statistics
+            };
+          })
       })
     );
   }, [pathname, search]);

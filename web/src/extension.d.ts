@@ -1,7 +1,7 @@
 declare global {
-    interface String {
-        macSeparator(): string
-    }
+  interface String {
+    macSeparator(): string;
+  }
 }
 
-export {}
+export {};

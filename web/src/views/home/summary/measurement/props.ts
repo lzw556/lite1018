@@ -33,7 +33,7 @@ export type MeasurementRow = {
     timestamp: number;
     values: { [propName: string]: number };
   };
-  alertLevel?: number
+  alertLevel?: number;
 };
 
 export function convertRow(values?: MeasurementRow): Measurement | null {
@@ -73,6 +73,6 @@ export type AlarmRule = {
   monitoringPoints?: MeasurementRow[];
   bindedStatus?: boolean;
   bindingStatus?: boolean;
-  alertLevel?:number;
+  alertLevel?: number;
   editable: boolean;
 };

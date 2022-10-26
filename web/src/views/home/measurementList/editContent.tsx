@@ -16,8 +16,7 @@ export const EditContent: React.FC<{ form: any; asset?: AssetRow; doUpdating?: b
   const [parents, setParents] = React.useState<AssetRow[]>([]);
   const [disabled, setDisabled] = React.useState(true);
   const configWind = AppConfig.use('wind');
-  const parentId =
-    asset && asset.type !== configWind.assetType.id ? asset.id : undefined;
+  const parentId = asset && asset.type !== configWind.assetType.id ? asset.id : undefined;
   const parentLabel =
     AppConfig.use(window.assetCategory).assetType.secondAsset?.label ||
     AppConfig.use(window.assetCategory).assetType.label;
@@ -44,7 +43,9 @@ export const EditContent: React.FC<{ form: any; asset?: AssetRow; doUpdating?: b
           placeholder='请选择类型'
           onChange={(e) => {
             if (!doUpdating) {
-              const type = Object.values(AppConfig.use(window.assetCategory).measurementTypes).find((type) => type.id === e);
+              const type = Object.values(AppConfig.use(window.assetCategory).measurementTypes).find(
+                (type) => type.id === e
+              );
               if (type) {
                 setTypes(type.deviceType);
                 if (form.getFieldValue('device_id')) {
@@ -56,11 +57,13 @@ export const EditContent: React.FC<{ form: any; asset?: AssetRow; doUpdating?: b
           }}
           disabled={doUpdating}
         >
-          {Object.values(AppConfig.use(window.assetCategory).measurementTypes).map(({ id, label }) => (
-            <Select.Option key={id} value={id}>
-              {label}
-            </Select.Option>
-          ))}
+          {Object.values(AppConfig.use(window.assetCategory).measurementTypes).map(
+            ({ id, label }) => (
+              <Select.Option key={id} value={id}>
+                {label}
+              </Select.Option>
+            )
+          )}
         </Select>
       </Form.Item>
       <Form.Item

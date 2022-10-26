@@ -1,4 +1,3 @@
-
 export type LoginResponse = {
-    username: string
-}
+  username: string;
+};

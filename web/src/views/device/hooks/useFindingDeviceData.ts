@@ -3,7 +3,7 @@ import { FindDeviceDataRequest } from '../../../apis/device';
 
 export const useFindingDeviceData = (): [
   boolean,
-  {timestamp:number}[],
+  { timestamp: number }[],
   (id: number, from: number, to: number, filters: any) => void
 ] => {
   const [isLoading, setIsLoading] = React.useState(false);

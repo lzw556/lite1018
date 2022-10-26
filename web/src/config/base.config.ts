@@ -8,7 +8,7 @@ export const devTypes: { val: number; name: string }[] = Object.values(DeviceTyp
     val: Number(val),
     name: DeviceType.toString(Number(val))
   }));
-  
+
 export const sensorTypes = DeviceType.sensors();
 
 export const site = {
@@ -54,7 +54,7 @@ export const measurementTypes: Record<
     firstClassFieldKeys: ['preload', 'pressure', 'tof', 'temperature'],
     deviceType: [DeviceType.BoltElongation]
   },
-  
+
   thickness: {
     id: 10201,
     label: '厚度',

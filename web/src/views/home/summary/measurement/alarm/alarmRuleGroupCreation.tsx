@@ -64,9 +64,9 @@ const AlarmRuleGroupCreation = () => {
               style={{ width: isMobile ? '75%' : 435 }}
               onChange={(e) => {
                 getPropertiesByMeasurementType(e).then((res) => {
-                  const measurementType = Object.values(AppConfig.use(window.assetCategory).measurementTypes).find(
-                    ({ id }) => e === id
-                  );
+                  const measurementType = Object.values(
+                    AppConfig.use(window.assetCategory).measurementTypes
+                  ).find(({ id }) => e === id);
                   if (measurementType) {
                     setDisabled(false);
                     setProperties(
@@ -87,11 +87,13 @@ const AlarmRuleGroupCreation = () => {
                 }
               }}
             >
-              {Object.values(AppConfig.use(window.assetCategory).measurementTypes).map(({ label, id }) => (
-                <Select.Option key={id} value={id}>
-                  {label}
-                </Select.Option>
-              ))}
+              {Object.values(AppConfig.use(window.assetCategory).measurementTypes).map(
+                ({ label, id }) => (
+                  <Select.Option key={id} value={id}>
+                    {label}
+                  </Select.Option>
+                )
+              )}
             </Select>
           </Form.Item>
           <Form.Item label='名称' name='name' rules={[Rules.range(4, 16)]}>
@@ -244,7 +246,10 @@ const AlarmRuleGroupCreation = () => {
                           rules={[Rules.range(4, 16), { validator: onNameValidator }]}
                           dependencies={index === 0 ? undefined : ['user', index - 1, 'name']}
                         >
-                          <Input placeholder={`请填写名称`} style={{ width: isMobile ? '75%' : 435 }} />
+                          <Input
+                            placeholder={`请填写名称`}
+                            style={{ width: isMobile ? '75%' : 435 }}
+                          />
                         </Form.Item>
                         {properties && properties.length > 0 && (
                           <Form.Item

@@ -1,81 +1,81 @@
 #login-page {
-    background-image: url("../../assets/images/login-bg-dark.jpg");
-    background-size: cover;
-    position: fixed;
-    height: 100%;
-    width: 100%;
-    overflow-y: scroll;
-    text-align: center;
+  background-image: url('../../assets/images/login-bg-dark.jpg');
+  background-size: cover;
+  position: fixed;
+  height: 100%;
+  width: 100%;
+  overflow-y: scroll;
+  text-align: center;
 }
 
 #login-page .logo {
-    padding-top: 8%;
-    position: relative;
-    display: inline-block;
+  padding-top: 8%;
+  position: relative;
+  display: inline-block;
 }
 
 #login-page .title {
-    font-size: 32px;
-    color: white;
-    letter-spacing: 10pt;
+  font-size: 32px;
+  color: white;
+  letter-spacing: 10pt;
 }
 
 #login-page .ad {
-    background-image: url("../../assets/images/login-ad-dark.png");
+  background-image: url('../../assets/images/login-ad-dark.png');
 }
 
 #login-page .split-line {
-    height: 1px;
-    background: linear-gradient(244deg, #2f3243, #c30d23 50%, #2f3243);
+  height: 1px;
+  background: linear-gradient(244deg, #2f3243, #c30d23 50%, #2f3243);
 }
 
 #login-page .ts-login-form {
-    padding-top: 18%;
-    text-align: start;
+  padding-top: 18%;
+  text-align: start;
 }
 
 #login-page Form Button {
+  width: 100%;
+  font-weight: bold;
+}
+#login-page .ant-form {
+  display: flex;
+  justify-content: space-between;
+  margin: auto;
+  width: 840px;
+}
+#login-page .ant-form .ant-form-item {
+  width: 30%;
+}
+@media (max-width: 840px) {
+  #login-page .ant-form {
+    display: inherit;
+    justify-content: initial;
+    width: auto;
+    padding: 30px;
+  }
+  #login-page .ant-form .ant-form-item {
     width: 100%;
-    font-weight: bold;
-}
-#login-page .ant-form{
-    display: flex;
-    justify-content: space-between;
-    margin: auto;
-    width: 840px;
-}
-#login-page .ant-form .ant-form-item{
-    width: 30%;
-}
-@media (max-width:840px){
-    #login-page .ant-form{
-        display: inherit;
-        justify-content: initial;
-        width: auto;
-        padding: 30px;
-    }
-    #login-page .ant-form .ant-form-item{
-        width: 100%;
-    }
-    #login-page .logo {
-        margin-top:50px;
-    }
-    #login-page .logo .ant-space {
-        gap: 0 !important;
-    }
-    #login-page .logo img[alt='ThetaSensors'] {
-        height: 70px;
-    }
-    #login-page .logo .split-line {
-        display: none;
-    }
-    #login-page .logo img[alt='Theta'] {
-       display: none;
-    }
-    #login-page .title {
-        display: none;
-    }
-    #login-page .ts-login-form{
-        padding-top: 0;
-    }
+  }
+  #login-page .logo {
+    margin-top: 50px;
+  }
+  #login-page .logo .ant-space {
+    gap: 0 !important;
+  }
+  #login-page .logo img[alt='ThetaSensors'] {
+    height: 70px;
+  }
+  #login-page .logo .split-line {
+    display: none;
+  }
+  #login-page .logo img[alt='Theta'] {
+    display: none;
+  }
+  #login-page .title {
+    display: none;
+  }
+  #login-page .ts-login-form {
+    padding-top: 0;
+  }
 }

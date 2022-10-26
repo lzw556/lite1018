@@ -75,7 +75,7 @@ export const RecentHistory: React.FC<{ device: Device }> = ({ device }) => {
             xAxis: {
               type: 'category',
               boundaryGap: false,
-              axisLabel: {show: false},
+              axisLabel: { show: false },
               data: times.map((item: any) => item.format('YYYY-MM-DD HH:mm:ss'))
             }
           };
@@ -88,7 +88,10 @@ export const RecentHistory: React.FC<{ device: Device }> = ({ device }) => {
     if (historyOptions && historyOptions.length) {
       return historyOptions.map((item: any, index: number) => {
         return (
-          <Card.Grid key={index} style={{ boxShadow: 'none', border: 'none', width: isMobile ? '100%' : '25%' }}>
+          <Card.Grid
+            key={index}
+            style={{ boxShadow: 'none', border: 'none', width: isMobile ? '100%' : '25%' }}
+          >
             <ReactECharts option={item} style={{ border: 'none', height: '256px' }} />
           </Card.Grid>
         );

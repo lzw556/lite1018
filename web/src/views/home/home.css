@@ -67,13 +67,13 @@ dl.name-value-groups.horizontal {
 }
 
 .introduction.normal .introduction-icon {
-  background-color: #28A745;
+  background-color: #28a745;
 }
 .introduction.info .introduction-icon {
-  background-color: #FFC107;
+  background-color: #ffc107;
 }
 .introduction.warn .introduction-icon {
-  background-color: #FE6D2C;
+  background-color: #fe6d2c;
 }
 .introduction.danger .introduction-icon {
   background-color: #ff0000;
@@ -93,13 +93,13 @@ dl.name-value-groups.horizontal {
   background-color: #fff;
 }
 .introduction.normal.focus .introduction-icon .icon-svg {
-  fill: #28A745;
+  fill: #28a745;
 }
 .introduction.info.focus .introduction-icon .icon-svg {
-  fill: #FFC107;
+  fill: #ffc107;
 }
 .introduction.warn.focus .introduction-icon .icon-svg {
-  fill: #FE6D2C;
+  fill: #fe6d2c;
 }
 .introduction.danger.focus .introduction-icon .icon-svg {
   fill: #ff0000;
@@ -115,10 +115,10 @@ dl.name-value-groups.horizontal {
   text-align: center;
 }
 .overview-statistic .ant-statistic.info .ant-statistic-content {
-  color: #FFC107;
+  color: #ffc107;
 }
 .overview-statistic .ant-statistic.warn .ant-statistic-content {
-  color: #FE6D2C;
+  color: #fe6d2c;
 }
 .overview-statistic .ant-statistic.danger .ant-statistic-content {
   color: #ff0000;
@@ -132,35 +132,35 @@ dl.name-value-groups.horizontal {
   font-size: 16px;
 }
 .asset-list-tree .ant-tree-icon__customize svg {
-  height:1em;
+  height: 1em;
   width: 1em;
   border-radius: 1em;
 }
 .asset-list-tree .ant-tree-icon__customize svg.normal {
-  background-color: #28A745;
+  background-color: #28a745;
 }
 .asset-list-tree .ant-tree-icon__customize svg.info {
-  background-color: #FFC107;
+  background-color: #ffc107;
 }
 .asset-list-tree .ant-tree-icon__customize svg.warn {
-  background-color: #FE6D2C;
+  background-color: #fe6d2c;
 }
 .asset-list-tree .ant-tree-icon__customize svg.danger {
   background-color: #ff0000;
 }
 .asset-list-tree .ant-tree-icon__customize svg.normal.focus {
   background-color: #fff;
-  fill:#28A745
+  fill: #28a745;
 }
 .asset-list-tree .ant-tree-icon__customize svg.info.focus {
   background-color: #fff;
-  fill:#FFC107
+  fill: #ffc107;
 }
 .asset-list-tree .ant-tree-icon__customize svg.warn.focus {
   background-color: #fff;
-  fill:#FE6D2C
+  fill: #fe6d2c;
 }
 .asset-list-tree .ant-tree-icon__customize svg.danger.focus {
   background-color: #fff;
-  fill:#ff0000
+  fill: #ff0000;
 }

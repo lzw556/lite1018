@@ -1,46 +1,52 @@
 .ts-detail-label {
-    line-height: 30px;
-    color: #8a8e99;
+  line-height: 30px;
+  color: #8a8e99;
 }
 
 .ts-graph {
-    position: relative;
-    width: 100%;
-    background: white repeating-radial-gradient(rgba(0, 0, 0, .2), rgba(0, 0, 0, .2) 1px, transparent 0, transparent 100%);
-    background-size: 30px 30px, 30px 30px;
+  position: relative;
+  width: 100%;
+  background: white
+    repeating-radial-gradient(
+      rgba(0, 0, 0, 0.2),
+      rgba(0, 0, 0, 0.2) 1px,
+      transparent 0,
+      transparent 100%
+    );
+  background-size: 30px 30px, 30px 30px;
 }
 
 .ts-remove {
-    transform: translateX(25px) translateY(-10px);
+  transform: translateX(25px) translateY(-10px);
 }
 
 .ts-form-item {
-    margin-bottom: 4px;
+  margin-bottom: 4px;
 }
 
 .ts-online {
-    border: 1px solid #28A745;
-    border-radius: 2px;
+  border: 1px solid #28a745;
+  border-radius: 2px;
 }
 
 .ts-online a {
-    color: #28A745;
+  color: #28a745;
 }
 
 .ts-offline {
-    border: 1px solid #FFC107;
-    border-radius: 2px;
+  border: 1px solid #ffc107;
+  border-radius: 2px;
 }
 
 .ts-offline a {
-    color: #FFC107;
+  color: #ffc107;
 }
 .ant-form fieldset {
-    margin-bottom: 10px;
-    padding: 20px;
-    border: solid 1px #d9d9d9;
+  margin-bottom: 10px;
+  padding: 20px;
+  border: solid 1px #d9d9d9;
 }
 .ant-form fieldset legend {
-    width: initial;
-    border: initial;
+  width: initial;
+  border: initial;
 }

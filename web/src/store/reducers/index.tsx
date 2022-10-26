@@ -1,38 +1,38 @@
-import {combineReducers} from 'redux';
-import userLogin from './user'
-import storage from "redux-persist/lib/storage";
-import {persistReducer} from "redux-persist";
-import getMenus from "./menu";
-import setProject from "./project";
-import setPermission from "./permission";
+import { combineReducers } from 'redux';
+import userLogin from './user';
+import storage from 'redux-persist/lib/storage';
+import { persistReducer } from 'redux-persist';
+import getMenus from './menu';
+import setProject from './project';
+import setPermission from './permission';
 
 export interface State<T> {
-    data: T
+  data: T;
 }
 
 const authPersistConfig = {
-    key: 'auth',
-    storage: storage,
-}
+  key: 'auth',
+  storage: storage
+};
 
 const menuPersistConfig = {
-    key: 'menu',
-    storage: storage,
-}
+  key: 'menu',
+  storage: storage
+};
 
 const projectPersistConfig = {
-    key: 'project',
-    storage: storage,
-}
+  key: 'project',
+  storage: storage
+};
 
 const permissionPersistConfig = {
-    key: 'permission',
-    storage: storage,
-}
+  key: 'permission',
+  storage: storage
+};
 
 export default combineReducers({
-    auth: persistReducer(authPersistConfig, userLogin),
-    menu: persistReducer(menuPersistConfig, getMenus),
-    project: persistReducer(projectPersistConfig, setProject),
-    permission: persistReducer(permissionPersistConfig, setPermission),
-})
+  auth: persistReducer(authPersistConfig, userLogin),
+  menu: persistReducer(menuPersistConfig, getMenus),
+  project: persistReducer(projectPersistConfig, setProject),
+  permission: persistReducer(permissionPersistConfig, setPermission)
+});

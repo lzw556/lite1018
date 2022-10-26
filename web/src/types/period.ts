@@ -1,4 +1,4 @@
 export type Period = {
-    value: number
-    text: string
-}
+  value: number;
+  text: string;
+};

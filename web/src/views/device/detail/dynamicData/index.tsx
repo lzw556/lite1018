@@ -8,7 +8,15 @@ import { EmptyLayout } from '../../../layout';
 import { useFindingDeviceData } from '../../hooks/useFindingDeviceData';
 import usePermission, { Permission } from '../../../../permission/permission';
 import EChartsReact from 'echarts-for-react';
-import { Fields_ad, Fields_be, Fields_be_axis, fields_be_hasAxis, useGetingDeviceData, Values_ad, Values_be } from '../../hooks/useGetingDeviceData';
+import {
+  Fields_ad,
+  Fields_be,
+  Fields_be_axis,
+  fields_be_hasAxis,
+  useGetingDeviceData,
+  Values_ad,
+  Values_be
+} from '../../hooks/useGetingDeviceData';
 import Label from '../../../../components/label';
 import { LineChartStyles } from '../../../../constants/chart';
 import { DownloadDeviceDataByTimestampRequest } from '../../../../apis/device';
@@ -163,7 +171,7 @@ export const DynamicData: React.FC<Device> = ({ id, typeId }) => {
         return (
           <Row>
             {DYNAMIC_DATA_BOLTELONGATION.metaData.map((item) => (
-              <Col span={isMobile ? 12: 8}>
+              <Col span={isMobile ? 12 : 8}>
                 <Row>
                   <Col span={isMobile ? 24 : 8} className='ts-detail-label'>
                     {item.label}
@@ -182,7 +190,7 @@ export const DynamicData: React.FC<Device> = ({ id, typeId }) => {
         return (
           <Row>
             {DYNAMIC_DATA_ANGLEDIP.metaData.map((item) => (
-              <Col span={isMobile ? 12: 8}>
+              <Col span={isMobile ? 12 : 8}>
                 <Row>
                   <Col span={isMobile ? 24 : 8} className='ts-detail-label'>
                     {item.label}
@@ -244,7 +252,7 @@ export const DynamicData: React.FC<Device> = ({ id, typeId }) => {
             <DownloadOutlined onClick={() => onDownload(timestamp)} />
           </Col>
         </Row>
-        {timestamp !== 0 && <ShadowCard style={{marginBottom: 10}}>{renderMeta()}</ShadowCard>}
+        {timestamp !== 0 && <ShadowCard style={{ marginBottom: 10 }}>{renderMeta()}</ShadowCard>}
         <Row>
           <Col span={20}>
             <Label name={'属性'}>
@@ -253,7 +261,11 @@ export const DynamicData: React.FC<Device> = ({ id, typeId }) => {
                 defaultValue={fields[0].value}
                 placeholder={'请选择属性'}
                 onChange={(value, option: any) =>
-                  setField({ label: option.children, value: option.key, unit: option.props['data-unit']} as any)
+                  setField({
+                    label: option.children,
+                    value: option.key,
+                    unit: option.props['data-unit']
+                  } as any)
                 }
               >
                 {fields.map(({ label, value, unit }) => (
@@ -337,8 +349,8 @@ export const DynamicData: React.FC<Device> = ({ id, typeId }) => {
             </Col>
           </Row>
         </Col>
-        <Col xl={18} xxl={20} style={{backgroundColor:'#f0f2f5'}}>
-          {timestamp !== 0 && <ShadowCard style={{marginBottom: 10}}>{renderMeta()}</ShadowCard>}
+        <Col xl={18} xxl={20} style={{ backgroundColor: '#f0f2f5' }}>
+          {timestamp !== 0 && <ShadowCard style={{ marginBottom: 10 }}>{renderMeta()}</ShadowCard>}
           <ShadowCard>
             <Row justify='end'>
               <Col>
@@ -349,7 +361,11 @@ export const DynamicData: React.FC<Device> = ({ id, typeId }) => {
                     placeholder={'请选择属性'}
                     style={{ width: '120px' }}
                     onChange={(value, option: any) =>
-                      setField({ label: option.children, value: option.key, unit: option.props['data-unit']} as any)
+                      setField({
+                        label: option.children,
+                        value: option.key,
+                        unit: option.props['data-unit']
+                      } as any)
                     }
                   >
                     {fields.map(({ label, value, unit }) => (
@@ -363,7 +379,7 @@ export const DynamicData: React.FC<Device> = ({ id, typeId }) => {
             </Row>
             <Row justify={'start'}>
               <Col span={24}>{renderChart()}</Col>
-            </Row>  
+            </Row>
           </ShadowCard>
         </Col>
       </Row>

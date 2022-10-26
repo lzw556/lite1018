@@ -17,7 +17,9 @@ export const Brand: React.FC<{
       {status === 'loaded' && (
         <img src={image?.src} alt={logoImgAlt || 'logo'} style={{ width, height }} />
       )}
-      <strong style={brandNameStyle} className='title'>{AppConfig.use(window.assetCategory).site.name}</strong>
+      <strong style={brandNameStyle} className='title'>
+        {AppConfig.use(window.assetCategory).site.name}
+      </strong>
     </Space>
   );
 };

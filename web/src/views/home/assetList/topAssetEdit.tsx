@@ -63,7 +63,7 @@ export const TopAssetEdit: React.FC<
           <Input placeholder={`请填写${topAsset.label}名称`} />
         </Form.Item>
         <Form.Item name='type' hidden={true} initialValue={topAsset.id}>
-          <Input/>
+          <Input />
         </Form.Item>
         {parents.length > 0 && (
           <Form.Item label='上级资产' name='parent_id' hidden={asset && asset.parentId === 0}>

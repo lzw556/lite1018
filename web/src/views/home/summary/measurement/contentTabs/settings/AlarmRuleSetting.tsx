@@ -81,7 +81,9 @@ export const AlarmRuleSetting: React.FC<MeasurementRow & { onUpdate?: () => void
       key: 'type',
       width: 120,
       render: (typeId: number) => {
-        const type = Object.values(AppConfig.use(window.assetCategory).measurementTypes).find(({ id }) => id === typeId);
+        const type = Object.values(AppConfig.use(window.assetCategory).measurementTypes).find(
+          ({ id }) => id === typeId
+        );
         return type ? type.label : '-';
       }
     },

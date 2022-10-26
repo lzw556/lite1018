@@ -73,11 +73,14 @@ const DevicePage = () => {
   const [visibleCalibrate, setVisibleCalibrate] = useState(false);
   const [visibleAlarmRules, setVisibleAlarmRules] = useState(false);
   const [store, setStore] = useStore('deviceList');
-  
+
   const fetchDevices = (store: Store['deviceList']) => {
-    const {filters, pagedOptions: {index, size}} = store;
+    const {
+      filters,
+      pagedOptions: { index, size }
+    } = store;
     PagingDevicesRequest(index, size, omitSpecificKeys(filters ?? {}, [])).then(setDataSource);
-  }
+  };
 
   useEffect(() => {
     fetchDevices(store);
@@ -269,14 +272,14 @@ const DevicePage = () => {
             .map((attr: any, index: number) => {
               if (index > 2) return null;
               const field = attr.fields.find((field: any) => field.important);
-              if(!field) return null;
+              if (!field) return null;
               let value = field.value;
-              if(!value) {
+              if (!value) {
                 value = value === 0 ? value : '-';
-              }else if(!Number.isInteger(field.value)){
-                value = field.value.toFixed(attr.precision)
+              } else if (!Number.isInteger(field.value)) {
+                value = field.value.toFixed(attr.precision);
               }
-              if(value !== '-') value = `${value}${attr.unit}`
+              if (value !== '-') value = `${value}${attr.unit}`;
               return `${attr.name}: ${value}`;
             })
             .join(', ');
@@ -379,7 +382,10 @@ const DevicePage = () => {
                     setStore((prev) => ({
                       ...prev,
                       pagedOptions: { ...prev.pagedOptions, index: 1 },
-                      filters: { ...prev.filters, type: Number.isInteger(val) ? Number(val) : undefined }
+                      filters: {
+                        ...prev.filters,
+                        type: Number.isInteger(val) ? Number(val) : undefined
+                      }
                     }));
                   }}
                   defaultValue={store.filters?.type}
@@ -395,7 +401,7 @@ const DevicePage = () => {
                 <Select
                   defaultValue={store.searchTarget}
                   style={{ width: '80px' }}
-                  onChange={(val) => setStore(prev => ({...prev, searchTarget: val}))}
+                  onChange={(val) => setStore((prev) => ({ ...prev, searchTarget: val }))}
                   suffixIcon={<CaretDownOutlined />}
                 >
                   <Option value={0}>名称</Option>
@@ -410,7 +416,10 @@ const DevicePage = () => {
                     setStore((prev) => ({
                       ...prev,
                       pagedOptions: { ...prev.pagedOptions, index: 1 },
-                      filters: { ...prev.filters, [store.searchTarget === 0 ? 'name' : 'mac_address']: val }
+                      filters: {
+                        ...prev.filters,
+                        [store.searchTarget === 0 ? 'name' : 'mac_address']: val
+                      }
                     }));
                   }}
                   allowClear
@@ -433,7 +442,9 @@ const DevicePage = () => {
                 Permission.DeviceDelete
               ]}
               dataSource={dataSource}
-              onChange={(index: number, size: number) => setStore(prev => ({...prev, pagedOptions: {index, size}}))}
+              onChange={(index: number, size: number) =>
+                setStore((prev) => ({ ...prev, pagedOptions: { index, size } }))
+              }
             />
           </Col>
         </Row>

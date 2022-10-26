@@ -70,11 +70,13 @@ const AlarmRuleGroupEdit = () => {
             rules={[{ required: true, message: '请选择监测点类型' }]}
           >
             <Select disabled={true} style={{ width: isMobile ? '75%' : 435 }}>
-              {Object.values(AppConfig.use(window.assetCategory).measurementTypes).map(({ label, id }) => (
-                <Select.Option key={id} value={id}>
-                  {label}
-                </Select.Option>
-              ))}
+              {Object.values(AppConfig.use(window.assetCategory).measurementTypes).map(
+                ({ label, id }) => (
+                  <Select.Option key={id} value={id}>
+                    {label}
+                  </Select.Option>
+                )
+              )}
             </Select>
           </Form.Item>
           <Form.Item label='名称' name='name'>
@@ -211,7 +213,10 @@ const AlarmRuleGroupEdit = () => {
                             disabled={true}
                           />
                         </Form.Item>
-                        <Form.Item label='指标' style={{ display: 'inline-flex', marginRight: 20, marginBottom: 0 }}>
+                        <Form.Item
+                          label='指标'
+                          style={{ display: 'inline-flex', marginRight: 20, marginBottom: 0 }}
+                        >
                           <Input
                             disabled={true}
                             value={rule.rules[index].metric.name}

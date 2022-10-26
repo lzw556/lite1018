@@ -12,46 +12,48 @@ export const SingleDeviceDetail: React.FC<{ device: Device; upgradeStatus: any }
   device,
   upgradeStatus
 }) => {
-
-    const render = () => {
-        if (device.information.iccid_4g) {
-            return  <Col span={isMobile ? 12 : 9}>
-                <Row>
-                    <Col span={isMobile ? 24 : 8} className='ts-detail-label'>
-                        4G卡号
-                    </Col>
-                    <Col span={isMobile ? 24 : 16} className='ts-detail-content'>
-                        {device.information.iccid_4g}
-                    </Col>
-                </Row>
+  const render = () => {
+    if (device.information.iccid_4g) {
+      return (
+        <Col span={isMobile ? 12 : 9}>
+          <Row>
+            <Col span={isMobile ? 24 : 8} className='ts-detail-label'>
+              4G卡号
             </Col>
-        }else {
-            return  <Col span={isMobile ? 12 : 9}>
-                <Row>
-                    <Col span={isMobile ? 24 : 8} className='ts-detail-label'>
-                        IP地址
-                    </Col>
-                    <Col span={isMobile ? 24 : 16} className='ts-detail-content'>
-                        {device.information.ip_address ? (
-                            <Space>
-                                {device.information.ip_address}{' '}
-                                <a
-                                    href={`http://${device.information.ip_address}`}
-                                    target={'_blank'}
-                                    style={{ fontSize: '10pt' }}
-                                >
-                                    访问管理界面
-                                </a>
-                            </Space>
-                        ) : (
-                            '-'
-                        )}
-                    </Col>
-                </Row>
+            <Col span={isMobile ? 24 : 16} className='ts-detail-content'>
+              {device.information.iccid_4g}
             </Col>
-        }
+          </Row>
+        </Col>
+      );
+    } else {
+      return (
+        <Col span={isMobile ? 12 : 9}>
+          <Row>
+            <Col span={isMobile ? 24 : 8} className='ts-detail-label'>
+              IP地址
+            </Col>
+            <Col span={isMobile ? 24 : 16} className='ts-detail-content'>
+              {device.information.ip_address ? (
+                <Space>
+                  {device.information.ip_address}{' '}
+                  <a
+                    href={`http://${device.information.ip_address}`}
+                    target={'_blank'}
+                    style={{ fontSize: '10pt' }}
+                  >
+                    访问管理界面
+                  </a>
+                </Space>
+              ) : (
+                '-'
+              )}
+            </Col>
+          </Row>
+        </Col>
+      );
     }
-
+  };
 
   return (
     <Row justify={'start'}>
@@ -73,7 +75,9 @@ export const SingleDeviceDetail: React.FC<{ device: Device; upgradeStatus: any }
           <Col span={isMobile ? 24 : 8} className='ts-detail-label'>
             类型
           </Col>
-          <Col span={isMobile ? 24 : 16} className='ts-detail-content'>{DeviceType.toString(device.typeId)}</Col>
+          <Col span={isMobile ? 24 : 16} className='ts-detail-content'>
+            {DeviceType.toString(device.typeId)}
+          </Col>
         </Row>
       </Col>
       <Col span={isMobile ? 12 : 9}>
@@ -113,7 +117,9 @@ export const SingleDeviceDetail: React.FC<{ device: Device; upgradeStatus: any }
           <Col span={isMobile ? 24 : 8} className='ts-detail-label'>
             所属网络
           </Col>
-          <Col span={isMobile ? 24 : 16} className='ts-detail-content'>{device.network ? device.network.name : '无'}</Col>
+          <Col span={isMobile ? 24 : 16} className='ts-detail-content'>
+            {device.network ? device.network.name : '无'}
+          </Col>
         </Row>
       </Col>
       <Col span={isMobile ? 12 : 9}>
@@ -134,7 +140,9 @@ export const SingleDeviceDetail: React.FC<{ device: Device; upgradeStatus: any }
           <Col span={isMobile ? 24 : 8} className='ts-detail-label'>
             信号强度(dB)
           </Col>
-          <Col span={isMobile ? 24 : 16} className='ts-detail-content'>{device.state ? device.state.signalLevel : '-'}</Col>
+          <Col span={isMobile ? 24 : 16} className='ts-detail-content'>
+            {device.state ? device.state.signalLevel : '-'}
+          </Col>
         </Row>
       </Col>
       <Col span={isMobile ? 12 : 9}>

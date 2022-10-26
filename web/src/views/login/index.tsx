@@ -45,7 +45,7 @@ const LoginPage: FC = () => {
           </Col>
         </Row>
         <br />
-        <Row justify='center' align='bottom' style={{visibility:'hidden'}}>
+        <Row justify='center' align='bottom' style={{ visibility: 'hidden' }}>
           <Col span={24}>
             <img src={ad} alt='Theta' />
           </Col>

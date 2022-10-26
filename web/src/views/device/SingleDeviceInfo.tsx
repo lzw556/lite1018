@@ -74,12 +74,12 @@ export const SingleDeviceInfo: React.FC<{
         {data.map((attr: any, index: number) => {
           if (index > 2) return null;
           const field = attr.fields.find((field: any) => field.important);
-          if(!field) return null;
+          if (!field) return null;
           let value = field.value;
-          if(!value) {
+          if (!value) {
             value = value === 0 ? value : '-';
-          }else if(!Number.isInteger(field.value)){
-            value = field.value.toFixed(attr.precision)
+          } else if (!Number.isInteger(field.value)) {
+            value = field.value.toFixed(attr.precision);
           }
           return (
             <Col span={8}>

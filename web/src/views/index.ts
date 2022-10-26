@@ -25,13 +25,19 @@ export const Project = lazy(() => import('./project'));
 export const DeviceMonitor = lazy(() => import('./device/DeviceMonitor'));
 export const ProjectOverview = lazy(() => import('./home'));
 export const AssetManagement = lazy(() => import('./home/assetList'));
-export const WindTurbineOverview = lazy(() => import('./home/summary/windTurbine/windTurbineOverview'));
+export const WindTurbineOverview = lazy(
+  () => import('./home/summary/windTurbine/windTurbineOverview')
+);
 export const FlangeOverview = lazy(() => import('./home/summary/flange/flangeOverview'));
 export const MeasurementManagement = lazy(() => import('./home/measurementList'));
-export const BoltOverview = lazy(()=>import('./home/summary/measurement/boltOverview'));
+export const BoltOverview = lazy(() => import('./home/summary/measurement/boltOverview'));
 export const AlarmRule = lazy(() => import('./home/summary/measurement/alarm'));
-export const AlarmRuleGroupCreation = lazy(() => import('./home/summary/measurement/alarm/alarmRuleGroupCreation'));
-export const AlarmRuleGroupEdit = lazy(() => import('./home/summary/measurement/alarm/alarmRuleGroupEdit'));
+export const AlarmRuleGroupCreation = lazy(
+  () => import('./home/summary/measurement/alarm/alarmRuleGroupCreation')
+);
+export const AlarmRuleGroupEdit = lazy(
+  () => import('./home/summary/measurement/alarm/alarmRuleGroupEdit')
+);
 export const AssetOverview = lazy(() => import('./home/summary/base/assetOverview'));
 
 export const Unauthorized = lazy(() => import('./403'));

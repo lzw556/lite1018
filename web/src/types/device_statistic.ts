@@ -1,6 +1,6 @@
-import {Device} from "./device";
+import { Device } from './device';
 
 export type DeviceStatistic = {
-    device: Device
-    status: number
-}
+  device: Device;
+  status: number;
+};

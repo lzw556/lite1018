@@ -40,7 +40,10 @@ export function generateChartOptionsOfLastestData(
   polar.push(actuals.radius);
   angleAxis.push(actuals.angleAxis);
   const max = getMax(actuals.max, attributes, measurements[0].type);
-  const min = measurements[0].type === AppConfig.use(window.assetCategory).measurementTypes.loosening_angle.id ? -(max * 1.5) : max / 2;
+  const min =
+    measurements[0].type === AppConfig.use(window.assetCategory).measurementTypes.loosening_angle.id
+      ? -(max * 1.5)
+      : max / 2;
   radiusAxis.push({ ...actuals.radiusAxis, max, min });
   series.push(actuals.series);
 
@@ -54,38 +57,39 @@ export function generateChartOptionsOfLastestData(
     measurements[0].type === AppConfig.use(window.assetCategory).measurementTypes.preload.id &&
     checkValidAttr(attributes, 'normal', min)
   ) {
-    const seriesName = `额定值 ${attributes?.normal?.value}${field?.unit}`
+    const seriesName = `额定值 ${attributes?.normal?.value}${field?.unit}`;
     const normal = getSeries(ColorHealth, attributes?.normal?.value, seriesName);
     legends.push({ name: seriesName, itemStyle: { color: ColorHealth } });
     series.push(normal.series);
   }
 
   if (
-    measurements[0].type === AppConfig.use(window.assetCategory).measurementTypes.loosening_angle.id &&
+    measurements[0].type ===
+      AppConfig.use(window.assetCategory).measurementTypes.loosening_angle.id &&
     checkValidAttr(attributes, 'initial', min)
   ) {
-    const seriesName = `初始值 ${attributes?.initial?.value}${field?.unit}`
+    const seriesName = `初始值 ${attributes?.initial?.value}${field?.unit}`;
     const initial = getSeries(ColorHealth, attributes?.initial?.value, seriesName);
     legends.push({ name: seriesName, itemStyle: { color: ColorHealth } });
     series.push(initial.series);
   }
 
   if (checkValidAttr(attributes, 'info', min)) {
-    const seriesName = `次要报警 ${attributes?.info?.value}${field?.unit}`
+    const seriesName = `次要报警 ${attributes?.info?.value}${field?.unit}`;
     const info = getSeries(ColorInfo, attributes?.info?.value, seriesName);
     legends.push({ name: seriesName, itemStyle: { color: ColorInfo } });
     series.push(info.series);
   }
 
   if (checkValidAttr(attributes, 'warn', min)) {
-    const seriesName = `重要报警 ${attributes?.warn?.value}${field?.unit}`
+    const seriesName = `重要报警 ${attributes?.warn?.value}${field?.unit}`;
     const warn = getSeries(ColorWarn, attributes?.warn?.value, seriesName);
     legends.push({ name: seriesName, itemStyle: { color: ColorWarn } });
     series.push(warn.series);
   }
 
   if (checkValidAttr(attributes, 'danger', min)) {
-    const seriesName = `紧急报警 ${attributes?.danger?.value}${field?.unit}`
+    const seriesName = `紧急报警 ${attributes?.danger?.value}${field?.unit}`;
     const danger = getSeries(ColorDanger, attributes?.danger?.value, seriesName);
     legends.push({ name: seriesName, itemStyle: { color: ColorDanger } });
     series.push(danger.series);
@@ -128,7 +132,10 @@ function checkValidAttr(
 
 function getMax(max: number, attributes: AssetRow['attributes'], type: number) {
   let final = max;
-  if (type === AppConfig.use(window.assetCategory).measurementTypes.preload.id && checkValidAttr(attributes, 'normal', final, true)) {
+  if (
+    type === AppConfig.use(window.assetCategory).measurementTypes.preload.id &&
+    checkValidAttr(attributes, 'normal', final, true)
+  ) {
     final = Math.abs(attributes?.normal?.value as number);
   }
   if (
@@ -166,7 +173,10 @@ export function generateChartOptionsOfHistoryData(
         const _series = seriesData.find(({ name }) => name === property.name);
         if (_series) {
           times.map((time, index) =>
-            _data.push([moment.unix(time).local().format('YYYY-MM-DD HH:mm:ss'), _series.data[index]])
+            _data.push([
+              moment.unix(time).local().format('YYYY-MM-DD HH:mm:ss'),
+              _series.data[index]
+            ])
           );
         }
       }
@@ -217,7 +227,7 @@ function calculateRangeOfAngle(seriesData: number[][]) {
 
 function generateOuter(measurements: MeasurementRow[], isBig: boolean = false) {
   let radius: any = { radius: isBig ? 180 : 150 };
-  if(isMobile){
+  if (isMobile) {
     radius = { radius: isBig ? '90%' : '85%' };
   }
   const angleAxis = {
@@ -285,7 +295,7 @@ function generateOuter(measurements: MeasurementRow[], isBig: boolean = false) {
 
 function generateActuals(measurements: MeasurementRow[], isBig: boolean = false) {
   let radius: any = { radius: isBig ? 150 : 120 };
-  if(isMobile){
+  if (isMobile) {
     radius = { radius: isBig ? '85%' : '80%' };
   }
   const seriesData: any = [];
@@ -305,7 +315,7 @@ function generateActuals(measurements: MeasurementRow[], isBig: boolean = false)
         if (value < min) min = value;
       }
     }
-    if(!Number.isNaN(value)) seriesData.push([value, (index * 360) / measurements.length]);
+    if (!Number.isNaN(value)) seriesData.push([value, (index * 360) / measurements.length]);
   });
   const angleAxis = {
     polarIndex: 1,
@@ -397,8 +407,16 @@ function takeFieldValue(property: Property | undefined, fieldKey: string) {
   return value;
 }
 
-export function generateChartOptionsOfHistoryDatas(data: HistoryData, measurementType: number, propertyKey?: string) {
-  const optionsData = getHistoryDatas(data, getKeysOfFirstClassFields(measurementType), propertyKey);
+export function generateChartOptionsOfHistoryDatas(
+  data: HistoryData,
+  measurementType: number,
+  propertyKey?: string
+) {
+  const optionsData = getHistoryDatas(
+    data,
+    getKeysOfFirstClassFields(measurementType),
+    propertyKey
+  );
   return optionsData.map(({ times, seriesData, property }) => {
     return {
       tooltip: {
@@ -476,17 +494,19 @@ function getDisplayValue(value: number | null | undefined, unit?: string) {
 }
 
 function roundValue(value: number, precision?: number) {
-  if(Number.isNaN(value) || value === 0) return value;
+  if (Number.isNaN(value) || value === 0) return value;
   return round(value, precision ?? 3);
 }
 
 export function getKeysOfFirstClassFields(measurementType: number) {
-  const type = Object.values(AppConfig.use(window.assetCategory).measurementTypes).find((type) => type.id === measurementType);
+  const type = Object.values(AppConfig.use(window.assetCategory).measurementTypes).find(
+    (type) => type.id === measurementType
+  );
   return type ? type.firstClassFieldKeys : [];
 }
 
 function getFirstClassFields(measurement: MeasurementRow) {
-  if(!measurement.properties) return []
+  if (!measurement.properties) return [];
   const fields: (Property['fields'][0] & Pick<Property, 'precision' | 'unit'>)[] = [];
   getKeysOfFirstClassFields(measurement.type).forEach((fieldKey) => {
     for (const property of measurement.properties) {
@@ -504,18 +524,17 @@ export function generateDatasOfMeasurement(measurement: MeasurementRow) {
   const properties = getFirstClassFields(measurement);
   const { data } = measurement;
   if (properties.length > 0) {
-    return properties
-      .map(({ name, key, unit, precision }) => {
-        let value = NaN;
-        if (data && data.values) {
-          value = roundValue(data.values[key], precision);
-        }
-        return { name, value: getDisplayValue(value, unit) };
-      })
-      // .concat({
-      //   name: '采集时间',
-      //   value: data ? moment(data.timestamp * 1000).format('YYYY-MM-DD HH:mm:ss') : '-'
-      // });
+    return properties.map(({ name, key, unit, precision }) => {
+      let value = NaN;
+      if (data && data.values) {
+        value = roundValue(data.values[key], precision);
+      }
+      return { name, value: getDisplayValue(value, unit) };
+    });
+    // .concat({
+    //   name: '采集时间',
+    //   value: data ? moment(data.timestamp * 1000).format('YYYY-MM-DD HH:mm:ss') : '-'
+    // });
   }
   return [];
 }

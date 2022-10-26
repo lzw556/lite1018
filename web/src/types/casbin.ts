@@ -1,6 +1,5 @@
-
 export type CasbinRule = {
-    subject: string;
-    model: string;
-    rules: string;
-}
+  subject: string;
+  model: string;
+  rules: string;
+};

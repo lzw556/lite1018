@@ -41,7 +41,9 @@ const AlarmRuleList = () => {
       key: 'type',
       width: 120,
       render: (typeId: number) => {
-        const type = Object.values(AppConfig.use(window.assetCategory).measurementTypes).find(({ id }) => id === typeId);
+        const type = Object.values(AppConfig.use(window.assetCategory).measurementTypes).find(
+          ({ id }) => id === typeId
+        );
         return type ? type.label : '-';
       }
     }
@@ -56,10 +58,8 @@ const AlarmRuleList = () => {
             {row.editable && (
               <>
                 <HasPermission value={Permission.AlarmRuleGroupEdit}>
-                  <Button type="text" size="small" title={`编辑`}>
-                    <Link
-                      to={`alarm-management?locale=alarmRules/editAlarmRuleGroup&id=${row.id}`}
-                    >
+                  <Button type='text' size='small' title={`编辑`}>
+                    <Link to={`alarm-management?locale=alarmRules/editAlarmRuleGroup&id=${row.id}`}>
                       <EditOutlined />
                     </Link>
                   </Button>
@@ -73,12 +73,7 @@ const AlarmRuleList = () => {
                       });
                     }}
                   >
-                    <Button
-                      type="text"
-                      danger={true}
-                      size="small"
-                      title={`删除`}
-                    >
+                    <Button type='text' danger={true} size='small' title={`删除`}>
                       <DeleteOutlined />
                     </Button>
                   </Popconfirm>
@@ -86,7 +81,7 @@ const AlarmRuleList = () => {
               </>
             )}
             <HasPermission value={Permission.AlarmRuleGroupBind}>
-              <Button type="text" size="small" title="编辑监测点">
+              <Button type='text' size='small' title='编辑监测点'>
                 <MoreOutlined
                   onClick={() => {
                     setSelectedRow(row);

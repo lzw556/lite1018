@@ -65,4 +65,10 @@ export const omitSpecificKeys = <T extends { [propName: string]: any }>(
   return newObj;
 };
 
-export type Filters = {name?:string; mac_address?:string; network_id?:number; type?:number; types?: string;};
+export type Filters = {
+  name?: string;
+  mac_address?: string;
+  network_id?: number;
+  type?: number;
+  types?: string;
+};

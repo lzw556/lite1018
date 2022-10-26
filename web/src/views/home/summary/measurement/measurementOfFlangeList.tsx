@@ -51,7 +51,14 @@ export const MeasurementOfFlangeList: React.FC<{
         key: 'name',
         width: isMobile ? 300 : 400,
         render: (name: string, row: MeasurementRow) => (
-          <Link to={combineFinalUrl(pathname, search, AppConfig.use(window.assetCategory).measurementTypes.preload.url, row.id)}>
+          <Link
+            to={combineFinalUrl(
+              pathname,
+              search,
+              AppConfig.use(window.assetCategory).measurementTypes.preload.url,
+              row.id
+            )}
+          >
             {name}
           </Link>
         )

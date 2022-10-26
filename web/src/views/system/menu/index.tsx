@@ -1,11 +1,11 @@
-import MyBreadcrumb from "../../../components/myBreadcrumb";
+import MyBreadcrumb from '../../../components/myBreadcrumb';
 
 const MenuPage = () => {
-    return <>
-        <MyBreadcrumb>
-
-        </MyBreadcrumb>
+  return (
+    <>
+      <MyBreadcrumb></MyBreadcrumb>
     </>
-}
+  );
+};
 
-export default MenuPage
+export default MenuPage;

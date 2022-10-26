@@ -15,13 +15,14 @@ export const Monitor: React.FC<MeasurementRow> = (props) => {
     const from = moment().startOf('day').subtract(7, 'd').utc().unix();
     const to = moment().endOf('day').utc().unix();
     getData(id, from, to).then((data) => {
-      setLoading(false)
+      setLoading(false);
       if (data.length > 0) setHistoryOptions(generateChartOptionsOfHistoryDatas(data, type));
     });
   }, [id, type]);
 
   if (loading) return <Spin />;
-  if (!historyOptions || historyOptions.length === 0) return <Empty description='暂无数据' image={Empty.PRESENTED_IMAGE_SIMPLE} />;
+  if (!historyOptions || historyOptions.length === 0)
+    return <Empty description='暂无数据' image={Empty.PRESENTED_IMAGE_SIMPLE} />;
 
   return (
     <Row gutter={[32, 32]}>

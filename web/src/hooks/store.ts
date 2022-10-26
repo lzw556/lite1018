@@ -36,7 +36,7 @@ export function useStore<ReturnType extends keyof Store>(
     projectList: { ...defaultPagedOptions },
     accountList: { ...defaultPagedOptions }
   });
-  
+
   const local = localStorage.getItem('store') || initial;
   const localStore = JSON.parse(local) as Store;
   const [subStore, setSubStore] = React.useState<Store[typeof key]>(localStore[key]);

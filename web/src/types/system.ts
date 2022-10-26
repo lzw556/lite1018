@@ -1,6 +1,6 @@
-import {ServerInfo} from "./server_info";
+import { ServerInfo } from './server_info';
 
 export type System = {
-    server: ServerInfo
-    mqtt: any
-}
+  server: ServerInfo;
+  mqtt: any;
+};

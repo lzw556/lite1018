@@ -15,7 +15,7 @@ export const SearchResultPage: React.FC<SearchResult> = (props) => {
   return (
     <>
       {actions && (
-        <Row style={{flex: '0 0 42px'}}>
+        <Row style={{ flex: '0 0 42px' }}>
           <Col span={24}>
             <MyBreadcrumb fixed={true}>
               <Space wrap={true}>{actions}</Space>

@@ -1,18 +1,16 @@
-import {Card, CardProps} from "antd";
-import {FC} from "react";
-import "./index.css";
+import { Card, CardProps } from 'antd';
+import { FC } from 'react';
+import './index.css';
 
-export interface ShadowCardProps extends CardProps {
+export interface ShadowCardProps extends CardProps {}
 
-}
-
-const ShadowCard:FC<ShadowCardProps> = (props) => {
-    const {children} = props
-    return <Card {...props} className={"ts-card-shadow"}>
-        {
-            children
-        }
+const ShadowCard: FC<ShadowCardProps> = (props) => {
+  const { children } = props;
+  return (
+    <Card {...props} className={'ts-card-shadow'}>
+      {children}
     </Card>
-}
+  );
+};
 
-export default ShadowCard
+export default ShadowCard;

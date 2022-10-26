@@ -278,7 +278,7 @@ const SecondaryRoutes: Menu[] = [
     hidden: false,
     isAuth: true,
     children: []
-  },
+  }
 ];
 
 export { AppRoutes, SecondaryRoutes };

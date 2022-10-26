@@ -1,6 +1,6 @@
-import {User} from "./user";
+import { User } from './user';
 
 export type AllocUser = {
-    user: User
-    isAllocated: boolean
-}
+  user: User;
+  isAllocated: boolean;
+};

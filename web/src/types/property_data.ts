@@ -1,4 +1,4 @@
 export type PropertyData = {
-    timestamp: number;
-    value: any;
-}
+  timestamp: number;
+  value: any;
+};

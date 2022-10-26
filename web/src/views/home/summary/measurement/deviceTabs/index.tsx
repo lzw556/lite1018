@@ -8,10 +8,10 @@ export const MeasurementDevices: React.FC<{ devices: Device[]; alertLevel?: numb
   alertLevel
 }) => {
   const [key, setKey] = React.useState(devices[0].macAddress);
-  if (devices.length === 1) return <SingleDeviceInfo {...devices[0]} alertLevel={alertLevel}/>;
+  if (devices.length === 1) return <SingleDeviceInfo {...devices[0]} alertLevel={alertLevel} />;
   const contents: Record<string, JSX.Element> = {};
   devices.forEach((device) => {
-    contents[device.macAddress] = <SingleDeviceInfo {...device} alertLevel={alertLevel}/>;
+    contents[device.macAddress] = <SingleDeviceInfo {...device} alertLevel={alertLevel} />;
   });
 
   return (

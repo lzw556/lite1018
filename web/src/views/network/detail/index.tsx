@@ -45,7 +45,7 @@ const NetworkDetail = () => {
               communication_period: data.communicationPeriod,
               communication_period_2: data.communicationPeriod2,
               communication_offset: data.communicationOffset,
-              group_size: data.groupSize,
+              group_size: data.groupSize
             }
           });
           setNetwork(data);
@@ -96,9 +96,12 @@ const NetworkDetail = () => {
   const renderInformation = () => {
     if (network) {
       return (
-        <Row style={{flexGrow:1}}>
-          <Col xl={16} xxl={18} id={"topologyView"}>
-            <ShadowCard style={{height: '100%'}} bodyStyle={{height:'100%', minWidth: "500px"}}>
+        <Row style={{ flexGrow: 1 }}>
+          <Col xl={16} xxl={18} id={'topologyView'}>
+            <ShadowCard
+              style={{ height: '100%' }}
+              bodyStyle={{ height: '100%', minWidth: '500px' }}
+            >
               <TopologyView network={network} />
             </ShadowCard>
           </Col>
@@ -108,7 +111,7 @@ const NetworkDetail = () => {
                 <Form.Item label={'名称'} name={'name'} rules={[Rules.range(4, 16)]}>
                   <Input placeholder={'请输入网络名称'} />
                 </Form.Item>
-                <WsnFormItem mode={network.mode}/>
+                <WsnFormItem mode={network.mode} />
                 <Form.Item wrapperCol={{ offset: 6, span: 18 }}>
                   <Row justify='end'>
                     <Col>
@@ -122,8 +125,8 @@ const NetworkDetail = () => {
                           type='primary'
                           onClick={() => {
                             form.validateFields().then((values) => {
-                              UpdateNetworkRequest(network.id, values).then(res => {
-                                if(res.code === 200) message.success('保存成功')
+                              UpdateNetworkRequest(network.id, values).then((res) => {
+                                if (res.code === 200) message.success('保存成功');
                               });
                             });
                           }}
@@ -159,9 +162,8 @@ const NetworkDetail = () => {
   };
 
   return (
-    <Content style={{display:'flex',flexDirection:'column'}}>
-      <MyBreadcrumb firstBreadState={location.state as any}>
-      </MyBreadcrumb>
+    <Content style={{ display: 'flex', flexDirection: 'column' }}>
+      <MyBreadcrumb firstBreadState={location.state as any}></MyBreadcrumb>
       {renderInformation()}
     </Content>
   );

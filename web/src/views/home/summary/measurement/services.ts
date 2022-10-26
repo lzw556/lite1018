@@ -118,9 +118,7 @@ export function clearHistory(id: number, from: number, to: number, type: string 
 }
 
 export function downloadRawHistory(id: number, timestamp: number) {
-  return request.download<any>(
-    `/monitoringPoints/${id}/download/data/${timestamp}`
-  );
+  return request.download<any>(`/monitoringPoints/${id}/download/data/${timestamp}`);
 }
 
 export function exportAlarmRules(alarm_rule_group_ids?: number[]) {

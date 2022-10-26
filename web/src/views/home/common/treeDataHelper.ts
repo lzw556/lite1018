@@ -1,5 +1,5 @@
-import { cloneDeep } from "lodash";
-import { MeasurementRow } from "../summary/measurement/props";
+import { cloneDeep } from 'lodash';
+import { MeasurementRow } from '../summary/measurement/props';
 
 export type Node = {
   id: number;
@@ -36,7 +36,10 @@ export function mapTreeNode<N extends Node>(node: N, fn: <N extends Node>(node: 
   }
 }
 
-export function forEachTreeNode<N extends Node>(node: N, fn: <N extends Node>(node: N) => void): void {
+export function forEachTreeNode<N extends Node>(
+  node: N,
+  fn: <N extends Node>(node: N) => void
+): void {
   fn(node);
   if (node.children && node.children.length > 0) {
     node.children.map((node) => forEachTreeNode(node, fn));
