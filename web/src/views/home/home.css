@@ -164,3 +164,10 @@ dl.name-value-groups.horizontal {
   background-color: #fff;
   fill: #ff0000;
 }
+.ts-detail-label {
+  line-height: 30px;
+  color: #8a8e99;
+}
+.ts-detail-content {
+  line-height: 30px;
+}
