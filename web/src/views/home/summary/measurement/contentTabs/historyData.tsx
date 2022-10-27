@@ -93,7 +93,7 @@ export const HistoryData: React.FC<MeasurementRow> = (props) => {
                 showFooter={true}
               />
               <div>
-                <HasPermission value={Permission.DeviceDataDownload}>
+                <HasPermission value={Permission.MeasurementDataDownload}>
                   <Button
                     type='primary'
                     onClick={() => {

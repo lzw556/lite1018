@@ -102,10 +102,14 @@ export function bindMeasurementsToAlarmRule2(
   return request.put(`/alarmRuleGroups/${id}/bindings`, values).then(PutResponse);
 }
 
-export function downloadHistory(id: number, from: number, to: number, pids: any) {
-  return request.download<any>(
-    `/monitoringPoints/${id}/download/data?from=${from}&to=${to}&pids=${pids}`
-  );
+export function downloadHistory(id: number, from: number, to: number, pids: any, assetId?: number) {
+  if (assetId) {
+    return request.download<any>(`/assets/${id}/download/data?from=${from}&to=${to}&pids=${pids}`);
+  } else {
+    return request.download<any>(
+      `/monitoringPoints/${id}/download/data?from=${from}&to=${to}&pids=${pids}`
+    );
+  }
 }
 
 export function clearHistory(id: number, from: number, to: number, type: string = '') {

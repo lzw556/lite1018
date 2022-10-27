@@ -1,4 +1,4 @@
-import { Col, Empty, Row, Select, Space } from 'antd';
+import { Button, Col, Empty, Row, Select, Space } from 'antd';
 import * as React from 'react';
 import ShadowCard from '../../../../components/shadowCard';
 import { AssetRow } from '../../assetList/props';
@@ -14,6 +14,10 @@ import { isMobile } from '../../../../utils/deviceDetection';
 import Label from '../../../../components/label';
 import { RangeDatePicker } from '../../../../components/rangeDatePicker';
 import { ChartContainer } from '../../components/charts/chartContainer';
+import HasPermission from '../../../../permission';
+import { Permission } from '../../../../permission/permission';
+import { DownloadOutlined } from '@ant-design/icons';
+import { HistoryDataDownload } from '../measurement/contentTabs/historyDataDownload';
 
 export const HistoryData: React.FC<AssetRow> = (props) => {
   const properties =
@@ -28,6 +32,7 @@ export const HistoryData: React.FC<AssetRow> = (props) => {
   const [historyDatas, setHistoryDatas] = React.useState<
     { name: string; data: HistoryDatas; index: number }[]
   >([]);
+  const [visible, setVisible] = React.useState(false);
 
   React.useEffect(() => {
     const measurements = props.monitoringPoints || [];
@@ -93,6 +98,16 @@ export const HistoryData: React.FC<AssetRow> = (props) => {
                   </Select>
                 </Label>
                 <RangeDatePicker onChange={handleChange} showFooter={true} />
+                <HasPermission value={Permission.AssetDataDownload}>
+                  <Button
+                    type='primary'
+                    onClick={() => {
+                      setVisible(true);
+                    }}
+                  >
+                    <DownloadOutlined />
+                  </Button>
+                </HasPermission>
               </Space>
             </Col>
           </Row>
@@ -100,6 +115,15 @@ export const HistoryData: React.FC<AssetRow> = (props) => {
         <Col span={24}>
           <ChartContainer title='' options={historyOptions} style={{ height: '500px' }} />
         </Col>
+        {visible && props.monitoringPoints && props.monitoringPoints.length > 0 && (
+          <HistoryDataDownload
+            measurement={props.monitoringPoints[0]}
+            visible={visible}
+            onSuccess={() => setVisible(false)}
+            onCancel={() => setVisible(false)}
+            assetId={props.id}
+          />
+        )}
       </Row>
     </ShadowCard>
   );

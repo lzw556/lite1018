@@ -12,10 +12,11 @@ export interface DownloadModalProps extends ModalProps {
   measurement: MeasurementRow;
   property?: any;
   onSuccess: () => void;
+  assetId?: number;
 }
 
 export const HistoryDataDownload: React.FC<DownloadModalProps> = (props) => {
-  const { visible, measurement, property, onSuccess } = props;
+  const { visible, measurement, property, onSuccess, assetId } = props;
   const [range, setRange] = React.useState<[number, number]>();
   const [form] = Form.useForm();
 
@@ -31,15 +32,17 @@ export const HistoryDataDownload: React.FC<DownloadModalProps> = (props) => {
     form.validateFields().then((values) => {
       if (range) {
         const [from, to] = range;
-        downloadHistory(measurement.id, from, to, JSON.stringify(values.properties)).then((res) => {
-          const url = window.URL.createObjectURL(new Blob([res.data]));
-          const link = document.createElement('a');
-          link.href = url;
-          link.setAttribute('download', getFilename(res));
-          document.body.appendChild(link);
-          link.click();
-          onSuccess();
-        });
+        downloadHistory(measurement.id, from, to, JSON.stringify(values.properties), assetId).then(
+          (res) => {
+            const url = window.URL.createObjectURL(new Blob([res.data]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', getFilename(res));
+            document.body.appendChild(link);
+            link.click();
+            onSuccess();
+          }
+        );
       }
     });
   };
