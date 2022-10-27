@@ -92,3 +92,5 @@ export const measurementTypes: Record<
     }
   }
 };
+
+export const unusedMenunames: string[] = ['measurement-management'];

@@ -3,6 +3,7 @@ import * as React from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { Menu as MenuItem } from '../../types/menu';
 import { GetParamValue } from '../../utils/path';
+import * as AppConfig from '../../config';
 
 export const NavMenu: React.FC<{
   menus: MenuItem[];
@@ -13,7 +14,10 @@ export const NavMenu: React.FC<{
   const { SubMenu } = Menu;
   const renderMenuItem = (children: []) => {
     return children.sort(sortMenus).map((item: any) => {
-      if (!item.hidden) {
+      if (
+        !item.hidden &&
+        !AppConfig.use(window.assetCategory).unusedMenunames.includes(item.name)
+      ) {
         if (item.children && item.children.filter((item: any) => !item.hidden).length) {
           return (
             <SubMenu key={item.name} title={item.title}>
