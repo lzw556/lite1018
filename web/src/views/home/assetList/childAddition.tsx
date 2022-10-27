@@ -5,7 +5,7 @@ import { defaultValidateMessages, Rules } from '../../../constants/validator';
 import { EditFormPayload } from '../common/useActionBarStatus';
 import { EditContent } from '../measurementList/editContent';
 import { Measurement } from '../summary/measurement/props';
-import { addMeasurement, bindDevice } from '../summary/measurement/services';
+import { addMeasurements } from '../summary/measurement/services';
 import { Asset } from './props';
 import { addAsset } from './services';
 
@@ -42,8 +42,17 @@ export const ChildAddition: React.FC<
           } else if (type === 'point') {
             formPoint.validateFields().then((values) => {
               try {
-                addMeasurement(values).then((measurement) => {
-                  bindDevice(measurement.id, values.device_id);
+                addMeasurements({
+                  monitoring_points: [
+                    {
+                      asset_id: values.asset_id,
+                      name: values.name,
+                      type: values.type,
+                      attributes: values.attributes,
+                      device_binding: { device_id: values.device_id }
+                    }
+                  ]
+                }).then(() => {
                   onSuccess();
                 });
               } catch (error) {
