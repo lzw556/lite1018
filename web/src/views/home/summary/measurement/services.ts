@@ -1,6 +1,5 @@
 import request from '../../../../utils/request';
 import { DeleteResponse, GetResponse, PostResponse, PutResponse } from '../../../../utils/response';
-import { Values_be } from '../../../device/hooks/useGetingDeviceData';
 import { HistoryData } from '../../common/historyDataHelper';
 import { AlarmRule, Measurement, MeasurementRow, Property } from './props';
 
@@ -46,9 +45,9 @@ export function getData(id: Measurement['id'], from: number, to: number, rawOnly
     .then(GetResponse);
 }
 
-export function getDynamicData(id: Measurement['id'], timestamp: number) {
+export function getDynamicData<T>(id: Measurement['id'], timestamp: number) {
   return request
-    .get<{ timestamp: number; values: Values_be }>(`/monitoringPoints/${id}/data/${timestamp}`)
+    .get<{ timestamp: number; values: T }>(`/monitoringPoints/${id}/data/${timestamp}`)
     .then(GetResponse);
 }
 
