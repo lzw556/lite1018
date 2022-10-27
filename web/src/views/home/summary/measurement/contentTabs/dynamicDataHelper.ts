@@ -62,11 +62,19 @@ export function transformDynamicData(
   pro: DynamicDataProperty,
   field: { label: string; value: string }
 ) {
-  const proValues = pro[field.value];
+  const proValues = pro.hasOwnProperty('mv')
+    ? (combineDynamicDataDC(pro as any) as any)[field.value]
+    : pro[field.value];
   if (!proValues || proValues.length === 0) return null;
   const firstValue = proValues[0];
+
   if (Array.isArray(firstValue)) {
-    return [{ field, data: proValues as number[][] }];
+    return [
+      {
+        field,
+        data: (proValues as number[][]).map((val) => val.map((item) => Number(item.toFixed(3))))
+      }
+    ];
   } else if (typeof firstValue === 'object') {
     return [
       {
@@ -130,12 +138,21 @@ export function generateChartOptions(
       }
     ]
   };
-  const series = values.map(({ field, data }) => ({ type: 'line', name: field.label, data }));
-  if (series.length === 0) return undefined;
+  const seriesData = values.map(({ field, data }) => ({ name: field.label, data }));
+  if (seriesData.length === 0 || seriesData[0].data.length === 0) return undefined;
+  const isDC = Array.isArray(seriesData[0].data[0]);
   let xAxis: any = {
-    type: 'category'
+    type: 'category',
+    data: Object.keys(seriesData[0].data)
   };
-  if (!Array.isArray(series[0])) xAxis = { ...xAxis, data: Object.keys(series[0].data) };
+  //specific options for DC
+  //1. series type is 'scatter'
+  const type = isDC ? 'scatter' : 'line';
+  //2. xAxis
+  if (isDC) xAxis = { type: 'value', min: 'dataMin', max: 'dataMax' };
+  //3. tooltip text -> below
+
+  const series = seriesData.map((series) => ({ ...series, type }));
 
   return {
     legend: {
@@ -146,7 +163,7 @@ export function generateChartOptions(
       trigger: 'axis',
       formatter: (paras: any) => {
         return `<p>
-          ${paras[0].dataIndex}
+          ${!isDC ? paras[0].dataIndex : ''}
           <br />
           ${paras
             .map(

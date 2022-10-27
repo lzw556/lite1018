@@ -12,6 +12,7 @@ import * as AppConfig from '../../../../../config';
 export const MeasurementContents: React.FC<MeasurementRow & { onUpdate?: () => void }> = (
   measurement
 ) => {
+  const dynamicDataConfigs = AppConfig.getDynamicDataConfigs(measurement.type);
   const contents: Record<string, JSX.Element> = {
     monitor: <Monitor {...measurement} />,
     history: <HistoryData {...measurement} />,
@@ -26,8 +27,7 @@ export const MeasurementContents: React.FC<MeasurementRow & { onUpdate?: () => v
       { key: 'monitor', tab: '监控' },
       { key: 'history', tab: '历史数据' }
     ];
-    if (measurement.type === AppConfig.use(window.assetCategory).measurementTypes.preload.id)
-      tabList.push({ key: 'dynamicData', tab: '动态数据' });
+    if (dynamicDataConfigs) tabList.push({ key: 'dynamicData', tab: '动态数据' });
     if (hasPermission(Permission.MeasurementEdit))
       tabList.push({ key: 'setting', tab: '配置信息' });
     tabList.push({ key: 'alarmRecord', tab: '报警记录' });

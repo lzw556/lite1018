@@ -51,6 +51,10 @@ export const measurementTypes: Record<
     url: string;
     firstClassFieldKeys: string[];
     deviceType: number[];
+    dynamicData?: {
+      fields: { label: string; value: string; unit: string }[];
+      metaData: { label: string; value: string; unit: string }[];
+    };
   }
 > = {
   loosening_angle: {
@@ -71,6 +75,22 @@ export const measurementTypes: Record<
     label: '预紧力',
     url: '/bolt',
     firstClassFieldKeys: ['preload', 'pressure', 'tof', 'temperature'],
-    deviceType: [DeviceType.BoltElongation]
+    deviceType: [DeviceType.BoltElongation],
+    dynamicData: {
+      fields: [
+        { label: '预紧力', value: 'dynamic_preload', unit: 'kN' },
+        { label: '应力', value: 'dynamic_pressure', unit: 'MPa' },
+        { label: '长度', value: 'dynamic_length', unit: 'mm' },
+        { label: '飞行时间', value: 'dynamic_tof', unit: 'ns' },
+        { label: '加速度', value: 'dynamic_acceleration', unit: 'g' }
+      ],
+      metaData: [
+        { label: '预紧力', value: 'min_preload', unit: 'kN' },
+        { label: '长度', value: 'min_length', unit: 'mm' },
+        { label: '温度', value: 'temperature', unit: '℃' },
+        { label: '飞行时间', value: 'min_tof', unit: 'ns' },
+        { label: '缺陷位置', value: 'defect_location', unit: 'mm' }
+      ]
+    }
   }
 };
