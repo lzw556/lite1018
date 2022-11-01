@@ -52,7 +52,8 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "deploy:dev": "cd build && scp -r ./ root@172.16.7.134:/home/workspace/cloud-lite-web"
+    "deploy:wind": "cd build && scp -r ./ root@172.16.7.134:/home/workspace/cloud-lite-web",
+    "deploy:basic": "cd build && scp -r ./ root@172.16.7.134:/home/workspace/cloud-lite-web3"
   },
   "eslintConfig": {
     "extends": [
