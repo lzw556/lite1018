@@ -27,7 +27,7 @@ export const MeasurementContents: React.FC<MeasurementRow & { onUpdate?: () => v
       { key: 'monitor', tab: '监控' },
       { key: 'history', tab: '历史数据' }
     ];
-    if (dynamicDataConfigs) tabList.push({ key: 'dynamicData', tab: '动态数据' });
+    if (dynamicDataConfigs) tabList.push({ key: 'dynamicData', tab: dynamicDataConfigs.title });
     if (hasPermission(Permission.MeasurementEdit))
       tabList.push({ key: 'setting', tab: '配置信息' });
     tabList.push({ key: 'alarmRecord', tab: '报警记录' });

@@ -52,6 +52,7 @@ export const measurementTypes: Record<
     firstClassFieldKeys: string[];
     deviceType: number[];
     dynamicData?: {
+      title: string;
       fields: { label: string; value: string; unit: string }[];
       metaData: { label: string; value: string; unit: string }[];
     };
@@ -77,6 +78,7 @@ export const measurementTypes: Record<
     firstClassFieldKeys: ['preload', 'pressure', 'tof', 'temperature'],
     deviceType: [DeviceType.BoltElongation],
     dynamicData: {
+      title: '动态数据',
       fields: [
         { label: '预紧力', value: 'dynamic_preload', unit: 'kN' },
         { label: '应力', value: 'dynamic_pressure', unit: 'MPa' },

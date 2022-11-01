@@ -147,12 +147,12 @@ export function generateChartOptions(
   };
   //specific options for DC
   //1. series type is 'scatter'
-  const type = isDC ? 'scatter' : 'line';
+  const type = 'line';
   //2. xAxis
   if (isDC) xAxis = { type: 'value', min: 'dataMin', max: 'dataMax' };
   //3. tooltip text -> below
 
-  const series = seriesData.map((series) => ({ ...series, type }));
+  const series = seriesData.map((series) => ({ ...series, type, smooth: isDC }));
 
   return {
     legend: {
