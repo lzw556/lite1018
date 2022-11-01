@@ -152,7 +152,12 @@ export function generateChartOptions(
   if (isDC) xAxis = { type: 'value', min: 'dataMin', max: 'dataMax' };
   //3. tooltip text -> below
 
-  const series = seriesData.map((series) => ({ ...series, type, smooth: isDC }));
+  const series = seriesData.map((series) => ({
+    ...series,
+    type,
+    smooth: isDC,
+    symbol: isDC ? 'none' : 'emptyCircle'
+  }));
 
   return {
     legend: {
