@@ -19,7 +19,7 @@ export const devTypes: { val: number; name: string }[] = Object.values(DeviceTyp
 export const sensorTypes = [DeviceType.BoltLoosening, DeviceType.BoltElongation];
 
 export const site = {
-  name: '风力发电螺栓监测系统'
+  name: '风电螺栓监测系统'
   //configure logo in 'views\home\summary\windTurbine\icon.tsx'
 };
 

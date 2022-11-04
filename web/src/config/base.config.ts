@@ -12,7 +12,7 @@ export const devTypes: { val: number; name: string }[] = Object.values(DeviceTyp
 export const sensorTypes = DeviceType.sensors();
 
 export const site = {
-  name: '云监控平台'
+  name: 'LoT云监控平台'
   //configure logo in 'views\home\summary\windTurbine\icon.tsx'
 };
 
