@@ -15,7 +15,11 @@ export const Brand: React.FC<{
   return (
     <Space className={'ts-title'} size={gap}>
       {status === 'loaded' && (
-        <img src={image?.src} alt={logoImgAlt || 'logo'} style={{ width, height }} />
+        <img
+          src={image?.src}
+          alt={logoImgAlt || 'logo'}
+          style={{ width, height, display: 'block' }}
+        />
       )}
       <strong style={brandNameStyle} className='title'>
         {AppConfig.use(window.assetCategory).site.name}

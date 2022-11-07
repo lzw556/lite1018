@@ -63,7 +63,7 @@ const HeaderLayout = (props: any) => {
       <Row justify='start' className='pc'>
         <Col span={12}>
           <Brand
-            height={40}
+            height={36}
             brandNameStyle={{
               fontSize: '14pt',
               color: '#fff',
