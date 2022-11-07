@@ -52,8 +52,8 @@ const DeviceEvent: FC<DeviceEventProps> = ({ device }) => {
     },
     {
       title: '详情',
-      dataIndex: 'message',
-      key: 'message'
+      dataIndex: 'content',
+      key: 'content'
     },
     {
       title: '发生时间',
