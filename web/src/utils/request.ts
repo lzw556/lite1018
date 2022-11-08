@@ -111,8 +111,7 @@ function filterNull(params: any) {
   Object.keys(params).map((key) => {
     if (params[key] === null) {
       delete params[key];
-    }
-    if (typeOf(params[key]) === 'string') {
+    } else if (typeOf(params[key]) === 'string') {
       params[key] = params[key].trim();
     } else if (typeOf(params[key] === 'object')) {
       params[key] = filterNull(params[key]);
