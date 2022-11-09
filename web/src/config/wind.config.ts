@@ -1,4 +1,5 @@
 import * as DeviceTypeOld from '../types/device_type';
+import { DataType } from '../views/home/summary/measurement/contentTabs/dynamicDataHelper';
 
 export const category: typeof window.assetCategory = 'wind';
 
@@ -53,6 +54,13 @@ export const measurementTypes: Record<
     deviceType: number[];
     dynamicData?: {
       title: string;
+      serverDatatype: DataType;
+      fields: { label: string; value: string; unit: string }[];
+      metaData: { label: string; value: string; unit: string }[];
+    };
+    waveData?: {
+      title: string;
+      serverDatatype: DataType;
       fields: { label: string; value: string; unit: string }[];
       metaData: { label: string; value: string; unit: string }[];
     };
@@ -78,7 +86,26 @@ export const measurementTypes: Record<
     firstClassFieldKeys: ['preload', 'pressure', 'tof', 'temperature'],
     deviceType: [DeviceType.BoltElongation],
     dynamicData: {
+      serverDatatype: 'raw',
       title: '动态数据',
+      fields: [
+        { label: '预紧力', value: 'dynamic_preload', unit: 'kN' },
+        { label: '应力', value: 'dynamic_pressure', unit: 'MPa' },
+        { label: '长度', value: 'dynamic_length', unit: 'mm' },
+        { label: '飞行时间', value: 'dynamic_tof', unit: 'ns' },
+        { label: '加速度', value: 'dynamic_acceleration', unit: 'g' }
+      ],
+      metaData: [
+        { label: '预紧力', value: 'min_preload', unit: 'kN' },
+        { label: '长度', value: 'min_length', unit: 'mm' },
+        { label: '温度', value: 'temperature', unit: '℃' },
+        { label: '飞行时间', value: 'min_tof', unit: 'ns' },
+        { label: '缺陷位置', value: 'defect_location', unit: 'mm' }
+      ]
+    },
+    waveData: {
+      serverDatatype: 'waveform',
+      title: '波形数据',
       fields: [
         { label: '预紧力', value: 'dynamic_preload', unit: 'kN' },
         { label: '应力', value: 'dynamic_pressure', unit: 'MPa' },

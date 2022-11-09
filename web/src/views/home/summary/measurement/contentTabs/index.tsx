@@ -12,19 +12,29 @@ import * as AppConfig from '../../../../../config';
 export const MeasurementContents: React.FC<MeasurementRow & { onUpdate?: () => void }> = (
   measurement
 ) => {
-  const dynamicDataConfigs = AppConfig.getDynamicDataConfigs(measurement.type);
+  const measurementType = AppConfig.getMeasurementType(measurement.type);
   const { hasPermission } = usePermission();
   const getTabList = () => {
     const tabList: { key: string; tab: string; content: JSX.Element }[] = [
       { key: 'monitor', tab: '监控', content: <Monitor {...measurement} /> },
       { key: 'history', tab: '历史数据', content: <HistoryData {...measurement} /> }
     ];
-    if (dynamicDataConfigs)
+    if (measurementType && measurementType.dynamicData) {
       tabList.push({
         key: 'dynamicData',
-        tab: dynamicDataConfigs.title,
-        content: <DynamicData {...measurement} />
+        tab: measurementType.dynamicData.title,
+        content: (
+          <DynamicData {...measurement} dataType={measurementType.dynamicData.serverDatatype} />
+        )
       });
+    }
+    if (measurementType && measurementType.waveData) {
+      tabList.push({
+        key: 'waveData',
+        tab: measurementType.waveData.title,
+        content: <DynamicData {...measurement} dataType={measurementType.waveData.serverDatatype} />
+      });
+    }
     if (hasPermission(Permission.MeasurementEdit))
       tabList.push({
         key: 'setting',

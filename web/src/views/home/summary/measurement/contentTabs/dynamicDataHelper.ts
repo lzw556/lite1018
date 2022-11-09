@@ -2,6 +2,8 @@ import * as React from 'react';
 import { AXIS_THREE } from '../../../../device/detail/dynamicData/constants';
 import { getData, getDynamicData } from '../services';
 
+export type DataType = 'raw' | 'waveform';
+
 export type DynamicDataType = {
   fields: { label: string; value: string; unit: string }[];
   metaData: { label: string; value: string; unit: string }[];
@@ -11,10 +13,13 @@ export type DynamicDataProperty = {
   [proName: string]: number[] | { xAxis: number; yAxis: number; zAxis: number }[] | number[][];
 } & { metadata: { [proName: string]: any } };
 
-export function useDynamicDataRequest<T>(id: number, range?: [number, number]) {
-  const [timestamps, setTimestamps] = React.useState<{ timestamp: number }[]>([]);
+export function useDynamicDataRequest<T>(id: number, dataType: DataType, range?: [number, number]) {
+  const [timestamps, setTimestamps] = React.useState<{
+    dataType: DataType;
+    data: { timestamp: number }[];
+  }>({ dataType, data: [] });
   const [loading, setLoading] = React.useState(true);
-  const [timestamp, setTimestamp] = React.useState<number>();
+  const [timestamp, setTimestamp] = React.useState<{ dataType: DataType; data: number }>();
   const [dynamicData, setDynamicData] = React.useState<{
     timestamp: number;
     values: T;
@@ -23,35 +28,35 @@ export function useDynamicDataRequest<T>(id: number, range?: [number, number]) {
   React.useEffect(() => {
     if (range) {
       const [from, to] = range;
-      getData(id, from, to, true).then((data) => {
-        setTimestamps(data);
+      getData(id, from, to, dataType).then((data) => {
+        setTimestamps({ dataType, data });
         setLoading(false);
       });
     }
-  }, [range, id]);
+  }, [range, id, dataType]);
 
   React.useEffect(() => {
-    if (timestamps.length > 0) {
-      setTimestamp(timestamps[0].timestamp);
+    if (timestamps.data.length > 0) {
+      setTimestamp({ dataType: timestamps.dataType, data: timestamps.data[0].timestamp });
     } else {
       setTimestamp(undefined);
     }
   }, [timestamps]);
 
   React.useEffect(() => {
-    if (timestamp) {
+    if (timestamp && timestamp.dataType === dataType) {
       setLoading2(true);
-      getDynamicData<T>(id, timestamp).then((data) => {
+      getDynamicData<T>(id, timestamp.data, dataType).then((data) => {
         setDynamicData(data);
         setLoading2(false);
       });
     }
-  }, [id, timestamp]);
+  }, [id, timestamp, dataType]);
 
   return {
-    all: { timestamps, loading },
+    all: { timestamps: timestamps.data, loading },
     selected: {
-      timestamp,
+      timestamp: timestamp?.data,
       dynamicData: { values: dynamicData?.values, loading: loading2 },
       setTimestamp
     }

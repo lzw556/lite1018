@@ -8,16 +8,28 @@ import { getFilename } from '../../../common/utils';
 import { MeasurementRow } from '../props';
 import { downloadRawHistory } from '../services';
 import { DynamicDataContent } from './dynamicDataContent';
-import { DynamicDataProperty, useDynamicDataRequest } from './dynamicDataHelper';
+import { DataType, DynamicDataProperty, useDynamicDataRequest } from './dynamicDataHelper';
 
-export const DynamicData: React.FC<MeasurementRow> = (props) => {
+export const DynamicData: React.FC<MeasurementRow & { dataType: DataType }> = (props) => {
   const [range, setRange] = React.useState<[number, number]>();
   const { hasPermission } = usePermission();
   const {
     all: { timestamps, loading },
     selected: { timestamp, dynamicData, setTimestamp }
-  } = useDynamicDataRequest<DynamicDataProperty>(props.id, range);
-  const dynamicDataConfigs = AppConfig.getDynamicDataConfigs(props.type);
+  } = useDynamicDataRequest<DynamicDataProperty>(props.id, props.dataType, range);
+
+  const getDynamicDataType = () => {
+    const measurementType = AppConfig.getMeasurementType(props.type);
+    if (measurementType) {
+      if (props.dataType === 'raw') {
+        return measurementType.dynamicData;
+      } else if (props.dataType === 'waveform') {
+        return measurementType.waveData;
+      }
+    }
+  };
+
+  const dynamicDataType = getDynamicDataType();
 
   const renderTimestampsList = () => {
     return (
@@ -66,7 +78,7 @@ export const DynamicData: React.FC<MeasurementRow> = (props) => {
         onRow={(record) => ({
           onClick: () => {
             if (record.timestamp !== timestamp) {
-              setTimestamp(record.timestamp);
+              setTimestamp({ dataType: props.dataType, data: record.timestamp });
             }
           },
           onMouseLeave: () => (window.document.body.style.cursor = 'default'),
@@ -93,9 +105,10 @@ export const DynamicData: React.FC<MeasurementRow> = (props) => {
               </Col>
             )}
             {timestamps.length > 0 && <Col span={6}>{renderTimestampsList()}</Col>}
-            {timestamp && dynamicData.values && dynamicDataConfigs && (
+            {timestamp && dynamicDataType && dynamicData.values && (
               <DynamicDataContent
-                type={dynamicDataConfigs}
+                key={props.dataType}
+                type={dynamicDataType}
                 data={{ values: dynamicData.values, loading: dynamicData.loading }}
               />
             )}

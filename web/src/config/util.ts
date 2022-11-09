@@ -8,9 +8,8 @@ export function use(appCate: typeof window.assetCategory = 'default') {
   return Base;
 }
 
-export function getDynamicDataConfigs(typeId: number) {
-  const pointType = Object.values(use(window.assetCategory).measurementTypes).find(
+export function getMeasurementType(typeId: number) {
+  return Object.values(use(window.assetCategory).measurementTypes).find(
     (type) => type.id === typeId
   );
-  return pointType ? pointType.dynamicData : undefined;
 }

@@ -1,6 +1,7 @@
 import request from '../../../../utils/request';
 import { DeleteResponse, GetResponse, PostResponse, PutResponse } from '../../../../utils/response';
 import { HistoryData } from '../../common/historyDataHelper';
+import { DataType } from './contentTabs/dynamicDataHelper';
 import { AlarmRule, Measurement, MeasurementRow, Property } from './props';
 
 export function getMeasurements(filters?: Pick<Measurement, 'asset_id'>) {
@@ -37,17 +38,19 @@ export function unbindDevice(id: Measurement['id'], device_id: number) {
   return request.post(`/monitoringPoints/${id}/unbindDevice`, { device_id });
 }
 
-export function getData(id: Measurement['id'], from: number, to: number, rawOnly: boolean = false) {
+export function getData(id: Measurement['id'], from: number, to: number, dataType?: DataType) {
   return request
     .get<HistoryData>(
-      `/monitoringPoints/${id}/data?from=${from}&to=${to}${rawOnly ? `&type=raw` : ''}`
+      `/monitoringPoints/${id}/data?from=${from}&to=${to}${dataType ? `&type=${dataType}` : ''}`
     )
     .then(GetResponse);
 }
 
-export function getDynamicData<T>(id: Measurement['id'], timestamp: number) {
+export function getDynamicData<T>(id: Measurement['id'], timestamp: number, dataType: DataType) {
   return request
-    .get<{ timestamp: number; values: T }>(`/monitoringPoints/${id}/data/${timestamp}`)
+    .get<{ timestamp: number; values: T }>(
+      `/monitoringPoints/${id}/data/${timestamp}?type=${dataType}`
+    )
     .then(GetResponse);
 }
 

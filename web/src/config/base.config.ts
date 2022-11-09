@@ -1,4 +1,5 @@
 import { DeviceType } from '../types/device_type';
+import { DataType } from '../views/home/summary/measurement/contentTabs/dynamicDataHelper';
 
 export const category: typeof window.assetCategory = 'default';
 
@@ -34,6 +35,13 @@ export const measurementTypes: Record<
     deviceType: number[];
     dynamicData?: {
       title: string;
+      serverDatatype: DataType;
+      fields: { label: string; value: string; unit: string }[];
+      metaData: { label: string; value: string; unit: string }[];
+    };
+    waveData?: {
+      title: string;
+      serverDatatype: DataType;
       fields: { label: string; value: string; unit: string }[];
       metaData: { label: string; value: string; unit: string }[];
     };
@@ -59,6 +67,7 @@ export const measurementTypes: Record<
     firstClassFieldKeys: ['preload', 'pressure', 'tof', 'temperature'],
     deviceType: [DeviceType.BoltElongation],
     dynamicData: {
+      serverDatatype: 'raw',
       title: '动态数据',
       fields: [
         { label: '预紧力', value: 'dynamic_preload', unit: 'kN' },
@@ -74,6 +83,18 @@ export const measurementTypes: Record<
         { label: '飞行时间', value: 'min_tof', unit: 'ns' },
         { label: '缺陷位置', value: 'defect_location', unit: 'mm' }
       ]
+    },
+    waveData: {
+      serverDatatype: 'waveform',
+      title: '波形数据',
+      fields: [{ label: 'mv', value: 'mv', unit: '' }],
+      metaData: [
+        { label: '预紧力', value: 'preload', unit: 'kN' },
+        { label: '应力', value: 'pressure', unit: 'MPa' },
+        { label: '飞行时间', value: 'tof', unit: 'ns' },
+        { label: '温度', value: 'temperature', unit: '℃' },
+        { label: '长度', value: 'length', unit: 'mm' }
+      ]
     }
   },
   thickness: {
@@ -82,7 +103,8 @@ export const measurementTypes: Record<
     url: '/bolt',
     firstClassFieldKeys: ['thickness', 'temperature', 'annualized_corrosion_rate'],
     deviceType: [DeviceType.NormalTemperatureCorrosion, DeviceType.HighTemperatureCorrosion],
-    dynamicData: {
+    waveData: {
+      serverDatatype: 'waveform',
       title: '波形数据',
       fields: [{ label: 'mv', value: 'mv', unit: '' }],
       metaData: [
