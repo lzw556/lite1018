@@ -65,6 +65,10 @@ const ImportNetworkPage = () => {
   }, [network]);
 
   const onSave = () => {
+    if (network === undefined) {
+      message.error('请上传文件');
+      return;
+    }
     const nodes = network.devices;
     if (nodes && nodes.length) {
       form.validateFields().then((values) => {
