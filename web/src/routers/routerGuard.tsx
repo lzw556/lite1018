@@ -11,7 +11,7 @@ const RouterGuard = (props: any) => {
   const { pathname } = location;
 
   if (pathname === '/') {
-    return <Redirect to={'/device-management?locale=devices'} />;
+    return <Redirect to={'/project-overview?locale=project-overview'} />;
   }
   if (routes.length === 0) {
     return <Redirect to={'/403'} />;

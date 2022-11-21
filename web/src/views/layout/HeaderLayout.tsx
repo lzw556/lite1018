@@ -45,7 +45,7 @@ const HeaderLayout = (props: any) => {
           type: 'SET_PROJECT',
           payload: data.id
         });
-        window.location.reload();
+        window.location.href = '/';
       })
       .catch((e) => {
         console.log(e);
