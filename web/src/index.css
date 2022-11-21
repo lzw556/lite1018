@@ -10,3 +10,6 @@ body {
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
+tbody.ant-table-tbody > tr.ant-table-row:hover > td {
+  background-color: #eee;
+}
