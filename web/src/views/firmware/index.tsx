@@ -21,7 +21,7 @@ import { Store, useStore } from '../../hooks/store';
 const FirmwarePage = () => {
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [dataSource, setDataSource] = useState<PageResult<Firmware[]>>();
-  const [store, setStore] = useStore('firmwareList');
+  const [store, setStore, gotoPage] = useStore('firmwareList');
 
   const fetchFirmwares = (store: Store['firmwareList']) => {
     const {
@@ -46,8 +46,12 @@ const FirmwarePage = () => {
     UploadFirmwareRequest(formData).then((res) => {
       setIsUploading(false);
       if (res.code === 200) {
-        message.success('固件上传成功').then();
-        fetchFirmwares(store);
+        message.success('固件上传成功').then(() => {
+          if (dataSource) {
+            const { size, page, total } = dataSource;
+            gotoPage({ size, total, index: page }, 'next');
+          }
+        });
       } else {
         message.error(`上传失败,${res.msg}`).then();
       }
@@ -55,7 +59,12 @@ const FirmwarePage = () => {
   };
 
   const onDelete = (id: number) => {
-    RemoveFirmwareRequest(id).then((_) => fetchFirmwares(store));
+    RemoveFirmwareRequest(id).then((_) => {
+      if (dataSource) {
+        const { size, page, total } = dataSource;
+        gotoPage({ size, total, index: page }, 'prev');
+      }
+    });
   };
 
   const columns = [

@@ -31,7 +31,7 @@ const NetworkPage = () => {
   const [editVisible, setEditVisible] = useState<boolean>(false);
   const [network, setNetwork] = useState<Network>();
   const [dataSource, setDataSource] = useState<PageResult<any>>();
-  const [store, setStore] = useStore('networkList');
+  const [store, setStore, gotoPage] = useStore('networkList');
 
   const fetchNetworks = (store: Store['networkList']) => {
     const {
@@ -46,13 +46,9 @@ const NetworkPage = () => {
 
   const onDelete = (id: number, index: number) => {
     DeleteNetworkRequest(id).then(() => {
-      if (index === 0) {
-        setStore((prev) => ({
-          ...prev,
-          pagedOptions: { index: prev.pagedOptions.index - 1 || 1, size: prev.pagedOptions.size }
-        }));
-      } else {
-        fetchNetworks(store);
+      if (dataSource) {
+        const { size, page, total } = dataSource;
+        gotoPage({ size, total, index: page }, 'prev');
       }
     });
   };
@@ -248,7 +244,10 @@ const NetworkPage = () => {
         onCancel={() => setAddVisible(false)}
         onSuccess={() => {
           setAddVisible(false);
-          fetchNetworks(store);
+          if (dataSource) {
+            const { size, page, total } = dataSource;
+            gotoPage({ size, total, index: page }, 'next');
+          }
         }}
       />
       {network && (

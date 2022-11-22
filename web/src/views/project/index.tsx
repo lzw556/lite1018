@@ -25,7 +25,7 @@ const ProjectPage = () => {
   const [dataSource, setDataSource] = useState<PageResult<any>>();
   const [project, setProject] = useState<Project>();
   const { hasPermissions } = usePermission();
-  const [store, setStore] = useStore('projectList');
+  const [store, setStore, gotoPage] = useStore('projectList');
   const [refreshKey, setRefreshKey] = useState<number>(0);
 
   const fetchProjects = (store: Store['firmwareList']) => {
@@ -55,6 +55,10 @@ const ProjectPage = () => {
         type: 'SET_PROJECT',
         payload: 0
       });
+      if (dataSource) {
+        const { size, page, total } = dataSource;
+        gotoPage({ size, total, index: page }, 'prev');
+      }
       window.location.reload();
     });
   };
@@ -187,7 +191,10 @@ const ProjectPage = () => {
           onSuccess={() => {
             setVisible(false);
             setProject(undefined);
-            fetchProjects(store);
+            if (dataSource) {
+              const { size, page, total } = dataSource;
+              gotoPage({ size, total, index: page }, 'next');
+            }
           }}
           onCancel={() => {
             setVisible(false);

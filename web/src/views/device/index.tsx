@@ -73,7 +73,7 @@ const DevicePage = () => {
   const { hasPermission, hasPermissions } = usePermission();
   const [visibleCalibrate, setVisibleCalibrate] = useState(false);
   const [visibleAlarmRules, setVisibleAlarmRules] = useState(false);
-  const [store, setStore] = useStore('deviceList');
+  const [store, setStore, gotoPage] = useStore('deviceList');
 
   const fetchDevices = (store: Store['deviceList']) => {
     const {
@@ -88,7 +88,12 @@ const DevicePage = () => {
   }, [store]);
 
   const onDelete = (id: number) => {
-    DeleteDeviceRequest(id).then((_) => fetchDevices(store));
+    DeleteDeviceRequest(id).then((_) => {
+      if (dataSource) {
+        const { size, page, total } = dataSource;
+        gotoPage({ size, total, index: page }, 'prev');
+      }
+    });
   };
 
   const onCommand = (device: Device, key: any) => {

@@ -4,37 +4,53 @@ import { PagedOption } from '../types/props';
 import { Filters } from '../views/device/util';
 
 export type Store = {
-  deviceList: { filters?: Filters; pagedOptions: PagedOption; searchTarget: number };
-  measurementListFilters: { windTurbineId: number };
-  networkList: { pagedOptions: PagedOption };
-  firmwareList: { pagedOptions: PagedOption };
-  alarmRecordList: { pagedOptions: PagedOption; range: [number, number]; alertLevels: number[] };
-  projectList: { pagedOptions: PagedOption };
-  accountList: { pagedOptions: PagedOption };
+  deviceList: {
+    filters?: Filters;
+    pagedOptions: PagedOption;
+    searchTarget: number;
+    lastUpdate: number;
+  };
+  measurementListFilters: { windTurbineId: number; pagedOptions: PagedOption; lastUpdate: number };
+  networkList: { pagedOptions: PagedOption; lastUpdate: number };
+  firmwareList: { pagedOptions: PagedOption; lastUpdate: number };
+  alarmRecordList: {
+    pagedOptions: PagedOption;
+    range: [number, number];
+    alertLevels: number[];
+    lastUpdate: number;
+  };
+  projectList: { pagedOptions: PagedOption; lastUpdate: number };
+  accountList: { pagedOptions: PagedOption; lastUpdate: number };
 };
 
 export function useStore<ReturnType extends keyof Store>(
   key: ReturnType
-): [Store[typeof key], React.Dispatch<React.SetStateAction<Store[typeof key]>>] {
+): [
+  Store[typeof key],
+  React.Dispatch<React.SetStateAction<Store[typeof key]>>,
+  (pageInfo: { total: number; index: number; size: number }, action: 'prev' | 'next') => void
+] {
   const defaultPagedOptions = { pagedOptions: { index: 1, size: 10 } };
+  const lastUpdate = new Date().getTime();
+  const defaultOptions = { ...defaultPagedOptions, lastUpdate };
   const initial = JSON.stringify({
     deviceList: {
-      ...defaultPagedOptions,
+      ...defaultOptions,
       searchTarget: 0
     },
-    measurementListFilters: { windTurbineId: 0 },
-    networkList: { ...defaultPagedOptions },
-    firmwareList: { ...defaultPagedOptions },
+    measurementListFilters: { ...defaultOptions, windTurbineId: 0 },
+    networkList: { ...defaultOptions },
+    firmwareList: { ...defaultOptions },
     alarmRecordList: {
-      ...defaultPagedOptions,
+      ...defaultOptions,
       alertLevels: [1, 2, 3],
       range: [
         moment().subtract(1, 'd').startOf('day').utc().unix(),
         moment().endOf('day').utc().unix()
       ]
     },
-    projectList: { ...defaultPagedOptions },
-    accountList: { ...defaultPagedOptions }
+    projectList: { ...defaultOptions },
+    accountList: { ...defaultOptions }
   });
 
   const local = localStorage.getItem('store') || initial;
@@ -45,5 +61,22 @@ export function useStore<ReturnType extends keyof Store>(
     localStorage.setItem('store', JSON.stringify({ ...localStore, [key]: subStore }));
   }, [localStore, subStore, key]);
 
-  return [subStore, setSubStore];
+  function gotoPage(
+    pageInfo: { total: number; index: number; size: number },
+    action: 'prev' | 'next'
+  ) {
+    const { total, index, size } = pageInfo;
+    const pageCount = Math.ceil((total + (action === 'next' ? 1 : -1)) / size);
+    const nextIndex = action === 'next' ? pageCount : pageCount < index ? pageCount : index;
+    if (nextIndex !== index) {
+      setSubStore((prev) => ({
+        ...prev,
+        pagedOptions: { index: nextIndex, size: prev.pagedOptions.size }
+      }));
+    } else {
+      setSubStore((prev) => ({ ...prev, lastUpdate: new Date().getTime() }));
+    }
+  }
+
+  return [subStore, setSubStore, gotoPage];
 }

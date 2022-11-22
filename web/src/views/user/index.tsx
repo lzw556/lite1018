@@ -20,7 +20,7 @@ const UserPage = () => {
   const [editUserVisible, setEditUserVisible] = useState<boolean>(false);
   const [user, setUser] = useState(InitializeUserState);
   const [dataSource, setDataSource] = useState<PageResult<User[]>>();
-  const [store, setStore] = useStore('accountList');
+  const [store, setStore, gotoPage] = useStore('accountList');
 
   const fetchUsers = (store: Store['accountList']) => {
     const {
@@ -35,7 +35,10 @@ const UserPage = () => {
 
   const onAddUserSuccess = () => {
     setAddUserVisible(false);
-    fetchUsers(store);
+    if (dataSource) {
+      const { size, page, total } = dataSource;
+      gotoPage({ size, total, index: page }, 'next');
+    }
   };
 
   const onEdit = async (id: number) => {
@@ -51,7 +54,12 @@ const UserPage = () => {
   };
 
   const onDelete = (id: number) => {
-    RemoveUserRequest(id).then((_) => fetchUsers(store));
+    RemoveUserRequest(id).then((_) => {
+      if (dataSource) {
+        const { size, page, total } = dataSource;
+        gotoPage({ size, total, index: page }, 'prev');
+      }
+    });
   };
 
   const columns = [

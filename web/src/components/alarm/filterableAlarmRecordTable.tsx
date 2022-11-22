@@ -26,7 +26,7 @@ export const FilterableAlarmRecordTable: React.FC<{ sourceId?: number }> = ({ so
   const [alarmRecord, setAlarmRecord] = React.useState<any>();
   const [acknowledge, setAcknowledge] = React.useState<any>();
   const [status, setStatus] = React.useState<any>([0, 1, 2]);
-  const [store, setStore] = useStore('alarmRecordList');
+  const [store, setStore, gotoPage] = useStore('alarmRecordList');
 
   const fetchAlarmRecords = (status: any, store: Store['alarmRecordList'], sourceId?: number) => {
     const {
@@ -61,7 +61,12 @@ export const FilterableAlarmRecordTable: React.FC<{ sourceId?: number }> = ({ so
   }, [status, sourceId, store]);
 
   const onDelete = (id: number) => {
-    RemoveAlarmRecordRequest(id).then((_) => fetchAlarmRecords(status, store, sourceId));
+    RemoveAlarmRecordRequest(id).then((_) => {
+      if (dataSource) {
+        const { size, page, total } = dataSource;
+        gotoPage({ size, total, index: page }, 'prev');
+      }
+    });
   };
 
   const onAcknowledge = (record: any) => {
