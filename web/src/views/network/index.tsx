@@ -32,6 +32,7 @@ const NetworkPage = () => {
   const [network, setNetwork] = useState<Network>();
   const [dataSource, setDataSource] = useState<PageResult<any>>();
   const [store, setStore, gotoPage] = useStore('networkList');
+  const [deviceListStore, setDeviceListStore] = useStore('deviceList');
 
   const fetchNetworks = (store: Store['networkList']) => {
     const {
@@ -49,6 +50,17 @@ const NetworkPage = () => {
       if (dataSource) {
         const { size, page, total } = dataSource;
         gotoPage({ size, total, index: page }, 'prev');
+      }
+      if (
+        deviceListStore.filters &&
+        deviceListStore.filters.network_id &&
+        deviceListStore.filters.network_id === id
+      ) {
+        setDeviceListStore((prev) => {
+          const prevFilter = prev.filters;
+          delete prevFilter?.network_id;
+          return { ...prev, filters: prevFilter };
+        });
       }
     });
   };
