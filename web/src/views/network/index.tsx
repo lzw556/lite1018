@@ -156,7 +156,7 @@ const NetworkPage = () => {
         if (text === 0) {
           return '无';
         }
-        if (text / 1000 < 60) {
+        if (text / 1000 < 60 || (text / 1000) % 60 !== 0) {
           return `${text / 1000}秒`;
         }
         return moment.duration(text / 1000, 'seconds').humanize();
