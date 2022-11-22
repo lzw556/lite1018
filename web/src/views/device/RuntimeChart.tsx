@@ -5,8 +5,12 @@ import ReactECharts from 'echarts-for-react';
 import { GetDeviceRuntimeRequest } from '../../apis/device';
 import { DefaultMonitorDataOption, LineChartStyles } from '../../constants/chart';
 import { isMobile } from '../../utils/deviceDetection';
+import { DeviceType } from '../../types/device_type';
 
-export const RuntimeChart: React.FC<{ deviceId: number }> = ({ deviceId }) => {
+export const RuntimeChart: React.FC<{ deviceId: number; deviceType: number }> = ({
+  deviceId,
+  deviceType
+}) => {
   const [runtimeOptions, setRuntimeOptions] = React.useState<any>();
 
   React.useEffect(() => {
@@ -61,9 +65,13 @@ export const RuntimeChart: React.FC<{ deviceId: number }> = ({ deviceId }) => {
           )
         }
       };
-      setRuntimeOptions([batteryOption, signalOption]);
+      if (deviceType !== DeviceType.Gateway) {
+        setRuntimeOptions([batteryOption, signalOption]);
+      } else {
+        setRuntimeOptions([signalOption]);
+      }
     });
-  }, [deviceId]);
+  }, [deviceId, deviceType]);
 
   if (runtimeOptions && runtimeOptions.length) {
     return (

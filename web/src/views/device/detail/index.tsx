@@ -69,7 +69,7 @@ const DeviceDetailPage = () => {
     ['historyData', device && <HistoryDataPage device={device} />],
     ['waveData', device && <WaveDataChart device={device} />],
     ['monitor', device && <RecentHistory device={device} />],
-    ['ta', device && <RuntimeChart deviceId={device.id} />],
+    ['ta', device && <RuntimeChart deviceId={device.id} deviceType={device.typeId} />],
     ['events', device && <DeviceEvent device={device} />],
     ['alarm', device && <FilterableAlarmRecordTable sourceId={device.id} />],
     ['dynamicData', device && <DynamicData {...device} />]
