@@ -62,6 +62,10 @@ const UpgradeModal: FC<UpgradeModalProps> = ({ visible, device, onCancel, onSucc
   };
 
   const onUpgrade = () => {
+    if (firmware === undefined) {
+      message.success('请选择固件');
+      return;
+    }
     if (device) {
       setIsLoading(true);
       DeviceUpgradeRequest(device.id, {
