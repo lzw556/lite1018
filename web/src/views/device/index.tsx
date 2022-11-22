@@ -57,6 +57,7 @@ import EditCalibrateParas from './edit/editCalibrateParas';
 import { AlarmRuleSettings } from './detail/setting/alarmRuleSettings';
 import { Store, useStore } from '../../hooks/store';
 import * as AppConfig from '../../config';
+import { Normalizes } from '../../constants/validator';
 
 const { Search } = Input;
 const { Option } = Select;
@@ -418,7 +419,8 @@ const DevicePage = () => {
                       pagedOptions: { ...prev.pagedOptions, index: 1 },
                       filters: {
                         ...prev.filters,
-                        [store.searchTarget === 0 ? 'name' : 'mac_address']: val
+                        name: store.searchTarget === 0 ? val : '',
+                        mac_address: store.searchTarget === 0 ? '' : Normalizes.macAddress(val)
                       }
                     }));
                   }}
