@@ -5,7 +5,7 @@ import { ImportOutlined, InboxOutlined } from '@ant-design/icons';
 import { ImportNetworkRequest } from '../../../apis/network';
 import ShadowCard from '../../../components/shadowCard';
 import MyBreadcrumb from '../../../components/myBreadcrumb';
-import G6 from '@antv/g6';
+import G6, { TreeGraph } from '@antv/g6';
 import '../../../components/shape/shape';
 import WsnFormItem from '../../../components/formItems/wsnFormItem';
 import { Rules } from '../../../constants/validator';
@@ -26,7 +26,7 @@ const ImportNetworkPage = () => {
   const [success, setSuccess] = useState<boolean>(false);
   const [provisioningMode, setProvisioningMode] = useState<number>(1);
   const [form] = Form.useForm();
-  let graph: any = null;
+  const [graph, setGraph] = useState<TreeGraph | undefined>();
 
   const checkJSONFormat = (source: any) => {
     return source.hasOwnProperty('deviceList') && source.hasOwnProperty('wsn');
@@ -63,6 +63,22 @@ const ImportNetworkPage = () => {
       });
     }
   }, [network]);
+
+  useEffect(() => {
+    function handleResize() {
+      if (graph) {
+        graph.changeSize(
+          document.querySelector('#container')?.clientWidth ?? 500,
+          document.querySelector('#container')?.clientHeight ?? 500
+        );
+        graph.fitView();
+      }
+    }
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [graph]);
 
   const onSave = () => {
     if (network === undefined) {
@@ -108,10 +124,10 @@ const ImportNetworkPage = () => {
   useEffect(() => {
     if (network?.devices && network?.devices.length) {
       if (!graph) {
-        graph = new G6.TreeGraph({
+        const graphInstance = new G6.TreeGraph({
           container: 'container',
-          width: document.querySelector('#container')?.clientWidth,
-          height: document.querySelector('#container')?.clientHeight,
+          // width: document.querySelector('#container')?.clientWidth,
+          // height: document.querySelector('#container')?.clientHeight,
           modes: {
             default: [{ type: 'collapse-expand' }, 'drag-canvas', 'zoom-canvas']
           },
@@ -149,13 +165,14 @@ const ImportNetworkPage = () => {
             }
           }
         });
-        graph.data({
+        graphInstance.data({
           id: network.devices[0].address,
           data: network.devices[0],
           children: tree(network.devices[0])
         });
-        graph.render();
-        graph.fitView();
+        graphInstance.render();
+        graphInstance.fitView();
+        setGraph(graphInstance);
       }
     }
   }, [network]);

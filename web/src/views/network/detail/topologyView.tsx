@@ -1,5 +1,5 @@
-import G6 from '@antv/g6';
-import { FC, useEffect } from 'react';
+import G6, { TreeGraph } from '@antv/g6';
+import { FC, useEffect, useState } from 'react';
 import { Network } from '../../../types/network';
 import { Device } from '../../../types/device';
 import '../../../components/shape/shape';
@@ -9,7 +9,7 @@ export interface TopologyViewProps {
 }
 
 const TopologyView: FC<TopologyViewProps> = ({ network }) => {
-  let graph: any = null;
+  const [graph, setGraph] = useState<TreeGraph | undefined>();
 
   const tree: any = (root: Device) => {
     console.log(network.nodes);
@@ -26,8 +26,24 @@ const TopologyView: FC<TopologyViewProps> = ({ network }) => {
   };
 
   useEffect(() => {
+    function handleResize() {
+      if (graph) {
+        graph.changeSize(
+          document.querySelector('#container')?.clientWidth ?? 500,
+          document.querySelector('#container')?.clientHeight ?? 500
+        );
+        graph.fitView();
+      }
+    }
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [graph]);
+
+  useEffect(() => {
     if (!graph) {
-      graph = new G6.TreeGraph({
+      const graphInstance = new G6.TreeGraph({
         container: 'container',
         width: document.querySelector('#container')?.clientWidth,
         height: document.querySelector('#container')?.clientHeight,
@@ -68,13 +84,14 @@ const TopologyView: FC<TopologyViewProps> = ({ network }) => {
           }
         }
       });
-      graph.data({
+      graphInstance.data({
         id: network.gateway.macAddress,
         data: network.gateway,
         children: tree(network.gateway)
       });
-      graph.render();
-      graph.fitView();
+      graphInstance.render();
+      graphInstance.fitView();
+      setGraph(graphInstance);
     }
   }, []);
 
