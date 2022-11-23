@@ -2,7 +2,6 @@ import { MinusCircleOutlined } from '@ant-design/icons';
 import { Button, Divider, Form, Input, Select } from 'antd';
 import * as React from 'react';
 import { useHistory } from 'react-router-dom';
-import { CheckAlarmRuleNameRequest } from '../../../../../apis/alarm';
 import MyBreadcrumb from '../../../../../components/myBreadcrumb';
 import ShadowCard from '../../../../../components/shadowCard';
 import { defaultValidateMessages, Rules } from '../../../../../constants/validator';
@@ -22,28 +21,6 @@ const AlarmRuleGroupCreation = () => {
   React.useEffect(() => {
     window.addEventListener('resize', (e) => setSmallSize(window.innerWidth < 1300));
   }, []);
-
-  const onNameValidator = (rule: any, value: any) => {
-    return new Promise<void>((resolve, reject) => {
-      if (!value) {
-        resolve();
-        return;
-      }
-      const rules: AlarmRule[] = form.getFieldValue('rules');
-      if (rules.filter(({ name }) => name === value).length > 1) {
-        reject('规则名称不能重复');
-      }
-      CheckAlarmRuleNameRequest(value)
-        .then((data) => {
-          if (data) {
-            resolve();
-          } else {
-            reject('该名称已存在');
-          }
-        })
-        .catch((_) => reject('该名称已存在'));
-    });
-  };
 
   return (
     <>
@@ -113,7 +90,7 @@ const AlarmRuleGroupCreation = () => {
                         <Form.Item
                           {...restFields}
                           name={[name, 'name']}
-                          rules={[Rules.range(4, 16), { validator: onNameValidator }]}
+                          rules={[Rules.range(4, 16)]}
                           dependencies={index === 0 ? undefined : ['user', index - 1, 'name']}
                           style={{ display: 'inline-flex', marginRight: 20, marginBottom: 0 }}
                         >
@@ -243,7 +220,7 @@ const AlarmRuleGroupCreation = () => {
                           label='名称'
                           {...restFields}
                           name={[name, 'name']}
-                          rules={[Rules.range(4, 16), { validator: onNameValidator }]}
+                          rules={[Rules.range(4, 16)]}
                           dependencies={index === 0 ? undefined : ['user', index - 1, 'name']}
                         >
                           <Input

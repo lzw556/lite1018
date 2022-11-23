@@ -1,7 +1,6 @@
 import { Button, Divider, Form, Input, Select } from 'antd';
 import * as React from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
-import { CheckAlarmRuleNameRequest } from '../../../../../apis/alarm';
 import MyBreadcrumb from '../../../../../components/myBreadcrumb';
 import ShadowCard from '../../../../../components/shadowCard';
 import { defaultValidateMessages, Normalizes, Rules } from '../../../../../constants/validator';
@@ -30,28 +29,6 @@ const AlarmRuleGroupEdit = () => {
       form.setFieldsValue(rule);
     }
   }, [rule, form]);
-
-  const onNameValidator = (rule: any, value: any) => {
-    return new Promise<void>((resolve, reject) => {
-      if (!value) {
-        resolve();
-        return;
-      }
-      const rules: AlarmRule[] = form.getFieldValue('rules');
-      if (rules.filter(({ name }) => name === value).length > 1) {
-        reject('规则名称不能重复');
-      }
-      CheckAlarmRuleNameRequest(value)
-        .then((data) => {
-          if (data) {
-            resolve();
-          } else {
-            reject('该名称已存在');
-          }
-        })
-        .catch((_) => reject('该名称已存在'));
-    });
-  };
 
   if (!rule) return null;
   return (
@@ -97,11 +74,7 @@ const AlarmRuleGroupEdit = () => {
                           label='名称'
                           {...restFields}
                           name={[name, 'name']}
-                          rules={
-                            index < rule.rules.length
-                              ? undefined
-                              : [Rules.range(4, 16), { validator: onNameValidator }]
-                          }
+                          rules={index < rule.rules.length ? undefined : [Rules.range(4, 16)]}
                         >
                           <Input
                             placeholder={`请填写名称`}
@@ -199,11 +172,7 @@ const AlarmRuleGroupEdit = () => {
                         <Form.Item
                           {...restFields}
                           name={[name, 'name']}
-                          rules={
-                            index < rule.rules.length
-                              ? undefined
-                              : [Rules.range(4, 16), { validator: onNameValidator }]
-                          }
+                          rules={index < rule.rules.length ? undefined : [Rules.range(4, 16)]}
                           style={{ display: 'inline-flex', marginRight: 20, marginBottom: 0 }}
                         >
                           <Input
