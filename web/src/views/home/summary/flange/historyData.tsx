@@ -38,6 +38,7 @@ export const HistoryData: React.FC<AssetRow> = (props) => {
     const measurements = props.monitoringPoints || [];
     if (measurements.length > 0 && range) {
       const [from, to] = range;
+      setHistoryDatas([]);
       measurements.forEach(({ id, name, attributes }) => {
         getData(id, from, to).then((data) => {
           if (data.length > 0)
@@ -45,7 +46,7 @@ export const HistoryData: React.FC<AssetRow> = (props) => {
         });
       });
     }
-  }, [props, range]);
+  }, [props.monitoringPoints, range]);
 
   React.useEffect(() => {
     const measurements = props.monitoringPoints || [];
@@ -59,7 +60,7 @@ export const HistoryData: React.FC<AssetRow> = (props) => {
         )
       );
     }
-  }, [historyDatas, props, property]);
+  }, [historyDatas, props.monitoringPoints, property]);
 
   const handleChange = React.useCallback((range: [number, number]) => setRange(range), []);
 
