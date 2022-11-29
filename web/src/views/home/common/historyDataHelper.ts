@@ -43,7 +43,7 @@ export function generateChartOptionsOfLastestData(
   const min =
     measurements[0].type === AppConfig.use(window.assetCategory).measurementTypes.loosening_angle.id
       ? -(max * 1.5)
-      : max / 2;
+      : actuals.min || -1;
   radiusAxis.push({ ...actuals.radiusAxis, max, min });
   series.push(actuals.series);
 
