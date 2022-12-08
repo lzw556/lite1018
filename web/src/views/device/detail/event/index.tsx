@@ -46,14 +46,19 @@ const DeviceEvent: FC<DeviceEventProps> = ({ device }) => {
 
   const columns = [
     {
-      title: '事件名称',
+      title: '类型',
       dataIndex: 'name',
       key: 'name'
     },
     {
-      title: '详情',
+      title: '说明',
       dataIndex: 'content',
       key: 'content'
+    },
+    {
+      title: '详情',
+      dataIndex: 'message',
+      key: 'message'
     },
     {
       title: '发生时间',
