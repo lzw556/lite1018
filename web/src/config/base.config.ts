@@ -26,7 +26,7 @@ export const assetType = {
 };
 
 export const measurementTypes: Record<
-  'loosening_angle' | 'preload' | 'thickness',
+  'loosening_angle' | 'preload' | 'thickness' | 'vibration' | 'angleDip' | 'pressure',
   {
     id: number;
     label: string;
@@ -115,6 +115,32 @@ export const measurementTypes: Record<
         { label: '信号强度', value: 'sigStrength', unit: '' }
       ]
     }
+  },
+  vibration: {
+    id: 10401,
+    label: '振动',
+    url: '/bolt',
+    firstClassFieldKeys: ['vibration_severity_y', 'enveloping_pk2pk_y', 'temperature'],
+    deviceType: [
+      DeviceType.VibrationTemperature3Axis,
+      DeviceType.VibrationTemperature3AxisAdvanced,
+      DeviceType.VibrationTemperature3AxisAdvancedNB,
+      DeviceType.VibrationTemperature3AxisNB
+    ]
+  },
+  angleDip: {
+    id: 10501,
+    label: '倾角',
+    url: '/bolt',
+    firstClassFieldKeys: ['inclination', 'pitch', 'roll', 'waggle'],
+    deviceType: [DeviceType.AngleDip]
+  },
+  pressure: {
+    id: 10601,
+    label: '压力',
+    url: '/bolt',
+    firstClassFieldKeys: ['pressure', 'temperature'],
+    deviceType: [DeviceType.PressureTemperature]
   }
 };
 

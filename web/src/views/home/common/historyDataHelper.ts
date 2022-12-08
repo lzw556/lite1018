@@ -512,7 +512,8 @@ function getFirstClassFields(measurement: MeasurementRow) {
     for (const property of measurement.properties) {
       const field = property.fields.find((field) => field.key === fieldKey);
       if (field) {
-        fields.push({ ...field, unit: property.unit, precision: property.precision });
+        const name = field.name === property.name ? field.name : property.name;
+        fields.push({ ...field, unit: property.unit, precision: property.precision, name });
         break;
       }
     }
