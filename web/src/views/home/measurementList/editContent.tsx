@@ -2,7 +2,6 @@ import { Form, Input, Select } from 'antd';
 import * as React from 'react';
 import DeviceSelect from '../../../components/select/deviceSelect';
 import { Rules } from '../../../constants/validator';
-import { DeviceType } from '../../../types/device_type';
 import { AssetRow } from '../assetList/props';
 import { getAssets } from '../assetList/services';
 import * as AppConfig from '../../../config';
@@ -12,7 +11,7 @@ export const EditContent: React.FC<{ form: any; asset?: AssetRow; doUpdating?: b
   form,
   doUpdating
 }) => {
-  const [types, setTypes] = React.useState([DeviceType.BoltLoosening, DeviceType.BoltElongation]);
+  const [types, setTypes] = React.useState(AppConfig.use(window.assetCategory).sensorTypes);
   const [parents, setParents] = React.useState<AssetRow[]>([]);
   const [disabled, setDisabled] = React.useState(true);
   const configWind = AppConfig.use('wind');
