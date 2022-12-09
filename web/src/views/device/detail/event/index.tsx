@@ -11,6 +11,7 @@ import {
 import TableLayout from '../../../layout/TableLayout';
 import HasPermission from '../../../../permission';
 import usePermission, { Permission } from '../../../../permission/permission';
+import { store } from '../../../../store';
 
 const { RangePicker } = DatePicker;
 
@@ -26,6 +27,9 @@ const DeviceEvent: FC<DeviceEventProps> = ({ device }) => {
   const [dataSource, setDataSource] = useState<any>();
   const [selectedRowKeys, setSelectedRowKeys] = useState<any[]>([]);
   const { hasPermission } = usePermission();
+  const isPlatformAccount =
+    store.getState().permission.data.subject === 'admin' ||
+    store.getState().permission.data.subject === '平台管理员';
 
   const fetchDeviceEvents = useCallback(
     (current: number, size: number) => {
@@ -44,7 +48,7 @@ const DeviceEvent: FC<DeviceEventProps> = ({ device }) => {
     fetchDeviceEvents(1, 10);
   }, [fetchDeviceEvents]);
 
-  const columns = [
+  const columns: any = [
     {
       title: '类型',
       dataIndex: 'name',
@@ -54,21 +58,23 @@ const DeviceEvent: FC<DeviceEventProps> = ({ device }) => {
       title: '说明',
       dataIndex: 'content',
       key: 'content'
-    },
-    {
+    }
+  ];
+  if (isPlatformAccount) {
+    columns.push({
       title: '详情',
       dataIndex: 'message',
       key: 'message'
-    },
-    {
-      title: '发生时间',
-      dataIndex: 'timestamp',
-      key: 'timestamp',
-      render: (timestamp: number) => {
-        return moment.unix(timestamp).local().format('YYYY-MM-DD HH:mm:ss');
-      }
+    });
+  }
+  columns.push({
+    title: '发生时间',
+    dataIndex: 'timestamp',
+    key: 'timestamp',
+    render: (timestamp: number) => {
+      return moment.unix(timestamp).local().format('YYYY-MM-DD HH:mm:ss');
     }
-  ];
+  });
 
   const onBatchDelete = () => {
     BatchDeleteDeviceEventsRequest(device.id, selectedRowKeys).then(() => {
