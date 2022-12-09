@@ -14,11 +14,12 @@ export const ActionBar: React.FC<{
   target?: number;
   payload?: EditFormPayload;
   onSuccess?: () => void;
+  style?: React.CSSProperties;
 }> = (props) => {
   const { actions, visible, setVisible, target, payload, onSuccess } = props;
 
   return (
-    <Space wrap={true}>
+    <Space wrap={true} style={props.style}>
       {actions}
       {visible && target === 0 && (
         <TopAssetEdit

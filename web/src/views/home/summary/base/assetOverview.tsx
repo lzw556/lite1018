@@ -1,20 +1,16 @@
-import { Button, Col, Form, Row, Spin } from 'antd';
+import { Form, Spin } from 'antd';
 import * as React from 'react';
 import { useLocation, useHistory } from 'react-router-dom';
 import { AssetNavigator } from '../../components/assetNavigator';
 import '../../home.css';
-import { getAsset, updateAsset } from '../../assetList/services';
+import { getAsset } from '../../assetList/services';
 import { OverviewPage } from '../../components/overviewPage';
 import { getAssetStatistics, NameValue } from '../../common/statisticsHelper';
 import ShadowCard from '../../../../components/shadowCard';
 import { Asset, AssetRow, convertRow } from '../../assetList/props';
-import { MonitorTabContent } from './monitorTabContent';
-import { SettingsTabContent } from './settingsTabContent';
-import usePermission, { Permission } from '../../../../permission/permission';
 import { ActionBar } from '../../components/actionBar';
 import { useActionBarStatus } from '../../common/useActionBarStatus';
-import { PlusOutlined } from '@ant-design/icons';
-import { MeasurementOfAssetList } from './MeasurementOfAssetList';
+import { AssetTree } from '../../assetList/assetTree';
 
 const AssetOverview: React.FC = () => {
   const { pathname, search } = useLocation();
@@ -25,37 +21,7 @@ const AssetOverview: React.FC = () => {
   const [statistics, setStatistics] = React.useState<NameValue[]>();
   const [form] = Form.useForm<Asset>();
   const [isForceRefresh, setIsForceRefresh] = React.useState(0);
-  const { hasPermission } = usePermission();
   const actionStatus = useActionBarStatus();
-  const tabs = [
-    {
-      key: 'monitor',
-      tab: '监控',
-      content: <MonitorTabContent asset={asset} pathname={pathname} search={search} />
-    },
-    {
-      key: 'list',
-      tab: '监测点列表',
-      content: (
-        <ShadowCard>
-          <Row>
-            <Col span={24}>
-              <MeasurementOfAssetList
-                asset={asset}
-                pathname={pathname}
-                search={search}
-                handleMeasurementEdit={actionStatus.handleMeasurementEdit}
-                fetchAssets={() => {
-                  fetchAsset(id);
-                }}
-              />
-            </Col>
-          </Row>
-        </ShadowCard>
-      )
-    }
-  ];
-  const [tabKey, setTabKey] = React.useState(tabs[0].key);
 
   const fetchAsset = (id: number, form?: any) => {
     getAsset(id).then((asset) => {
@@ -96,41 +62,28 @@ const AssetOverview: React.FC = () => {
       <OverviewPage
         {...{
           statistics,
-          tabs: hasPermission(Permission.AssetEdit)
-            ? tabs.concat([
-                {
-                  key: 'settings',
-                  tab: '配置信息',
-                  content: (
-                    <SettingsTabContent
-                      asset={asset}
-                      form={form}
-                      onSubmit={(values) => {
-                        updateAsset(id, values).then(() => {
-                          setIsForceRefresh((prev) => ++prev);
-                        });
-                      }}
-                    />
-                  )
-                }
-              ])
-            : tabs,
-          tabBarExtraContent: asset && tabKey === 'list' && hasPermission(Permission.AssetAdd) && (
-            <ActionBar
-              actions={[
-                <Button
-                  type='primary'
-                  onClick={() => actionStatus.handleMeasurementEdit({ asset })}
-                >
-                  添加监测点
-                  <PlusOutlined />
-                </Button>
-              ]}
-              {...actionStatus}
-              onSuccess={() => fetchAsset(id)}
-            />
-          ),
-          onTabChange: (key) => setTabKey(key)
+          children: (
+            <ShadowCard>
+              <ActionBar
+                actions={[]}
+                {...actionStatus}
+                style={{ display: 'none' }}
+                onSuccess={() => {
+                  fetchAsset(id, form);
+                  setIsForceRefresh(1);
+                }}
+              />
+              <AssetTree
+                assets={asset ? [asset] : []}
+                pathname={pathname}
+                search={search}
+                onsuccess={() => fetchAsset(id, form)}
+                {...actionStatus}
+                rootId={asset?.id}
+                key={asset?.id}
+              />
+            </ShadowCard>
+          )
         }}
       />
     </>

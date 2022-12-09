@@ -39,6 +39,7 @@ export type Overview = {
   tabs?: { key: string; tab: string; content: JSX.Element }[];
   tabBarExtraContent?: React.ReactNode;
   onTabChange?: (key: string) => void;
+  children?: React.ReactNode;
 };
 export const OverviewPage: React.FC<Overview> = (props) => {
   const { statistics, chartList, introductionList, tabs, tabBarExtraContent, onTabChange } = props;
@@ -112,6 +113,7 @@ export const OverviewPage: React.FC<Overview> = (props) => {
             </Tabs>
           </Col>
         )}
+        <Col span={24}>{props.children}</Col>
       </Row>
     </>
   );

@@ -31,6 +31,7 @@ export const AssetTree: React.FC<{
   handleFlangeEdit?: (data?: EditFormPayload) => void;
   handleMeasurementEdit?: (data?: EditFormPayload) => void;
   handleChildAddition?: (data?: EditFormPayload) => void;
+  rootId?: number;
 }> = ({
   assets,
   pathname,
@@ -40,7 +41,8 @@ export const AssetTree: React.FC<{
   handleFlangeEdit,
   handleWindEdit,
   handleMeasurementEdit,
-  handleChildAddition
+  handleChildAddition,
+  rootId
 }) => {
   const [treedata, setTreedata] = React.useState<any>();
   const [selectedNode, setSelectedNode] = React.useState<any>();
@@ -131,6 +133,7 @@ export const AssetTree: React.FC<{
         } else {
           subpath = AppConfig.use(window.assetCategory).measurementTypes.preload.url;
         }
+        const isNonRoot = rootId === undefined || selectedNode?.id !== rootId;
         return (
           <Space>
             {name}
@@ -155,26 +158,28 @@ export const AssetTree: React.FC<{
                       }}
                     />
                   </Button>
-                  <HasPermission value={Permission.AssetDelete}>
-                    <Popconfirm
-                      title={`确定要删除${name}吗?`}
-                      onConfirm={() => {
-                        if (selectedNode?.type < 10000) {
-                          deleteAsset(selectedNode?.id).then(() => {
-                            if (onsuccess) onsuccess();
-                          });
-                        } else {
-                          deleteMeasurement(selectedNode?.id).then(() => {
-                            if (onsuccess) onsuccess();
-                          });
-                        }
-                      }}
-                    >
-                      <Button type='text' danger={true} size='small' title={`删除${name}`}>
-                        <DeleteOutlined />
-                      </Button>
-                    </Popconfirm>
-                  </HasPermission>
+                  {isNonRoot && (
+                    <HasPermission value={Permission.AssetDelete}>
+                      <Popconfirm
+                        title={`确定要删除${name}吗?`}
+                        onConfirm={() => {
+                          if (selectedNode?.type < 10000) {
+                            deleteAsset(selectedNode?.id).then(() => {
+                              if (onsuccess) onsuccess();
+                            });
+                          } else {
+                            deleteMeasurement(selectedNode?.id).then(() => {
+                              if (onsuccess) onsuccess();
+                            });
+                          }
+                        }}
+                      >
+                        <Button type='text' danger={true} size='small' title={`删除${name}`}>
+                          <DeleteOutlined />
+                        </Button>
+                      </Popconfirm>
+                    </HasPermission>
+                  )}
                   {selectedNode?.type < 10000 && (
                     <Button type='text' size='small'>
                       <PlusOutlined
@@ -194,11 +199,13 @@ export const AssetTree: React.FC<{
                     </Button>
                   )}
                 </HasPermission>
-                <Link to={combineFinalUrl(pathname, search, subpath, selectedNode?.id)}>
-                  <Button type='text' size='small'>
-                    <ArrowRightOutlined />
-                  </Button>
-                </Link>
+                {isNonRoot && (
+                  <Link to={combineFinalUrl(pathname, search, subpath, selectedNode?.id)}>
+                    <Button type='text' size='small'>
+                      <ArrowRightOutlined />
+                    </Button>
+                  </Link>
+                )}
               </>
             )}
           </Space>
