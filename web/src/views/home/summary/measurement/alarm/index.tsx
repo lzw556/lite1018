@@ -22,8 +22,10 @@ import { deleteAlarmRule, getAlarmRules, importAlarmRules } from '../services';
 import { MeasurementBind } from './measurementBind';
 import { RuleSelection } from './ruleSelection';
 import * as AppConfig from '../../../../../config';
+import { MeasurementBindBase } from './measurementBindBase';
 
 const AlarmRuleList = () => {
+  const appConfig = AppConfig.use(window.assetCategory);
   const { hasPermission } = usePermission();
   const [visible, setVisible] = React.useState(false);
   const [visibleExport, setVisibleExport] = React.useState(false);
@@ -41,9 +43,7 @@ const AlarmRuleList = () => {
       key: 'type',
       width: 120,
       render: (typeId: number) => {
-        const type = Object.values(AppConfig.use(window.assetCategory).measurementTypes).find(
-          ({ id }) => id === typeId
-        );
+        const type = Object.values(appConfig.measurementTypes).find(({ id }) => id === typeId);
         return type ? type.label : '-';
       }
     }
@@ -210,8 +210,21 @@ const AlarmRuleList = () => {
         results: <Table {...result} />
       }}
     >
-      {visible && selectedRow && (
+      {visible && selectedRow && appConfig.category === 'wind' && (
         <MeasurementBind
+          {...{
+            visible,
+            onCancel: () => setVisible(false),
+            selectedRow,
+            onSuccess: () => {
+              setVisible(false);
+              fetchAlarmRules();
+            }
+          }}
+        />
+      )}
+      {visible && selectedRow && appConfig.category === 'default' && (
+        <MeasurementBindBase
           {...{
             visible,
             onCancel: () => setVisible(false),
