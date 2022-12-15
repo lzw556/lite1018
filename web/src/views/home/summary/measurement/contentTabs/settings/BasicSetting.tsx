@@ -4,7 +4,6 @@ import DeviceSelect from '../../../../../../components/select/deviceSelect';
 import * as AppConfig from '../../../../../../config';
 import { defaultValidateMessages, Rules } from '../../../../../../constants/validator';
 import { useStore } from '../../../../../../hooks/store';
-import { DeviceType } from '../../../../../../types/device_type';
 import { isMobile } from '../../../../../../utils/deviceDetection';
 import { AssetRow } from '../../../../assetList/props';
 import { getAssets } from '../../../../assetList/services';
@@ -12,21 +11,28 @@ import { convertRow, Measurement, MeasurementRow } from '../../props';
 import { bindDevice, unbindDevice, updateMeasurement } from '../../services';
 
 export const BasicSetting: React.FC<MeasurementRow & { onUpdate?: () => void }> = (props) => {
-  const [types, setTypes] = React.useState([DeviceType.BoltLoosening, DeviceType.BoltElongation]);
+  const appConfig = AppConfig.use(window.assetCategory);
+  const assetLabel = appConfig.assetType.secondAsset?.id
+    ? appConfig.assetType.secondAsset?.label
+    : appConfig.assetType.label;
+  const [types, setTypes] = React.useState(appConfig.sensorTypes);
   const { id, bindingDevices } = props;
   const [form] = Form.useForm<Measurement & { device_id: number }>();
   const [parents, setParents] = React.useState<AssetRow[]>([]);
   const [store] = useStore('measurementListFilters');
 
   React.useEffect(() => {
-    getAssets({ type: AppConfig.use('wind').assetType.secondAsset?.id }).then((assets) => {
+    const assetType = appConfig.assetType.secondAsset?.id
+      ? appConfig.assetType.secondAsset?.id
+      : appConfig.assetType.id;
+    getAssets({ type: assetType }).then((assets) => {
       setParents(
         assets.filter((asset) =>
           store.windTurbineId ? store.windTurbineId === asset.parentId : true
         )
       );
     });
-  }, [store]);
+  }, [store, appConfig.assetType]);
 
   React.useEffect(() => {
     form.resetFields();
@@ -73,11 +79,11 @@ export const BasicSetting: React.FC<MeasurementRow & { onUpdate?: () => void }> 
             <DeviceSelect filters={{ types: types.join(',') }} />
           </Form.Item>
           <Form.Item
-            label='法兰'
+            label={assetLabel}
             name='asset_id'
-            rules={[{ required: true, message: `请选择法兰` }]}
+            rules={[{ required: true, message: `请选择${assetLabel}` }]}
           >
-            <Select placeholder='请选择法兰'>
+            <Select placeholder={`请选择${assetLabel}`}>
               {parents.map(({ id, name }) => (
                 <Select.Option key={id} value={id}>
                   {name}
