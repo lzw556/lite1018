@@ -82,7 +82,7 @@ export const FIRST_CLASS_PROPERTIES = [
     typeId: DeviceType.NormalTemperatureCorrosion,
     properties: ['thickness', 'temperature', 'annualized_corrosion_rate']
   },
-  { typeId: DeviceType.PressureTemperature, properties: ['loosening_angle', 'attitude', 'motion'] },
+  { typeId: DeviceType.PressureTemperature, properties: ['pressure', 'temperature'] },
   { typeId: DeviceType.AngleDip, properties: ['inclination', 'pitch', 'roll'] },
   { typeId: DeviceType.AngleDipNB, properties: ['inclination', 'pitch', 'roll'] },
   {
