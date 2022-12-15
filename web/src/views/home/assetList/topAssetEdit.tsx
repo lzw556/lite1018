@@ -18,7 +18,11 @@ export const TopAssetEdit: React.FC<
 
   React.useEffect(() => {
     getAssets({ type: topAsset.id }).then((assets) =>
-      setParents(assets.filter((_asset) => (asset ? asset.id !== _asset.id : true)))
+      setParents(
+        assets.filter((_asset) =>
+          asset ? asset.id !== _asset.id && _asset.id <= asset.parentId : true
+        )
+      )
     );
   }, [asset, topAsset.id]);
 
