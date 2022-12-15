@@ -1,6 +1,5 @@
 import { Select, SelectProps } from 'antd';
 import { FC } from 'react';
-import { CaretDownOutlined } from '@ant-design/icons';
 
 const { Option } = Select;
 
@@ -12,7 +11,7 @@ const CommunicationPeriodSelect: FC<CommunicationPeriodSelectProps> = (props) =>
   const { periods } = props;
 
   return (
-    <Select {...props} suffixIcon={<CaretDownOutlined />}>
+    <Select {...props}>
       {periods.map((item) => (
         <Option key={item.value} value={item.value}>
           {item.text}

@@ -1,4 +1,4 @@
-import { Button, Card, Col, Form, message, Result, Row, Select, Space, Upload } from 'antd';
+import { Button, Card, Col, Form, message, Result, Row, Space, Upload } from 'antd';
 import { Content } from 'antd/lib/layout/layout';
 import { useEffect, useState } from 'react';
 import { ImportOutlined, InboxOutlined } from '@ant-design/icons';
@@ -8,11 +8,10 @@ import MyBreadcrumb from '../../../components/myBreadcrumb';
 import G6, { TreeGraph } from '@antv/g6';
 import '../../../components/shape/shape';
 import WsnFormItem from '../../../components/formItems/wsnFormItem';
-import { Rules } from '../../../constants/validator';
-import { NetworkProvisioningMode } from '../../../types/network';
+import { useProvisionMode } from '../useProvisionMode';
+import { Network } from '../../../types/network';
 
 const { Dragger } = Upload;
-const { Option } = Select;
 
 export interface NetworkRequestForm {
   mode: number;
@@ -24,9 +23,10 @@ const ImportNetworkPage = () => {
   const [height] = useState<number>(window.innerHeight - 190);
   const [network, setNetwork] = useState<any>();
   const [success, setSuccess] = useState<boolean>(false);
-  const [provisioningMode, setProvisioningMode] = useState<number>(1);
   const [form] = Form.useForm();
   const [graph, setGraph] = useState<TreeGraph | undefined>();
+  const [networkSettings, setNetworkSettings] = useState<any>();
+  const [provisionMode, setProvisionMode, settings] = useProvisionMode(networkSettings);
 
   const checkJSONFormat = (source: any) => {
     return source.hasOwnProperty('deviceList') && source.hasOwnProperty('wsn');
@@ -50,21 +50,6 @@ const ImportNetworkPage = () => {
   };
 
   useEffect(() => {
-    if (network) {
-      if (network.wsn && network.wsn.provisioning_mode) {
-        setProvisioningMode(network.wsn.provisioning_mode);
-      } else {
-        network.wsn.provisioning_mode = NetworkProvisioningMode.Mode1;
-        setProvisioningMode(NetworkProvisioningMode.Mode1);
-      }
-      form.setFieldsValue({
-        mode: network.wsn.provisioning_mode,
-        wsn: network.wsn
-      });
-    }
-  }, [network]);
-
-  useEffect(() => {
     function handleResize() {
       if (graph) {
         graph.changeSize(
@@ -86,10 +71,10 @@ const ImportNetworkPage = () => {
       return;
     }
     const nodes = network.devices;
-    if (nodes && nodes.length) {
+    if (nodes && nodes.length && provisionMode) {
       form.validateFields().then((values) => {
         const req: NetworkRequestForm = {
-          mode: provisioningMode,
+          mode: provisionMode,
           wsn: values.wsn,
           devices: nodes.map((n: any) => {
             return {
@@ -177,6 +162,36 @@ const ImportNetworkPage = () => {
     }
   }, [network]);
 
+  useEffect(() => {
+    console.log(network?.wsn);
+    setNetworkSettings(
+      network?.wsn
+        ? ({
+            mode: network.wsn.provisioning_mode,
+            communicationPeriod: network.wsn.communication_period,
+            communicationPeriod2: network.wsn.communication_period_2,
+            communicationOffset: network.wsn.communication_offset,
+            groupSize: network.wsn.group_size
+          } as Network)
+        : undefined
+    );
+  }, [network]);
+
+  useEffect(() => {
+    if (network !== undefined) {
+      form.setFieldsValue({
+        name: network.name
+      });
+      setProvisionMode(network.wsn.provisioning_mode === 0 ? 1 : network.wsn.provisioning_mode);
+    }
+  }, [network, form, setProvisionMode]);
+
+  useEffect(() => {
+    if (settings) {
+      form.setFieldsValue(settings);
+    }
+  }, [form, settings]);
+
   const renderAction = () => {
     if (network) {
       return (
@@ -255,29 +270,9 @@ const ImportNetworkPage = () => {
                   {/*    <GroupSizeSelect placeholder={"请选择每组设备数"}/>*/}
                   {/*</Form.Item>*/}
                   {/*<br/>*/}
-                  <Form.Item label={'组网模式'} name={'mode'} rules={[Rules.required]}>
-                    <Select
-                      placeholder={'请选择组网模式'}
-                      onChange={(value) => {
-                        setProvisioningMode(Number(value));
-                        form.setFieldsValue({
-                          wsn: {
-                            group_size: 4,
-                            communication_period: 2 * 60 * 60 * 1000,
-                            communication_offset: 0
-                          }
-                        });
-                      }}
-                    >
-                      <Option key={1} value={NetworkProvisioningMode.Mode1}>
-                        {NetworkProvisioningMode.toString(NetworkProvisioningMode.Mode1)}
-                      </Option>
-                      <Option key={2} value={NetworkProvisioningMode.Mode2}>
-                        {NetworkProvisioningMode.toString(NetworkProvisioningMode.Mode2)}
-                      </Option>
-                    </Select>
-                  </Form.Item>
-                  {network && <WsnFormItem mode={provisioningMode} />}
+                  {network && provisionMode && (
+                    <WsnFormItem mode={provisionMode} onModeChange={setProvisionMode} />
+                  )}
                 </Card>
               </Col>
             </Row>

@@ -20,11 +20,11 @@ export const COMMUNICATION_PERIOD = [
   },
   {
     value: 60 * 60 * millisecond,
-    text: '60分钟'
+    text: '1小时'
   },
   {
     value: 2 * 60 * 60 * millisecond,
-    text: '120分钟'
+    text: '2小时'
   }
 ];
 
@@ -38,8 +38,8 @@ export const COMMUNICATION_PERIOD_2 = [
     text: '10分钟'
   },
   {
-    value: 15 * 60 * millisecond,
-    text: '15分钟'
+    value: 20 * 60 * millisecond,
+    text: '20分钟'
   },
   {
     value: 30 * 60 * millisecond,
@@ -52,14 +52,6 @@ export const COMMUNICATION_PERIOD_2 = [
   {
     value: 2 * 60 * 60 * millisecond,
     text: '2小时'
-  },
-  {
-    value: 3 * 60 * 60 * millisecond,
-    text: '3小时'
-  },
-  {
-    value: 4 * 60 * 60 * millisecond,
-    text: '4小时'
   }
 ];
 
@@ -74,11 +66,27 @@ export const SECOND_COMMUNICATION_PERIOD = [
   },
   {
     value: 60 * 60 * millisecond,
-    text: '60分钟'
+    text: '1小时'
   },
   {
     value: 2 * 60 * 60 * millisecond,
-    text: '120分钟'
+    text: '2小时'
+  },
+  {
+    value: 4 * 60 * 60 * millisecond,
+    text: '4小时'
+  },
+  {
+    value: 6 * 60 * 60 * millisecond,
+    text: '6小时'
+  },
+  {
+    value: 8 * 60 * 60 * millisecond,
+    text: '8小时'
+  },
+  {
+    value: 12 * 60 * 60 * millisecond,
+    text: '12小时'
   }
 ];
 

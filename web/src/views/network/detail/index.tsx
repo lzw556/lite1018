@@ -20,6 +20,7 @@ import usePermission, { Permission } from '../../../permission/permission';
 import ButtonGroup from 'antd/lib/button/button-group';
 import { defaultValidateMessages, Rules } from '../../../constants/validator';
 import WsnFormItem from '../../../components/formItems/wsnFormItem';
+import { useProvisionMode } from '../useProvisionMode';
 
 const NetworkDetail = () => {
   const { hasPermission } = usePermission();
@@ -28,6 +29,7 @@ const NetworkDetail = () => {
   const [network, setNetwork] = useState<Network>();
   const [refreshKey, setRefreshKey] = useState(0);
   const [form] = Form.useForm();
+  const [provisionMode, setProvisionMode, settings] = useProvisionMode(network);
 
   const onRefresh = () => {
     setRefreshKey(refreshKey + 1);
@@ -38,16 +40,6 @@ const NetworkDetail = () => {
     if (id) {
       GetNetworkRequest(Number(id))
         .then((data) => {
-          form.setFieldsValue({
-            name: data.name,
-            wsn: {
-              mode: data.mode,
-              communication_period: data.communicationPeriod,
-              communication_period_2: data.communicationPeriod2,
-              communication_offset: data.communicationOffset,
-              group_size: data.groupSize
-            }
-          });
           setNetwork(data);
         })
         .catch((_) => {
@@ -55,6 +47,21 @@ const NetworkDetail = () => {
         });
     }
   }, []);
+
+  useEffect(() => {
+    if (network !== undefined) {
+      form.setFieldsValue({
+        name: network.name
+      });
+      setProvisionMode(network.mode === 0 ? 1 : network.mode);
+    }
+  }, [network, form, setProvisionMode]);
+
+  useEffect(() => {
+    if (settings) {
+      form.setFieldsValue(settings);
+    }
+  }, [form, settings]);
 
   const sendCommand = (network: Network, key: string) => {
     switch (key) {
@@ -111,7 +118,9 @@ const NetworkDetail = () => {
                 <Form.Item label={'名称'} name={'name'} rules={[Rules.range(4, 16)]}>
                   <Input placeholder={'请输入网络名称'} />
                 </Form.Item>
-                <WsnFormItem mode={network.mode} />
+                {provisionMode && (
+                  <WsnFormItem mode={provisionMode} onModeChange={setProvisionMode} />
+                )}
                 <Form.Item wrapperCol={{ offset: 6, span: 18 }}>
                   <Row justify='end'>
                     <Col>
