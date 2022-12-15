@@ -35,7 +35,7 @@ export const defaultValidateMessages = {
     len: "'${name}' must equal ${len}",
     min: "'${name}' cannot be less than ${min}",
     max: "'${name}' cannot be greater than ${max}",
-    range: "'${name}' must be between ${min} and ${max}"
+    range: '必须大于等于${min}, 小于等于${max}'
   },
   array: {
     len: "'${name}' must be exactly ${len} in length",
