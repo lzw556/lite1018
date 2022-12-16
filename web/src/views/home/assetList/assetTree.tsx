@@ -53,7 +53,14 @@ export const AssetTree: React.FC<{
 
   const getTreedata = (assets: AssetRow[]) => {
     const processNodeFn = (node: any) => {
-      if (node.children && node.children.length > 0) {
+      if (
+        node.children &&
+        node.children.length > 0 &&
+        node.monitoringPoints &&
+        node.monitoringPoints.length > 0
+      ) {
+        return { ...node, children: [...node.children, ...node.monitoringPoints] };
+      } else if (node.children && node.children.length > 0) {
         return { ...node, children: sortFlangesByAttributes(node.children as AssetRow[]) };
       } else if (node.monitoringPoints && node.monitoringPoints.length > 0) {
         return {
@@ -68,15 +75,6 @@ export const AssetTree: React.FC<{
     if (assets.length > 0) {
       const copy = cloneDeep(assets);
       const treedata = copy
-        .map((node) =>
-          mapTreeNode(node, (node) => {
-            if (node.children && node.monitoringPoints) {
-              return { ...node, children: [...node.children, ...node.monitoringPoints] };
-            } else {
-              return node;
-            }
-          })
-        )
         .map((node: any) => mapTreeNode(node, processNodeFn))
         .map((node) =>
           mapTreeNode(node, (node) => ({
