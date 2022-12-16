@@ -8,10 +8,8 @@ import HasPermission from '../../../../../permission';
 import { Permission } from '../../../../../permission/permission';
 import { isMobile } from '../../../../../utils/deviceDetection';
 import {
-  filterProperties,
   generateChartOptionsOfHistoryDatas,
-  getKeysOfFirstClassFields,
-  sortProperties
+  getSpecificProperties
 } from '../../../common/historyDataHelper';
 import { ChartContainer } from '../../../components/charts/chartContainer';
 import { MeasurementRow } from '../props';
@@ -78,10 +76,7 @@ export const HistoryData: React.FC<MeasurementRow> = (props) => {
                     setProperty(value);
                   }}
                 >
-                  {sortProperties(
-                    filterProperties(properties),
-                    getKeysOfFirstClassFields(type)
-                  ).map(({ name, key }) => (
+                  {getSpecificProperties(properties, type).map(({ name, key }) => (
                     <Select.Option key={key} value={key}>
                       {name}
                     </Select.Option>

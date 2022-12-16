@@ -4,11 +4,9 @@ import ShadowCard from '../../../../components/shadowCard';
 import { AssetRow } from '../../assetList/props';
 import { getData } from '../measurement/services';
 import {
-  filterProperties,
   generateChartOptionsOfHistoryData,
-  getKeysOfFirstClassFields,
-  HistoryData as HistoryDatas,
-  sortProperties
+  getSpecificProperties,
+  HistoryData as HistoryDatas
 } from '../../common/historyDataHelper';
 import { isMobile } from '../../../../utils/deviceDetection';
 import Label from '../../../../components/label';
@@ -88,14 +86,13 @@ export const HistoryData: React.FC<AssetRow> = (props) => {
                       setProperty(value);
                     }}
                   >
-                    {sortProperties(
-                      filterProperties(properties),
-                      getKeysOfFirstClassFields(props.monitoringPoints[0].type)
-                    ).map(({ name, key }) => (
-                      <Select.Option key={key} value={key}>
-                        {name}
-                      </Select.Option>
-                    ))}
+                    {getSpecificProperties(properties, props.monitoringPoints[0].type).map(
+                      ({ name, key }) => (
+                        <Select.Option key={key} value={key}>
+                          {name}
+                        </Select.Option>
+                      )
+                    )}
                   </Select>
                 </Label>
                 <RangeDatePicker onChange={handleChange} showFooter={true} />

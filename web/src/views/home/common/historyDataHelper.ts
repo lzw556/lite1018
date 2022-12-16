@@ -166,7 +166,7 @@ export function generateChartOptionsOfHistoryData(
   measurementType: number
 ) {
   const series = history.map(({ name, data }) => {
-    const datas = getHistoryDatas(data, getKeysOfFirstClassFields(measurementType), property.key);
+    const datas = getHistoryDatas(data, measurementType, property.key);
     let _data: [string, number][] = [];
     datas.forEach(({ times, seriesData, property: _property }) => {
       if (property.key === _property.key) {
@@ -376,8 +376,8 @@ function getSeries(color: string, value: number | string | undefined, name: stri
   return { series };
 }
 
-function getHistoryDatas(data: HistoryData, firstClassFieldKeys: string[], propertyKey?: string) {
-  const firstValue = sortProperties(filterProperties(data[0].values), firstClassFieldKeys);
+function getHistoryDatas(data: HistoryData, measurementType: number, propertyKey?: string) {
+  const firstValue = getSpecificProperties(data[0].values, measurementType);
   const times = data.map(({ timestamp }) => timestamp);
   return firstValue
     .filter((property) => (propertyKey ? property.key === propertyKey : true))
@@ -412,11 +412,7 @@ export function generateChartOptionsOfHistoryDatas(
   measurementType: number,
   propertyKey?: string
 ) {
-  const optionsData = getHistoryDatas(
-    data,
-    getKeysOfFirstClassFields(measurementType),
-    propertyKey
-  );
+  const optionsData = getHistoryDatas(data, measurementType, propertyKey);
   return optionsData.map(({ times, seriesData, property }) => {
     return {
       tooltip: {
@@ -540,20 +536,24 @@ export function generateDatasOfMeasurement(measurement: MeasurementRow) {
   return [];
 }
 
-export function sortProperties(properties: Property[], firstClassFieldKeys: string[]) {
+export function getSpecificProperties(
+  properties: Property[],
+  measurementType: number,
+  includeRemainProperties: boolean = true
+) {
+  const filterableProperties = properties.filter(({ isShow }) => isShow);
+  const fieldKeysOfType = getKeysOfFirstClassFields(measurementType);
   const sorted: Property[] = [];
-  firstClassFieldKeys.forEach((fieldKey) => {
-    const property = properties.find(({ fields }) =>
+  fieldKeysOfType.forEach((fieldKey) => {
+    const property = filterableProperties.find(({ fields }) =>
       fields.map(({ key }) => key).includes(fieldKey)
     );
     if (property) sorted.push(property);
   });
-  properties.forEach((property) => {
-    if (!sorted.map(({ key }) => key).includes(property.key)) sorted.push(property);
-  });
+  if (includeRemainProperties) {
+    filterableProperties.forEach((property) => {
+      if (!sorted.map(({ key }) => key).includes(property.key)) sorted.push(property);
+    });
+  }
   return sorted;
-}
-
-export function filterProperties(properties: Property[]) {
-  return properties.filter(({ isShow }) => isShow);
 }
