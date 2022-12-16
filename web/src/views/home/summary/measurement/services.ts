@@ -107,7 +107,9 @@ export function bindMeasurementsToAlarmRule2(
 
 export function downloadHistory(id: number, from: number, to: number, pids: any, assetId?: number) {
   if (assetId) {
-    return request.download<any>(`/assets/${id}/download/data?from=${from}&to=${to}&pids=${pids}`);
+    return request.download<any>(
+      `/assets/${assetId}/download/data?from=${from}&to=${to}&pids=${pids}`
+    );
   } else {
     return request.download<any>(
       `/monitoringPoints/${id}/download/data?from=${from}&to=${to}&pids=${pids}`

@@ -96,7 +96,7 @@ export const HistoryData: React.FC<AssetRow> = (props) => {
                   </Select>
                 </Label>
                 <RangeDatePicker onChange={handleChange} showFooter={true} />
-                <HasPermission value={Permission.AssetDataDownload}>
+                {/* <HasPermission value={Permission.AssetDataDownload}>
                   <Button
                     type='primary'
                     onClick={() => {
@@ -105,7 +105,7 @@ export const HistoryData: React.FC<AssetRow> = (props) => {
                   >
                     <DownloadOutlined />
                   </Button>
-                </HasPermission>
+                </HasPermission> */}
               </Space>
             </Col>
           </Row>
