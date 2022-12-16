@@ -24,6 +24,7 @@ function getDisplayValue(value: number | null | undefined, unit?: string) {
 }
 
 function roundValue(value: number, precision?: number) {
+  if (value === null || value === undefined) return Number.NaN;
   if (Number.isNaN(value) || value === 0) return value;
   return round(value, precision ?? 3);
 }
