@@ -1,19 +1,23 @@
 import { MinusCircleOutlined } from '@ant-design/icons';
-import { Button, Divider, Form, Input, Select } from 'antd';
+import { Button, Cascader, Divider, Form, Input, Select } from 'antd';
 import * as React from 'react';
 import { useHistory } from 'react-router-dom';
 import MyBreadcrumb from '../../../../../components/myBreadcrumb';
 import ShadowCard from '../../../../../components/shadowCard';
 import { defaultValidateMessages, Rules } from '../../../../../constants/validator';
 import { isMobile } from '../../../../../utils/deviceDetection';
-import { AlarmRule } from '../props';
+import { AlarmRule, Property } from '../props';
 import { addAlarmRule, getPropertiesByMeasurementType } from '../services';
 import * as AppConfig from '../../../../../config';
+import {
+  getSpecificProperties,
+  removeDulpicateProperties
+} from '../../../common/historyDataHelper';
 
 const AlarmRuleGroupCreation = () => {
   const history = useHistory();
   const [form] = Form.useForm();
-  const [properties, setProperties] = React.useState<any[]>([]);
+  const [properties, setProperties] = React.useState<Property[]>([]);
   const [metric, setMetric] = React.useState<{ key: string; name: string; unit: string }[]>([]);
   const [disabled, setDisabled] = React.useState(true);
   const [smallSize, setSmallSize] = React.useState(window.innerWidth < 1300);
@@ -47,9 +51,7 @@ const AlarmRuleGroupCreation = () => {
                   if (measurementType) {
                     setDisabled(false);
                     setProperties(
-                      res.filter((property) =>
-                        measurementType.firstClassFieldKeys.find((key: any) => key === property.key)
-                      )
+                      removeDulpicateProperties(getSpecificProperties(res, measurementType.id))
                     );
                   }
                 });
@@ -104,15 +106,16 @@ const AlarmRuleGroupCreation = () => {
                             rules={[{ required: true, message: '请选择指标名称' }]}
                             style={{ display: 'inline-flex', marginRight: 20, marginBottom: 0 }}
                           >
-                            <Select
+                            <Cascader
                               disabled={disabled}
                               style={{ width: 100 }}
-                              onChange={(e) => {
-                                const property = properties.find(({ key }) => e === key);
-                                if (property && property.fields && property.fields.length > 0) {
+                              onChange={(e, selectOptions) => {
+                                const property = properties.find(({ key }) => key === e[0]);
+                                if (property) {
+                                  const selected = e.length === 1 ? [...e, ...e] : e;
                                   const metric = {
-                                    key: property.key + '.' + property.fields[0].key,
-                                    name: property.name,
+                                    key: selected.join('.'),
+                                    name: selectOptions.map(({ name }) => name).join(':'),
                                     unit: property.unit
                                   };
                                   setMetric((prev) => {
@@ -132,13 +135,9 @@ const AlarmRuleGroupCreation = () => {
                                   });
                                 }
                               }}
-                            >
-                              {properties.map(({ name, key }) => (
-                                <Select.Option key={key} value={key}>
-                                  {name}
-                                </Select.Option>
-                              ))}
-                            </Select>
+                              options={properties}
+                              fieldNames={{ label: 'name', value: 'key', children: 'fields' }}
+                            />
                           </Form.Item>
                         )}
                         <Form.Item

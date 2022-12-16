@@ -1,4 +1,4 @@
-import { round } from 'lodash';
+import { cloneDeep, round } from 'lodash';
 import moment from 'moment';
 import { LineChartStyles } from '../../../constants/chart';
 import { ColorDanger, ColorHealth, ColorInfo, ColorWarn } from '../../../constants/color';
@@ -556,4 +556,16 @@ export function getSpecificProperties(
     });
   }
   return sorted;
+}
+
+export function removeDulpicateProperties(properties: Property[]) {
+  const final = cloneDeep(properties);
+  return final.map((property) => {
+    const fields = property.fields;
+    if (fields.every((field) => field.key === property.key)) {
+      return { ...property, fields: [] };
+    } else {
+      return property;
+    }
+  });
 }
