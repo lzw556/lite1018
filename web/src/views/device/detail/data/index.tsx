@@ -14,6 +14,7 @@ import ReactECharts from 'echarts-for-react';
 import DownloadModal from './modal/downloadModal';
 import { isMobile } from '../../../../utils/deviceDetection';
 import { RangeDatePicker } from '../../../../components/rangeDatePicker';
+import { getSpecificProperties } from '../../util';
 
 const { Option } = Select;
 
@@ -137,7 +138,7 @@ const HistoryDataPage: FC<DeviceDataProps> = ({ device }) => {
                     }}
                   >
                     {device
-                      ? device.properties.map((item) => (
+                      ? getSpecificProperties(device.properties, device.typeId).map((item) => (
                           <Option key={item.key} value={item.key}>
                             {item.name}
                           </Option>

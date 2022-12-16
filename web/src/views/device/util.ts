@@ -1,46 +1,50 @@
+import { round } from 'lodash';
 import { FIRST_CLASS_PROPERTIES } from '../../constants/field';
-import { DeviceType } from '../../types/device_type';
+import { Device } from '../../types/device';
 import { Property } from '../../types/property';
 
-export const getValueOfFirstClassProperty = (
-  values: any,
-  properties: Property[],
-  typeId: number
-) => {
-  const fields = Object.keys(values);
-  if (fields.length === 0 || fields.map((field) => values[field]).every((val) => !val)) return [];
-  let data: any = [];
-  const firstClassProperties = getFirstClassProperties(typeId, properties);
-  fields.forEach((field) => {
-    const property = firstClassProperties.find((pro) =>
-      pro.fields.find((subpro) => subpro.key === field && subpro.important)
-    );
-    if (property && !data.find((pro: any) => pro.key === property.key)) {
-      data.push({
-        ...property,
-        fields: property.fields.map((item) => ({ ...item, value: values[field] }))
-      });
-    }
-  });
-  if (data.length > 0) data = data.sort((pro1: any, pro2: any) => pro1.sort - pro2.sort);
-  return data;
+export const getValueOfFirstClassProperty = (device: Device) => {
+  const properties = getFirstClassFields(device);
+  const { data } = device;
+  if (properties.length > 0) {
+    return properties.map(({ name, key, unit, precision }) => {
+      let value = NaN;
+      if (data && data.values) {
+        value = roundValue(data.values[key], precision);
+      }
+      return { name, value: getDisplayValue(value, unit) };
+    });
+  }
+  return [];
 };
 
-const getFirstClassProperties = (typeId: number, properties: Property[]) => {
-  const property = FIRST_CLASS_PROPERTIES.find((pro) => pro.typeId === typeId);
-  const keys = property ? property.properties : [];
-  return properties
-    .filter((pro) => pro.fields.find((field) => keys.find((key) => key === field.key)))
-    .map((pro) => {
-      return {
-        ...pro,
-        fields: pro.fields.map((field) => ({
-          ...field,
-          important: !!keys.find((key) => key === field.key)
-        }))
-      };
-    });
-};
+function getDisplayValue(value: number | null | undefined, unit?: string) {
+  if (Number.isNaN(value) || value === null || value === undefined) return '-';
+  return `${value}${unit ?? ''}`;
+}
+
+function roundValue(value: number, precision?: number) {
+  if (Number.isNaN(value) || value === 0) return value;
+  return round(value, precision ?? 3);
+}
+
+function getFirstClassFields(device: Device) {
+  if (!device.properties) return [];
+  const fields: (Property['fields'][0] & Pick<Property, 'precision' | 'unit'>)[] = [];
+  const propertiesOfType = FIRST_CLASS_PROPERTIES.find((pro) => pro.typeId === device.typeId);
+  const fieldKeysOfType = propertiesOfType ? propertiesOfType.properties : [];
+  fieldKeysOfType.forEach((fieldKey) => {
+    for (const property of device.properties) {
+      const field = property.fields.find((field) => field.key === fieldKey);
+      if (field) {
+        const name = field.name === property.name ? field.name : property.name;
+        fields.push({ ...field, unit: property.unit, precision: property.precision, name });
+        break;
+      }
+    }
+  });
+  return fields;
+}
 
 export const omitSpecificKeys = <T extends { [propName: string]: any }>(
   obj: T,
@@ -72,3 +76,25 @@ export type Filters = {
   type?: number;
   types?: string;
 };
+
+export function getSpecificProperties(
+  properties: Property[],
+  deviceType: number,
+  includeRemainProperties: boolean = true
+) {
+  const propertiesOfType = FIRST_CLASS_PROPERTIES.find((pro) => pro.typeId === deviceType);
+  const fieldKeysOfType = propertiesOfType ? propertiesOfType.properties : [];
+  const sorted: Property[] = [];
+  fieldKeysOfType.forEach((fieldKey) => {
+    const property = properties.find(({ fields }) =>
+      fields.map(({ key }) => key).includes(fieldKey)
+    );
+    if (property) sorted.push(property);
+  });
+  if (includeRemainProperties) {
+    properties.forEach((property) => {
+      if (!sorted.map(({ key }) => key).includes(property.key)) sorted.push(property);
+    });
+  }
+  return sorted;
+}

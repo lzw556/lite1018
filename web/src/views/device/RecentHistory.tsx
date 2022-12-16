@@ -6,6 +6,7 @@ import { FindDeviceDataRequest } from '../../apis/device';
 import { DefaultMonitorDataOption, LineChartStyles } from '../../constants/chart';
 import { Device } from '../../types/device';
 import { isMobile } from '../../utils/deviceDetection';
+import { getSpecificProperties } from './util';
 
 export const RecentHistory: React.FC<{ device: Device }> = ({ device }) => {
   const [historyOptions, setHistoryOptions] = React.useState<any>();
@@ -18,7 +19,7 @@ export const RecentHistory: React.FC<{ device: Device }> = ({ device }) => {
       {}
     ).then((data) => {
       setHistoryOptions(
-        device.properties.map((property: any) => {
+        getSpecificProperties(device.properties, device.typeId).map((property: any) => {
           const fields = new Map<string, number[]>();
           const times: any[] = [];
           data

@@ -266,29 +266,10 @@ const DevicePage = () => {
       title: '数据',
       key: 'data',
       render: (text: any, device: Device) => {
-        const {
-          properties,
-          typeId,
-          data: { values }
-        } = device;
-        const data = getValueOfFirstClassProperty(values, properties, typeId);
-        if (typeId === DeviceType.Gateway || typeId === DeviceType.Router) return '-';
+        if (device.typeId === DeviceType.Gateway || device.typeId === DeviceType.Router) return '-';
+        const data = getValueOfFirstClassProperty(device);
         if (data && data.length > 0) {
-          return data
-            .map((attr: any, index: number) => {
-              if (index > 2) return null;
-              const field = attr.fields.find((field: any) => field.important);
-              if (!field) return null;
-              let value = field.value;
-              if (!value) {
-                value = value === 0 ? value : '-';
-              } else if (!Number.isInteger(field.value)) {
-                value = field.value.toFixed(attr.precision);
-              }
-              if (value !== '-') value = `${value}${attr.unit}`;
-              return `${attr.name}: ${value}`;
-            })
-            .join(', ');
+          return data.map(({ name, value }) => `${name}:${value}`).join(', ');
         }
         return '暂无数据';
       }

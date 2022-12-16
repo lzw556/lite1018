@@ -59,44 +59,44 @@ export const SingleDeviceInfo: React.FC<{
 
   const renderStatistic = () => {
     if (typeId === DeviceType.Gateway || typeId === DeviceType.Router) return null;
-    const data = getValueOfFirstClassProperty(values, properties, typeId);
-    if (data.length === 0)
-      return (
-        <div className='ant-statistic'>
-          <div className='ant-statistic-title'>暂无数据</div>
-          <div className='ant-statistic-content' style={{ visibility: 'hidden' }}>
-            -100
-          </div>
-        </div>
-      );
-    return (
-      <Row justify='center'>
-        {data.map((attr: any, index: number) => {
-          if (index > 2) return null;
-          const field = attr.fields.find((field: any) => field.important);
-          if (!field) return null;
-          let value = field.value;
-          if (!value) {
-            value = value === 0 ? value : '-';
-          } else if (!Number.isInteger(field.value)) {
-            value = field.value.toFixed(attr.precision);
-          }
-          return (
-            <Col span={8}>
-              <Statistic
-                title={
-                  <Text
-                    ellipsis={true}
-                    title={`${attr.name}${attr.unit ? `(${attr.unit})` : ''}`}
-                  >{`${attr.name}${attr.unit ? `(${attr.unit})` : ''}`}</Text>
-                }
-                value={value}
-              />
-            </Col>
-          );
-        })}
-      </Row>
-    );
+    // const data = getValueOfFirstClassProperty(values, properties, typeId);
+    // if (data.length === 0)
+    //   return (
+    //     <div className='ant-statistic'>
+    //       <div className='ant-statistic-title'>暂无数据</div>
+    //       <div className='ant-statistic-content' style={{ visibility: 'hidden' }}>
+    //         -100
+    //       </div>
+    //     </div>
+    //   );
+    // return (
+    //   <Row justify='center'>
+    //     {data.map((attr: any, index: number) => {
+    //       if (index > 2) return null;
+    //       const field = attr.fields.find((field: any) => field.important);
+    //       if (!field) return null;
+    //       let value = field.value;
+    //       if (!value) {
+    //         value = value === 0 ? value : '-';
+    //       } else if (!Number.isInteger(field.value)) {
+    //         value = field.value.toFixed(attr.precision);
+    //       }
+    //       return (
+    //         <Col span={8}>
+    //           <Statistic
+    //             title={
+    //               <Text
+    //                 ellipsis={true}
+    //                 title={`${attr.name}${attr.unit ? `(${attr.unit})` : ''}`}
+    //               >{`${attr.name}${attr.unit ? `(${attr.unit})` : ''}`}</Text>
+    //             }
+    //             value={value}
+    //           />
+    //         </Col>
+    //       );
+    //     })}
+    //   </Row>
+    // );
   };
 
   return (
