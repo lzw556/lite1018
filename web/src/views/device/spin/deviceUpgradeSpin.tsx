@@ -10,6 +10,7 @@ export interface DeviceUpgradeSpinProps {
 
 const DeviceUpgradeSpin: FC<DeviceUpgradeSpinProps> = ({ status }) => {
   const render = () => {
+    const DOWNLOAD_COMPLETE_TEXT = '固件下载完成, 待升级';
     switch (status.code) {
       case DeviceUpgradeStatus.Pending:
         return (
@@ -21,6 +22,9 @@ const DeviceUpgradeSpin: FC<DeviceUpgradeSpinProps> = ({ status }) => {
           </>
         );
       case DeviceUpgradeStatus.Loading:
+        const progressValue = status.progress.toFixed(0);
+        const progressText =
+          Number(progressValue) === 100 ? DOWNLOAD_COMPLETE_TEXT : `固件下载中${progressValue}%`;
         return (
           <>
             <Progress
@@ -36,7 +40,9 @@ const DeviceUpgradeSpin: FC<DeviceUpgradeSpinProps> = ({ status }) => {
                 fontSize: '9pt',
                 color: '#8a8e99'
               }}
-            >{`固件下载中${status.progress.toFixed(0)}%`}</Text>
+            >
+              {progressText}
+            </Text>
           </>
         );
       case DeviceUpgradeStatus.Upgrading:
