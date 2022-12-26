@@ -102,7 +102,7 @@ export const MeasurementBindBase: React.FC<
       title='编辑监测点'
       bodyStyle={{ maxHeight: 700, overflow: 'auto' }}
       {...props}
-      okButtonProps={{ disabled: checkedIds.length === 0 }}
+      // okButtonProps={{ disabled: checkedIds.length === 0 }}
       onOk={() => {
         console.log(checkedIds);
         if (checkedIds.length === 0) props.onSuccess();
