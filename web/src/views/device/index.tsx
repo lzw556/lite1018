@@ -144,6 +144,15 @@ const DevicePage = () => {
               重启
             </Menu.Item>
             {record.typeId !== DeviceType.Gateway && record.typeId !== DeviceType.Router && (
+              <Menu.Item
+                key={DeviceCommand.AcquireSensorData}
+                disabled={!disabled}
+                hidden={isUpgrading}
+              >
+                采集数据
+              </Menu.Item>
+            )}
+            {record.typeId !== DeviceType.Gateway && record.typeId !== DeviceType.Router && (
               <Menu.Item key={DeviceCommand.ResetData} disabled={!disabled} hidden={isUpgrading}>
                 重置数据
               </Menu.Item>
