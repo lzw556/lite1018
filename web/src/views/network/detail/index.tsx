@@ -130,18 +130,20 @@ const NetworkDetail = () => {
                             导出网络
                           </Button>
                         )}
-                        <Button
-                          type='primary'
-                          onClick={() => {
-                            form.validateFields().then((values) => {
-                              UpdateNetworkRequest(network.id, values).then((res) => {
-                                if (res.code === 200) message.success('保存成功');
+                        {hasPermission(Permission.NetworkEdit) && (
+                          <Button
+                            type='primary'
+                            onClick={() => {
+                              form.validateFields().then((values) => {
+                                UpdateNetworkRequest(network.id, values).then((res) => {
+                                  if (res.code === 200) message.success('保存成功');
+                                });
                               });
-                            });
-                          }}
-                        >
-                          保存网络
-                        </Button>
+                            }}
+                          >
+                            保存网络
+                          </Button>
+                        )}
                       </ButtonGroup>
                     </Col>
                   </Row>
