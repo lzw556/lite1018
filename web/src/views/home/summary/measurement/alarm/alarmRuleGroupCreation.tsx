@@ -110,29 +110,31 @@ const AlarmRuleGroupCreation = () => {
                               disabled={disabled}
                               style={{ width: 100 }}
                               onChange={(e, selectOptions) => {
-                                const property = properties.find(({ key }) => key === e[0]);
-                                if (property) {
-                                  const selected = e.length === 1 ? [...e, ...e] : e;
-                                  const metric = {
-                                    key: selected.join('.'),
-                                    name: selectOptions.map(({ name }) => name).join(':'),
-                                    unit: property.unit
-                                  };
-                                  setMetric((prev) => {
-                                    if (prev.length === 0) {
-                                      return [metric];
-                                    } else if (prev.length < index + 1) {
-                                      return [...prev, metric];
-                                    } else {
-                                      return prev.map((item, n) => {
-                                        if (n === index) {
-                                          return metric;
-                                        } else {
-                                          return item;
-                                        }
-                                      });
-                                    }
-                                  });
+                                if (e !== undefined) {
+                                  const property = properties.find(({ key }) => key === e[0]);
+                                  if (property) {
+                                    const selected = e.length === 1 ? [...e, ...e] : e;
+                                    const metric = {
+                                      key: selected.join('.'),
+                                      name: selectOptions.map(({ name }) => name).join(':'),
+                                      unit: property.unit
+                                    };
+                                    setMetric((prev) => {
+                                      if (prev.length === 0) {
+                                        return [metric];
+                                      } else if (prev.length < index + 1) {
+                                        return [...prev, metric];
+                                      } else {
+                                        return prev.map((item, n) => {
+                                          if (n === index) {
+                                            return metric;
+                                          } else {
+                                            return item;
+                                          }
+                                        });
+                                      }
+                                    });
+                                  }
                                 }
                               }}
                               options={properties}
@@ -234,41 +236,40 @@ const AlarmRuleGroupCreation = () => {
                             label='指标'
                             rules={[{ required: true, message: '请选择指标名称' }]}
                           >
-                            <Select
+                            <Cascader
                               disabled={disabled}
                               style={{ width: isMobile ? '75%' : 435 }}
-                              onChange={(e) => {
-                                const property = properties.find(({ key }) => e === key);
-                                if (property && property.fields && property.fields.length > 0) {
-                                  const metric = {
-                                    key: property.key + '.' + property.fields[0].key,
-                                    name: property.name,
-                                    unit: property.unit
-                                  };
-                                  setMetric((prev) => {
-                                    if (prev.length === 0) {
-                                      return [metric];
-                                    } else if (prev.length < index + 1) {
-                                      return [...prev, metric];
-                                    } else {
-                                      return prev.map((item, n) => {
-                                        if (n === index) {
-                                          return metric;
-                                        } else {
-                                          return item;
-                                        }
-                                      });
-                                    }
-                                  });
+                              onChange={(e, selectOptions) => {
+                                if (e !== undefined) {
+                                  const property = properties.find(({ key }) => key === e[0]);
+                                  if (property) {
+                                    const selected = e.length === 1 ? [...e, ...e] : e;
+                                    const metric = {
+                                      key: selected.join('.'),
+                                      name: selectOptions.map(({ name }) => name).join(':'),
+                                      unit: property.unit
+                                    };
+                                    setMetric((prev) => {
+                                      if (prev.length === 0) {
+                                        return [metric];
+                                      } else if (prev.length < index + 1) {
+                                        return [...prev, metric];
+                                      } else {
+                                        return prev.map((item, n) => {
+                                          if (n === index) {
+                                            return metric;
+                                          } else {
+                                            return item;
+                                          }
+                                        });
+                                      }
+                                    });
+                                  }
                                 }
                               }}
-                            >
-                              {properties.map(({ name, key }) => (
-                                <Select.Option key={key} value={key}>
-                                  {name}
-                                </Select.Option>
-                              ))}
-                            </Select>
+                              options={properties}
+                              fieldNames={{ label: 'name', value: 'key', children: 'fields' }}
+                            />
                           </Form.Item>
                         )}
                         <Form.Item label='周期' required>
