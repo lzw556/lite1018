@@ -11,7 +11,7 @@ import {
 } from '../common/statisticsHelper';
 import { MeasurementRow } from '../summary/measurement/props';
 import { deleteMeasurement } from '../summary/measurement/services';
-import { combineFinalUrl } from '../common/utils';
+import { combineFinalUrl, getRealPoints } from '../common/utils';
 import { sortMeasurementsByAttributes } from './util';
 import { sortFlangesByAttributes } from '../assetList/util';
 import usePermission, { Permission } from '../../../permission/permission';
@@ -35,13 +35,13 @@ export const MeasurementOfWindList: React.FC<{
       return <Empty description='没有法兰' image={Empty.PRESENTED_IMAGE_SIMPLE} />;
     return (
       <Row gutter={[0, 16]}>
-        {sortFlangesByAttributes(wind.children).map(({ id, name, monitoringPoints }) =>
-          generateTable(
+        {sortFlangesByAttributes(wind.children).map(({ id, name, monitoringPoints }) => {
+          return generateTable(
             id,
             name,
-            monitoringPoints ? sortMeasurementsByAttributes(monitoringPoints) : []
-          )
-        )}
+            sortMeasurementsByAttributes(getRealPoints(monitoringPoints))
+          );
+        })}
       </Row>
     );
   };

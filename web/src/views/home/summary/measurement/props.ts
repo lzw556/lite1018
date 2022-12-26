@@ -31,7 +31,7 @@ export type MeasurementRow = {
   properties: Property[];
   data?: {
     timestamp: number;
-    values: { [propName: string]: number };
+    values: { [propName: string]: number | number[] };
   };
   alertLevel?: number;
 };

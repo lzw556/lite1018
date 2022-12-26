@@ -1,13 +1,18 @@
-import { Form, Input, Select } from 'antd';
+import { Checkbox, Form, Input, Select } from 'antd';
 import * as React from 'react';
 import { Rules } from '../../../constants/validator';
 import { getAssets } from './services';
 import { AssetRow } from './props';
 import { AttributeFormItem } from './attributeFormItem';
 import * as AppConfig from '../../../config';
+import { SAMPLE_OFFSET, SAMPLE_PERIOD_2 } from '../../../constants';
 
-export const EditContent: React.FC<{ parentId?: number }> = ({ parentId }) => {
+export const EditContent: React.FC<{ parentId?: number; initialIsFlangePreload?: boolean }> = ({
+  parentId,
+  initialIsFlangePreload
+}) => {
   const [parents, setParents] = React.useState<AssetRow[]>([]);
+  const [isFlangePreload, setIsFlangePreload] = React.useState(initialIsFlangePreload);
   const windConfig = AppConfig.use('wind');
 
   React.useEffect(() => {
@@ -70,6 +75,65 @@ export const EditContent: React.FC<{ parentId?: number }> = ({ parentId }) => {
       <AttributeFormItem label='次要报警' name='info' />
       <AttributeFormItem label='重要报警' name='warn' />
       <AttributeFormItem label='紧急报警' name='danger' />
+      <Form.Item
+        name={['attributes', 'sub_type']}
+        valuePropName='checked'
+        wrapperCol={{ offset: 4 }}
+        initialValue={false}
+      >
+        <Checkbox onChange={(e) => setIsFlangePreload(e.target.checked)}>计算法兰预紧力</Checkbox>
+      </Form.Item>
+      {isFlangePreload && (
+        <>
+          <Form.Item
+            label='螺栓数量'
+            name={['attributes', 'monitoring_points_num']}
+            rules={[Rules.number]}
+          >
+            <Input placeholder={`请填写螺栓数量`} />
+          </Form.Item>
+          <Form.Item
+            label='采集周期'
+            name={['attributes', 'sample_period']}
+            rules={[{ required: true, message: '请选择采集周期' }]}
+          >
+            <Select placeholder={'请选择采集周期'}>
+              {SAMPLE_PERIOD_2.map((item) => (
+                <Select.Option key={item.value} value={item.value}>
+                  {item.text}
+                </Select.Option>
+              ))}
+            </Select>
+          </Form.Item>
+          <Form.Item
+            label='采集延迟'
+            name={['attributes', 'sample_time_offset']}
+            rules={[{ required: true, message: '请选择采集延迟' }]}
+          >
+            <Select placeholder={'请选择采集延迟'}>
+              {SAMPLE_OFFSET.map((item) => (
+                <Select.Option key={item.value} value={item.value}>
+                  {item.text}
+                </Select.Option>
+              ))}
+            </Select>
+          </Form.Item>
+          <Form.Item
+            label='初始预紧力'
+            name={['attributes', 'initial_preload']}
+            rules={[Rules.number]}
+          >
+            <Input placeholder={`请填写初始预紧力`} suffix='kN' />
+          </Form.Item>
+          <Form.Item
+            label='初始应力'
+            name={['attributes', 'initial_pressure']}
+            rules={[Rules.number]}
+          >
+            <Input placeholder={`请填写初始应力`} suffix='MPa' />
+          </Form.Item>
+        </>
+      )}
     </>
   );
 };

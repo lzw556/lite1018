@@ -1,6 +1,7 @@
 import { ProjectStatistics } from '..';
 import request from '../../../utils/request';
 import { DeleteResponse, GetResponse, PostResponse, PutResponse } from '../../../utils/response';
+import { HistoryData } from '../common/historyDataHelper';
 import { Asset, AssetRow } from './props';
 
 export function getAssets(filters?: Partial<Pick<Asset, 'type' | 'parent_id'>>) {
@@ -39,4 +40,14 @@ export function exportAssets(projectId: number, asset_ids?: number[]) {
 
 export function importAssets(id: number, data: any) {
   return request.post<any>(`my/projects/${id}/import`, data);
+}
+
+export function getData(id: AssetRow['id'], from: number, to: number) {
+  return request
+    .get<{ timestamp: number }[]>(`/assets/${id}/data?from=${from}&to=${to}`)
+    .then(GetResponse);
+}
+
+export function getFlangeData(id: AssetRow['id'], timestamp: number) {
+  return request.get<HistoryData[0]>(`/assets/${id}/data/${timestamp}`).then(GetResponse);
 }

@@ -1,5 +1,6 @@
 import moment from 'moment';
 import * as AppConfig from '../../../config';
+import { MeasurementRow } from '../summary/measurement/props';
 
 export function generateColProps({
   xs,
@@ -75,4 +76,11 @@ export function verifyAssetOverview(search: string) {
     return true;
   }
   return false;
+}
+
+export function getRealPoints(measurements?: MeasurementRow[]) {
+  if (!measurements) return [];
+  return measurements.filter(
+    (point) => point.type !== AppConfig.use('wind').measurementTypes.flangePreload.id
+  );
 }

@@ -30,16 +30,27 @@ export const AssetEdit: React.FC<
         title: `${windConfig.assetType.secondAsset?.label}${doUpdating ? '编辑' : '添加'}`,
         cancelText: '取消',
         okText: doUpdating ? '更新' : '添加',
+        bodyStyle: { overflow: 'auto', maxHeight: 610 },
         ...props,
         onOk: () => {
           form.validateFields().then((values) => {
+            const _values = {
+              ...values,
+              attributes: {
+                ...values.attributes,
+                monitoring_points_num: Number(values.attributes?.monitoring_points_num),
+                sub_type: Number(values.attributes?.sub_type),
+                initial_preload: Number(values.attributes?.initial_preload),
+                initial_pressure: Number(values.attributes?.initial_pressure)
+              }
+            };
             try {
               if (!doUpdating) {
-                addAsset(values).then(() => {
+                addAsset(_values as any).then(() => {
                   onSuccess();
                 });
               } else if (asset) {
-                updateAsset(asset.id, values).then(() => {
+                updateAsset(asset.id, _values as any).then(() => {
                   onSuccess();
                 });
               }
@@ -50,8 +61,11 @@ export const AssetEdit: React.FC<
         }
       }}
     >
-      <Form form={form} labelCol={{ span: 4 }} validateMessages={defaultValidateMessages}>
-        <EditContent parentId={parentId} />
+      <Form form={form} labelCol={{ span: 5 }} validateMessages={defaultValidateMessages}>
+        <EditContent
+          parentId={parentId}
+          initialIsFlangePreload={!!asset && doUpdating && !!asset.attributes?.sub_type}
+        />
       </Form>
     </Modal>
   );

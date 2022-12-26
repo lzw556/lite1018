@@ -14,6 +14,12 @@ export type Asset = {
     info?: { enabled: boolean; value: number | string };
     warn?: { enabled: boolean; value: number | string };
     danger?: { enabled: boolean; value: number | string };
+    sub_type: number;
+    monitoring_points_num: number;
+    sample_period: number;
+    sample_time_offset: number;
+    initial_preload: number;
+    initial_pressure: number;
   };
 };
 
@@ -36,6 +42,12 @@ export type AssetRow = {
     info?: { enabled: boolean; value: number | string };
     warn?: { enabled: boolean; value: number | string };
     danger?: { enabled: boolean; value: number | string };
+    sub_type: number;
+    monitoring_points_num: number;
+    sample_period: number;
+    sample_time_offset: number;
+    initial_preload: number;
+    initial_pressure: number;
   };
 };
 

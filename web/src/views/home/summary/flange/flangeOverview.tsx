@@ -17,6 +17,7 @@ import usePermission, { Permission } from '../../../../permission/permission';
 import { HistoryData } from './historyData';
 import { ActionBar } from '../../components/actionBar';
 import { useActionBarStatus } from '../../common/useActionBarStatus';
+import { FlangeStatus } from './FlangeStatus';
 
 const FlangeOverview: React.FC = () => {
   const { search, pathname } = useLocation();
@@ -95,7 +96,12 @@ const FlangeOverview: React.FC = () => {
 
   if (asset)
     tabs = [...tabs, { key: 'history', tab: '历史数据', content: <HistoryData {...asset} /> }];
-
+  if (asset && asset.attributes && asset.attributes.sub_type === 1) {
+    tabs = [
+      ...tabs,
+      { key: 'flangeSatus', tab: '法兰螺栓状态', content: <FlangeStatus {...asset} /> }
+    ];
+  }
   return (
     <>
       {asset && (
@@ -114,7 +120,17 @@ const FlangeOverview: React.FC = () => {
                       asset={asset}
                       form={form}
                       onSubmit={(values) => {
-                        updateAsset(id, values).then(() => {
+                        const _values = {
+                          ...values,
+                          attributes: {
+                            ...values.attributes,
+                            monitoring_points_num: Number(values.attributes?.monitoring_points_num),
+                            sub_type: Number(values.attributes?.sub_type),
+                            initial_preload: Number(values.attributes?.initial_preload),
+                            initial_pressure: Number(values.attributes?.initial_pressure)
+                          }
+                        };
+                        updateAsset(id, _values).then(() => {
                           fetchAsset(id);
                           setIsForceRefresh((prev) => ++prev);
                         });

@@ -2,7 +2,7 @@ import { Breadcrumb, Dropdown, Menu, Space } from 'antd';
 import * as React from 'react';
 import { Link, useHistory, useLocation } from 'react-router-dom';
 import { getAssets } from '../assetList/services';
-import { combineFinalUrl } from '../common/utils';
+import { combineFinalUrl, getRealPoints } from '../common/utils';
 import { DownOutlined } from '@ant-design/icons';
 import { forEachTreeNode } from '../common/treeDataHelper';
 import { getMenus } from '../../../utils/session';
@@ -62,10 +62,9 @@ export const AssetNavigator: React.FC<
       const arr: Node[] = [];
       forEachTreeNode(node, (node) => {
         arr.push(node);
-        if (node.monitoringPoints && node.monitoringPoints.length > 0)
-          arr.push(
-            ...node.monitoringPoints.map((point) => ({ ...point, parentId: point.assetId }))
-          );
+        const points = getRealPoints(node.monitoringPoints);
+        if (points.length > 0)
+          arr.push(...points.map((point) => ({ ...point, parentId: point.assetId })));
       });
       if (arr.length > 0) {
         const paths: { parentId: number; id: number }[] = [{ parentId, id }];

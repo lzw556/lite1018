@@ -6,6 +6,7 @@ import { TopAssetEdit } from '../assetList/topAssetEdit';
 import { WindEdit } from '../assetList/windEdit';
 import { EditFormPayload } from '../common/useActionBarStatus';
 import { MeasurementEdit } from '../measurementList/edit';
+import { MeasurementBatchAddition } from '../measurementList/MeasurementBatchAddition';
 
 export const ActionBar: React.FC<{
   actions: React.ReactNode[];
@@ -75,6 +76,19 @@ export const ActionBar: React.FC<{
       )}
       {visible && target === 4 && (
         <ChildAddition
+          {...{
+            visible,
+            onCancel: () => setVisible && setVisible(false),
+            payload,
+            onSuccess: () => {
+              if (onSuccess) onSuccess();
+              setVisible && setVisible(false);
+            }
+          }}
+        />
+      )}
+      {visible && target === 5 && (
+        <MeasurementBatchAddition
           {...{
             visible,
             onCancel: () => setVisible && setVisible(false),

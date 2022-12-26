@@ -10,7 +10,7 @@ import { generateDatasOfMeasurement } from '../common/historyDataHelper';
 import { convertAlarmLevelToState } from '../common/statisticsHelper';
 import { mapTreeNode } from '../common/treeDataHelper';
 import { EditFormPayload } from '../common/useActionBarStatus';
-import { combineFinalUrl } from '../common/utils';
+import { combineFinalUrl, getRealPoints } from '../common/utils';
 import { sortMeasurementsByAttributes } from '../measurementList/util';
 import { FlangeIcon } from '../summary/flange/icon';
 import { MeasurementIcon } from '../summary/measurement/icon';
@@ -32,6 +32,7 @@ export const AssetTree: React.FC<{
   handleMeasurementEdit?: (data?: EditFormPayload) => void;
   handleChildAddition?: (data?: EditFormPayload) => void;
   rootId?: number;
+  handleAddMeasurements?: (data?: EditFormPayload) => void;
 }> = ({
   assets,
   pathname,
@@ -42,7 +43,8 @@ export const AssetTree: React.FC<{
   handleWindEdit,
   handleMeasurementEdit,
   handleChildAddition,
-  rootId
+  rootId,
+  handleAddMeasurements
 }) => {
   const [treedata, setTreedata] = React.useState<any>();
   const [selectedNode, setSelectedNode] = React.useState<any>();
@@ -53,19 +55,15 @@ export const AssetTree: React.FC<{
 
   const getTreedata = (assets: AssetRow[]) => {
     const processNodeFn = (node: any) => {
-      if (
-        node.children &&
-        node.children.length > 0 &&
-        node.monitoringPoints &&
-        node.monitoringPoints.length > 0
-      ) {
-        return { ...node, children: [...node.children, ...node.monitoringPoints] };
+      const points = getRealPoints(node.monitoringPoints);
+      if (node.children && node.children.length > 0 && points.length > 0) {
+        return { ...node, children: [...node.children, ...points] };
       } else if (node.children && node.children.length > 0) {
         return { ...node, children: sortFlangesByAttributes(node.children as AssetRow[]) };
-      } else if (node.monitoringPoints && node.monitoringPoints.length > 0) {
+      } else if (points.length > 0) {
         return {
           ...node,
-          children: sortMeasurementsByAttributes(node.monitoringPoints),
+          children: sortMeasurementsByAttributes(points),
           monitoringPoints: []
         };
       } else {
@@ -188,7 +186,7 @@ export const AssetTree: React.FC<{
                           } else if (
                             type === AppConfig.use(window.assetCategory).assetType.secondAsset?.id
                           ) {
-                            handleMeasurementEdit && handleMeasurementEdit({ asset: selectedNode });
+                            handleAddMeasurements && handleAddMeasurements({ asset: selectedNode });
                           } else {
                             handleChildAddition && handleChildAddition({ asset: selectedNode });
                           }

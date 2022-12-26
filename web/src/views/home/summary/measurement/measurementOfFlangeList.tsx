@@ -11,7 +11,7 @@ import {
 } from '../../common/statisticsHelper';
 import { MeasurementRow } from './props';
 import { deleteMeasurement } from './services';
-import { combineFinalUrl } from '../../common/utils';
+import { combineFinalUrl, getRealPoints } from '../../common/utils';
 import { sortMeasurementsByAttributes } from '../../measurementList/util';
 import usePermission, { Permission } from '../../../../permission/permission';
 import HasPermission from '../../../../permission';
@@ -30,17 +30,14 @@ export const MeasurementOfFlangeList: React.FC<{
   const { hasPermission } = usePermission();
   const generateTables = () => {
     if (!flange) return null;
-    if (!flange.monitoringPoints || flange.monitoringPoints.length === 0)
+    const measurements = getRealPoints(flange.monitoringPoints);
+    if (measurements.length === 0)
       return (
         <ShadowCard>
           <Empty description='没有监测点' image={Empty.PRESENTED_IMAGE_SIMPLE} />
         </ShadowCard>
       );
-    return (
-      <Row gutter={[0, 16]}>
-        {generateTable(sortMeasurementsByAttributes(flange.monitoringPoints))}
-      </Row>
-    );
+    return <Row gutter={[0, 16]}>{generateTable(sortMeasurementsByAttributes(measurements))}</Row>;
   };
 
   const getColumns = (dataSource: TableProps<any>['dataSource']) => {

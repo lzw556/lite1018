@@ -56,13 +56,13 @@ export const EditContent: React.FC<{ form: any; asset?: AssetRow; doUpdating?: b
           }}
           disabled={doUpdating}
         >
-          {Object.values(AppConfig.use(window.assetCategory).measurementTypes).map(
-            ({ id, label }) => (
+          {Object.values(AppConfig.use(window.assetCategory).measurementTypes)
+            .filter((type) => !type.hidden)
+            .map(({ id, label }) => (
               <Select.Option key={id} value={id}>
                 {label}
               </Select.Option>
-            )
-          )}
+            ))}
         </Select>
       </Form.Item>
       <Form.Item

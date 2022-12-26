@@ -16,16 +16,15 @@ import HasPermission from '../../../../permission';
 import { Permission } from '../../../../permission/permission';
 import { DownloadOutlined } from '@ant-design/icons';
 import { HistoryDataDownload } from '../measurement/contentTabs/historyDataDownload';
+import { MeasurementRow } from '../measurement/props';
+import { getRealPoints } from '../../common/utils';
 
 export const HistoryData: React.FC<AssetRow> = (props) => {
-  const properties =
-    props.monitoringPoints && props.monitoringPoints.length > 0
-      ? props.monitoringPoints[0].properties
-      : [];
+  const [measurements, setMeasurements] = React.useState<MeasurementRow[]>([]);
   const [historyOptions, setHistoryOptions] = React.useState<any>();
   const [range, setRange] = React.useState<[number, number]>();
   const [property, setProperty] = React.useState(
-    properties.length > 0 ? properties[0].key : undefined
+    measurements.length > 0 ? measurements[0].properties[0].key : undefined
   );
   const [historyDatas, setHistoryDatas] = React.useState<
     { name: string; data: HistoryDatas; index: number }[]
@@ -33,7 +32,10 @@ export const HistoryData: React.FC<AssetRow> = (props) => {
   const [visible, setVisible] = React.useState(false);
 
   React.useEffect(() => {
-    const measurements = props.monitoringPoints || [];
+    setMeasurements(getRealPoints(props.monitoringPoints));
+  }, [props.monitoringPoints]);
+
+  React.useEffect(() => {
     if (measurements.length > 0 && range) {
       const [from, to] = range;
       setHistoryDatas([]);
@@ -44,10 +46,9 @@ export const HistoryData: React.FC<AssetRow> = (props) => {
         });
       });
     }
-  }, [props.monitoringPoints, range]);
+  }, [measurements, range]);
 
   React.useEffect(() => {
-    const measurements = props.monitoringPoints || [];
     if (historyDatas.length > 0 && measurements.length > 0) {
       setHistoryOptions(
         generateChartOptionsOfHistoryData(
@@ -58,11 +59,11 @@ export const HistoryData: React.FC<AssetRow> = (props) => {
         )
       );
     }
-  }, [historyDatas, props.monitoringPoints, property]);
+  }, [historyDatas, measurements, property]);
 
   const handleChange = React.useCallback((range: [number, number]) => setRange(range), []);
 
-  if (!props.monitoringPoints || props.monitoringPoints.length === 0)
+  if (measurements.length === 0)
     return (
       <ShadowCard>
         <Empty description='没有监测点' image={Empty.PRESENTED_IMAGE_SIMPLE} />
@@ -86,7 +87,7 @@ export const HistoryData: React.FC<AssetRow> = (props) => {
                       setProperty(value);
                     }}
                   >
-                    {getSpecificProperties(properties, props.monitoringPoints[0].type).map(
+                    {getSpecificProperties(measurements[0].properties, measurements[0].type).map(
                       ({ name, key }) => (
                         <Select.Option key={key} value={key}>
                           {name}
@@ -96,16 +97,18 @@ export const HistoryData: React.FC<AssetRow> = (props) => {
                   </Select>
                 </Label>
                 <RangeDatePicker onChange={handleChange} showFooter={true} />
-                {/* <HasPermission value={Permission.AssetDataDownload}>
-                  <Button
-                    type='primary'
-                    onClick={() => {
-                      setVisible(true);
-                    }}
-                  >
-                    <DownloadOutlined />
-                  </Button>
-                </HasPermission> */}
+                {props.attributes?.sub_type && (
+                  <HasPermission value={Permission.AssetDataDownload}>
+                    <Button
+                      type='primary'
+                      onClick={() => {
+                        setVisible(true);
+                      }}
+                    >
+                      <DownloadOutlined />
+                    </Button>
+                  </HasPermission>
+                )}
               </Space>
             </Col>
           </Row>
@@ -113,9 +116,9 @@ export const HistoryData: React.FC<AssetRow> = (props) => {
         <Col span={24}>
           <ChartContainer title='' options={historyOptions} style={{ height: '500px' }} />
         </Col>
-        {visible && props.monitoringPoints && props.monitoringPoints.length > 0 && (
+        {visible && measurements.length > 0 && (
           <HistoryDataDownload
-            measurement={props.monitoringPoints[0]}
+            measurement={measurements[0]}
             visible={visible}
             onSuccess={() => setVisible(false)}
             onCancel={() => setVisible(false)}

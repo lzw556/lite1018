@@ -39,6 +39,12 @@ export function useActionBarStatus() {
     setTarget(4);
   };
 
+  const handleAddMeasurements = (data?: EditFormPayload) => {
+    setPayload(data);
+    setVisible(true);
+    setTarget(5);
+  };
+
   return {
     visible,
     setVisible,
@@ -48,6 +54,7 @@ export function useActionBarStatus() {
     handleWindEdit,
     handleFlangeEdit,
     handleMeasurementEdit,
-    handleChildAddition
+    handleChildAddition,
+    handleAddMeasurements
   };
 }

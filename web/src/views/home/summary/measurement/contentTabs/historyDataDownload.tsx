@@ -63,11 +63,13 @@ export const HistoryDataDownload: React.FC<DownloadModalProps> = (props) => {
           rules={[{ required: true, message: '请选择属性' }]}
         >
           <Select placeholder={'请选择属性'} mode={'multiple'} maxTagCount={2}>
-            {measurement.properties.map((item) => (
-              <Option key={item.key} value={item.key}>
-                {item.name}
-              </Option>
-            ))}
+            {measurement.properties
+              .filter((pro) => pro.key === 'preload' || pro.key === 'pressure')
+              .map((item) => (
+                <Option key={item.key} value={item.key}>
+                  {item.name}
+                </Option>
+              ))}
           </Select>
         </Form.Item>
         <Form.Item label={'时间范围'} required>

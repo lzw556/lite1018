@@ -30,7 +30,7 @@ export const SettingsTabContent: React.FC<{
           </>
         );
       } else {
-        return <EditContent />;
+        return <EditContent initialIsFlangePreload={!!asset.attributes?.sub_type} />;
       }
     } else {
       return null;

@@ -45,7 +45,7 @@ export const assetType = {
 };
 
 export const measurementTypes: Record<
-  'loosening_angle' | 'preload',
+  'loosening_angle' | 'preload' | 'flangePreload',
   {
     id: number;
     label: string;
@@ -64,6 +64,7 @@ export const measurementTypes: Record<
       fields: { label: string; value: string; unit: string }[];
       metaData: { label: string; value: string; unit: string }[];
     };
+    hidden?: boolean;
   }
 > = {
   loosening_angle: {
@@ -121,6 +122,14 @@ export const measurementTypes: Record<
         { label: '缺陷位置', value: 'defect_location', unit: 'mm' }
       ]
     }
+  },
+  flangePreload: {
+    id: 10311,
+    label: '法兰预紧力',
+    url: '/bolt',
+    firstClassFieldKeys: ['preload', 'pressure', 'tof', 'temperature'],
+    deviceType: [DeviceType.BoltElongation],
+    hidden: true
   }
 };
 

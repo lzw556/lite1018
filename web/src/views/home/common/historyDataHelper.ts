@@ -12,6 +12,7 @@ import {
   getAlarmStateText
 } from './statisticsHelper';
 import * as AppConfig from '../../../config';
+import { FlangeStatusData } from '../summary/flange/FlangeStatus';
 
 export type HistoryData = {
   timestamp: number;
@@ -256,7 +257,7 @@ function generateOuter(measurements: MeasurementRow[], isBig: boolean = false) {
     }
     let value = NaN;
     if (field && data) {
-      value = roundValue(data.values[field.key], field.precision);
+      value = roundValue(data.values[field.key] as number, field.precision);
     }
     return {
       name,
@@ -309,7 +310,7 @@ function generateActuals(measurements: MeasurementRow[], isBig: boolean = false)
   measurements.forEach(({ data, name }, index) => {
     let value = NaN;
     if (field && data) {
-      value = roundValue(data.values[field.key], field.precision);
+      value = roundValue(data.values[field.key] as number, field.precision);
       if (value) {
         if (Math.abs(value) > max) max = Math.abs(value);
         if (value < min) min = value;
@@ -464,7 +465,7 @@ export function generatePropertyColumns(measurement: MeasurementRow) {
         render: ({ data }: MeasurementRow) => {
           let value = NaN;
           if (data && data.values) {
-            value = roundValue(data.values[key], precision);
+            value = roundValue(data.values[key] as number, precision);
           }
           return getDisplayValue(value, unit);
         },
@@ -524,7 +525,7 @@ export function generateDatasOfMeasurement(measurement: MeasurementRow) {
     return properties.map(({ name, key, unit, precision }) => {
       let value = NaN;
       if (data && data.values) {
-        value = roundValue(data.values[key], precision);
+        value = roundValue(data.values[key] as number, precision);
       }
       return { name, value: getDisplayValue(value, unit) };
     });
@@ -568,4 +569,149 @@ export function removeDulpicateProperties(properties: Property[]) {
       return property;
     }
   });
+}
+
+export function generateLastestFlangeStatusChartOptions(
+  points: MeasurementRow[],
+  property: Property
+) {
+  if (!points || points.length === 0) return null;
+  const series: any = [];
+  const reals = points
+    .filter((point) => point.type !== AppConfig.use('wind').measurementTypes.flangePreload.id)
+    .filter((point) => !!point.data);
+  if (reals.length > 0) {
+    series.push({
+      type: 'scatter',
+      name: `监测点`,
+      data: reals.map(({ attributes, data }, n) => [
+        attributes ? attributes?.index - 1 : 1,
+        roundValue((data?.values[property.key] as number) || NaN)
+      ])
+    });
+  }
+
+  const fakes = points
+    .filter((point) => point.type === AppConfig.use('wind').measurementTypes.flangePreload.id)
+    .filter((point) => !!point.data);
+  if (fakes.length > 0) {
+    series.push({
+      type: 'line',
+      name: `螺栓`,
+      data: (fakes[0].data?.values[property.key] as number[]).map((val, index) => [
+        index,
+        roundValue(val)
+      ])
+    });
+  }
+
+  if (reals.length === 0 || fakes.length === 0) return null;
+
+  return {
+    tooltip: {
+      trigger: 'axis',
+      formatter: function (params: any) {
+        let relVal = '';
+        for (let i = 0; i < params.length; i++) {
+          const index = Number(params[i].value[0]) + 1;
+          const value = Number(params[i].value[1]);
+          relVal += `<br/> ${params[i].marker} ${index}号${params[i].seriesName}: ${
+            property.name
+          }${getDisplayValue(value, property.unit)}`;
+        }
+        return relVal;
+      }
+    },
+    grid: { bottom: 20, left: 50 },
+    title: {
+      text: `${property.name}${property.unit ? `(${property.unit})` : ''}`
+    },
+    series,
+    xAxis: {
+      type: 'category',
+      boundaryGap: false,
+      axisLabel: { align: 'left' },
+      data: getXAxisData(fakes[0])
+    },
+    yAxis: { type: 'value' }
+  };
+}
+
+function getXAxisData(fakePoint: MeasurementRow) {
+  if (!fakePoint || !fakePoint.data || fakePoint.properties.length === 0) return [];
+  return (fakePoint.data.values[fakePoint.properties[0].key] as number[]).map(
+    (point, index) => index + 1
+  );
+}
+
+export function generateFlangeStatusChartOptions(
+  propertyKey: string,
+  origialData?: FlangeStatusData
+) {
+  if (!origialData || origialData.values.length === 0) return null;
+  const property = origialData.values.find(({ key }) => key === propertyKey);
+  const series: any = [];
+  const propertyInput = origialData.values.find(({ key }) => key === `${propertyKey}_input`);
+  if (propertyInput) {
+    const propertyInputDatas = propertyInput.data[propertyInput.name] as {
+      index: number;
+      value: number;
+      timestamp: number;
+    }[];
+    if (propertyInputDatas.length > 0) {
+      series.push({
+        type: 'scatter',
+        name: `监测点`,
+        data: propertyInputDatas.map(({ index, value }) => [index - 1, roundValue(value)])
+      });
+    }
+  }
+  let xAxisDatas: number[] = [];
+  const fake = origialData.values.find(({ fields }) =>
+    fields.find((field) => field.key === propertyKey)
+  );
+  if (fake) {
+    const field = fake.fields.find((field) => field.key === propertyKey);
+    if (field) {
+      const fakeDatas = fake.data[field.name] as number[];
+      if (fakeDatas.length > 0) {
+        xAxisDatas = fakeDatas.map((value, index) => index + 1);
+        series.push({
+          type: 'line',
+          name: `螺栓`,
+          data: fakeDatas.map((value, index) => [index, roundValue(value)])
+        });
+      }
+    }
+  }
+
+  return {
+    tooltip: {
+      trigger: 'axis',
+      formatter: function (params: any) {
+        let relVal = '';
+        for (let i = 0; i < params.length; i++) {
+          const index = Number(params[i].value[0]) + 1;
+          const value = Number(params[i].value[1]);
+          relVal += `<br/> ${params[i].marker} ${index}号${params[i].seriesName}: ${
+            property?.name
+          }${getDisplayValue(value, property?.unit)}`;
+        }
+        return relVal;
+      }
+    },
+    legend: { show: !!propertyKey },
+    grid: { bottom: 20, left: 50 },
+    title: {
+      text: `${property?.name}${property?.unit ? `(${property.unit})` : ''}`
+    },
+    series,
+    xAxis: {
+      type: 'category',
+      boundaryGap: false,
+      axisLabel: { align: 'left' },
+      data: xAxisDatas
+    },
+    yAxis: { type: 'value' }
+  };
 }

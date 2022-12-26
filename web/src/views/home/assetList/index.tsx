@@ -11,7 +11,7 @@ import { useLocation } from 'react-router-dom';
 import { ActionBar } from '../components/actionBar';
 import { useActionBarStatus } from '../common/useActionBarStatus';
 import usePermission, { Permission } from '../../../permission/permission';
-import { PlusOutlined, WindowsFilled } from '@ant-design/icons';
+import { PlusOutlined } from '@ant-design/icons';
 import { FileInput } from '../components/fileInput';
 import { AssetExport } from '../components/assetExport';
 import * as AppConfig from '../../../config';
@@ -105,7 +105,13 @@ const AssetManagement: React.FC = () => {
               <Button
                 key='measurementEdit'
                 type='primary'
-                onClick={() => actionStatus.handleMeasurementEdit()}
+                onClick={() => {
+                  if (isAssetWind) {
+                    actionStatus.handleAddMeasurements();
+                  } else {
+                    actionStatus.handleMeasurementEdit();
+                  }
+                }}
                 disabled={
                   assets.items.filter((asset) => {
                     if (window.assetCategory === 'wind') {
