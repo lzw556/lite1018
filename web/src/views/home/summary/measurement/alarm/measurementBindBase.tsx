@@ -38,7 +38,7 @@ export const MeasurementBindBase: React.FC<
 
   const renderModalContent = () => {
     if (loading) return <Spin />;
-    if (treeData.length === 0)
+    if (!treeData || treeData.length === 0)
       return <Empty description='暂无数据' image={Empty.PRESENTED_IMAGE_SIMPLE} />;
     return (
       <Tree
