@@ -153,7 +153,8 @@ const DevicePage = () => {
             </Menu.Item>
             {(record.typeId === DeviceType.HighTemperatureCorrosion ||
               record.typeId === DeviceType.NormalTemperatureCorrosion ||
-              record.typeId === DeviceType.BoltElongation) && (
+              record.typeId === DeviceType.BoltElongation ||
+              record.typeId === DeviceType.PressureTemperature) && (
               <Menu.Item key={DeviceCommand.Calibrate} disabled={!disabled} hidden={isUpgrading}>
                 校准
               </Menu.Item>
