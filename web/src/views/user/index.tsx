@@ -14,6 +14,8 @@ import { Permission } from '../../permission/permission';
 import { PageResult } from '../../types/page';
 import { isMobile } from '../../utils/deviceDetection';
 import { Store, useStore } from '../../hooks/store';
+import { Role } from '../../types/role';
+import { PagingRolesRequest } from '../../apis/role';
 
 const UserPage = () => {
   const [addUserVisible, setAddUserVisible] = useState<boolean>(false);
@@ -21,6 +23,7 @@ const UserPage = () => {
   const [user, setUser] = useState(InitializeUserState);
   const [dataSource, setDataSource] = useState<PageResult<User[]>>();
   const [store, setStore, gotoPage] = useStore('accountList');
+  const [roles, setRoles] = useState<Role[]>([]);
 
   const fetchUsers = (store: Store['accountList']) => {
     const {
@@ -28,6 +31,12 @@ const UserPage = () => {
     } = store;
     PagingUsersRequest(index, size).then(setDataSource);
   };
+
+  useEffect(() => {
+    PagingRolesRequest(1, 100).then((data) => {
+      setRoles(data.result);
+    });
+  }, []);
 
   useEffect(() => {
     fetchUsers(store);
@@ -77,6 +86,15 @@ const UserPage = () => {
       title: '邮箱',
       dataIndex: 'email',
       key: 'email'
+    },
+    {
+      title: '角色',
+      dataIndex: 'role',
+      render: (roleId: number) => {
+        const role = roles.find((role) => role.id === roleId);
+        return role?.name;
+      },
+      key: 'role'
     },
     {
       title: '操作',
