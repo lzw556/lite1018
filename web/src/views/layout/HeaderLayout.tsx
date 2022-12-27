@@ -84,8 +84,7 @@ const HeaderLayout = (props: any) => {
                 defaultActiveFirstOption={true}
                 suffixIcon={<CaretDownOutlined style={{ color: 'white' }} />}
                 style={{
-                  width: '120px',
-                  textAlign: 'center',
+                  maxWidth: 180,
                   backgroundColor: 'transparent',
                   color: 'white'
                 }}

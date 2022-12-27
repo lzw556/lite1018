@@ -32,7 +32,7 @@ const ProjectSelect: FC<ProjectSelectProps> = (props) => {
   };
 
   return (
-    <Select {...props} onDropdownVisibleChange={onProjectChange}>
+    <Select {...props} onDropdownVisibleChange={onProjectChange} dropdownMatchSelectWidth={160}>
       {dataSource.map((item) => (
         <Option key={item.id} value={item.id}>
           {item.name}
