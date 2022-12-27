@@ -10,7 +10,8 @@ export const measurementTypes: Record<
   | 'vibration'
   | 'angleDip'
   | 'pressure'
-  | 'flangePreload',
+  | 'flangePreload'
+  | 'temperature',
   {
     id: number;
     label: string;
@@ -147,5 +148,12 @@ export const measurementTypes: Record<
     firstClassFieldKeys: ['preload', 'pressure', 'tof', 'temperature'],
     deviceType: [DeviceType.BoltElongation],
     hidden: true
+  },
+  temperature: {
+    id: 10801,
+    label: '温度',
+    url: '/bolt',
+    firstClassFieldKeys: ['temperature'],
+    deviceType: [DeviceType.Temperature]
   }
 };
