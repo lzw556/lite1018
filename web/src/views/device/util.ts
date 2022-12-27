@@ -6,6 +6,7 @@ import { Property } from '../../types/property';
 export const getValueOfFirstClassProperty = (device: Device) => {
   const properties = getFirstClassFields(device);
   const { data } = device;
+  if (data.timestamp < 0) return [];
   if (properties.length > 0) {
     return properties.map(({ name, key, unit, precision }) => {
       let value = NaN;
