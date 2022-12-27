@@ -5,6 +5,7 @@ import { downloadHistory } from '../services';
 import { defaultValidateMessages } from '../../../../../constants/validator';
 import { getFilename } from '../../../common/utils';
 import { RangeDatePicker } from '../../../../../components/rangeDatePicker';
+import { getSpecificProperties } from '../../../common/historyDataHelper';
 
 const { Option } = Select;
 
@@ -13,6 +14,7 @@ export interface DownloadModalProps extends ModalProps {
   property?: any;
   onSuccess: () => void;
   assetId?: number;
+  isFlangeProload?: boolean;
 }
 
 export const HistoryDataDownload: React.FC<DownloadModalProps> = (props) => {
@@ -63,8 +65,14 @@ export const HistoryDataDownload: React.FC<DownloadModalProps> = (props) => {
           rules={[{ required: true, message: '请选择属性' }]}
         >
           <Select placeholder={'请选择属性'} mode={'multiple'} maxTagCount={2}>
-            {measurement.properties
-              .filter((pro) => pro.key === 'preload' || pro.key === 'pressure')
+            {getSpecificProperties(measurement.properties, measurement.type)
+              .filter((pro) => {
+                if (props.isFlangeProload) {
+                  return pro.key === 'preload' || pro.key === 'pressure';
+                } else {
+                  return () => true;
+                }
+              })
               .map((item) => (
                 <Option key={item.key} value={item.key}>
                   {item.name}

@@ -123,6 +123,7 @@ export const HistoryData: React.FC<AssetRow> = (props) => {
             onSuccess={() => setVisible(false)}
             onCancel={() => setVisible(false)}
             assetId={props.id}
+            isFlangeProload={!!props.attributes?.sub_type}
           />
         )}
       </Row>
