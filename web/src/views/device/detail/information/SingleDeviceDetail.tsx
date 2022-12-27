@@ -122,19 +122,18 @@ export const SingleDeviceDetail: React.FC<{ device: Device; upgradeStatus: any }
           </Col>
         </Row>
       </Col>
-      <Col span={isMobile ? 12 : 9}>
-        <Row>
-          {' '}
-          <Col span={isMobile ? 24 : 8} className='ts-detail-label'>
-            电池电压(mV)
-          </Col>
-          <Col span={isMobile ? 24 : 16} className='ts-detail-content'>
-            {device.state && device.typeId !== DeviceType.Gateway
-              ? device.state.batteryVoltage
-              : '-'}
-          </Col>
-        </Row>
-      </Col>
+      {device.state && device.typeId !== DeviceType.Gateway && (
+        <Col span={isMobile ? 12 : 9}>
+          <Row>
+            <Col span={isMobile ? 24 : 8} className='ts-detail-label'>
+              电池电压(mV)
+            </Col>
+            <Col span={isMobile ? 24 : 16} className='ts-detail-content'>
+              {device.state ? device.state.batteryVoltage : '-'}
+            </Col>
+          </Row>
+        </Col>
+      )}
       <Col span={isMobile ? 12 : 9}>
         <Row>
           <Col span={isMobile ? 24 : 8} className='ts-detail-label'>
