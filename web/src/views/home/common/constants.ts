@@ -111,7 +111,20 @@ export const measurementTypes: Record<
       DeviceType.VibrationTemperature3AxisAdvanced,
       DeviceType.VibrationTemperature3AxisAdvancedNB,
       DeviceType.VibrationTemperature3AxisNB
-    ]
+    ],
+    dynamicData: {
+      serverDatatype: 'raw',
+      title: '波形数据',
+      fields: [
+        { label: '加速度时域', value: 'accelerationTimeDomain', unit: 'm/s²' },
+        { label: '加速度频域', value: 'accelerationFrequencyDomain', unit: 'm/s²' },
+        { label: '速度时域', value: 'velocityTimeDomain', unit: 'mm/s' },
+        { label: '速度频域', value: 'velocityFrequencyDomain', unit: 'mm/s' },
+        { label: '位移时域', value: 'displacementTimeDomain', unit: 'μm' },
+        { label: '位移频域', value: 'displacementFrequencyDomain', unit: 'μm' }
+      ],
+      metaData: []
+    }
   },
   angleDip: {
     id: 10501,

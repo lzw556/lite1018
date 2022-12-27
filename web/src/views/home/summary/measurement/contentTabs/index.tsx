@@ -8,6 +8,8 @@ import { HistoryData } from './historyData';
 import { Monitor } from './monitor';
 import { MeasurementSettings } from './settings';
 import * as AppConfig from '../../../../../config';
+import { measurementTypes } from '../../../common/constants';
+import { WaveDataVibration } from './waveDataVibration';
 
 export const MeasurementContents: React.FC<MeasurementRow & { onUpdate?: () => void }> = (
   measurement
@@ -23,9 +25,12 @@ export const MeasurementContents: React.FC<MeasurementRow & { onUpdate?: () => v
       tabList.push({
         key: 'dynamicData',
         tab: measurementType.dynamicData.title,
-        content: (
-          <DynamicData {...measurement} dataType={measurementType.dynamicData.serverDatatype} />
-        )
+        content:
+          measurementType.id === measurementTypes.vibration.id ? (
+            <WaveDataVibration {...measurement} />
+          ) : (
+            <DynamicData {...measurement} dataType={measurementType.dynamicData.serverDatatype} />
+          )
       });
     }
     if (measurementType && measurementType.waveData) {

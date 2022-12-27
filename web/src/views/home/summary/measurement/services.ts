@@ -54,6 +54,19 @@ export function getDynamicData<T>(id: Measurement['id'], timestamp: number, data
     .then(GetResponse);
 }
 
+export function getDynamicDataVibration<T>(
+  id: Measurement['id'],
+  timestamp: number,
+  dataType: DataType,
+  filter: { field: string; axis: number }
+) {
+  return request
+    .get<{ timestamp: number; values: T }>(
+      `/monitoringPoints/${id}/data/${timestamp}?type=${dataType}&calculate=${filter.field}&dimension=${filter.axis}`
+    )
+    .then(GetResponse);
+}
+
 export function getPropertiesByMeasurementType(type: number) {
   return request
     .get<Property[]>(`/properties?type=monitoring_point&monitoring_point_type=${type}`)
