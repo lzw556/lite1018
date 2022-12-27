@@ -19,6 +19,7 @@ import { isMobile } from '../../../../utils/deviceDetection';
 import ShadowCard from '../../../../components/shadowCard';
 import { EditFormPayload } from '../../common/useActionBarStatus';
 import * as AppConfig from '../../../../config';
+import { measurementTypes } from '../../common/constants';
 
 export const MeasurementOfFlangeList: React.FC<{
   flange?: AssetRow;
@@ -48,14 +49,7 @@ export const MeasurementOfFlangeList: React.FC<{
         key: 'name',
         width: isMobile ? 300 : 400,
         render: (name: string, row: MeasurementRow) => (
-          <Link
-            to={combineFinalUrl(
-              pathname,
-              search,
-              AppConfig.use(window.assetCategory).measurementTypes.preload.url,
-              row.id
-            )}
-          >
+          <Link to={combineFinalUrl(pathname, search, measurementTypes.preload.url, row.id)}>
             {name}
           </Link>
         )

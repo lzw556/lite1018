@@ -17,6 +17,7 @@ import HasPermission from '../../../../permission';
 import { isMobile } from '../../../../utils/deviceDetection';
 import { EditFormPayload } from '../../common/useActionBarStatus';
 import * as AppConfig from '../../../../config';
+import { measurementTypes } from '../../common/constants';
 
 export const MeasurementOfAssetList: React.FC<{
   asset?: AssetRow;
@@ -35,14 +36,7 @@ export const MeasurementOfAssetList: React.FC<{
         key: 'name',
         width: isMobile ? 300 : 400,
         render: (name: string, row: MeasurementRow) => (
-          <Link
-            to={combineFinalUrl(
-              pathname,
-              search,
-              AppConfig.use(window.assetCategory).measurementTypes.preload.url,
-              row.id
-            )}
-          >
+          <Link to={combineFinalUrl(pathname, search, measurementTypes.preload.url, row.id)}>
             {name}
           </Link>
         )

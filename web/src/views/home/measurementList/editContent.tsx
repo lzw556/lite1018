@@ -14,6 +14,7 @@ export const EditContent: React.FC<{ form: any; asset?: AssetRow; doUpdating?: b
   const [types, setTypes] = React.useState(AppConfig.use(window.assetCategory).sensorTypes);
   const [parents, setParents] = React.useState<AssetRow[]>([]);
   const [disabled, setDisabled] = React.useState(true);
+  const measurementTypes = AppConfig.getMeasurementTypes(window.assetCategory);
   const configWind = AppConfig.use('wind');
   const parentId = asset && asset.type !== configWind.assetType.id ? asset.id : undefined;
   const parentLabel =
@@ -42,9 +43,7 @@ export const EditContent: React.FC<{ form: any; asset?: AssetRow; doUpdating?: b
           placeholder='请选择类型'
           onChange={(e) => {
             if (!doUpdating) {
-              const type = Object.values(AppConfig.use(window.assetCategory).measurementTypes).find(
-                (type) => type.id === e
-              );
+              const type = measurementTypes.find((type) => type.id === e);
               if (type) {
                 setTypes(type.deviceType);
                 if (form.getFieldValue('device_id')) {
@@ -56,7 +55,7 @@ export const EditContent: React.FC<{ form: any; asset?: AssetRow; doUpdating?: b
           }}
           disabled={doUpdating}
         >
-          {Object.values(AppConfig.use(window.assetCategory).measurementTypes)
+          {measurementTypes
             .filter((type) => !type.hidden)
             .map(({ id, label }) => (
               <Select.Option key={id} value={id}>

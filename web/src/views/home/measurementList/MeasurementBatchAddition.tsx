@@ -22,6 +22,7 @@ export const MeasurementBatchAddition: React.FC<
   const { payload, onSuccess } = props;
   const asset = payload?.asset;
   const [parents, setParents] = React.useState<AssetRow[]>([]);
+  const measurementTypes = AppConfig.getMeasurementTypes(window.assetCategory);
   const configWind = AppConfig.use('wind');
   const parentId = asset && asset.type !== configWind.assetType.id ? asset.id : undefined;
   const [form] = Form.useForm<MeasurementBatch>();
@@ -165,7 +166,7 @@ export const MeasurementBatchAddition: React.FC<
                     rules={[{ required: true, message: `请选择类型` }]}
                   >
                     <Select placeholder='请选择类型'>
-                      {Object.values(AppConfig.use(window.assetCategory).measurementTypes)
+                      {measurementTypes
                         .filter((type) => !type.hidden)
                         .map(({ id, label }) => (
                           <Select.Option key={id} value={id}>

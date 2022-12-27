@@ -10,6 +10,7 @@ import { Menu as MenuPro } from '../../../types/menu';
 import { Node } from '../common/treeDataHelper';
 import { AssetRow } from '../assetList/props';
 import * as AppConfig from '../../../config';
+import { measurementTypes } from '../common/constants';
 
 type BreadcrumbItemData = Node & { type?: number };
 export const AssetNavigator: React.FC<
@@ -140,7 +141,7 @@ export const AssetNavigator: React.FC<
         AppConfig.use('wind').assetType,
         AppConfig.use('wind').assetType.secondAsset
       ]),
-      ...Object.values(AppConfig.use(window.assetCategory).measurementTypes)
+      ...Object.values(measurementTypes)
     ];
     const assetType = types.find((_type) => _type?.id === asset.type);
     return assetType

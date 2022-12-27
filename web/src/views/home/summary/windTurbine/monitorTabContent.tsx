@@ -5,6 +5,7 @@ import ShadowCard from '../../../../components/shadowCard';
 import * as AppConfig from '../../../../config';
 import { AssetRow } from '../../assetList/props';
 import { sortFlangesByAttributes } from '../../assetList/util';
+import { measurementTypes } from '../../common/constants';
 import { generateChartOptionsOfLastestData } from '../../common/historyDataHelper';
 import { getAssetStatistics } from '../../common/statisticsHelper';
 import { combineFinalUrl, generateColProps } from '../../common/utils';
@@ -38,7 +39,7 @@ export const MonitorTabContent: React.FC<{
                     combineFinalUrl(
                       pathname,
                       search,
-                      AppConfig.use(window.assetCategory).measurementTypes.preload.url,
+                      measurementTypes.preload.url,
                       item.monitoringPoints[index].id
                     )
                   );

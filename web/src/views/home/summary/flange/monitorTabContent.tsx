@@ -15,6 +15,7 @@ import { ChartContainer } from '../../components/charts/chartContainer';
 import { MeasurementRow } from '../measurement/props';
 import { getData } from '../measurement/services';
 import * as AppConfig from '../../../../config';
+import { measurementTypes } from '../../common/constants';
 
 export const MonitorTabContent: React.FC<{
   measurements: MeasurementRow[];
@@ -82,9 +83,7 @@ export const MonitorTabContent: React.FC<{
       </ShadowCard>
     );
 
-  const measurementType = Object.values(AppConfig.use(window.assetCategory).measurementTypes).find(
-    (type) => type.id === measurements[0].type
-  );
+  const measurementType = AppConfig.getMeasurementType(measurements[0].type);
   if (!measurementType) return null;
   return (
     <Col span={24}>
@@ -103,7 +102,7 @@ export const MonitorTabContent: React.FC<{
                     combineFinalUrl(
                       pathname,
                       search,
-                      AppConfig.use(window.assetCategory).measurementTypes.preload.url,
+                      measurementTypes.preload.url,
                       measurements[index].id
                     )
                   );

@@ -20,6 +20,7 @@ export const BasicSetting: React.FC<MeasurementRow & { onUpdate?: () => void }> 
   const [form] = Form.useForm<Measurement & { device_id: number }>();
   const [parents, setParents] = React.useState<AssetRow[]>([]);
   const [store] = useStore('measurementListFilters');
+  const measurementTypes = AppConfig.getMeasurementTypes(window.assetCategory);
 
   React.useEffect(() => {
     const assetType = appConfig.assetType.secondAsset?.id
@@ -38,9 +39,7 @@ export const BasicSetting: React.FC<MeasurementRow & { onUpdate?: () => void }> 
     form.resetFields();
     const values = convertRow(props);
     if (values) {
-      const type = Object.values(AppConfig.use(window.assetCategory).measurementTypes).find(
-        (type) => type.id === values.type
-      );
+      const type = AppConfig.getMeasurementType(values.type);
       if (type) setTypes(type.deviceType);
       form.setFieldsValue(values);
     }
@@ -58,13 +57,11 @@ export const BasicSetting: React.FC<MeasurementRow & { onUpdate?: () => void }> 
           </Form.Item>
           <Form.Item label='类型' name='type' rules={[{ required: true, message: `请选择类型` }]}>
             <Select placeholder='请选择类型' disabled={!!id}>
-              {Object.values(AppConfig.use(window.assetCategory).measurementTypes).map(
-                ({ id, label }) => (
-                  <Select.Option key={id} value={id}>
-                    {label}
-                  </Select.Option>
-                )
-              )}
+              {measurementTypes.map(({ id, label }) => (
+                <Select.Option key={id} value={id}>
+                  {label}
+                </Select.Option>
+              ))}
             </Select>
           </Form.Item>
           {/* TODO */}

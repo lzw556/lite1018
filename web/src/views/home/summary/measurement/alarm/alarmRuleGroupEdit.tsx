@@ -16,6 +16,7 @@ const AlarmRuleGroupEdit = () => {
   const [form] = Form.useForm();
   const [rule, setRule] = React.useState<AlarmRule>();
   const [smallSize, setSmallSize] = React.useState(window.innerWidth < 1300);
+  const measurementTypes = AppConfig.getMeasurementTypes(window.assetCategory);
 
   React.useEffect(() => {
     window.addEventListener('resize', (e) => setSmallSize(window.innerWidth < 1300));
@@ -47,13 +48,13 @@ const AlarmRuleGroupEdit = () => {
             rules={[{ required: true, message: '请选择监测点类型' }]}
           >
             <Select disabled={true} style={{ width: isMobile ? '75%' : 435 }}>
-              {Object.values(AppConfig.use(window.assetCategory).measurementTypes).map(
-                ({ label, id }) => (
+              {measurementTypes
+                .filter((type) => !type.hidden)
+                .map(({ label, id }) => (
                   <Select.Option key={id} value={id}>
                     {label}
                   </Select.Option>
-                )
-              )}
+                ))}
             </Select>
           </Form.Item>
           <Form.Item label='名称' name='name'>

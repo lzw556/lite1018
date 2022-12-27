@@ -1,6 +1,7 @@
 import moment from 'moment';
 import * as AppConfig from '../../../config';
 import { MeasurementRow } from '../summary/measurement/props';
+import { measurementTypes } from './constants';
 
 export function generateColProps({
   xs,
@@ -68,11 +69,7 @@ export function verifyAssetOverview(search: string) {
   ) {
     return true;
   }
-  if (
-    Object.values(AppConfig.use(window.assetCategory).measurementTypes).find(
-      (type) => search.indexOf(type.url) > -1
-    )
-  ) {
+  if (Object.values(measurementTypes).find((type) => search.indexOf(type.url) > -1)) {
     return true;
   }
   return false;
@@ -80,7 +77,5 @@ export function verifyAssetOverview(search: string) {
 
 export function getRealPoints(measurements?: MeasurementRow[]) {
   if (!measurements) return [];
-  return measurements.filter(
-    (point) => point.type !== AppConfig.use('wind').measurementTypes.flangePreload.id
-  );
+  return measurements.filter((point) => point.type !== measurementTypes.flangePreload.id);
 }

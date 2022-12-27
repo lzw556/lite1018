@@ -43,7 +43,7 @@ const AlarmRuleList = () => {
       key: 'type',
       width: 120,
       render: (typeId: number) => {
-        const type = Object.values(appConfig.measurementTypes).find(({ id }) => id === typeId);
+        const type = AppConfig.getMeasurementType(typeId);
         return type ? type.label : '-';
       }
     }

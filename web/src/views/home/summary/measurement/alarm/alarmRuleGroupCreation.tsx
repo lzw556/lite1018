@@ -21,6 +21,7 @@ const AlarmRuleGroupCreation = () => {
   const [metric, setMetric] = React.useState<{ key: string; name: string; unit: string }[]>([]);
   const [disabled, setDisabled] = React.useState(true);
   const [smallSize, setSmallSize] = React.useState(window.innerWidth < 1300);
+  const measurementTypes = AppConfig.getMeasurementTypes(window.assetCategory);
 
   React.useEffect(() => {
     window.addEventListener('resize', (e) => setSmallSize(window.innerWidth < 1300));
@@ -45,9 +46,7 @@ const AlarmRuleGroupCreation = () => {
               style={{ width: isMobile ? '75%' : 435 }}
               onChange={(e) => {
                 getPropertiesByMeasurementType(e).then((res) => {
-                  const measurementType = Object.values(
-                    AppConfig.use(window.assetCategory).measurementTypes
-                  ).find(({ id }) => e === id);
+                  const measurementType = measurementTypes.find(({ id }) => e === id);
                   if (measurementType) {
                     setDisabled(false);
                     setProperties(
@@ -66,13 +65,13 @@ const AlarmRuleGroupCreation = () => {
                 }
               }}
             >
-              {Object.values(AppConfig.use(window.assetCategory).measurementTypes).map(
-                ({ label, id }) => (
+              {measurementTypes
+                .filter((type) => !type.hidden)
+                .map(({ label, id }) => (
                   <Select.Option key={id} value={id}>
                     {label}
                   </Select.Option>
-                )
-              )}
+                ))}
             </Select>
           </Form.Item>
           <Form.Item label='名称' name='name' rules={[Rules.range(4, 16)]}>

@@ -20,6 +20,7 @@ import { AssetRow } from './props';
 import { deleteAsset } from './services';
 import { sortFlangesByAttributes } from './util';
 import * as AppConfig from '../../../config';
+import { measurementTypes } from '../common/constants';
 
 export const AssetTree: React.FC<{
   assets: AssetRow[];
@@ -127,7 +128,7 @@ export const AssetTree: React.FC<{
         if (selectedNode?.type < 10000) {
           if (assetType) subpath = assetType.url;
         } else {
-          subpath = AppConfig.use(window.assetCategory).measurementTypes.preload.url;
+          subpath = measurementTypes.angleDip.url;
         }
         const isNonRoot = rootId === undefined || selectedNode?.id !== rootId;
         return (

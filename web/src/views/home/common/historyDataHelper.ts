@@ -11,8 +11,8 @@ import {
   getAlarmLevelColor,
   getAlarmStateText
 } from './statisticsHelper';
-import * as AppConfig from '../../../config';
 import { FlangeStatusData } from '../summary/flange/FlangeStatus';
+import { measurementTypes } from './constants';
 
 export type HistoryData = {
   timestamp: number;
@@ -42,9 +42,7 @@ export function generateChartOptionsOfLastestData(
   angleAxis.push(actuals.angleAxis);
   const max = getMax(actuals.max, attributes, measurements[0].type);
   const min =
-    measurements[0].type === AppConfig.use(window.assetCategory).measurementTypes.loosening_angle.id
-      ? -(max * 1.5)
-      : actuals.min || -1;
+    measurements[0].type === measurementTypes.loosening_angle.id ? -(max * 1.5) : actuals.min || -1;
   radiusAxis.push({ ...actuals.radiusAxis, max, min });
   series.push(actuals.series);
 
@@ -55,7 +53,7 @@ export function generateChartOptionsOfLastestData(
     field = firstClassFields[0];
   }
   if (
-    measurements[0].type === AppConfig.use(window.assetCategory).measurementTypes.preload.id &&
+    measurements[0].type === measurementTypes.preload.id &&
     checkValidAttr(attributes, 'normal', min)
   ) {
     const seriesName = `额定值 ${attributes?.normal?.value}${field?.unit}`;
@@ -65,8 +63,7 @@ export function generateChartOptionsOfLastestData(
   }
 
   if (
-    measurements[0].type ===
-      AppConfig.use(window.assetCategory).measurementTypes.loosening_angle.id &&
+    measurements[0].type === measurementTypes.loosening_angle.id &&
     checkValidAttr(attributes, 'initial', min)
   ) {
     const seriesName = `初始值 ${attributes?.initial?.value}${field?.unit}`;
@@ -133,14 +130,11 @@ function checkValidAttr(
 
 function getMax(max: number, attributes: AssetRow['attributes'], type: number) {
   let final = max;
-  if (
-    type === AppConfig.use(window.assetCategory).measurementTypes.preload.id &&
-    checkValidAttr(attributes, 'normal', final, true)
-  ) {
+  if (type === measurementTypes.preload.id && checkValidAttr(attributes, 'normal', final, true)) {
     final = Math.abs(attributes?.normal?.value as number);
   }
   if (
-    type === AppConfig.use(window.assetCategory).measurementTypes.loosening_angle.id &&
+    type === measurementTypes.loosening_angle.id &&
     checkValidAttr(attributes, 'initial', final, true)
   ) {
     final = Math.abs(attributes?.initial?.value as number);
@@ -204,7 +198,7 @@ export function generateChartOptionsOfHistoryData(
     },
     xAxis: { type: 'time' },
     yAxis:
-      measurementType === AppConfig.use(window.assetCategory).measurementTypes.preload.id
+      measurementType === measurementTypes.preload.id
         ? { type: 'value' }
         : {
             type: 'value',
@@ -496,9 +490,7 @@ function roundValue(value: number, precision?: number) {
 }
 
 export function getKeysOfFirstClassFields(measurementType: number) {
-  const type = Object.values(AppConfig.use(window.assetCategory).measurementTypes).find(
-    (type) => type.id === measurementType
-  );
+  const type = Object.values(measurementTypes).find((type) => type.id === measurementType);
   return type ? type.firstClassFieldKeys : [];
 }
 
@@ -578,7 +570,7 @@ export function generateLastestFlangeStatusChartOptions(
   if (!points || points.length === 0) return null;
   const series: any = [];
   const reals = points
-    .filter((point) => point.type !== AppConfig.use('wind').measurementTypes.flangePreload.id)
+    .filter((point) => point.type !== measurementTypes.flangePreload.id)
     .filter((point) => !!point.data);
   if (reals.length > 0) {
     series.push({
@@ -592,7 +584,7 @@ export function generateLastestFlangeStatusChartOptions(
   }
 
   const fakes = points
-    .filter((point) => point.type === AppConfig.use('wind').measurementTypes.flangePreload.id)
+    .filter((point) => point.type === measurementTypes.flangePreload.id)
     .filter((point) => !!point.data);
   if (fakes.length > 0) {
     series.push({
