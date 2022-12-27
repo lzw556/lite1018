@@ -55,18 +55,29 @@ export const MeasurementBindBase: React.FC<
 
   function getTreedata(assets: AssetRow[], ruleTypeId: number) {
     const processNodeFn = (node: any) => {
-      if (node.children && node.children.length > 0) {
+      const points = node.monitoringPoints
+        ? node.monitoringPoints.filter((point: any) => point.type === ruleTypeId)
+        : node.monitoringPoints;
+      if (node.children && node.children.length > 0 && points && points.length > 0) {
+        return {
+          ...node,
+          children: [
+            ...node.children,
+            ...node.monitoringPoints.filter((point: any) => point.type === ruleTypeId)
+          ]
+        };
+      } else if (node.children && node.children.length > 0) {
         return {
           ...node,
           children: sortFlangesByAttributes(node.children as AssetRow[]),
           disableCheckbox: node.children.every((point: any) => point.type !== ruleTypeId)
         };
-      } else if (node.monitoringPoints && node.monitoringPoints.length > 0) {
+      } else if (points && points.length > 0) {
         return {
           ...node,
-          children: sortMeasurementsByAttributes(node.monitoringPoints),
+          children: sortMeasurementsByAttributes(points),
           monitoringPoints: [],
-          disableCheckbox: node.monitoringPoints.every((point: any) => point.type !== ruleTypeId)
+          disableCheckbox: points.every((point: any) => point.type !== ruleTypeId)
         };
       } else {
         const disableCheckbox = node.type !== ruleTypeId;
@@ -76,15 +87,6 @@ export const MeasurementBindBase: React.FC<
     if (assets.length > 0) {
       const copy = cloneDeep(assets);
       const treedata = copy
-        .map((node) =>
-          mapTreeNode(node, (node) => {
-            if (node.children && node.monitoringPoints) {
-              return { ...node, children: [...node.children, ...node.monitoringPoints] };
-            } else {
-              return node;
-            }
-          })
-        )
         .map((node: any) => mapTreeNode(node, processNodeFn))
         .map((node) =>
           mapTreeNode(node, (node) => ({
