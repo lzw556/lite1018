@@ -1,4 +1,4 @@
-import { Button, Form, Input, Modal } from 'antd';
+import { Button, Form, Input, Modal, Select } from 'antd';
 import { defaultValidateMessages, Rules } from '../../../constants/validator';
 import { DeviceType } from '../../../types/device_type';
 import { Property } from '../../../types/property';
@@ -14,11 +14,12 @@ const EditCalibrateParas = ({
   properties: Property[];
   visible: boolean;
   setVisible: React.Dispatch<React.SetStateAction<boolean>>;
-  onUpdate: (val: { param: number }) => void;
+  onUpdate: (val: { param: number; channel?: number }) => void;
 }) => {
   const [form] = Form.useForm();
   const typeParaMapping = new Map();
   typeParaMapping.set(DeviceType.BoltElongation, 'preload');
+  typeParaMapping.set(DeviceType.BoltElongationMultiChannels, 'preload');
   typeParaMapping.set(DeviceType.NormalTemperatureCorrosion, 'thickness');
   typeParaMapping.set(DeviceType.HighTemperatureCorrosion, 'thickness');
   typeParaMapping.set(DeviceType.PressureTemperature, 'pressure');
@@ -30,7 +31,7 @@ const EditCalibrateParas = ({
       onUpdate({ param });
     } else {
       form.validateFields().then((values) => {
-        onUpdate({ param: Number(values.param) });
+        onUpdate({ param: Number(values.param), channel: Number(values.channel) });
       });
     }
   }
@@ -65,6 +66,27 @@ const EditCalibrateParas = ({
           <Form.Item label={`${property.name}`} name='param' rules={[Rules.number]}>
             <Input placeholder={`请输入${property.name}`} suffix={`${property.unit}`} />
           </Form.Item>
+          {typeId === DeviceType.BoltElongationMultiChannels && (
+            <Form.Item
+              label='通道号'
+              name='channel'
+              rules={[{ required: true, message: `请选择通道号` }]}
+              initialValue={1}
+            >
+              <Select>
+                {[
+                  { label: '1', value: 1 },
+                  { label: '2', value: 2 },
+                  { label: '3', value: 3 },
+                  { label: '4', value: 4 }
+                ].map(({ label, value }) => (
+                  <Select.Option key={value} value={value}>
+                    {label}
+                  </Select.Option>
+                ))}
+              </Select>
+            </Form.Item>
+          )}
         </Form>
       </Modal>
     );

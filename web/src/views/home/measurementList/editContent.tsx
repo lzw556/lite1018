@@ -5,6 +5,7 @@ import { Rules } from '../../../constants/validator';
 import { AssetRow } from '../assetList/props';
 import { getAssets } from '../assetList/services';
 import * as AppConfig from '../../../config';
+import { DeviceType } from '../../../types/device_type';
 
 export const EditContent: React.FC<{ form: any; asset?: AssetRow; doUpdating?: boolean }> = ({
   asset,
@@ -20,6 +21,7 @@ export const EditContent: React.FC<{ form: any; asset?: AssetRow; doUpdating?: b
   const parentLabel =
     AppConfig.use(window.assetCategory).assetType.secondAsset?.label ||
     AppConfig.use(window.assetCategory).assetType.label;
+  const [deviceTypeId, setDeviceTypeId] = React.useState<number | undefined>();
 
   React.useEffect(() => {
     const configWind = AppConfig.use('wind');
@@ -69,8 +71,33 @@ export const EditContent: React.FC<{ form: any; asset?: AssetRow; doUpdating?: b
         name='device_id'
         rules={[{ required: true, message: `请选择传感器` }]}
       >
-        <DeviceSelect filters={{ types: types.join(',') }} disabled={disabled && !doUpdating} />
+        <DeviceSelect
+          filters={{ types: types.join(',') }}
+          disabled={disabled && !doUpdating}
+          onTypeChange={(type) => setDeviceTypeId(type)}
+        />
       </Form.Item>
+      {deviceTypeId === DeviceType.BoltElongationMultiChannels && (
+        <Form.Item
+          label='通道号'
+          name='channel'
+          rules={[{ required: true, message: `请选择通道号` }]}
+          initialValue={1}
+        >
+          <Select>
+            {[
+              { label: '1', value: 1 },
+              { label: '2', value: 2 },
+              { label: '3', value: 3 },
+              { label: '4', value: 4 }
+            ].map(({ label, value }) => (
+              <Select.Option key={value} value={value}>
+                {label}
+              </Select.Option>
+            ))}
+          </Select>
+        </Form.Item>
+      )}
       <Form.Item
         label={parentLabel}
         name='asset_id'

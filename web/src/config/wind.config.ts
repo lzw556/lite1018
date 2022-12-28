@@ -7,7 +7,8 @@ export enum DeviceType {
   Gateway = 1,
   Router = 257,
   BoltLoosening = 131073,
-  BoltElongation = 196609
+  BoltElongation = 196609,
+  BoltElongationMultiChannels = 196611
 }
 
 export const devTypes: { val: number; name: string }[] = Object.values(DeviceType)
@@ -17,7 +18,11 @@ export const devTypes: { val: number; name: string }[] = Object.values(DeviceTyp
     name: DeviceTypeOld.DeviceType.toString(Number(val))
   }));
 
-export const sensorTypes = [DeviceType.BoltLoosening, DeviceType.BoltElongation];
+export const sensorTypes = [
+  DeviceType.BoltLoosening,
+  DeviceType.BoltElongation,
+  DeviceType.BoltElongationMultiChannels
+];
 
 export const site = {
   name: '风电螺栓监测系统'

@@ -3,6 +3,7 @@ export enum DeviceType {
   Router = 257,
   BoltLoosening = 131073,
   BoltElongation = 196609,
+  BoltElongationMultiChannels = 196611,
   NormalTemperatureCorrosion = 262145,
   HighTemperatureCorrosion = 262401,
   VibrationTemperature3Axis = 327938,
@@ -24,6 +25,8 @@ export namespace DeviceType {
         return '中继器';
       case DeviceType.BoltElongation:
         return '螺栓预紧力';
+      case DeviceType.BoltElongationMultiChannels:
+        return '多通道螺栓预紧力';
       case DeviceType.BoltLoosening:
         return '螺栓松动';
       case DeviceType.HighTemperatureCorrosion:
@@ -55,6 +58,7 @@ export namespace DeviceType {
     return [
       DeviceType.BoltLoosening,
       DeviceType.BoltElongation,
+      DeviceType.BoltElongationMultiChannels,
       DeviceType.NormalTemperatureCorrosion,
       DeviceType.HighTemperatureCorrosion,
       DeviceType.VibrationTemperature3Axis,

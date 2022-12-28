@@ -15,6 +15,7 @@ import DownloadModal from './modal/downloadModal';
 import { isMobile } from '../../../../utils/deviceDetection';
 import { RangeDatePicker } from '../../../../components/rangeDatePicker';
 import { getSpecificProperties } from '../../util';
+import { DeviceType } from '../../../../types/device_type';
 
 const { Option } = Select;
 
@@ -23,17 +24,23 @@ export interface DeviceDataProps {
 }
 
 const HistoryDataPage: FC<DeviceDataProps> = ({ device }) => {
-  const [property, setProperty] = useState<any>(device.properties[0]);
+  const [property, setProperty] = useState<any>(
+    device.properties.filter((pro) => pro.key !== 'channel')[0]
+  );
   const [range, setRange] = useState<[number, number]>();
   const [dataSource, setDataSource] = useState<any>();
   const [downloadVisible, setDownloadVisible] = useState<boolean>(false);
+  const isMultiChannels = device.typeId === DeviceType.BoltElongationMultiChannels;
+  const [channel, setChannel] = useState('1');
 
   const fetchDeviceData = useCallback(() => {
     if (range) {
       const [from, to] = range;
-      FindDeviceDataRequest(device.id, from, to, {}).then(setDataSource);
+      FindDeviceDataRequest(device.id, from, to, isMultiChannels ? { channel } : {}).then(
+        setDataSource
+      );
     }
-  }, [range]);
+  }, [device.id, range, channel, isMultiChannels]);
 
   useEffect(() => {
     fetchDeviceData();
@@ -127,6 +134,26 @@ const HistoryDataPage: FC<DeviceDataProps> = ({ device }) => {
           <Row justify='end'>
             <Col span={24} style={{ textAlign: 'right' }}>
               <Space style={{ textAlign: 'center' }} wrap={true}>
+                {isMultiChannels && (
+                  <Label name='当前通道号'>
+                    <Select
+                      onChange={(val) => setChannel(val)}
+                      defaultValue={channel}
+                      bordered={false}
+                    >
+                      {[
+                        { label: '1', key: 1 },
+                        { label: '2', key: 2 },
+                        { label: '3', key: 3 },
+                        { label: '4', key: 4 }
+                      ].map(({ label, key }) => (
+                        <Select.Option value={key} key={key}>
+                          {label}
+                        </Select.Option>
+                      ))}
+                    </Select>
+                  </Label>
+                )}
                 <Label name={'属性'}>
                   <Select
                     bordered={false}
@@ -138,7 +165,10 @@ const HistoryDataPage: FC<DeviceDataProps> = ({ device }) => {
                     }}
                   >
                     {device
-                      ? getSpecificProperties(device.properties, device.typeId).map((item) => (
+                      ? getSpecificProperties(
+                          device.properties.filter((pro) => pro.key !== 'channel'),
+                          device.typeId
+                        ).map((item) => (
                           <Option key={item.key} value={item.key}>
                             {item.name}
                           </Option>

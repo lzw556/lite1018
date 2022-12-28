@@ -7,6 +7,7 @@ export type Measurement = {
   asset_id: number;
   device_id?: number;
   attributes?: { index: number };
+  channel?: number;
 };
 
 export type Property = {

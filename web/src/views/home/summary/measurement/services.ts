@@ -162,7 +162,7 @@ export function addMeasurements(data: {
     name: string;
     type: number;
     attributes?: { index: number };
-    device_binding: { device_id: number };
+    device_binding: { device_id: number; process_id?: number; parameters?: { channel: number } };
   }[];
 }) {
   return request.post<any>(`monitoringPoints/batch`, data).then(PostResponse);

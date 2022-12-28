@@ -13,6 +13,7 @@ import { DeviceSetting } from '../../../types/device_setting';
 import DeviceSettingFormItem from '../../../components/formItems/deviceSettingFormItem';
 import { isMobile } from '../../../utils/deviceDetection';
 import { DeviceType } from '../../../types/device_type';
+import { DeviceSettingContent } from '../DeviceSettingContent';
 
 const AddDevicePage = () => {
   const [deviceSettings, setDeviceSettings] = useState<DeviceSetting[]>();
@@ -34,7 +35,7 @@ const AddDevicePage = () => {
   };
 
   const renderNetwork = () => {
-    if (!DeviceType.isNB(deviceType)) {
+    if (!DeviceType.isNB(deviceType) && deviceType !== DeviceType.BoltElongationMultiChannels) {
       return (
         <>
           <Form.Item label={'所属网络'} name={'network'} rules={[Rules.required]}>
@@ -125,10 +126,13 @@ const AddDevicePage = () => {
                         />
                       </Form.Item>
                       {deviceType && renderNetwork()}
-                      {deviceSettings?.map((item) => (
-                        <DeviceSettingFormItem value={item} editable={true} />
-                      ))}
+                      {deviceType && deviceType !== DeviceType.BoltElongationMultiChannels && (
+                        <DeviceSettingContent settings={deviceSettings} deviceType={deviceType} />
+                      )}
                     </fieldset>
+                    {deviceType && deviceType === DeviceType.BoltElongationMultiChannels && (
+                      <DeviceSettingContent settings={deviceSettings} deviceType={deviceType} />
+                    )}
                   </Form>
                 </Col>
                 <Col span={isMobile ? 24 : 20} style={{ textAlign: 'right' }}>

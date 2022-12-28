@@ -5,7 +5,14 @@ import { GetDevicesRequest } from '../../../apis/device';
 import { Device } from '../../../types/device';
 import * as AppConfig from '../../../config';
 
-export type MeasurementInfo = { place: string; name: string; dev_id: number; dev_name: string };
+export type MeasurementInfo = {
+  place: string;
+  name: string;
+  dev_id: number;
+  dev_name: string;
+  dev_type: number;
+  channel?: number;
+};
 
 export const DeviceSelection: React.FC<{
   onSelect: (selected: MeasurementInfo[]) => void;
@@ -31,7 +38,8 @@ export const DeviceSelection: React.FC<{
                   dev_id: id,
                   dev_name: device ? device.name : id.toString(),
                   place: '',
-                  name: ''
+                  name: '',
+                  dev_type: device ? device.typeId : 0
                 };
               })
             );

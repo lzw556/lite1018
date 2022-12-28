@@ -97,7 +97,16 @@ const DevicePage = () => {
   };
 
   const onCommand = (device: Device, key: any) => {
-    switch (Number(key)) {
+    let commandKey = Number(key);
+    let channel = undefined;
+    if (Number.isNaN(commandKey)) {
+      try {
+        const commands: [number, number] = JSON.parse(key);
+        commandKey = commands[0];
+        channel = commands[1];
+      } catch (error) {}
+    }
+    switch (commandKey) {
       case DeviceCommand.Upgrade:
         setDevice(device);
         setUpgradeVisible(true);
@@ -117,7 +126,7 @@ const DevicePage = () => {
         break;
       default:
         setExecuteDevice(device);
-        SendDeviceCommandRequest(device.id, key, {}).then((res) => {
+        SendDeviceCommandRequest(device.id, commandKey, channel ? { channel } : {}).then((res) => {
           setExecuteDevice(undefined);
           if (res.code === 200) {
             message.success('命令发送成功').then();
@@ -137,6 +146,7 @@ const DevicePage = () => {
         onClick={(e) => {
           onCommand(record, e.key);
         }}
+        mode='vertical'
       >
         {hasPermission(Permission.DeviceCommand) && (
           <>
@@ -152,17 +162,51 @@ const DevicePage = () => {
                 采集数据
               </Menu.Item>
             )}
-            {record.typeId !== DeviceType.Gateway && record.typeId !== DeviceType.Router && (
-              <Menu.Item key={DeviceCommand.ResetData} disabled={!disabled} hidden={isUpgrading}>
-                重置数据
-              </Menu.Item>
-            )}
+            {record.typeId !== DeviceType.Gateway &&
+              record.typeId !== DeviceType.Router &&
+              (record.typeId === DeviceType.BoltElongationMultiChannels ? (
+                <Menu.SubMenu title='重置数据'>
+                  <Menu.Item
+                    key={`[${DeviceCommand.ResetData},1]`}
+                    disabled={!disabled}
+                    hidden={isUpgrading}
+                  >
+                    1
+                  </Menu.Item>
+                  <Menu.Item
+                    key={`[${DeviceCommand.ResetData},2]`}
+                    disabled={!disabled}
+                    hidden={isUpgrading}
+                  >
+                    2
+                  </Menu.Item>
+                  <Menu.Item
+                    key={`[${DeviceCommand.ResetData},3]`}
+                    disabled={!disabled}
+                    hidden={isUpgrading}
+                  >
+                    3
+                  </Menu.Item>
+                  <Menu.Item
+                    key={`[${DeviceCommand.ResetData},4]`}
+                    disabled={!disabled}
+                    hidden={isUpgrading}
+                  >
+                    4
+                  </Menu.Item>
+                </Menu.SubMenu>
+              ) : (
+                <Menu.Item key={DeviceCommand.ResetData} disabled={!disabled} hidden={isUpgrading}>
+                  重置数据
+                </Menu.Item>
+              ))}
             <Menu.Item key={DeviceCommand.Reset} disabled={!disabled} hidden={isUpgrading}>
               恢复出厂设置
             </Menu.Item>
             {(record.typeId === DeviceType.HighTemperatureCorrosion ||
               record.typeId === DeviceType.NormalTemperatureCorrosion ||
               record.typeId === DeviceType.BoltElongation ||
+              record.typeId === DeviceType.BoltElongationMultiChannels ||
               record.typeId === DeviceType.PressureTemperature) && (
               <Menu.Item key={DeviceCommand.Calibrate} disabled={!disabled} hidden={isUpgrading}>
                 校准
@@ -279,7 +323,9 @@ const DevicePage = () => {
         if (device.typeId === DeviceType.Gateway || device.typeId === DeviceType.Router) return '-';
         const data = getValueOfFirstClassProperty(device);
         if (data && data.length > 0) {
-          return data.map(({ name, value }) => `${name}:${value}`).join(', ');
+          const channel = device.data?.values?.channel;
+          const channelText = channel ? `(通道${channel})` : '';
+          return data.map(({ name, value }) => `${name}:${value}`).join(', ') + channelText;
         }
         return '暂无数据';
       }

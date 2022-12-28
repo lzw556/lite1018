@@ -45,7 +45,13 @@ export const MeasurementEdit: React.FC<
                       name: values.name,
                       type: values.type,
                       attributes: values.attributes,
-                      device_binding: { device_id: values.device_id }
+                      device_binding: values.channel
+                        ? {
+                            device_id: values.device_id,
+                            process_id: 2,
+                            parameters: { channel: values.channel }
+                          }
+                        : { device_id: values.device_id }
                     }
                   ]
                 }).then(() => {

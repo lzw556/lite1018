@@ -51,7 +51,7 @@ export const measurementTypes: Record<
     label: '预紧力',
     url: '/bolt',
     firstClassFieldKeys: ['preload', 'pressure', 'tof', 'temperature'],
-    deviceType: [DeviceType.BoltElongation],
+    deviceType: [DeviceType.BoltElongation, DeviceType.BoltElongationMultiChannels],
     dynamicData: {
       serverDatatype: 'raw',
       title: '动态数据',

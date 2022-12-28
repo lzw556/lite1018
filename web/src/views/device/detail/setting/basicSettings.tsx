@@ -27,7 +27,10 @@ export const BasicSettings: React.FC<BasicSettingsProps> = ({ device, onUpdate }
   }, [form, device]);
 
   const renderNetworkFormItem = () => {
-    if (DeviceType.isNB(device.typeId)) {
+    if (
+      DeviceType.isNB(device.typeId) ||
+      device.typeId === DeviceType.BoltElongationMultiChannels
+    ) {
       return <></>;
     }
     return (

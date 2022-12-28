@@ -7,6 +7,7 @@ import '../../string-extension';
 export interface DeviceSelectProps extends SelectProps<any> {
   filters?: any;
   dispalyField?: keyof Pick<Device, 'id' | 'macAddress'>;
+  onTypeChange?: (type: number | undefined) => void;
 }
 
 const { Option } = Select;
@@ -20,7 +21,13 @@ const DeviceSelect: FC<DeviceSelectProps> = (props) => {
   }, [filters]);
 
   return (
-    <Select {...props}>
+    <Select
+      {...props}
+      onChange={(value, option) => {
+        props.onChange?.(value, option);
+        props.onTypeChange?.(devices.find((device) => device.id === value)?.typeId);
+      }}
+    >
       {devices.map((device) => (
         <Option key={device.id} value={device[dispalyField]}>
           <Typography.Text strong>{device.name}</Typography.Text>

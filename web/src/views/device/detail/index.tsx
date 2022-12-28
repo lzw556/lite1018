@@ -160,7 +160,16 @@ const DeviceDetailPage = () => {
 
   const onCommand = ({ key }: any) => {
     if (device) {
-      switch (Number(key)) {
+      let commandKey = Number(key);
+      let channel = undefined;
+      if (Number.isNaN(commandKey)) {
+        try {
+          const commands: [number, number] = JSON.parse(key);
+          commandKey = commands[0];
+          channel = commands[1];
+        } catch (error) {}
+      }
+      switch (commandKey) {
         case DeviceCommand.Upgrade:
           setDevice(device);
           setUpgradeVisible(true);
@@ -179,13 +188,15 @@ const DeviceDetailPage = () => {
           setVisibleCalibrate(true);
           break;
         default:
-          SendDeviceCommandRequest(device.id, key, {}).then((res) => {
-            if (res.code === 200) {
-              message.success('发送成功').then();
-            } else {
-              message.error('发送失败').then();
+          SendDeviceCommandRequest(device.id, commandKey, channel ? { channel } : {}).then(
+            (res) => {
+              if (res.code === 200) {
+                message.success('发送成功').then();
+              } else {
+                message.error('发送失败').then();
+              }
             }
-          });
+          );
           break;
       }
     }
@@ -208,9 +219,43 @@ const DeviceDetailPage = () => {
             >
               采集数据
             </Menu.Item>
-            <Menu.Item key={DeviceCommand.ResetData} disabled={!isOnline} hidden={isUpgrading}>
-              重置数据
-            </Menu.Item>
+
+            {device.typeId === DeviceType.BoltElongationMultiChannels ? (
+              <Menu.SubMenu title='重置数据'>
+                <Menu.Item
+                  key={`[${DeviceCommand.ResetData},1]`}
+                  disabled={!isOnline}
+                  hidden={isUpgrading}
+                >
+                  1
+                </Menu.Item>
+                <Menu.Item
+                  key={`[${DeviceCommand.ResetData},2]`}
+                  disabled={!isOnline}
+                  hidden={isUpgrading}
+                >
+                  2
+                </Menu.Item>
+                <Menu.Item
+                  key={`[${DeviceCommand.ResetData},3]`}
+                  disabled={!isOnline}
+                  hidden={isUpgrading}
+                >
+                  3
+                </Menu.Item>
+                <Menu.Item
+                  key={`[${DeviceCommand.ResetData},4]`}
+                  disabled={!isOnline}
+                  hidden={isUpgrading}
+                >
+                  4
+                </Menu.Item>
+              </Menu.SubMenu>
+            ) : (
+              <Menu.Item key={DeviceCommand.ResetData} disabled={!isOnline} hidden={isUpgrading}>
+                重置数据
+              </Menu.Item>
+            )}
           </>
         )}
         <Menu.Item key={DeviceCommand.Reset} disabled={!isOnline} hidden={isUpgrading}>
@@ -220,6 +265,7 @@ const DeviceDetailPage = () => {
           (device.typeId === DeviceType.HighTemperatureCorrosion ||
             device.typeId === DeviceType.NormalTemperatureCorrosion ||
             device.typeId === DeviceType.BoltElongation ||
+            device.typeId === DeviceType.BoltElongationMultiChannels ||
             device.typeId === DeviceType.PressureTemperature) && (
             <Menu.Item key={DeviceCommand.Calibrate} disabled={!isOnline} hidden={isUpgrading}>
               校准

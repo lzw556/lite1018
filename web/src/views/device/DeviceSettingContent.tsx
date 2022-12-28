@@ -11,7 +11,10 @@ export const DeviceSettingContent: React.FC<{
   settings?: DeviceSetting[];
 }> = ({ deviceType, settings }) => {
   if (deviceType !== DeviceType.Router && settings) {
-    if (deviceType === DeviceType.BoltElongation) {
+    if (
+      deviceType === DeviceType.BoltElongation ||
+      deviceType === DeviceType.BoltElongationMultiChannels
+    ) {
       let groups: DeviceSetting['group'][] = [];
       settings.forEach((setting) => {
         if (
@@ -49,5 +52,5 @@ export const DeviceSettingContent: React.FC<{
       );
     }
   }
-  return <EmptyLayout description={'暂无配置信息'} />;
+  return null;
 };

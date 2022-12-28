@@ -67,6 +67,10 @@ export const FIRST_CLASS_PROPERTIES = [
   { typeId: DeviceType.BoltLoosening, properties: ['loosening_angle', 'attitude', 'motion'] },
   { typeId: DeviceType.BoltElongation, properties: ['preload', 'pressure', 'temperature'] },
   {
+    typeId: DeviceType.BoltElongationMultiChannels,
+    properties: ['preload', 'pressure', 'temperature']
+  },
+  {
     typeId: DeviceType.VibrationTemperature3Axis,
     properties: ['vibration_severity_y', 'enveloping_pk2pk_y', 'temperature']
   },

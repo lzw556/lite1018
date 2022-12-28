@@ -8,6 +8,7 @@ import { EditFormPayload } from '../common/useActionBarStatus';
 import { addMeasurements } from '../summary/measurement/services';
 import * as AppConfig from '../../../config';
 import { DeviceSelection, MeasurementInfo } from './DeviceSelection';
+import { DeviceType } from '../../../types/device_type';
 
 export type MeasurementBatch = {
   asset_id: number;
@@ -45,11 +46,12 @@ export const MeasurementBatchAddition: React.FC<
     if (selected.length > 0) {
       const inputs = form.getFieldsValue();
       const points: MeasurementInfo[] = inputs.monitoring_points;
-      let values: MeasurementInfo[] = selected.map(({ dev_name, dev_id, place }) => ({
+      let values: MeasurementInfo[] = selected.map(({ dev_name, dev_id, place, dev_type }) => ({
         name: dev_name,
         place,
         dev_id,
-        dev_name
+        dev_name,
+        dev_type
       }));
       if (points && points.length > 0) {
         values = selected.map(({ dev_id, dev_name }, index) => {
@@ -93,13 +95,29 @@ export const MeasurementBatchAddition: React.FC<
             try {
               addMeasurements({
                 monitoring_points: values.monitoring_points.map(
-                  ({ dev_id, place, name, type }) => ({
-                    name,
-                    type,
-                    attributes: { index: Number(place) },
-                    device_binding: { device_id: dev_id },
-                    asset_id: values.asset_id
-                  })
+                  ({ dev_id, place, name, type, channel }) => {
+                    if (channel !== undefined) {
+                      return {
+                        name,
+                        type,
+                        attributes: { index: Number(place) },
+                        device_binding: {
+                          device_id: dev_id,
+                          process_id: 2,
+                          parameters: { channel }
+                        },
+                        asset_id: values.asset_id
+                      };
+                    } else {
+                      return {
+                        name,
+                        type,
+                        attributes: { index: Number(place) },
+                        device_binding: { device_id: dev_id },
+                        asset_id: values.asset_id
+                      };
+                    }
+                  }
                 )
               }).then(() => {
                 onSuccess();
@@ -160,6 +178,28 @@ export const MeasurementBatchAddition: React.FC<
                   >
                     <Input placeholder={`请填写监测点名称`} />
                   </Form.Item>
+                  {form.getFieldValue('monitoring_points')[name].dev_type ===
+                    DeviceType.BoltElongationMultiChannels && (
+                    <Form.Item
+                      label='通道号'
+                      name={[name, 'channel']}
+                      rules={[{ required: true, message: `请选择通道号` }]}
+                      initialValue={1}
+                    >
+                      <Select>
+                        {[
+                          { label: '1', value: 1 },
+                          { label: '2', value: 2 },
+                          { label: '3', value: 3 },
+                          { label: '4', value: 4 }
+                        ].map(({ label, value }) => (
+                          <Select.Option key={value} value={value}>
+                            {label}
+                          </Select.Option>
+                        ))}
+                      </Select>
+                    </Form.Item>
+                  )}
                   <Form.Item
                     label='类型'
                     name={[name, 'type']}

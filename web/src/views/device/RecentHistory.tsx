@@ -1,4 +1,4 @@
-import { Card, Col, Empty, Row, Typography } from 'antd';
+import { Card, Col, Empty, Row, Select, Space } from 'antd';
 import * as React from 'react';
 import moment from 'moment';
 import ReactECharts from 'echarts-for-react';
@@ -7,19 +7,26 @@ import { DefaultMonitorDataOption, LineChartStyles } from '../../constants/chart
 import { Device } from '../../types/device';
 import { isMobile } from '../../utils/deviceDetection';
 import { getSpecificProperties } from './util';
+import { DeviceType } from '../../types/device_type';
+import Label from '../../components/label';
 
 export const RecentHistory: React.FC<{ device: Device }> = ({ device }) => {
+  const isMultiChannels = device.typeId === DeviceType.BoltElongationMultiChannels;
   const [historyOptions, setHistoryOptions] = React.useState<any>();
+  const [channel, setChannel] = React.useState('1');
 
   React.useEffect(() => {
     FindDeviceDataRequest(
       device.id,
       moment().startOf('day').subtract(13, 'd').utc().unix(),
       moment().endOf('day').utc().unix(),
-      {}
+      isMultiChannels ? { channel } : {}
     ).then((data) => {
       setHistoryOptions(
-        getSpecificProperties(device.properties, device.typeId).map((property: any) => {
+        getSpecificProperties(
+          device.properties.filter((pro) => pro.key !== 'channel'),
+          device.typeId
+        ).map((property: any) => {
           const fields = new Map<string, number[]>();
           const times: any[] = [];
           data
@@ -48,7 +55,9 @@ export const RecentHistory: React.FC<{ device: Device }> = ({ device }) => {
               type: 'line',
               data: fields.get(field.name)
             });
-            const value = device.data?.values[field.key];
+            const datas = fields.get(field.name);
+            const value =
+              datas && datas.length > 0 ? datas[datas.length - 1] : device.data?.values[field.key];
             if (value) {
               subText += `${field.name} ${value.toFixed(property.precision)} `;
             }
@@ -83,7 +92,7 @@ export const RecentHistory: React.FC<{ device: Device }> = ({ device }) => {
         })
       );
     });
-  }, [device]);
+  }, [device, channel, isMultiChannels]);
 
   const renderDeviceHistoryDataChart = () => {
     if (historyOptions && historyOptions.length) {
@@ -120,7 +129,35 @@ export const RecentHistory: React.FC<{ device: Device }> = ({ device }) => {
   return (
     <Row justify={'start'}>
       <Col span={24}>
-        <Card bordered={false}>{renderDeviceHistoryDataChart()}</Card>
+        <Card
+          bordered={false}
+          title={
+            isMultiChannels && (
+              <Space>
+                <Label name='当前通道号'>
+                  <Select
+                    onChange={(val) => setChannel(val)}
+                    defaultValue={channel}
+                    bordered={false}
+                  >
+                    {[
+                      { label: '1', key: 1 },
+                      { label: '2', key: 2 },
+                      { label: '3', key: 3 },
+                      { label: '4', key: 4 }
+                    ].map(({ label, key }) => (
+                      <Select.Option value={key} key={key}>
+                        {label}
+                      </Select.Option>
+                    ))}
+                  </Select>
+                </Label>
+              </Space>
+            )
+          }
+        >
+          {renderDeviceHistoryDataChart()}
+        </Card>
       </Col>
     </Row>
   );
