@@ -49,7 +49,7 @@ export const WaveDataVibration: React.FC<MeasurementRow> = (props) => {
   }, [props.id, timestamp, field, axis]);
 
   React.useEffect(() => {
-    if (dynamicData !== undefined) {
+    if (dynamicData !== undefined && dynamicData.values) {
       const data = dynamicData.values;
       const legends = ['X轴', 'Y轴', 'Z轴'];
       let series: any[] = [
