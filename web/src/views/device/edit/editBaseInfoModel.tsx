@@ -58,20 +58,18 @@ const EditBaseInfoModel = (props: any) => {
         >
           <Input placeholder={'请输入设备MAC地址'} />
         </Form.Item>
-        <Form.Item
-          label={'所属网络'}
-          name={'network'}
-          rules={[Rules.required]}
-          hidden={device && (device.parent === '' || device.parent === device.macAddress)}
-        >
-          <NetworkSelect
-            placeholder={'请选择设备所属网络'}
-            onChange={(value) => {
-              setNetwork(value);
-              form.resetFields(['parent']);
-            }}
-          />
-        </Form.Item>
+
+        {device && device.parent !== '' && device.parent !== device.macAddress && (
+          <Form.Item label={'所属网络'} name={'network'} rules={[Rules.required]}>
+            <NetworkSelect
+              placeholder={'请选择设备所属网络'}
+              onChange={(value) => {
+                setNetwork(value);
+                form.resetFields(['parent']);
+              }}
+            />
+          </Form.Item>
+        )}
         {device && device.parent !== '' && device.parent !== device.macAddress && (
           <Form.Item label={'设备父节点'} name={'parent'}>
             <DeviceSelect
