@@ -23,9 +23,7 @@ export const HistoryData: React.FC<AssetRow> = (props) => {
   const [measurements, setMeasurements] = React.useState<MeasurementRow[]>([]);
   const [historyOptions, setHistoryOptions] = React.useState<any>();
   const [range, setRange] = React.useState<[number, number]>();
-  const [property, setProperty] = React.useState(
-    measurements.length > 0 ? measurements[0].properties[0].key : undefined
-  );
+  const [property, setProperty] = React.useState<string | undefined>();
   const [historyDatas, setHistoryDatas] = React.useState<
     { name: string; data: HistoryDatas; index: number }[]
   >([]);
@@ -45,6 +43,9 @@ export const HistoryData: React.FC<AssetRow> = (props) => {
             setHistoryDatas((prev) => [...prev, { name, data, index: attributes?.index ?? 0 }]);
         });
       });
+      if (measurements[0].properties && measurements[0].properties.length > 0) {
+        setProperty(measurements[0].properties[0].key);
+      }
     }
   }, [measurements, range]);
 
@@ -77,25 +78,27 @@ export const HistoryData: React.FC<AssetRow> = (props) => {
             <Col></Col>
             <Col>
               <Space direction={isMobile ? 'vertical' : 'horizontal'}>
-                <Label name={'属性'}>
-                  <Select
-                    bordered={false}
-                    defaultValue={property}
-                    placeholder={'请选择属性'}
-                    style={{ width: isMobile ? '100%' : '120px' }}
-                    onChange={(value: string) => {
-                      setProperty(value);
-                    }}
-                  >
-                    {getSpecificProperties(measurements[0].properties, measurements[0].type).map(
-                      ({ name, key }) => (
-                        <Select.Option key={key} value={key}>
-                          {name}
-                        </Select.Option>
-                      )
-                    )}
-                  </Select>
-                </Label>
+                {property && (
+                  <Label name={'属性'}>
+                    <Select
+                      bordered={false}
+                      defaultValue={property}
+                      placeholder={'请选择属性'}
+                      style={{ width: isMobile ? '100%' : '120px' }}
+                      onChange={(value: string) => {
+                        setProperty(value);
+                      }}
+                    >
+                      {getSpecificProperties(measurements[0].properties, measurements[0].type).map(
+                        ({ name, key }) => (
+                          <Select.Option key={key} value={key}>
+                            {name}
+                          </Select.Option>
+                        )
+                      )}
+                    </Select>
+                  </Label>
+                )}
                 <RangeDatePicker onChange={handleChange} showFooter={true} />
                 {props.attributes?.sub_type && (
                   <HasPermission value={Permission.AssetDataDownload}>
