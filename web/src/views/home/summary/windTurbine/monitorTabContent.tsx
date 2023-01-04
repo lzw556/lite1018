@@ -8,7 +8,7 @@ import { sortFlangesByAttributes } from '../../assetList/util';
 import { measurementTypes } from '../../common/constants';
 import { generateChartOptionsOfLastestData } from '../../common/historyDataHelper';
 import { getAssetStatistics } from '../../common/statisticsHelper';
-import { combineFinalUrl, generateColProps } from '../../common/utils';
+import { combineFinalUrl, generateColProps, getRealPoints } from '../../common/utils';
 import { Introduction, IntroductionPage } from '../../components/introductionPage';
 import { FlangeIcon } from '../flange/icon';
 import { MeasurementRow } from '../measurement/props';
@@ -27,28 +27,27 @@ export const MonitorTabContent: React.FC<{
       flanges.push(
         ...sortFlangesByAttributes(children).map((item) => {
           let chart: any = null;
-          if (item.monitoringPoints && item.monitoringPoints.length > 0) {
+          const points = getRealPoints(item.monitoringPoints);
+          if (points.length > 0) {
             chart = {
               title: '',
-              options: generateChartOptionsOfLastestData(item.monitoringPoints, item.attributes),
+              options: generateChartOptionsOfLastestData(points, item.attributes),
               style: { left: '-24px', top: '-20px', height: 450 },
               clickHandler: (paras: any) => {
                 const index = paras.value[1];
-                if (item.monitoringPoints && item.monitoringPoints.length > index) {
+                if (points.length > index) {
                   history.replace(
                     combineFinalUrl(
                       pathname,
                       search,
                       measurementTypes.preload.url,
-                      item.monitoringPoints[index].id
+                      points[index].id
                     )
                   );
                 }
               }
             };
-            measurements.push(
-              ...item.monitoringPoints.map((point) => ({ ...point, assetName: item.name }))
-            );
+            measurements.push(...points.map((point) => ({ ...point, assetName: item.name })));
           }
           const { alarmState, statistics } = getAssetStatistics(
             item.statistics,
