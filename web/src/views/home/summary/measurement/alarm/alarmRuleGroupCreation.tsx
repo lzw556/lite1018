@@ -13,6 +13,7 @@ import {
   getSpecificProperties,
   removeDulpicateProperties
 } from '../../../common/historyDataHelper';
+import './style.css';
 
 const AlarmRuleGroupCreation = () => {
   const history = useHistory();
@@ -108,6 +109,7 @@ const AlarmRuleGroupCreation = () => {
                             <Cascader
                               disabled={disabled}
                               style={{ width: 100 }}
+                              popupClassName='alarm-rule-creation-cascader'
                               onChange={(e, selectOptions) => {
                                 if (e !== undefined) {
                                   const property = properties.find(({ key }) => key === e[0]);
