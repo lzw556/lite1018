@@ -130,7 +130,7 @@ export const AssetTree: React.FC<{
         } else {
           subpath = measurementTypes.angleDip.url;
         }
-        const isNonRoot = rootId === undefined || selectedNode?.id !== rootId;
+        const isRoot = selectedNode?.id === rootId && selectedNode?.type < 10000;
         return (
           <Space>
             {name}
@@ -155,7 +155,7 @@ export const AssetTree: React.FC<{
                       }}
                     />
                   </Button>
-                  {isNonRoot && (
+                  {!isRoot && (
                     <HasPermission value={Permission.AssetDelete}>
                       <Popconfirm
                         title={`确定要删除${name}吗?`}
@@ -196,7 +196,7 @@ export const AssetTree: React.FC<{
                     </Button>
                   )}
                 </HasPermission>
-                {isNonRoot && (
+                {!isRoot && (
                   <Link to={combineFinalUrl(pathname, search, subpath, selectedNode?.id)}>
                     <Button type='text' size='small'>
                       <ArrowRightOutlined />
