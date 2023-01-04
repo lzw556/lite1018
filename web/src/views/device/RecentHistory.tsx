@@ -68,6 +68,7 @@ export const RecentHistory: React.FC<{ device: Device }> = ({ device }) => {
           const title = `${property.name}` + (property.unit ? `(${property.unit})` : '');
           return {
             ...DefaultMonitorDataOption,
+            grid: { bottom: 20, left: 50 },
             tooltip: {
               trigger: 'axis',
               formatter: function (params: any) {
@@ -85,7 +86,7 @@ export const RecentHistory: React.FC<{ device: Device }> = ({ device }) => {
             xAxis: {
               type: 'category',
               boundaryGap: false,
-              axisLabel: { show: false },
+              axisLabel: { align: 'left' },
               data: times.map((item: any) => item.format('YYYY-MM-DD HH:mm:ss'))
             }
           };
