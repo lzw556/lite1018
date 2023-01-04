@@ -180,7 +180,7 @@ export function generateChartOptionsOfHistoryData(
       type: 'line',
       name,
       data: _data,
-      showSymbol: false
+      showSymbol: _data.length === 1
     };
   });
 
