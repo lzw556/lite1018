@@ -86,7 +86,24 @@ export const RecentHistory: React.FC<{ device: Device }> = ({ device }) => {
             xAxis: {
               type: 'category',
               boundaryGap: false,
-              axisLabel: { align: 'left' },
+              axisLabel: {
+                align: 'left',
+                showMaxLabel: true,
+                formatter: (val: string, index: number) => {
+                  if (index === 0) {
+                    return val;
+                  } else if (index === times.length - 1) {
+                    return `{end| ${val}}`;
+                  }
+                  return '';
+                },
+                rich: {
+                  end: {
+                    align: 'left',
+                    padding: [0, 0, 0, -130]
+                  }
+                }
+              },
               data: times.map((item: any) => item.format('YYYY-MM-DD HH:mm:ss'))
             }
           };
