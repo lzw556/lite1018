@@ -221,7 +221,7 @@ const DeviceDetailPage = () => {
             </Menu.Item>
 
             {device.typeId === DeviceType.BoltElongationMultiChannels ? (
-              <Menu.SubMenu title='重置数据'>
+              <Menu.SubMenu title='重置数据' disabled={!isOnline}>
                 <Menu.Item
                   key={`[${DeviceCommand.ResetData},1]`}
                   disabled={!isOnline}
