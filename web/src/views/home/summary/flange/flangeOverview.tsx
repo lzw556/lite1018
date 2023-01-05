@@ -146,7 +146,7 @@ const FlangeOverview: React.FC = () => {
                 actions={[
                   <Button
                     type='primary'
-                    onClick={() => actionStatus.handleMeasurementEdit({ asset })}
+                    onClick={() => actionStatus.handleAddMeasurements({ asset })}
                   >
                     添加监测点
                     <PlusOutlined />

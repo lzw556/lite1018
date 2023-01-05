@@ -124,7 +124,7 @@ const WindTurbineOverview: React.FC = () => {
                 </Button>,
                 <Button
                   type='primary'
-                  onClick={() => actionStatus.handleMeasurementEdit({ asset })}
+                  onClick={() => actionStatus.handleAddMeasurements({ asset })}
                   disabled={!asset.children || asset.children.length === 0}
                 >
                   添加监测点

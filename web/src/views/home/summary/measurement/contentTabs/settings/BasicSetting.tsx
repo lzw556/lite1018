@@ -1,4 +1,4 @@
-import { Button, Col, Form, Input, Row, Select } from 'antd';
+import { Button, Col, Form, Input, InputNumber, Row, Select } from 'antd';
 import React from 'react';
 import DeviceSelect from '../../../../../../components/select/deviceSelect';
 import * as AppConfig from '../../../../../../config';
@@ -88,14 +88,26 @@ export const BasicSetting: React.FC<MeasurementRow & { onUpdate?: () => void }> 
               ))}
             </Select>
           </Form.Item>
-          <Form.Item label='序号' name={['attributes', 'index']} initialValue={1}>
-            <Select placeholder='请选择序号'>
-              {[1, 2, 3, 4, 5, 6, 7, 8].map((item) => (
-                <Select.Option key={item} value={item}>
-                  {item}
-                </Select.Option>
-              ))}
-            </Select>
+          <Form.Item
+            label='位置'
+            name={['attributes', 'index']}
+            initialValue={1}
+            rules={[
+              { required: true },
+              { type: 'integer', min: 1, message: '请填写整数(不能小于1)' }
+            ]}
+          >
+            {window.assetCategory === 'wind' ? (
+              <InputNumber placeholder={'请填写位置'} controls={false} style={{ width: '100%' }} />
+            ) : (
+              <Select placeholder='请选择序号'>
+                {[1, 2, 3, 4, 5, 6, 7, 8].map((item) => (
+                  <Select.Option key={item} value={item}>
+                    {item}
+                  </Select.Option>
+                ))}
+              </Select>
+            )}
           </Form.Item>
           <Form.Item style={{ textAlign: 'right' }}>
             <Button

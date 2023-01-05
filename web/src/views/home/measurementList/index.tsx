@@ -133,7 +133,7 @@ const MeasurementManagement: React.FC = () => {
               </Button>,
               <Button
                 type='primary'
-                onClick={() => actionStatus.handleMeasurementEdit()}
+                onClick={() => actionStatus.handleAddMeasurements()}
                 disabled={
                   assets.items.filter((asset) => asset.children && asset.children.length > 0)
                     .length === 0
