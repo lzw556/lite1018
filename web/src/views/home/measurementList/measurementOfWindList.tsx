@@ -67,17 +67,7 @@ export const MeasurementOfWindList: React.FC<{
         width: 120,
         render: (level: number) => {
           const alarmState = convertAlarmLevelToState(level);
-          return (
-            <Tag
-              // style={{
-              //   border: `solid 1px ${getAlarmLevelColor(alarmState)}`,
-              //   color: getAlarmLevelColor(alarmState)
-              // }}
-              color={getAlarmLevelColor(alarmState)}
-            >
-              {getAlarmStateText(alarmState)}
-            </Tag>
-          );
+          return <Tag color={getAlarmLevelColor(alarmState)}>{getAlarmStateText(alarmState)}</Tag>;
         }
       },
       {
