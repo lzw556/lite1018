@@ -100,7 +100,7 @@ export const HistoryData: React.FC<AssetRow> = (props) => {
                   </Label>
                 )}
                 <RangeDatePicker onChange={handleChange} showFooter={true} />
-                {props.attributes?.sub_type && (
+                {props.attributes?.sub_type === 1 && (
                   <HasPermission value={Permission.AssetDataDownload}>
                     <Button
                       type='primary'
