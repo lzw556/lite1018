@@ -12,7 +12,7 @@ const UnauthorizedPage = () => {
           <Button
             type='default'
             onClick={() => {
-              window.location.hash = '/dashboard';
+              window.location.hash = '/';
             }}
           >
             返回首页

@@ -1,12 +1,4 @@
-import {
-  AddAlarmRule,
-  AddAlarmRuleTemplate,
-  DeviceDetail,
-  Login,
-  NotFound,
-  ServerError,
-  Unauthorized
-} from '../views';
+import { DeviceDetail, Login, NotFound, ServerError, Unauthorized } from '../views';
 import { Menu } from '../types/menu';
 
 const AppRoutes = [
