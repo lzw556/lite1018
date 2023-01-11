@@ -22,7 +22,7 @@ const AddNetworkModal: FC<AddNetworkModalProps> = (props) => {
     if (visible) {
       form.resetFields();
     }
-    setProvisionMode(visible ? NetworkProvisioningMode.Mode1 : undefined);
+    setProvisionMode(visible ? NetworkProvisioningMode.Mode2 : undefined);
   }, [visible, form, setProvisionMode]);
 
   useEffect(() => {
