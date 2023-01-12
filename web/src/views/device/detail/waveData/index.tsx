@@ -169,6 +169,9 @@ const WaveDataChart: React.FC<{ device: Device }> = ({ device }) => {
       let option: any = { ...defaultChartOption };
       if (deviceData) {
         const data = deviceData.values;
+        if (data === undefined || data.values === undefined) {
+          return <EmptyLayout description='数据不足' />;
+        }
         const legends = ['X轴', 'Y轴', 'Z轴'];
         let series: any[] = [
           {
