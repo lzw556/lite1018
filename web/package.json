@@ -53,7 +53,8 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "deploy:wind": "cd build && scp -r ./ root@172.16.7.134:/home/workspace/cloud-lite-web",
-    "deploy:basic": "cd build && scp -r ./ root@172.16.7.134:/home/workspace/cloud-lite-web3"
+    "deploy:basic": "cd build && scp -r ./ root@172.16.7.134:/home/workspace/cloud-lite-web3",
+    "prepare": "cd .. && husky install"
   },
   "eslintConfig": {
     "extends": [
@@ -78,6 +79,11 @@
   },
   "devDependencies": {
     "@types/react-router-dom": "^5.1.8",
+    "husky": "^8.0.3",
+    "lint-staged": "^13.1.0",
     "prettier": "^2.7.1"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx,css,json}": "npx prettier --write"
   }
 }
