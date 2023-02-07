@@ -81,7 +81,7 @@ export const MeasurementEdit: React.FC<
       }}
     >
       <Form form={form} labelCol={{ span: 4 }} validateMessages={defaultValidateMessages}>
-        <EditContent asset={asset} form={form} />
+        <EditContent asset={asset} form={form} doUpdating={doUpdating} />
       </Form>
     </Modal>
   );
