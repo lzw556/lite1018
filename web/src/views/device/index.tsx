@@ -164,7 +164,7 @@ const DevicePage = () => {
             )}
             {record.typeId !== DeviceType.Gateway &&
               record.typeId !== DeviceType.Router &&
-              (record.typeId === DeviceType.BoltElongationMultiChannels ? (
+              (record.typeId === DeviceType.BoltElongationMultiChannels && !isUpgrading ? (
                 <Menu.SubMenu title='重置数据' disabled={!disabled}>
                   <Menu.Item
                     key={`[${DeviceCommand.ResetData},1]`}
