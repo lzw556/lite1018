@@ -12,7 +12,7 @@ export const SingleDeviceDetail: React.FC<{ device: Device; upgradeStatus: any }
   device,
   upgradeStatus
 }) => {
-  const render = () => {
+  const render = (isGateway: boolean) => {
     if (device.information.iccid_4g) {
       return (
         <Col span={isMobile ? 12 : 9}>
@@ -26,7 +26,7 @@ export const SingleDeviceDetail: React.FC<{ device: Device; upgradeStatus: any }
           </Row>
         </Col>
       );
-    } else {
+    } else if (device.information.ip_address) {
       return (
         <Col span={isMobile ? 12 : 9}>
           <Row>
@@ -37,13 +37,15 @@ export const SingleDeviceDetail: React.FC<{ device: Device; upgradeStatus: any }
               {device.information.ip_address ? (
                 <Space>
                   {device.information.ip_address}{' '}
-                  <a
-                    href={`http://${device.information.ip_address}`}
-                    target={'_blank'}
-                    style={{ fontSize: '10pt' }}
-                  >
-                    访问管理界面
-                  </a>
+                  {isGateway && (
+                    <a
+                      href={`http://${device.information.ip_address}`}
+                      target={'_blank'}
+                      style={{ fontSize: '10pt' }}
+                    >
+                      访问管理界面
+                    </a>
+                  )}
                 </Space>
               ) : (
                 '-'
@@ -112,16 +114,18 @@ export const SingleDeviceDetail: React.FC<{ device: Device; upgradeStatus: any }
           </Col>
         </Row>
       </Col>
-      <Col span={isMobile ? 12 : 9}>
-        <Row>
-          <Col span={isMobile ? 24 : 8} className='ts-detail-label'>
-            所属网络
-          </Col>
-          <Col span={isMobile ? 24 : 16} className='ts-detail-content'>
-            {device.network ? device.network.name : '无'}
-          </Col>
-        </Row>
-      </Col>
+      {device.state && device.typeId !== DeviceType.BoltElongationMultiChannels && (
+        <Col span={isMobile ? 12 : 9}>
+          <Row>
+            <Col span={isMobile ? 24 : 8} className='ts-detail-label'>
+              所属网络
+            </Col>
+            <Col span={isMobile ? 24 : 16} className='ts-detail-content'>
+              {device.network ? device.network.name : '无'}
+            </Col>
+          </Row>
+        </Col>
+      )}
       {device.state && device.typeId !== DeviceType.Gateway && (
         <Col span={isMobile ? 12 : 9}>
           <Row>
@@ -190,7 +194,7 @@ export const SingleDeviceDetail: React.FC<{ device: Device; upgradeStatus: any }
           </Row>
         </Col>
       )}
-      {device.typeId === DeviceType.Gateway && render()}
+      {render(device.typeId === DeviceType.Gateway)}
     </Row>
   );
 };
