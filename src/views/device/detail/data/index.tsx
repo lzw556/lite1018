@@ -16,7 +16,6 @@ import { isMobile } from '../../../../utils/deviceDetection';
 import { RangeDatePicker } from '../../../../components/rangeDatePicker';
 import { getSpecificProperties } from '../../util';
 import { DeviceType } from '../../../../types/device_type';
-import intl from 'react-intl-universal';
 
 const { Option } = Select;
 
@@ -70,10 +69,10 @@ const HistoryDataPage: FC<DeviceDataProps> = ({ device }) => {
       const legends: string[] = [];
       const series: any[] = [];
       Array.from(fields.keys()).forEach((key, index) => {
-        legends.push(intl.get(key));
+        legends.push(key);
         series.push({
           ...LineChartStyles[index],
-          name: intl.get(key),
+          name: key,
           type: 'line',
           data: fields.get(key)
         });
@@ -92,7 +91,7 @@ const HistoryDataPage: FC<DeviceDataProps> = ({ device }) => {
             return relVal;
           }
         },
-        title: { text: `${intl.get(property.name)}${property.unit ? `(${property.unit})` : ''}` },
+        title: { text: `${property.name}${property.unit ? `(${property.unit})` : ''}` },
         legend: { data: legends, left: isMobile ? 'right' : 'center' },
         series,
         xAxis: {
@@ -105,7 +104,7 @@ const HistoryDataPage: FC<DeviceDataProps> = ({ device }) => {
         <ReactECharts option={option} notMerge={true} style={{ height: `380px`, border: 'none' }} />
       );
     }
-    return <EmptyLayout description={intl.get('NO_DATA')} style={{ height: `400px` }} />;
+    return <EmptyLayout description={'暂无数据'} style={{ height: `400px` }} />;
   };
 
   const onRemoveDeviceData = () => {
@@ -113,14 +112,13 @@ const HistoryDataPage: FC<DeviceDataProps> = ({ device }) => {
       if (range) {
         const [from, to] = range;
         Modal.confirm({
-          title: intl.get('PROMPT'),
-          content: intl.get('DELETE_DEVICE_DATA_PROMPT', {
-            device: device.name,
-            start: moment.unix(from).local().format('YYYY-MM-DD'),
-            end: moment.unix(to).local().format('YYYY-MM-DD')
-          }),
-          okText: intl.get('OK'),
-          cancelText: intl.get('CANCEL'),
+          title: '提示',
+          content: `确定要删除设备${device.name}从${moment
+            .unix(from)
+            .local()
+            .format('YYYY-MM-DD')}到${moment.unix(to).local().format('YYYY-MM-DD')}的数据吗？`,
+          okText: '确定',
+          cancelText: '取消',
           onOk: (close) => {
             RemoveDeviceDataRequest(device.id, from, to).then((_) => close());
           }
@@ -137,7 +135,7 @@ const HistoryDataPage: FC<DeviceDataProps> = ({ device }) => {
             <Col span={24} style={{ textAlign: 'right' }}>
               <Space style={{ textAlign: 'center' }} wrap={true}>
                 {isMultiChannels && (
-                  <Label name={intl.get('CURRENT_CHANNEL')}>
+                  <Label name='当前通道号'>
                     <Select
                       onChange={(val) => setChannel(val)}
                       defaultValue={channel}
@@ -156,13 +154,11 @@ const HistoryDataPage: FC<DeviceDataProps> = ({ device }) => {
                     </Select>
                   </Label>
                 )}
-                <Label name={intl.get('PROPERTY')}>
+                <Label name={'属性'}>
                   <Select
                     bordered={false}
                     defaultValue={property.key}
-                    placeholder={intl.get('PLEASE_SELECT_SOMETHING', {
-                      something: intl.get('PROPERTY')
-                    })}
+                    placeholder={'请选择属性'}
                     style={{ width: '120px' }}
                     onChange={(value) => {
                       setProperty(device.properties.find((item: any) => item.key === value));
@@ -174,7 +170,7 @@ const HistoryDataPage: FC<DeviceDataProps> = ({ device }) => {
                           device.typeId
                         ).map((item) => (
                           <Option key={item.key} value={item.key}>
-                            {intl.get(item.name).d(item.name)}
+                            {item.name}
                           </Option>
                         ))
                       : null}

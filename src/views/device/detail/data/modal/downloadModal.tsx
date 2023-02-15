@@ -3,7 +3,6 @@ import { FC, useEffect, useState } from 'react';
 import { DownloadDeviceDataRequest } from '../../../../../apis/device';
 import moment from 'moment';
 import { Device } from '../../../../../types/device';
-import intl from 'react-intl-universal';
 
 const { RangePicker } = DatePicker;
 const { Option } = Select;
@@ -51,27 +50,23 @@ const DownloadModal: FC<DownloadModalProps> = (props) => {
   return (
     <Modal
       {...props}
-      width={430}
-      title={intl.get('DOWNLOAD_DATA')}
-      okText={intl.get('DOWNLOAD')}
+      width={390}
+      title={'数据下载'}
+      okText={'下载'}
       onOk={onDownload}
-      cancelText={intl.get('CANCEL')}
+      cancelText={'取消'}
     >
-      <Form form={form} labelCol={{ span: 8 }}>
-        <Form.Item label={intl.get('PROPERTY')} name={'properties'} required>
-          <Select
-            placeholder={intl.get('PLEASE_SELECT_DEVICE_PROPERTY')}
-            mode={'multiple'}
-            maxTagCount={2}
-          >
+      <Form form={form}>
+        <Form.Item label={'设备属性'} name={'properties'} required>
+          <Select placeholder={'请选择设备属性'} mode={'multiple'} maxTagCount={2}>
             {device.properties.map((item) => (
               <Option key={item.key} value={item.key}>
-                {intl.get(item.name)}
+                {item.name}
               </Option>
             ))}
           </Select>
         </Form.Item>
-        <Form.Item label={intl.get('DATE_RANGE')} required>
+        <Form.Item label={'时间范围'} required>
           <RangePicker
             allowClear={false}
             style={{ width: '252px' }}
