@@ -3,6 +3,7 @@ import { FC, useEffect, useState } from 'react';
 import { DownloadDeviceDataRequest } from '../../../../../apis/device';
 import moment from 'moment';
 import { Device } from '../../../../../types/device';
+import { getSpecificProperties } from '../../../util';
 
 const { RangePicker } = DatePicker;
 const { Option } = Select;
@@ -11,6 +12,7 @@ export interface DownloadModalProps extends ModalProps {
   device: Device;
   property?: any;
   onSuccess: () => void;
+  channel?: string;
 }
 
 const DownloadModal: FC<DownloadModalProps> = (props) => {
@@ -31,9 +33,15 @@ const DownloadModal: FC<DownloadModalProps> = (props) => {
 
   const onDownload = () => {
     form.validateFields(['properties']).then((values) => {
-      DownloadDeviceDataRequest(device.id, startDate.utc().unix(), endDate.utc().unix(), {
-        pids: JSON.stringify(values.properties)
-      }).then((res) => {
+      const pids = JSON.stringify(values.properties);
+      const channel = props.channel;
+      const filter = channel ? { pids, channel } : { pids };
+      DownloadDeviceDataRequest(
+        device.id,
+        startDate.utc().unix(),
+        endDate.utc().unix(),
+        filter
+      ).then((res) => {
         if (res.status === 200) {
           const url = window.URL.createObjectURL(new Blob([res.data]));
           const link = document.createElement('a');
@@ -59,7 +67,10 @@ const DownloadModal: FC<DownloadModalProps> = (props) => {
       <Form form={form}>
         <Form.Item label={'设备属性'} name={'properties'} required>
           <Select placeholder={'请选择设备属性'} mode={'multiple'} maxTagCount={2}>
-            {device.properties.map((item) => (
+            {getSpecificProperties(
+              device.properties.filter((pro) => pro.key !== 'channel'),
+              device.typeId
+            ).map((item) => (
               <Option key={item.key} value={item.key}>
                 {item.name}
               </Option>

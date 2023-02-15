@@ -218,6 +218,7 @@ const HistoryDataPage: FC<DeviceDataProps> = ({ device }) => {
           onSuccess={() => {
             setDownloadVisible(false);
           }}
+          channel={isMultiChannels ? channel : undefined}
         />
       )}
       {/*<RemoveModal visible={removeVisible} device={device} onCancel={() => setRemoveVisible(false)} onSuccess={() => {*/}
