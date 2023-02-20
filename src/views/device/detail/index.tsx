@@ -82,6 +82,7 @@ const DeviceDetailPage = () => {
       GetDeviceRequest(Number(id))
         .then((data) => {
           setDevice(data);
+          if (data.upgradeStatus) setUpgradeStatus(data.upgradeStatus);
           setIsLoading(false);
         })
         .catch((_) => (window.location.hash = '/device-management?locale=devices'));
