@@ -55,7 +55,9 @@ export function useStore<ReturnType extends keyof Store>(
 
   const local = localStorage.getItem('store') || initial;
   const localStore = JSON.parse(local) as Store;
-  const [subStore, setSubStore] = React.useState<Store[typeof key]>(localStore[key]);
+  const [subStore, setSubStore] = React.useState<Store[typeof key]>(
+    localStore[key] ?? JSON.parse(initial)[key]
+  );
 
   React.useEffect(() => {
     localStorage.setItem('store', JSON.stringify({ ...localStore, [key]: subStore }));
