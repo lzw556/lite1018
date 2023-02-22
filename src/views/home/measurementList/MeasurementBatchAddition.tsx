@@ -12,6 +12,7 @@ import { DeviceType } from '../../../types/device_type';
 
 export type MeasurementBatch = {
   asset_id: number;
+  type: number;
   monitoring_points: (MeasurementInfo & {
     type: number;
   })[];
@@ -95,11 +96,11 @@ export const MeasurementBatchAddition: React.FC<
             try {
               addMeasurements({
                 monitoring_points: values.monitoring_points.map(
-                  ({ dev_id, place, name, type, channel }) => {
+                  ({ dev_id, place, name, channel }) => {
                     if (channel !== undefined) {
                       return {
                         name,
-                        type,
+                        type: values.type,
                         attributes: { index: Number(place) },
                         device_binding: {
                           device_id: dev_id,
@@ -111,7 +112,7 @@ export const MeasurementBatchAddition: React.FC<
                     } else {
                       return {
                         name,
-                        type,
+                        type: values.type,
                         attributes: { index: Number(place) },
                         device_binding: { device_id: dev_id },
                         asset_id: values.asset_id
@@ -143,6 +144,17 @@ export const MeasurementBatchAddition: React.FC<
                 {name}
               </Select.Option>
             ))}
+          </Select>
+        </Form.Item>
+        <Form.Item label='类型' name='type' rules={[{ required: true, message: `请选择类型` }]}>
+          <Select placeholder='请选择类型'>
+            {measurementTypes
+              .filter((type) => !type.hidden)
+              .map(({ id, label }) => (
+                <Select.Option key={id} value={id}>
+                  {label}
+                </Select.Option>
+              ))}
           </Select>
         </Form.Item>
         <Form.List
@@ -200,21 +212,6 @@ export const MeasurementBatchAddition: React.FC<
                       </Select>
                     </Form.Item>
                   )}
-                  <Form.Item
-                    label='类型'
-                    name={[name, 'type']}
-                    rules={[{ required: true, message: `请选择类型` }]}
-                  >
-                    <Select placeholder='请选择类型'>
-                      {measurementTypes
-                        .filter((type) => !type.hidden)
-                        .map(({ id, label }) => (
-                          <Select.Option key={id} value={id}>
-                            {label}
-                          </Select.Option>
-                        ))}
-                    </Select>
-                  </Form.Item>
                   <Form.Item
                     label='位置'
                     {...restFields}
