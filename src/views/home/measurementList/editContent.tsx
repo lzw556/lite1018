@@ -7,11 +7,12 @@ import { getAssets } from '../assetList/services';
 import * as AppConfig from '../../../config';
 import { DeviceType } from '../../../types/device_type';
 
-export const EditContent: React.FC<{ form: any; asset?: AssetRow; doUpdating?: boolean }> = ({
-  asset,
-  form,
-  doUpdating
-}) => {
+export const EditContent: React.FC<{
+  form: any;
+  asset?: AssetRow;
+  doUpdating?: boolean;
+  initialDeviceType?: number;
+}> = ({ asset, form, doUpdating, initialDeviceType }) => {
   const [types, setTypes] = React.useState(AppConfig.use(window.assetCategory).sensorTypes);
   const [parents, setParents] = React.useState<AssetRow[]>([]);
   const [disabled, setDisabled] = React.useState(true);
@@ -21,7 +22,7 @@ export const EditContent: React.FC<{ form: any; asset?: AssetRow; doUpdating?: b
   const parentLabel =
     AppConfig.use(window.assetCategory).assetType.secondAsset?.label ||
     AppConfig.use(window.assetCategory).assetType.label;
-  const [deviceTypeId, setDeviceTypeId] = React.useState<number | undefined>();
+  const [deviceTypeId, setDeviceTypeId] = React.useState<number | undefined>(initialDeviceType);
 
   React.useEffect(() => {
     const configWind = AppConfig.use('wind');

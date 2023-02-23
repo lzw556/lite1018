@@ -24,12 +24,12 @@ export function deleteMeasurement(id: Measurement['id']) {
   return request.delete(`/monitoringPoints/${id}`).then(DeleteResponse);
 }
 
-export function bindDevice(id: Measurement['id'], device_id: number) {
+export function bindDevice(id: Measurement['id'], device_id: number, channel?: number) {
   //TODO
   return request.post(`/monitoringPoints/${id}/bindDevice`, {
     device_id,
-    process_id: 1,
-    parameters: {}
+    process_id: channel ? 2 : 1,
+    parameters: channel ? { channel } : {}
   });
 }
 

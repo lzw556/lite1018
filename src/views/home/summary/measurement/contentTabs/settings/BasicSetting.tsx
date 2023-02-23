@@ -4,6 +4,7 @@ import DeviceSelect from '../../../../../../components/select/deviceSelect';
 import * as AppConfig from '../../../../../../config';
 import { defaultValidateMessages, Rules } from '../../../../../../constants/validator';
 import { useStore } from '../../../../../../hooks/store';
+import { DeviceType } from '../../../../../../types/device_type';
 import { isMobile } from '../../../../../../utils/deviceDetection';
 import { AssetRow } from '../../../../assetList/props';
 import { getAssets } from '../../../../assetList/services';
@@ -21,6 +22,10 @@ export const BasicSetting: React.FC<MeasurementRow & { onUpdate?: () => void }> 
   const [parents, setParents] = React.useState<AssetRow[]>([]);
   const [store] = useStore('measurementListFilters');
   const measurementTypes = AppConfig.getMeasurementTypes(window.assetCategory);
+  const deviceType =
+    props.bindingDevices && props.bindingDevices.length > 0
+      ? props.bindingDevices[0].typeId
+      : undefined;
 
   React.useEffect(() => {
     const assetType = appConfig.assetType.secondAsset?.id
@@ -88,6 +93,27 @@ export const BasicSetting: React.FC<MeasurementRow & { onUpdate?: () => void }> 
               ))}
             </Select>
           </Form.Item>
+          {deviceType === DeviceType.BoltElongationMultiChannels && (
+            <Form.Item
+              label='通道号'
+              name='channel'
+              rules={[{ required: true, message: `请选择通道号` }]}
+              initialValue={1}
+            >
+              <Select>
+                {[
+                  { label: '1', value: 1 },
+                  { label: '2', value: 2 },
+                  { label: '3', value: 3 },
+                  { label: '4', value: 4 }
+                ].map(({ label, value }) => (
+                  <Select.Option key={value} value={value}>
+                    {label}
+                  </Select.Option>
+                ))}
+              </Select>
+            </Form.Item>
+          )}
           <Form.Item
             label='位置'
             name={['attributes', 'index']}
@@ -114,15 +140,16 @@ export const BasicSetting: React.FC<MeasurementRow & { onUpdate?: () => void }> 
               type='primary'
               onClick={() => {
                 form.validateFields().then((values) => {
-                  if (
-                    bindingDevices &&
-                    bindingDevices.length > 0 &&
-                    bindingDevices[0].id !== values.device_id
-                  ) {
-                    unbindDevice(id, bindingDevices[0].id);
-                    bindDevice(id, values.device_id);
-                  } else if (!bindingDevices || bindingDevices.length === 0) {
-                    bindDevice(id, values.device_id);
+                  if (bindingDevices && bindingDevices.length > 0) {
+                    if (bindingDevices[0].id !== values.device_id) {
+                      //replace
+                      unbindDevice(id, bindingDevices[0].id);
+                      bindDevice(id, values.device_id, values.channel);
+                    } else {
+                      bindDevice(id, values.device_id, values.channel);
+                    }
+                  } else {
+                    bindDevice(id, values.device_id, values.channel);
                   }
                   updateMeasurement(id, values).then(() => {
                     props.onUpdate && props.onUpdate();

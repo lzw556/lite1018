@@ -8,6 +8,7 @@ export type Measurement = {
   device_id?: number;
   attributes?: { index: number };
   channel?: number;
+  device_type?: number;
 };
 
 export type Property = {
@@ -26,7 +27,7 @@ export type MeasurementRow = {
   name: string;
   type: number;
   assetId: number;
-  bindingDevices?: Device[];
+  bindingDevices?: (Device & { channel?: number })[];
   attributes?: { index: number };
   assetName: string;
   properties: Property[];
@@ -39,16 +40,18 @@ export type MeasurementRow = {
 
 export function convertRow(values?: MeasurementRow): Measurement | null {
   if (!values) return null;
+  const firstDevice =
+    values.bindingDevices && values.bindingDevices.length > 0
+      ? values.bindingDevices[0]
+      : undefined;
   return {
     id: values.id,
     name: values.name,
     type: values.type,
     asset_id: values.assetId,
-    device_id:
-      values.bindingDevices && values.bindingDevices.length > 0
-        ? values.bindingDevices[0].id
-        : undefined,
-    attributes: values.attributes
+    device_id: firstDevice?.id,
+    attributes: values.attributes,
+    channel: firstDevice?.channel === 0 ? 1 : firstDevice?.channel
   };
 }
 

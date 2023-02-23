@@ -59,15 +59,16 @@ export const MeasurementEdit: React.FC<
                 });
               } else if (measurement) {
                 const { id, bindingDevices } = measurement;
-                if (
-                  bindingDevices &&
-                  bindingDevices.length > 0 &&
-                  bindingDevices[0].id !== values.device_id
-                ) {
-                  unbindDevice(id, bindingDevices[0].id);
-                  bindDevice(id, values.device_id);
-                } else if (!bindingDevices || bindingDevices.length === 0) {
-                  bindDevice(id, values.device_id);
+                if (bindingDevices && bindingDevices.length > 0) {
+                  if (bindingDevices[0].id !== values.device_id) {
+                    //replace
+                    unbindDevice(id, bindingDevices[0].id);
+                    bindDevice(id, values.device_id, values.channel);
+                  } else {
+                    bindDevice(id, values.device_id, values.channel);
+                  }
+                } else {
+                  bindDevice(id, values.device_id, values.channel);
                 }
                 updateMeasurement(id, values).then(() => {
                   onSuccess();
@@ -81,7 +82,16 @@ export const MeasurementEdit: React.FC<
       }}
     >
       <Form form={form} labelCol={{ span: 4 }} validateMessages={defaultValidateMessages}>
-        <EditContent asset={asset} form={form} doUpdating={doUpdating} />
+        <EditContent
+          asset={asset}
+          form={form}
+          doUpdating={doUpdating}
+          initialDeviceType={
+            measurement?.bindingDevices && measurement?.bindingDevices.length > 0
+              ? measurement?.bindingDevices[0].typeId
+              : undefined
+          }
+        />
       </Form>
     </Modal>
   );
