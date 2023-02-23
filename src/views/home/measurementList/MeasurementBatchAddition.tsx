@@ -8,6 +8,9 @@ import { EditFormPayload } from '../common/useActionBarStatus';
 import { addMeasurements } from '../summary/measurement/services';
 import * as AppConfig from '../../../config';
 import { DeviceSelection, MeasurementInfo } from './DeviceSelection';
+import { measurementTypes as measurementType } from '../common/constants';
+import { Device } from '../../../types/device';
+import { GetDevicesRequest } from '../../../apis/device';
 
 export type MeasurementBatch = {
   asset_id: number;
@@ -29,6 +32,10 @@ export const MeasurementBatchAddition: React.FC<
   const [form] = Form.useForm<MeasurementBatch>();
   const [visible, setVisible] = React.useState(false);
   const [selected, setSelected] = React.useState<MeasurementInfo[]>([]);
+  const [selectedFlangeId, setSelectedFlangeId] = React.useState<number | undefined>(asset?.id);
+  const [selectedFlange, setSelectedFlange] = React.useState<AssetRow | undefined>();
+  const [selectedPointType, setSelectedPointType] = React.useState<number | undefined>();
+  const [devices, setDevices] = React.useState<Device[]>([]);
 
   React.useEffect(() => {
     const configWind = AppConfig.use('wind');
@@ -41,6 +48,31 @@ export const MeasurementBatchAddition: React.FC<
       );
     });
   }, [asset]);
+
+  React.useEffect(() => {
+    const flange = parents.find((asset) => asset.id === selectedFlangeId);
+    setSelectedFlange(flange);
+  }, [parents, selectedFlangeId, form]);
+
+  React.useEffect(() => {
+    if (selectedFlange?.attributes?.sub_type === 1) {
+      setSelectedPointType(measurementType.preload.id);
+    } else if (selectedPointType !== form.getFieldValue('type')) {
+      setSelectedPointType(form.getFieldValue('type'));
+      // form.setFieldValue('type', undefined);
+    }
+  }, [selectedFlange, form, selectedPointType]);
+
+  React.useEffect(() => {
+    setSelected([]);
+  }, [selectedPointType]);
+
+  React.useEffect(() => {
+    if (selectedPointType) {
+      const type = measurementTypes.find((type) => type.id === selectedPointType);
+      GetDevicesRequest({ types: type?.deviceType.join(',') }).then(setDevices);
+    }
+  }, [selectedPointType, measurementTypes]);
 
   React.useEffect(() => {
     const inputs = form.getFieldsValue();
@@ -104,7 +136,7 @@ export const MeasurementBatchAddition: React.FC<
                     if (channel !== undefined) {
                       return {
                         name,
-                        type: values.type,
+                        type: values.type ?? measurementType.preload.id,
                         attributes: { index: Number(place) },
                         device_binding: {
                           device_id: dev_id,
@@ -116,7 +148,7 @@ export const MeasurementBatchAddition: React.FC<
                     } else {
                       return {
                         name,
-                        type: values.type,
+                        type: values.type ?? measurementType.preload.id,
                         attributes: { index: Number(place) },
                         device_binding: { device_id: dev_id },
                         asset_id: values.asset_id
@@ -142,7 +174,7 @@ export const MeasurementBatchAddition: React.FC<
           hidden={!!parentId}
           initialValue={parentId}
         >
-          <Select placeholder='请选择法兰'>
+          <Select placeholder='请选择法兰' onChange={(id) => setSelectedFlangeId(id)}>
             {parents.map(({ id, name }) => (
               <Select.Option key={id} value={id}>
                 {name}
@@ -150,17 +182,31 @@ export const MeasurementBatchAddition: React.FC<
             ))}
           </Select>
         </Form.Item>
-        <Form.Item label='类型' name='type' rules={[{ required: true, message: `请选择类型` }]}>
-          <Select placeholder='请选择类型'>
-            {measurementTypes
-              .filter((type) => !type.hidden)
-              .map(({ id, label }) => (
-                <Select.Option key={id} value={id}>
-                  {label}
-                </Select.Option>
-              ))}
-          </Select>
-        </Form.Item>
+        {selectedFlange?.attributes?.sub_type === 1 ? (
+          <Form.Item
+            name='type'
+            hidden={true}
+            initialValue={measurementType.preload.id}
+          ></Form.Item>
+        ) : (
+          <Form.Item label='类型' name='type' rules={[{ required: true, message: `请选择类型` }]}>
+            <Select
+              placeholder='请选择类型'
+              onChange={(id) => {
+                setSelectedPointType(id);
+                // setSelected([]);
+              }}
+            >
+              {measurementTypes
+                .filter((type) => !type.hidden)
+                .map(({ id, label }) => (
+                  <Select.Option key={id} value={id}>
+                    {label}
+                  </Select.Option>
+                ))}
+            </Select>
+          </Form.Item>
+        )}
         <Form.List
           name='monitoring_points'
           rules={[
@@ -219,6 +265,7 @@ export const MeasurementBatchAddition: React.FC<
                   content={
                     visible && (
                       <DeviceSelection
+                        devices={devices}
                         onSelect={(selecteds) => {
                           setVisible(false);
                           setSelected(selecteds);
@@ -232,7 +279,7 @@ export const MeasurementBatchAddition: React.FC<
                   visible={visible}
                   onVisibleChange={(visible) => setVisible(visible)}
                 >
-                  <Button>选择传感器</Button>
+                  <Button disabled={selectedPointType === undefined}>选择传感器</Button>
                 </Popover>
               </Form.Item>
             </div>

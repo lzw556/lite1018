@@ -13,7 +13,7 @@ export const EditContent: React.FC<{
   doUpdating?: boolean;
   initialDeviceType?: number;
 }> = ({ asset, form, doUpdating, initialDeviceType }) => {
-  const [types, setTypes] = React.useState(AppConfig.use(window.assetCategory).sensorTypes);
+  const [types, setTypes] = React.useState([initialDeviceType]);
   const [parents, setParents] = React.useState<AssetRow[]>([]);
   const [disabled, setDisabled] = React.useState(true);
   const measurementTypes = AppConfig.getMeasurementTypes(window.assetCategory);

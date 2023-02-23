@@ -1,11 +1,9 @@
 import { Button, Checkbox, Col, Row, Space } from 'antd';
 import { CheckboxValueType } from 'antd/lib/checkbox/Group';
 import * as React from 'react';
-import { GetDevicesRequest } from '../../../apis/device';
-import { Device } from '../../../types/device';
-import * as AppConfig from '../../../config';
 import { DeviceType } from '../../../types/device_type';
 import { CheckboxChangeEvent } from 'antd/lib/checkbox';
+import { Device } from '../../../types/device';
 
 export type MeasurementInfo = {
   place: string;
@@ -17,26 +15,21 @@ export type MeasurementInfo = {
 };
 
 export const DeviceSelection: React.FC<{
+  devices: Device[];
   onSelect: (selected: MeasurementInfo[]) => void;
   initialSelected?: MeasurementInfo[];
 }> = (props) => {
-  const [devices, setDevices] = React.useState<Device[]>();
   const [selected, setSelected] = React.useState<[number, number[]][]>(
     parseInitialPoints(props.initialSelected)
   );
   const [selectedPoints, setSelectedPoints] = React.useState<MeasurementInfo[]>([]);
 
   React.useEffect(() => {
-    const configWind = AppConfig.use('wind');
-    GetDevicesRequest({ types: configWind.sensorTypes.toString() }).then(setDevices);
-  }, []);
-
-  React.useEffect(() => {
     const points: MeasurementInfo[] = [];
-    if (devices !== undefined && devices.length > 0) {
+    if (props.devices !== undefined && props.devices.length > 0) {
       selected.forEach((item) => {
         const deviceId = item[0];
-        const device = devices?.find((dev) => dev.id === deviceId);
+        const device = props.devices?.find((dev) => dev.id === deviceId);
         if (device) {
           const channels = item[1];
           const point: MeasurementInfo = {
@@ -61,13 +54,13 @@ export const DeviceSelection: React.FC<{
     }
 
     setSelectedPoints(points);
-  }, [selected, devices]);
+  }, [selected, props.devices]);
 
   return (
     <>
       <div style={{ overflow: 'auto', maxHeight: 300 }}>
         <Checkbox.Group value={selected.map((item) => item[0])}>
-          {devices?.map(({ id, name, macAddress, typeId }) => {
+          {props.devices?.map(({ id, name, macAddress, typeId }) => {
             const defaultCheckedList =
               selected.filter((item) => item[0] === id).length > 0
                 ? selected.filter((item) => item[0] === id)[0][1]
