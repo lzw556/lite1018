@@ -128,7 +128,10 @@ const DeviceDetailPage = () => {
     if (hasPermissions(Permission.DeviceSettingsGet, Permission.DeviceSettingsEdit)) {
       tabs.push({ key: 'settings', tab: '配置信息' });
     }
-    if (hasPermission(Permission.DeviceRuntimeDataGet)) {
+    if (
+      hasPermission(Permission.DeviceRuntimeDataGet) &&
+      device.typeId !== DeviceType.BoltElongationMultiChannels
+    ) {
       tabs.push({ key: 'ta', tab: '状态历史' });
     }
     switch (device.typeId) {

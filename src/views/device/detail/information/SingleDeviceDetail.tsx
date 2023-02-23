@@ -126,28 +126,32 @@ export const SingleDeviceDetail: React.FC<{ device: Device; upgradeStatus: any }
           </Row>
         </Col>
       )}
-      {device.state && device.typeId !== DeviceType.Gateway && (
+      {device.state &&
+        device.typeId !== DeviceType.Gateway &&
+        device.typeId !== DeviceType.BoltElongationMultiChannels && (
+          <Col span={isMobile ? 12 : 9}>
+            <Row>
+              <Col span={isMobile ? 24 : 8} className='ts-detail-label'>
+                电池电压(mV)
+              </Col>
+              <Col span={isMobile ? 24 : 16} className='ts-detail-content'>
+                {device.state ? device.state.batteryVoltage : '-'}
+              </Col>
+            </Row>
+          </Col>
+        )}
+      {device.state && device.typeId !== DeviceType.BoltElongationMultiChannels && (
         <Col span={isMobile ? 12 : 9}>
           <Row>
             <Col span={isMobile ? 24 : 8} className='ts-detail-label'>
-              电池电压(mV)
+              信号强度(dB)
             </Col>
             <Col span={isMobile ? 24 : 16} className='ts-detail-content'>
-              {device.state ? device.state.batteryVoltage : '-'}
+              {device.state ? device.state.signalLevel : '-'}
             </Col>
           </Row>
         </Col>
       )}
-      <Col span={isMobile ? 12 : 9}>
-        <Row>
-          <Col span={isMobile ? 24 : 8} className='ts-detail-label'>
-            信号强度(dB)
-          </Col>
-          <Col span={isMobile ? 24 : 16} className='ts-detail-content'>
-            {device.state ? device.state.signalLevel : '-'}
-          </Col>
-        </Row>
-      </Col>
       <Col span={isMobile ? 12 : 9}>
         <Row>
           <Col span={isMobile ? 24 : 8} className='ts-detail-label'>
