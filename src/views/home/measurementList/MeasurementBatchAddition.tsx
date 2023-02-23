@@ -8,7 +8,6 @@ import { EditFormPayload } from '../common/useActionBarStatus';
 import { addMeasurements } from '../summary/measurement/services';
 import * as AppConfig from '../../../config';
 import { DeviceSelection, MeasurementInfo } from './DeviceSelection';
-import { DeviceType } from '../../../types/device_type';
 
 export type MeasurementBatch = {
   asset_id: number;
@@ -44,31 +43,36 @@ export const MeasurementBatchAddition: React.FC<
   }, [asset]);
 
   React.useEffect(() => {
-    if (selected.length > 0) {
-      const inputs = form.getFieldsValue();
-      const points: MeasurementInfo[] = inputs.monitoring_points;
-      let values: MeasurementInfo[] = selected.map(({ dev_name, dev_id, place, dev_type }) => ({
-        name: dev_name,
+    const inputs = form.getFieldsValue();
+    const points: MeasurementInfo[] = inputs.monitoring_points;
+    let values: MeasurementInfo[] = selected.map(
+      ({ dev_name, dev_id, place, dev_type, channel }) => ({
+        name: getPointName(dev_name, channel),
         place,
         dev_id,
         dev_name,
-        dev_type
-      }));
-      if (points && points.length > 0) {
-        values = selected.map(({ dev_id, dev_name }, index) => {
-          const point = points.find((item) => dev_id === item.dev_id);
-          if (point) {
-            return point;
-          } else {
-            return { ...selected[index], name: dev_name };
-          }
-        });
-      }
-      form.setFieldsValue({
-        monitoring_points: values
+        dev_type,
+        channel
+      })
+    );
+    if (points && points.length > 0) {
+      values = selected.map(({ dev_id, dev_name, channel }, index) => {
+        const point = points.find((item) => dev_id === item.dev_id && item.channel === channel);
+        if (point) {
+          return point;
+        } else {
+          return { ...selected[index], name: getPointName(dev_name, channel) };
+        }
       });
     }
+    form.setFieldsValue({
+      monitoring_points: values
+    });
   }, [selected, form]);
+
+  function getPointName(name: string, channel?: number) {
+    return `${name}${channel ? `-通道${channel}` : ''}`;
+  }
 
   const onNameValidator = (rule: any, value: any) => {
     return new Promise<void>((resolve, reject) => {
@@ -190,28 +194,7 @@ export const MeasurementBatchAddition: React.FC<
                   >
                     <Input placeholder={`请填写监测点名称`} />
                   </Form.Item>
-                  {form.getFieldValue('monitoring_points')[name].dev_type ===
-                    DeviceType.BoltElongationMultiChannels && (
-                    <Form.Item
-                      label='通道号'
-                      name={[name, 'channel']}
-                      rules={[{ required: true, message: `请选择通道号` }]}
-                      initialValue={1}
-                    >
-                      <Select>
-                        {[
-                          { label: '1', value: 1 },
-                          { label: '2', value: 2 },
-                          { label: '3', value: 3 },
-                          { label: '4', value: 4 }
-                        ].map(({ label, value }) => (
-                          <Select.Option key={value} value={value}>
-                            {label}
-                          </Select.Option>
-                        ))}
-                      </Select>
-                    </Form.Item>
-                  )}
+                  <Form.Item name={[name, 'channel']} hidden={true}></Form.Item>
                   <Form.Item
                     label='位置'
                     {...restFields}
