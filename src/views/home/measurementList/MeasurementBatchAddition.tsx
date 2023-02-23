@@ -1,5 +1,5 @@
 import { MinusCircleOutlined } from '@ant-design/icons';
-import { Button, Divider, Form, Input, Modal, ModalProps, Popover, Select } from 'antd';
+import { Button, Col, Divider, Form, Input, Modal, ModalProps, Popover, Row, Select } from 'antd';
 import * as React from 'react';
 import { defaultValidateMessages, Rules } from '../../../constants/validator';
 import { AssetRow } from '../assetList/props';
@@ -91,7 +91,7 @@ export const MeasurementBatchAddition: React.FC<
   return (
     <Modal
       {...{
-        title: `监测点批量添加`,
+        title: `监测点添加`,
         cancelText: '取消',
         okText: '添加',
         ...props,
@@ -176,35 +176,41 @@ export const MeasurementBatchAddition: React.FC<
           {(fields, { add, remove }, { errors }) => (
             <div style={{ overflow: 'auto', maxHeight: 600 }}>
               {fields.map(({ key, name, ...restFields }, index) => (
-                <div key={key} style={{ position: 'relative' }}>
-                  <p style={{ textIndent: 35, color: '#8a8e99' }}>
-                    {form.getFieldValue('monitoring_points')[name].dev_name}
-                    <MinusCircleOutlined
-                      onClick={() => {
-                        remove(name);
-                        setSelected((prev) => prev.filter((item, n) => n !== index));
-                      }}
-                    />
-                  </p>
-                  <Form.Item
-                    label='名称'
-                    {...restFields}
-                    name={[name, 'name']}
-                    rules={[Rules.range(4, 16)]}
-                  >
-                    <Input placeholder={`请填写监测点名称`} />
-                  </Form.Item>
-                  <Form.Item name={[name, 'channel']} hidden={true}></Form.Item>
-                  <Form.Item
-                    label='位置'
-                    {...restFields}
-                    name={[name, 'place']}
-                    rules={[Rules.number, { validator: onNameValidator }]}
-                  >
-                    <Input placeholder={`请填写监测点位置`} />
-                  </Form.Item>
+                <Row key={key} style={{ position: 'relative' }} justify='space-between'>
+                  <MinusCircleOutlined
+                    onClick={() => {
+                      remove(name);
+                      setSelected((prev) => prev.filter((item, n) => n !== index));
+                    }}
+                    style={{ position: 'absolute', top: 10 }}
+                  />
+                  <Col offset={1}>
+                    <Form.Item
+                      label='名称'
+                      labelCol={{ span: 6 }}
+                      {...restFields}
+                      name={[name, 'name']}
+                      rules={[Rules.range(4, 16)]}
+                      style={{ marginBottom: 0 }}
+                    >
+                      <Input placeholder={`请填写监测点名称`} />
+                    </Form.Item>
+                    <Form.Item name={[name, 'channel']} hidden={true}></Form.Item>
+                  </Col>
+                  <Col>
+                    <Form.Item
+                      label='位置'
+                      labelCol={{ span: 6 }}
+                      {...restFields}
+                      name={[name, 'place']}
+                      rules={[Rules.number, { validator: onNameValidator }]}
+                      style={{ marginBottom: 0 }}
+                    >
+                      <Input placeholder={`请填写监测点位置`} style={{ width: 150 }} />
+                    </Form.Item>
+                  </Col>
                   <Divider />
-                </div>
+                </Row>
               ))}
               <Form.ErrorList errors={errors} />
               <Form.Item wrapperCol={{ offset: 2 }}>
