@@ -7,6 +7,7 @@ import { DeviceSetting } from '../../../../types/device_setting';
 import { defaultValidateMessages } from '../../../../constants/validator';
 import { DeviceType } from '../../../../types/device_type';
 import { DeviceSettingContent } from '../../DeviceSettingContent';
+import { processArrayValuesInSensorSetting } from '../../../../components/formItems/deviceSettingFormItem';
 
 export interface DeviceSettingsProps {
   device: Device;
@@ -27,7 +28,10 @@ const DeviceSettings: FC<DeviceSettingsProps> = ({ device }) => {
 
   const onSave = () => {
     form.validateFields().then((values) => {
-      UpdateDeviceSettingRequest(device.id, values).then();
+      UpdateDeviceSettingRequest(device.id, {
+        ...values,
+        sensors: processArrayValuesInSensorSetting(values.sensors)
+      }).then();
     });
   };
 

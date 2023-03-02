@@ -39,7 +39,7 @@ export const defaultValidateMessages = {
   },
   array: {
     len: "'${name}' must be exactly ${len} in length",
-    min: "'${name}' cannot be less than ${min} in length",
+    min: '至少选择 ${min} 项',
     max: "'${name}' cannot be greater than ${max} in length",
     range: "'${name}' must be between ${min} and ${max} in length"
   },

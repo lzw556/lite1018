@@ -1,7 +1,7 @@
-import { Form, Input, InputNumber, Radio, Select } from 'antd';
+import { Checkbox, Form, Input, Radio, Select } from 'antd';
 import { DeviceSetting, DeviceSettingValueType } from '../../types/device_setting';
 import { FC, useState } from 'react';
-import { Normalizes, Rules } from '../../constants/validator';
+import { Rules } from '../../constants/validator';
 
 export interface DeviceSettingFormItemProps {
   value: DeviceSetting;
@@ -11,7 +11,7 @@ export interface DeviceSettingFormItemProps {
 const { Option } = Select;
 
 const DeviceSettingFormItem: FC<DeviceSettingFormItemProps> = ({ value, editable }) => {
-  const [setting, setSetting] = useState<DeviceSetting>(value);
+  const [setting, setSetting] = useState<DeviceSetting>(transformValue(value));
 
   const renderComponents = () => {
     switch (setting.type) {
@@ -34,6 +34,17 @@ const DeviceSettingFormItem: FC<DeviceSettingFormItemProps> = ({ value, editable
         );
     }
     if (setting.options) {
+      if (setting.optionType === 'checkbox') {
+        return (
+          <Checkbox.Group
+            options={Object.keys(setting.options).map((value) => ({
+              label: setting.options[value],
+              value: Number(value)
+            }))}
+            onChange={(value) => setSetting({ ...setting, value })}
+          />
+        );
+      }
       return (
         <Select onChange={(value) => setSetting({ ...setting, value: value })} disabled={!editable}>
           {Object.keys(setting.options).map((key) => {
@@ -55,8 +66,14 @@ const DeviceSettingFormItem: FC<DeviceSettingFormItemProps> = ({ value, editable
       setting.children.map((child) => {
         if (setting.value === child.show) {
           return <DeviceSettingFormItem editable={editable} value={child} />;
+        } else if (
+          setting.options &&
+          Array.isArray(setting.value) &&
+          setting.value.includes(child.show)
+        ) {
+          return <DeviceSettingFormItem editable={editable} value={child} />;
         }
-        return;
+        return null;
       })
     );
   };
@@ -66,12 +83,20 @@ const DeviceSettingFormItem: FC<DeviceSettingFormItemProps> = ({ value, editable
       case DeviceSettingValueType.uint8:
       case DeviceSettingValueType.uint16:
       case DeviceSettingValueType.uint32:
-      case DeviceSettingValueType.uint64:
       case DeviceSettingValueType.float:
         if (setting.validator) {
           return [{ ...Rules.number(), ...setting.validator }];
         }
         return [Rules.number()];
+      case DeviceSettingValueType.uint64:
+        if (setting.optionType === 'checkbox') {
+          return [{ type: 'array', min: 1 }];
+        } else {
+          if (setting.validator) {
+            return [{ ...Rules.number(), ...setting.validator }];
+          }
+          return [Rules.number()];
+        }
       default:
         if (setting.validator) {
           return [setting.validator];
@@ -79,6 +104,29 @@ const DeviceSettingFormItem: FC<DeviceSettingFormItemProps> = ({ value, editable
         return [];
     }
   };
+
+  function transformValue(setting: any) {
+    if (setting.options && setting.optionType === 'checkbox') {
+      return {
+        ...setting,
+        value: valueToArray(
+          Object.keys(setting.options).map((value) => Number(value)),
+          setting.value
+        )
+      };
+    }
+    return setting;
+  }
+
+  function valueToArray(optionArray: number[], value: number) {
+    var ret = [];
+    for (let i = 0; i < optionArray.length; i++) {
+      if ((value & optionArray[i]) > 0) {
+        ret.push(optionArray[i]);
+      }
+    }
+    return ret;
+  }
 
   return (
     <>
@@ -95,3 +143,20 @@ const DeviceSettingFormItem: FC<DeviceSettingFormItemProps> = ({ value, editable
   );
 };
 export default DeviceSettingFormItem;
+
+export function processArrayValuesInSensorSetting(setting: any) {
+  const newSetting = { ...setting };
+  for (const key in newSetting) {
+    if (Object.prototype.hasOwnProperty.call(newSetting, key)) {
+      const value = newSetting[key];
+      if (Array.isArray(value)) {
+        newSetting[key] = convertArrayValue2Single(value);
+      }
+    }
+  }
+  return newSetting;
+}
+
+function convertArrayValue2Single(value: number[]) {
+  return value.reduce((prev, crt) => prev | crt);
+}

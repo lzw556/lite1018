@@ -32,4 +32,5 @@ export type DeviceSetting = {
   children?: DeviceSetting[];
   group?: keyof typeof SETTING_GROUPS;
   validator: any;
+  optionType: string;
 };

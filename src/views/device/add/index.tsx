@@ -10,7 +10,9 @@ import NetworkSelect from '../../../components/select/networkSelect';
 import DeviceSelect from '../../../components/select/deviceSelect';
 import DeviceTypeSelect from '../../../components/select/deviceTypeSelect';
 import { DeviceSetting } from '../../../types/device_setting';
-import DeviceSettingFormItem from '../../../components/formItems/deviceSettingFormItem';
+import DeviceSettingFormItem, {
+  processArrayValuesInSensorSetting
+} from '../../../components/formItems/deviceSettingFormItem';
 import { isMobile } from '../../../utils/deviceDetection';
 import { DeviceType } from '../../../types/device_type';
 import { DeviceSettingContent } from '../DeviceSettingContent';
@@ -30,7 +32,10 @@ const AddDevicePage = () => {
 
   const onSave = () => {
     form.validateFields().then((values) => {
-      AddDeviceRequest(values).then((_) => setSuccess(true));
+      AddDeviceRequest({
+        ...values,
+        sensors: processArrayValuesInSensorSetting(values.sensors)
+      }).then((_) => setSuccess(true));
     });
   };
 

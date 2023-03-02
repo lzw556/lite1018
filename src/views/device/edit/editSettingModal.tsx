@@ -4,6 +4,7 @@ import { GetDeviceSettingRequest, UpdateDeviceSettingRequest } from '../../../ap
 import { useEffect, useState } from 'react';
 import { defaultValidateMessages } from '../../../constants/validator';
 import { DeviceSettingContent } from '../DeviceSettingContent';
+import { processArrayValuesInSensorSetting } from '../../../components/formItems/deviceSettingFormItem';
 
 export interface EditSettingProps extends ModalProps {
   device: Device;
@@ -26,7 +27,10 @@ const EditSettingModal = (props: EditSettingProps) => {
   const onSave = () => {
     form.validateFields().then((values) => {
       setIsLoading(true);
-      UpdateDeviceSettingRequest(device.id, values).then((_) => {
+      UpdateDeviceSettingRequest(device.id, {
+        ...values,
+        sensors: processArrayValuesInSensorSetting(values.sensors)
+      }).then((_) => {
         setIsLoading(false);
         onSuccess();
       });
