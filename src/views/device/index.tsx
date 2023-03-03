@@ -4,13 +4,11 @@ import {
   Dropdown,
   Input,
   Menu,
-  message,
   Modal,
   Popconfirm,
   Row,
   Select,
   Space,
-  Spin,
   Typography
 } from 'antd';
 import {
@@ -18,26 +16,17 @@ import {
   CodeOutlined,
   DeleteOutlined,
   EditOutlined,
-  LoadingOutlined,
   PlusOutlined
 } from '@ant-design/icons';
 import { Content } from 'antd/lib/layout/layout';
 import { useEffect, useState } from 'react';
-import { DeviceCommand } from '../../types/device_command';
-import {
-  DeleteDeviceRequest,
-  DeviceUpgradeRequest,
-  GetDeviceRequest,
-  PagingDevicesRequest,
-  SendDeviceCommandRequest
-} from '../../apis/device';
+import { DeleteDeviceRequest, GetDeviceRequest, PagingDevicesRequest } from '../../apis/device';
 import { DeviceType } from '../../types/device_type';
 import EditSettingModal from './edit/editSettingModal';
 import { Device } from '../../types/device';
 import EditBaseInfoModel from './edit/editBaseInfoModel';
 import Label from '../../components/label';
 import ShadowCard from '../../components/shadowCard';
-import UpgradeModal from './upgrade';
 import '../../string-extension';
 import { IsUpgrading } from '../../types/device_upgrade_status';
 import '../../assets/iconfont.css';
@@ -53,11 +42,11 @@ import { SingleDeviceStatus } from './SingleDeviceStatus';
 import { getValueOfFirstClassProperty, omitSpecificKeys } from './util';
 import { isMobile } from '../../utils/deviceDetection';
 import { Link } from 'react-router-dom';
-import EditCalibrateParas from './edit/editCalibrateParas';
 import { AlarmRuleSettings } from './detail/setting/alarmRuleSettings';
 import { Store, useStore } from '../../hooks/store';
 import * as AppConfig from '../../config';
 import { Normalizes } from '../../constants/validator';
+import { CommandMenu } from './commandMenu';
 
 const { Search } = Input;
 const { Option } = Select;
@@ -67,11 +56,8 @@ const DevicePage = () => {
   const [device, setDevice] = useState<Device>();
   const [editSettingVisible, setEditSettingVisible] = useState<boolean>(false);
   const [editBaseInfoVisible, setEditBaseInfoVisible] = useState<boolean>(false);
-  const [upgradeVisible, setUpgradeVisible] = useState<boolean>(false);
-  const [executeDevice, setExecuteDevice] = useState<Device>();
   const [dataSource, setDataSource] = useState<PageResult<any>>();
   const { hasPermission, hasPermissions } = usePermission();
-  const [visibleCalibrate, setVisibleCalibrate] = useState(false);
   const [visibleAlarmRules, setVisibleAlarmRules] = useState(false);
   const [store, setStore, gotoPage] = useStore('deviceList');
 
@@ -94,138 +80,6 @@ const DevicePage = () => {
         gotoPage({ size, total, index: page }, 'prev');
       }
     });
-  };
-
-  const onCommand = (device: Device, key: any) => {
-    let commandKey = Number(key);
-    let channel = undefined;
-    if (Number.isNaN(commandKey)) {
-      try {
-        const commands: [number, number] = JSON.parse(key);
-        commandKey = commands[0];
-        channel = commands[1];
-      } catch (error) {}
-    }
-    switch (commandKey) {
-      case DeviceCommand.Upgrade:
-        setDevice(device);
-        setUpgradeVisible(true);
-        break;
-      case DeviceCommand.CancelUpgrade:
-        DeviceUpgradeRequest(device.id, { type: DeviceCommand.CancelUpgrade }).then((res) => {
-          if (res.code === 200) {
-            message.success('取消升级成功').then();
-          } else {
-            message.error(`取消升级失败,${res.msg}`).then();
-          }
-        });
-        break;
-      case DeviceCommand.Calibrate:
-        setDevice(device);
-        setVisibleCalibrate(true);
-        break;
-      default:
-        setExecuteDevice(device);
-        SendDeviceCommandRequest(device.id, commandKey, channel ? { channel } : {}).then((res) => {
-          setExecuteDevice(undefined);
-          if (res.code === 200) {
-            message.success('命令发送成功').then();
-          } else {
-            message.error(res.msg).then();
-          }
-        });
-        break;
-    }
-  };
-
-  const renderCommandMenus = (record: Device) => {
-    const disabled = record.state && record.state.isOnline;
-    const isUpgrading = record.upgradeStatus && IsUpgrading(record.upgradeStatus.code);
-    return (
-      <Menu
-        onClick={(e) => {
-          onCommand(record, e.key);
-        }}
-        mode='vertical'
-      >
-        {hasPermission(Permission.DeviceCommand) && (
-          <>
-            <Menu.Item key={DeviceCommand.Reboot} disabled={!disabled} hidden={isUpgrading}>
-              重启
-            </Menu.Item>
-            {record.typeId !== DeviceType.Gateway && record.typeId !== DeviceType.Router && (
-              <Menu.Item
-                key={DeviceCommand.AcquireSensorData}
-                disabled={!disabled}
-                hidden={isUpgrading}
-              >
-                采集数据
-              </Menu.Item>
-            )}
-            {record.typeId !== DeviceType.Gateway &&
-              record.typeId !== DeviceType.Router &&
-              (record.typeId === DeviceType.BoltElongationMultiChannels && !isUpgrading ? (
-                <Menu.SubMenu title='重置数据' disabled={!disabled}>
-                  <Menu.Item
-                    key={`[${DeviceCommand.ResetData},1]`}
-                    disabled={!disabled}
-                    hidden={isUpgrading}
-                  >
-                    1
-                  </Menu.Item>
-                  <Menu.Item
-                    key={`[${DeviceCommand.ResetData},2]`}
-                    disabled={!disabled}
-                    hidden={isUpgrading}
-                  >
-                    2
-                  </Menu.Item>
-                  <Menu.Item
-                    key={`[${DeviceCommand.ResetData},3]`}
-                    disabled={!disabled}
-                    hidden={isUpgrading}
-                  >
-                    3
-                  </Menu.Item>
-                  <Menu.Item
-                    key={`[${DeviceCommand.ResetData},4]`}
-                    disabled={!disabled}
-                    hidden={isUpgrading}
-                  >
-                    4
-                  </Menu.Item>
-                </Menu.SubMenu>
-              ) : (
-                <Menu.Item key={DeviceCommand.ResetData} disabled={!disabled} hidden={isUpgrading}>
-                  重置数据
-                </Menu.Item>
-              ))}
-            <Menu.Item key={DeviceCommand.Reset} disabled={!disabled} hidden={isUpgrading}>
-              恢复出厂设置
-            </Menu.Item>
-            {(record.typeId === DeviceType.HighTemperatureCorrosion ||
-              record.typeId === DeviceType.NormalTemperatureCorrosion ||
-              record.typeId === DeviceType.BoltElongation ||
-              record.typeId === DeviceType.BoltElongationMultiChannels ||
-              record.typeId === DeviceType.PressureTemperature) && (
-              <Menu.Item key={DeviceCommand.Calibrate} disabled={!disabled} hidden={isUpgrading}>
-                校准
-              </Menu.Item>
-            )}
-          </>
-        )}
-        {hasPermissions(Permission.DeviceUpgrade, Permission.DeviceFirmwares) && (
-          <>
-            <Menu.Item key={DeviceCommand.Upgrade} disabled={!disabled} hidden={isUpgrading}>
-              固件升级
-            </Menu.Item>
-            <Menu.Item key={DeviceCommand.CancelUpgrade} hidden={!isUpgrading}>
-              取消升级
-            </Menu.Item>
-          </>
-        )}
-      </Menu>
-    );
   };
 
   const onEdit = (id: number, key: any) => {
@@ -270,16 +124,12 @@ const DevicePage = () => {
       render: (text: string, record: Device) => {
         return (
           <Space>
-            <Spin
-              indicator={<LoadingOutlined />}
-              size={'small'}
-              spinning={executeDevice ? executeDevice.id === record.id : false}
-            />
             {hasPermission(Permission.DeviceDetail) ? (
               <Link
                 to={{
                   pathname: `device-management`,
-                  search: `?locale=devices/deviceDetail&id=${record.id}`
+                  search: `?locale=devices/deviceDetail&id=${record.id}`,
+                  state: record.upgradeStatus?.code
                 }}
               >
                 {text}
@@ -351,7 +201,7 @@ const DevicePage = () => {
               />
             </Dropdown>
             <Dropdown
-              overlay={renderCommandMenus(record)}
+              overlay={<CommandMenu device={record} />}
               trigger={isMobile ? ['click'] : ['hover']}
             >
               <Button
@@ -518,40 +368,6 @@ const DevicePage = () => {
           onCancel={() => {
             setDevice(undefined);
             setEditSettingVisible(false);
-          }}
-        />
-      )}
-      {device && (
-        <UpgradeModal
-          visible={upgradeVisible}
-          device={device}
-          onSuccess={() => {
-            setDevice(undefined);
-            setUpgradeVisible(false);
-          }}
-          onCancel={() => {
-            setDevice(undefined);
-            setUpgradeVisible(false);
-          }}
-        />
-      )}
-      {visibleCalibrate && device && (
-        <EditCalibrateParas
-          visible={visibleCalibrate}
-          setVisible={setVisibleCalibrate}
-          typeId={device?.typeId}
-          properties={device.properties}
-          onUpdate={(paras) => {
-            setDevice(undefined);
-            setVisibleCalibrate(false);
-            SendDeviceCommandRequest(device.id, DeviceCommand.Calibrate, paras).then((res) => {
-              setExecuteDevice(undefined);
-              if (res.code === 200) {
-                message.success('命令发送成功').then();
-              } else {
-                message.error(res.msg).then();
-              }
-            });
           }}
         />
       )}
