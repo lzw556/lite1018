@@ -32,7 +32,6 @@ const AssetManagement: React.FC = () => {
   const { hasPermission } = usePermission();
 
   React.useEffect(() => {
-    localStorage.setItem('prevProjectId', getProject());
     fetchAssets({ type: appConfig.assetType.id });
   }, [appConfig.assetType.id]);
 

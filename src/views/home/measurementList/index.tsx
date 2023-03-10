@@ -34,7 +34,6 @@ const MeasurementManagement: React.FC = () => {
   const { hasPermission } = usePermission();
 
   React.useEffect(() => {
-    localStorage.setItem('prevProjectId', getProject());
     fetchAssets({ type: AppConfig.use(window.assetCategory).assetType.id });
   }, []);
 

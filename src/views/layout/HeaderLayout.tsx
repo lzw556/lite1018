@@ -9,11 +9,8 @@ import { persistor, store } from '../../store';
 import { useState } from 'react';
 import dayjs from '../../utils/dayjsUtils';
 import ProjectSelect from '../../components/select/projectSelect';
-import { getProject } from '../../utils/session';
 import { NavMenu } from './NavMenu';
 import { GetMyProjectRequest } from '../../apis/project';
-import { useLocation } from 'react-router-dom';
-import { verifyAssetOverview } from '../home/common/utils';
 import { Brand } from './brand';
 
 const { Text } = Typography;
@@ -23,7 +20,6 @@ const HeaderLayout = (props: any) => {
   const [currentUser] = useState<any>(store.getState().auth.data.user);
   const [now, setNow] = useState<string>(dayjs().format('YYYY-MM-DD HH:mm:ss'));
   const [visible, setVisible] = useState(false);
-  const { search } = useLocation();
 
   setInterval(() => {
     setNow(dayjs().format('YYYY-MM-DD HH:mm:ss'));
@@ -39,8 +35,6 @@ const HeaderLayout = (props: any) => {
     GetMyProjectRequest(value)
       .then((data) => {
         localStorage.removeItem('store');
-        if (verifyAssetOverview(search))
-          localStorage.setItem('prevProjectId', getProject() || value);
         store.dispatch({
           type: 'SET_PROJECT',
           payload: data.id

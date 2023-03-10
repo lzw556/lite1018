@@ -12,7 +12,6 @@ import { Introduction } from './components/introductionPage';
 import { OverviewPage } from './components/overviewPage';
 import { generateProjectAlarmStatis, getAssetStatistics } from './common/statisticsHelper';
 import { AlarmStatisticOfProject } from './AlarmStatisticOfProject';
-import { getProject } from '../../utils/session';
 import { isMobile } from '../../utils/deviceDetection';
 import * as AppConfig from '../../config';
 
@@ -40,7 +39,6 @@ const ProjectOverview: React.FC = () => {
     React.useState<ChartOptions<Series_Pie>>();
   const [statisticOfSensor, setStatisticOfSensor] = React.useState<ChartOptions<Series_Pie>>();
   React.useEffect(() => {
-    localStorage.setItem('prevProjectId', getProject());
     getProjectStatistics().then(
       ({
         rootAssetNum,
