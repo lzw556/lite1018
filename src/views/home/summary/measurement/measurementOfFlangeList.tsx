@@ -71,9 +71,7 @@ export const MeasurementOfFlangeList: React.FC<{
         width: 200,
         render: (name: string, row: MeasurementRow) =>
           row.bindingDevices && row.bindingDevices.length > 0
-            ? row.bindingDevices.map(({ id, name }) => (
-                <Link to={`/device-management?locale=devices/deviceDetail&id=${id}`}>{name}</Link>
-              ))
+            ? row.bindingDevices.map(({ id, name }) => <Link to={`devices/${id}`}>{name}</Link>)
             : ''
       },
       ...generatePropertyColumns(dataSource ? dataSource[0] : [])

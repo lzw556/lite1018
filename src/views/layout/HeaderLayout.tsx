@@ -7,7 +7,7 @@ import logo from '../../assets/images/logo-dark.png';
 import { CaretDownOutlined, MenuOutlined, UserOutlined } from '@ant-design/icons';
 import { persistor, store } from '../../store';
 import { useState } from 'react';
-import moment from 'moment';
+import dayjs from '../../utils/dayjsUtils';
 import ProjectSelect from '../../components/select/projectSelect';
 import { getProject } from '../../utils/session';
 import { NavMenu } from './NavMenu';
@@ -19,14 +19,14 @@ import { Brand } from './brand';
 const { Text } = Typography;
 
 const HeaderLayout = (props: any) => {
-  const { hideConsole, menus } = props;
+  const { menus } = props;
   const [currentUser] = useState<any>(store.getState().auth.data.user);
-  const [now, setNow] = useState<string>(moment().format('YYYY-MM-DD HH:mm:ss'));
+  const [now, setNow] = useState<string>(dayjs().format('YYYY-MM-DD HH:mm:ss'));
   const [visible, setVisible] = useState(false);
   const { search } = useLocation();
 
   setInterval(() => {
-    setNow(moment().format('YYYY-MM-DD HH:mm:ss'));
+    setNow(dayjs().format('YYYY-MM-DD HH:mm:ss'));
   }, 1000);
 
   const onLogout = () => {
@@ -80,15 +80,12 @@ const HeaderLayout = (props: any) => {
             {currentUser && (
               <ProjectSelect
                 bordered={false}
-                defaultValue={getProject()}
-                defaultActiveFirstOption={true}
                 suffixIcon={<CaretDownOutlined style={{ color: 'white' }} />}
                 style={{
                   maxWidth: 180,
                   backgroundColor: 'transparent',
                   color: 'white'
                 }}
-                size={'small'}
                 onChange={onProjectChange}
               />
             )}
@@ -119,16 +116,13 @@ const HeaderLayout = (props: any) => {
           onClose={() => setVisible(false)}
           bodyStyle={{ paddingLeft: 0, paddingRight: 0 }}
         >
-          <NavMenu menus={menus} setVisible={setVisible} />
+          <NavMenu menus={menus} />
           <Divider />
           {currentUser && (
             <div style={{ paddingLeft: 24, paddingBottom: 100 }}>
               <ProjectSelect
-                defaultValue={getProject()}
-                defaultActiveFirstOption={true}
                 suffixIcon={<CaretDownOutlined />}
                 style={{ width: '120px', textAlign: 'center' }}
-                size={'small'}
                 onChange={onProjectChange}
               />
             </div>

@@ -8,15 +8,15 @@ import {
   RemoveFirmwareRequest,
   UploadFirmwareRequest
 } from '../../apis/firmware';
-import moment from 'moment';
+import dayjs from '../../utils/dayjsUtils';
 import ShadowCard from '../../components/shadowCard';
-import MyBreadcrumb from '../../components/myBreadcrumb';
 import HasPermission from '../../permission';
 import { Permission } from '../../permission/permission';
 import { PageResult } from '../../types/page';
 import { Firmware } from '../../types/firmware';
 import { isMobile } from '../../utils/deviceDetection';
 import { Store, useStore } from '../../hooks/store';
+import { PageTitle } from '../../components/pageTitle';
 
 const FirmwarePage = () => {
   const [isUploading, setIsUploading] = useState<boolean>(false);
@@ -92,7 +92,7 @@ const FirmwarePage = () => {
       title: '编译时间',
       dataIndex: 'buildTime',
       key: 'buildTime',
-      render: (text: number) => moment.unix(text).local().format('yyyy-MM-DD HH:mm:ss')
+      render: (text: number) => dayjs.unix(text).local().format('yyyy-MM-DD HH:mm:ss')
     },
     {
       title: '操作',
@@ -117,22 +117,26 @@ const FirmwarePage = () => {
 
   return (
     <Content>
-      <MyBreadcrumb>
-        <HasPermission value={Permission.FirmwareAdd}>
-          <Upload
-            accept={'.bin'}
-            name='file'
-            customRequest={onUpload}
-            showUploadList={false}
-            onChange={onFileChange}
-          >
-            <Button type='primary' loading={isUploading}>
-              {isUploading ? '固件上传中' : '上传固件'}
-              {isUploading ? null : <UploadOutlined />}
-            </Button>
-          </Upload>
-        </HasPermission>
-      </MyBreadcrumb>
+      <PageTitle
+        items={[{ title: '固件列表' }]}
+        actions={
+          <HasPermission value={Permission.FirmwareAdd}>
+            <Upload
+              accept={'.bin'}
+              name='file'
+              customRequest={onUpload}
+              showUploadList={false}
+              onChange={onFileChange}
+            >
+              <Button type='primary' loading={isUploading}>
+                {isUploading ? '固件上传中' : '上传固件'}
+                {isUploading ? null : <UploadOutlined />}
+              </Button>
+            </Upload>
+          </HasPermission>
+        }
+      />
+
       <Row justify='center'>
         <Col span={24}>
           <ShadowCard>

@@ -1,11 +1,9 @@
-import MyBreadcrumb from '../../../components/myBreadcrumb';
 import { Content } from 'antd/es/layout/layout';
 import ShadowCard from '../../../components/shadowCard';
-import { Button, Col, Form, Input, message, Row, Space } from 'antd';
+import { Button, Col, Form, Input, message, Row } from 'antd';
 import { useEffect, useState } from 'react';
 import { Network } from '../../../types/network';
-import { useHistory, useLocation } from 'react-router-dom';
-import { GetParamValue } from '../../../utils/path';
+import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import {
   ExportNetworkRequest,
   GetNetworkRequest,
@@ -21,32 +19,29 @@ import ButtonGroup from 'antd/lib/button/button-group';
 import { defaultValidateMessages, Rules } from '../../../constants/validator';
 import WsnFormItem from '../../../components/formItems/wsnFormItem';
 import { useProvisionMode } from '../useProvisionMode';
+import { PageTitle } from '../../../components/pageTitle';
+import { Link } from 'react-router-dom';
 
 const NetworkDetail = () => {
   const { hasPermission } = usePermission();
   const location = useLocation();
-  const history = useHistory();
+  const { id } = useParams();
+  const navigate = useNavigate();
   const [network, setNetwork] = useState<Network>();
-  const [refreshKey, setRefreshKey] = useState(0);
   const [form] = Form.useForm();
   const [provisionMode, setProvisionMode, settings] = useProvisionMode(network);
 
-  const onRefresh = () => {
-    setRefreshKey(refreshKey + 1);
-  };
-
   useEffect(() => {
-    const id = GetParamValue(location.search, 'id');
     if (id) {
       GetNetworkRequest(Number(id))
         .then((data) => {
           setNetwork(data);
         })
         .catch((_) => {
-          history.goBack();
+          navigate(-1);
         });
     }
-  }, []);
+  }, [id, navigate]);
 
   useEffect(() => {
     if (network !== undefined) {
@@ -174,7 +169,7 @@ const NetworkDetail = () => {
 
   return (
     <Content style={{ display: 'flex', flexDirection: 'column' }}>
-      <MyBreadcrumb firstBreadState={location.state as any}></MyBreadcrumb>
+      <PageTitle items={[{ title: <Link to='/networks'>网络列表</Link> }, { title: '网络详情' }]} />
       {renderInformation()}
     </Content>
   );

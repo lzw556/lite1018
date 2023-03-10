@@ -1,6 +1,6 @@
 import { Card, Col, Empty, Row, Select, Space } from 'antd';
 import * as React from 'react';
-import moment from 'moment';
+import dayjs from '../../utils/dayjsUtils';
 import ReactECharts from 'echarts-for-react';
 import { FindDeviceDataRequest } from '../../apis/device';
 import { DefaultMonitorDataOption, LineChartStyles } from '../../constants/chart';
@@ -18,8 +18,8 @@ export const RecentHistory: React.FC<{ device: Device }> = ({ device }) => {
   React.useEffect(() => {
     FindDeviceDataRequest(
       device.id,
-      moment().startOf('day').subtract(13, 'd').utc().unix(),
-      moment().endOf('day').utc().unix(),
+      dayjs().startOf('day').subtract(13, 'd').utc().unix(),
+      dayjs().endOf('day').utc().unix(),
       isMultiChannels ? { channel } : {}
     ).then((data) => {
       setHistoryOptions(
@@ -32,7 +32,7 @@ export const RecentHistory: React.FC<{ device: Device }> = ({ device }) => {
           data
             .map((item: any) => {
               return {
-                time: moment.unix(item.timestamp).local(),
+                time: dayjs.unix(item.timestamp).local(),
                 property: item.values.find((item: any) => item.key === property.key)
               };
             })

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { PageResult } from '../../types/page';
-import moment from 'moment';
+import dayjs from '../../utils/dayjsUtils';
 import {
   GetAlarmRecordAcknowledgeRequest,
   PagingAlarmRecordRequest,
@@ -183,7 +183,7 @@ export const FilterableAlarmRecordTable: React.FC<{ sourceId?: number }> = ({ so
       key: 'createdAt',
       width: '15%',
       render: (createdAt: number) => {
-        return moment.unix(createdAt).local().format('YYYY-MM-DD HH:mm:ss');
+        return dayjs.unix(createdAt).local().format('YYYY-MM-DD HH:mm:ss');
       }
     },
     {
@@ -195,12 +195,12 @@ export const FilterableAlarmRecordTable: React.FC<{ sourceId?: number }> = ({ so
         switch (record.status) {
           case 1:
           case 2:
-            return moment
+            return dayjs
               .unix(record.createdAt)
               .local()
-              .from(moment.unix(record.updatedAt).local(), true);
+              .from(dayjs.unix(record.updatedAt).local(), true);
           default:
-            return moment.unix(record.createdAt).local().fromNow(true);
+            return dayjs.unix(record.createdAt).local().fromNow(true);
         }
       }
     },
@@ -296,7 +296,7 @@ export const FilterableAlarmRecordTable: React.FC<{ sourceId?: number }> = ({ so
               </Select>
             </Label>
             <RangeDatePicker
-              defaultRange={[moment.unix(store.range[0]), moment.unix(store.range[1])]}
+              defaultRange={[dayjs.unix(store.range[0]), dayjs.unix(store.range[1])]}
               onChange={React.useCallback(
                 (range: [number, number]) => {
                   setStore((prev) => {

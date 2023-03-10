@@ -1,20 +1,19 @@
 import { Button, DatePicker, Space } from 'antd';
-import moment from 'moment';
 import * as React from 'react';
+import dayjs, { RangeValue } from '../utils/dayjsUtils';
 
-export type RangeValue = [moment.Moment, moment.Moment];
 export const RangeDatePicker: React.FC<{
   defaultRange?: RangeValue;
   onChange?: (range: [number, number]) => void;
   showFooter?: boolean;
-}> = ({ defaultRange = [moment().subtract(7, 'd'), moment()], onChange, showFooter }) => {
+}> = ({ defaultRange = [dayjs().subtract(7, 'd'), dayjs()], onChange, showFooter }) => {
   const [range, setRange] = React.useState<RangeValue>(defaultRange);
 
   React.useEffect(() => {
     if (range && onChange) {
       onChange([
-        moment(range[0]).startOf('day').utc().unix(),
-        moment(range[1]).endOf('day').utc().unix()
+        dayjs(range[0]).startOf('day').utc().unix(),
+        dayjs(range[1]).endOf('day').utc().unix()
       ]);
     }
   }, [range, onChange]);
@@ -25,8 +24,8 @@ export const RangeDatePicker: React.FC<{
       defaultValue={defaultRange}
       value={range}
       renderExtraFooter={() => {
-        const calculateRange = (months: number): [moment.Moment, moment.Moment] => {
-          return [moment().startOf('day').subtract(months, 'months'), moment().endOf('day')];
+        const calculateRange = (months: number): RangeValue => {
+          return [dayjs().startOf('day').subtract(months, 'months'), dayjs().endOf('day')];
         };
         return (
           showFooter && (

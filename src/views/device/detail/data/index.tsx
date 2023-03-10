@@ -3,7 +3,7 @@ import { Button, Card, Col, Modal, Row, Select, Space } from 'antd';
 import { DeleteOutlined, DownloadOutlined } from '@ant-design/icons';
 import { Content } from 'antd/lib/layout/layout';
 import { Device } from '../../../../types/device';
-import moment from 'moment';
+import dayjs from '../../../../utils/dayjsUtils';
 import { EmptyLayout } from '../../../layout';
 import { FindDeviceDataRequest, RemoveDeviceDataRequest } from '../../../../apis/device';
 import HasPermission from '../../../../permission';
@@ -50,7 +50,7 @@ const HistoryDataPage: FC<DeviceDataProps> = ({ device }) => {
     if (dataSource) {
       const data = dataSource.map((item: any) => {
         return {
-          time: moment.unix(item.timestamp).local(),
+          time: dayjs.unix(item.timestamp).local(),
           property: item.values.find((item: any) => item.key === property.key)
         };
       });
@@ -113,10 +113,10 @@ const HistoryDataPage: FC<DeviceDataProps> = ({ device }) => {
         const [from, to] = range;
         Modal.confirm({
           title: '提示',
-          content: `确定要删除设备${device.name}从${moment
+          content: `确定要删除设备${device.name}从${dayjs
             .unix(from)
             .local()
-            .format('YYYY-MM-DD')}到${moment.unix(to).local().format('YYYY-MM-DD')}的数据吗？`,
+            .format('YYYY-MM-DD')}到${dayjs.unix(to).local().format('YYYY-MM-DD')}的数据吗？`,
           okText: '确定',
           cancelText: '取消',
           onOk: (close) => {

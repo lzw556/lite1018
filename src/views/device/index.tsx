@@ -30,7 +30,6 @@ import ShadowCard from '../../components/shadowCard';
 import '../../string-extension';
 import { IsUpgrading } from '../../types/device_upgrade_status';
 import '../../assets/iconfont.css';
-import MyBreadcrumb from '../../components/myBreadcrumb';
 import HasPermission from '../../permission';
 import usePermission, { Permission } from '../../permission/permission';
 import { PageResult } from '../../types/page';
@@ -47,6 +46,7 @@ import { Store, useStore } from '../../hooks/store';
 import * as AppConfig from '../../config';
 import { Normalizes } from '../../constants/validator';
 import { CommandMenu } from './commandMenu';
+import { PageTitle } from '../../components/pageTitle';
 
 const { Search } = Input;
 const { Option } = Select;
@@ -125,15 +125,7 @@ const DevicePage = () => {
         return (
           <Space>
             {hasPermission(Permission.DeviceDetail) ? (
-              <Link
-                to={{
-                  pathname: `device-management`,
-                  search: `?locale=devices/deviceDetail&id=${record.id}`,
-                  state: record.upgradeStatus?.code
-                }}
-              >
-                {text}
-              </Link>
+              <Link to={`${record.id}`}>{text}</Link>
             ) : (
               text
             )}
@@ -240,14 +232,17 @@ const DevicePage = () => {
 
   return (
     <Content>
-      <MyBreadcrumb>
-        <Space>
-          <Button type={'primary'} href={'#/device-management?locale=devices/addDevice'}>
-            添加设备
-            <PlusOutlined />
-          </Button>
-        </Space>
-      </MyBreadcrumb>
+      <PageTitle
+        items={[{ title: '设备列表' }]}
+        actions={
+          <Link to='create'>
+            <Button type='primary'>
+              添加设备
+              <PlusOutlined />
+            </Button>
+          </Link>
+        }
+      />
       <ShadowCard>
         <Row justify='center'>
           <Col span={24}>

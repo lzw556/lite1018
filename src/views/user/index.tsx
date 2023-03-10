@@ -8,7 +8,6 @@ import { DeleteOutlined, EditOutlined, UserAddOutlined } from '@ant-design/icons
 import AddUserModal from './add';
 import EditUserModal from './edit';
 import ShadowCard from '../../components/shadowCard';
-import MyBreadcrumb from '../../components/myBreadcrumb';
 import HasPermission from '../../permission';
 import { Permission } from '../../permission/permission';
 import { PageResult } from '../../types/page';
@@ -16,6 +15,7 @@ import { isMobile } from '../../utils/deviceDetection';
 import { Store, useStore } from '../../hooks/store';
 import { Role } from '../../types/role';
 import { PagingRolesRequest } from '../../apis/role';
+import { PageTitle } from '../../components/pageTitle';
 
 const UserPage = () => {
   const [addUserVisible, setAddUserVisible] = useState<boolean>(false);
@@ -132,15 +132,16 @@ const UserPage = () => {
 
   return (
     <Content>
-      <MyBreadcrumb>
-        <Space>
+      <PageTitle
+        items={[{ title: '用户管理' }]}
+        actions={
           <HasPermission value={Permission.UserAdd}>
             <Button type='primary' onClick={() => setAddUserVisible(true)}>
               添加用户 <UserAddOutlined />
             </Button>
           </HasPermission>
-        </Space>
-      </MyBreadcrumb>
+        }
+      />
       <Row justify='center'>
         <Col span={24}>
           <ShadowCard>

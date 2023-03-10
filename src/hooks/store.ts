@@ -1,4 +1,4 @@
-import moment from 'moment';
+import dayjs from '../utils/dayjsUtils';
 import * as React from 'react';
 import { PagedOption } from '../types/props';
 import { Filters } from '../views/device/util';
@@ -45,8 +45,8 @@ export function useStore<ReturnType extends keyof Store>(
       ...defaultOptions,
       alertLevels: [1, 2, 3],
       range: [
-        moment().subtract(1, 'd').startOf('day').utc().unix(),
-        moment().endOf('day').utc().unix()
+        dayjs().subtract(1, 'd').startOf('day').utc().unix(),
+        dayjs().endOf('day').utc().unix()
       ]
     },
     projectList: { ...defaultOptions },

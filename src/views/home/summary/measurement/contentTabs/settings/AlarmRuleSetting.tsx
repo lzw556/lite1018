@@ -176,7 +176,7 @@ export const AlarmRuleSetting: React.FC<MeasurementRow & { onUpdate?: () => void
         description={
           <p>
             还没有规则,去
-            <Link to='alarm-management?locale=alarmRules'>添加</Link>
+            <Link to='alarmRules'>添加</Link>
           </p>
         }
       />

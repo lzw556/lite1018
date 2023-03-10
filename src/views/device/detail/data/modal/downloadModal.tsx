@@ -1,7 +1,7 @@
 import { DatePicker, Form, Modal, ModalProps, Select } from 'antd';
 import { FC, useEffect, useState } from 'react';
 import { DownloadDeviceDataRequest } from '../../../../../apis/device';
-import moment from 'moment';
+import dayjs, { Dayjs } from '../../../../../utils/dayjsUtils';
 import { Device } from '../../../../../types/device';
 import { getSpecificProperties } from '../../../util';
 
@@ -17,10 +17,8 @@ export interface DownloadModalProps extends ModalProps {
 
 const DownloadModal: FC<DownloadModalProps> = (props) => {
   const { visible, device, property, onSuccess } = props;
-  const [startDate, setStartDate] = useState<moment.Moment>(
-    moment().startOf('day').subtract(7, 'd')
-  );
-  const [endDate, setEndDate] = useState<moment.Moment>(moment().endOf('day'));
+  const [startDate, setStartDate] = useState<Dayjs>(dayjs().startOf('day').subtract(7, 'd'));
+  const [endDate, setEndDate] = useState<Dayjs>(dayjs().endOf('day'));
   const [form] = Form.useForm();
 
   useEffect(() => {
@@ -84,8 +82,8 @@ const DownloadModal: FC<DownloadModalProps> = (props) => {
             value={[startDate, endDate]}
             onChange={(_, dateString) => {
               if (dateString) {
-                setStartDate(moment(dateString[0]).startOf('day'));
-                setEndDate(moment(dateString[1]).endOf('day'));
+                setStartDate(dayjs(dateString[0]).startOf('day'));
+                setEndDate(dayjs(dateString[1]).endOf('day'));
               }
             }}
           />

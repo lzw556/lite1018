@@ -3,7 +3,7 @@ import { FC, useEffect, useState } from 'react';
 import { Firmware } from '../../../types/firmware';
 import { Device } from '../../../types/device';
 import { GetDeviceFirmwaresRequest } from '../../../apis/firmware';
-import moment from 'moment/moment';
+import dayjs from '../../../utils/dayjsUtils';
 import { DeviceUpgradeRequest } from '../../../apis/device';
 import { DeviceCommand } from '../../../types/device_command';
 
@@ -53,7 +53,7 @@ const UpgradeModal: FC<UpgradeModalProps> = ({ visible, device, onCancel, onSucc
               编译时间
             </Col>
             <Col span={16}>
-              {moment.unix(firmware.buildTime).local().format('YYYY-MM-DD HH:mm:ss')}
+              {dayjs.unix(firmware.buildTime).local().format('YYYY-MM-DD HH:mm:ss')}
             </Col>
           </Row>
         </>

@@ -1,7 +1,7 @@
 import { Col, Empty, Row } from 'antd';
-import moment from 'moment';
+import dayjs from '../../../../utils/dayjsUtils';
 import * as React from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import ShadowCard from '../../../../components/shadowCard';
 import { AssetRow } from '../../assetList/props';
 import {
@@ -23,7 +23,7 @@ export const MonitorTabContent: React.FC<{
   search: string;
   asset?: AssetRow;
 }> = ({ measurements: measurementsProps, pathname, search, asset }) => {
-  const history = useHistory();
+  const navigate = useNavigate();
   const [measurements, setMeasurements] = React.useState<MeasurementRow[]>([]);
   const [statisticOfPreload, setStatisticOfPreload] = React.useState<any>();
   const [historyDatas, setHistoryDatas] = React.useState<
@@ -36,8 +36,8 @@ export const MonitorTabContent: React.FC<{
 
   React.useEffect(() => {
     if (measurements && measurements.length > 0) {
-      const from = moment().startOf('day').subtract(7, 'd').utc().unix();
-      const to = moment().endOf('day').utc().unix();
+      const from = dayjs().startOf('day').subtract(7, 'd').utc().unix();
+      const to = dayjs().endOf('day').utc().unix();
       setHistoryDatas([]);
       measurements.forEach(({ id, name, attributes }) => {
         getData(id, from, to).then((data) => {
@@ -98,7 +98,7 @@ export const MonitorTabContent: React.FC<{
               clickHandler: (paras: any, instance: any) => {
                 const index = paras.value[1];
                 if (measurements.length > index) {
-                  history.replace(
+                  navigate(
                     combineFinalUrl(
                       pathname,
                       search,

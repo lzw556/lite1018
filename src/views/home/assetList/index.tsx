@@ -15,6 +15,7 @@ import { PlusOutlined } from '@ant-design/icons';
 import { FileInput } from '../components/fileInput';
 import { AssetExport } from '../components/assetExport';
 import * as AppConfig from '../../../config';
+import { PageTitle } from '../../../components/pageTitle';
 
 const AssetManagement: React.FC = () => {
   const appConfig = AppConfig.use(window.assetCategory);
@@ -74,62 +75,69 @@ const AssetManagement: React.FC = () => {
   return (
     <SearchResultPage
       {...{
-        actions: hasPermission(Permission.AssetAdd) && (
-          <ActionBar
-            actions={[
-              <Button
-                key='topAssetEdit'
-                type='primary'
-                onClick={() => {
-                  if (isAssetWind) {
-                    actionStatus.handleWindEdit();
-                  } else {
-                    actionStatus.handleTopAssetEdit();
-                  }
-                }}
-              >
-                添加{appConfig.assetType.label}
-                <PlusOutlined />
-              </Button>,
-              isAssetWind && (
-                <Button
-                  key='flangeEidt'
-                  type='primary'
-                  onClick={() => actionStatus.handleFlangeEdit()}
-                  disabled={assets.items.length === 0}
-                >
-                  添加法兰
-                  <PlusOutlined />
-                </Button>
-              ),
-              <Button
-                key='measurementEdit'
-                type='primary'
-                onClick={() => {
-                  if (isAssetWind) {
-                    actionStatus.handleAddMeasurements();
-                  } else {
-                    actionStatus.handleMeasurementEdit();
-                  }
-                }}
-                disabled={
-                  assets.items.filter((asset) => {
-                    if (window.assetCategory === 'wind') {
-                      return asset.children && asset.children.length > 0;
-                    } else {
-                      return true;
-                    }
-                  }).length === 0
-                }
-              >
-                添加监测点
-                <PlusOutlined />
-              </Button>,
-              assets.items.length > 0 && <AssetExport winds={assets.items} key='export' />,
-              <FileInput onUpload={handleUpload} key='upload' />
-            ]}
-            {...actionStatus}
-            onSuccess={() => fetchAssets({ type: appConfig.assetType.id })}
+        pageTitle: (
+          <PageTitle
+            items={[{ title: '资产树' }]}
+            actions={
+              hasPermission(Permission.AssetAdd) && (
+                <ActionBar
+                  actions={[
+                    <Button
+                      key='topAssetEdit'
+                      type='primary'
+                      onClick={() => {
+                        if (isAssetWind) {
+                          actionStatus.handleWindEdit();
+                        } else {
+                          actionStatus.handleTopAssetEdit();
+                        }
+                      }}
+                    >
+                      添加{appConfig.assetType.label}
+                      <PlusOutlined />
+                    </Button>,
+                    isAssetWind && (
+                      <Button
+                        key='flangeEidt'
+                        type='primary'
+                        onClick={() => actionStatus.handleFlangeEdit()}
+                        disabled={assets.items.length === 0}
+                      >
+                        添加法兰
+                        <PlusOutlined />
+                      </Button>
+                    ),
+                    <Button
+                      key='measurementEdit'
+                      type='primary'
+                      onClick={() => {
+                        if (isAssetWind) {
+                          actionStatus.handleAddMeasurements();
+                        } else {
+                          actionStatus.handleMeasurementEdit();
+                        }
+                      }}
+                      disabled={
+                        assets.items.filter((asset) => {
+                          if (window.assetCategory === 'wind') {
+                            return asset.children && asset.children.length > 0;
+                          } else {
+                            return true;
+                          }
+                        }).length === 0
+                      }
+                    >
+                      添加监测点
+                      <PlusOutlined />
+                    </Button>,
+                    assets.items.length > 0 && <AssetExport winds={assets.items} key='export' />,
+                    <FileInput onUpload={handleUpload} key='upload' />
+                  ]}
+                  {...actionStatus}
+                  onSuccess={() => fetchAssets({ type: appConfig.assetType.id })}
+                />
+              )
+            }
           />
         ),
         results: renderResult()

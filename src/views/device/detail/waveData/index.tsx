@@ -1,6 +1,6 @@
 import { Checkbox, Col, ConfigProvider, DatePicker, Row, Select, Space, Table } from 'antd';
 import EChartsReact from 'echarts-for-react';
-import moment from 'moment';
+import dayjs from '../../../../utils/dayjsUtils';
 import * as React from 'react';
 import { useCallback, useState } from 'react';
 import { LineChartStyles } from '../../../../constants/chart';
@@ -47,8 +47,8 @@ const defaultChartOption = {
 };
 
 const WaveDataChart: React.FC<{ device: Device }> = ({ device }) => {
-  const [beginDate, setBeginDate] = React.useState(moment().subtract(3, 'days').startOf('day'));
-  const [endDate, setEndDate] = React.useState(moment().endOf('day'));
+  const [beginDate, setBeginDate] = React.useState(dayjs().subtract(3, 'days').startOf('day'));
+  const [endDate, setEndDate] = React.useState(dayjs().endOf('day'));
   const [dataSource, setDataSource] = React.useState<any>();
   const [deviceData, setDeviceData] = React.useState<any>();
   const [calculate, setCalculate] = React.useState<string>('accelerationTimeDomain');
@@ -127,7 +127,7 @@ const WaveDataChart: React.FC<{ device: Device }> = ({ device }) => {
       dataIndex: 'timestamp',
       key: 'timestamp',
       width: '80%',
-      render: (timestamp: number) => moment.unix(timestamp).local().format('YYYY-MM-DD HH:mm:ss')
+      render: (timestamp: number) => dayjs.unix(timestamp).local().format('YYYY-MM-DD HH:mm:ss')
     },
     {
       title: '操作',
@@ -154,7 +154,7 @@ const WaveDataChart: React.FC<{ device: Device }> = ({ device }) => {
         link.href = url;
         link.setAttribute(
           'download',
-          `${moment.unix(timestamp).local().format('YYYY-MM-DD_hh-mm-ss')}${getChartTitle()}.csv`
+          `${dayjs.unix(timestamp).local().format('YYYY-MM-DD_hh-mm-ss')}${getChartTitle()}.csv`
         );
         document.body.appendChild(link);
         link.click();
@@ -311,8 +311,8 @@ const WaveDataChart: React.FC<{ device: Device }> = ({ device }) => {
               value={[beginDate, endDate]}
               onChange={(date, dateString) => {
                 if (dateString) {
-                  setBeginDate(moment(dateString[0]).startOf('day'));
-                  setEndDate(moment(dateString[1]).endOf('day'));
+                  setBeginDate(dayjs(dateString[0]).startOf('day'));
+                  setEndDate(dayjs(dateString[1]).endOf('day'));
                 }
               }}
             />
@@ -331,7 +331,7 @@ const WaveDataChart: React.FC<{ device: Device }> = ({ device }) => {
             >
               {dataSource.map((item: any) => (
                 <Option key={item.timestamp} value={item.timestamp}>
-                  {moment.unix(item.timestamp).local().format('YYYY-MM-DD HH:mm:ss')}
+                  {dayjs.unix(item.timestamp).local().format('YYYY-MM-DD HH:mm:ss')}
                 </Option>
               ))}
             </Select>
@@ -372,8 +372,8 @@ const WaveDataChart: React.FC<{ device: Device }> = ({ device }) => {
                 value={[beginDate, endDate]}
                 onChange={(date, dateString) => {
                   if (dateString) {
-                    setBeginDate(moment(dateString[0]).startOf('day'));
-                    setEndDate(moment(dateString[1]).endOf('day'));
+                    setBeginDate(dayjs(dateString[0]).startOf('day'));
+                    setEndDate(dayjs(dateString[1]).endOf('day'));
                   }
                 }}
               />

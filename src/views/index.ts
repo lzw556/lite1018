@@ -1,7 +1,6 @@
 import { lazy } from 'react';
 
 export const Login = lazy(() => import('./login'));
-export const Console = lazy(() => import('./console'));
 export const Device = lazy(() => import('./device'));
 export const DeviceDetail = lazy(() => import('./device/detail'));
 export const AddDevice = lazy(() => import('./device/add'));
@@ -13,8 +12,6 @@ export const Firmware = lazy(() => import('./firmware'));
 export const User = lazy(() => import('./user'));
 export const Me = lazy(() => import('./me'));
 export const Role = lazy(() => import('./system/role'));
-export const Menu = lazy(() => import('./system/menu'));
-export const Permission = lazy(() => import('./system/permission'));
 export const System = lazy(() => import('./system'));
 export const Project = lazy(() => import('./project'));
 export const ProjectOverview = lazy(() => import('./home'));

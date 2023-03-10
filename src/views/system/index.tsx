@@ -7,8 +7,8 @@ import EChartsReact from 'echarts-for-react';
 import { DefaultGaugeOption } from '../../constants/chart';
 import { ColorHealth } from '../../constants/color';
 import { Content } from 'antd/es/layout/layout';
-import MyBreadcrumb from '../../components/myBreadcrumb';
 import { isMobile } from '../../utils/deviceDetection';
+import { PageTitle } from '../../components/pageTitle';
 
 const SystemPage = () => {
   const [data, setData] = useState<System>();
@@ -62,7 +62,7 @@ const SystemPage = () => {
 
   return (
     <Content>
-      <MyBreadcrumb />
+      <PageTitle items={[{ title: '系统状态' }]} />
       <Row justify={'space-between'}>
         <Col
           span={isMobile ? 24 : 12}

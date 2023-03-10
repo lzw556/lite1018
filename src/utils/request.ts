@@ -2,7 +2,7 @@ import axios, { AxiosRequestConfig, AxiosResponse, Method } from 'axios';
 import { ResponseResult } from '../types/response';
 import { getProject, getToken, isLogin } from './session';
 import { message } from 'antd';
-import moment from 'moment-timezone';
+import dayjs from '../utils/dayjsUtils';
 
 axios.defaults.timeout = 30 * 1000;
 axios.defaults.baseURL = '/api';
@@ -11,7 +11,7 @@ axios.interceptors.request.use((config: AxiosRequestConfig) => {
   if (isLogin()) {
     config.headers.Authorization = `Bearer ${getToken()}`;
     config.headers.Project = getProject();
-    config.headers.Timezone = moment.tz.guess();
+    config.headers.Timezone = dayjs.tz.guess();
   }
   return config;
 });

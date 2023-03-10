@@ -1,5 +1,5 @@
 import { Col, Row, Space, Typography } from 'antd';
-import moment from 'moment';
+import dayjs from '../../../../utils/dayjsUtils';
 import * as React from 'react';
 import { Device } from '../../../../types/device';
 import { DeviceType } from '../../../../types/device_type';
@@ -169,7 +169,7 @@ export const SingleDeviceDetail: React.FC<{ device: Device; upgradeStatus: any }
           </Col>
           <Col span={isMobile ? 24 : 16} className='ts-detail-content'>
             {device.state.connectedAt
-              ? moment(device.state.connectedAt * 1000).format('YYYY-MM-DD HH:mm:ss')
+              ? dayjs(device.state.connectedAt * 1000).format('YYYY-MM-DD HH:mm:ss')
               : '-'}
           </Col>
         </Row>
@@ -192,7 +192,7 @@ export const SingleDeviceDetail: React.FC<{ device: Device; upgradeStatus: any }
             </Col>
             <Col span={isMobile ? 24 : 16} className='ts-detail-content'>
               {device.data && device.data.timestamp && device.data.timestamp > 0
-                ? moment.unix(device.data.timestamp).local().format('YYYY-MM-DD HH:mm:ss')
+                ? dayjs.unix(device.data.timestamp).local().format('YYYY-MM-DD HH:mm:ss')
                 : '-'}
             </Col>
           </Row>

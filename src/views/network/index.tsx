@@ -10,20 +10,20 @@ import {
 } from '../../apis/network';
 import ShadowCard from '../../components/shadowCard';
 import './index.css';
-import MyBreadcrumb from '../../components/myBreadcrumb';
 import TableLayout from '../layout/TableLayout';
 import AddNetworkModal from './modal/addNetworkModal';
 import { Button, Col, Dropdown, Menu, message, Popconfirm, Row, Space } from 'antd';
 import { CodeOutlined, DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
 import { Network, NetworkProvisioningMode } from '../../types/network';
 import EditNetworkModal from './modal/editNetworkModal';
-import moment from 'moment';
+import dayjs from '../../utils/dayjsUtils';
 import { PageResult } from '../../types/page';
 import usePermission, { Permission } from '../../permission/permission';
 import HasPermission from '../../permission';
 import { isMobile } from '../../utils/deviceDetection';
 import { Link } from 'react-router-dom';
 import { Store, useStore } from '../../hooks/store';
+import { PageTitle } from '../../components/pageTitle';
 
 const NetworkPage = () => {
   const { hasPermission, hasPermissions } = usePermission();
@@ -130,16 +130,7 @@ const NetworkPage = () => {
       key: 'name',
       render: (text: string, record: Network) => {
         if (hasPermission(Permission.NetworkDetail)) {
-          return (
-            <Link
-              to={{
-                pathname: `network-management`,
-                search: `?locale=networks/networkDetail&id=${record.id}`
-              }}
-            >
-              {text}
-            </Link>
-          );
+          return <Link to={`${record.id}`}>{text}</Link>;
         }
         return text;
       }
@@ -157,7 +148,7 @@ const NetworkPage = () => {
       dataIndex: 'communicationPeriod',
       key: 'communicationPeriod',
       render: (text: number, record: Network) => {
-        return moment.duration(text / 1000, 'seconds').humanize();
+        return dayjs.duration(text / 1000, 'seconds').humanize();
       }
     },
     {
@@ -171,7 +162,7 @@ const NetworkPage = () => {
         if (text / 1000 < 60 || (text / 1000) % 60 !== 0) {
           return `${text / 1000}秒`;
         }
-        return moment.duration(text / 1000, 'seconds').humanize();
+        return dayjs.duration(text / 1000, 'seconds').humanize();
       }
     },
     {
@@ -220,16 +211,17 @@ const NetworkPage = () => {
 
   return (
     <Content>
-      <MyBreadcrumb>
-        <HasPermission value={Permission.NetworkAdd}>
-          <Space>
+      <PageTitle
+        items={[{ title: '网络列表' }]}
+        actions={
+          <HasPermission value={Permission.NetworkAdd}>
             <Button type={'primary'} onClick={() => setAddVisible(true)}>
               添加网络
               <PlusOutlined />
             </Button>
-          </Space>
-        </HasPermission>
-      </MyBreadcrumb>
+          </HasPermission>
+        }
+      />
       <ShadowCard>
         <Row justify={'start'}>
           <Col span={24}>

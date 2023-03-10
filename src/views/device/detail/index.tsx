@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
-import { GetParamValue } from '../../../utils/path';
-import { Button, Col, Dropdown, message, Row, Space } from 'antd';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
+import { Button, Col, Dropdown, message, Row } from 'antd';
 import { Device } from '../../../types/device';
 import { GetDeviceRequest } from '../../../apis/device';
 import { Content } from 'antd/lib/layout/layout';
@@ -10,7 +9,6 @@ import ShadowCard from '../../../components/shadowCard';
 import { DownOutlined } from '@ant-design/icons';
 import SettingPage from './setting';
 import { DeviceType } from '../../../types/device_type';
-import MyBreadcrumb from '../../../components/myBreadcrumb';
 import HasPermission from '../../../permission';
 import userPermission, { Permission } from '../../../permission/permission';
 import HistoryDataPage from './data';
@@ -23,6 +21,8 @@ import { isMobile } from '../../../utils/deviceDetection';
 import { FilterableAlarmRecordTable } from '../../../components/alarm/filterableAlarmRecordTable';
 import { DynamicData } from './dynamicData';
 import { CommandMenu } from '../commandMenu';
+import { isNumber } from 'lodash';
+import { PageTitle } from '../../../components/pageTitle';
 
 const tabTitleList = [
   {
@@ -36,7 +36,9 @@ const tabTitleList = [
 ];
 
 const DeviceDetailPage = () => {
-  const location = useLocation<any>();
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const location = useLocation();
   const { PubSub } = useSocket();
   const [device, setDevice] = useState<Device>();
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -66,20 +68,19 @@ const DeviceDetailPage = () => {
   ]);
 
   const fetchDevice = useCallback(() => {
-    const id = GetParamValue(location.search, 'id');
-    if (id && !!Number(id)) {
+    if (id && isNumber(Number(id))) {
       setIsLoading(true);
       GetDeviceRequest(Number(id))
         .then((data) => {
           setDevice(data);
           setIsLoading(false);
         })
-        .catch((_) => (window.location.hash = '/device-management?locale=devices'));
+        .catch((_) => navigate('/devices'));
     } else {
       message.error('设备不存在').then();
-      window.location.hash = '/device-management?locale=devices';
+      navigate('/devices');
     }
-  }, []);
+  }, [id, navigate]);
 
   useEffect(() => {
     fetchDevice();
@@ -149,8 +150,9 @@ const DeviceDetailPage = () => {
   return (
     <Content>
       {device && (
-        <MyBreadcrumb firstBreadState={location.state}>
-          <Space>
+        <PageTitle
+          items={[{ title: <Link to='/devices'>设备列表</Link> }, { title: '设备详情' }]}
+          actions={
             <HasPermission value={Permission.DeviceCommand}>
               <Dropdown
                 overlay={<CommandMenu device={device} initialUpgradeCode={location.state} />}
@@ -162,8 +164,8 @@ const DeviceDetailPage = () => {
                 </Button>
               </Dropdown>
             </HasPermission>
-          </Space>
-        </MyBreadcrumb>
+          }
+        />
       )}
       <Row justify='center'>
         <Col span={24}>

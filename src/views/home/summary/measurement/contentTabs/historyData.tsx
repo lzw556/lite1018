@@ -1,6 +1,6 @@
 import { DeleteOutlined, DownloadOutlined } from '@ant-design/icons';
 import { Button, Col, Empty, Modal, Row, Select, Space, Spin } from 'antd';
-import moment from 'moment';
+import dayjs from '../../../../../utils/dayjsUtils';
 import * as React from 'react';
 import Label from '../../../../../components/label';
 import { RangeDatePicker } from '../../../../../components/rangeDatePicker';
@@ -108,10 +108,10 @@ export const HistoryData: React.FC<MeasurementRow> = (props) => {
                         const [from, to] = range;
                         Modal.confirm({
                           title: '提示',
-                          content: `确定要删除${props.name}从${moment
+                          content: `确定要删除${props.name}从${dayjs
                             .unix(from)
                             .local()
-                            .format('YYYY-MM-DD')}到${moment
+                            .format('YYYY-MM-DD')}到${dayjs
                             .unix(to)
                             .local()
                             .format('YYYY-MM-DD')}的数据吗？`,

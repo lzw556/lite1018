@@ -1,4 +1,4 @@
-import moment from 'moment';
+import dayjs from '../../../utils/dayjsUtils';
 import * as AppConfig from '../../../config';
 import { MeasurementRow } from '../summary/measurement/props';
 import { measurementTypes } from './constants';
@@ -44,7 +44,7 @@ export function combineFinalUrl(pathname: string, search: string, subpath: strin
 }
 
 export const getFilename = (res: any) => {
-  let filename = `${moment().format('YYYY-MM-DD HH:mm:ss')}.json`;
+  let filename = `${dayjs().format('YYYY-MM-DD HH:mm:ss')}.json`;
   const dispos = res.headers['content-disposition'];
   if (dispos) {
     const disposParts = dispos.split(';');

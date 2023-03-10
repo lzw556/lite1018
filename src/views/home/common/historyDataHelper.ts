@@ -1,5 +1,5 @@
 import { cloneDeep, round } from 'lodash';
-import moment from 'moment';
+import dayjs from '../../../utils/dayjsUtils';
 import { LineChartStyles } from '../../../constants/chart';
 import { ColorDanger, ColorHealth, ColorInfo, ColorWarn } from '../../../constants/color';
 import { isMobile } from '../../../utils/deviceDetection';
@@ -169,7 +169,7 @@ export function generateChartOptionsOfHistoryData(
         if (_series) {
           times.map((time, index) =>
             _data.push([
-              moment.unix(time).local().format('YYYY-MM-DD HH:mm:ss'),
+              dayjs.unix(time).local().format('YYYY-MM-DD HH:mm:ss'),
               _series.data[index]
             ])
           );
@@ -442,7 +442,7 @@ export function generateChartOptionsOfHistoryDatas(
         type: 'category',
         boundaryGap: false,
         axisLabel: { align: 'left' },
-        data: times.map((item) => moment.unix(item).local().format('YYYY-MM-DD HH:mm:ss'))
+        data: times.map((item) => dayjs.unix(item).local().format('YYYY-MM-DD HH:mm:ss'))
       },
       yAxis: { type: 'value' }
     };
@@ -470,7 +470,7 @@ export function generatePropertyColumns(measurement: MeasurementRow) {
         key: 'timestamp',
         render: (measurement: MeasurementRow) => {
           return measurement.data && measurement.data.timestamp
-            ? moment(measurement.data.timestamp * 1000).format('YYYY-MM-DD HH:mm:ss')
+            ? dayjs(measurement.data.timestamp * 1000).format('YYYY-MM-DD HH:mm:ss')
             : '-';
         },
         width: 200

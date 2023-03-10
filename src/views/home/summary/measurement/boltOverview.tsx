@@ -1,6 +1,6 @@
 import { Col, Empty, Row, Spin } from 'antd';
 import * as React from 'react';
-import { useLocation, useHistory, Link } from 'react-router-dom';
+import { useLocation, useNavigate, Link } from 'react-router-dom';
 import '../../home.css';
 import { MeasurementRow } from './props';
 import { getMeasurement } from './services';
@@ -10,7 +10,7 @@ import { AssetNavigator } from '../../components/assetNavigator';
 
 const BoltOverview: React.FC = () => {
   const { search } = useLocation();
-  const history = useHistory();
+  const navigate = useNavigate();
   const id = Number(search.substring(search.lastIndexOf('id=') + 3));
   const [loading, setLoading] = React.useState(true);
   const [measurement, setMeasurement] = React.useState<MeasurementRow>();
@@ -32,12 +32,11 @@ const BoltOverview: React.FC = () => {
       <Empty
         description={
           <p>
-            还没有监测点, 去
-            <Link to='/measurement-management?locale=measruement-management'>创建</Link>, 或
+            还没有监测点, 去<Link to='measurement-management'>创建</Link>, 或
             <a
               href='#!'
               onClick={(e) => {
-                history.goBack();
+                navigate(-1);
                 e.preventDefault();
               }}
             >

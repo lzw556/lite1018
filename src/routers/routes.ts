@@ -52,39 +52,6 @@ const SecondaryRoutes: Menu[] = [
     children: []
   },
   {
-    id: 101,
-    name: 'addAlarmRule',
-    path: '/alarm-management',
-    title: '添加规则',
-    view: 'AddAlarmRule',
-    icon: '',
-    hidden: true,
-    isAuth: true,
-    children: []
-  },
-  {
-    id: 102,
-    name: 'addAlarmRuleTemplate',
-    path: '/alarm-management',
-    title: '添加规则模板',
-    view: 'AddAlarmRuleTemplate',
-    icon: '',
-    hidden: true,
-    isAuth: true,
-    children: []
-  },
-  {
-    id: 103,
-    name: 'editAlarmRuleTemplate',
-    path: '/alarm-management',
-    title: '编辑规则模板',
-    view: 'EditAlarmRuleTemplate',
-    icon: '',
-    hidden: true,
-    isAuth: true,
-    children: []
-  },
-  {
     id: 104,
     name: 'networkDetail',
     path: '/network-management',
@@ -92,127 +59,6 @@ const SecondaryRoutes: Menu[] = [
     view: 'NetworkDetail',
     icon: '',
     hidden: true,
-    isAuth: true,
-    children: []
-  },
-  {
-    id: 105,
-    name: 'measurementDetail',
-    path: '/asset-management',
-    title: '监测点详情',
-    view: 'MeasurementDetail',
-    icon: '',
-    hidden: true,
-    isAuth: true,
-    children: []
-  },
-  {
-    id: 107,
-    name: 'deviceDetail',
-    path: '/device-monitor',
-    title: '设备详情',
-    view: 'DeviceDetail',
-    icon: '',
-    hidden: true,
-    isAuth: true,
-    children: []
-  },
-  {
-    id: 108,
-    name: 'windturbine',
-    path: '/project-overview',
-    title: '总览',
-    view: 'WindTurbineOverview',
-    icon: '',
-    hidden: false,
-    isAuth: true,
-    children: []
-  },
-  {
-    id: 109,
-    name: 'windturbine',
-    path: '/asset-management',
-    title: '资产列表',
-    view: 'WindTurbineOverview',
-    icon: '',
-    hidden: false,
-    isAuth: true,
-    children: []
-  },
-  {
-    id: 110,
-    name: 'windturbine',
-    path: '/measurement-management',
-    title: '监测点列表',
-    view: 'WindTurbineOverview',
-    icon: '',
-    hidden: false,
-    isAuth: true,
-    children: []
-  },
-  {
-    id: 111,
-    name: 'flange',
-    path: '/project-overview',
-    title: '总览',
-    view: 'FlangeOverview',
-    icon: '',
-    hidden: false,
-    isAuth: true,
-    children: []
-  },
-  {
-    id: 112,
-    name: 'flange',
-    path: '/asset-management',
-    title: '资产列表',
-    view: 'FlangeOverview',
-    icon: '',
-    hidden: false,
-    isAuth: true,
-    children: []
-  },
-  {
-    id: 113,
-    name: 'flange',
-    path: '/measurement-management',
-    title: '监测点列表',
-    view: 'FlangeOverview',
-    icon: '',
-    hidden: false,
-    isAuth: true,
-    children: []
-  },
-  {
-    id: 114,
-    name: 'bolt',
-    path: '/project-overview',
-    title: '总览',
-    view: 'BoltOverview',
-    icon: '',
-    hidden: false,
-    isAuth: true,
-    children: []
-  },
-  {
-    id: 115,
-    name: 'bolt',
-    path: '/asset-management',
-    title: '资产列表',
-    view: 'BoltOverview',
-    icon: '',
-    hidden: false,
-    isAuth: true,
-    children: []
-  },
-  {
-    id: 116,
-    name: 'bolt',
-    path: '/measurement-management',
-    title: '监测点列表',
-    view: 'BoltOverview',
-    icon: '',
-    hidden: false,
     isAuth: true,
     children: []
   },
@@ -235,39 +81,6 @@ const SecondaryRoutes: Menu[] = [
     view: 'AlarmRuleGroupEdit',
     icon: '',
     hidden: true,
-    isAuth: true,
-    children: []
-  },
-  {
-    id: 113,
-    name: 'asset',
-    path: '/project-overview',
-    title: '总览',
-    view: 'AssetOverview',
-    icon: '',
-    hidden: false,
-    isAuth: true,
-    children: []
-  },
-  {
-    id: 114,
-    name: 'asset',
-    path: '/asset-management',
-    title: '资产列表',
-    view: 'AssetOverview',
-    icon: '',
-    hidden: false,
-    isAuth: true,
-    children: []
-  },
-  {
-    id: 115,
-    name: 'asset',
-    path: '/measurement-management',
-    title: '监测点列表',
-    view: 'AssetOverview',
-    icon: '',
-    hidden: false,
     isAuth: true,
     children: []
   }

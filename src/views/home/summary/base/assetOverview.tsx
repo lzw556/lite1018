@@ -1,6 +1,6 @@
 import { Form, Spin } from 'antd';
 import * as React from 'react';
-import { useLocation, useHistory } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { AssetNavigator } from '../../components/assetNavigator';
 import '../../home.css';
 import { getAsset } from '../../assetList/services';
@@ -14,7 +14,6 @@ import { AssetTree } from '../../assetList/assetTree';
 
 const AssetOverview: React.FC = () => {
   const { pathname, search } = useLocation();
-  const history = useHistory();
   const id = Number(search.substring(search.lastIndexOf('id=') + 3));
   const [asset, setAsset] = React.useState<AssetRow>();
   const [loading, setLoading] = React.useState(true);
@@ -50,7 +49,7 @@ const AssetOverview: React.FC = () => {
         ).statistics
       );
     }
-  }, [asset, pathname, search, history]);
+  }, [asset, pathname, search]);
 
   if (loading) return <Spin />;
 

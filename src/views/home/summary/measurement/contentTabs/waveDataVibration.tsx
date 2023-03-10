@@ -1,5 +1,5 @@
 import { Col, Empty, Row, Select, Space, Spin, Table } from 'antd';
-import moment from 'moment';
+import dayjs from '../../../../../utils/dayjsUtils';
 import * as React from 'react';
 import { RangeDatePicker } from '../../../../../components/rangeDatePicker';
 import { LineChartStyles } from '../../../../../constants/chart';
@@ -136,7 +136,7 @@ export const WaveDataVibration: React.FC<MeasurementRow> = (props) => {
             key: 'timestamp',
             width: '80%',
             render: (timestamp: number) =>
-              moment.unix(timestamp).local().format('YYYY-MM-DD HH:mm:ss')
+              dayjs.unix(timestamp).local().format('YYYY-MM-DD HH:mm:ss')
           }
         ]}
         pagination={false}

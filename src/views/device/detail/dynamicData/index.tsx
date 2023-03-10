@@ -1,6 +1,6 @@
 import { DownloadOutlined } from '@ant-design/icons';
 import { Col, ConfigProvider, DatePicker, Row, Select, Space, Table } from 'antd';
-import moment from 'moment';
+import dayjs from '../../../../utils/dayjsUtils';
 import * as React from 'react';
 import { Device } from '../../../../types/device';
 import { isMobile } from '../../../../utils/deviceDetection';
@@ -27,8 +27,8 @@ import ShadowCard from '../../../../components/shadowCard';
 export const DynamicData: React.FC<Device> = ({ id, typeId }) => {
   const { fields, data_type } =
     typeId === DeviceType.AngleDip ? DYNAMIC_DATA_ANGLEDIP : DYNAMIC_DATA_BOLTELONGATION;
-  const [beginDate, setBeginDate] = React.useState(moment().subtract(3, 'days').startOf('day'));
-  const [endDate, setEndDate] = React.useState(moment().endOf('day'));
+  const [beginDate, setBeginDate] = React.useState(dayjs().subtract(3, 'days').startOf('day'));
+  const [endDate, setEndDate] = React.useState(dayjs().endOf('day'));
   const [isLoading, timestamps, fetchTimestamps] = useFindingDeviceData();
   const [timestamp, setTimestamp] = React.useState(0);
   const [field, setField] = React.useState(fields[0]);
@@ -61,7 +61,7 @@ export const DynamicData: React.FC<Device> = ({ id, typeId }) => {
         link.href = url;
         link.setAttribute(
           'download',
-          `${moment.unix(timestamp).local().format('YYYY-MM-DD_hh-mm-ss')}${field.label}.csv`
+          `${dayjs.unix(timestamp).local().format('YYYY-MM-DD_hh-mm-ss')}${field.label}.csv`
         );
         document.body.appendChild(link);
         link.click();
@@ -223,8 +223,8 @@ export const DynamicData: React.FC<Device> = ({ id, typeId }) => {
               value={[beginDate, endDate]}
               onChange={(date, dateString) => {
                 if (dateString) {
-                  setBeginDate(moment(dateString[0]).startOf('day'));
-                  setEndDate(moment(dateString[1]).endOf('day'));
+                  setBeginDate(dayjs(dateString[0]).startOf('day'));
+                  setEndDate(dayjs(dateString[1]).endOf('day'));
                 }
               }}
             />
@@ -243,7 +243,7 @@ export const DynamicData: React.FC<Device> = ({ id, typeId }) => {
             >
               {timestamps.map((item: any) => (
                 <Select.Option key={item.timestamp} value={item.timestamp}>
-                  {moment.unix(item.timestamp).local().format('YYYY-MM-DD HH:mm:ss')}
+                  {dayjs.unix(item.timestamp).local().format('YYYY-MM-DD HH:mm:ss')}
                 </Select.Option>
               ))}
             </Select>
@@ -293,8 +293,8 @@ export const DynamicData: React.FC<Device> = ({ id, typeId }) => {
                 value={[beginDate, endDate]}
                 onChange={(date, dateString) => {
                   if (dateString) {
-                    setBeginDate(moment(dateString[0]).startOf('day'));
-                    setEndDate(moment(dateString[1]).endOf('day'));
+                    setBeginDate(dayjs(dateString[0]).startOf('day'));
+                    setEndDate(dayjs(dateString[1]).endOf('day'));
                   }
                 }}
               />
@@ -314,7 +314,7 @@ export const DynamicData: React.FC<Device> = ({ id, typeId }) => {
                       key: 'timestamp',
                       width: '80%',
                       render: (timestamp: number) =>
-                        moment.unix(timestamp).local().format('YYYY-MM-DD HH:mm:ss')
+                        dayjs.unix(timestamp).local().format('YYYY-MM-DD HH:mm:ss')
                     },
                     {
                       title: '操作',

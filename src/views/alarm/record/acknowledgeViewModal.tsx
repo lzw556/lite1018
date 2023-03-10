@@ -1,6 +1,6 @@
 import { Form, Input, Modal, ModalProps } from 'antd';
 import { FC } from 'react';
-import moment from 'moment';
+import dayjs from '../../../utils/dayjsUtils';
 
 export interface AcknowledgeViewModalProps extends ModalProps {
   acknowledge: any;
@@ -20,7 +20,7 @@ const AcknowledgeViewModal: FC<AcknowledgeViewModalProps> = (props) => {
       <Form.Item label={'处理时间'} labelCol={{ span: 5 }}>
         <Input
           disabled
-          value={moment.unix(acknowledge.timestamp).local().format('YYYY-MM-DD HH:mm:ss')}
+          value={dayjs.unix(acknowledge.timestamp).local().format('YYYY-MM-DD HH:mm:ss')}
         />
       </Form.Item>
     </Modal>

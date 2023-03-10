@@ -1,10 +1,9 @@
 import { Content } from 'antd/es/layout/layout';
-import MyBreadcrumb from '../../components/myBreadcrumb';
 import ShadowCard from '../../components/shadowCard';
 import TableLayout from '../layout/TableLayout';
 import { Button, Card, Modal, Popconfirm, Space, Typography } from 'antd';
 import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { PageResult } from '../../types/page';
 import {
   DeleteProjectRequest,
@@ -18,6 +17,7 @@ import HasPermission from '../../permission';
 import usePermission, { Permission } from '../../permission/permission';
 import { Store, useStore } from '../../hooks/store';
 import { store as reduxStore } from '../../store';
+import { PageTitle } from '../../components/pageTitle';
 
 const ProjectPage = () => {
   const [visible, setVisible] = useState(false);
@@ -158,16 +158,17 @@ const ProjectPage = () => {
 
   return (
     <Content>
-      <MyBreadcrumb>
-        <HasPermission value={Permission.ProjectAdd}>
-          <Space>
+      <PageTitle
+        items={[{ title: '项目管理' }]}
+        actions={
+          <HasPermission value={Permission.ProjectAdd}>
             <Button type={'primary'} onClick={() => setVisible(true)}>
               添加项目
               <PlusOutlined />
             </Button>
-          </Space>
-        </HasPermission>
-      </MyBreadcrumb>
+          </HasPermission>
+        }
+      />
       <ShadowCard>
         <TableLayout
           emptyText={'项目列表为空'}

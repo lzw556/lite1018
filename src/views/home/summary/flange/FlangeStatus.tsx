@@ -1,5 +1,5 @@
 import { Col, Empty, Row, Spin, Table } from 'antd';
-import moment from 'moment';
+import dayjs from '../../../../utils/dayjsUtils';
 import * as React from 'react';
 import { RangeDatePicker } from '../../../../components/rangeDatePicker';
 import ShadowCard from '../../../../components/shadowCard';
@@ -92,7 +92,7 @@ export const FlangeStatus: React.FC<AssetRow> = (props) => {
             key: 'timestamp',
             width: '80%',
             render: (timestamp: number) =>
-              moment.unix(timestamp).local().format('YYYY-MM-DD HH:mm:ss')
+              dayjs.unix(timestamp).local().format('YYYY-MM-DD HH:mm:ss')
           }
           // {
           //   title: '操作',

@@ -1,5 +1,5 @@
 import { Col, Row, Tag } from 'antd';
-import moment from 'moment';
+import dayjs from '../../../../../utils/dayjsUtils';
 import * as React from 'react';
 import ShadowCard from '../../../../../components/shadowCard';
 import { Device } from '../../../../../types/device';
@@ -25,7 +25,7 @@ export const SingleDeviceInfo: React.FC<Device & { alertLevel?: number }> = (pro
             <div className='name-value'>
               <dt>设备名称</dt>
               <dd>
-                <Link to={`/device-management?locale=devices/deviceDetail&id=${id}`}>{name}</Link>
+                <Link to={`/devices/${id}`}>{name}</Link>
               </dd>
             </div>
           </dl>
@@ -88,7 +88,7 @@ export const SingleDeviceInfo: React.FC<Device & { alertLevel?: number }> = (pro
               <dt>最近连接时间</dt>
               <dd>
                 {state && connectedAt > 0
-                  ? moment(connectedAt * 1000).format('YYYY-MM-DD HH:mm:ss')
+                  ? dayjs(connectedAt * 1000).format('YYYY-MM-DD HH:mm:ss')
                   : '-'}
               </dd>
             </div>
@@ -100,7 +100,7 @@ export const SingleDeviceInfo: React.FC<Device & { alertLevel?: number }> = (pro
               <dt>最近一次采集时间</dt>
               <dd>
                 {data && data.timestamp > 0
-                  ? moment.unix(data.timestamp).local().format('YYYY-MM-DD HH:mm:ss')
+                  ? dayjs.unix(data.timestamp).local().format('YYYY-MM-DD HH:mm:ss')
                   : '-'}
               </dd>
             </div>

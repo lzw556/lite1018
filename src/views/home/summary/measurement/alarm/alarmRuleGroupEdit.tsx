@@ -1,18 +1,19 @@
 import { Button, Col, Divider, Form, Input, InputNumber, Row, Select } from 'antd';
 import * as React from 'react';
-import { useHistory, useLocation } from 'react-router-dom';
-import MyBreadcrumb from '../../../../../components/myBreadcrumb';
+import { useNavigate, useParams } from 'react-router-dom';
 import ShadowCard from '../../../../../components/shadowCard';
 import { defaultValidateMessages, Normalizes, Rules } from '../../../../../constants/validator';
 import { isMobile } from '../../../../../utils/deviceDetection';
 import { AlarmRule } from '../props';
 import { getAlarmRule, updateAlarmRule } from '../services';
 import * as AppConfig from '../../../../../config';
+import { PageTitle } from '../../../../../components/pageTitle';
+import { Link } from 'react-router-dom';
 
 const AlarmRuleGroupEdit = () => {
-  const history = useHistory();
-  const { search } = useLocation();
-  const id = Number(search.substring(search.lastIndexOf('id=') + 3));
+  const navigate = useNavigate();
+  const { id } = useParams();
+
   const [form] = Form.useForm();
   const [rule, setRule] = React.useState<AlarmRule>();
   const [smallSize, setSmallSize] = React.useState(window.innerWidth < 1500);
@@ -22,7 +23,7 @@ const AlarmRuleGroupEdit = () => {
     window.addEventListener('resize', (e) => setSmallSize(window.innerWidth < 1500));
   }, []);
   React.useEffect(() => {
-    getAlarmRule(id).then(setRule);
+    getAlarmRule(Number(id)).then(setRule);
   }, [id]);
 
   React.useEffect(() => {
@@ -34,7 +35,9 @@ const AlarmRuleGroupEdit = () => {
   if (!rule) return null;
   return (
     <>
-      <MyBreadcrumb />
+      <PageTitle
+        items={[{ title: <Link to='/alarmRules'>报警规则</Link> }, { title: '编辑规则' }]}
+      />
       <ShadowCard>
         <Form
           form={form}
@@ -275,16 +278,14 @@ const AlarmRuleGroupEdit = () => {
                       description: _rule.description || ''
                     }))
                   };
-                  updateAlarmRule(id, final).then(() =>
-                    history.replace(`alarm-management?locale=alarmRules`)
-                  );
+                  updateAlarmRule(Number(id), final).then(() => navigate(`alarmRules`));
                 });
               }}
             >
               保存
             </Button>
             &nbsp;&nbsp;&nbsp;
-            <Button type='primary' onClick={() => history.go(-1)}>
+            <Button type='primary' onClick={() => navigate(-1)}>
               取消
             </Button>
           </Form.Item>

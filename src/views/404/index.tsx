@@ -1,7 +1,9 @@
 import { FC } from 'react';
 import { Button, Result } from 'antd';
+import { useNavigate } from 'react-router-dom';
 
 const NotFoundPage: FC = () => {
+  const navigate = useNavigate();
   return (
     <Result
       status='404'
@@ -11,7 +13,7 @@ const NotFoundPage: FC = () => {
         <Button
           type='primary'
           onClick={() => {
-            window.location.hash = '/';
+            navigate('/');
           }}
         >
           返回首页

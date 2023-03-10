@@ -1,6 +1,4 @@
-import MyBreadcrumb from '../../../components/myBreadcrumb';
 import { Button, Space } from 'antd';
-import { PlusOutlined } from '@ant-design/icons';
 import { Content } from 'antd/es/layout/layout';
 import TableLayout from '../../layout/TableLayout';
 import ShadowCard from '../../../components/shadowCard';
@@ -11,10 +9,10 @@ import EditRoleModal from './modal/edit';
 import { Role } from '../../../types/role';
 import MenuDrawer from './menuDrawer';
 import PermissionDrawer from './permissionDrawer';
-import HasPermission from '../../../permission';
 import usePermission, { Permission } from '../../../permission/permission';
 import { PageResult } from '../../../types/page';
 import { isMobile } from '../../../utils/deviceDetection';
+import { PageTitle } from '../../../components/pageTitle';
 
 const RolePage = () => {
   const [addVisible, setAddVisible] = useState(false);
@@ -85,7 +83,7 @@ const RolePage = () => {
 
   return (
     <Content>
-      <MyBreadcrumb />
+      <PageTitle items={[{ title: '角色管理' }]} />
       <ShadowCard>
         <TableLayout
           emptyText={'角色列表为空'}

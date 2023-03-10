@@ -1,15 +1,16 @@
-import { Button, Card, Col, Form, message, Result, Row, Space, Upload } from 'antd';
+import { Button, Card, Col, Form, message, Result, Row, Upload } from 'antd';
 import { Content } from 'antd/lib/layout/layout';
 import { useEffect, useState } from 'react';
 import { ImportOutlined, InboxOutlined } from '@ant-design/icons';
 import { ImportNetworkRequest } from '../../../apis/network';
 import ShadowCard from '../../../components/shadowCard';
-import MyBreadcrumb from '../../../components/myBreadcrumb';
 import G6, { TreeGraph } from '@antv/g6';
 import '../../../components/shape/shape';
 import WsnFormItem from '../../../components/formItems/wsnFormItem';
 import { useProvisionMode } from '../useProvisionMode';
 import { Network } from '../../../types/network';
+import { useNavigate } from 'react-router';
+import { PageTitle } from '../../../components/pageTitle';
 
 const { Dragger } = Upload;
 
@@ -27,6 +28,7 @@ const ImportNetworkPage = () => {
   const [graph, setGraph] = useState<TreeGraph | undefined>();
   const [networkSettings, setNetworkSettings] = useState<any>();
   const [provisionMode, setProvisionMode, settings] = useProvisionMode(networkSettings);
+  const navigate = useNavigate();
 
   const checkJSONFormat = (source: any) => {
     return source.hasOwnProperty('deviceList') && source.hasOwnProperty('wsn');
@@ -210,16 +212,17 @@ const ImportNetworkPage = () => {
 
   return (
     <Content>
-      <MyBreadcrumb>
-        <Space>
-          {!success && (
+      <PageTitle
+        items={[{ title: '导入网络' }]}
+        actions={
+          !success && (
             <Button type='primary' onClick={onSave}>
               保存网络
               <ImportOutlined />
             </Button>
-          )}
-        </Space>
-      </MyBreadcrumb>
+          )
+        }
+      />
       <ShadowCard>
         <Form form={form} labelCol={{ span: 9 }}>
           {!success ? (
@@ -282,13 +285,7 @@ const ImportNetworkPage = () => {
               title='网络导入成功'
               subTitle='您可以返回网络列表查看网络信息或者继续导入网络'
               extra={[
-                <Button
-                  type='primary'
-                  key='devices'
-                  onClick={() => {
-                    window.location.hash = 'network-management?locale=networks';
-                  }}
-                >
+                <Button type='primary' key='devices' onClick={() => navigate('/networks')}>
                   返回网络列表
                 </Button>,
                 <Button

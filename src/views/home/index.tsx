@@ -160,7 +160,7 @@ const ProjectOverview: React.FC = () => {
         description={
           <p>
             还没有{AppConfig.use(window.assetCategory).assetType.label}, 去
-            <Link to='/asset-management?locale=asset-management'>创建</Link>
+            <Link to='/asset-management'>创建</Link>
           </p>
         }
         image={Empty.PRESENTED_IMAGE_SIMPLE}

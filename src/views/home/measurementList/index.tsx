@@ -15,6 +15,7 @@ import { PlusOutlined } from '@ant-design/icons';
 import { AssetExport } from '../components/assetExport';
 import { FileInput } from '../components/fileInput';
 import * as AppConfig from '../../../config';
+import { PageTitle } from '../../../components/pageTitle';
 
 const MeasurementManagement: React.FC = () => {
   const topAssetName = AppConfig.use(window.assetCategory).assetType.label;
@@ -116,39 +117,46 @@ const MeasurementManagement: React.FC = () => {
     <SearchResultPage
       {...{
         filters: generateFilters(),
-        actions: hasPermission(Permission.AssetAdd) && (
-          <ActionBar
-            actions={[
-              <Button type='primary' onClick={() => actionStatus.handleWindEdit()}>
-                添加风机
-                <PlusOutlined />
-              </Button>,
-              <Button
-                type='primary'
-                onClick={() => actionStatus.handleFlangeEdit()}
-                disabled={assets.items.length === 0}
-              >
-                添加法兰
-                <PlusOutlined />
-              </Button>,
-              <Button
-                type='primary'
-                onClick={() => actionStatus.handleAddMeasurements()}
-                disabled={
-                  assets.items.filter((asset) => asset.children && asset.children.length > 0)
-                    .length === 0
-                }
-              >
-                添加监测点
-                <PlusOutlined />
-              </Button>,
-              assets.items.length > 0 && <AssetExport winds={assets.items} />,
-              <FileInput onUpload={handleUpload} />
-            ]}
-            {...actionStatus}
-            // assetId={filters?.windTurbineId}
-            onSuccess={() =>
-              fetchAssets({ type: AppConfig.use(window.assetCategory).assetType.id })
+        pageTitle: (
+          <PageTitle
+            items={[{ title: '资产列表' }]}
+            actions={
+              hasPermission(Permission.AssetAdd) && (
+                <ActionBar
+                  actions={[
+                    <Button type='primary' onClick={() => actionStatus.handleWindEdit()}>
+                      添加风机
+                      <PlusOutlined />
+                    </Button>,
+                    <Button
+                      type='primary'
+                      onClick={() => actionStatus.handleFlangeEdit()}
+                      disabled={assets.items.length === 0}
+                    >
+                      添加法兰
+                      <PlusOutlined />
+                    </Button>,
+                    <Button
+                      type='primary'
+                      onClick={() => actionStatus.handleAddMeasurements()}
+                      disabled={
+                        assets.items.filter((asset) => asset.children && asset.children.length > 0)
+                          .length === 0
+                      }
+                    >
+                      添加监测点
+                      <PlusOutlined />
+                    </Button>,
+                    assets.items.length > 0 && <AssetExport winds={assets.items} />,
+                    <FileInput onUpload={handleUpload} />
+                  ]}
+                  {...actionStatus}
+                  // assetId={filters?.windTurbineId}
+                  onSuccess={() =>
+                    fetchAssets({ type: AppConfig.use(window.assetCategory).assetType.id })
+                  }
+                />
+              )
             }
           />
         ),

@@ -6,8 +6,8 @@ import './index.css';
 import { GetMyProfile, UpdateMyProfile } from '../../apis/profile';
 import { User } from '../../types/user';
 import ShadowCard from '../../components/shadowCard';
-import MyBreadcrumb from '../../components/myBreadcrumb';
 import { isMobile } from '../../utils/deviceDetection';
+import { PageTitle } from '../../components/pageTitle';
 
 const MePage = () => {
   const [isPhoneEdit, setIsPhoneEdit] = useState<boolean>(false);
@@ -74,7 +74,7 @@ const MePage = () => {
 
   return (
     <Content>
-      <MyBreadcrumb />
+      <PageTitle items={[{ title: '用户中心' }]} />
       <Row justify='center'>
         <Col span={24}>
           <ShadowCard title='基本信息' bordered={false}>

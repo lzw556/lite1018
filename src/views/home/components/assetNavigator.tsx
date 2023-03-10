@@ -1,6 +1,6 @@
 import { Breadcrumb, Dropdown, Menu, Space } from 'antd';
 import * as React from 'react';
-import { Link, useHistory, useLocation } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { getAssets } from '../assetList/services';
 import { combineFinalUrl, getRealPoints } from '../common/utils';
 import { DownOutlined } from '@ant-design/icons';
@@ -16,7 +16,7 @@ type BreadcrumbItemData = Node & { type?: number };
 export const AssetNavigator: React.FC<
   Pick<Node, 'id' | 'parentId'> & { isForceRefresh?: number }
 > = ({ id, parentId, isForceRefresh }) => {
-  const history = useHistory();
+  const navigate = useNavigate();
   const { pathname, search } = useLocation();
   const [assets, setAssets] = React.useState<AssetRow[]>([]);
   const [items, setItems] = React.useState<[number, boolean, Node[]][]>([]);
@@ -91,7 +91,7 @@ export const AssetNavigator: React.FC<
             <Menu.Item
               key={asset.id}
               onClick={() => {
-                history.replace(pickUrlFromType(asset));
+                navigate(pickUrlFromType(asset));
               }}
             >
               {asset.name}

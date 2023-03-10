@@ -1,5 +1,5 @@
 import { Spin } from 'antd';
-import moment from 'moment';
+import dayjs from '../../utils/dayjsUtils';
 import * as React from 'react';
 import { GetAlertStatisticsRequest } from '../../apis/statistic';
 import { ColorDanger, ColorInfo, ColorWarn } from '../../constants/color';
@@ -33,9 +33,7 @@ export const AlarmStatisticOfProject: React.FC<{ title: string }> = ({ title }) 
       warn: any = [],
       danger: any = [];
     if (data.length > 0) {
-      xAxisData.push(
-        ...data.map(({ timestamp }) => moment.unix(timestamp).local().format('MM/DD'))
-      );
+      xAxisData.push(...data.map(({ timestamp }) => dayjs.unix(timestamp).local().format('MM/DD')));
       info.push(...data.map(({ info }) => info));
       warn.push(...data.map(({ warn }) => warn));
       danger.push(...data.map(({ critical }) => critical));

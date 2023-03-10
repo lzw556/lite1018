@@ -1,8 +1,7 @@
 import { MinusCircleOutlined } from '@ant-design/icons';
 import { Button, Cascader, Col, Divider, Form, Input, InputNumber, Row, Select } from 'antd';
 import * as React from 'react';
-import { useHistory } from 'react-router-dom';
-import MyBreadcrumb from '../../../../../components/myBreadcrumb';
+import { Link, useNavigate } from 'react-router-dom';
 import ShadowCard from '../../../../../components/shadowCard';
 import { defaultValidateMessages, Rules } from '../../../../../constants/validator';
 import { isMobile } from '../../../../../utils/deviceDetection';
@@ -14,9 +13,10 @@ import {
   removeDulpicateProperties
 } from '../../../common/historyDataHelper';
 import './style.css';
+import { PageTitle } from '../../../../../components/pageTitle';
 
 const AlarmRuleGroupCreation = () => {
-  const history = useHistory();
+  const navigate = useNavigate();
   const [form] = Form.useForm();
   const [properties, setProperties] = React.useState<Property[]>([]);
   const [metric, setMetric] = React.useState<{ key: string; name: string; unit: string }[]>([]);
@@ -30,7 +30,9 @@ const AlarmRuleGroupCreation = () => {
 
   return (
     <>
-      <MyBreadcrumb />
+      <PageTitle
+        items={[{ title: <Link to='/alarmRules'>报警规则</Link> }, { title: '添加规则' }]}
+      />
       <ShadowCard>
         <Form
           form={form}
@@ -386,16 +388,14 @@ const AlarmRuleGroupCreation = () => {
                       };
                     })
                   };
-                  addAlarmRule(final).then(() =>
-                    history.replace(`alarm-management?locale=alarmRules`)
-                  );
+                  addAlarmRule(final).then(() => navigate(`alarmRules`));
                 });
               }}
             >
               创建
             </Button>
             &nbsp;&nbsp;&nbsp;
-            <Button type='primary' onClick={() => history.go(-1)}>
+            <Button type='primary' onClick={() => navigate(-1)}>
               取消
             </Button>
           </Form.Item>

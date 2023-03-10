@@ -9,10 +9,12 @@ import { useDispatch } from 'redux-react-hook';
 import { persistor } from '../../store';
 import { KeyOutlined, UserOutlined } from '@ant-design/icons';
 import { Brand } from '../layout/brand';
+import { useNavigate } from 'react-router';
 
 const LoginPage: FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const login = (values: any) => {
     setIsLoading(true);
@@ -21,7 +23,7 @@ const LoginPage: FC = () => {
       if (res.code === 200) {
         message.success('登录成功').then();
         dispatch(userLoginSuccess(res.data));
-        window.location.hash = '/';
+        navigate('/');
       } else {
         message.error(res.msg).then();
       }

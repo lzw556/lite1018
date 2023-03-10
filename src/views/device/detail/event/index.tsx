@@ -1,13 +1,9 @@
 import { Device } from '../../../../types/device';
 import { FC, useCallback, useEffect, useState } from 'react';
 import { Col, Row, Space, DatePicker, Button } from 'antd';
-import moment from 'moment';
+import dayjs, { Dayjs } from '../../../../utils/dayjsUtils';
 import { Content } from 'antd/es/layout/layout';
-import {
-  BatchDeleteDeviceEventsRequest,
-  GetDeviceEventsRequest,
-  PagingDeviceEventsRequest
-} from '../../../../apis/device';
+import { BatchDeleteDeviceEventsRequest, PagingDeviceEventsRequest } from '../../../../apis/device';
 import TableLayout from '../../../layout/TableLayout';
 import HasPermission from '../../../../permission';
 import usePermission, { Permission } from '../../../../permission/permission';
@@ -20,10 +16,8 @@ export interface DeviceEventProps {
 }
 
 const DeviceEvent: FC<DeviceEventProps> = ({ device }) => {
-  const [startDate, setStartDate] = useState<moment.Moment>(
-    moment().startOf('day').subtract(7, 'd')
-  );
-  const [endDate, setEndDate] = useState<moment.Moment>(moment().endOf('day'));
+  const [startDate, setStartDate] = useState<Dayjs>(dayjs().startOf('day').subtract(7, 'd'));
+  const [endDate, setEndDate] = useState<Dayjs>(dayjs().endOf('day'));
   const [dataSource, setDataSource] = useState<any>();
   const [selectedRowKeys, setSelectedRowKeys] = useState<any[]>([]);
   const { hasPermission } = usePermission();
@@ -72,7 +66,7 @@ const DeviceEvent: FC<DeviceEventProps> = ({ device }) => {
     dataIndex: 'timestamp',
     key: 'timestamp',
     render: (timestamp: number) => {
-      return moment.unix(timestamp).local().format('YYYY-MM-DD HH:mm:ss');
+      return dayjs.unix(timestamp).local().format('YYYY-MM-DD HH:mm:ss');
     }
   });
 
@@ -113,8 +107,8 @@ const DeviceEvent: FC<DeviceEventProps> = ({ device }) => {
                   value={[startDate, endDate]}
                   onChange={(date, dateString) => {
                     if (date) {
-                      setStartDate(moment(date[0]));
-                      setEndDate(moment(date[1]));
+                      setStartDate(dayjs(date[0]));
+                      setEndDate(dayjs(date[1]));
                     }
                   }}
                 />

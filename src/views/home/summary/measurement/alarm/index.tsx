@@ -23,6 +23,7 @@ import { MeasurementBind } from './measurementBind';
 import { RuleSelection } from './ruleSelection';
 import * as AppConfig from '../../../../../config';
 import { MeasurementBindBase } from './measurementBindBase';
+import { PageTitle } from '../../../../../components/pageTitle';
 
 const AlarmRuleList = () => {
   const appConfig = AppConfig.use(window.assetCategory);
@@ -59,7 +60,7 @@ const AlarmRuleList = () => {
               <>
                 <HasPermission value={Permission.AlarmRuleGroupEdit}>
                   <Button type='text' size='small' title={`编辑`}>
-                    <Link to={`alarm-management?locale=alarmRules/editAlarmRuleGroup&id=${row.id}`}>
+                    <Link to={`${row.id}`}>
                       <EditOutlined />
                     </Link>
                   </Button>
@@ -162,50 +163,57 @@ const AlarmRuleList = () => {
   return (
     <SearchResultPage
       {...{
-        actions: (
-          <>
-            <HasPermission value={Permission.AlarmRuleGroupAdd}>
-              <Button type='primary' href='#/alarm-management?locale=alarmRules/addAlarmRuleGroup'>
-                添加规则
-                <PlusOutlined />
-              </Button>
-            </HasPermission>
-            <HasPermission value={Permission.AlarmRuleGroupExport}>
-              {result.dataSource && result.dataSource.length > 0 && (
-                <Button
-                  type='primary'
-                  onClick={() => {
-                    setVisibleExport(true);
-                  }}
-                >
-                  导出配置
-                  <ExportOutlined />
-                </Button>
-              )}
-            </HasPermission>
-            <HasPermission value={Permission.AlarmRuleGroupImport}>
-              <FileInput
-                onUpload={(data) => {
-                  return importAlarmRules(data).then((res) => {
-                    if (res.data.code === 200) {
-                      message.success('导入成功');
-                      fetchAlarmRules();
-                    } else {
-                      message.error(`导入失败: ${res.data.msg}`);
-                    }
-                  });
-                }}
-              />
-            </HasPermission>
-            {visibleExport && (
-              <RuleSelection
-                visible={visibleExport}
-                onCancel={() => setVisibleExport(false)}
-                rules={result.dataSource as AlarmRule[]}
-                onSuccess={() => setVisibleExport(false)}
-              />
-            )}
-          </>
+        pageTitle: (
+          <PageTitle
+            items={[{ title: '报警规则' }]}
+            actions={
+              <>
+                <HasPermission value={Permission.AlarmRuleGroupAdd}>
+                  <Link to='create'>
+                    <Button type='primary'>
+                      添加规则
+                      <PlusOutlined />
+                    </Button>
+                  </Link>
+                </HasPermission>
+                <HasPermission value={Permission.AlarmRuleGroupExport}>
+                  {result.dataSource && result.dataSource.length > 0 && (
+                    <Button
+                      type='primary'
+                      onClick={() => {
+                        setVisibleExport(true);
+                      }}
+                    >
+                      导出配置
+                      <ExportOutlined />
+                    </Button>
+                  )}
+                </HasPermission>
+                <HasPermission value={Permission.AlarmRuleGroupImport}>
+                  <FileInput
+                    onUpload={(data) => {
+                      return importAlarmRules(data).then((res) => {
+                        if (res.data.code === 200) {
+                          message.success('导入成功');
+                          fetchAlarmRules();
+                        } else {
+                          message.error(`导入失败: ${res.data.msg}`);
+                        }
+                      });
+                    }}
+                  />
+                </HasPermission>
+                {visibleExport && (
+                  <RuleSelection
+                    visible={visibleExport}
+                    onCancel={() => setVisibleExport(false)}
+                    rules={result.dataSource as AlarmRule[]}
+                    onSuccess={() => setVisibleExport(false)}
+                  />
+                )}
+              </>
+            }
+          />
         ),
         results: <Table {...result} />
       }}

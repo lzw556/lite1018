@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Card, Empty } from 'antd';
-import moment from 'moment';
+import dayjs from '../../utils/dayjsUtils';
 import ReactECharts from 'echarts-for-react';
 import { GetDeviceRuntimeRequest } from '../../apis/device';
 import { DefaultMonitorDataOption, LineChartStyles } from '../../constants/chart';
@@ -16,8 +16,8 @@ export const RuntimeChart: React.FC<{ deviceId: number; deviceType: number }> = 
   React.useEffect(() => {
     GetDeviceRuntimeRequest(
       deviceId,
-      moment().startOf('day').subtract(13, 'd').utc().unix(),
-      moment().endOf('day').utc().unix()
+      dayjs().startOf('day').subtract(13, 'd').utc().unix(),
+      dayjs().endOf('day').utc().unix()
     ).then((data) => {
       const batteryOption = {
         ...DefaultMonitorDataOption,
@@ -38,7 +38,7 @@ export const RuntimeChart: React.FC<{ deviceId: number; deviceType: number }> = 
           type: 'category',
           boundaryGap: false,
           data: data.map((item: any) =>
-            moment.unix(item.timestamp).local().format('YYYY-MM-DD HH:mm:ss')
+            dayjs.unix(item.timestamp).local().format('YYYY-MM-DD HH:mm:ss')
           )
         }
       };
@@ -61,7 +61,7 @@ export const RuntimeChart: React.FC<{ deviceId: number; deviceType: number }> = 
           type: 'category',
           boundaryGap: false,
           data: data.map((item: any) =>
-            moment.unix(item.timestamp).local().format('YYYY-MM-DD HH:mm:ss')
+            dayjs.unix(item.timestamp).local().format('YYYY-MM-DD HH:mm:ss')
           )
         }
       };

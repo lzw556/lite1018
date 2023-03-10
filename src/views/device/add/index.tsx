@@ -4,18 +4,17 @@ import { useState } from 'react';
 import '../index.css';
 import { AddDeviceRequest, GetDefaultDeviceSettingsRequest } from '../../../apis/device';
 import ShadowCard from '../../../components/shadowCard';
-import MyBreadcrumb from '../../../components/myBreadcrumb';
 import { defaultValidateMessages, Normalizes, Rules } from '../../../constants/validator';
 import NetworkSelect from '../../../components/select/networkSelect';
 import DeviceSelect from '../../../components/select/deviceSelect';
 import DeviceTypeSelect from '../../../components/select/deviceTypeSelect';
 import { DeviceSetting } from '../../../types/device_setting';
-import DeviceSettingFormItem, {
-  processArrayValuesInSensorSetting
-} from '../../../components/formItems/deviceSettingFormItem';
+import { processArrayValuesInSensorSetting } from '../../../components/formItems/deviceSettingFormItem';
 import { isMobile } from '../../../utils/deviceDetection';
 import { DeviceType } from '../../../types/device_type';
 import { DeviceSettingContent } from '../DeviceSettingContent';
+import { Link, useNavigate } from 'react-router-dom';
+import { PageTitle } from '../../../components/pageTitle';
 
 const AddDevicePage = () => {
   const [deviceSettings, setDeviceSettings] = useState<DeviceSetting[]>();
@@ -23,6 +22,7 @@ const AddDevicePage = () => {
   const [network, setNetwork] = useState<number>();
   const [success, setSuccess] = useState<boolean>(false);
   const [form] = Form.useForm();
+  const navigate = useNavigate();
 
   const fetchDeviceDefaultSettings = (type: any) => {
     setDeviceType(type);
@@ -69,7 +69,9 @@ const AddDevicePage = () => {
   return (
     <>
       <Content>
-        <MyBreadcrumb />
+        <PageTitle
+          items={[{ title: <Link to='/devices'>设备列表</Link> }, { title: '添加设备' }]}
+        />
         <ShadowCard>
           {success && (
             <Result
@@ -81,7 +83,7 @@ const AddDevicePage = () => {
                   type='primary'
                   key='devices'
                   onClick={() => {
-                    window.location.hash = 'device-management?locale=devices';
+                    navigate('/devices');
                   }}
                 >
                   返回设备列表

@@ -5,13 +5,11 @@ import './index.css';
 import reportWebVitals from './reportWebVitals';
 import { StoreContext } from 'redux-react-hook';
 import AppRouter from './routers';
-import zhCN from 'antd/es/locale/zh_CN';
-import moment from 'moment';
-import 'moment/locale/zh-cn';
+import 'dayjs/locale/zh-cn';
+import zhCN from 'antd/locale/zh_CN';
 import { ConfigProvider } from 'antd';
 import request from './utils/request';
 
-moment.locale('zh-cn');
 request.get<{ type: 'general' | 'windTurbine' | 'vibration' }>('webConfig').then((res) => {
   if (res.data.code === 200) {
     if (res.data.data.type === 'windTurbine') window.assetCategory = 'wind';

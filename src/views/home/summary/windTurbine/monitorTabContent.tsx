@@ -1,6 +1,6 @@
 import { Col, Empty, Row } from 'antd';
 import * as React from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import ShadowCard from '../../../../components/shadowCard';
 import * as AppConfig from '../../../../config';
 import { AssetRow } from '../../assetList/props';
@@ -18,7 +18,7 @@ export const MonitorTabContent: React.FC<{
   pathname: string;
   search: string;
 }> = ({ asset, pathname, search }) => {
-  const history = useHistory();
+  const navigate = useNavigate();
   const measurements: MeasurementRow[] = [];
   const flanges: Introduction[] = [];
   if (asset) {
@@ -36,7 +36,7 @@ export const MonitorTabContent: React.FC<{
               clickHandler: (paras: any) => {
                 const index = paras.value[1];
                 if (points.length > index) {
-                  history.replace(
+                  navigate(
                     combineFinalUrl(
                       pathname,
                       search,

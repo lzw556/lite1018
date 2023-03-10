@@ -1,5 +1,5 @@
 import { Select, SelectProps } from 'antd';
-import { FC, useEffect, useState } from 'react';
+import { FC, useState, useEffect } from 'react';
 import { GetMyProjectsRequest } from '../../apis/project';
 import { Project } from '../../types/project';
 import { getProject } from '../../utils/session';
@@ -11,28 +11,19 @@ export interface ProjectSelectProps extends SelectProps<any> {
 }
 
 const ProjectSelect: FC<ProjectSelectProps> = (props) => {
-  const { onChange, defaultActiveFirstOption } = props;
   const [dataSource, setDataSource] = useState<Project[]>([]);
 
   useEffect(() => {
     GetMyProjectsRequest().then((data) => {
       setDataSource(data);
-      if (defaultActiveFirstOption && onChange && getProject() === 0) {
-        onChange(data[0]?.id);
-      }
     });
   }, []);
 
-  const onProjectChange = (open: any) => {
-    if (open) {
-      GetMyProjectsRequest().then((data) => {
-        setDataSource(data);
-      });
-    }
-  };
+  const projectId = getProject();
+  if (!projectId) return null;
 
   return (
-    <Select {...props} onDropdownVisibleChange={onProjectChange} dropdownMatchSelectWidth={160}>
+    <Select {...props} dropdownMatchSelectWidth={160} defaultValue={projectId}>
       {dataSource.map((item) => (
         <Option key={item.id} value={item.id}>
           {item.name}

@@ -1,6 +1,6 @@
 import { Button, Col, Form, Row, Spin } from 'antd';
 import * as React from 'react';
-import { useLocation, useHistory } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { AssetNavigator } from '../../components/assetNavigator';
 import '../../home.css';
 import { getAsset, updateAsset } from '../../assetList/services';
@@ -18,7 +18,6 @@ import { PlusOutlined } from '@ant-design/icons';
 
 const WindTurbineOverview: React.FC = () => {
   const { pathname, search } = useLocation();
-  const history = useHistory();
   const id = Number(search.substring(search.lastIndexOf('id=') + 3));
   const [asset, setAsset] = React.useState<AssetRow>();
   const [loading, setLoading] = React.useState(true);
@@ -84,7 +83,7 @@ const WindTurbineOverview: React.FC = () => {
         ).statistics
       );
     }
-  }, [asset, pathname, search, history]);
+  }, [asset, pathname, search]);
 
   if (loading) return <Spin />;
 

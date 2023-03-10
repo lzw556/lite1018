@@ -1,5 +1,5 @@
 import { Col, Empty, Row, Spin } from 'antd';
-import moment from 'moment';
+import dayjs from '../../../../../utils/dayjsUtils';
 import * as React from 'react';
 import { isMobile } from '../../../../../utils/deviceDetection';
 import { generateChartOptionsOfHistoryDatas } from '../../../common/historyDataHelper';
@@ -12,8 +12,8 @@ export const Monitor: React.FC<MeasurementRow> = (props) => {
   const [loading, setLoading] = React.useState(true);
   const [historyOptions, setHistoryOptions] = React.useState<any>();
   React.useEffect(() => {
-    const from = moment().startOf('day').subtract(7, 'd').utc().unix();
-    const to = moment().endOf('day').utc().unix();
+    const from = dayjs().startOf('day').subtract(7, 'd').utc().unix();
+    const to = dayjs().endOf('day').utc().unix();
     getData(id, from, to).then((data) => {
       setLoading(false);
       if (data.length > 0) setHistoryOptions(generateChartOptionsOfHistoryDatas(data, type));
