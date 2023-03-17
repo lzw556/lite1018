@@ -56,7 +56,7 @@ export const PrimaryLayout = () => {
         >
           {menus && <NavMenu menus={menus} />}
         </Sider>
-        <Layout style={{ padding: '15px', background: '#eef0f5', overflowY: 'scroll' }}>
+        <Layout style={{ padding: 16, background: '#eef0f5', overflowY: 'scroll' }}>
           <ValidateProject>
             <Outlet />
           </ValidateProject>

@@ -275,7 +275,7 @@ export const FilterableAlarmRecordTable: React.FC<{ sourceId?: number }> = ({ so
                 bordered={false}
                 mode={'multiple'}
                 value={store.alertLevels}
-                style={{ width: '200px' }}
+                style={{ width: '220px' }}
                 onChange={(value) => {
                   if (value.length) {
                     setStore((prev) => ({ ...prev, alertLevels: value }));

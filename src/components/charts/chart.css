@@ -1,0 +1,8 @@
+.chart-container {
+  position: relative;
+}
+.chart-container .chart-title {
+  position: absolute;
+  width: 100%;
+  text-align: center;
+}

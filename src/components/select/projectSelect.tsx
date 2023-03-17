@@ -3,6 +3,7 @@ import { FC, useState, useEffect } from 'react';
 import { GetMyProjectsRequest } from '../../apis/project';
 import { Project } from '../../types/project';
 import { getProject } from '../../utils/session';
+import './projectSelect.css';
 
 const { Option } = Select;
 
@@ -23,7 +24,12 @@ const ProjectSelect: FC<ProjectSelectProps> = (props) => {
   if (!projectId) return null;
 
   return (
-    <Select {...props} dropdownMatchSelectWidth={160} defaultValue={projectId}>
+    <Select
+      {...props}
+      dropdownMatchSelectWidth={160}
+      defaultValue={projectId}
+      className='project-select'
+    >
       {dataSource.map((item) => (
         <Option key={item.id} value={item.id}>
           {item.name}

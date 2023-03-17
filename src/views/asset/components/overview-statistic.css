@@ -1,0 +1,16 @@
+.overview-statistic .ant-statistic {
+  max-width: 120px;
+  text-align: center;
+}
+.overview-statistic .ant-statistic.info .ant-statistic-content {
+  color: #ffc107;
+}
+.overview-statistic .ant-statistic.warn .ant-statistic-content {
+  color: #fe6d2c;
+}
+.overview-statistic .ant-statistic.danger .ant-statistic-content {
+  color: #ff0000;
+}
+.overview-statistic .ant-statistic.offline .ant-statistic-content {
+  color: #bfbfbf;
+}

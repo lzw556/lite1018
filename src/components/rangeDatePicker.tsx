@@ -2,11 +2,21 @@ import { Button, DatePicker, Space } from 'antd';
 import * as React from 'react';
 import dayjs, { RangeValue } from '../utils/dayjsUtils';
 
+export const oneWeekRange: RangeValue = [
+  dayjs().startOf('day').subtract(7, 'd'),
+  dayjs().endOf('day')
+];
+
+export const oneWeekNumberRange: [number, number] = [
+  oneWeekRange[0].utc().unix(),
+  oneWeekRange[1].utc().unix()
+];
+
 export const RangeDatePicker: React.FC<{
   defaultRange?: RangeValue;
   onChange?: (range: [number, number]) => void;
   showFooter?: boolean;
-}> = ({ defaultRange = [dayjs().subtract(7, 'd'), dayjs()], onChange, showFooter }) => {
+}> = ({ defaultRange = oneWeekRange, onChange, showFooter }) => {
   const [range, setRange] = React.useState<RangeValue>(defaultRange);
 
   React.useEffect(() => {

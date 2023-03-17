@@ -43,10 +43,11 @@ import { isMobile } from '../../utils/deviceDetection';
 import { Link } from 'react-router-dom';
 import { AlarmRuleSettings } from './detail/setting/alarmRuleSettings';
 import { Store, useStore } from '../../hooks/store';
-import * as AppConfig from '../../config';
 import { Normalizes } from '../../constants/validator';
 import { CommandMenu } from './commandMenu';
 import { PageTitle } from '../../components/pageTitle';
+import { SENSORS } from '../../config/assetCategory.config';
+import { useAssetCategoryContext } from '../asset/components/assetCategoryContext';
 
 const { Search } = Input;
 const { Option } = Select;
@@ -60,6 +61,7 @@ const DevicePage = () => {
   const { hasPermission, hasPermissions } = usePermission();
   const [visibleAlarmRules, setVisibleAlarmRules] = useState(false);
   const [store, setStore, gotoPage] = useStore('deviceList');
+  const category = useAssetCategoryContext();
 
   const fetchDevices = (store: Store['deviceList']) => {
     const {
@@ -278,11 +280,15 @@ const DevicePage = () => {
                   }}
                   defaultValue={store.filters?.type}
                 >
-                  {AppConfig.use(window.assetCategory).devTypes.map(({ val, name }: any) => (
-                    <Select.Option key={val} value={val}>
-                      {name}
-                    </Select.Option>
-                  ))}
+                  {[DeviceType.Gateway, DeviceType.Router]
+                    .concat(SENSORS.get(category) ?? [])
+                    .map((d) => {
+                      return (
+                        <Select.Option key={d} value={d}>
+                          {DeviceType.toString(d)}
+                        </Select.Option>
+                      );
+                    })}
                 </Select>
               </Label>
               <Input.Group compact>

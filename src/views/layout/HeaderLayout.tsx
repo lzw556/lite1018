@@ -1,5 +1,5 @@
 import { Header } from 'antd/es/layout/layout';
-import { Button, Col, Divider, Drawer, Dropdown, Menu, Row, Space, Typography } from 'antd';
+import { Button, Col, Divider, Drawer, Dropdown, Row, Space, Typography } from 'antd';
 import '../../App.css';
 import './layout.css';
 import '../../assets/iconfont.css';
@@ -46,12 +46,6 @@ const HeaderLayout = (props: any) => {
       });
   };
 
-  const menu = (
-    <Menu onClick={onLogout}>
-      <Menu.Item key={1}>退出登录</Menu.Item>
-    </Menu>
-  );
-
   return (
     <Header className='ts-header'>
       <Row justify='start' className='pc'>
@@ -75,15 +69,10 @@ const HeaderLayout = (props: any) => {
               <ProjectSelect
                 bordered={false}
                 suffixIcon={<CaretDownOutlined style={{ color: 'white' }} />}
-                style={{
-                  maxWidth: 180,
-                  backgroundColor: 'transparent',
-                  color: 'white'
-                }}
                 onChange={onProjectChange}
               />
             )}
-            <Dropdown overlay={menu}>
+            <Dropdown menu={{ items: [{ key: 'logout', label: '退出登录', onClick: onLogout }] }}>
               <Space>
                 <Button type={'text'} style={{ color: '#fff' }}>
                   <UserOutlined />
@@ -99,11 +88,11 @@ const HeaderLayout = (props: any) => {
         <div className='logo'>
           <img src={logo} width={100} alt='ThetaSensors' style={{ verticalAlign: 'middle' }} />
         </div>
-        <Dropdown overlay={menu}>
+        <Dropdown menu={{ items: [{ key: 'logout', label: '退出登录', onClick: onLogout }] }}>
           <UserOutlined />
         </Dropdown>
         <Drawer
-          visible={visible}
+          open={visible}
           placement='left'
           width='60%'
           closable={false}

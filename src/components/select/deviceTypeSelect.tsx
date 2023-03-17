@@ -3,6 +3,8 @@ import { Select, SelectProps } from 'antd';
 import { FC, useEffect } from 'react';
 import { CaretDownOutlined } from '@ant-design/icons';
 import * as AppConfig from '../../config';
+import { SENSORS } from '../../config/assetCategory.config';
+import { useAssetCategoryContext } from '../../views/asset/components/assetCategoryContext';
 
 const { Option, OptGroup } = Select;
 
@@ -13,6 +15,7 @@ export interface DeviceTypeSelectProps extends SelectProps<any> {
 
 const DeviceTypeSelect: FC<DeviceTypeSelectProps> = (props) => {
   const { sensors, children, onChange } = props;
+  const category = useAssetCategoryContext();
 
   useEffect(() => {
     if (onChange && sensors) {
@@ -52,7 +55,7 @@ const DeviceTypeSelect: FC<DeviceTypeSelectProps> = (props) => {
             </Option>
           </OptGroup>
           <OptGroup label={'传感器'} key={'sensor'}>
-            {AppConfig.use(window.assetCategory).sensorTypes.map((item) => (
+            {SENSORS.get(category)?.map((item) => (
               <Option key={item} value={item}>
                 {DeviceType.toString(item)}
               </Option>

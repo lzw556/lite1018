@@ -1,0 +1,31 @@
+.icon-svg {
+  border-radius: 1em;
+}
+.icon-svg.normal {
+  background-color: #28a745;
+}
+.icon-svg.info {
+  background-color: #ffc107;
+}
+.icon-svg.warn {
+  background-color: #fe6d2c;
+}
+.icon-svg.danger {
+  background-color: #ff0000;
+}
+.icon-svg.normal.focus {
+  background-color: #fff;
+  fill: #28a745;
+}
+.icon-svg.info.focus {
+  background-color: #fff;
+  fill: #ffc107;
+}
+.icon-svg.warn.focus {
+  background-color: #fff;
+  fill: #fe6d2c;
+}
+.icon-svg.danger.focus {
+  background-color: #fff;
+  fill: #ff0000;
+}

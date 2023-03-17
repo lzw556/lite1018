@@ -8,19 +8,15 @@ import AppRouter from './routers';
 import 'dayjs/locale/zh-cn';
 import zhCN from 'antd/locale/zh_CN';
 import { ConfigProvider } from 'antd';
-import request from './utils/request';
+import { AssetCategoryProvider } from './views/asset/components/assetCategoryContext';
 
-request.get<{ type: 'general' | 'windTurbine' | 'vibration' }>('webConfig').then((res) => {
-  if (res.data.code === 200) {
-    if (res.data.data.type === 'windTurbine') window.assetCategory = 'wind';
-  }
-});
-// window.assetCategory = 'wind';
 ReactDOM.render(
   <StoreContext.Provider value={store}>
     <PersistGate loading={null} persistor={persistor}>
       <ConfigProvider locale={zhCN}>
-        <AppRouter />
+        <AssetCategoryProvider>
+          <AppRouter />
+        </AssetCategoryProvider>
       </ConfigProvider>
     </PersistGate>
   </StoreContext.Provider>,

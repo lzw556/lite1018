@@ -1,0 +1,27 @@
+dl.name-value-groups {
+  margin: 0;
+}
+dl.name-value-groups.horizontal {
+  display: flex;
+  flex-wrap: wrap;
+}
+.name-value {
+  display: flex;
+  line-height: 30px;
+}
+.name-value.half {
+  flex: 0 0 50%;
+}
+/* hardcord */
+.name-value.anomalous {
+  flex: 0 0 50%;
+}
+.name-value dt {
+  flex: 0 0 55%;
+  max-width: 10em;
+  color: #8a8e99;
+}
+.name-value dd {
+  flex: 0 0 45%;
+  margin: 0;
+}
