@@ -1,0 +1,11 @@
+export const GENERAL = '资产';
+export const CREATE_GENERAL = `添加${GENERAL}`;
+export const UPDATE_GENERAL = `编辑${GENERAL}`;
+export const SELECT_GENERAL = `选择${GENERAL}`;
+export const PLEASE_SELECT_GENERAL = `请${SELECT_GENERAL}`;
+export const GENERAL_NAME = `${GENERAL}名称`;
+export const PLEASE_INPUT_GENERAL_NAME = `请填写${GENERAL_NAME}`;
+export const INVALID_GENERAL = `异常${GENERAL}`;
+export const NO_GENERALS = `没有${GENERAL}`;
+export const GENERAL_PARENT = `上级${GENERAL}`;
+export const PLEASE_SELECT_GENERAL_PARENT = `请选择${GENERAL_PARENT}`;

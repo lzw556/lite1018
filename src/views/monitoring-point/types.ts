@@ -79,18 +79,64 @@ const dynamic_preload: { dynamicData?: DynamicData; waveData?: WaveData } = {
     ]
   }
 };
+const dynamic_thickness: { dynamicData?: DynamicData; waveData?: WaveData } = {
+  waveData: {
+    serverDatatype: 'waveform',
+    title: '波形数据',
+    fields: [{ label: 'mv', value: 'mv', unit: '' }],
+    metaData: [
+      { label: '厚度', value: 'thickness', unit: 'mm' },
+      { label: '温度', value: 'temp', unit: '℃' },
+      { label: '飞行时间', value: 'tof', unit: 'ns' },
+      { label: '环境温度', value: 'envTemp', unit: '℃' },
+      { label: '信号强度', value: 'sigStrength', unit: '' }
+    ]
+  }
+};
+const dynamic_vibration: { dynamicData?: DynamicData; waveData?: WaveData } = {
+  dynamicData: {
+    serverDatatype: 'raw',
+    title: '波形数据',
+    fields: [
+      { label: '加速度时域', value: 'accelerationTimeDomain', unit: 'm/s²' },
+      { label: '加速度频域', value: 'accelerationFrequencyDomain', unit: 'm/s²' },
+      { label: '速度时域', value: 'velocityTimeDomain', unit: 'mm/s' },
+      { label: '速度频域', value: 'velocityFrequencyDomain', unit: 'mm/s' },
+      { label: '位移时域', value: 'displacementTimeDomain', unit: 'μm' },
+      { label: '位移频域', value: 'displacementFrequencyDomain', unit: 'μm' }
+    ],
+    metaData: []
+  }
+};
 export const MONITORING_POINT_TYPE_VALUE_DYNAMIC_MAPPING = new Map([
   [MonitoringPointTypeValue.LOOSENING_ANGLE, dynamic_preload],
+  [MonitoringPointTypeValue.THICKNESS, dynamic_thickness],
   [MonitoringPointTypeValue.PRELOAD, dynamic_preload],
-  [MonitoringPointTypeValue.FLANGE_PRELOAD, undefined]
+  [MonitoringPointTypeValue.VIBRATION, dynamic_vibration]
 ]);
 
 export const MONITORING_POINT_TYPE_VALUE_DEVICE_TYPE_ID_MAPPING = new Map([
   [MonitoringPointTypeValue.LOOSENING_ANGLE, [DeviceType.BoltLoosening]],
   [
+    MonitoringPointTypeValue.THICKNESS,
+    [DeviceType.NormalTemperatureCorrosion, DeviceType.HighTemperatureCorrosion]
+  ],
+  [
     MonitoringPointTypeValue.PRELOAD,
     [DeviceType.BoltElongation, DeviceType.BoltElongationMultiChannels]
   ],
+  [
+    MonitoringPointTypeValue.VIBRATION,
+    [
+      DeviceType.VibrationTemperature3Axis,
+      DeviceType.VibrationTemperature3AxisAdvanced,
+      DeviceType.VibrationTemperature3AxisAdvancedNB,
+      DeviceType.VibrationTemperature3AxisNB
+    ]
+  ],
+  [MonitoringPointTypeValue.ANGLE_DIP, [DeviceType.AngleDip]],
+  [MonitoringPointTypeValue.PRESSURE, [DeviceType.PressureTemperature]],
+  [MonitoringPointTypeValue.TEMPERATURE, [DeviceType.Temperature]],
   [
     MonitoringPointTypeValue.FLANGE_PRELOAD,
     [DeviceType.BoltElongation, DeviceType.BoltElongationMultiChannels]
@@ -102,14 +148,22 @@ export const MONITORING_POINT_FIRST_CLASS_FIELDS_MAPPING = new Map([
     MonitoringPointTypeValue.LOOSENING_ANGLE,
     ['loosening_angle', 'attitude', 'motion', 'temperature', 'measurement_index']
   ],
+  [MonitoringPointTypeValue.THICKNESS, ['thickness', 'temperature', 'annualized_corrosion_rate']],
   [MonitoringPointTypeValue.PRELOAD, ['preload', 'pressure', 'tof', 'temperature']],
+  [
+    MonitoringPointTypeValue.VIBRATION,
+    ['vibration_severity_y', 'enveloping_pk2pk_y', 'temperature']
+  ],
+  [MonitoringPointTypeValue.ANGLE_DIP, ['inclination', 'pitch', 'roll', 'waggle']],
+  [MonitoringPointTypeValue.PRESSURE, ['pressure', 'temperature']],
+  [MonitoringPointTypeValue.TEMPERATURE, ['temperature']],
   [MonitoringPointTypeValue.FLANGE_PRELOAD, ['preload', 'pressure', 'tof', 'temperature']]
 ]);
 
 export type DataType = 'raw' | 'waveform';
 
 export type DynamicData = {
-  title: '动态数据';
+  title: '动态数据' | '波形数据';
   serverDatatype: DataType;
   fields: { label: string; value: string; unit: string }[];
   metaData: { label: string; value: string; unit: string }[];

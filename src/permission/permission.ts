@@ -1,4 +1,5 @@
 import { Enforcer, MemoryAdapter, newEnforcer, newModel } from 'casbin.js';
+import React from 'react';
 import { getPermission } from '../utils/session';
 
 export type PermissionType = {
@@ -107,17 +108,17 @@ e = some(where (p.eft == allow))
 [matchers]
 m = g(r.sub, p.sub) && keyMatch2(r.obj, p.obj) && r.act == p.act || r.sub == "admin"`);
 
-const data = getPermission();
-
-if (data) {
-  const adapter = new MemoryAdapter(data.rules);
-  newEnforcer(model, adapter).then((value) => {
-    enforcer = value;
-    subject = data.subject;
-  });
-}
-
 const usePermission = () => {
+  React.useEffect(() => {
+    const data = getPermission();
+    if (data && data.subject.length > 0) {
+      const adapter = new MemoryAdapter(data.rules);
+      newEnforcer(model, adapter).then((value) => {
+        enforcer = value;
+        subject = data.subject;
+      });
+    }
+  }, []);
   return {
     hasPermission: (value: PermissionType) => {
       return !!(enforcer && enforcer.enforceSync(subject, value.path, value.method));

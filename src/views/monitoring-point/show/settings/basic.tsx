@@ -2,7 +2,7 @@ import { Button, Form } from 'antd';
 import React from 'react';
 import { isMobile } from '../../../../utils/deviceDetection';
 import { AssetRow } from '../../../asset';
-import { UpdateForm } from '../../manage/updateForm';
+import { UpdateForm } from '../../manage/wind-turbine/updateForm';
 import { bindDevice, unbindDevice, updateMeasurement } from '../../services';
 import { MonitoringPoint, MonitoringPointRow } from '../../types';
 

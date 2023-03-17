@@ -1,18 +1,17 @@
 import { Form, FormInstance, Select } from 'antd';
 import React from 'react';
-import { GetDevicesRequest } from '../../../apis/device';
-import { MONITORING_POINTS } from '../../../config/assetCategory.config';
-import { Device } from '../../../types/device';
-import { useAssetCategoryContext } from '../../asset/components/assetCategoryContext';
-import { AssetRow } from '../../asset';
+import { GetDevicesRequest } from '../../../../apis/device';
+import { MONITORING_POINTS } from '../../../../config/assetCategory.config';
+import { Device } from '../../../../types/device';
+import { useAssetCategoryContext, AssetRow } from '../../../asset';
 import {
   MonitoringPointTypeValue,
   MONITORING_POINT_TYPE,
   MONITORING_POINT_TYPE_VALUE_DEVICE_TYPE_ID_MAPPING,
   PLEASE_SELECT_MONITORING_POINT_TYPE
-} from '../types';
+} from '../../types';
 import { MonitoringPointBatch } from './create';
-import { checkIsFlangePreload, FLANGE, PLEASE_SELECT_FLANGE } from '../../flange';
+import { checkIsFlangePreload, FLANGE, PLEASE_SELECT_FLANGE } from '../../../flange';
 
 export const SelectFlangeFormItem = ({
   flanges = [],

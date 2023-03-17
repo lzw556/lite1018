@@ -1,12 +1,12 @@
 import { Form, Modal, ModalProps } from 'antd';
 import * as React from 'react';
-import { defaultValidateMessages } from '../../../constants/validator';
-import { Device } from '../../../types/device';
-import { AssetRow } from '../../asset';
-import { addMonitoringPoints } from '../services';
-import { CREATE_MONITORING_POINT } from '../types';
-import { MonitoringPointInfo } from './DeviceSelection';
-import { MonitoringPointFormItem } from './monitoringPointFormItem';
+import { defaultValidateMessages } from '../../../../constants/validator';
+import { Device } from '../../../../types/device';
+import { AssetRow } from '../../../asset';
+import { addMonitoringPoints } from '../../services';
+import { CREATE_MONITORING_POINT } from '../../types';
+import { MonitoringPointInfo } from '../DeviceSelection';
+import { MonitoringPointFormItem } from '../monitoringPointFormItem';
 import { SelectFlangeFormItem } from './selectFlangeFormItem';
 
 export type MonitoringPointBatch = {
@@ -17,7 +17,7 @@ export type MonitoringPointBatch = {
   })[];
 };
 
-export const MonitoringPointCreate: React.FC<
+export const WindTurbineMonitoringPointCreate: React.FC<
   ModalProps & { flanges?: AssetRow[]; flange?: AssetRow; onSuccess: () => void }
 > = (props) => {
   const { flanges = [], flange, onSuccess } = props;

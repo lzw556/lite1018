@@ -1,12 +1,12 @@
 import { Form, Input, InputNumber, Select } from 'antd';
 import { FormInstance } from 'antd/lib/form/Form';
 import React from 'react';
-import DeviceSelect from '../../../components/select/deviceSelect';
-import { MONITORING_POINTS } from '../../../config/assetCategory.config';
-import { defaultValidateMessages, Rules } from '../../../constants/validator';
-import { DeviceType } from '../../../types/device_type';
-import { useAssetCategoryContext, AssetRow } from '../../asset';
-import { FLANGE, PLEASE_SELECT_FLANGE } from '../../flange';
+import DeviceSelect from '../../../../components/select/deviceSelect';
+import { MONITORING_POINTS } from '../../../../config/assetCategory.config';
+import { defaultValidateMessages, Rules } from '../../../../constants/validator';
+import { DeviceType } from '../../../../types/device_type';
+import { useAssetCategoryContext, AssetRow } from '../../../asset';
+import { FLANGE, PLEASE_SELECT_FLANGE } from '../../../flange';
 import {
   MonitoringPoint,
   MonitoringPointRow,
@@ -17,8 +17,8 @@ import {
   PLEASE_INPUT_MONITORING_POINT_NAME,
   PLEASE_INPUT_MONITORING_POINT_POSITION,
   PLEASE_SELECT_MONITORING_POINT_TYPE
-} from '../types';
-import { convertRow } from '../utils';
+} from '../../types';
+import { convertRow } from '../../utils';
 
 export const UpdateForm = ({
   monitoringPoint,

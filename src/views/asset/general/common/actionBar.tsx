@@ -1,20 +1,18 @@
 import { Space } from 'antd';
 import * as React from 'react';
-import { FlangeCreate, FlangeUpdate } from '../../../flange';
 import {
-  WindTurbineMonitoringPointCreate,
-  WindTurbineMonitoringPointUpdate
+  GeneralMonitoringPointCreate,
+  GeneralMonitoringPointUpdate
 } from '../../../monitoring-point';
-import { WindTurbineCreate } from '../manage/create';
-import { WindTurbineUpdate } from '../manage/update';
+import { GeneralCreate } from '../manage/create';
+import { GeneralUpdate } from '../manage/update';
 
 export enum AssetAction {
-  WIND_TURBINE_CREATE,
-  WIND_TURBINE_UPDATE,
-  FLANGE_CREATE,
-  FLANGE_UPDATE,
+  GENERAL_CREATE,
+  GENERAL_UPDATE,
   MONITORING_POINT_CREATE,
-  MONITORING_POINT_UPDATE
+  MONITORING_POINT_UPDATE,
+  GENERAL_CREATE_MIX
 }
 
 export const ActionBar: React.FC<{
@@ -38,20 +36,8 @@ export const ActionBar: React.FC<{
   return (
     <Space wrap={true} style={props.style}>
       {hasPermission && actions}
-      {visible && type === AssetAction.WIND_TURBINE_CREATE && (
-        <WindTurbineCreate
-          {...{
-            visible,
-            onCancel: () => setVisible && setVisible(false),
-            onSuccess: () => {
-              if (onSuccess) onSuccess();
-              setVisible && setVisible(false);
-            }
-          }}
-        />
-      )}
-      {visible && type === AssetAction.WIND_TURBINE_UPDATE && (
-        <WindTurbineUpdate
+      {visible && type === AssetAction.GENERAL_CREATE && (
+        <GeneralCreate
           {...{
             visible,
             onCancel: () => setVisible && setVisible(false),
@@ -63,21 +49,8 @@ export const ActionBar: React.FC<{
           }}
         />
       )}
-      {visible && type === AssetAction.FLANGE_CREATE && (
-        <FlangeCreate
-          {...{
-            visible,
-            onCancel: () => setVisible && setVisible(false),
-            ...payload,
-            onSuccess: () => {
-              if (onSuccess) onSuccess();
-              setVisible && setVisible(false);
-            }
-          }}
-        />
-      )}
-      {visible && type === AssetAction.FLANGE_UPDATE && (
-        <FlangeUpdate
+      {visible && type === AssetAction.GENERAL_UPDATE && (
+        <GeneralUpdate
           {...{
             visible,
             onCancel: () => setVisible && setVisible(false),
@@ -90,7 +63,7 @@ export const ActionBar: React.FC<{
         />
       )}
       {visible && type === AssetAction.MONITORING_POINT_CREATE && (
-        <WindTurbineMonitoringPointCreate
+        <GeneralMonitoringPointCreate
           {...{
             visible,
             onCancel: () => setVisible && setVisible(false),
@@ -103,7 +76,7 @@ export const ActionBar: React.FC<{
         />
       )}
       {visible && type === AssetAction.MONITORING_POINT_UPDATE && (
-        <WindTurbineMonitoringPointUpdate
+        <GeneralMonitoringPointUpdate
           {...{
             visible,
             onCancel: () => setVisible && setVisible(false),

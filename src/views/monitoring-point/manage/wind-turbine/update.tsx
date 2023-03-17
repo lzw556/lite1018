@@ -1,11 +1,11 @@
 import { Form, Modal, ModalProps } from 'antd';
 import * as React from 'react';
-import { AssetRow } from '../../asset';
-import { bindDevice, unbindDevice, updateMeasurement } from '../services';
-import { MonitoringPoint, MonitoringPointRow, UPDATE_MONITORING_POINT } from '../types';
+import { AssetRow } from '../../../asset';
+import { bindDevice, unbindDevice, updateMeasurement } from '../../services';
+import { MonitoringPoint, MonitoringPointRow, UPDATE_MONITORING_POINT } from '../../types';
 import { UpdateForm } from './updateForm';
 
-export const MonitoringPointUpdate: React.FC<
+export const WindTurbineMonitoringPointUpdate: React.FC<
   ModalProps & { monitoringPoint: MonitoringPointRow; flanges: AssetRow[]; onSuccess: () => void }
 > = (props) => {
   const { monitoringPoint, flanges, onSuccess } = props;

@@ -33,6 +33,13 @@ const AssetViewSwitch = lazy(() => import('../views/asset/components/assetViewSw
 const AlarmRuleGroups = lazy(() => import('../views/alarm/alarm-group/index'));
 const CreateAlarmRuleGroups = lazy(() => import('../views/alarm/alarm-group/create'));
 const UpdateAlarmRuleGroups = lazy(() => import('../views/alarm/alarm-group/update'));
+
+//general
+const Generals = lazy(() => import('../views/asset/general/projectOverview'));
+const GeneralsTreeList = lazy(() => import('../views/asset/general/tree-list/index'));
+const GeneralShow = lazy(() => import('../views/asset/general/show/index'));
+const GeneralMonitoringPointShow = lazy(() => import('../views/monitoring-point/show/index'));
+
 //wind-turbine
 const WindTurbines = lazy(() => import('../views/asset/wind-turbine/projectOverview'));
 const WindTurbinesTreeList = lazy(() => import('../views/asset/wind-turbine/tree-list/index'));
@@ -63,16 +70,17 @@ const AppRouter = () => {
       children: [
         {
           index: true,
-          element: <AssetViewSwitch windTurbine={<WindTurbines />} />
+          element: <AssetViewSwitch general={<Generals />} windTurbine={<WindTurbines />} />
         },
         {
           path: 'project-overview',
-          element: <AssetViewSwitch windTurbine={<WindTurbines />} />
+          element: <AssetViewSwitch general={<Generals />} windTurbine={<WindTurbines />} />
         },
         {
           path: `${ASSET_CATEGORY[category]}/:id`,
           element: (
             <AssetViewSwitch
+              general={<GeneralShow />}
               windTurbine={<WindTurbineShow />}
               // hydroTurbine={<HydroTurbineShow />}
             />
@@ -100,6 +108,7 @@ const AppRouter = () => {
           path: 'asset-management',
           element: (
             <AssetViewSwitch
+              general={<GeneralsTreeList />}
               windTurbine={<WindTurbinesTreeList />}
               // hydroTurbine={<HydroTurbinesTreeList />}
             />

@@ -32,6 +32,21 @@ export const ROOT_ASSETS: Map<AssetCategory, number> = new Map([
 
 export const MONITORING_POINTS: Map<AssetCategory, MonitoringPointType[]> = new Map([
   [
+    'general',
+    [
+      {
+        id: MonitoringPointTypeValue.LOOSENING_ANGLE,
+        label: MonitoringPointTypeText.LOOSENING_ANGLE
+      },
+      { id: MonitoringPointTypeValue.THICKNESS, label: MonitoringPointTypeText.THICKNESS },
+      { id: MonitoringPointTypeValue.PRELOAD, label: MonitoringPointTypeText.PRELOAD },
+      { id: MonitoringPointTypeValue.VIBRATION, label: MonitoringPointTypeText.VIBRATION },
+      { id: MonitoringPointTypeValue.ANGLE_DIP, label: MonitoringPointTypeText.ANGLE_DIP },
+      { id: MonitoringPointTypeValue.PRESSURE, label: MonitoringPointTypeText.PRESSURE },
+      { id: MonitoringPointTypeValue.TEMPERATURE, label: MonitoringPointTypeText.TEMPERATURE }
+    ]
+  ],
+  [
     'windTurbine',
     [
       {
