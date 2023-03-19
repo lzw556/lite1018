@@ -1,9 +1,16 @@
 import { Checkbox, Form, FormInstance, Input, Select } from 'antd';
 import React from 'react';
 import { checkIsFlangePreload } from '..';
+import { ROOT_ASSETS } from '../../../config/assetCategory.config';
 import { SAMPLE_OFFSET, SAMPLE_PERIOD_2 } from '../../../constants';
 import { defaultValidateMessages, Rules } from '../../../constants/validator';
-import { Asset, AssetRow, PLEASE_SELECT_WIND_TURBINE, WIND_TURBINE, convertRow } from '../../asset';
+import { Asset, AssetRow, getAssets } from '../../asset';
+import {
+  convertRow,
+  getWinds,
+  PLEASE_SELECT_WIND_TURBINE,
+  WIND_TURBINE
+} from '../../asset/wind-turbine';
 import {
   FLANGE_ASSET_TYPE_ID,
   FLANGE_NAME,
@@ -18,16 +25,21 @@ export const UpdateForm = ({
   flange,
   form,
   children,
-  style,
-  windTurbines
+  style
 }: {
   flange: AssetRow;
   form: FormInstance<Asset>;
   children?: JSX.Element;
   style?: React.CSSProperties;
-  windTurbines: AssetRow[];
 }) => {
+  const [windTurbines, setWindTurbines] = React.useState<AssetRow[]>([]);
   const [isFlangePreload, setIsFlangePreload] = React.useState(checkIsFlangePreload(flange));
+
+  React.useEffect(() => {
+    getAssets({ type: ROOT_ASSETS.get('windTurbine') }).then((assets) =>
+      setWindTurbines(getWinds(assets))
+    );
+  }, []);
 
   React.useEffect(() => {
     if (flange) {

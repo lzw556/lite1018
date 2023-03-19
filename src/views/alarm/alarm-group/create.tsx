@@ -393,7 +393,7 @@ export default function CreateAlarmRuleGroup() {
                       };
                     })
                   };
-                  addAlarmRule(final).then(() => navigate(`alarmRules`));
+                  addAlarmRule(final).then(() => navigate(`/alarmRules`));
                 });
               }}
             >

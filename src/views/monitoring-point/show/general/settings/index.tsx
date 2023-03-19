@@ -1,9 +1,8 @@
 import { Radio } from 'antd';
 import * as React from 'react';
-import { useAssetsContext } from '../../../asset';
-import { getFlanges } from '../../../flange';
-import { MonitoringPointRow } from '../../types';
-import { AlarmRuleSetting } from './alarm';
+import { useAssetsContext } from '../../../../asset';
+import { MonitoringPointRow } from '../../../types';
+import { AlarmRuleSetting } from '../../alarm';
 import { BasicSetting } from './basic';
 
 export const MonitoringPointSet = ({
@@ -29,11 +28,7 @@ export const MonitoringPointSet = ({
         buttonStyle='solid'
       />
       {type === 'basic' && (
-        <BasicSetting
-          monitoringPoint={point}
-          flanges={getFlanges(assets)}
-          onUpdateSuccess={onUpdateSuccess}
-        />
+        <BasicSetting monitoringPoint={point} onUpdateSuccess={onUpdateSuccess} />
       )}
       {type === 'alarm' && <AlarmRuleSetting {...point} />}
     </>

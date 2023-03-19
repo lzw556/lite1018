@@ -2,20 +2,18 @@ import { PlusOutlined } from '@ant-design/icons';
 import { Button, Col, Row, Spin, TabsProps } from 'antd';
 import React from 'react';
 import { useLocation, useParams } from 'react-router-dom';
-import { checkIsFlangePreload, getFlanges } from '..';
+import { checkIsFlangePreload } from '..';
 import { oneWeekNumberRange } from '../../../components/rangeDatePicker';
 import { TabsCard } from '../../../components/tabsCard';
 import usePermission, { Permission } from '../../../permission/permission';
 import {
-  ActionBar,
   AssetAlarmStatistic,
   AssetNavigator,
   AssetRow,
   getAsset,
-  getWinds,
-  useActionBarStatus,
   useAssetsContext
 } from '../../asset';
+import { ActionBar, useActionBarStatus } from '../../asset/wind-turbine';
 import {
   CREATE_MONITORING_POINT,
   getDataOfMonitoringPoint,
@@ -69,7 +67,7 @@ export default function FlangeShow() {
         <FlangeMonitoringPointList
           flange={flange}
           onUpdate={(point) => {
-            actionStatus.onMonitoringPointUpdate?.(point, getFlanges(assets));
+            actionStatus.onMonitoringPointUpdate?.(point);
           }}
           onDeleteSuccess={() => fetchFlange(Number(id))}
         />
@@ -95,7 +93,6 @@ export default function FlangeShow() {
       children: (
         <FlangeSet
           flange={flange}
-          windTurbines={getWinds(assets)}
           onUpdateSuccess={() => {
             fetchFlange(Number(id));
             refresh();

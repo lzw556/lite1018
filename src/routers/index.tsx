@@ -38,7 +38,9 @@ const UpdateAlarmRuleGroups = lazy(() => import('../views/alarm/alarm-group/upda
 const Generals = lazy(() => import('../views/asset/general/projectOverview'));
 const GeneralsTreeList = lazy(() => import('../views/asset/general/tree-list/index'));
 const GeneralShow = lazy(() => import('../views/asset/general/show/index'));
-const GeneralMonitoringPointShow = lazy(() => import('../views/monitoring-point/show/index'));
+const GeneralMonitoringPointShow = lazy(
+  () => import('../views/monitoring-point/show/general/index')
+);
 
 //wind-turbine
 const WindTurbines = lazy(() => import('../views/asset/wind-turbine/projectOverview'));
@@ -46,7 +48,9 @@ const WindTurbinesTreeList = lazy(() => import('../views/asset/wind-turbine/tree
 const WindTurbinesTableList = lazy(() => import('../views/asset/wind-turbine/table-list/index'));
 const WindTurbineShow = lazy(() => import('../views/asset/wind-turbine/show/index'));
 const WindTurbineFlangeShow = lazy(() => import('../views/flange/show/index'));
-const WindTurbineMonitoringPointShow = lazy(() => import('../views/monitoring-point/show/index'));
+const WindTurbineMonitoringPointShow = lazy(
+  () => import('../views/monitoring-point/show/wind-turbine/index')
+);
 
 // hydro-turbine
 // const HydroTurbines = lazy(() => import('../asset/hydro-turbine/index'));
@@ -99,6 +103,7 @@ const AppRouter = () => {
           path: `${MONITORING_POINT_PATHNAME}/:id`,
           element: (
             <AssetViewSwitch
+              general={<GeneralMonitoringPointShow />}
               windTurbine={<WindTurbineMonitoringPointShow />}
               // hydroTurbine={<HydroTurbineMonitoringPointShow />}
             />

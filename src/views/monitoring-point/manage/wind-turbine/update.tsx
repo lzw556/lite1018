@@ -1,14 +1,13 @@
 import { Form, Modal, ModalProps } from 'antd';
 import * as React from 'react';
-import { AssetRow } from '../../../asset';
 import { bindDevice, unbindDevice, updateMeasurement } from '../../services';
 import { MonitoringPoint, MonitoringPointRow, UPDATE_MONITORING_POINT } from '../../types';
 import { UpdateForm } from './updateForm';
 
 export const WindTurbineMonitoringPointUpdate: React.FC<
-  ModalProps & { monitoringPoint: MonitoringPointRow; flanges: AssetRow[]; onSuccess: () => void }
+  ModalProps & { monitoringPoint: MonitoringPointRow; onSuccess: () => void }
 > = (props) => {
-  const { monitoringPoint, flanges, onSuccess } = props;
+  const { monitoringPoint, onSuccess } = props;
   const [form] = Form.useForm<MonitoringPoint & { device_id: number }>();
 
   return (
@@ -41,7 +40,7 @@ export const WindTurbineMonitoringPointUpdate: React.FC<
         }
       }}
     >
-      <UpdateForm form={form} monitoringPoint={monitoringPoint} flanges={flanges} />
+      <UpdateForm form={form} monitoringPoint={monitoringPoint} />
     </Modal>
   );
 };

@@ -66,7 +66,7 @@ export default function WindTurbinesTableList() {
             <Col span={24}>
               <WindTurbineMonitoringPointList
                 wind={selectedWind}
-                onUpdate={(point) => actionStatus.onMonitoringPointUpdate(point, flanges)}
+                onUpdate={(point) => actionStatus.onMonitoringPointUpdate(point)}
                 onDeleteSuccess={() => refresh()}
               />
             </Col>
@@ -107,7 +107,7 @@ export default function WindTurbinesTableList() {
                 <Button
                   key='flange-create'
                   type='primary'
-                  onClick={() => actionStatus.onFlangeCreate(winds)}
+                  onClick={() => actionStatus.onFlangeCreate()}
                 >
                   {CREATE_FLANGE}
                   <PlusOutlined />
@@ -117,7 +117,7 @@ export default function WindTurbinesTableList() {
                 <Button
                   key='monitoring-point-create'
                   type='primary'
-                  onClick={() => actionStatus.onMonitoringPointCreate(flanges)}
+                  onClick={() => actionStatus.onMonitoringPointCreate()}
                 >
                   {CREATE_MONITORING_POINT}
                   <PlusOutlined />

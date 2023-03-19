@@ -4,8 +4,12 @@ import { Link } from 'react-router-dom';
 import { AssetRow } from '../types';
 import { DownOutlined } from '@ant-design/icons';
 import { forEachTreeNode, Node } from '../../../utils/tree';
-import { getRealPoints } from '../../monitoring-point';
-import { getPathFromType, useAssetCategoryContext, rootPathState } from '..';
+import { getRealPoints, MONITORING_POINT_PATHNAME } from '../../monitoring-point';
+import { useAssetCategoryContext, AssetCategory, ASSET_CATEGORY } from '..';
+import { ROOT_ASSETS } from '../../../config/assetCategory.config';
+import { FLANGE_ASSET_TYPE_ID, FLANGE_PATHNAME } from '../../flange';
+
+export const rootPathState = { from: { label: '总览', path: '/project-overview' } };
 
 type BreadcrumbItemData = Node & { type?: number };
 export const AssetNavigator = ({
@@ -126,3 +130,15 @@ export const AssetNavigator = ({
   if (items.length === 0) return null;
   return <Breadcrumb className='asset-navigator'>{items.map(renderBreadcrumbItem)}</Breadcrumb>;
 };
+
+export function getPathFromType(category: AssetCategory, type?: number) {
+  let pathname = null;
+  if (type === ROOT_ASSETS.get(category)) {
+    pathname = `/${ASSET_CATEGORY[category]}/`;
+  } else if (type === FLANGE_ASSET_TYPE_ID) {
+    pathname = `/${FLANGE_PATHNAME}/`;
+  } else {
+    pathname = `/${MONITORING_POINT_PATHNAME}/`;
+  }
+  return pathname;
+}

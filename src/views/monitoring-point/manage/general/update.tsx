@@ -1,14 +1,13 @@
 import { Form, Modal, ModalProps } from 'antd';
 import * as React from 'react';
-import { AssetRow } from '../../../asset';
 import { bindDevice, unbindDevice, updateMeasurement } from '../../services';
 import { MonitoringPoint, MonitoringPointRow, UPDATE_MONITORING_POINT } from '../../types';
 import { UpdateForm } from './updateForm';
 
 export const GeneralMonitoringPointUpdate: React.FC<
-  ModalProps & { monitoringPoint: MonitoringPointRow; parents: AssetRow[]; onSuccess: () => void }
+  ModalProps & { monitoringPoint: MonitoringPointRow; onSuccess: () => void }
 > = (props) => {
-  const { monitoringPoint, parents, onSuccess } = props;
+  const { monitoringPoint, onSuccess } = props;
   const [form] = Form.useForm<MonitoringPoint & { device_id: number }>();
 
   return (
@@ -41,7 +40,7 @@ export const GeneralMonitoringPointUpdate: React.FC<
         }
       }}
     >
-      <UpdateForm form={form} monitoringPoint={monitoringPoint} parents={parents} />
+      <UpdateForm form={form} monitoringPoint={monitoringPoint} />
     </Modal>
   );
 };

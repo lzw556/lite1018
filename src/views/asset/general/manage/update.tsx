@@ -5,10 +5,10 @@ import { Asset, AssetRow } from '../../types';
 import { UPDATE_GENERAL } from '../common/types';
 import { UpdateForm } from './updateForm';
 
-export const GeneralUpdate: React.FC<
-  ModalProps & { asset: AssetRow; parents?: AssetRow[]; onSuccess: () => void }
-> = (props) => {
-  const { asset, parents, onSuccess } = props;
+export const GeneralUpdate: React.FC<ModalProps & { asset: AssetRow; onSuccess: () => void }> = (
+  props
+) => {
+  const { asset, onSuccess } = props;
   const [form] = Form.useForm<Asset>();
 
   return (
@@ -31,7 +31,7 @@ export const GeneralUpdate: React.FC<
         }
       }}
     >
-      <UpdateForm form={form} general={asset} parents={parents} />
+      <UpdateForm form={form} general={asset} />
     </Modal>
   );
 };

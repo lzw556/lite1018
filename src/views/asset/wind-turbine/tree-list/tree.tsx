@@ -5,43 +5,42 @@ import * as React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { ROOT_ASSETS } from '../../../../config/assetCategory.config';
 import HasPermission from '../../../../permission';
-import { Permission } from '../../../../permission/permission';
+import usePermission, { Permission } from '../../../../permission/permission';
 import { isMobile } from '../../../../utils/deviceDetection';
 import { mapTreeNode } from '../../../../utils/tree';
-import { FlangeIcon, FLANGE_ASSET_TYPE_ID, getFlanges } from '../../../flange';
+import { FlangeIcon, FLANGE_ASSET_TYPE_ID } from '../../../flange';
 import {
   MonitoringPointIcon,
   deleteMeasurement,
-  MonitoringPointRow,
   generateDatasOfMeasurement,
-  getRealPoints
+  getRealPoints,
+  getMeasurement
 } from '../../../monitoring-point';
 import { convertAlarmLevelToState } from '../../common/statisticsHelper';
+import { getPathFromType } from '../../components';
 import { useAssetCategoryContext } from '../../components/assetCategoryContext';
-import { deleteAsset } from '../../services';
+import { deleteAsset, getAsset } from '../../services';
 import { AssetRow } from '../../types';
-import { getPathFromType, sortAssetsByIndex } from '../common/utils';
+import { ActionBar } from '../common/actionBar';
+import { useActionBarStatus } from '../common/useActionBarStatus';
+import { sortAssetsByIndex } from '../common/utils';
 import { WindTurbineIcon } from '../icon/icon';
 import './tree.css';
 
 export const WindTurbineTree: React.FC<{
   assets: AssetRow[];
-  onWindTurbineUpdate?: (asset: AssetRow) => void;
-  onFlangeCreate?: (paras: AssetRow[] | number) => void;
-  onFlangeUpdate?: (flange: AssetRow, windTurbines: AssetRow[]) => void;
-  onMonitoringPointCreate?: (paras: AssetRow[] | AssetRow) => void;
-  onMonitoringPointUpdate?: (monitoringPoint: MonitoringPointRow, flanges: AssetRow[]) => void;
-  onsuccess?: () => void;
-}> = ({
-  assets,
-  onWindTurbineUpdate,
-  onFlangeCreate,
-  onFlangeUpdate,
-  onMonitoringPointCreate,
-  onMonitoringPointUpdate,
-  onsuccess
-}) => {
+  onSuccess?: () => void;
+}> = ({ assets, onSuccess }) => {
   const { state } = useLocation();
+  const { hasPermission } = usePermission();
+  const actionStatus = useActionBarStatus();
+  const {
+    onWindTurbineUpdate,
+    onFlangeCreate,
+    onFlangeUpdate,
+    onMonitoringPointCreate,
+    onMonitoringPointUpdate
+  } = actionStatus;
   const [treedata, setTreedata] = React.useState<any>();
   const [selectedNode, setSelectedNode] = React.useState<any>();
   const category = useAssetCategoryContext();
@@ -98,99 +97,137 @@ export const WindTurbineTree: React.FC<{
 
   if (!treedata) return null;
   return (
-    <Tree
-      treeData={treedata}
-      fieldNames={{ key: 'key', title: 'name' }}
-      showIcon={true}
-      className='asset-list-tree'
-      titleRender={(props: any) => {
-        const name = `${props.name}`;
-        let alarmText = null;
-        if (props.type > 10000) {
-          const nameValues = generateDatasOfMeasurement(props);
-          if (nameValues.length > 0) {
-            alarmText = (
-              <Space style={{ fontSize: 14, color: '#8a8e99' }}>
-                {nameValues.map(({ name, value }) => `${name}: ${value}`)}
-              </Space>
-            );
+    <>
+      <Tree
+        treeData={treedata}
+        fieldNames={{ key: 'key', title: 'name' }}
+        showIcon={true}
+        className='asset-list-tree'
+        titleRender={(props: any) => {
+          const name = `${props.name}`;
+          let alarmText = null;
+          if (props.type > 10000) {
+            const nameValues = generateDatasOfMeasurement(props);
+            if (nameValues.length > 0) {
+              alarmText = (
+                <Space style={{ fontSize: 14, color: '#8a8e99' }}>
+                  {nameValues.map(({ name, value }) => `${name}: ${value}`)}
+                </Space>
+              );
+            }
           }
-        }
 
-        return (
-          <Space>
-            {name}
-            {!isMobile && alarmText}
-            {selectedNode?.key === props.key && (
-              <>
-                <HasPermission value={Permission.AssetAdd}>
-                  <Button type='text' size='small'>
-                    <EditOutlined
-                      onClick={() => {
-                        const type = selectedNode?.type;
-                        if (type === WIND_TURBINE_ASSET_TYPE_ID) {
-                          onWindTurbineUpdate?.(selectedNode);
-                        } else if (type === FLANGE_ASSET_TYPE_ID) {
-                          onFlangeUpdate?.(selectedNode, assets);
-                        } else {
-                          onMonitoringPointUpdate?.(selectedNode, getFlanges(assets));
-                        }
-                      }}
-                    />
-                  </Button>
-                  <HasPermission value={Permission.AssetDelete}>
-                    <Popconfirm
-                      title={`确定要删除${name}吗?`}
-                      onConfirm={() => {
-                        if (selectedNode?.type < 10000) {
-                          deleteAsset(selectedNode?.id).then(() => {
-                            if (onsuccess) onsuccess();
-                          });
-                        } else {
-                          deleteMeasurement(selectedNode?.id).then(() => {
-                            if (onsuccess) onsuccess();
-                          });
-                        }
-                      }}
-                    >
-                      <Button type='text' danger={true} size='small' title={`删除${name}`}>
-                        <DeleteOutlined />
-                      </Button>
-                    </Popconfirm>
-                  </HasPermission>
-                  {selectedNode?.type < 10000 && (
+          return (
+            <Space>
+              {name}
+              {!isMobile && alarmText}
+              {selectedNode?.key === props.key && (
+                <>
+                  <HasPermission value={Permission.AssetAdd}>
                     <Button type='text' size='small'>
-                      <PlusOutlined
+                      <EditOutlined
                         onClick={() => {
                           const type = selectedNode?.type;
                           if (type === WIND_TURBINE_ASSET_TYPE_ID) {
-                            onFlangeCreate?.(selectedNode?.id);
+                            getAsset(selectedNode?.id)
+                              .then((asset) => {
+                                onWindTurbineUpdate?.(asset);
+                              })
+                              .catch(() => {
+                                onSuccess?.();
+                              });
                           } else if (type === FLANGE_ASSET_TYPE_ID) {
-                            onMonitoringPointCreate?.(selectedNode);
+                            getAsset(selectedNode?.id)
+                              .then((asset) => {
+                                onFlangeUpdate?.(asset);
+                              })
+                              .catch(() => {
+                                onSuccess?.();
+                              });
+                          } else {
+                            getMeasurement(selectedNode?.id)
+                              .then((point) => {
+                                onMonitoringPointUpdate?.(point);
+                              })
+                              .catch(() => {
+                                onSuccess?.();
+                              });
                           }
                         }}
                       />
                     </Button>
-                  )}
-                </HasPermission>
-                <Link
-                  to={`${getPathFromType(category, selectedNode?.type)}${selectedNode?.id}`}
-                  state={state}
-                >
-                  <Button type='text' size='small'>
-                    <ArrowRightOutlined />
-                  </Button>
-                </Link>
-              </>
-            )}
-          </Space>
-        );
-      }}
-      onSelect={(selectedKeys: any, e: any) => {
-        setSelectedNode(e.node);
-      }}
-      defaultExpandAll={true}
-      height={780}
-    />
+                    <HasPermission value={Permission.AssetDelete}>
+                      <Popconfirm
+                        title={`确定要删除${name}吗?`}
+                        onConfirm={() => {
+                          if (selectedNode?.type < 10000) {
+                            deleteAsset(selectedNode?.id).then(() => {
+                              onSuccess?.();
+                            });
+                          } else {
+                            deleteMeasurement(selectedNode?.id).then(() => {
+                              onSuccess?.();
+                            });
+                          }
+                        }}
+                      >
+                        <Button type='text' danger={true} size='small' title={`删除${name}`}>
+                          <DeleteOutlined />
+                        </Button>
+                      </Popconfirm>
+                    </HasPermission>
+                    {selectedNode?.type < 10000 && (
+                      <Button type='text' size='small'>
+                        <PlusOutlined
+                          onClick={() => {
+                            const type = selectedNode?.type;
+                            if (type === WIND_TURBINE_ASSET_TYPE_ID) {
+                              getAsset(selectedNode?.id)
+                                .then((asset) => {
+                                  onFlangeCreate?.(asset.id);
+                                })
+                                .catch(() => {
+                                  onSuccess?.();
+                                });
+                            } else if (type === FLANGE_ASSET_TYPE_ID) {
+                              getAsset(selectedNode?.id)
+                                .then((asset) => {
+                                  onMonitoringPointCreate?.(asset);
+                                })
+                                .catch(() => {
+                                  onSuccess?.();
+                                });
+                            }
+                          }}
+                        />
+                      </Button>
+                    )}
+                  </HasPermission>
+                  <Link
+                    to={`${getPathFromType(category, selectedNode?.type)}${selectedNode?.id}`}
+                    state={state}
+                  >
+                    <Button type='text' size='small'>
+                      <ArrowRightOutlined />
+                    </Button>
+                  </Link>
+                </>
+              )}
+            </Space>
+          );
+        }}
+        onSelect={(selectedKeys: any, e: any) => {
+          setSelectedNode(e.node);
+        }}
+        defaultExpandAll={true}
+        height={780}
+      />
+      <ActionBar
+        hasPermission={hasPermission(Permission.AssetAdd)}
+        actions={[]}
+        {...actionStatus}
+        onSuccess={onSuccess}
+      />
+    </>
   );
 };

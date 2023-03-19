@@ -1,8 +1,10 @@
 import { Checkbox, Form, Input, Modal, ModalProps, Select } from 'antd';
 import React from 'react';
+import { ROOT_ASSETS } from '../../../config/assetCategory.config';
 import { SAMPLE_OFFSET, SAMPLE_PERIOD_2 } from '../../../constants';
 import { defaultValidateMessages, Rules } from '../../../constants/validator';
-import { addAsset, Asset, AssetRow, PLEASE_SELECT_WIND_TURBINE, WIND_TURBINE } from '../../asset';
+import { addAsset, Asset, AssetRow, getAssets } from '../../asset';
+import { PLEASE_SELECT_WIND_TURBINE, WIND_TURBINE } from '../../asset/wind-turbine';
 import {
   CREATE_FLANGE,
   FLANGE_ASSET_TYPE_ID,
@@ -16,14 +18,20 @@ import { AttributeFormItem } from './attributeFormItem';
 
 export const FlangeCreate: React.FC<
   ModalProps & {
-    windTurbines?: AssetRow[];
     onSuccess: () => void;
     windTurbineId?: number;
   }
 > = (props) => {
-  const { windTurbines = [], windTurbineId, onSuccess } = props;
+  const [windTurbines, setWindTurbines] = React.useState<AssetRow[]>([]);
+  const { windTurbineId, onSuccess } = props;
   const [form] = Form.useForm<Asset>();
   const [isFlangePreload, setIsFlangePreload] = React.useState(false);
+
+  React.useEffect(() => {
+    if (windTurbineId === undefined) {
+      getAssets({ type: ROOT_ASSETS.get('windTurbine') }).then(setWindTurbines);
+    }
+  }, [windTurbineId]);
 
   return (
     <Modal
@@ -35,6 +43,7 @@ export const FlangeCreate: React.FC<
         ...props,
         onOk: () => {
           form.validateFields().then((values) => {
+            console.log(values);
             const _values = {
               ...values,
               attributes: {
@@ -61,7 +70,7 @@ export const FlangeCreate: React.FC<
           <Input placeholder={PLEASE_INPUT_FLANGE_NAME} />
         </Form.Item>
         <Form.Item name='type' hidden={true} initialValue={FLANGE_ASSET_TYPE_ID}></Form.Item>
-        {windTurbines.length > 0 ? (
+        {windTurbines.length > 0 && windTurbineId === undefined ? (
           <Form.Item
             label={WIND_TURBINE}
             name='parent_id'

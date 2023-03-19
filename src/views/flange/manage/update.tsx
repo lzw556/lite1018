@@ -6,12 +6,11 @@ import { UpdateForm } from './updateForm';
 
 export const FlangeUpdate: React.FC<
   ModalProps & {
-    windTurbines: AssetRow[];
     onSuccess: () => void;
     flange: AssetRow;
   }
 > = (props) => {
-  const { flange, windTurbines = [], onSuccess } = props;
+  const { flange, onSuccess } = props;
   const [form] = Form.useForm<Asset>();
 
   return (
@@ -45,7 +44,7 @@ export const FlangeUpdate: React.FC<
         }
       }}
     >
-      <UpdateForm flange={flange} form={form} windTurbines={windTurbines} />
+      <UpdateForm flange={flange} form={form} />
     </Modal>
   );
 };

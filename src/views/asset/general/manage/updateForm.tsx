@@ -3,6 +3,7 @@ import { FormInstance } from 'antd/lib/form/Form';
 import React from 'react';
 import { ROOT_ASSETS } from '../../../../config/assetCategory.config';
 import { defaultValidateMessages, Rules } from '../../../../constants/validator';
+import { getAssets } from '../../services';
 import { Asset, AssetRow } from '../../types';
 import {
   PLEASE_INPUT_GENERAL_NAME,
@@ -10,21 +11,27 @@ import {
   GENERAL_PARENT,
   PLEASE_SELECT_GENERAL_PARENT
 } from '../common/types';
-import { convertRow } from '../common/utils';
+import { convertRow, getValidParents } from '../common/utils';
 
 export const UpdateForm = ({
   general,
-  parents = [],
   form,
   children,
   style
 }: {
   general: AssetRow;
-  parents?: AssetRow[];
   form: FormInstance<Asset>;
   children?: JSX.Element;
   style?: React.CSSProperties;
 }) => {
+  const [parents, setParents] = React.useState<AssetRow[]>([]);
+
+  React.useEffect(() => {
+    getAssets({ type: ROOT_ASSETS.get('general') }).then((assets) =>
+      setParents(getValidParents(assets, general.id))
+    );
+  }, [general.id]);
+
   React.useEffect(() => {
     if (general) {
       form.resetFields();

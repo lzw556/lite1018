@@ -18,9 +18,9 @@ export type GeneralMonitoringPointBatch = {
 };
 
 export const GeneralMonitoringPointCreate: React.FC<
-  ModalProps & { parents?: AssetRow[]; parent?: AssetRow; onSuccess: () => void }
+  ModalProps & { parent?: AssetRow; onSuccess: () => void }
 > = (props) => {
-  const { parents = [], parent, onSuccess } = props;
+  const { parent, onSuccess } = props;
   const [form] = Form.useForm<GeneralMonitoringPointBatch>();
   const [selectedPointType, setSelectedPointType] = React.useState<number | undefined>();
   const [devices, setDevices] = React.useState<Device[]>([]);
@@ -102,7 +102,6 @@ export const GeneralMonitoringPointCreate: React.FC<
     >
       <Form form={form} labelCol={{ span: 6 }} validateMessages={defaultValidateMessages}>
         <SelectParentFormItem
-          parents={parents}
           parent={parent}
           onSelect={(type: number, devices: Device[]) => {
             if (type !== selectedPointType) {

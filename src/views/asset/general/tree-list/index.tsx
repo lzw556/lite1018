@@ -22,14 +22,14 @@ export default function GeneralsTreeList() {
   const { assets, refresh } = useAssetsContext();
   const actionStatus = useActionBarStatus();
 
-  const generals = filterEmptyChildren(assets);
+  const generals = filterEmptyChildren(assets).filter((asset) => asset.parentId === 0);
 
   const renderResult = () => {
     if (generals.length === 0)
       return <Empty description={NO_GENERALS} image={Empty.PRESENTED_IMAGE_SIMPLE} />;
     return (
       <ShadowCard>
-        <GeneralTree assets={generals} onsuccess={() => refresh()} {...actionStatus} />
+        <GeneralTree assets={generals} onSuccess={refresh} />
       </ShadowCard>
     );
   };
@@ -56,7 +56,7 @@ export default function GeneralsTreeList() {
               <Button
                 key='wind-turbine-create'
                 type='primary'
-                onClick={() => actionStatus.onGeneralCreate(generals)}
+                onClick={() => actionStatus.onGeneralCreate()}
               >
                 {CREATE_GENERAL}
                 <PlusOutlined />
@@ -65,7 +65,7 @@ export default function GeneralsTreeList() {
                 <Button
                   key='monitoring-point-create'
                   type='primary'
-                  onClick={() => actionStatus.onMonitoringPointCreate(generals)}
+                  onClick={() => actionStatus.onMonitoringPointCreate()}
                 >
                   {CREATE_MONITORING_POINT}
                   <PlusOutlined />

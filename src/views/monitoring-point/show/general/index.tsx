@@ -1,21 +1,21 @@
 import { Col, Empty, Row, Spin, TabsProps } from 'antd';
 import React from 'react';
 import { useLocation, useParams } from 'react-router-dom';
-import { FilterableAlarmRecordTable } from '../../../components/alarm/filterableAlarmRecordTable';
-import { TabsCard } from '../../../components/tabsCard';
-import usePermission, { Permission } from '../../../permission/permission';
-import { useAssetsContext, AssetNavigator } from '../../asset';
-import { getMeasurement } from '../services';
+import { FilterableAlarmRecordTable } from '../../../../components/alarm/filterableAlarmRecordTable';
+import { TabsCard } from '../../../../components/tabsCard';
+import usePermission, { Permission } from '../../../../permission/permission';
+import { useAssetsContext, AssetNavigator } from '../../../asset';
+import { getMeasurement } from '../../services';
 import {
   INVALID_MONITORING_POINT,
   MonitoringPointRow,
   MONITORING_POINT_TYPE_VALUE_DYNAMIC_MAPPING
-} from '../types';
-import { checkHasDynamicData, checkHasWaveData } from '../utils';
-import { RelatedDevices } from './device';
-import { MonitoringPointDynamicData } from './dynamicData/dynamicData';
-import { MonitoringPointHistory } from './history';
-import { MonitoringPointMonitor } from './monitor';
+} from '../../types';
+import { checkHasDynamicData, checkHasWaveData } from '../../utils';
+import { RelatedDevices } from '../device';
+import { MonitoringPointDynamicData } from '../dynamicData/dynamicData';
+import { MonitoringPointHistory } from '../history';
+import { MonitoringPointMonitor } from '../monitor';
 import { MonitoringPointSet } from './settings/index';
 
 export default function MonitoringPointShow() {

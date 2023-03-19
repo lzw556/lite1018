@@ -1,16 +1,15 @@
 import { Button, Form } from 'antd';
 import React from 'react';
 import { isMobile } from '../../../utils/deviceDetection';
-import { Asset, AssetRow, convertRow, updateAsset } from '../../asset';
+import { Asset, AssetRow, updateAsset } from '../../asset';
+import { convertRow } from '../../asset/wind-turbine';
 import { UpdateForm } from '../manage/updateForm';
 
 export const FlangeSet = ({
   flange,
-  windTurbines,
   onUpdateSuccess
 }: {
   flange: AssetRow;
-  windTurbines: AssetRow[];
   onUpdateSuccess: () => void;
 }) => {
   const [form] = Form.useForm<Asset>();
@@ -23,12 +22,7 @@ export const FlangeSet = ({
     }
   }, [flange, form]);
   return (
-    <UpdateForm
-      flange={flange}
-      form={form}
-      style={{ width: isMobile ? '100%' : '50%' }}
-      windTurbines={windTurbines}
-    >
+    <UpdateForm flange={flange} form={form} style={{ width: isMobile ? '100%' : '50%' }}>
       <Form.Item wrapperCol={{ offset: 5 }}>
         <Button
           type='primary'

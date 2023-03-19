@@ -1,14 +1,13 @@
 import { Button, Form } from 'antd';
 import React from 'react';
-import { isMobile } from '../../../../utils/deviceDetection';
-import { AssetRow } from '../../../asset';
-import { UpdateForm } from '../../manage/wind-turbine/updateForm';
-import { bindDevice, unbindDevice, updateMeasurement } from '../../services';
-import { MonitoringPoint, MonitoringPointRow } from '../../types';
+import { isMobile } from '../../../../../utils/deviceDetection';
+import { AssetRow } from '../../../../asset';
+import { UpdateForm } from '../../../manage/wind-turbine/updateForm';
+import { bindDevice, unbindDevice, updateMeasurement } from '../../../services';
+import { MonitoringPoint, MonitoringPointRow } from '../../../types';
 
 export const BasicSetting = ({
   monitoringPoint,
-  flanges,
   onUpdateSuccess
 }: {
   monitoringPoint: MonitoringPointRow;
@@ -21,7 +20,6 @@ export const BasicSetting = ({
     <UpdateForm
       form={form}
       monitoringPoint={monitoringPoint}
-      flanges={flanges}
       style={{ width: isMobile ? '100%' : '50%' }}
     >
       <Form.Item wrapperCol={{ offset: 4 }}>

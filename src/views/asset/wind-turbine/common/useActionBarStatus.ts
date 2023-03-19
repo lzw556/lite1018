@@ -20,33 +20,30 @@ export function useActionBarStatus() {
     setAction({ type: AssetAction.WIND_TURBINE_UPDATE, payload: { asset } });
   };
 
-  const handleFlangeCreate = (paras: AssetRow[] | number) => {
+  const handleFlangeCreate = (paras?: number) => {
     setVisible(true);
     setAction({
       type: AssetAction.FLANGE_CREATE,
-      payload: typeof paras === 'number' ? { windTurbineId: paras } : { windTurbines: paras }
+      payload: { windTurbineId: paras }
     });
   };
 
-  const handleFlangeUpdate = (flange: AssetRow, windTurbines: AssetRow[]) => {
+  const handleFlangeUpdate = (flange: AssetRow) => {
     setVisible(true);
-    setAction({ type: AssetAction.FLANGE_UPDATE, payload: { flange, windTurbines } });
+    setAction({ type: AssetAction.FLANGE_UPDATE, payload: { flange } });
   };
 
-  const handleMonitoringPointCreate = (paras: AssetRow[] | AssetRow) => {
+  const handleMonitoringPointCreate = (paras?: AssetRow) => {
     setVisible(true);
     setAction({
       type: AssetAction.MONITORING_POINT_CREATE,
-      payload: Array.isArray(paras) ? { flanges: paras } : { flange: paras }
+      payload: { flange: paras }
     });
   };
 
-  const handleMonitoringPointUpdate = (
-    monitoringPoint: MonitoringPointRow,
-    flanges: AssetRow[]
-  ) => {
+  const handleMonitoringPointUpdate = (monitoringPoint: MonitoringPointRow) => {
     setVisible(true);
-    setAction({ type: AssetAction.MONITORING_POINT_UPDATE, payload: { monitoringPoint, flanges } });
+    setAction({ type: AssetAction.MONITORING_POINT_UPDATE, payload: { monitoringPoint } });
   };
 
   return {

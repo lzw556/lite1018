@@ -10,34 +10,30 @@ export function useActionBarStatus() {
     payload?: any;
   }>({ type: AssetAction.GENERAL_CREATE });
 
-  const handleGeneralCreate = (paras: AssetRow[] | number) => {
+  const handleGeneralCreate = (paras?: number) => {
     setVisible(true);
     setAction({
       type: AssetAction.GENERAL_CREATE,
-      payload: Array.isArray(paras) ? { parents: paras } : { parentId: paras }
+      payload: { parentId: paras }
     });
   };
 
-  const handleGeneralUpdate = (asset: AssetRow, parents?: AssetRow[]) => {
-    debugger;
+  const handleGeneralUpdate = (asset: AssetRow) => {
     setVisible(true);
-    setAction({ type: AssetAction.GENERAL_UPDATE, payload: { asset, parents } });
+    setAction({ type: AssetAction.GENERAL_UPDATE, payload: { asset } });
   };
 
-  const handleMonitoringPointCreate = (paras: AssetRow[] | AssetRow) => {
+  const handleMonitoringPointCreate = (paras?: AssetRow) => {
     setVisible(true);
     setAction({
       type: AssetAction.MONITORING_POINT_CREATE,
-      payload: Array.isArray(paras) ? { parents: paras } : { parent: paras }
+      payload: { parent: paras }
     });
   };
 
-  const handleMonitoringPointUpdate = (
-    monitoringPoint: MonitoringPointRow,
-    parents: AssetRow[]
-  ) => {
+  const handleMonitoringPointUpdate = (monitoringPoint: MonitoringPointRow) => {
     setVisible(true);
-    setAction({ type: AssetAction.MONITORING_POINT_UPDATE, payload: { monitoringPoint, parents } });
+    setAction({ type: AssetAction.MONITORING_POINT_UPDATE, payload: { monitoringPoint } });
   };
 
   return {

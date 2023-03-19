@@ -18,9 +18,9 @@ export type MonitoringPointBatch = {
 };
 
 export const WindTurbineMonitoringPointCreate: React.FC<
-  ModalProps & { flanges?: AssetRow[]; flange?: AssetRow; onSuccess: () => void }
+  ModalProps & { flange?: AssetRow; onSuccess: () => void }
 > = (props) => {
-  const { flanges = [], flange, onSuccess } = props;
+  const { flange, onSuccess } = props;
   const [form] = Form.useForm<MonitoringPointBatch>();
   const [selectedPointType, setSelectedPointType] = React.useState<number | undefined>();
   const [devices, setDevices] = React.useState<Device[]>([]);
@@ -102,7 +102,6 @@ export const WindTurbineMonitoringPointCreate: React.FC<
     >
       <Form form={form} labelCol={{ span: 6 }} validateMessages={defaultValidateMessages}>
         <SelectFlangeFormItem
-          flanges={flanges}
           flange={flange}
           onSelect={(type: number, devices: Device[]) => {
             if (type !== selectedPointType) {

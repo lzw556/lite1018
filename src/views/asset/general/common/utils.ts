@@ -1,6 +1,5 @@
 import { Asset, AssetCategory, AssetRow, ASSET_CATEGORY } from '../..';
 import { ROOT_ASSETS } from '../../../../config/assetCategory.config';
-import { MONITORING_POINT_PATHNAME } from '../../../monitoring-point';
 
 export function convertRow(values?: AssetRow): Asset | null {
   if (!values) return null;
@@ -17,8 +16,8 @@ export function getGenerals(assets: AssetRow[]) {
   return assets.filter((a) => a.type === ROOT_ASSETS.get('general'));
 }
 
-export function getValidParents(assets: AssetRow[], asset: AssetRow) {
-  return getGenerals(assets).filter((a) => a.id !== asset.id && a.parentId !== asset.id);
+export function getValidParents(assets: AssetRow[], assetId: number) {
+  return getGenerals(assets).filter((a) => a.id !== assetId && a.parentId !== assetId);
 }
 
 export function sortAssetsByIndex(assets: AssetRow[]) {
@@ -27,14 +26,4 @@ export function sortAssetsByIndex(assets: AssetRow[]) {
     (prev, crt) =>
       (prev.attributes?.index ?? Number.MAX_VALUE) - (crt.attributes?.index ?? Number.MAX_VALUE)
   );
-}
-
-export function getPathFromType(category: AssetCategory, type?: number) {
-  let pathname = null;
-  if (type === ROOT_ASSETS.get('general')) {
-    pathname = `/${ASSET_CATEGORY[category]}/`;
-  } else {
-    pathname = `/${MONITORING_POINT_PATHNAME}/`;
-  }
-  return pathname;
 }

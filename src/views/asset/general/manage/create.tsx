@@ -2,7 +2,7 @@ import { Form, Input, Modal, ModalProps, Select } from 'antd';
 import * as React from 'react';
 import { ROOT_ASSETS } from '../../../../config/assetCategory.config';
 import { defaultValidateMessages, Rules } from '../../../../constants/validator';
-import { addAsset } from '../../services';
+import { addAsset, getAssets } from '../../services';
 import { Asset, AssetRow } from '../../types';
 import {
   CREATE_GENERAL,
@@ -12,11 +12,18 @@ import {
   PLEASE_SELECT_GENERAL_PARENT
 } from '../common/types';
 
-export const GeneralCreate: React.FC<
-  ModalProps & { parents?: AssetRow[]; parentId?: number; onSuccess: () => void }
-> = (props) => {
-  const { parents = [], parentId, onSuccess } = props;
+export const GeneralCreate: React.FC<ModalProps & { parentId?: number; onSuccess: () => void }> = (
+  props
+) => {
+  const { parentId, onSuccess } = props;
+  const [parents, setParents] = React.useState<AssetRow[]>([]);
   const [form] = Form.useForm<Asset>();
+
+  React.useEffect(() => {
+    if (parentId === undefined) {
+      getAssets({ type: ROOT_ASSETS.get('general') }).then(setParents);
+    }
+  }, [parentId]);
 
   return (
     <Modal
@@ -28,7 +35,7 @@ export const GeneralCreate: React.FC<
         onOk: () => {
           form.validateFields().then((values) => {
             try {
-              addAsset({ ...values, parent_id: values.parent_id || 0 }).then(() => {
+              addAsset({ ...values, parent_id: values.parent_id ?? parentId ?? 0 }).then(() => {
                 onSuccess();
               });
             } catch (error) {
@@ -43,7 +50,7 @@ export const GeneralCreate: React.FC<
           <Input placeholder={PLEASE_INPUT_GENERAL_NAME} />
         </Form.Item>
         <Form.Item name='type' hidden={true} initialValue={ROOT_ASSETS.get('general')}></Form.Item>
-        {parents?.length > 0 ? (
+        {parents?.length > 0 && parentId === undefined ? (
           <Form.Item label={GENERAL_PARENT} name='parent_id'>
             <Select placeholder={PLEASE_SELECT_GENERAL_PARENT}>
               {parents.map(({ id, name, attributes }) => (

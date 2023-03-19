@@ -1,9 +1,9 @@
 import { Form, Select } from 'antd';
 import React from 'react';
 import { GetDevicesRequest } from '../../../../apis/device';
-import { MONITORING_POINTS } from '../../../../config/assetCategory.config';
+import { MONITORING_POINTS, ROOT_ASSETS } from '../../../../config/assetCategory.config';
 import { Device } from '../../../../types/device';
-import { useAssetCategoryContext, AssetRow } from '../../../asset';
+import { useAssetCategoryContext, AssetRow, getAssets } from '../../../asset';
 import {
   MONITORING_POINT_TYPE,
   MONITORING_POINT_TYPE_VALUE_DEVICE_TYPE_ID_MAPPING,
@@ -12,15 +12,20 @@ import {
 import { GENERAL_PARENT, PLEASE_SELECT_GENERAL_PARENT } from '../../../asset/general';
 
 export const SelectParentFormItem = ({
-  parents = [],
   parent,
   onSelect
 }: {
-  parents?: AssetRow[];
   parent?: AssetRow;
   onSelect: (pointType: number, devices: Device[]) => void;
 }) => {
   const category = useAssetCategoryContext();
+  const [parents, setParents] = React.useState<AssetRow[]>([]);
+
+  React.useEffect(() => {
+    if (parent === undefined) {
+      getAssets({ type: ROOT_ASSETS.get('general') }).then(setParents);
+    }
+  }, [parent]);
 
   const handlePointTypeChange = React.useCallback(
     (type: number) => {

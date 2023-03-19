@@ -31,7 +31,7 @@ export default function WindTurbinesTreeList() {
       return <Empty description={NO_WIND_TURBINES} image={Empty.PRESENTED_IMAGE_SIMPLE} />;
     return (
       <ShadowCard>
-        <WindTurbineTree assets={winds} onsuccess={() => refresh()} {...actionStatus} />
+        <WindTurbineTree assets={winds} onSuccess={refresh} />
       </ShadowCard>
     );
   };
@@ -67,7 +67,7 @@ export default function WindTurbinesTreeList() {
                 <Button
                   key='flange-create'
                   type='primary'
-                  onClick={() => actionStatus.onFlangeCreate(winds)}
+                  onClick={() => actionStatus.onFlangeCreate()}
                 >
                   {CREATE_FLANGE}
                   <PlusOutlined />
@@ -77,7 +77,7 @@ export default function WindTurbinesTreeList() {
                 <Button
                   key='monitoring-point-create'
                   type='primary'
-                  onClick={() => actionStatus.onMonitoringPointCreate(flanges)}
+                  onClick={() => actionStatus.onMonitoringPointCreate()}
                 >
                   {CREATE_MONITORING_POINT}
                   <PlusOutlined />

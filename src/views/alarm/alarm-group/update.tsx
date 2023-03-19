@@ -278,7 +278,7 @@ export default function UpdateAlarmRuleGroup() {
                       description: _rule.description || ''
                     }))
                   };
-                  updateAlarmRule(Number(id), final).then(() => navigate(`alarmRules`));
+                  updateAlarmRule(Number(id), final).then(() => navigate(`/alarmRules`));
                 });
               }}
             >

@@ -17,6 +17,7 @@ import { ColorHealth, ColorOffline } from '../../../constants/color';
 import { isMobile } from '../../../utils/deviceDetection';
 import { INVALID_MONITORING_POINT, MONITORING_POINT } from '../../monitoring-point';
 import { NameValueGroups } from '../../../components/name-values';
+import { rootPathState } from '../components';
 
 export type ProjectStatistics = {
   deviceOfflineNum: number;
@@ -26,8 +27,6 @@ export type ProjectStatistics = {
   rootAssetAlarmNum: [number, number, number];
   rootAssetNum: number;
 };
-
-export const rootPathState = { from: { label: '总览', path: '/project-overview' } };
 
 export default function ProjectOverview() {
   const { state } = useLocation();

@@ -1,21 +1,21 @@
 import { Button, Empty, Space, Spin, Table, TableProps, Tag } from 'antd';
 import * as React from 'react';
 import { Link } from 'react-router-dom';
-import { MONITORING_POINTS } from '../../../../config/assetCategory.config';
-import { isMobile } from '../../../../utils/deviceDetection';
+import { MONITORING_POINTS } from '../../../config/assetCategory.config';
+import { isMobile } from '../../../utils/deviceDetection';
 import {
   bindMeasurementsToAlarmRule,
   getAlarmRules,
   unbindMeasurementsToAlarmRule
-} from '../../../alarm/alarm-group/services';
-import { AlarmRule } from '../../../alarm/alarm-group/types';
+} from '../../alarm/alarm-group/services';
+import { AlarmRule } from '../../alarm/alarm-group/types';
 import {
   convertAlarmLevelToState,
   getAlarmLevelColor,
   getAlarmStateText,
   useAssetCategoryContext
-} from '../../../asset';
-import { MonitoringPointRow, MONITORING_POINT_TYPE } from '../../types';
+} from '../../asset';
+import { MonitoringPointRow, MONITORING_POINT_TYPE } from '../types';
 
 export const AlarmRuleSetting = (point: MonitoringPointRow) => {
   const [allRules, setAllRules] = React.useState<AlarmRule[]>();
