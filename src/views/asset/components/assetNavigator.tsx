@@ -8,6 +8,7 @@ import { getRealPoints, MONITORING_POINT_PATHNAME } from '../../monitoring-point
 import { useAssetCategoryContext, AssetCategory, ASSET_CATEGORY } from '..';
 import { ROOT_ASSETS } from '../../../config/assetCategory.config';
 import { FLANGE_ASSET_TYPE_ID, FLANGE_PATHNAME } from '../../flange';
+import { AREA_ASSET_TYPES, AREA_ASSET_TYPE_PATHNAME } from '../corrosion';
 
 export const rootPathState = { from: { label: '总览', path: '/project-overview' } };
 
@@ -137,6 +138,8 @@ export function getPathFromType(category: AssetCategory, type?: number) {
     pathname = `/${ASSET_CATEGORY[category]}/`;
   } else if (type === FLANGE_ASSET_TYPE_ID) {
     pathname = `/${FLANGE_PATHNAME}/`;
+  } else if (type && AREA_ASSET_TYPES.map((t) => t.key).includes(type)) {
+    pathname = `/${AREA_ASSET_TYPE_PATHNAME}/`;
   } else {
     pathname = `/${MONITORING_POINT_PATHNAME}/`;
   }

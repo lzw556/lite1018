@@ -5,7 +5,8 @@ import request from '../../../utils/request';
 export const ASSET_CATEGORY = {
   windTurbine: 'wind-turbines',
   general: 'generals',
-  hydroTurbine: 'hydro-turbines'
+  hydroTurbine: 'hydro-turbines',
+  corrosion: 'corrosion'
 };
 
 export type AssetCategory = keyof typeof ASSET_CATEGORY;

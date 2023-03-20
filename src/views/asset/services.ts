@@ -1,8 +1,8 @@
-import { ProjectStatistics } from '.';
 import request from '../../utils/request';
 import { DeleteResponse, GetResponse, PostResponse, PutResponse } from '../../utils/response';
 import { HistoryData } from '../monitoring-point';
 import { Asset, AssetRow } from './types';
+import { ProjectStatistics } from './wind-turbine';
 
 export function getAssets(filters?: Partial<Pick<Asset, 'type' | 'parent_id'>>) {
   return request.get<AssetRow[]>(`/assets`, { ...filters }).then(GetResponse);

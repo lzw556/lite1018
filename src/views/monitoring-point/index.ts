@@ -2,6 +2,8 @@ export * from './manage/wind-turbine/create';
 export * from './manage/wind-turbine/update';
 export * from './manage/general/create';
 export * from './manage/general/update';
+export * from './manage/corrosion/create';
+export * from './manage/corrosion/update';
 export * from './columns';
 export * from './historyDataHelper';
 export * from './icon';

@@ -42,6 +42,15 @@ const GeneralMonitoringPointShow = lazy(
   () => import('../views/monitoring-point/show/general/index')
 );
 
+//corrosion
+const Areas = lazy(() => import('../views/asset/corrosion/projectOverview'));
+const AreasTreeList = lazy(() => import('../views/asset/corrosion/tree-list/index'));
+const AreasTableList = lazy(() => import('../views/asset/corrosion/table-list/index'));
+const AreaShow = lazy(() => import('../views/asset/corrosion/show/index'));
+const AreaMonitoringPointShow = lazy(
+  () => import('../views/monitoring-point/show/corrosion/index')
+);
+
 //wind-turbine
 const WindTurbines = lazy(() => import('../views/asset/wind-turbine/projectOverview'));
 const WindTurbinesTreeList = lazy(() => import('../views/asset/wind-turbine/tree-list/index'));
@@ -79,6 +88,7 @@ const AppRouter = () => {
               general={<Generals />}
               windTurbine={<WindTurbines />}
               hydroTurbine={<HydroTurbines />}
+              corrosion={<Areas />}
             />
           )
         },
@@ -89,6 +99,7 @@ const AppRouter = () => {
               general={<Generals />}
               windTurbine={<WindTurbines />}
               hydroTurbine={<HydroTurbines />}
+              corrosion={<Areas />}
             />
           )
         },
@@ -99,6 +110,7 @@ const AppRouter = () => {
               general={<GeneralShow />}
               windTurbine={<WindTurbineShow />}
               hydroTurbine={<HydroTurbineShow />}
+              corrosion={<AreaShow />}
             />
           )
         },
@@ -118,6 +130,7 @@ const AppRouter = () => {
               general={<GeneralMonitoringPointShow />}
               windTurbine={<WindTurbineMonitoringPointShow />}
               hydroTurbine={<HydroTurbineMonitoringPointShow />}
+              corrosion={<AreaMonitoringPointShow />}
             />
           )
         },
@@ -128,6 +141,7 @@ const AppRouter = () => {
               general={<GeneralsTreeList />}
               windTurbine={<WindTurbinesTreeList />}
               hydroTurbine={<HydroTurbinesTreeList />}
+              corrosion={<AreasTreeList />}
             />
           )
         },
@@ -137,6 +151,7 @@ const AppRouter = () => {
             <AssetViewSwitch
               windTurbine={<WindTurbinesTableList />}
               hydroTurbine={<HydroTurbinesTableList />}
+              corrosion={<AreasTableList />}
             />
           )
         },
