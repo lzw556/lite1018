@@ -1,15 +1,19 @@
 import { Form, Select } from 'antd';
 import React from 'react';
 import { GetDevicesRequest } from '../../../../apis/device';
-import { MONITORING_POINTS, ROOT_ASSETS } from '../../../../config/assetCategory.config';
 import { Device } from '../../../../types/device';
-import { useAssetCategoryContext, AssetRow, getAssets } from '../../../asset';
+import { AssetRow, getAssets } from '../../../asset';
 import {
   MONITORING_POINT_TYPE,
   MONITORING_POINT_TYPE_VALUE_DEVICE_TYPE_ID_MAPPING,
   PLEASE_SELECT_MONITORING_POINT_TYPE
 } from '../../types';
-import { GENERAL_PARENT, PLEASE_SELECT_GENERAL_PARENT } from '../../../asset/general';
+import {
+  GENERAL_ASSET_TYPE_ID,
+  GENERAL_PARENT,
+  MONITORING_POINTS,
+  PLEASE_SELECT_GENERAL_PARENT
+} from '../../../asset/general';
 
 export const SelectParentFormItem = ({
   parent,
@@ -18,12 +22,11 @@ export const SelectParentFormItem = ({
   parent?: AssetRow;
   onSelect: (pointType: number, devices: Device[]) => void;
 }) => {
-  const category = useAssetCategoryContext();
   const [parents, setParents] = React.useState<AssetRow[]>([]);
 
   React.useEffect(() => {
     if (parent === undefined) {
-      getAssets({ type: ROOT_ASSETS.get('general') }).then(setParents);
+      getAssets({ type: GENERAL_ASSET_TYPE_ID }).then(setParents);
     }
   }, [parent]);
 
@@ -66,7 +69,7 @@ export const SelectParentFormItem = ({
           placeholder={PLEASE_SELECT_MONITORING_POINT_TYPE}
           onChange={(id) => handlePointTypeChange(id)}
         >
-          {MONITORING_POINTS.get(category)?.map(({ id, label }) => (
+          {MONITORING_POINTS.map(({ id, label }) => (
             <Select.Option key={id} value={id}>
               {label}
             </Select.Option>

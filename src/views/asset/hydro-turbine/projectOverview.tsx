@@ -1,14 +1,14 @@
 import { Empty } from 'antd';
 import * as React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { GeneralIcon } from './icon/icon';
+import { WindTurbineIcon } from './icon/icon';
 import { getProjectStatistics } from '../services';
 import { ChartOptions } from '../../../components/charts/common';
 import { Series_Pie } from '../../../components/charts/pie';
 import { OverviewPage } from '../components/overviewPage';
 import { generateProjectAlarmStatis, getAssetStatistics } from '../common/statisticsHelper';
 import { Introduction } from '../components/introduction';
-import { NO_GENERALS, GENERAL } from './config';
+import { NO_HYDRO_TURBINES, HYDRO_TURBINE } from './config';
 import { AlarmTrend } from './alarmTrend';
 import { useAssetsContext } from '../components/assetsContext';
 import { ASSET_CATEGORY, useAssetCategoryContext } from '../components/assetCategoryContext';
@@ -124,7 +124,7 @@ export default function ProjectOverview() {
       <Empty
         description={
           <p>
-            {NO_GENERALS}, 去<Link to='/asset-management'>创建</Link>
+            {NO_HYDRO_TURBINES}, 去<Link to='/asset-management'>创建</Link>
           </p>
         }
         image={Empty.PRESENTED_IMAGE_SIMPLE}
@@ -136,7 +136,7 @@ export default function ProjectOverview() {
       {...{
         charts: [
           {
-            title: GENERAL,
+            title: HYDRO_TURBINE,
             colProps,
             options: statisticOfAsset
           },
@@ -162,7 +162,7 @@ export default function ProjectOverview() {
                   state: state ?? rootPathState
                 },
                 alarmState,
-                icon: { svg: <GeneralIcon />, small: true }
+                icon: { svg: <WindTurbineIcon />, small: true }
               }}
             />
           );

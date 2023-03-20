@@ -2,10 +2,10 @@ import { Form, Input, InputNumber, Select } from 'antd';
 import { FormInstance } from 'antd/lib/form/Form';
 import React from 'react';
 import DeviceSelect from '../../../../components/select/deviceSelect';
-import { MONITORING_POINTS, ROOT_ASSETS } from '../../../../config/assetCategory.config';
 import { defaultValidateMessages, Rules } from '../../../../constants/validator';
 import { DeviceType } from '../../../../types/device_type';
-import { useAssetCategoryContext, AssetRow, getAssets } from '../../../asset';
+import { AssetRow, getAssets } from '../../../asset';
+import { MONITORING_POINTS, WIND_TURBINE_ASSET_TYPE_ID } from '../../../asset/wind-turbine';
 import { FLANGE, getFlanges, PLEASE_SELECT_FLANGE } from '../../../flange';
 import {
   MonitoringPoint,
@@ -32,7 +32,6 @@ export const UpdateForm = ({
   style?: React.CSSProperties;
 }) => {
   const [flanges, setFlanges] = React.useState<AssetRow[]>([]);
-  const category = useAssetCategoryContext();
   const [deviceTypeId, setDeviceTypeId] = React.useState<number | undefined>(
     monitoringPoint?.bindingDevices && monitoringPoint?.bindingDevices.length > 0
       ? monitoringPoint?.bindingDevices[0].typeId
@@ -40,7 +39,7 @@ export const UpdateForm = ({
   );
 
   React.useEffect(() => {
-    getAssets({ type: ROOT_ASSETS.get('windTurbine') }).then((assets) =>
+    getAssets({ type: WIND_TURBINE_ASSET_TYPE_ID }).then((assets) =>
       setFlanges(getFlanges(assets))
     );
   }, []);
@@ -69,7 +68,7 @@ export const UpdateForm = ({
         rules={[{ required: true, message: PLEASE_SELECT_MONITORING_POINT_TYPE }]}
       >
         <Select placeholder={PLEASE_SELECT_MONITORING_POINT_TYPE} disabled={true}>
-          {MONITORING_POINTS.get(category)?.map(({ id, label }) => (
+          {MONITORING_POINTS.map(({ id, label }) => (
             <Select.Option key={id} value={id}>
               {label}
             </Select.Option>

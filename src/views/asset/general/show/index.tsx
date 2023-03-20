@@ -6,7 +6,7 @@ import { AssetAlarmStatistic, AssetNavigator, useAssetsContext } from '../../com
 import { AssetRow } from '../../types';
 import { useActionBarStatus } from '../common/useActionBarStatus';
 import { getAsset } from '../../services';
-import { INVALID_GENERAL } from '../common/types';
+import { INVALID_GENERAL } from '../config';
 import { GeneralTree } from '../tree-list/tree';
 
 export default function GeneralShow() {

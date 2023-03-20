@@ -1,5 +1,5 @@
 import { Asset, AssetRow } from '../..';
-import { WIND_TURBINE_ASSET_TYPE_ID } from '../config';
+import { HYDRO_TURBINE_ASSET_TYPE_ID } from '../config';
 
 export function convertRow(values?: AssetRow): Asset | null {
   if (!values) return null;
@@ -13,7 +13,7 @@ export function convertRow(values?: AssetRow): Asset | null {
 }
 
 export function getWinds(assets: AssetRow[]) {
-  return assets.filter((a) => a.type === WIND_TURBINE_ASSET_TYPE_ID);
+  return assets.filter((a) => a.type === HYDRO_TURBINE_ASSET_TYPE_ID);
 }
 
 export function sortAssetsByIndex(assets: AssetRow[]) {

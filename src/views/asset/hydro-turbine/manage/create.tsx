@@ -4,10 +4,10 @@ import { defaultValidateMessages, Rules } from '../../../../constants/validator'
 import { addAsset } from '../../services';
 import { Asset } from '../../types';
 import {
-  CREATE_WIND_TURBINE,
-  PLEASE_INPUT_WIND_TURBINE_NAME,
-  WIND_TURBINE_ASSET_TYPE_ID,
-  WIND_TURBINE_NAME
+  CREATE_HYDRO_TURBINE,
+  PLEASE_INPUT_HYDRO_TURBINE_NAME,
+  HYDRO_TURBINE_ASSET_TYPE_ID,
+  HYDRO_TURBINE_NAME
 } from '../config';
 
 export const WindTurbineCreate: React.FC<ModalProps & { onSuccess: () => void }> = (props) => {
@@ -17,7 +17,7 @@ export const WindTurbineCreate: React.FC<ModalProps & { onSuccess: () => void }>
   return (
     <Modal
       {...{
-        title: CREATE_WIND_TURBINE,
+        title: CREATE_HYDRO_TURBINE,
         cancelText: '取消',
         okText: '添加',
         ...props,
@@ -35,10 +35,10 @@ export const WindTurbineCreate: React.FC<ModalProps & { onSuccess: () => void }>
       }}
     >
       <Form form={form} labelCol={{ span: 6 }} validateMessages={defaultValidateMessages}>
-        <Form.Item label={WIND_TURBINE_NAME} name='name' rules={[Rules.range(4, 50)]}>
-          <Input placeholder={PLEASE_INPUT_WIND_TURBINE_NAME} />
+        <Form.Item label={HYDRO_TURBINE_NAME} name='name' rules={[Rules.range(4, 50)]}>
+          <Input placeholder={PLEASE_INPUT_HYDRO_TURBINE_NAME} />
         </Form.Item>
-        <Form.Item name='type' hidden={true} initialValue={WIND_TURBINE_ASSET_TYPE_ID}></Form.Item>
+        <Form.Item name='type' hidden={true} initialValue={HYDRO_TURBINE_ASSET_TYPE_ID}></Form.Item>
       </Form>
     </Modal>
   );

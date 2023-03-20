@@ -8,7 +8,7 @@ import { Series_Pie } from '../../../components/charts/pie';
 import { OverviewPage } from '../components/overviewPage';
 import { generateProjectAlarmStatis, getAssetStatistics } from '../common/statisticsHelper';
 import { Introduction } from '../components/introduction';
-import { NO_WIND_TURBINES, WIND_TURBINE } from './common/types';
+import { NO_WIND_TURBINES, WIND_TURBINE } from './config';
 import { AlarmTrend } from './alarmTrend';
 import { useAssetsContext } from '../components/assetsContext';
 import { ASSET_CATEGORY, useAssetCategoryContext } from '../components/assetCategoryContext';

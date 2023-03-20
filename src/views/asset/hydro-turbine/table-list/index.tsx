@@ -1,5 +1,5 @@
 import { PlusOutlined } from '@ant-design/icons';
-import { Button, Empty, message } from 'antd';
+import { Button, Col, Empty, message, Row, Select } from 'antd';
 import { Content } from 'antd/es/layout/layout';
 import React from 'react';
 import { AssetExport } from '../../components/assetExport';
@@ -7,31 +7,71 @@ import { FileInput } from '../../components/fileInput';
 import { importAssets } from '../../services';
 import { ActionBar } from '../common/actionBar';
 import { useAssetsContext } from '../../components/assetsContext';
-import { CREATE_WIND_TURBINE, NO_WIND_TURBINES } from '../config';
+import { CREATE_HYDRO_TURBINE, NO_HYDRO_TURBINES, HYDRO_TURBINE } from '../config';
 import { useActionBarStatus } from '../common/useActionBarStatus';
-import { WindTurbineTree } from './tree';
+import { WindTurbineMonitoringPointList } from '../show/list';
 import usePermission, { Permission } from '../../../../permission/permission';
+import { useStore } from '../../../../hooks/store';
 import { filterEmptyChildren } from '../../../../utils/tree';
 import ShadowCard from '../../../../components/shadowCard';
+import Label from '../../../../components/label';
 import { getProject } from '../../../../utils/session';
 import { PageTitle } from '../../../../components/pageTitle';
 import { CREATE_MONITORING_POINT } from '../../../monitoring-point';
 import { CREATE_FLANGE, getFlanges } from '../../../flange';
 
-export default function WindTurbinesTreeList() {
+export default function WindTurbinesTableList() {
   const { hasPermission } = usePermission();
   const { assets, refresh } = useAssetsContext();
   const actionStatus = useActionBarStatus();
-
+  const [store, setStore] = useStore('measurementListFilters');
   const winds = filterEmptyChildren(assets).filter((asset) => asset.parentId === 0);
   const flanges = getFlanges(winds);
 
+  const getSelectedWind = () => {
+    if (winds.length > 0) {
+      if (store.windTurbineId) {
+        return winds.find((asset) => asset.id === store.windTurbineId);
+      } else {
+        return winds[0];
+      }
+    }
+  };
+  const selectedWind = getSelectedWind();
+
   const renderResult = () => {
     if (winds.length === 0)
-      return <Empty description={NO_WIND_TURBINES} image={Empty.PRESENTED_IMAGE_SIMPLE} />;
+      return <Empty description={NO_HYDRO_TURBINES} image={Empty.PRESENTED_IMAGE_SIMPLE} />;
     return (
       <ShadowCard>
-        <WindTurbineTree assets={winds} onSuccess={refresh} />
+        <Row gutter={[16, 16]}>
+          <Col span={6}>
+            <Label name={HYDRO_TURBINE}>
+              <Select
+                bordered={false}
+                onChange={(val) => {
+                  setStore((prev) => ({ ...prev, windTurbineId: val }));
+                }}
+                defaultValue={selectedWind?.id}
+              >
+                {winds.map(({ id, name }) => (
+                  <Select.Option key={id} value={id}>
+                    {name}
+                  </Select.Option>
+                ))}
+              </Select>
+            </Label>
+          </Col>
+          {selectedWind && (
+            <Col span={24}>
+              <WindTurbineMonitoringPointList
+                wind={selectedWind}
+                onUpdate={(point) => actionStatus.onMonitoringPointUpdate(point)}
+                onDeleteSuccess={() => refresh()}
+              />
+            </Col>
+          )}
+        </Row>
       </ShadowCard>
     );
   };
@@ -50,7 +90,7 @@ export default function WindTurbinesTreeList() {
   return (
     <Content>
       <PageTitle
-        items={[{ title: '资产树' }]}
+        items={[{ title: '资产列表' }]}
         actions={
           <ActionBar
             hasPermission={hasPermission(Permission.AssetAdd)}
@@ -60,7 +100,7 @@ export default function WindTurbinesTreeList() {
                 type='primary'
                 onClick={actionStatus.onWindTurbineCreate}
               >
-                {CREATE_WIND_TURBINE}
+                {CREATE_HYDRO_TURBINE}
                 <PlusOutlined />
               </Button>,
               winds.length > 0 && (

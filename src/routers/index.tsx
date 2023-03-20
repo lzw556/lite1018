@@ -52,15 +52,15 @@ const WindTurbineMonitoringPointShow = lazy(
   () => import('../views/monitoring-point/show/wind-turbine/index')
 );
 
-// hydro-turbine
-// const HydroTurbines = lazy(() => import('../asset/hydro-turbine/index'));
-// const HydroTurbinesTreeList = lazy(() => import('../asset/hydro-turbine/tree-list/index'));
-// const HydroTurbinesTableList = lazy(() => import('../asset/hydro-turbine/table-list/index'));
-// const HydroTurbineShow = lazy(() => import('../asset/hydro-turbine/root/show/index'));
-// const HydroTurbineFlangeShow = lazy(() => import('../asset/hydro-turbine/flange/show/index'));
-// const HydroTurbineMonitoringPointShow = lazy(
-//   () => import('../asset/hydro-turbine/monitoring-point/show/index')
-// );
+//hydro-turbine
+const HydroTurbines = lazy(() => import('../views/asset/hydro-turbine/projectOverview'));
+const HydroTurbinesTreeList = lazy(() => import('../views/asset/hydro-turbine/tree-list/index'));
+const HydroTurbinesTableList = lazy(() => import('../views/asset/hydro-turbine/table-list/index'));
+const HydroTurbineShow = lazy(() => import('../views/asset/hydro-turbine/show/index'));
+const HydroTurbineFlangeShow = lazy(() => import('../views/flange/show/index'));
+const HydroTurbineMonitoringPointShow = lazy(
+  () => import('../views/monitoring-point/show/wind-turbine/index')
+);
 
 const AppRouter = () => {
   const category = useAssetCategoryContext();
@@ -74,11 +74,23 @@ const AppRouter = () => {
       children: [
         {
           index: true,
-          element: <AssetViewSwitch general={<Generals />} windTurbine={<WindTurbines />} />
+          element: (
+            <AssetViewSwitch
+              general={<Generals />}
+              windTurbine={<WindTurbines />}
+              hydroTurbine={<HydroTurbines />}
+            />
+          )
         },
         {
           path: 'project-overview',
-          element: <AssetViewSwitch general={<Generals />} windTurbine={<WindTurbines />} />
+          element: (
+            <AssetViewSwitch
+              general={<Generals />}
+              windTurbine={<WindTurbines />}
+              hydroTurbine={<HydroTurbines />}
+            />
+          )
         },
         {
           path: `${ASSET_CATEGORY[category]}/:id`,
@@ -86,7 +98,7 @@ const AppRouter = () => {
             <AssetViewSwitch
               general={<GeneralShow />}
               windTurbine={<WindTurbineShow />}
-              // hydroTurbine={<HydroTurbineShow />}
+              hydroTurbine={<HydroTurbineShow />}
             />
           )
         },
@@ -95,7 +107,7 @@ const AppRouter = () => {
           element: (
             <AssetViewSwitch
               windTurbine={<WindTurbineFlangeShow />}
-              // hydroTurbine={<HydroTurbineFlangeShow />}
+              hydroTurbine={<HydroTurbineFlangeShow />}
             />
           )
         },
@@ -105,7 +117,7 @@ const AppRouter = () => {
             <AssetViewSwitch
               general={<GeneralMonitoringPointShow />}
               windTurbine={<WindTurbineMonitoringPointShow />}
-              // hydroTurbine={<HydroTurbineMonitoringPointShow />}
+              hydroTurbine={<HydroTurbineMonitoringPointShow />}
             />
           )
         },
@@ -115,7 +127,7 @@ const AppRouter = () => {
             <AssetViewSwitch
               general={<GeneralsTreeList />}
               windTurbine={<WindTurbinesTreeList />}
-              // hydroTurbine={<HydroTurbinesTreeList />}
+              hydroTurbine={<HydroTurbinesTreeList />}
             />
           )
         },
@@ -124,7 +136,7 @@ const AppRouter = () => {
           element: (
             <AssetViewSwitch
               windTurbine={<WindTurbinesTableList />}
-              // hydroTurbine={<HydroTurbinesTableList />}
+              hydroTurbine={<HydroTurbinesTableList />}
             />
           )
         },

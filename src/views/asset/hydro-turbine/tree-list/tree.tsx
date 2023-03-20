@@ -1,5 +1,5 @@
 import { ArrowRightOutlined, DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
-import { Button, Dropdown, Popconfirm, Space, Tree } from 'antd';
+import { Button, Popconfirm, Space, Tree } from 'antd';
 import { cloneDeep } from 'lodash';
 import * as React from 'react';
 import { Link, useLocation } from 'react-router-dom';
@@ -7,12 +7,12 @@ import HasPermission from '../../../../permission';
 import usePermission, { Permission } from '../../../../permission/permission';
 import { isMobile } from '../../../../utils/deviceDetection';
 import { mapTreeNode } from '../../../../utils/tree';
+import { FlangeIcon, FLANGE_ASSET_TYPE_ID } from '../../../flange';
 import {
   MonitoringPointIcon,
   deleteMeasurement,
   generateDatasOfMeasurement,
   getRealPoints,
-  MONITORING_POINT,
   getMeasurement
 } from '../../../monitoring-point';
 import { convertAlarmLevelToState } from '../../common/statisticsHelper';
@@ -21,22 +21,26 @@ import { useAssetCategoryContext } from '../../components/assetCategoryContext';
 import { deleteAsset, getAsset } from '../../services';
 import { AssetRow } from '../../types';
 import { ActionBar } from '../common/actionBar';
-import { GENERAL, GENERAL_ASSET_TYPE_ID } from '../config';
 import { useActionBarStatus } from '../common/useActionBarStatus';
 import { sortAssetsByIndex } from '../common/utils';
-import { GeneralIcon } from '../icon/icon';
+import { HYDRO_TURBINE_ASSET_TYPE_ID } from '../config';
+import { WindTurbineIcon } from '../icon/icon';
 import './tree.css';
 
-export const GeneralTree: React.FC<{
+export const WindTurbineTree: React.FC<{
   assets: AssetRow[];
   onSuccess?: () => void;
-  rootId?: number;
-}> = ({ assets, onSuccess, rootId }) => {
+}> = ({ assets, onSuccess }) => {
   const { state } = useLocation();
   const { hasPermission } = usePermission();
   const actionStatus = useActionBarStatus();
-  const { onGeneralCreate, onGeneralUpdate, onMonitoringPointCreate, onMonitoringPointUpdate } =
-    actionStatus;
+  const {
+    onWindTurbineUpdate,
+    onFlangeCreate,
+    onFlangeUpdate,
+    onMonitoringPointCreate,
+    onMonitoringPointUpdate
+  } = actionStatus;
   const [treedata, setTreedata] = React.useState<any>();
   const [selectedNode, setSelectedNode] = React.useState<any>();
   const category = useAssetCategoryContext();
@@ -59,7 +63,6 @@ export const GeneralTree: React.FC<{
         return node;
       }
     };
-
     if (assets.length > 0) {
       const copy = cloneDeep(assets);
       const treedata = copy
@@ -70,8 +73,10 @@ export const GeneralTree: React.FC<{
             key: `${node.id}-${node.type}`,
             icon: (props: any) => {
               const alarmState = convertAlarmLevelToState(props.alertLevel);
-              if (props.type === GENERAL_ASSET_TYPE_ID) {
-                return <GeneralIcon className={alarmState} />;
+              if (props.type === HYDRO_TURBINE_ASSET_TYPE_ID) {
+                return <WindTurbineIcon className={alarmState} />;
+              } else if (props.type === FLANGE_ASSET_TYPE_ID) {
+                return <FlangeIcon className={`${alarmState} focus`} />;
               } else {
                 return <MonitoringPointIcon className={`${alarmState} focus`} />;
               }
@@ -87,7 +92,6 @@ export const GeneralTree: React.FC<{
   }, [assets, getTreedata]);
 
   if (!treedata) return null;
-
   return (
     <>
       <Tree
@@ -108,7 +112,7 @@ export const GeneralTree: React.FC<{
               );
             }
           }
-          const isRoot = selectedNode?.id === rootId && selectedNode?.type < 10000;
+
           return (
             <Space>
               {name}
@@ -120,10 +124,18 @@ export const GeneralTree: React.FC<{
                       <EditOutlined
                         onClick={() => {
                           const type = selectedNode?.type;
-                          if (type === GENERAL_ASSET_TYPE_ID) {
+                          if (type === HYDRO_TURBINE_ASSET_TYPE_ID) {
                             getAsset(selectedNode?.id)
                               .then((asset) => {
-                                onGeneralUpdate?.(asset);
+                                onWindTurbineUpdate?.(asset);
+                              })
+                              .catch(() => {
+                                onSuccess?.();
+                              });
+                          } else if (type === FLANGE_ASSET_TYPE_ID) {
+                            getAsset(selectedNode?.id)
+                              .then((asset) => {
+                                onFlangeUpdate?.(asset);
                               })
                               .catch(() => {
                                 onSuccess?.();
@@ -140,69 +152,61 @@ export const GeneralTree: React.FC<{
                         }}
                       />
                     </Button>
-                    {!isRoot && (
-                      <HasPermission value={Permission.AssetDelete}>
-                        <Popconfirm
-                          title={`确定要删除${name}吗?`}
-                          onConfirm={() => {
-                            if (selectedNode?.type < 10000) {
-                              deleteAsset(selectedNode?.id).then(() => {
-                                onSuccess?.();
-                              });
-                            } else {
-                              deleteMeasurement(selectedNode?.id).then(() => {
-                                onSuccess?.();
-                              });
-                            }
-                          }}
-                        >
-                          <Button type='text' danger={true} size='small' title={`删除${name}`}>
-                            <DeleteOutlined />
-                          </Button>
-                        </Popconfirm>
-                      </HasPermission>
-                    )}
+                    <HasPermission value={Permission.AssetDelete}>
+                      <Popconfirm
+                        title={`确定要删除${name}吗?`}
+                        onConfirm={() => {
+                          if (selectedNode?.type < 10000) {
+                            deleteAsset(selectedNode?.id).then(() => {
+                              onSuccess?.();
+                            });
+                          } else {
+                            deleteMeasurement(selectedNode?.id).then(() => {
+                              onSuccess?.();
+                            });
+                          }
+                        }}
+                      >
+                        <Button type='text' danger={true} size='small' title={`删除${name}`}>
+                          <DeleteOutlined />
+                        </Button>
+                      </Popconfirm>
+                    </HasPermission>
                     {selectedNode?.type < 10000 && (
-                      <Dropdown
-                        menu={{
-                          items: [
-                            { key: 'general-create', label: GENERAL },
-                            { key: 'monitoring-point-create', label: MONITORING_POINT }
-                          ],
-                          onClick: ({ key }) => {
+                      <Button type='text' size='small'>
+                        <PlusOutlined
+                          onClick={() => {
                             const type = selectedNode?.type;
-                            if (type === GENERAL_ASSET_TYPE_ID) {
+                            if (type === HYDRO_TURBINE_ASSET_TYPE_ID) {
                               getAsset(selectedNode?.id)
                                 .then((asset) => {
-                                  if (key === 'general-create') {
-                                    onGeneralCreate?.(asset.id);
-                                  } else if (key === 'monitoring-point-create') {
-                                    onMonitoringPointCreate?.(asset);
-                                  }
+                                  onFlangeCreate?.(asset.id);
+                                })
+                                .catch(() => {
+                                  onSuccess?.();
+                                });
+                            } else if (type === FLANGE_ASSET_TYPE_ID) {
+                              getAsset(selectedNode?.id)
+                                .then((asset) => {
+                                  onMonitoringPointCreate?.(asset);
                                 })
                                 .catch(() => {
                                   onSuccess?.();
                                 });
                             }
-                          }
-                        }}
-                      >
-                        <Button type='text' size='small'>
-                          <PlusOutlined />
-                        </Button>
-                      </Dropdown>
+                          }}
+                        />
+                      </Button>
                     )}
                   </HasPermission>
-                  {!isRoot && (
-                    <Link
-                      to={`${getPathFromType(category, selectedNode?.type)}${selectedNode?.id}`}
-                      state={state}
-                    >
-                      <Button type='text' size='small'>
-                        <ArrowRightOutlined />
-                      </Button>
-                    </Link>
-                  )}
+                  <Link
+                    to={`${getPathFromType(category, selectedNode?.type)}${selectedNode?.id}`}
+                    state={state}
+                  >
+                    <Button type='text' size='small'>
+                      <ArrowRightOutlined />
+                    </Button>
+                  </Link>
                 </>
               )}
             </Space>

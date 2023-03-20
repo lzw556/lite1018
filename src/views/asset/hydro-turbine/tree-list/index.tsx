@@ -7,7 +7,7 @@ import { FileInput } from '../../components/fileInput';
 import { importAssets } from '../../services';
 import { ActionBar } from '../common/actionBar';
 import { useAssetsContext } from '../../components/assetsContext';
-import { CREATE_WIND_TURBINE, NO_WIND_TURBINES } from '../config';
+import { CREATE_HYDRO_TURBINE, NO_HYDRO_TURBINES } from '../config';
 import { useActionBarStatus } from '../common/useActionBarStatus';
 import { WindTurbineTree } from './tree';
 import usePermission, { Permission } from '../../../../permission/permission';
@@ -28,7 +28,7 @@ export default function WindTurbinesTreeList() {
 
   const renderResult = () => {
     if (winds.length === 0)
-      return <Empty description={NO_WIND_TURBINES} image={Empty.PRESENTED_IMAGE_SIMPLE} />;
+      return <Empty description={NO_HYDRO_TURBINES} image={Empty.PRESENTED_IMAGE_SIMPLE} />;
     return (
       <ShadowCard>
         <WindTurbineTree assets={winds} onSuccess={refresh} />
@@ -60,7 +60,7 @@ export default function WindTurbinesTreeList() {
                 type='primary'
                 onClick={actionStatus.onWindTurbineCreate}
               >
-                {CREATE_WIND_TURBINE}
+                {CREATE_HYDRO_TURBINE}
                 <PlusOutlined />
               </Button>,
               winds.length > 0 && (

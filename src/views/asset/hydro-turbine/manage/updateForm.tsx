@@ -4,9 +4,9 @@ import React from 'react';
 import { defaultValidateMessages, Rules } from '../../../../constants/validator';
 import { Asset, AssetRow } from '../../types';
 import {
-  PLEASE_INPUT_WIND_TURBINE_NAME,
-  WIND_TURBINE_ASSET_TYPE_ID,
-  WIND_TURBINE_NAME
+  PLEASE_INPUT_HYDRO_TURBINE_NAME,
+  HYDRO_TURBINE_ASSET_TYPE_ID,
+  HYDRO_TURBINE_NAME
 } from '../config';
 import { convertRow } from '../common/utils';
 
@@ -36,10 +36,10 @@ export const UpdateForm = ({
       validateMessages={defaultValidateMessages}
       style={style}
     >
-      <Form.Item label={WIND_TURBINE_NAME} name='name' rules={[Rules.range(4, 50)]}>
-        <Input placeholder={PLEASE_INPUT_WIND_TURBINE_NAME} />
+      <Form.Item label={HYDRO_TURBINE_NAME} name='name' rules={[Rules.range(4, 50)]}>
+        <Input placeholder={PLEASE_INPUT_HYDRO_TURBINE_NAME} />
       </Form.Item>
-      <Form.Item name='type' hidden={true} initialValue={WIND_TURBINE_ASSET_TYPE_ID}></Form.Item>
+      <Form.Item name='type' hidden={true} initialValue={HYDRO_TURBINE_ASSET_TYPE_ID}></Form.Item>
       {children}
     </Form>
   );

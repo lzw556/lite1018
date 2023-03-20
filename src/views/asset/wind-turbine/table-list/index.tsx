@@ -7,7 +7,7 @@ import { FileInput } from '../../components/fileInput';
 import { importAssets } from '../../services';
 import { ActionBar } from '../common/actionBar';
 import { useAssetsContext } from '../../components/assetsContext';
-import { CREATE_WIND_TURBINE, NO_WIND_TURBINES, WIND_TURBINE } from '../common/types';
+import { CREATE_WIND_TURBINE, NO_WIND_TURBINES, WIND_TURBINE } from '../config';
 import { useActionBarStatus } from '../common/useActionBarStatus';
 import { WindTurbineMonitoringPointList } from '../show/list';
 import usePermission, { Permission } from '../../../../permission/permission';

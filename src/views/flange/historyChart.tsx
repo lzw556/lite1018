@@ -1,11 +1,10 @@
 import React from 'react';
 import { ChartContainer } from '../../components/charts/chartContainer';
-import { MONITORING_POINTS } from '../../config/assetCategory.config';
 import dayjs from '../../utils/dayjsUtils';
 import { isMobile } from '../../utils/deviceDetection';
 import { getDisplayValue } from '../../utils/format';
-import { useAssetCategoryContext } from '../asset/components/assetCategoryContext';
 import { AssetRow } from '../asset/types';
+import { MONITORING_POINTS } from '../asset/wind-turbine';
 import {
   getHistoryDatas,
   getRealPoints,
@@ -25,7 +24,6 @@ export const FlangeHistoryChart = ({
   propertyKey?: string;
   showTitle?: boolean;
 }) => {
-  const category = useAssetCategoryContext();
   const points = getRealPoints(flange.monitoringPoints);
   const firstPoint = points[0];
   const selectedProperty =
@@ -34,7 +32,7 @@ export const FlangeHistoryChart = ({
   if (points.length === 0) return <p>信息异常</p>;
 
   const title = showTitle
-    ? `${MONITORING_POINTS.get(category)?.find((m) => m.id === firstPoint.type)?.label}趋势图`
+    ? `${MONITORING_POINTS.find((m) => m.id === firstPoint.type)?.label}趋势图`
     : '';
 
   return (

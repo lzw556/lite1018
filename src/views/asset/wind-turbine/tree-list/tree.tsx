@@ -3,7 +3,6 @@ import { Button, Popconfirm, Space, Tree } from 'antd';
 import { cloneDeep } from 'lodash';
 import * as React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { ROOT_ASSETS } from '../../../../config/assetCategory.config';
 import HasPermission from '../../../../permission';
 import usePermission, { Permission } from '../../../../permission/permission';
 import { isMobile } from '../../../../utils/deviceDetection';
@@ -24,6 +23,7 @@ import { AssetRow } from '../../types';
 import { ActionBar } from '../common/actionBar';
 import { useActionBarStatus } from '../common/useActionBarStatus';
 import { sortAssetsByIndex } from '../common/utils';
+import { WIND_TURBINE_ASSET_TYPE_ID } from '../config';
 import { WindTurbineIcon } from '../icon/icon';
 import './tree.css';
 
@@ -44,52 +44,48 @@ export const WindTurbineTree: React.FC<{
   const [treedata, setTreedata] = React.useState<any>();
   const [selectedNode, setSelectedNode] = React.useState<any>();
   const category = useAssetCategoryContext();
-  const WIND_TURBINE_ASSET_TYPE_ID = ROOT_ASSETS.get('windTurbine');
 
-  const getTreedata = React.useCallback(
-    (assets: AssetRow[]) => {
-      const processNodeFn = (node: any) => {
-        const points = getRealPoints(node.monitoringPoints);
-        const children = node.children ?? [];
-        if (children.length > 0 && points.length > 0) {
-          return { ...node, children: [...children, ...points] };
-        } else if (node.children && node.children.length > 0) {
-          return { ...node, children: sortAssetsByIndex(children as AssetRow[]) };
-        } else if (points.length > 0) {
-          return {
-            ...node,
-            children: points,
-            monitoringPoints: []
-          };
-        } else {
-          return node;
-        }
-      };
-      if (assets.length > 0) {
-        const copy = cloneDeep(assets);
-        const treedata = copy
-          .map((node: any) => mapTreeNode(node, processNodeFn))
-          .map((node) =>
-            mapTreeNode(node, (node) => ({
-              ...node,
-              key: `${node.id}-${node.type}`,
-              icon: (props: any) => {
-                const alarmState = convertAlarmLevelToState(props.alertLevel);
-                if (props.type === WIND_TURBINE_ASSET_TYPE_ID) {
-                  return <WindTurbineIcon className={alarmState} />;
-                } else if (props.type === FLANGE_ASSET_TYPE_ID) {
-                  return <FlangeIcon className={`${alarmState} focus`} />;
-                } else {
-                  return <MonitoringPointIcon className={`${alarmState} focus`} />;
-                }
-              }
-            }))
-          );
-        setTreedata(treedata);
+  const getTreedata = React.useCallback((assets: AssetRow[]) => {
+    const processNodeFn = (node: any) => {
+      const points = getRealPoints(node.monitoringPoints);
+      const children = node.children ?? [];
+      if (children.length > 0 && points.length > 0) {
+        return { ...node, children: [...children, ...points] };
+      } else if (node.children && node.children.length > 0) {
+        return { ...node, children: sortAssetsByIndex(children as AssetRow[]) };
+      } else if (points.length > 0) {
+        return {
+          ...node,
+          children: points,
+          monitoringPoints: []
+        };
+      } else {
+        return node;
       }
-    },
-    [WIND_TURBINE_ASSET_TYPE_ID]
-  );
+    };
+    if (assets.length > 0) {
+      const copy = cloneDeep(assets);
+      const treedata = copy
+        .map((node: any) => mapTreeNode(node, processNodeFn))
+        .map((node) =>
+          mapTreeNode(node, (node) => ({
+            ...node,
+            key: `${node.id}-${node.type}`,
+            icon: (props: any) => {
+              const alarmState = convertAlarmLevelToState(props.alertLevel);
+              if (props.type === WIND_TURBINE_ASSET_TYPE_ID) {
+                return <WindTurbineIcon className={alarmState} />;
+              } else if (props.type === FLANGE_ASSET_TYPE_ID) {
+                return <FlangeIcon className={`${alarmState} focus`} />;
+              } else {
+                return <MonitoringPointIcon className={`${alarmState} focus`} />;
+              }
+            }
+          }))
+        );
+      setTreedata(treedata);
+    }
+  }, []);
 
   React.useEffect(() => {
     getTreedata(assets);

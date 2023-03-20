@@ -1,9 +1,0 @@
-export const WIND_TURBINE = '风机';
-export const CREATE_WIND_TURBINE = `添加${WIND_TURBINE}`;
-export const UPDATE_WIND_TURBINE = `编辑${WIND_TURBINE}`;
-export const SELECT_WIND_TURBINE = `选择${WIND_TURBINE}`;
-export const PLEASE_SELECT_WIND_TURBINE = `请${SELECT_WIND_TURBINE}`;
-export const WIND_TURBINE_NAME = `${WIND_TURBINE}名称`;
-export const PLEASE_INPUT_WIND_TURBINE_NAME = `请填写${WIND_TURBINE_NAME}`;
-export const INVALID_WIND_TURBINE = `异常${WIND_TURBINE}`;
-export const NO_WIND_TURBINES = `没有${WIND_TURBINE}`;

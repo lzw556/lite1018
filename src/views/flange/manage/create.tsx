@@ -1,10 +1,13 @@
 import { Checkbox, Form, Input, Modal, ModalProps, Select } from 'antd';
 import React from 'react';
-import { ROOT_ASSETS } from '../../../config/assetCategory.config';
 import { SAMPLE_OFFSET, SAMPLE_PERIOD_2 } from '../../../constants';
 import { defaultValidateMessages, Rules } from '../../../constants/validator';
 import { addAsset, Asset, AssetRow, getAssets } from '../../asset';
-import { PLEASE_SELECT_WIND_TURBINE, WIND_TURBINE } from '../../asset/wind-turbine';
+import {
+  PLEASE_SELECT_WIND_TURBINE,
+  WIND_TURBINE,
+  WIND_TURBINE_ASSET_TYPE_ID
+} from '../../asset/wind-turbine';
 import {
   CREATE_FLANGE,
   FLANGE_ASSET_TYPE_ID,
@@ -29,7 +32,7 @@ export const FlangeCreate: React.FC<
 
   React.useEffect(() => {
     if (windTurbineId === undefined) {
-      getAssets({ type: ROOT_ASSETS.get('windTurbine') }).then(setWindTurbines);
+      getAssets({ type: WIND_TURBINE_ASSET_TYPE_ID }).then(setWindTurbines);
     }
   }, [windTurbineId]);
 

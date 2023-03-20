@@ -2,7 +2,7 @@ import { Form, Modal, ModalProps } from 'antd';
 import * as React from 'react';
 import { updateAsset } from '../../services';
 import { Asset, AssetRow } from '../../types';
-import { UPDATE_GENERAL } from '../common/types';
+import { UPDATE_GENERAL } from '../config';
 import { UpdateForm } from './updateForm';
 
 export const GeneralUpdate: React.FC<ModalProps & { asset: AssetRow; onSuccess: () => void }> = (

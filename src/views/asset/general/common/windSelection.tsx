@@ -4,7 +4,7 @@ import * as React from 'react';
 import { AssetRow, exportAssets } from '../..';
 import { getFilename } from '../../../../utils/format';
 import { getProject } from '../../../../utils/session';
-import { SELECT_GENERAL } from './types';
+import { SELECT_GENERAL } from '../config';
 
 export const WindSelection: React.FC<{ winds: AssetRow[]; onSuccess: () => void } & ModalProps> = (
   props

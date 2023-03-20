@@ -9,7 +9,7 @@ import { AssetAlarmStatistic, AssetNavigator, useAssetsContext } from '../../com
 import { AssetRow } from '../../types';
 import { useActionBarStatus } from '../common/useActionBarStatus';
 import { getAsset } from '../../services';
-import { INVALID_WIND_TURBINE } from '../config';
+import { INVALID_HYDRO_TURBINE } from '../config';
 import { getWinds } from '../common/utils';
 import { CREATE_FLANGE, getFlanges } from '../../../flange';
 import { WindTurbineMonitor } from './monitor';
@@ -39,7 +39,7 @@ export default function WindTurbineShow() {
   }, [id]);
 
   if (loading) return <Spin />;
-  if (wind === undefined) return <p>{INVALID_WIND_TURBINE}</p>;
+  if (wind === undefined) return <p>{INVALID_HYDRO_TURBINE}</p>;
 
   const windTurbines = getWinds(assets);
   const flanges = getFlanges(assets);

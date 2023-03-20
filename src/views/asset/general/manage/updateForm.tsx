@@ -1,7 +1,6 @@
 import { Form, Input, Select } from 'antd';
 import { FormInstance } from 'antd/lib/form/Form';
 import React from 'react';
-import { ROOT_ASSETS } from '../../../../config/assetCategory.config';
 import { defaultValidateMessages, Rules } from '../../../../constants/validator';
 import { getAssets } from '../../services';
 import { Asset, AssetRow } from '../../types';
@@ -9,8 +8,9 @@ import {
   PLEASE_INPUT_GENERAL_NAME,
   GENERAL_NAME,
   GENERAL_PARENT,
-  PLEASE_SELECT_GENERAL_PARENT
-} from '../common/types';
+  PLEASE_SELECT_GENERAL_PARENT,
+  GENERAL_ASSET_TYPE_ID
+} from '../config';
 import { convertRow, getValidParents } from '../common/utils';
 
 export const UpdateForm = ({
@@ -27,7 +27,7 @@ export const UpdateForm = ({
   const [parents, setParents] = React.useState<AssetRow[]>([]);
 
   React.useEffect(() => {
-    getAssets({ type: ROOT_ASSETS.get('general') }).then((assets) =>
+    getAssets({ type: GENERAL_ASSET_TYPE_ID }).then((assets) =>
       setParents(getValidParents(assets, general.id))
     );
   }, [general.id]);
@@ -50,7 +50,7 @@ export const UpdateForm = ({
       <Form.Item label={GENERAL_NAME} name='name' rules={[Rules.range(4, 50)]}>
         <Input placeholder={PLEASE_INPUT_GENERAL_NAME} />
       </Form.Item>
-      <Form.Item name='type' hidden={true} initialValue={ROOT_ASSETS.get('general')}></Form.Item>
+      <Form.Item name='type' hidden={true} initialValue={GENERAL_ASSET_TYPE_ID}></Form.Item>
       {parents?.length > 0 ? (
         <Form.Item
           label={GENERAL_PARENT}

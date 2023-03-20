@@ -4,7 +4,7 @@ import * as React from 'react';
 import { AssetRow, exportAssets } from '../..';
 import { getFilename } from '../../../../utils/format';
 import { getProject } from '../../../../utils/session';
-import { SELECT_WIND_TURBINE } from '../config';
+import { SELECT_HYDRO_TURBINE } from '../config';
 
 export const WindSelection: React.FC<{ winds: AssetRow[]; onSuccess: () => void } & ModalProps> = (
   props
@@ -34,7 +34,7 @@ export const WindSelection: React.FC<{ winds: AssetRow[]; onSuccess: () => void 
   return (
     <Modal
       {...props}
-      title={SELECT_WIND_TURBINE}
+      title={SELECT_HYDRO_TURBINE}
       footer={[
         <Button key='back' onClick={(e) => props.onCancel && props.onCancel(e as any)}>
           取消

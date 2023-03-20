@@ -1,5 +1,5 @@
-import { Asset, AssetCategory, AssetRow, ASSET_CATEGORY } from '../..';
-import { ROOT_ASSETS } from '../../../../config/assetCategory.config';
+import { Asset, AssetRow } from '../..';
+import { GENERAL_ASSET_TYPE_ID } from '../config';
 
 export function convertRow(values?: AssetRow): Asset | null {
   if (!values) return null;
@@ -13,7 +13,7 @@ export function convertRow(values?: AssetRow): Asset | null {
 }
 
 export function getGenerals(assets: AssetRow[]) {
-  return assets.filter((a) => a.type === ROOT_ASSETS.get('general'));
+  return assets.filter((a) => a.type === GENERAL_ASSET_TYPE_ID);
 }
 
 export function getValidParents(assets: AssetRow[], assetId: number) {

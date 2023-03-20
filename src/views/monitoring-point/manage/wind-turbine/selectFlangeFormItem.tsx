@@ -1,9 +1,8 @@
 import { Form, FormInstance, Select } from 'antd';
 import React from 'react';
 import { GetDevicesRequest } from '../../../../apis/device';
-import { MONITORING_POINTS, ROOT_ASSETS } from '../../../../config/assetCategory.config';
 import { Device } from '../../../../types/device';
-import { useAssetCategoryContext, AssetRow, getAssets } from '../../../asset';
+import { AssetRow, getAssets } from '../../../asset';
 import {
   MonitoringPointTypeValue,
   MONITORING_POINT_TYPE,
@@ -12,6 +11,7 @@ import {
 } from '../../types';
 import { MonitoringPointBatch } from './create';
 import { checkIsFlangePreload, FLANGE, getFlanges, PLEASE_SELECT_FLANGE } from '../../../flange';
+import { MONITORING_POINTS, WIND_TURBINE_ASSET_TYPE_ID } from '../../../asset/wind-turbine';
 
 export const SelectFlangeFormItem = ({
   flange,
@@ -24,11 +24,10 @@ export const SelectFlangeFormItem = ({
 }) => {
   const [flanges, setFlanges] = React.useState<AssetRow[]>([]);
   const [isFlangePreload, setIsFlangePreload] = React.useState(checkIsFlangePreload(flange));
-  const category = useAssetCategoryContext();
 
   React.useEffect(() => {
     if (flange === undefined) {
-      getAssets({ type: ROOT_ASSETS.get('windTurbine') }).then((assets) =>
+      getAssets({ type: WIND_TURBINE_ASSET_TYPE_ID }).then((assets) =>
         setFlanges(getFlanges(assets))
       );
     }
@@ -85,7 +84,7 @@ export const SelectFlangeFormItem = ({
           placeholder={PLEASE_SELECT_MONITORING_POINT_TYPE}
           onChange={(id) => handlePointTypeChange(id)}
         >
-          {MONITORING_POINTS.get(category)?.map(({ id, label }) => (
+          {MONITORING_POINTS.map(({ id, label }) => (
             <Select.Option
               key={id}
               value={id}

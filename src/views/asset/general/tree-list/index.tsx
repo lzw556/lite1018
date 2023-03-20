@@ -7,7 +7,7 @@ import { FileInput } from '../../components/fileInput';
 import { importAssets } from '../../services';
 import { ActionBar } from '../common/actionBar';
 import { useAssetsContext } from '../../components/assetsContext';
-import { CREATE_GENERAL, NO_GENERALS } from '../common/types';
+import { CREATE_GENERAL, NO_GENERALS } from '../config';
 import { useActionBarStatus } from '../common/useActionBarStatus';
 import { GeneralTree } from './tree';
 import usePermission, { Permission } from '../../../../permission/permission';

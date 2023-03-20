@@ -16,10 +16,13 @@ import { ValidateProject } from './validateProject';
 import './layout.css';
 import '../../App.css';
 import { Menu } from '../../types/menu';
+import { MENUS_HIDDEN } from '../../config/assetCategory.config';
+import { AssetCategory, useAssetCategoryContext } from '../asset';
 
 export const PrimaryLayout = () => {
   const [menus, setMenus] = React.useState<Menu[]>();
   const dispatch = useDispatch();
+  const category = useAssetCategoryContext();
 
   React.useEffect(() => {
     if (isLogin()) {
@@ -30,11 +33,12 @@ export const PrimaryLayout = () => {
         });
       });
       GetMyMenusRequest().then((data) => {
-        setMenus(data);
-        dispatch(setMenusAction(data));
+        const filters = hideMenus(data, category);
+        setMenus(filters);
+        dispatch(setMenusAction(filters));
       });
     }
-  }, [dispatch]);
+  }, [dispatch, category]);
 
   if (!isLogin()) {
     return <Navigate to='/login' />;
@@ -66,3 +70,8 @@ export const PrimaryLayout = () => {
     </Layout>
   );
 };
+
+function hideMenus(menus: Menu[], category: AssetCategory) {
+  const filter = (m: Menu) => !MENUS_HIDDEN.get(category)?.includes(m.name);
+  return menus.filter(filter).map((m) => ({ ...m, children: m.children.filter(filter) }));
+}

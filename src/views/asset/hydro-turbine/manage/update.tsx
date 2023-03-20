@@ -2,7 +2,7 @@ import { Form, Modal, ModalProps } from 'antd';
 import * as React from 'react';
 import { updateAsset } from '../../services';
 import { Asset, AssetRow } from '../../types';
-import { UPDATE_WIND_TURBINE } from '../config';
+import { UPDATE_HYDRO_TURBINE } from '../config';
 import { UpdateForm } from './updateForm';
 
 export const WindTurbineUpdate: React.FC<
@@ -14,7 +14,7 @@ export const WindTurbineUpdate: React.FC<
   return (
     <Modal
       {...{
-        title: UPDATE_WIND_TURBINE,
+        title: UPDATE_HYDRO_TURBINE,
         cancelText: '取消',
         okText: '编辑',
         ...props,

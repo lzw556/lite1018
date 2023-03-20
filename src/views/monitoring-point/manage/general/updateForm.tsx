@@ -2,11 +2,15 @@ import { Form, Input, InputNumber, Select } from 'antd';
 import { FormInstance } from 'antd/lib/form/Form';
 import React from 'react';
 import DeviceSelect from '../../../../components/select/deviceSelect';
-import { MONITORING_POINTS, ROOT_ASSETS } from '../../../../config/assetCategory.config';
 import { defaultValidateMessages, Rules } from '../../../../constants/validator';
 import { DeviceType } from '../../../../types/device_type';
-import { useAssetCategoryContext, AssetRow, getAssets } from '../../../asset';
-import { GENERAL_PARENT, PLEASE_SELECT_GENERAL_PARENT } from '../../../asset/general';
+import { AssetRow, getAssets } from '../../../asset';
+import {
+  GENERAL_ASSET_TYPE_ID,
+  GENERAL_PARENT,
+  MONITORING_POINTS,
+  PLEASE_SELECT_GENERAL_PARENT
+} from '../../../asset/general';
 import {
   MonitoringPoint,
   MonitoringPointRow,
@@ -31,7 +35,6 @@ export const UpdateForm = ({
   children?: JSX.Element;
   style?: React.CSSProperties;
 }) => {
-  const category = useAssetCategoryContext();
   const [deviceTypeId, setDeviceTypeId] = React.useState<number | undefined>(
     monitoringPoint?.bindingDevices && monitoringPoint?.bindingDevices.length > 0
       ? monitoringPoint?.bindingDevices[0].typeId
@@ -40,7 +43,7 @@ export const UpdateForm = ({
   const [parents, setParents] = React.useState<AssetRow[]>([]);
 
   React.useEffect(() => {
-    getAssets({ type: ROOT_ASSETS.get('general') }).then(setParents);
+    getAssets({ type: GENERAL_ASSET_TYPE_ID }).then(setParents);
   }, [monitoringPoint]);
 
   React.useEffect(() => {
@@ -67,7 +70,7 @@ export const UpdateForm = ({
         rules={[{ required: true, message: PLEASE_SELECT_MONITORING_POINT_TYPE }]}
       >
         <Select placeholder={PLEASE_SELECT_MONITORING_POINT_TYPE} disabled={true}>
-          {MONITORING_POINTS.get(category)?.map(({ id, label }) => (
+          {MONITORING_POINTS.map(({ id, label }) => (
             <Select.Option key={id} value={id}>
               {label}
             </Select.Option>
