@@ -1,12 +1,11 @@
 import { Checkbox, Form, Modal, ModalProps, Row, Col, Button } from 'antd';
 import { CheckboxValueType } from 'antd/lib/checkbox/Group';
 import * as React from 'react';
-import { AssetRow, exportAssets } from '../..';
-import { getFilename } from '../../../../utils/format';
-import { getProject } from '../../../../utils/session';
-import { SELECT_WIND_TURBINE } from '../config';
+import { AssetRow, exportAssets } from '..';
+import { getFilename } from '../../../utils/format';
+import { getProject } from '../../../utils/session';
 
-export const WindSelection: React.FC<{ winds: AssetRow[]; onSuccess: () => void } & ModalProps> = (
+export const SelectAssets: React.FC<{ winds: AssetRow[]; onSuccess: () => void } & ModalProps> = (
   props
 ) => {
   const [form] = Form.useForm();
@@ -34,7 +33,7 @@ export const WindSelection: React.FC<{ winds: AssetRow[]; onSuccess: () => void 
   return (
     <Modal
       {...props}
-      title={SELECT_WIND_TURBINE}
+      title='导出'
       footer={[
         <Button key='back' onClick={(e) => props.onCancel && props.onCancel(e as any)}>
           取消

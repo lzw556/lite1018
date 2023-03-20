@@ -2,7 +2,6 @@ import { DeviceType } from '../../types/device_type';
 import { Select, SelectProps } from 'antd';
 import { FC, useEffect } from 'react';
 import { CaretDownOutlined } from '@ant-design/icons';
-import * as AppConfig from '../../config';
 import { SENSORS } from '../../config/assetCategory.config';
 import { useAssetCategoryContext } from '../../views/asset/components/assetCategoryContext';
 
@@ -24,13 +23,11 @@ const DeviceTypeSelect: FC<DeviceTypeSelectProps> = (props) => {
   }, []);
 
   const renderSensors = () => {
-    return AppConfig.use(window.assetCategory)
-      .sensorTypes.filter((item: DeviceType) => sensors?.includes(item))
-      .map((item) => (
-        <Option key={item} value={item}>
-          {DeviceType.toString(item)}
-        </Option>
-      ));
+    return SENSORS.get(category)?.map((item) => (
+      <Option key={item} value={item}>
+        {DeviceType.toString(item)}
+      </Option>
+    ));
   };
 
   const render = () => {

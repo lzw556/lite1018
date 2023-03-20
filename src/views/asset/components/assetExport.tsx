@@ -2,7 +2,7 @@ import { ExportOutlined } from '@ant-design/icons';
 import { Button } from 'antd';
 import * as React from 'react';
 import { AssetRow } from '..';
-import { WindSelection } from '../wind-turbine/common/windSelection';
+import { SelectAssets } from './selectAssets';
 
 export const AssetExport: React.FC<{ winds: AssetRow[] }> = ({ winds }) => {
   const [visible, setVisible] = React.useState(false);
@@ -18,7 +18,7 @@ export const AssetExport: React.FC<{ winds: AssetRow[] }> = ({ winds }) => {
         <ExportOutlined />
       </Button>
       {visible && (
-        <WindSelection
+        <SelectAssets
           open={visible}
           onCancel={() => setVisible(false)}
           winds={winds}
