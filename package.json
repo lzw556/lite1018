@@ -54,6 +54,7 @@
     "eject": "react-scripts eject",
     "deploy:wind": "cd build && scp -r ./ root@172.16.7.134:/home/workspace/cloud-lite-web",
     "deploy:basic": "cd build && scp -r ./ root@172.16.7.134:/home/workspace/cloud-lite-web3",
+    "deploy:corrosion": "cd build && scp -r ./ root@172.16.7.134:/home/workspace/cloud-lite-web4",
     "prepare": "husky install"
   },
   "eslintConfig": {
