@@ -48,6 +48,7 @@ import { CommandMenu } from './commandMenu';
 import { PageTitle } from '../../components/pageTitle';
 import { SENSORS } from '../../config/assetCategory.config';
 import { useAssetCategoryContext } from '../asset/components/assetCategoryContext';
+import intl from 'react-intl-universal';
 
 const { Search } = Input;
 const { Option } = Select;
@@ -102,9 +103,11 @@ const DevicePage = () => {
         }}
         disabled={isUpgrading}
       >
-        {hasPermission(Permission.DeviceEdit) && <Menu.Item key={1}>编辑设备信息</Menu.Item>}
+        {hasPermission(Permission.DeviceEdit) && (
+          <Menu.Item key={1}>{intl.get('EDIT_DEVICE_INFO')}</Menu.Item>
+        )}
         {hasPermission(Permission.DeviceSettingsEdit) && record.typeId !== DeviceType.Router && (
-          <Menu.Item key={2}>更新设备配置</Menu.Item>
+          <Menu.Item key={2}>{intl.get('EDIT_DEVICE_SETTINGS')}</Menu.Item>
         )}
       </Menu>
     );
@@ -112,7 +115,7 @@ const DevicePage = () => {
 
   const columns = [
     {
-      title: '状态',
+      title: intl.get('STATUS'),
       dataIndex: 'state',
       key: 'state',
       render: (state: any, device: Device) => {
@@ -120,7 +123,7 @@ const DevicePage = () => {
       }
     },
     {
-      title: '设备名称',
+      title: intl.get('DEVICE_NAME'),
       dataIndex: 'name',
       key: 'name',
       render: (text: string, record: Device) => {
@@ -137,7 +140,7 @@ const DevicePage = () => {
       }
     },
     {
-      title: 'MAC地址',
+      title: intl.get('MAC_ADDRESS'),
       dataIndex: 'macAddress',
       key: 'macAddress',
       render: (text: string) => {
@@ -145,15 +148,15 @@ const DevicePage = () => {
       }
     },
     {
-      title: '设备类型',
+      title: intl.get('DEVICE_TYPE'),
       dataIndex: 'typeId',
       key: 'typeId',
       render: (text: DeviceType) => {
-        return DeviceType.toString(text);
+        return intl.get(DeviceType.toString(text));
       }
     },
     {
-      title: '信号强度(dB)',
+      title: intl.get('SIGNAL_STRENGTH_DB'),
       dataIndex: 'state',
       key: 'signalLevel',
       render: (state: any) => {
@@ -161,21 +164,23 @@ const DevicePage = () => {
       }
     },
     {
-      title: '数据',
+      title: intl.get('DATA'),
       key: 'data',
       render: (text: any, device: Device) => {
         if (device.typeId === DeviceType.Gateway || device.typeId === DeviceType.Router) return '-';
         const data = getValueOfFirstClassProperty(device);
         if (data && data.length > 0) {
           const channel = device.data?.values?.channel;
-          const channelText = channel ? `(通道${channel})` : '';
-          return data.map(({ name, value }) => `${name}:${value}`).join(', ') + channelText;
+          const channelText = channel ? `(${intl.get('CHANNEL')}${channel})` : '';
+          return (
+            data.map(({ name, value }) => `${intl.get(name)}:${value}`).join(', ') + channelText
+          );
         }
-        return '暂无数据';
+        return intl.get('NO_DATA');
       }
     },
     {
-      title: '操作',
+      title: intl.get('OPERATION'),
       key: 'action',
       render: (text: any, record: any) => {
         const isUpgrading = record.upgradeStatus && IsUpgrading(record.upgradeStatus.code);
@@ -212,10 +217,10 @@ const DevicePage = () => {
             <HasPermission value={Permission.DeviceDelete}>
               <Popconfirm
                 placement='left'
-                title='确认要删除该设备吗?'
+                title={intl.get('DELETE_DEVICE_PROMPT')}
                 onConfirm={() => onDelete(record.id)}
-                okText='删除'
-                cancelText='取消'
+                okText={intl.get('DELETE')}
+                cancelText={intl.get('CANCEL')}
               >
                 <Button
                   type='text'
@@ -235,11 +240,11 @@ const DevicePage = () => {
   return (
     <Content>
       <PageTitle
-        items={[{ title: '设备列表' }]}
+        items={[{ title: intl.get('MENU_DEVICE_LSIT') }]}
         actions={
           <Link to='create'>
             <Button type='primary'>
-              添加设备
+              {intl.get('CREATE_DEVICE')}
               <PlusOutlined />
             </Button>
           </Link>
@@ -249,7 +254,7 @@ const DevicePage = () => {
         <Row justify='center'>
           <Col span={24}>
             <Space direction={isMobile ? 'vertical' : 'horizontal'}>
-              <Label name={'网络'}>
+              <Label name={intl.get('NETWORK')}>
                 <NetworkSelect
                   bordered={false}
                   onChange={(network) => {
@@ -263,9 +268,9 @@ const DevicePage = () => {
                   defaultValue={store.filters?.network_id}
                 />
               </Label>
-              <Label name='设备类型'>
+              <Label name={intl.get('DEVICE_TYPE')}>
                 <Select
-                  placeholder='请选择设备类型'
+                  placeholder={intl.get('PLEASE_SELECT_DEVICE_TYPE')}
                   bordered={false}
                   allowClear={true}
                   onChange={(val) => {
@@ -285,7 +290,7 @@ const DevicePage = () => {
                     .map((d) => {
                       return (
                         <Select.Option key={d} value={d}>
-                          {DeviceType.toString(d)}
+                          {intl.get(DeviceType.toString(d))}
                         </Select.Option>
                       );
                     })}
@@ -298,13 +303,15 @@ const DevicePage = () => {
                   onChange={(val) => setStore((prev) => ({ ...prev, searchTarget: val }))}
                   suffixIcon={<CaretDownOutlined />}
                 >
-                  <Option value={0}>名称</Option>
+                  <Option value={0}>{intl.get('NAME')}</Option>
                   <Option value={1}>MAC</Option>
                 </Select>
                 <Search
                   style={{ width: isMobile ? 'calc(100% - 80px)' : '256px' }}
                   placeholder={
-                    store.searchTarget === 0 ? '请输入设备名称进行查询' : '请输入设备MAC进行查询'
+                    store.searchTarget === 0
+                      ? intl.get('PLEASE_INPUT_DEVICE_NAME_TO_QUERY')
+                      : intl.get('PLEASE_INPUT_MAC_TO_QUERY')
                   }
                   onSearch={(val) => {
                     setStore((prev) => ({
@@ -374,7 +381,7 @@ const DevicePage = () => {
       )}
       {visibleAlarmRules && device && (
         <Modal
-          title='报警规则'
+          title={intl.get('ALARM_RULES')}
           visible={visibleAlarmRules}
           onCancel={() => {
             setVisibleAlarmRules(false);

@@ -4,6 +4,7 @@ import { Project } from '../../types/project';
 import { AllocUsersRequest, GetAllocUsersRequest } from '../../apis/project';
 import { AllocUser } from '../../types/alloc_user';
 import Search from 'antd/es/input/Search';
+import intl from 'react-intl-universal';
 
 export interface AllocUserDrawerProps extends DrawerProps {
   project: Project;
@@ -41,7 +42,7 @@ const AllocUserDrawer: FC<AllocUserDrawerProps> = (props) => {
     return (
       <Space>
         <Button type={'primary'} onClick={onSave}>
-          保存
+          {intl.get('SAVE')}
         </Button>
       </Space>
     );
@@ -50,7 +51,7 @@ const AllocUserDrawer: FC<AllocUserDrawerProps> = (props) => {
   const convertTreeData = (dataSource: AllocUser[]) => {
     return [
       {
-        title: '用户列表',
+        title: intl.get('USER_LIST'),
         key: 'users',
         checkable: false,
         children: dataSource.map((item) => {
@@ -84,7 +85,10 @@ const AllocUserDrawer: FC<AllocUserDrawerProps> = (props) => {
     <Drawer {...props} title={project.name} placement={'right'} extra={renderExtra()}>
       <Row justify={'center'}>
         <Col span={24}>
-          <Search placeholder={'请输入用户名进行搜索'} onChange={(e) => onChange(e.target.value)} />
+          <Search
+            placeholder={intl.get('PLEASE_INPUT_USERNAME_TO_SEARCH')}
+            onChange={(e) => onChange(e.target.value)}
+          />
         </Col>
       </Row>
       <Row justify={'start'}>

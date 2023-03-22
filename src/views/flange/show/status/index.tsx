@@ -4,6 +4,7 @@ import { FlangeStatusData, SingleFlangeStatus } from './single';
 import dayjs from '../../../../utils/dayjsUtils';
 import { RangeDatePicker } from '../../../../components/rangeDatePicker';
 import { AssetRow, getDataOfAsset, getFlangeData } from '../../../asset';
+import intl from 'react-intl-universal';
 
 export const FakeFlangeStatus: React.FC<AssetRow> = (props) => {
   const [range, setRange] = React.useState<[number, number]>();
@@ -47,7 +48,7 @@ export const FakeFlangeStatus: React.FC<AssetRow> = (props) => {
     if (timestamps.length === 0) {
       content = (
         <Col span={24}>
-          <Empty description='暂无数据' image={Empty.PRESENTED_IMAGE_SIMPLE} />
+          <Empty description={intl.get('NO_DATA_PROMPT')} image={Empty.PRESENTED_IMAGE_SIMPLE} />
         </Col>
       );
     } else {
@@ -69,7 +70,7 @@ export const FakeFlangeStatus: React.FC<AssetRow> = (props) => {
         showHeader={false}
         columns={[
           {
-            title: '时间',
+            title: intl.get('TIMESTAMP'),
             dataIndex: 'timestamp',
             key: 'timestamp',
             width: '80%',

@@ -12,12 +12,13 @@ import {
   MONITORING_POINT_PATHNAME,
   UPDATE_MONITORING_POINT
 } from './types';
+import intl from 'react-intl-universal';
 
 export const useMonitoringPointTableColumns = () => {
   const { state } = useLocation();
   return [
     {
-      title: '名称',
+      title: intl.get('NAME'),
       dataIndex: 'name',
       key: 'name',
       width: isMobile ? 300 : 400,
@@ -28,7 +29,7 @@ export const useMonitoringPointTableColumns = () => {
       )
     },
     {
-      title: '状态',
+      title: intl.get('STATUS'),
       dataIndex: 'alertLevel',
       key: 'alertLevel',
       width: 120,
@@ -38,7 +39,7 @@ export const useMonitoringPointTableColumns = () => {
       }
     },
     {
-      title: '传感器',
+      title: intl.get('SENSOR'),
       dataIndex: 'devices',
       key: 'devices',
       width: 200,
@@ -55,23 +56,28 @@ export const useMonitoringPointTableOperationColumn = (
   onDeleteSuccess: () => void
 ) => {
   return {
-    title: '操作',
+    title: intl.get('OPERATION'),
     key: 'action',
     render: (row: MonitoringPointRow) => (
       <Space>
         <HasPermission value={Permission.MeasurementEdit}>
-          <Button type='text' size='small' title={UPDATE_MONITORING_POINT}>
+          <Button type='text' size='small' title={intl.get(UPDATE_MONITORING_POINT)}>
             <EditOutlined onClick={() => onUpdate(row)} />
           </Button>
         </HasPermission>
         <HasPermission value={Permission.MeasurementDelete}>
           <Popconfirm
-            title={`确定要删除${row.name}吗?`}
+            title={intl.get('DELETE_SOMETHING_PROMPT', { something: row.name })}
             onConfirm={() => {
               deleteMeasurement(row.id).then(onDeleteSuccess);
             }}
           >
-            <Button type='text' danger={true} size='small' title={DELETE_MONITORING_POINT}>
+            <Button
+              type='text'
+              danger={true}
+              size='small'
+              title={intl.get(DELETE_MONITORING_POINT)}
+            >
               <DeleteOutlined />
             </Button>
           </Popconfirm>

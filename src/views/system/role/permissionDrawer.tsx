@@ -5,6 +5,7 @@ import { GetPermissionsWithGroupRequest } from '../../../apis/permission';
 import { AllocPermissionsRequest } from '../../../apis/role';
 import usePermission, { Permission } from '../../../permission/permission';
 import HasPermission from '../../../permission';
+import intl from 'react-intl-universal';
 
 export interface PermissionDrawerProps extends DrawerProps {
   role: Role;
@@ -55,10 +56,10 @@ const PermissionDrawer: FC<PermissionDrawerProps> = (props) => {
   const renderExtra = () => {
     return (
       <Space>
-        <Button onClick={onCancel}>取消</Button>
+        <Button onClick={onCancel}>{intl.get('CANCEL')}</Button>
         <HasPermission value={Permission.RoleAllocPermissions}>
           <Button type={'primary'} onClick={onSave}>
-            保存
+            {intl.get('SAVE')}
           </Button>
         </HasPermission>
       </Space>
@@ -73,7 +74,7 @@ const PermissionDrawer: FC<PermissionDrawerProps> = (props) => {
     const treeData: any[] = [];
     Object.keys(permissions).forEach((key) => {
       treeData.push({
-        title: key,
+        title: intl.get(key).d(key),
         key: key,
         checkable: true,
         children: permissions[key].map((item: any) => {

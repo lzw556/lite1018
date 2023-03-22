@@ -9,6 +9,7 @@ import dayjs from '../../../utils/dayjsUtils';
 import { generateColProps } from '../../../utils/grid';
 import { convertAlarmLevelToState, getAlarmLevelColor, getAlarmStateText } from '../../asset';
 import { MonitoringPointRow } from '../types';
+import intl from 'react-intl-universal';
 
 export const RelatedDevices = (point: MonitoringPointRow) => {
   const { bindingDevices: devices = [], alertLevel } = point;
@@ -40,33 +41,47 @@ function SingleDeviceInfo(props: Device & { alertLevel?: number }) {
       <Row>
         <Col {...colProps}>
           <NameValueGroups
-            items={[{ name: '设备名称', value: <Link to={`/devices/${id}`}>{name}</Link> }]}
-          />
-        </Col>
-        <Col {...colProps}>
-          <NameValueGroups items={[{ name: '类型', value: DeviceType.toString(typeId) }]} />
-        </Col>
-        <Col {...colProps}>
-          <NameValueGroups items={[{ name: '型号', value: information?.model ?? '-' }]} />
-        </Col>
-        <Col {...colProps}>
-          <NameValueGroups
-            items={[{ name: 'MAC地址', value: macAddress.toUpperCase().macSeparator() }]}
+            items={[
+              { name: intl.get('DEVICE_NAME'), value: <Link to={`/devices/${id}`}>{name}</Link> }
+            ]}
           />
         </Col>
         <Col {...colProps}>
           <NameValueGroups
-            items={[{ name: '电池电压(mV)', value: state?.batteryVoltage ?? '-' }]}
+            items={[{ name: intl.get('TYPE'), value: intl.get(DeviceType.toString(typeId)) }]}
           />
         </Col>
         <Col {...colProps}>
-          <NameValueGroups items={[{ name: '信号强度(dB)', value: state?.signalLevel ?? '-' }]} />
+          <NameValueGroups
+            items={[{ name: intl.get('MODEL'), value: information?.model ?? '-' }]}
+          />
+        </Col>
+        <Col {...colProps}>
+          <NameValueGroups
+            items={[
+              { name: intl.get('MAC_ADDRESS'), value: macAddress.toUpperCase().macSeparator() }
+            ]}
+          />
+        </Col>
+        <Col {...colProps}>
+          <NameValueGroups
+            items={[
+              { name: `${intl.get('BATTERY_VOLTAGE')}(mV)`, value: state?.batteryVoltage ?? '-' }
+            ]}
+          />
+        </Col>
+        <Col {...colProps}>
+          <NameValueGroups
+            items={[
+              { name: `${intl.get('SIGNAL_STRENGTH')}(dB)`, value: state?.signalLevel ?? '-' }
+            ]}
+          />
         </Col>
         <Col {...colProps}>
           <NameValueGroups
             items={[
               {
-                name: '状态',
+                name: intl.get('STATUS'),
                 value: (
                   <Tag color={getAlarmLevelColor(convertAlarmLevelToState(alertLevel || 0))}>
                     {getAlarmStateText(convertAlarmLevelToState(alertLevel || 0))}
@@ -80,7 +95,7 @@ function SingleDeviceInfo(props: Device & { alertLevel?: number }) {
           <NameValueGroups
             items={[
               {
-                name: '最近连接时间',
+                name: intl.get('LAST_CONNECTED_TIME'),
                 value: state?.connectedAt
                   ? dayjs.unix(state.connectedAt).local().format('YYYY-MM-DD HH:mm:ss')
                   : '-'
@@ -92,7 +107,7 @@ function SingleDeviceInfo(props: Device & { alertLevel?: number }) {
           <NameValueGroups
             items={[
               {
-                name: '最近一次采集时间',
+                name: intl.get('LAST_SAMPLE_TIME'),
                 value: data?.timestamp
                   ? dayjs.unix(data.timestamp).local().format('YYYY-MM-DD HH:mm:ss')
                   : '-'

@@ -1,4 +1,4 @@
-import { Form, InputNumber, Select } from 'antd';
+import { Form, InputNumber, Select, Typography } from 'antd';
 import { FC } from 'react';
 import CommunicationPeriodSelect from '../../components/communicationPeriodSelect';
 import GroupSizeSelect from '../../components/groupSizeSelect';
@@ -9,6 +9,7 @@ import {
   COMMUNICATION_PERIOD_2,
   SECOND_COMMUNICATION_PERIOD
 } from '../../constants';
+import intl from 'react-intl-universal';
 
 export interface NetworkFormItemProps {
   mode: NetworkProvisioningMode;
@@ -21,39 +22,77 @@ const WsnFormItem: FC<NetworkFormItemProps> = ({ mode, onModeChange }) => {
       return (
         <>
           <Form.Item
-            label={'主要通讯周期'}
+            label={
+              <Typography.Text ellipsis={true} title={intl.get('MAJOR_COMMUNICATION_PERIOD')}>
+                {intl.get('MAJOR_COMMUNICATION_PERIOD')}
+              </Typography.Text>
+            }
             name={['wsn', 'communication_period']}
             rules={[Rules.required]}
           >
             <CommunicationPeriodSelect
               periods={COMMUNICATION_PERIOD_2}
-              placeholder={'请选择主要通讯周期'}
+              placeholder={intl.get('PLEASE_SELECT_SOMETHING', {
+                something: intl.get('MAJOR_COMMUNICATION_PERIOD')
+              })}
             />
           </Form.Item>
           <Form.Item
-            label={'次要通讯周期'}
+            label={
+              <Typography.Text ellipsis={true} title={intl.get('SECONDARY_COMMUNICATION_PERIOD')}>
+                {intl.get('SECONDARY_COMMUNICATION_PERIOD')}
+              </Typography.Text>
+            }
             name={['wsn', 'communication_period_2']}
             rules={[Rules.required]}
           >
             <CommunicationPeriodSelect
               periods={SECOND_COMMUNICATION_PERIOD}
-              placeholder={'请选择次要通讯周期'}
+              placeholder={intl.get('PLEASE_SELECT_SOMETHING', {
+                something: intl.get('SECONDARY_COMMUNICATION_PERIOD')
+              })}
             />
           </Form.Item>
         </>
       );
     }
     return (
-      <Form.Item label={'通讯周期'} name={['wsn', 'communication_period']} rules={[Rules.required]}>
-        <CommunicationPeriodSelect periods={COMMUNICATION_PERIOD} placeholder={'请选择通讯周期'} />
+      <Form.Item
+        label={
+          <Typography.Text ellipsis={true} title={intl.get('COMMUNICATION_PERIOD')}>
+            {intl.get('COMMUNICATION_PERIOD')}
+          </Typography.Text>
+        }
+        name={['wsn', 'communication_period']}
+        rules={[Rules.required]}
+      >
+        <CommunicationPeriodSelect
+          periods={COMMUNICATION_PERIOD}
+          placeholder={intl.get('PLEASE_SELECT_SOMETHING', {
+            something: intl.get('COMMUNICATION_PERIOD')
+          })}
+        />
       </Form.Item>
     );
   };
 
   return (
     <div>
-      <Form.Item label={'组网模式'} name={'mode'} rules={[Rules.required]}>
-        <Select placeholder={'请选择组网模式'} onChange={(value) => onModeChange?.(value)}>
+      <Form.Item
+        label={
+          <Typography.Text ellipsis={true} title={intl.get('PROVISION_MODE')}>
+            {intl.get('PROVISION_MODE')}
+          </Typography.Text>
+        }
+        name={'mode'}
+        rules={[Rules.required]}
+      >
+        <Select
+          placeholder={intl.get('PLEASE_SELECT_SOMETHING', {
+            something: intl.get('PROVISION_MODE')
+          })}
+          onChange={(value) => onModeChange?.(value)}
+        >
           <Select.Option key={1} value={NetworkProvisioningMode.Mode1}>
             {NetworkProvisioningMode.toString(NetworkProvisioningMode.Mode1)}
           </Select.Option>
@@ -64,33 +103,50 @@ const WsnFormItem: FC<NetworkFormItemProps> = ({ mode, onModeChange }) => {
       </Form.Item>
       {render()}
       <Form.Item
-        label={'通讯延迟'}
+        label={
+          <Typography.Text ellipsis={true} title={intl.get('COMMUNICATION_OFFSET')}>
+            {intl.get('COMMUNICATION_OFFSET')}
+          </Typography.Text>
+        }
         name={['wsn', 'communication_offset']}
         rules={[
-          { required: true },
-          { type: 'integer', min: 0, message: '请填写整数(不能小于0)' },
+          {
+            required: true,
+            message: intl.get('PLEASE_INPUT_SOMETHING', {
+              something: intl.get('SETTING_COMMUNICATION_PERIOD')
+            })
+          },
+          { type: 'integer', min: 0, message: intl.get('UNSIGNED_INTEGER_INPUT_PROMPT') },
           ({ getFieldValue }) => ({
             validator(_, value) {
               const wsn = getFieldValue('wsn');
               if (!value || Number(wsn.communication_period) >= value) {
                 return Promise.resolve();
               }
-              return Promise.reject(new Error('通讯延迟不能超过通讯周期'));
+              return Promise.reject(new Error(intl.get('COMMUNICATION_OFFSET_PROMPT')));
             }
           })
         ]}
         dependencies={[['wsn', 'communication_period']]}
       >
         <InputNumber
-          placeholder={'请输入通讯延迟'}
+          placeholder={intl.get('PLEASE_INPUT_SOMETHING', {
+            something: intl.get('COMMUNICATION_OFFSET')
+          })}
           controls={false}
-          addonAfter='毫秒'
+          addonAfter={intl.get('UNIT_MILLISECOND')}
           style={{ width: '100%' }}
         />
       </Form.Item>
       {mode === NetworkProvisioningMode.Mode1 && (
-        <Form.Item label={'每组设备数'} name={['wsn', 'group_size']} rules={[Rules.required]}>
-          <GroupSizeSelect placeholder={'请选择网络每组设备数'} />
+        <Form.Item
+          label={intl.get('GROUP_SIZE')}
+          name={['wsn', 'group_size']}
+          rules={[Rules.required]}
+        >
+          <GroupSizeSelect
+            placeholder={intl.get('PLEASE_SELECT_SOMETHING', { something: intl.get('GROUP_SIZE') })}
+          />
         </Form.Item>
       )}
     </div>

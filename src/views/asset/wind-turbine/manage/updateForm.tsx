@@ -9,6 +9,7 @@ import {
   WIND_TURBINE_NAME
 } from '../config';
 import { convertRow } from '../common/utils';
+import intl from 'react-intl-universal';
 
 export const UpdateForm = ({
   wind,
@@ -32,12 +33,12 @@ export const UpdateForm = ({
   return (
     <Form
       form={form}
-      labelCol={{ span: 6 }}
+      labelCol={{ span: 8 }}
       validateMessages={defaultValidateMessages}
       style={style}
     >
-      <Form.Item label={WIND_TURBINE_NAME} name='name' rules={[Rules.range(4, 50)]}>
-        <Input placeholder={PLEASE_INPUT_WIND_TURBINE_NAME} />
+      <Form.Item label={intl.get(WIND_TURBINE_NAME)} name='name' rules={[Rules.range(4, 50)]}>
+        <Input placeholder={intl.get(PLEASE_INPUT_WIND_TURBINE_NAME)} />
       </Form.Item>
       <Form.Item name='type' hidden={true} initialValue={WIND_TURBINE_ASSET_TYPE_ID}></Form.Item>
       {children}

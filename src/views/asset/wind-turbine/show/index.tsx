@@ -16,6 +16,7 @@ import { WindTurbineMonitor } from './monitor';
 import { WindTurbineMonitoringPointList } from './list';
 import { WindTurbineSet } from './settings';
 import { ActionBar } from '../common/actionBar';
+import intl from 'react-intl-universal';
 
 export default function WindTurbineShow() {
   const { id } = useParams();
@@ -45,10 +46,10 @@ export default function WindTurbineShow() {
   const flanges = getFlanges(assets);
 
   const items: TabsProps['items'] = [
-    { key: 'monitor', label: '监控', children: <WindTurbineMonitor {...wind} /> },
+    { key: 'monitor', label: intl.get('MONITOR'), children: <WindTurbineMonitor {...wind} /> },
     {
       key: 'monitoringPointList',
-      label: MONITORING_POINT_LIST,
+      label: intl.get(MONITORING_POINT_LIST),
       children: (
         <ShadowCard>
           <WindTurbineMonitoringPointList
@@ -67,7 +68,7 @@ export default function WindTurbineShow() {
   if (hasPermission(Permission.AssetEdit)) {
     items.push({
       key: 'settings',
-      label: '配置信息',
+      label: intl.get('SETTINGS'),
       children: <WindTurbineSet {...wind} />
     });
   }
@@ -93,7 +94,7 @@ export default function WindTurbineShow() {
                       type='primary'
                       onClick={() => actionStatus.onFlangeCreate(Number(id))}
                     >
-                      {CREATE_FLANGE}
+                      {intl.get(CREATE_FLANGE)}
                       <PlusOutlined />
                     </Button>
                   ),
@@ -103,7 +104,7 @@ export default function WindTurbineShow() {
                       type='primary'
                       onClick={() => actionStatus.onMonitoringPointCreate(wind)}
                     >
-                      {CREATE_MONITORING_POINT}
+                      {intl.get(CREATE_MONITORING_POINT)}
                       <PlusOutlined />
                     </Button>
                   )

@@ -9,6 +9,7 @@ import {
   MONITORING_POINT_TYPE_VALUE_DYNAMIC_MAPPING,
   Property
 } from './types';
+import intl from 'react-intl-universal';
 
 export function getKeysOfFirstClassFields(measurementType: number) {
   return MONITORING_POINT_FIRST_CLASS_FIELDS_MAPPING.get(measurementType) ?? [];
@@ -101,7 +102,7 @@ export function generatePropertyColumns(measurement: MonitoringPointRow) {
   if (properties.length > 0) {
     return properties
       .map(({ name, key, unit, precision }) => ({
-        title: `${name}${unit ? `(${unit})` : ''}`,
+        title: `${intl.get(name)}${unit ? `(${unit})` : ''}`,
         key,
         render: ({ data }: MonitoringPointRow) => {
           let value = NaN;
@@ -113,7 +114,7 @@ export function generatePropertyColumns(measurement: MonitoringPointRow) {
         width: 120
       }))
       .concat({
-        title: '采集时间',
+        title: intl.get('SAMPLE_TIME'),
         key: 'timestamp',
         render: (measurement: MonitoringPointRow) => {
           return measurement.data && measurement.data.timestamp

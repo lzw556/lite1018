@@ -1,4 +1,4 @@
-import { DeviceDetail, Login, NotFound, ServerError, Unauthorized } from '../views';
+import { Login, NotFound, ServerError, Unauthorized } from '../views';
 import { Menu } from '../types/menu';
 
 const AppRoutes = [
@@ -33,7 +33,7 @@ const SecondaryRoutes: Menu[] = [
     id: 100,
     name: 'addDevice',
     path: '/device-management',
-    title: '添加设备',
+    title: 'CREATE_DEVICE',
     view: 'AddDevice',
     icon: '',
     hidden: true,
@@ -44,7 +44,7 @@ const SecondaryRoutes: Menu[] = [
     id: 100,
     name: 'deviceDetail',
     path: '/device-management',
-    title: '设备详情',
+    title: 'DEVICE_DETAIL',
     view: 'DeviceDetail',
     icon: '',
     hidden: true,
@@ -55,7 +55,7 @@ const SecondaryRoutes: Menu[] = [
     id: 104,
     name: 'networkDetail',
     path: '/network-management',
-    title: '网络详情',
+    title: 'NETWORK_DETAIL',
     view: 'NetworkDetail',
     icon: '',
     hidden: true,
@@ -66,7 +66,7 @@ const SecondaryRoutes: Menu[] = [
     id: 111,
     name: 'addAlarmRuleGroup',
     path: '/alarm-management',
-    title: '添加规则',
+    title: 'CREATE_ALARM_RULE',
     view: 'AlarmRuleGroupCreation',
     icon: '',
     hidden: true,
@@ -77,7 +77,7 @@ const SecondaryRoutes: Menu[] = [
     id: 112,
     name: 'editAlarmRuleGroup',
     path: '/alarm-management',
-    title: '编辑规则',
+    title: 'EDIT_ALARM_RULE',
     view: 'AlarmRuleGroupEdit',
     icon: '',
     hidden: true,

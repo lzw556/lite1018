@@ -1,12 +1,13 @@
 import { Button, Result, Space } from 'antd';
 import React from 'react';
+import intl from 'react-intl-universal';
 
 const UnauthorizedPage = () => {
   return (
     <Result
       status='403'
       title='403'
-      subTitle='对不起，你没有权限访问该页面，请联系管理员'
+      subTitle={intl.get('NO_PERMISSION_PROMPT')}
       extra={
         <Space>
           <Button
@@ -15,7 +16,7 @@ const UnauthorizedPage = () => {
               window.location.hash = '/';
             }}
           >
-            返回首页
+            {intl.get('RETURN_TO_HOME')}
           </Button>
           <Button
             type='primary'
@@ -23,7 +24,7 @@ const UnauthorizedPage = () => {
               window.location.hash = '/login';
             }}
           >
-            重新登录
+            {intl.get('LOGIN_AGAIN')}
           </Button>
         </Space>
       }

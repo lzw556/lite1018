@@ -23,6 +23,7 @@ import {
   PLEASE_SELECT_MONITORING_POINT_TYPE
 } from '../../types';
 import { convertRow } from '../../utils';
+import intl from 'react-intl-universal';
 
 export const UpdateForm = ({
   monitoringPoint,
@@ -57,30 +58,35 @@ export const UpdateForm = ({
   return (
     <Form
       form={form}
-      labelCol={{ span: 6 }}
+      labelCol={{ span: 10 }}
       validateMessages={defaultValidateMessages}
       style={style}
     >
-      <Form.Item label={MONITORING_POINT_NAME} name='name' rules={[Rules.range(4, 50)]}>
-        <Input placeholder={PLEASE_INPUT_MONITORING_POINT_NAME} />
+      <Form.Item label={intl.get(MONITORING_POINT_NAME)} name='name' rules={[Rules.range(4, 50)]}>
+        <Input placeholder={intl.get(PLEASE_INPUT_MONITORING_POINT_NAME)} />
       </Form.Item>
       <Form.Item
-        label={MONITORING_POINT_TYPE}
+        label={intl.get(MONITORING_POINT_TYPE)}
         name='type'
-        rules={[{ required: true, message: PLEASE_SELECT_MONITORING_POINT_TYPE }]}
+        rules={[{ required: true, message: intl.get(PLEASE_SELECT_MONITORING_POINT_TYPE) }]}
       >
-        <Select placeholder={PLEASE_SELECT_MONITORING_POINT_TYPE} disabled={true}>
+        <Select placeholder={intl.get(PLEASE_SELECT_MONITORING_POINT_TYPE)} disabled={true}>
           {MONITORING_POINTS.map(({ id, label }) => (
             <Select.Option key={id} value={id}>
-              {label}
+              {intl.get(label)}
             </Select.Option>
           ))}
         </Select>
       </Form.Item>
       <Form.Item
-        label='传感器'
+        label={intl.get('SENSOR')}
         name='device_id'
-        rules={[{ required: true, message: `请选择传感器` }]}
+        rules={[
+          {
+            required: true,
+            message: intl.get('PLEASE_SELECT_SOMETHING', { something: intl.get('SENSOR') })
+          }
+        ]}
       >
         <DeviceSelect
           filters={{
@@ -113,16 +119,16 @@ export const UpdateForm = ({
         </Form.Item>
       )}
       <Form.Item
-        label={GENERAL_PARENT}
+        label={intl.get(GENERAL_PARENT)}
         name='asset_id'
         rules={[
           {
             required: true,
-            message: PLEASE_SELECT_GENERAL_PARENT
+            message: intl.get(PLEASE_SELECT_GENERAL_PARENT)
           }
         ]}
       >
-        <Select placeholder={PLEASE_SELECT_GENERAL_PARENT}>
+        <Select placeholder={intl.get(PLEASE_SELECT_GENERAL_PARENT)}>
           {parents.map(({ id, name }) => (
             <Select.Option key={id} value={id}>
               {name}
@@ -131,13 +137,13 @@ export const UpdateForm = ({
         </Select>
       </Form.Item>
       <Form.Item
-        label={MONITORING_POINT_POSITION}
+        label={intl.get(MONITORING_POINT_POSITION)}
         name={['attributes', 'index']}
         initialValue={1}
         rules={[{ required: true }, { type: 'integer', min: 1, message: '请填写整数(不能小于1)' }]}
       >
         <InputNumber
-          placeholder={PLEASE_INPUT_MONITORING_POINT_POSITION}
+          placeholder={intl.get(PLEASE_INPUT_MONITORING_POINT_POSITION)}
           controls={false}
           style={{ width: '100%' }}
         />

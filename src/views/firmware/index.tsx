@@ -17,6 +17,7 @@ import { Firmware } from '../../types/firmware';
 import { isMobile } from '../../utils/deviceDetection';
 import { Store, useStore } from '../../hooks/store';
 import { PageTitle } from '../../components/pageTitle';
+import intl from 'react-intl-universal';
 
 const FirmwarePage = () => {
   const [isUploading, setIsUploading] = useState<boolean>(false);
@@ -46,14 +47,14 @@ const FirmwarePage = () => {
     UploadFirmwareRequest(formData).then((res) => {
       setIsUploading(false);
       if (res.code === 200) {
-        message.success('固件上传成功').then(() => {
+        message.success(intl.get('FIRMWARE_UPLOADED_SUCCESSFUL')).then(() => {
           if (dataSource) {
             const { size, page, total } = dataSource;
             gotoPage({ size, total, index: page }, 'next');
           }
         });
       } else {
-        message.error(`上传失败,${res.msg}`).then();
+        message.error(`${intl.get('FAILED_TO_UPLOAD')}${intl.get(res.msg).d(res.msg)}`).then();
       }
     });
   };
@@ -69,17 +70,17 @@ const FirmwarePage = () => {
 
   const columns = [
     {
-      title: '名称',
+      title: intl.get('NAME'),
       dataIndex: 'name',
       key: 'name'
     },
     {
-      title: '软件版本',
+      title: intl.get('SOFTWARE_VERSION'),
       dataIndex: 'version',
       key: 'version'
     },
     {
-      title: '硬件版本',
+      title: intl.get('HARDWARE_VERSION'),
       dataIndex: 'productId',
       key: 'productId'
     },
@@ -89,23 +90,23 @@ const FirmwarePage = () => {
       key: 'crc'
     },
     {
-      title: '编译时间',
+      title: intl.get('BUILD_DATE'),
       dataIndex: 'buildTime',
       key: 'buildTime',
       render: (text: number) => dayjs.unix(text).local().format('yyyy-MM-DD HH:mm:ss')
     },
     {
-      title: '操作',
+      title: intl.get('OPERATION'),
       key: 'action',
       render: (text: any, record: any) => {
         return (
           <Space>
             <Popconfirm
               placement='left'
-              title={`确认要删除固件【${record.name}】吗?`}
+              title={intl.get('DELETE_FIRMWARE_CONFIRM_WITH_NAME', { name: record.name })}
               onConfirm={() => onDelete(record.id)}
-              okText='删除'
-              cancelText='取消'
+              okText={intl.get('DELETE')}
+              cancelText={intl.get('CANCEL')}
             >
               <Button type='text' size='small' icon={<DeleteOutlined />} danger />
             </Popconfirm>
@@ -118,7 +119,7 @@ const FirmwarePage = () => {
   return (
     <Content>
       <PageTitle
-        items={[{ title: '固件列表' }]}
+        items={[{ title: intl.get('MENU_FIRMWARE_LIST') }]}
         actions={
           <HasPermission value={Permission.FirmwareAdd}>
             <Upload
@@ -129,7 +130,9 @@ const FirmwarePage = () => {
               onChange={onFileChange}
             >
               <Button type='primary' loading={isUploading}>
-                {isUploading ? '固件上传中' : '上传固件'}
+                {isUploading
+                  ? intl.get('FIRMWARE_IS_UPLOADING_PROMPT')
+                  : intl.get('UPLOAD_FIRMWARE')}
                 {isUploading ? null : <UploadOutlined />}
               </Button>
             </Upload>
@@ -141,7 +144,7 @@ const FirmwarePage = () => {
         <Col span={24}>
           <ShadowCard>
             <TableLayout
-              emptyText={'固件列表为空'}
+              emptyText={intl.get('NO_FIRMWARES_PROMPT')}
               columns={columns}
               permissions={[Permission.FirmwareDelete]}
               dataSource={dataSource}

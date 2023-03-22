@@ -1,6 +1,7 @@
 import { Form, Input, Modal, ModalProps } from 'antd';
 import { AcknowledgeAlarmRecordRequest } from '../../../apis/alarm';
 import { FC, useEffect } from 'react';
+import intl from 'react-intl-universal';
 
 export interface AcknowledgeModalProps extends ModalProps {
   record: any;
@@ -14,7 +15,11 @@ const AcknowledgeModal: FC<AcknowledgeModalProps> = (props) => {
   useEffect(() => {
     form.setFieldsValue({
       source: record.source,
-      content: `${record.metric.name} ${record.operation} ${record.threshold}${record.metric.unit} 报警值: ${record.value}${record.metric.unit}`
+      content: `${intl.get(record.metric.name).d(record.metric.name)} ${record.operation} ${
+        record.threshold
+      }${intl.get(record.metric.unit).d(record.metric.unit)} ${intl.get('ALARM_VALUE')}: ${
+        record.value
+      }${intl.get(record.metric.unit).d(record.metric.unit)}`
     });
   }, [record]);
 
@@ -25,16 +30,16 @@ const AcknowledgeModal: FC<AcknowledgeModalProps> = (props) => {
   };
 
   return (
-    <Modal {...props} width={400} title={'报警处理'} onOk={onSave}>
+    <Modal {...props} width={400} title={intl.get('ALARM_HANDLE')} onOk={onSave}>
       <Form form={form} labelCol={{ span: 6 }}>
-        <Form.Item label={'报警源'} name={['source', 'name']}>
+        <Form.Item label={intl.get('ALARM_SOURCE')} name={['source', 'name']}>
           <Input disabled />
         </Form.Item>
-        <Form.Item label={'报警详情'} name={['content']}>
+        <Form.Item label={intl.get('ALARM_DETAIL')} name={['content']}>
           <Input disabled />
         </Form.Item>
-        <Form.Item label={'处理意见'} name={'note'} initialValue={''}>
-          <Input.TextArea placeholder={'请输入处理意见'} rows={4} />
+        <Form.Item label={intl.get('ALARM_NOTE')} name={'note'} initialValue={''}>
+          <Input.TextArea placeholder={intl.get('PLEASE_INPUT_NOTE')} rows={4} />
         </Form.Item>
       </Form>
     </Modal>

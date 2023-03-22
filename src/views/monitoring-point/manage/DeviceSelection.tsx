@@ -4,6 +4,7 @@ import * as React from 'react';
 import { CheckboxChangeEvent } from 'antd/lib/checkbox';
 import { DeviceType } from '../../../types/device_type';
 import { Device } from '../../../types/device';
+import intl from 'react-intl-universal';
 
 export type MonitoringPointInfo = {
   place: string;
@@ -96,10 +97,10 @@ export const DeviceSelection: React.FC<{
                         }}
                         defaultCheckedList={defaultCheckedList}
                         options={[
-                          { label: '通道1', value: 1 },
-                          { label: '通道2', value: 2 },
-                          { label: '通道3', value: 3 },
-                          { label: '通道4', value: 4 }
+                          { label: `${intl.get('CHANNEL')}1`, value: 1 },
+                          { label: `${intl.get('CHANNEL')}2`, value: 2 },
+                          { label: `${intl.get('CHANNEL')}3`, value: 3 },
+                          { label: `${intl.get('CHANNEL')}4`, value: 4 }
                         ]}
                       />
                     </div>
@@ -131,7 +132,7 @@ export const DeviceSelection: React.FC<{
             props.onSelect(selectedPoints);
           }}
         >
-          选好了
+          {intl.get('OK')}
         </Button>
       </div>
     </>

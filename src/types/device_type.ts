@@ -1,3 +1,5 @@
+import intl from 'react-intl-universal';
+
 export enum DeviceType {
   Gateway = 1,
   Router = 257,
@@ -20,37 +22,37 @@ export namespace DeviceType {
   export function toString(type: DeviceType) {
     switch (type) {
       case DeviceType.Gateway:
-        return '网关';
+        return 'DEVICE_TYPE_GATEWAY';
       case DeviceType.Router:
-        return '中继器';
+        return 'DEVICE_TYPE_ROUTER';
       case DeviceType.BoltElongation:
-        return '螺栓预紧力';
+        return 'DEVICE_TYPE_BOLT_PRELOAD';
       case DeviceType.BoltElongationMultiChannels:
-        return '多通道螺栓预紧力';
+        return 'DEVICE_TYPE_MULTI_CHANNELS_BOLT_PRELOAD';
       case DeviceType.BoltLoosening:
-        return '螺栓松动';
+        return 'DEVICE_TYPE_BOLT_LOOSENING';
       case DeviceType.HighTemperatureCorrosion:
-        return '高温腐蚀';
+        return 'DEVICE_TYPE_HIGH_TEMPATURE_CORROSION';
       case DeviceType.NormalTemperatureCorrosion:
-        return '常温腐蚀';
+        return 'DEVICE_TYPE_CORROSION';
       case DeviceType.VibrationTemperature3Axis:
-        return '3轴振动温度';
+        return 'DEVICE_TYPE_VIBRATION';
       case DeviceType.VibrationTemperature3AxisNB:
-        return '3轴振动温度(NB)';
+        return 'DEVICE_TYPE_VIBRATION_NB';
       case DeviceType.VibrationTemperature3AxisAdvanced:
-        return '高端3轴振动温度';
+        return 'DEVICE_TYPE_VIBRATION_PRO';
       case DeviceType.VibrationTemperature3AxisAdvancedNB:
-        return '高端3轴振动温度(NB)';
+        return 'DEVICE_TYPE_VIBRATION_PRO_NB';
       case DeviceType.Temperature:
-        return '温度';
+        return 'DEVICE_TYPE_TEMPERATURE';
       case DeviceType.PressureTemperature:
-        return '压力温度';
+        return 'DEVICE_TYPE_PRESSURE';
       case DeviceType.AngleDip:
-        return '倾角';
+        return 'DEVICE_TYPE_INCLINATION';
       case DeviceType.AngleDipNB:
-        return '倾角(NB)';
+        return 'DEVICE_TYPE_INCLINATION_NB';
       default:
-        return '未知类型';
+        return 'DEVICE_TYPE_UNKNOWN';
     }
   }
 

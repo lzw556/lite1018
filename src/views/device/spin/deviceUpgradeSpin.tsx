@@ -3,6 +3,7 @@ import { LoadingOutlined } from '@ant-design/icons';
 import Text from 'antd/es/typography/Text';
 import { FC } from 'react';
 import { DeviceUpgradeStatus } from '../../../types/device_upgrade_status';
+import intl from 'react-intl-universal';
 
 export interface DeviceUpgradeSpinProps {
   status: any;
@@ -10,21 +11,23 @@ export interface DeviceUpgradeSpinProps {
 
 const DeviceUpgradeSpin: FC<DeviceUpgradeSpinProps> = ({ status }) => {
   const render = () => {
-    const DOWNLOAD_COMPLETE_TEXT = '固件下载完成, 待升级';
+    const DOWNLOAD_COMPLETE_TEXT = intl.get('FIRMWARE_DOWNLOADING_FINISHED_PROMPT');
     switch (status.code) {
       case DeviceUpgradeStatus.Pending:
         return (
           <>
             <Spin size={'small'} indicator={<LoadingOutlined />} spinning={true} />
             <Text strong style={{ fontSize: '9pt', color: '#8a8e99' }}>
-              连接中
+              {intl.get('CONNECTING')}
             </Text>
           </>
         );
       case DeviceUpgradeStatus.Loading:
         const progressValue = status.progress.toFixed(0);
         const progressText =
-          Number(progressValue) === 100 ? DOWNLOAD_COMPLETE_TEXT : `固件下载中${progressValue}%`;
+          Number(progressValue) === 100
+            ? DOWNLOAD_COMPLETE_TEXT
+            : intl.get('FIRMWARE_DOWNLOADING_WITH_PROGRESS', { progress: progressValue });
         return (
           <>
             <Progress
@@ -60,7 +63,9 @@ const DeviceUpgradeSpin: FC<DeviceUpgradeSpinProps> = ({ status }) => {
                 fontSize: '9pt',
                 color: '#8a8e99'
               }}
-            >{`升级中${status.progress.toFixed(0)}%`}</Text>
+            >
+              {intl.get('UPGRADING_WITH_PROGRESS', { progress: status.progress.toFixed(0) })}
+            </Text>
           </>
         );
       case DeviceUpgradeStatus.Cancelled:
@@ -79,7 +84,7 @@ const DeviceUpgradeSpin: FC<DeviceUpgradeSpinProps> = ({ status }) => {
               }}
               type={'warning'}
             >
-              升级已取消
+              {intl.get('UPGRADING_IS_CANCELLED')}
             </Text>
           </>
         );
@@ -95,7 +100,7 @@ const DeviceUpgradeSpin: FC<DeviceUpgradeSpinProps> = ({ status }) => {
               status={'exception'}
             />
             <Text style={{ fontSize: '9pt' }} type={'danger'}>
-              升级失败
+              {intl.get('UPGRADE_FIRMWARE_SUCCESSFUL')}
             </Text>
           </>
         );
@@ -104,7 +109,7 @@ const DeviceUpgradeSpin: FC<DeviceUpgradeSpinProps> = ({ status }) => {
           <>
             <Progress type='circle' percent={status.progress} strokeWidth={12} width={16} />
             <Text style={{ fontSize: '9pt' }} type={'success'}>
-              升级成功
+              {intl.get('FAILED_TO_UPGRADE_FIRMWARE')}
             </Text>
           </>
         );

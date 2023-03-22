@@ -3,8 +3,9 @@ import { useEffect, useState } from 'react';
 import { UpdateDeviceRequest } from '../../../apis/device';
 import NetworkSelect from '../../../components/select/networkSelect';
 import { defaultValidateMessages, Normalizes, Rules } from '../../../constants/validator';
-import { DeviceType } from '../../../types/device_type';
 import DeviceSelect from '../../../components/select/deviceSelect';
+import intl from 'react-intl-universal';
+import { FormInputItem } from '../../../components/formInputItem';
 
 const EditBaseInfoModel = (props: any) => {
   const { visible, device, onCancel, onSuccess } = props;
@@ -38,31 +39,49 @@ const EditBaseInfoModel = (props: any) => {
     <Modal
       width={420}
       visible={visible}
-      title={'设备信息'}
-      okText={'更新'}
+      title={intl.get('DEVICE_INFO')}
+      okText={intl.get('UPDATE')}
       onOk={onSave}
-      cancelText={'取消'}
+      cancelText={intl.get('CANCEL')}
       onCancel={onCancel}
       confirmLoading={isLoading}
     >
       <Form form={form} labelCol={{ span: 8 }} validateMessages={defaultValidateMessages}>
-        <Form.Item label={'设备名称'} name='name' rules={[Rules.range(4, 20)]}>
-          <Input placeholder={'请输入设备名称'} />
-        </Form.Item>
+        <FormInputItem
+          label={intl.get('DEVICE_NAME')}
+          name='name'
+          requiredMessage={intl.get('PLEASE_INPUT_DEVICE_NAME')}
+          lengthLimit={{ min: 4, max: 20, label: intl.get('DEVICE_NAME') }}
+        >
+          <Input placeholder={intl.get('PLEASE_INPUT_DEVICE_NAME')} />
+        </FormInputItem>
         <Form.Item
-          label={'设备MAC地址'}
+          label={intl.get('MAC_ADDRESS')}
           name='mac_address'
-          rules={[Rules.macAddress]}
+          rules={[
+            {
+              required: true,
+              message: intl.get('PLEASE_INPUT_MAC_ADDRESS')
+            },
+            {
+              pattern: /^([0-9a-fA-F]{2})(([0-9a-fA-F]{2}){5})$/,
+              message: intl.get('MAC_ADDRESS_IS_INVALID')
+            }
+          ]}
           normalize={Normalizes.macAddress}
           required
         >
-          <Input placeholder={'请输入设备MAC地址'} />
+          <Input placeholder={intl.get('PLEASE_INPUT_MAC_ADDRESS')} />
         </Form.Item>
 
         {device && device.parent !== '' && device.parent !== device.macAddress && (
-          <Form.Item label={'所属网络'} name={'network'} rules={[Rules.required]}>
+          <Form.Item
+            label={intl.get('NETWORK_BELONG_TO')}
+            name={'network'}
+            rules={[Rules.required]}
+          >
             <NetworkSelect
-              placeholder={'请选择设备所属网络'}
+              placeholder={intl.get('PLEASE_SELECT_NETWORK_BELONG_TO')}
               onChange={(value) => {
                 setNetwork(value);
                 form.resetFields(['parent']);
@@ -71,10 +90,10 @@ const EditBaseInfoModel = (props: any) => {
           </Form.Item>
         )}
         {device && device.parent !== '' && device.parent !== device.macAddress && (
-          <Form.Item label={'设备父节点'} name={'parent'}>
+          <Form.Item label={intl.get('PARENT')} name={'parent'}>
             <DeviceSelect
               filters={{ network_id: network }}
-              placeholder={'请选择设备所属父节点'}
+              placeholder={intl.get('PLEASE_SELECT_PARENT')}
               dispalyField='macAddress'
             />
           </Form.Item>

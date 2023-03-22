@@ -17,6 +17,7 @@ import { getProject } from '../../../../utils/session';
 import { PageTitle } from '../../../../components/pageTitle';
 import { CREATE_MONITORING_POINT } from '../../../monitoring-point';
 import { CREATE_FLANGE, getFlanges } from '../../../flange';
+import intl from 'react-intl-universal';
 
 export default function WindTurbinesTreeList() {
   const { hasPermission } = usePermission();
@@ -28,7 +29,9 @@ export default function WindTurbinesTreeList() {
 
   const renderResult = () => {
     if (winds.length === 0)
-      return <Empty description={NO_WIND_TURBINES} image={Empty.PRESENTED_IMAGE_SIMPLE} />;
+      return (
+        <Empty description={intl.get(NO_WIND_TURBINES)} image={Empty.PRESENTED_IMAGE_SIMPLE} />
+      );
     return (
       <ShadowCard>
         <WindTurbineTree assets={winds} onSuccess={refresh} />
@@ -39,10 +42,10 @@ export default function WindTurbinesTreeList() {
   const handleUpload = (data: any) => {
     return importAssets(getProject(), data).then((res) => {
       if (res.data.code === 200) {
-        message.success('导入成功');
+        message.success(intl.get('IMPORTED_SUCCESSFUL'));
         refresh();
       } else {
-        message.error(`导入失败: ${res.data.msg}`);
+        message.error(`${intl.get('FAILED_TO_IMPORT')}: ${res.data.msg}`);
       }
     });
   };
@@ -50,7 +53,7 @@ export default function WindTurbinesTreeList() {
   return (
     <Content>
       <PageTitle
-        items={[{ title: '资产树' }]}
+        items={[{ title: intl.get('MENU_ASSET_TREE') }]}
         actions={
           <ActionBar
             hasPermission={hasPermission(Permission.AssetAdd)}
@@ -60,7 +63,7 @@ export default function WindTurbinesTreeList() {
                 type='primary'
                 onClick={actionStatus.onWindTurbineCreate}
               >
-                {CREATE_WIND_TURBINE}
+                {intl.get(CREATE_WIND_TURBINE)}
                 <PlusOutlined />
               </Button>,
               winds.length > 0 && (
@@ -69,7 +72,7 @@ export default function WindTurbinesTreeList() {
                   type='primary'
                   onClick={() => actionStatus.onFlangeCreate()}
                 >
-                  {CREATE_FLANGE}
+                  {intl.get(CREATE_FLANGE)}
                   <PlusOutlined />
                 </Button>
               ),
@@ -79,7 +82,7 @@ export default function WindTurbinesTreeList() {
                   type='primary'
                   onClick={() => actionStatus.onMonitoringPointCreate()}
                 >
-                  {CREATE_MONITORING_POINT}
+                  {intl.get(CREATE_MONITORING_POINT)}
                   <PlusOutlined />
                 </Button>
               ),

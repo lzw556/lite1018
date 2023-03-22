@@ -4,6 +4,7 @@ import { updateAsset } from '../../../services';
 import { Asset, AssetRow } from '../../../types';
 import { UPDATE_AREA_ASSET } from '../../config';
 import { UpdateForm } from './updateForm';
+import intl from 'react-intl-universal';
 
 export const AreaAssetUpdate: React.FC<ModalProps & { asset: AssetRow; onSuccess: () => void }> = (
   props
@@ -14,9 +15,9 @@ export const AreaAssetUpdate: React.FC<ModalProps & { asset: AssetRow; onSuccess
   return (
     <Modal
       {...{
-        title: UPDATE_AREA_ASSET,
-        cancelText: '取消',
-        okText: '编辑',
+        title: intl.get(UPDATE_AREA_ASSET),
+        cancelText: intl.get('CANCEL'),
+        okText: intl.get('EDIT'),
         ...props,
         onOk: () => {
           form.validateFields().then((values) => {

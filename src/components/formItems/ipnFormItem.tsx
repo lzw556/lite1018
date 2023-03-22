@@ -1,6 +1,7 @@
-import { Form, Input, Radio } from 'antd';
+import { Form, Input, Radio, Typography } from 'antd';
 import { FC, useState } from 'react';
 import { IpnSetting } from '../../types/ipn_setting';
+import intl from 'react-intl-universal';
 
 export const IPNSettingKeys = [
   'ip_mode',
@@ -28,28 +29,32 @@ const IpnFormItem: FC<IpnFromItemProps> = ({ ipn }) => {
       return (
         <div>
           <Form.Item
-            label={'IP地址'}
+            label={intl.get('IP_ADDRESS')}
             name={['ipn', 'ip_addr']}
             initialValue={ipn?.ip_addr}
-            rules={[{ required: true, message: '请输入IP地址' }]}
+            rules={[{ required: true, message: intl.get('PLEASE_INPUT_IP_ADDRESS') }]}
           >
-            <Input placeholder={'请输入网关IP地址'} />
+            <Input placeholder={intl.get('PLEASE_INPUT_GATEWAY_IP_ADDRESS')} />
           </Form.Item>
           <Form.Item
-            label={'子网掩码'}
+            label={intl.get('SUBNET_MASK')}
             name={['ipn', 'subnet_mask']}
             initialValue={ipn?.subnet_mask}
-            rules={[{ required: true, message: '请输入子网掩码' }]}
+            rules={[{ required: true, message: intl.get('PLEASE_INPUT_GATEWAY_SUBNET_MASK') }]}
           >
-            <Input placeholder={'请输入网关子网掩码'} />
+            <Input placeholder={intl.get('PLEASE_INPUT_GATEWAY_SUBNET_MASK')} />
           </Form.Item>
           <Form.Item
-            label={'网关地址'}
+            label={
+              <Typography.Text ellipsis={true} title={intl.get('GATEWAY_ADDRESS')}>
+                {intl.get('GATEWAY_ADDRESS')}
+              </Typography.Text>
+            }
             name={['ipn', 'gateway_addr']}
             initialValue={ipn?.gateway_addr}
-            rules={[{ required: true, message: '请输入网关地址' }]}
+            rules={[{ required: true, message: intl.get('PLEASE_INPUT_GATEWAY_ADDRESS') }]}
           >
-            <Input placeholder={'请输入网关地址'} />
+            <Input placeholder={intl.get('PLEASE_INPUT_GATEWAY_ADDRESS')} />
           </Form.Item>
         </div>
       );
@@ -60,12 +65,12 @@ const IpnFormItem: FC<IpnFromItemProps> = ({ ipn }) => {
     if (isNtpEnabled) {
       return (
         <Form.Item
-          label={'NTP地址'}
+          label={intl.get('NTP_ADDRESS')}
           initialValue={ipn?.ntp_addr}
           name={['ipn', 'ntp_addr']}
-          rules={[{ required: true, message: '请输入NTP服务器地址' }]}
+          rules={[{ required: true, message: intl.get('PLEASE_INPUT_NTP_SERVER_ADDRESS') }]}
         >
-          <Input placeholder={'请输入NTP服务器地址'} />
+          <Input placeholder={intl.get('PLEASE_INPUT_NTP_SERVER_ADDRESS')} />
         </Form.Item>
       );
     }
@@ -73,7 +78,12 @@ const IpnFormItem: FC<IpnFromItemProps> = ({ ipn }) => {
 
   return (
     <div>
-      <Form.Item label={'IP模式'} required name={['ipn', 'ip_mode']} initialValue={ipn?.ip_mode}>
+      <Form.Item
+        label={intl.get('IP_MODE')}
+        required
+        name={['ipn', 'ip_mode']}
+        initialValue={ipn?.ip_mode}
+      >
         <Radio.Group
           buttonStyle={'solid'}
           onChange={(e) => {
@@ -81,16 +91,20 @@ const IpnFormItem: FC<IpnFromItemProps> = ({ ipn }) => {
           }}
         >
           <Radio.Button key={0} value={0}>
-            DHCP
+            {intl.get('IP_MODE_DHCP')}
           </Radio.Button>
           <Radio.Button key={1} value={1}>
-            静态
+            {intl.get('IP_MODE_STATIC')}
           </Radio.Button>
         </Radio.Group>
       </Form.Item>
       {renderIPFormItem()}
       <Form.Item
-        label={'是否启用NTP'}
+        label={
+          <Typography.Text ellipsis={true} title={intl.get('NTP_IS_ENABLED')}>
+            {intl.get('NTP_IS_ENABLED')}
+          </Typography.Text>
+        }
         required
         name={['ipn', 'ntp_is_enabled']}
         initialValue={ipn?.ntp_is_enabled}
@@ -102,10 +116,10 @@ const IpnFormItem: FC<IpnFromItemProps> = ({ ipn }) => {
           }}
         >
           <Radio.Button key={0} value={false}>
-            禁用
+            {intl.get('DISABLED')}
           </Radio.Button>
           <Radio.Button key={1} value={true}>
-            启用
+            {intl.get('ENABLED')}
           </Radio.Button>
         </Radio.Group>
       </Form.Item>

@@ -4,6 +4,7 @@ import * as React from 'react';
 import { AssetRow, exportAssets } from '..';
 import { getFilename } from '../../../utils/format';
 import { getProject } from '../../../utils/session';
+import intl from 'react-intl-universal';
 
 export const SelectAssets: React.FC<{ winds: AssetRow[]; onSuccess: () => void } & ModalProps> = (
   props
@@ -33,10 +34,10 @@ export const SelectAssets: React.FC<{ winds: AssetRow[]; onSuccess: () => void }
   return (
     <Modal
       {...props}
-      title='导出'
+      title={intl.get('EXPORT')}
       footer={[
         <Button key='back' onClick={(e) => props.onCancel && props.onCancel(e as any)}>
-          取消
+          {intl.get('CANCEL')}
         </Button>,
         <Button
           key='submitall'
@@ -47,7 +48,7 @@ export const SelectAssets: React.FC<{ winds: AssetRow[]; onSuccess: () => void }
           }}
           loading={loading}
         >
-          导出全部
+          {intl.get('EXPORT_ALL')}
         </Button>,
         <Button
           key='submit'
@@ -55,7 +56,7 @@ export const SelectAssets: React.FC<{ winds: AssetRow[]; onSuccess: () => void }
           disabled={selected.length === 0}
           onClick={() => handleUpload(selected as number[])}
         >
-          导出
+          {intl.get('EXPORT')}
         </Button>
       ]}
     >

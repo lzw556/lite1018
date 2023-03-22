@@ -3,18 +3,27 @@ import * as React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu as MenuItem } from '../../types/menu';
 import { dfsTransformTree } from '../../utils/tree';
+import intl from 'react-intl-universal';
 
 export const NavMenu: React.FC<{
   menus: MenuItem[];
 }> = ({ menus }) => {
   const { pathname, state } = useLocation();
   const items = dfsTransformTree(menus, (m) => {
+    let state = undefined;
+    if (
+      m.name === 'project-overview' ||
+      m.name === 'asset-management' ||
+      m.name === 'measurement-management'
+    ) {
+      state = { from: { path: m.path, label: m.title } };
+    }
     const label = m.path ? (
-      <Link to={`${m.name}`} state={{ from: { path: m.path, label: m.title } }}>
-        {m.title}
+      <Link to={`${m.name}`} state={state}>
+        {intl.get(m.title)}
       </Link>
     ) : (
-      m.title
+      intl.get(m.title)
     );
     const key = m.name;
     const icon = m.icon ? <span className={`iconfont ${m.icon}`} /> : null;
@@ -24,6 +33,7 @@ export const NavMenu: React.FC<{
       return { label, key, icon };
     }
   });
+
   const menuPaths = pathname
     .split('/')
     .filter((p) => p.length > 0)

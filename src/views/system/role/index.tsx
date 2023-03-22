@@ -13,6 +13,7 @@ import usePermission, { Permission } from '../../../permission/permission';
 import { PageResult } from '../../../types/page';
 import { isMobile } from '../../../utils/deviceDetection';
 import { PageTitle } from '../../../components/pageTitle';
+import intl from 'react-intl-universal';
 
 const RolePage = () => {
   const [addVisible, setAddVisible] = useState(false);
@@ -48,17 +49,23 @@ const RolePage = () => {
 
   const columns = [
     {
-      title: '角色名称',
+      title: intl.get('ROLE_NAME'),
       dataIndex: 'name',
-      key: 'name'
+      key: 'name',
+      render: (text: string, record: any) => {
+        return intl.get(record.name);
+      }
     },
     {
-      title: '角色描述',
+      title: intl.get('ROLE_DESCRIPTION'),
       dataIndex: 'description',
-      key: 'description'
+      key: 'description',
+      render: (text: string, record: any) => {
+        return intl.get(record.description);
+      }
     },
     {
-      title: '操作',
+      title: intl.get('OPERATION'),
       key: 'action',
       width: '25%',
       render: (text: string, record: any) => {
@@ -72,7 +79,7 @@ const RolePage = () => {
                   onAllocMenus(record.id);
                 }}
               >
-                分配菜单
+                {intl.get('ASSIGN_MENUS')}
               </Button>
             )}
           </Space>
@@ -83,10 +90,10 @@ const RolePage = () => {
 
   return (
     <Content>
-      <PageTitle items={[{ title: '角色管理' }]} />
+      <PageTitle items={[{ title: intl.get('MENU_ROLE_MANAGEMENT') }]} />
       <ShadowCard>
         <TableLayout
-          emptyText={'角色列表为空'}
+          emptyText={intl.get('NO_ROLES')}
           permissions={[
             Permission.RoleAllocMenus,
             Permission.RoleAllocPermissions,

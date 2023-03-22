@@ -1,19 +1,19 @@
 import { Device } from '../../types/device';
 import { DeviceType } from '../../types/device_type';
 
-export const MONITORING_POINT = '监测点';
-export const CREATE_MONITORING_POINT = `添加${MONITORING_POINT}`;
+export const MONITORING_POINT = 'MONITORING_POINT';
+export const CREATE_MONITORING_POINT = `CREATE_MONITORING_POINT`;
 export const PLEASE_CREATE_MONITORING_POINT = `请${CREATE_MONITORING_POINT}`;
-export const UPDATE_MONITORING_POINT = `编辑${MONITORING_POINT}`;
-export const DELETE_MONITORING_POINT = `删除${MONITORING_POINT}`;
-export const MONITORING_POINT_NAME = `${MONITORING_POINT}名称`;
-export const PLEASE_INPUT_MONITORING_POINT_NAME = `请填写${MONITORING_POINT_NAME}`;
-export const MONITORING_POINT_POSITION = `${MONITORING_POINT}位置`;
-export const PLEASE_INPUT_MONITORING_POINT_POSITION = `请填写${MONITORING_POINT_POSITION}`;
-export const MONITORING_POINT_TYPE = `${MONITORING_POINT}类型`;
-export const PLEASE_SELECT_MONITORING_POINT_TYPE = `请选择${MONITORING_POINT_TYPE}`;
-export const MONITORING_POINT_LIST = `${MONITORING_POINT}列表`;
-export const INVALID_MONITORING_POINT = `异常${MONITORING_POINT}`;
+export const UPDATE_MONITORING_POINT = `UPDATE_MONITORING_POINT`;
+export const DELETE_MONITORING_POINT = `DELETE_MONITORING_POINT`;
+export const MONITORING_POINT_NAME = `MONITORING_POINT_NAME`;
+export const PLEASE_INPUT_MONITORING_POINT_NAME = `PLEASE_INPUT_MONITORING_POINT_NAME`;
+export const MONITORING_POINT_POSITION = `MONITORING_POINT_POSITION`;
+export const PLEASE_INPUT_MONITORING_POINT_POSITION = `PLEASE_INPUT_MONITORING_POINT_POSITION`;
+export const MONITORING_POINT_TYPE = `MONITORING_POINT_TYPE`;
+export const PLEASE_SELECT_MONITORING_POINT_TYPE = `PLEASE_SELECT_MONITORING_POINT_TYPE`;
+export const MONITORING_POINT_LIST = `MONITORING_POINT_LIST`;
+export const INVALID_MONITORING_POINT = `ABNORMAL_MONITORING_POINT`;
 export const NO_MONITORING_POINTS = `没有${MONITORING_POINT}`;
 
 export const MONITORING_POINT_PATHNAME = 'monitoring-points';
@@ -30,14 +30,14 @@ export enum MonitoringPointTypeValue {
 }
 
 export enum MonitoringPointTypeText {
-  LOOSENING_ANGLE = '松动角度',
-  THICKNESS = '厚度',
-  PRELOAD = '预紧力',
-  VIBRATION = '振动',
-  ANGLE_DIP = '倾角',
-  PRESSURE = '压力',
-  FLANGE_PRELOAD = '法兰预紧力',
-  TEMPERATURE = '温度'
+  LOOSENING_ANGLE = 'FIELD_LOOSENING_ANGLE',
+  THICKNESS = 'FIELD_THICKNESS',
+  PRELOAD = 'SETTING_GROUP_PRELOAD',
+  VIBRATION = 'VIBRATION',
+  ANGLE_DIP = 'DEVICE_TYPE_INCLINATION',
+  PRESSURE = 'FIELD_PRESSURE2',
+  FLANGE_PRELOAD = 'FLANGE_PRELOAD',
+  TEMPERATURE = 'DEVICE_TYPE_TEMPERATURE'
 }
 
 export type MonitoringPointType = {
@@ -50,7 +50,7 @@ export type MonitoringPointType = {
 const dynamic_preload: { dynamicData?: DynamicData; waveData?: WaveData } = {
   dynamicData: {
     serverDatatype: 'raw',
-    title: '动态数据',
+    title: 'DYNAMIC_DATA',
     fields: [
       { label: '预紧力', value: 'dynamic_preload', unit: 'kN' },
       { label: '应力', value: 'dynamic_pressure', unit: 'MPa' },
@@ -68,7 +68,7 @@ const dynamic_preload: { dynamicData?: DynamicData; waveData?: WaveData } = {
   },
   waveData: {
     serverDatatype: 'waveform',
-    title: '波形数据',
+    title: 'WAVEFORM_DATA',
     fields: [{ label: 'mv', value: 'mv', unit: '' }],
     metaData: [
       { label: '预紧力', value: 'preload', unit: 'kN' },
@@ -82,7 +82,7 @@ const dynamic_preload: { dynamicData?: DynamicData; waveData?: WaveData } = {
 const dynamic_thickness: { dynamicData?: DynamicData; waveData?: WaveData } = {
   waveData: {
     serverDatatype: 'waveform',
-    title: '波形数据',
+    title: 'WAVEFORM_DATA',
     fields: [{ label: 'mv', value: 'mv', unit: '' }],
     metaData: [
       { label: '厚度', value: 'thickness', unit: 'mm' },
@@ -96,7 +96,7 @@ const dynamic_thickness: { dynamicData?: DynamicData; waveData?: WaveData } = {
 const dynamic_vibration: { dynamicData?: DynamicData; waveData?: WaveData } = {
   dynamicData: {
     serverDatatype: 'raw',
-    title: '波形数据',
+    title: 'WAVEFORM_DATA',
     fields: [
       { label: '加速度时域', value: 'accelerationTimeDomain', unit: 'm/s²' },
       { label: '加速度频域', value: 'accelerationFrequencyDomain', unit: 'm/s²' },
@@ -163,13 +163,13 @@ export const MONITORING_POINT_FIRST_CLASS_FIELDS_MAPPING = new Map([
 export type DataType = 'raw' | 'waveform';
 
 export type DynamicData = {
-  title: '动态数据' | '波形数据';
+  title: 'DYNAMIC_DATA' | 'WAVEFORM_DATA';
   serverDatatype: DataType;
   fields: { label: string; value: string; unit: string }[];
   metaData: { label: string; value: string; unit: string }[];
 };
 export type WaveData = {
-  title: '波形数据';
+  title: 'WAVEFORM_DATA';
   serverDatatype: DataType;
   fields: { label: string; value: string; unit: string }[];
   metaData: { label: string; value: string; unit: string }[];

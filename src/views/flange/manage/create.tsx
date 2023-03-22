@@ -18,6 +18,7 @@ import {
   PLEASE_SELECT_FLANGE_TYPE
 } from '../types';
 import { AttributeFormItem } from './attributeFormItem';
+import intl from 'react-intl-universal';
 
 export const FlangeCreate: React.FC<
   ModalProps & {
@@ -39,9 +40,9 @@ export const FlangeCreate: React.FC<
   return (
     <Modal
       {...{
-        title: CREATE_FLANGE,
-        cancelText: '取消',
-        okText: '添加',
+        title: intl.get(CREATE_FLANGE),
+        cancelText: intl.get('CANCEL'),
+        okText: intl.get('CREATE'),
         bodyStyle: { overflow: 'auto', maxHeight: 610 },
         ...props,
         onOk: () => {
@@ -68,18 +69,18 @@ export const FlangeCreate: React.FC<
         }
       }}
     >
-      <Form form={form} labelCol={{ span: 5 }} validateMessages={defaultValidateMessages}>
-        <Form.Item label={FLANGE_NAME} name='name' rules={[Rules.range(4, 50)]}>
-          <Input placeholder={PLEASE_INPUT_FLANGE_NAME} />
+      <Form form={form} labelCol={{ span: 6 }} validateMessages={defaultValidateMessages}>
+        <Form.Item label={intl.get(FLANGE_NAME)} name='name' rules={[Rules.range(4, 50)]}>
+          <Input placeholder={intl.get(PLEASE_INPUT_FLANGE_NAME)} />
         </Form.Item>
         <Form.Item name='type' hidden={true} initialValue={FLANGE_ASSET_TYPE_ID}></Form.Item>
         {windTurbines.length > 0 && windTurbineId === undefined ? (
           <Form.Item
-            label={WIND_TURBINE}
+            label={intl.get(WIND_TURBINE)}
             name='parent_id'
-            rules={[{ required: true, message: PLEASE_SELECT_WIND_TURBINE }]}
+            rules={[{ required: true, message: intl.get(PLEASE_SELECT_WIND_TURBINE) }]}
           >
-            <Select placeholder={PLEASE_SELECT_WIND_TURBINE}>
+            <Select placeholder={intl.get(PLEASE_SELECT_WIND_TURBINE)}>
               {windTurbines.map(({ id, name }) => (
                 <Select.Option key={id} value={id}>
                   {name}
@@ -91,20 +92,20 @@ export const FlangeCreate: React.FC<
           <Form.Item name='parent_id' hidden={true} initialValue={windTurbineId}></Form.Item>
         )}
         <Form.Item
-          label={FLANGE_TYPE}
+          label={intl.get(FLANGE_TYPE)}
           name={['attributes', 'type']}
-          rules={[{ required: true, message: PLEASE_SELECT_FLANGE_TYPE }]}
+          rules={[{ required: true, message: intl.get(PLEASE_SELECT_FLANGE_TYPE) }]}
         >
-          <Select placeholder={PLEASE_SELECT_FLANGE_TYPE}>
+          <Select placeholder={intl.get(PLEASE_SELECT_FLANGE_TYPE)}>
             {FLANGE_TYPES.map(({ value, label }) => (
               <Select.Option key={value} value={value}>
-                {label}
+                {intl.get(label)}
               </Select.Option>
             ))}
           </Select>
         </Form.Item>
-        <Form.Item label='序号' name={['attributes', 'index']} initialValue={1}>
-          <Select placeholder='请选择序号'>
+        <Form.Item label={intl.get('INDEX')} name={['attributes', 'index']} initialValue={1}>
+          <Select placeholder={intl.get('PLEASE_SELECT_INDEX')}>
             {[1, 2, 3, 4, 5].map((item) => (
               <Select.Option key={item} value={item}>
                 {item}
@@ -112,34 +113,51 @@ export const FlangeCreate: React.FC<
             ))}
           </Select>
         </Form.Item>
-        <AttributeFormItem label='额定值' name='normal' />
-        <AttributeFormItem label='初始值' name='initial' />
-        <AttributeFormItem label='次要报警' name='info' />
-        <AttributeFormItem label='重要报警' name='warn' />
-        <AttributeFormItem label='紧急报警' name='danger' />
+        <AttributeFormItem label={intl.get('RATING')} name='normal' />
+        <AttributeFormItem label={intl.get('INITIAL_VALUE')} name='initial' />
+        <AttributeFormItem label={intl.get('ALARM_LEVEL_INFO_TITLE')} name='info' />
+        <AttributeFormItem label={intl.get('ALARM_LEVEL_WARN_TITLE')} name='warn' />
+        <AttributeFormItem label={intl.get('ALARM_LEVEL_DANGER_TITLE')} name='danger' />
         <Form.Item
           name={['attributes', 'sub_type']}
           valuePropName='checked'
-          wrapperCol={{ offset: 4 }}
+          wrapperCol={{ offset: 6 }}
           initialValue={false}
         >
-          <Checkbox onChange={(e) => setIsFlangePreload(e.target.checked)}>计算法兰预紧力</Checkbox>
+          <Checkbox onChange={(e) => setIsFlangePreload(e.target.checked)}>
+            {intl.get('CALCULATE_FLANGE_PRELOAD')}
+          </Checkbox>
         </Form.Item>
         {isFlangePreload && (
           <>
             <Form.Item
-              label='螺栓数量'
+              label={intl.get('BOLT_AMOUNT')}
               name={['attributes', 'monitoring_points_num']}
               rules={[Rules.number]}
             >
-              <Input placeholder={`请填写螺栓数量`} />
+              <Input
+                placeholder={intl.get('PLEASE_INPUT_SOMETHING', {
+                  something: intl.get('BOLT_AMOUNT')
+                })}
+              />
             </Form.Item>
             <Form.Item
-              label='采集周期'
+              label={intl.get('SAMPLE_PERIOD')}
               name={['attributes', 'sample_period']}
-              rules={[{ required: true, message: '请选择采集周期' }]}
+              rules={[
+                {
+                  required: true,
+                  message: intl.get('PLEASE_SELECT_SOMETHING', {
+                    something: intl.get('SAMPLE_PERIOD')
+                  })
+                }
+              ]}
             >
-              <Select placeholder={'请选择采集周期'}>
+              <Select
+                placeholder={intl.get('PLEASE_SELECT_SOMETHING', {
+                  something: intl.get('SAMPLE_PERIOD')
+                })}
+              >
                 {SAMPLE_PERIOD_2.map((item) => (
                   <Select.Option key={item.value} value={item.value}>
                     {item.text}
@@ -148,11 +166,22 @@ export const FlangeCreate: React.FC<
               </Select>
             </Form.Item>
             <Form.Item
-              label='采集延迟'
+              label={intl.get('SAMPLE_OFFSET')}
               name={['attributes', 'sample_time_offset']}
-              rules={[{ required: true, message: '请选择采集延迟' }]}
+              rules={[
+                {
+                  required: true,
+                  message: intl.get('PLEASE_SELECT_SOMETHING', {
+                    something: intl.get('SAMPLE_OFFSET')
+                  })
+                }
+              ]}
             >
-              <Select placeholder={'请选择采集延迟'}>
+              <Select
+                placeholder={intl.get('PLEASE_SELECT_SOMETHING', {
+                  something: intl.get('SAMPLE_OFFSET')
+                })}
+              >
                 {SAMPLE_OFFSET.map((item) => (
                   <Select.Option key={item.value} value={item.value}>
                     {item.text}
@@ -161,18 +190,28 @@ export const FlangeCreate: React.FC<
               </Select>
             </Form.Item>
             <Form.Item
-              label='初始预紧力'
+              label={intl.get('INITIAL_PRELOAD')}
               name={['attributes', 'initial_preload']}
               rules={[Rules.number]}
             >
-              <Input placeholder={`请填写初始预紧力`} suffix='kN' />
+              <Input
+                placeholder={intl.get('PLEASE_INPUT_SOMETHING', {
+                  something: intl.get('INITIAL_PRELOAD')
+                })}
+                suffix='kN'
+              />
             </Form.Item>
             <Form.Item
-              label='初始应力'
+              label={intl.get('INITIAL_PRESSURE')}
               name={['attributes', 'initial_pressure']}
               rules={[Rules.number]}
             >
-              <Input placeholder={`请填写初始应力`} suffix='MPa' />
+              <Input
+                placeholder={intl.get('PLEASE_INPUT_SOMETHING', {
+                  something: intl.get('INITIAL_PRESSURE')
+                })}
+                suffix='MPa'
+              />
             </Form.Item>
           </>
         )}

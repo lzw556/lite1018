@@ -5,6 +5,7 @@ import { defaultValidateMessages, Rules } from '../../../../constants/validator'
 import { Asset, AssetRow } from '../../types';
 import { PLEASE_INPUT_AREA_NAME, AREA_NAME, AREA_ASSET_TYPE_ID } from '../config';
 import { convertRow } from '../common/utils';
+import intl from 'react-intl-universal';
 
 export const UpdateForm = ({
   general,
@@ -32,8 +33,8 @@ export const UpdateForm = ({
       validateMessages={defaultValidateMessages}
       style={style}
     >
-      <Form.Item label={AREA_NAME} name='name' rules={[Rules.range(4, 50)]}>
-        <Input placeholder={PLEASE_INPUT_AREA_NAME} />
+      <Form.Item label={intl.get(AREA_NAME)} name='name' rules={[Rules.range(4, 50)]}>
+        <Input placeholder={intl.get(PLEASE_INPUT_AREA_NAME)} />
       </Form.Item>
       <Form.Item name='type' hidden={true} initialValue={AREA_ASSET_TYPE_ID}></Form.Item>
       {children}

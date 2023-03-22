@@ -24,6 +24,7 @@ import { isMobile } from '../../utils/deviceDetection';
 import { Link } from 'react-router-dom';
 import { Store, useStore } from '../../hooks/store';
 import { PageTitle } from '../../components/pageTitle';
+import intl from 'react-intl-universal';
 
 const NetworkPage = () => {
   const { hasPermission, hasPermissions } = usePermission();
@@ -70,18 +71,18 @@ const NetworkPage = () => {
       case '0':
         NetworkSyncRequest(record.id).then((res) => {
           if (res.code === 200) {
-            message.success('发送成功');
+            message.success(intl.get('SENT_SUCCESSFUL'));
           } else {
-            message.error(`发送失败: ${res.msg}`);
+            message.error(`${intl.get('FAILED_TO_SEND')}${intl.get(res.msg).d(res.msg)}`);
           }
         });
         break;
       case '1':
         NetworkProvisionRequest(record.id).then((res) => {
           if (res.code === 200) {
-            message.success('发送成功');
+            message.success(intl.get('SENT_SUCCESSFUL'));
           } else {
-            message.error(`发送失败: ${res.msg}`);
+            message.error(`${intl.get('FAILED_TO_SEND')}${intl.get(res.msg).d(res.msg)}`);
           }
         });
         break;
@@ -109,9 +110,15 @@ const NetworkPage = () => {
           onCommand(record, e.key);
         }}
       >
-        {hasPermission(Permission.NetworkSync) && <Menu.Item key={0}>同步网络</Menu.Item>}
-        {hasPermission(Permission.NetworkProvision) && <Menu.Item key={1}>继续组网</Menu.Item>}
-        {hasPermission(Permission.NetworkExport) && <Menu.Item key={2}>导出网络</Menu.Item>}
+        {hasPermission(Permission.NetworkSync) && (
+          <Menu.Item key={0}>{intl.get('SYNC_NETWORK')}</Menu.Item>
+        )}
+        {hasPermission(Permission.NetworkProvision) && (
+          <Menu.Item key={1}>{intl.get('PROVISION')}</Menu.Item>
+        )}
+        {hasPermission(Permission.NetworkExport) && (
+          <Menu.Item key={2}>{intl.get('EXPORT_NETWORK')}</Menu.Item>
+        )}
       </Menu>
     );
   };
@@ -125,7 +132,7 @@ const NetworkPage = () => {
 
   const columns = [
     {
-      title: '网络名称',
+      title: intl.get('NETWORK_NAME'),
       dataIndex: 'name',
       key: 'name',
       render: (text: string, record: Network) => {
@@ -136,7 +143,7 @@ const NetworkPage = () => {
       }
     },
     {
-      title: '模式',
+      title: intl.get('MODE'),
       dataIndex: 'mode',
       key: 'mode',
       render: (mode: number) => {
@@ -144,7 +151,7 @@ const NetworkPage = () => {
       }
     },
     {
-      title: '通讯周期',
+      title: intl.get('COMMUNICATION_PERIOD'),
       dataIndex: 'communicationPeriod',
       key: 'communicationPeriod',
       render: (text: number, record: Network) => {
@@ -152,21 +159,21 @@ const NetworkPage = () => {
       }
     },
     {
-      title: '通讯延时',
+      title: intl.get('COMMUNICATION_OFFSET'),
       dataIndex: 'communicationOffset',
       key: 'communicationOffset',
       render: (text: number, record: Network) => {
         if (text === 0) {
-          return '无';
+          return intl.get('NONE');
         }
         if (text / 1000 < 60 || (text / 1000) % 60 !== 0) {
-          return `${text / 1000}秒`;
+          return intl.get('SECOND_OPTION', { value: text / 1000 });
         }
         return dayjs.duration(text / 1000, 'seconds').humanize();
       }
     },
     {
-      title: '操作',
+      title: intl.get('OPERATION'),
       key: 'action',
       render: (text: any, record: any, index: number) => (
         <Space size={'middle'}>
@@ -196,10 +203,10 @@ const NetworkPage = () => {
           {hasPermission(Permission.NetworkDelete) && (
             <Popconfirm
               placement='left'
-              title='确认要删除该设备吗?'
+              title={intl.get('DELETE_DEVICE_PROMPT')}
               onConfirm={() => onDelete(record.id, index)}
-              okText='删除'
-              cancelText='取消'
+              okText={intl.get('DELETE')}
+              cancelText={intl.get('CANCEL')}
             >
               <Button type='text' size='small' icon={<DeleteOutlined />} danger />
             </Popconfirm>
@@ -212,11 +219,11 @@ const NetworkPage = () => {
   return (
     <Content>
       <PageTitle
-        items={[{ title: '网络列表' }]}
+        items={[{ title: intl.get('MENU_NETWORK_LIST') }]}
         actions={
           <HasPermission value={Permission.NetworkAdd}>
             <Button type={'primary'} onClick={() => setAddVisible(true)}>
-              添加网络
+              {intl.get('CREATE_SOMETHING', { something: intl.get('NETWORK') })}
               <PlusOutlined />
             </Button>
           </HasPermission>
@@ -226,7 +233,7 @@ const NetworkPage = () => {
         <Row justify={'start'}>
           <Col span={24}>
             <TableLayout
-              emptyText={'网络列表为空'}
+              emptyText={intl.get('NO_NETWORKS_PROMPT')}
               permissions={[
                 Permission.NetworkEdit,
                 Permission.NetworkExport,

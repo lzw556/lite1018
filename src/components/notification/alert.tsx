@@ -2,6 +2,7 @@ import useSocket, { SocketTopic } from '../../socket';
 import { notification, Space } from 'antd';
 import { useEffect } from 'react';
 import { getProject } from '../../utils/session';
+import intl from 'react-intl-universal';
 
 const AlertMessageNotification = () => {
   const { PubSub } = useSocket();
@@ -29,28 +30,28 @@ const AlertMessageNotification = () => {
       case 1:
         api.info({
           key: `${record.monitoringPoint.id}-${record.level}`,
-          message: `次要报警`,
+          message: intl.get('ALARM_LEVEL_INFO_TITLE'),
           description: <div>{renderDescription(record)}</div>
         });
         break;
       case 2:
         api.warning({
           key: `${record.monitoringPoint.id}-${record.level}`,
-          message: `重要报警`,
+          message: intl.get('ALARM_LEVEL_WARN_TITLE'),
           description: <div>{renderDescription(record)}</div>
         });
         break;
       case 3:
         api.error({
           key: `${record.monitoringPoint.id}-${record.level}`,
-          message: `紧急报警`,
+          message: intl.get('ALARM_LEVEL_DANGER_TITLE'),
           description: <div>{renderDescription(record)}</div>
         });
         break;
       default:
         api.success({
           key: `${record.monitoringPoint.id}-${record.level}`,
-          message: `恢复正常`,
+          message: intl.get('RETURN_TO_NORMAL'),
           description: <div>{renderDescription(record)}</div>
         });
         break;
@@ -60,9 +61,9 @@ const AlertMessageNotification = () => {
   const renderDescription = (record: any) => {
     return (
       <>
-        <p>{`报警监测点: ${record.monitoringPoint.name}`}</p>
-        <p>{`报警属性: ${record.metric.name}`}</p>
-        <p>{`报警值: ${record.value}`}</p>
+        <p>{`${intl.get('ALARM_MONITORING_POINTS')}: ${record.monitoringPoint.name}`}</p>
+        <p>{`${intl.get('ALARM_PROPERTIES')}: ${intl.get(record.metric.name)}`}</p>
+        <p>{`${intl.get('ALARM_VALUE')}: ${record.value}`}</p>
       </>
     );
   };

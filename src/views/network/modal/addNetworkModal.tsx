@@ -1,4 +1,4 @@
-import { Form, Input, Modal, ModalProps } from 'antd';
+import { Form, Input, Modal, ModalProps, Typography } from 'antd';
 import { FC, useEffect, useState } from 'react';
 import IpnFormItem from '../../../components/formItems/ipnFormItem';
 import WsnFormItem from '../../../components/formItems/wsnFormItem';
@@ -7,6 +7,8 @@ import { defaultValidateMessages, Normalizes, Rules } from '../../../constants/v
 import { CreateNetworkRequest } from '../../../apis/network';
 import { NetworkProvisioningMode } from '../../../types/network';
 import { useProvisionMode } from '../useProvisionMode';
+import intl from 'react-intl-universal';
+import { FormInputItem } from '../../../components/formInputItem';
 
 export interface AddNetworkModalProps extends ModalProps {
   onSuccess: () => void;
@@ -54,29 +56,48 @@ const AddNetworkModal: FC<AddNetworkModalProps> = (props) => {
     <Modal
       {...props}
       width={460}
-      title={'网络添加'}
-      okText={'确定'}
+      title={intl.get('CREATE_NETWORK')}
+      okText={intl.get('OK')}
       onOk={onAdd}
-      cancelText={'取消'}
+      cancelText={intl.get('CANCEL')}
       confirmLoading={isLoading}
     >
       <Form form={form} labelCol={{ span: 7 }} validateMessages={defaultValidateMessages}>
         <fieldset>
-          <legend>基本信息</legend>
-          <Form.Item label={'名称'} name={'name'} rules={[Rules.range(4, 16)]}>
-            <Input placeholder={'请输入网络名称'} />
-          </Form.Item>
+          <legend>{intl.get('BASIC_INFORMATION')}</legend>
+
+          <FormInputItem
+            label={intl.get('NAME')}
+            name={'name'}
+            requiredMessage={intl.get('PLEASE_INPUT_NETWORK_NAME')}
+            lengthLimit={{ min: 4, max: 16, label: intl.get('NETWORK').toLowerCase() }}
+          >
+            <Input placeholder={intl.get('PLEASE_INPUT_NETWORK_NAME')} />
+          </FormInputItem>
           {provisionMode && <WsnFormItem mode={provisionMode} onModeChange={setProvisionMode} />}
         </fieldset>
         <fieldset>
-          <legend>网关信息</legend>
+          <legend>{intl.get('GATEWAY_INFORMATION')}</legend>
           <Form.Item
-            label={'MAC地址'}
+            label={
+              <Typography.Text ellipsis={true} title={intl.get('MAC_ADDRESS')}>
+                {intl.get('MAC_ADDRESS')}
+              </Typography.Text>
+            }
             name={['gateway', 'mac_address']}
             normalize={Normalizes.macAddress}
-            rules={[Rules.macAddress]}
+            rules={[
+              {
+                required: true,
+                message: intl.get('PLEASE_INPUT_SOMETHING', { something: intl.get('MAC_ADDRESS') })
+              },
+              {
+                pattern: /^([0-9a-fA-F]{2})(([0-9a-fA-F]{2}){5})$/,
+                message: intl.get('MAC_ADDRESS_IS_INVALID')
+              }
+            ]}
           >
-            <Input placeholder={'请输入网关MAC地址'} />
+            <Input placeholder={intl.get('PLEASE_INPUT_GATEWAY_MAC')} />
           </Form.Item>
           <IpnFormItem ipn={DEFAULT_IPN_SETTING} />
         </fieldset>

@@ -19,6 +19,7 @@ import { CREATE_MONITORING_POINT } from '../../../monitoring-point';
 import { getAreaAssets } from '../common/utils';
 import { AREA, CREATE_AREA, CREATE_AREA_ASSET, NO_AREAS } from '../config';
 import { AreaMonitoringPointList } from '../show/list';
+import intl from 'react-intl-universal';
 
 export default function CorrosionsTableList() {
   const { hasPermission } = usePermission();
@@ -41,12 +42,12 @@ export default function CorrosionsTableList() {
 
   const renderResult = () => {
     if (areas.length === 0)
-      return <Empty description={NO_AREAS} image={Empty.PRESENTED_IMAGE_SIMPLE} />;
+      return <Empty description={intl.get(NO_AREAS)} image={Empty.PRESENTED_IMAGE_SIMPLE} />;
     return (
       <ShadowCard>
         <Row gutter={[16, 16]}>
           <Col span={6}>
-            <Label name={AREA}>
+            <Label name={intl.get(AREA)}>
               <Select
                 bordered={false}
                 onChange={(val) => {
@@ -79,10 +80,10 @@ export default function CorrosionsTableList() {
   const handleUpload = (data: any) => {
     return importAssets(getProject(), data).then((res) => {
       if (res.data.code === 200) {
-        message.success('导入成功');
+        message.success(intl.get('IMPORTED_SUCCESSFUL'));
         refresh();
       } else {
-        message.error(`导入失败: ${res.data.msg}`);
+        message.error(`${intl.get('FAILED_TO_IMPORT')}: ${res.data.msg}`);
       }
     });
   };
@@ -90,7 +91,7 @@ export default function CorrosionsTableList() {
   return (
     <Content>
       <PageTitle
-        items={[{ title: '资产列表' }]}
+        items={[{ title: intl.get('ASSET_LIST') }]}
         actions={
           <ActionBar
             hasPermission={hasPermission(Permission.AssetAdd)}
@@ -100,7 +101,7 @@ export default function CorrosionsTableList() {
                 type='primary'
                 onClick={() => actionStatus.onAreaCreate()}
               >
-                {CREATE_AREA}
+                {intl.get(CREATE_AREA)}
                 <PlusOutlined />
               </Button>,
               areas.length > 0 && (
@@ -109,7 +110,7 @@ export default function CorrosionsTableList() {
                   type='primary'
                   onClick={() => actionStatus.onAreaAssetCreate()}
                 >
-                  {CREATE_AREA_ASSET}
+                  {intl.get(CREATE_AREA_ASSET)}
                   <PlusOutlined />
                 </Button>
               ),
@@ -119,7 +120,7 @@ export default function CorrosionsTableList() {
                   type='primary'
                   onClick={() => actionStatus.onMonitoringPointCreate()}
                 >
-                  {CREATE_MONITORING_POINT}
+                  {intl.get(CREATE_MONITORING_POINT)}
                   <PlusOutlined />
                 </Button>
               ),

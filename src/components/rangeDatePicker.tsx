@@ -1,6 +1,7 @@
 import { Button, DatePicker, Space } from 'antd';
 import * as React from 'react';
 import dayjs, { RangeValue } from '../utils/dayjsUtils';
+import intl from 'react-intl-universal';
 
 export const oneWeekRange: RangeValue = [
   dayjs().startOf('day').subtract(7, 'd'),
@@ -41,16 +42,16 @@ export const RangeDatePicker: React.FC<{
           showFooter && (
             <Space>
               <Button type='text' onClick={() => setRange(calculateRange(1))}>
-                最近一个月
+                {intl.get('LAST_MONTH')}
               </Button>
               <Button type='text' onClick={() => setRange(calculateRange(3))}>
-                最近三个月
+                {intl.get('LAST_3_MONTHS')}
               </Button>
               <Button type='text' onClick={() => setRange(calculateRange(6))}>
-                最近半年
+                {intl.get('LAST_HALF_YAER')}
               </Button>
               <Button type='text' onClick={() => setRange(calculateRange(12))}>
-                最近一年
+                {intl.get('LAST_YEAR')}
               </Button>
             </Space>
           )

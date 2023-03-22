@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { defaultValidateMessages } from '../../../constants/validator';
 import { DeviceSettingContent } from '../DeviceSettingContent';
 import { processArrayValuesInSensorSetting } from '../../../components/formItems/deviceSettingFormItem';
+import intl from 'react-intl-universal';
 
 export interface EditSettingProps extends ModalProps {
   device: Device;
@@ -41,10 +42,10 @@ const EditSettingModal = (props: EditSettingProps) => {
     <Modal
       width={520}
       visible={visible}
-      title={'设备配置'}
-      okText={'更新'}
+      title={intl.get('DEVICE_SETTINGS')}
+      okText={intl.get('UPDATE')}
       onOk={onSave}
-      cancelText={'取消'}
+      cancelText={intl.get('CANCEL')}
       onCancel={onCancel}
       confirmLoading={isLoading}
     >

@@ -8,6 +8,7 @@ import { useActionBarStatus } from '../common/useActionBarStatus';
 import { getAsset } from '../../services';
 import { INVALID_AREA } from '../config';
 import { AreaTree } from '../tree-list/tree';
+import intl from 'react-intl-universal';
 
 export default function AreaShow() {
   const { id } = useParams();
@@ -29,7 +30,7 @@ export default function AreaShow() {
   }, [id]);
 
   if (loading) return <Spin />;
-  if (wind === undefined) return <p>{INVALID_AREA}</p>;
+  if (wind === undefined) return <p>{intl.get(INVALID_AREA)}</p>;
 
   return (
     <Row gutter={[16, 16]}>

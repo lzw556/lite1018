@@ -11,6 +11,7 @@ import { useProvisionMode } from '../useProvisionMode';
 import { Network } from '../../../types/network';
 import { useNavigate } from 'react-router';
 import { PageTitle } from '../../../components/pageTitle';
+import intl from 'react-intl-universal';
 
 const { Dragger } = Upload;
 
@@ -44,7 +45,7 @@ const ImportNetworkPage = () => {
           console.log(json.deviceList);
           setNetwork({ wsn: json.wsn, devices: json.deviceList });
         } else {
-          message.error('文件格式错误').then();
+          message.error(intl.get('INVALID_FILE_FORMAT')).then();
         }
       }
     };
@@ -69,7 +70,7 @@ const ImportNetworkPage = () => {
 
   const onSave = () => {
     if (network === undefined) {
-      message.error('请上传文件');
+      message.error(intl.get('PLEASE_UPLOAD_FILE'));
       return;
     }
     const nodes = network.devices;
@@ -91,7 +92,7 @@ const ImportNetworkPage = () => {
         ImportNetworkRequest(req).then((_) => setSuccess(true));
       });
     } else {
-      message.error('不能导入空网络').then();
+      message.error(intl.get('DO_NOT_IMPORT_EMPTY_NETWORK')).then();
     }
   };
 
@@ -203,7 +204,7 @@ const ImportNetworkPage = () => {
             form.resetFields();
           }}
         >
-          重置
+          {intl.get('RESET')}
         </a>
       );
     }
@@ -213,11 +214,11 @@ const ImportNetworkPage = () => {
   return (
     <Content>
       <PageTitle
-        items={[{ title: '导入网络' }]}
+        items={[{ title: intl.get('MENU_IMPORT_NETWORK') }]}
         actions={
           !success && (
             <Button type='primary' onClick={onSave}>
-              保存网络
+              {intl.get('SAVE_NETWORK')}
               <ImportOutlined />
             </Button>
           )
@@ -231,7 +232,7 @@ const ImportNetworkPage = () => {
                 <Card
                   type='inner'
                   size={'small'}
-                  title={'预览'}
+                  title={intl.get('PREVIEW')}
                   style={{ height: `${height}px` }}
                   extra={renderAction()}
                 >
@@ -247,17 +248,20 @@ const ImportNetworkPage = () => {
                         <p className='ant-upload-drag-icon'>
                           <InboxOutlined />
                         </p>
-                        <p className='ant-upload-text'>点击或拖动网络模板文件到此区域</p>
-                        <p className='ant-upload-hint'>
-                          请选择以.json结尾的文件,只支持单个网络模板文件的上传
-                        </p>
+                        <p className='ant-upload-text'>{intl.get('UPLOAD_NETWORK_PROMPT')}</p>
+                        <p className='ant-upload-hint'>{intl.get('UPLOAD_NETWORK_HINT')}</p>
                       </Dragger>
                     )}
                   </div>
                 </Card>
               </Col>
               <Col xl={8} xxl={6} style={{ paddingLeft: '4px' }}>
-                <Card type='inner' size={'small'} title={'编辑'} style={{ height: `${height}px` }}>
+                <Card
+                  type='inner'
+                  size={'small'}
+                  title={intl.get('EDIT')}
+                  style={{ height: `${height}px` }}
+                >
                   {/*<Form.Item label="通讯周期" name="communication_period"*/}
                   {/*           rules={[{required: true, message: "请选择网络通讯周期"}]}>*/}
                   {/*    <CommunicationPeriodSelect periods={COMMUNICATION_PERIOD}*/}
@@ -282,11 +286,11 @@ const ImportNetworkPage = () => {
           ) : (
             <Result
               status='success'
-              title='网络导入成功'
-              subTitle='您可以返回网络列表查看网络信息或者继续导入网络'
+              title={intl.get('NETWORK_IMPORTED_SUCCESSFUL')}
+              subTitle={intl.get('NETWORK_IMPORTED_NEXT_PROMPT')}
               extra={[
                 <Button type='primary' key='devices' onClick={() => navigate('/networks')}>
-                  返回网络列表
+                  {intl.get('BACK_TO_NETWORKS')}
                 </Button>,
                 <Button
                   key='add'
@@ -296,7 +300,7 @@ const ImportNetworkPage = () => {
                     setSuccess(false);
                   }}
                 >
-                  继续导入网络
+                  {intl.get('CONTINUE_TO_IMPORT_NETWORK')}
                 </Button>
               ]}
             />

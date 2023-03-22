@@ -18,6 +18,7 @@ import { Permission } from '../../permission/permission';
 import Label from '../label';
 import { RangeDatePicker } from '../rangeDatePicker';
 import { Store, useStore } from '../../hooks/store';
+import intl from 'react-intl-universal';
 
 const { Option } = Select;
 
@@ -79,19 +80,19 @@ export const FilterableAlarmRecordTable: React.FC<{ sourceId?: number }> = ({ so
 
   const renderFilterDropdown = ({ setSelectedKeys, selectedKeys, confirm, clearFilters }: any) => {
     const data = {
-      title: '全选',
+      title: intl.get('SELECT_ALL'),
       key: -1,
       children: [
         {
-          title: '未处理',
+          title: intl.get('ALARM_STATUS_UNHANDLED'),
           key: 0
         },
         {
-          title: '手动处理',
+          title: intl.get('ALARM_STATUS_HANDLED'),
           key: 1
         },
         {
-          title: '系统自动处理',
+          title: intl.get('ALARM_STATUS_AUTO_HANDLED'),
           key: 2
         }
       ]
@@ -120,7 +121,7 @@ export const FilterableAlarmRecordTable: React.FC<{ sourceId?: number }> = ({ so
 
   const columns: any = [
     {
-      title: '报警名称',
+      title: intl.get('ALARM_NAME'),
       dataIndex: 'alarmRuleGroupName',
       key: 'alarmRuleGroupName',
       width: '15%',
@@ -129,18 +130,18 @@ export const FilterableAlarmRecordTable: React.FC<{ sourceId?: number }> = ({ so
       }
     },
     {
-      title: '报警级别',
+      title: intl.get('ALARM_LEVEL'),
       dataIndex: 'level',
       key: 'level',
       width: '8%',
       render: (level: number) => {
         switch (level) {
           case 1:
-            return <Tag color={ColorInfo}>次要</Tag>;
+            return <Tag color={ColorInfo}>{intl.get('ALARM_LEVEL_INFO')}</Tag>;
           case 2:
-            return <Tag color={ColorWarn}>重要</Tag>;
+            return <Tag color={ColorWarn}>{intl.get('ALARM_LEVEL_WARN')}</Tag>;
           case 3:
-            return <Tag color={ColorDanger}>紧急</Tag>;
+            return <Tag color={ColorDanger}>{intl.get('ALARM_LEVEL_DANGER')}</Tag>;
         }
       }
     },
@@ -157,7 +158,7 @@ export const FilterableAlarmRecordTable: React.FC<{ sourceId?: number }> = ({ so
     //     }
     // },
     {
-      title: '报警源',
+      title: intl.get('ALARM_SOURCE'),
       dataIndex: 'source',
       key: 'source',
       width: '10%',
@@ -165,20 +166,22 @@ export const FilterableAlarmRecordTable: React.FC<{ sourceId?: number }> = ({ so
         if (source) {
           return source.name;
         }
-        return '未知资源';
+        return intl.get('UNKOWN_SOURCE');
       }
     },
     {
-      title: '报警详情',
+      title: intl.get('ALARM_DETAIL'),
       dataIndex: 'metric',
       key: 'metric',
       width: '15%',
       render: (metric: any, record: any) => {
-        return `${metric.name} ${record.operation} ${record.threshold}${metric.unit} 报警值: ${record.value}${metric.unit}`;
+        return `${metric.name} ${record.operation} ${record.threshold}${metric.unit} ${intl.get(
+          'ALARM_VALUE'
+        )}: ${record.value}${metric.unit}`;
       }
     },
     {
-      title: '发生时间',
+      title: intl.get('ALARM_TIMESTAMP'),
       dataIndex: 'createdAt',
       key: 'createdAt',
       width: '15%',
@@ -187,7 +190,7 @@ export const FilterableAlarmRecordTable: React.FC<{ sourceId?: number }> = ({ so
       }
     },
     {
-      title: '持续时间',
+      title: intl.get('ALARM_DURATION'),
       dataIndex: 'duration',
       key: 'duration',
       width: '10%',
@@ -205,7 +208,7 @@ export const FilterableAlarmRecordTable: React.FC<{ sourceId?: number }> = ({ so
       }
     },
     {
-      title: '状态',
+      title: intl.get('ALARM_STATUS'),
       dataIndex: 'status',
       key: 'status',
       width: '5%',
@@ -213,16 +216,16 @@ export const FilterableAlarmRecordTable: React.FC<{ sourceId?: number }> = ({ so
       render: (status: number) => {
         switch (status) {
           case 1:
-            return <Tag color='blue'>手动处理</Tag>;
+            return <Tag color='blue'>{intl.get('ALARM_STATUS_HANDLED')}</Tag>;
           case 2:
-            return <Tag color='green'>系统自动处理</Tag>;
+            return <Tag color='green'>{intl.get('ALARM_STATUS_AUTO_HANDLED')}</Tag>;
           default:
-            return <Tag>未处理</Tag>;
+            return <Tag>{intl.get('ALARM_STATUS_UNHANDLED')}</Tag>;
         }
       }
     },
     {
-      title: '操作',
+      title: intl.get('OPERATION'),
       key: 'action',
       width: 64,
       // fixed: 'right',
@@ -232,7 +235,7 @@ export const FilterableAlarmRecordTable: React.FC<{ sourceId?: number }> = ({ so
             {record.status === 0 ? (
               <HasPermission value={Permission.AlarmRecordAcknowledge}>
                 <Button type='link' ghost size={'small'} onClick={() => onAcknowledge(record)}>
-                  标记为已处理
+                  {intl.get('MARK_HANDLED')}
                 </Button>
               </HasPermission>
             ) : (
@@ -244,17 +247,17 @@ export const FilterableAlarmRecordTable: React.FC<{ sourceId?: number }> = ({ so
                   size={'small'}
                   onClick={() => onViewAcknowledge(record.id)}
                 >
-                  查看处理详情
+                  {intl.get('VIEW_HANDLE_DETAIL')}
                 </Button>
               </HasPermission>
             )}
             <HasPermission value={Permission.AlarmRecordDelete}>
               <Popconfirm
                 placement='left'
-                title='确认要删除该报警记录吗?'
+                title={intl.get('DELETE_ALARM_RECORD_PROMPT')}
                 onConfirm={() => onDelete(record.id)}
-                okText='删除'
-                cancelText='取消'
+                okText={intl.get('DELETE')}
+                cancelText={intl.get('CANCEL')}
               >
                 <Button type='text' size='small' icon={<DeleteOutlined />} danger />
               </Popconfirm>
@@ -270,12 +273,12 @@ export const FilterableAlarmRecordTable: React.FC<{ sourceId?: number }> = ({ so
       <Row justify={'start'}>
         <Col span={24}>
           <Space direction={isMobile ? 'vertical' : 'horizontal'}>
-            <Label name={'报警级别'}>
+            <Label name={intl.get('ALARM_LEVEL')}>
               <Select
                 bordered={false}
                 mode={'multiple'}
                 value={store.alertLevels}
-                style={{ width: '220px' }}
+                style={{ width: 250 }}
                 onChange={(value) => {
                   if (value.length) {
                     setStore((prev) => ({ ...prev, alertLevels: value }));
@@ -285,13 +288,13 @@ export const FilterableAlarmRecordTable: React.FC<{ sourceId?: number }> = ({ so
                 }}
               >
                 <Option key={1} value={1}>
-                  次要
+                  {intl.get('ALARM_LEVEL_INFO')}
                 </Option>
                 <Option key={2} value={2}>
-                  重要
+                  {intl.get('ALARM_LEVEL_WARN')}
                 </Option>
                 <Option key={3} value={3}>
-                  紧急
+                  {intl.get('ALARM_LEVEL_DANGER')}
                 </Option>
               </Select>
             </Label>
@@ -324,7 +327,7 @@ export const FilterableAlarmRecordTable: React.FC<{ sourceId?: number }> = ({ so
       <Row justify={'start'}>
         <Col span={24}>
           <TableLayout
-            emptyText={'报警记录列表为空'}
+            emptyText={intl.get('NO_ALARM_RECORDS_PROMPT')}
             columns={columns}
             dataSource={dataSource}
             onPageChange={(index, size) =>

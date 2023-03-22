@@ -3,6 +3,7 @@ import { FC, useEffect, useState } from 'react';
 import { UpdateRoleRequest } from '../../../../apis/role';
 import RoleModal from './role';
 import { Role } from '../../../../types/role';
+import intl from 'react-intl-universal';
 
 export interface EditRoleModalProps {
   role: Role;
@@ -40,7 +41,7 @@ const EditRoleModal: FC<EditRoleModalProps> = (props) => {
       form={form}
       width={420}
       visible={visible}
-      title={'角色编辑'}
+      title={intl.get('EDIT_ROLE')}
       onOk={onSave}
       onCancel={onCancel}
       confirmLoading={isLoading}

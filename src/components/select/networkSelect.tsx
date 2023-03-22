@@ -2,6 +2,7 @@ import { Select, SelectProps } from 'antd';
 import { FC, useEffect, useState } from 'react';
 import { GetNetworksRequest } from '../../apis/network';
 import { Network } from '../../types/network';
+import intl from 'react-intl-universal';
 
 export interface NetworkSelectProps extends SelectProps<any> {}
 
@@ -16,7 +17,7 @@ const NetworkSelect: FC<NetworkSelectProps> = (props) => {
   }, []);
 
   return (
-    <Select {...props} placeholder={'请选择网络'}>
+    <Select {...props} placeholder={intl.get('PLEASE_SELECT_NETWORK')}>
       {dataSource.map((network) => (
         <Option key={network.id} value={network.id}>
           {network.name}

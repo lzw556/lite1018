@@ -5,6 +5,7 @@ import { isMobile } from '../../../utils/deviceDetection';
 import { getFilename } from '../../../utils/format';
 import { exportAlarmRules } from './services';
 import { AlarmRule } from './types';
+import intl from 'react-intl-universal';
 
 export const SelectRules: React.FC<{ rules: AlarmRule[]; onSuccess: () => void } & ModalProps> = (
   props
@@ -34,11 +35,11 @@ export const SelectRules: React.FC<{ rules: AlarmRule[]; onSuccess: () => void }
   return (
     <Modal
       {...props}
-      title='选择规则'
+      title={intl.get('SELECT_ALARM_RULE')}
       width={isMobile ? '80%' : '50%'}
       footer={[
         <Button key='back' onClick={(e) => props.onCancel && props.onCancel(e as any)}>
-          取消
+          {intl.get('CANCEL')}
         </Button>,
         <Button
           key='submitall'
@@ -49,7 +50,7 @@ export const SelectRules: React.FC<{ rules: AlarmRule[]; onSuccess: () => void }
           }}
           loading={loading}
         >
-          导出全部
+          {intl.get('EXPORT_ALL')}
         </Button>,
         <Button
           key='submit'
@@ -57,7 +58,7 @@ export const SelectRules: React.FC<{ rules: AlarmRule[]; onSuccess: () => void }
           disabled={selected.length === 0}
           onClick={() => handleUpload(selected as number[])}
         >
-          导出
+          {intl.get('EXPORT')}
         </Button>
       ]}
     >
@@ -67,7 +68,7 @@ export const SelectRules: React.FC<{ rules: AlarmRule[]; onSuccess: () => void }
             <Row>
               {props.rules.map(({ id, name }) => (
                 <Col span={8} key={id}>
-                  <Checkbox value={id}>{name}</Checkbox>
+                  <Checkbox value={id}>{intl.get(name).d(name)}</Checkbox>
                 </Col>
               ))}
             </Row>

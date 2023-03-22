@@ -3,376 +3,376 @@ const millisecond = 1000;
 export const COMMUNICATION_PERIOD = [
   {
     value: 4 * 60 * millisecond,
-    text: '4分钟'
+    text: 'OPTION_4_MINUTES'
   },
   {
     value: 10 * 60 * millisecond,
-    text: '10分钟'
+    text: 'OPTION_10_MINUTES'
   },
 
   {
     value: 20 * 60 * millisecond,
-    text: '20分钟'
+    text: 'OPTION_20_MINUTES'
   },
   {
     value: 30 * 60 * millisecond,
-    text: '30分钟'
+    text: 'OPTION_30_MINUTES'
   },
   {
     value: 60 * 60 * millisecond,
-    text: '1小时'
+    text: 'OPTION_1_HOUR'
   },
   {
     value: 2 * 60 * 60 * millisecond,
-    text: '2小时'
+    text: 'OPTION_2_HOURS'
   }
 ];
 
 export const COMMUNICATION_PERIOD_2 = [
   {
     value: 5 * 60 * millisecond,
-    text: '5分钟'
+    text: 'OPTION_5_MINUTES'
   },
   {
     value: 10 * 60 * millisecond,
-    text: '10分钟'
+    text: 'OPTION_10_MINUTES'
   },
   {
     value: 20 * 60 * millisecond,
-    text: '20分钟'
+    text: 'OPTION_20_MINUTES'
   },
   {
     value: 30 * 60 * millisecond,
-    text: '30分钟'
+    text: 'OPTION_30_MINUTES'
   },
   {
     value: 60 * 60 * millisecond,
-    text: '1小时'
+    text: 'OPTION_1_HOUR'
   },
   {
     value: 2 * 60 * 60 * millisecond,
-    text: '2小时'
+    text: 'OPTION_2_HOURS'
   }
 ];
 
 export const SECOND_COMMUNICATION_PERIOD = [
   {
     value: 0,
-    text: '无'
+    text: 'NONE'
   },
   {
     value: 30 * 60 * millisecond,
-    text: '30分钟'
+    text: 'OPTION_30_MINUTES'
   },
   {
     value: 60 * 60 * millisecond,
-    text: '1小时'
+    text: 'OPTION_1_HOUR'
   },
   {
     value: 2 * 60 * 60 * millisecond,
-    text: '2小时'
+    text: 'OPTION_2_HOURS'
   },
   {
     value: 4 * 60 * 60 * millisecond,
-    text: '4小时'
+    text: 'OPTION_4_HOURS'
   },
   {
     value: 6 * 60 * 60 * millisecond,
-    text: '6小时'
+    text: 'OPTION_6_HOURS'
   },
   {
     value: 8 * 60 * 60 * millisecond,
-    text: '8小时'
+    text: 'OPTION_8_HOURS'
   },
   {
     value: 12 * 60 * 60 * millisecond,
-    text: '12小时'
+    text: 'OPTION_12_HOURS'
   }
 ];
 
 export const COMMUNICATION_OFFSET = [
   {
     value: 0,
-    text: '无'
+    text: 'NONE'
   },
   {
     value: 10 * millisecond,
-    text: '10秒'
+    text: 'OPTION_10_SECONDS'
   },
   {
     value: 20 * millisecond,
-    text: '20秒'
+    text: 'OPTION_20_SECONDS'
   },
   {
     value: 30 * millisecond,
-    text: '30秒'
+    text: 'OPTION_30_SECONDS'
   },
   {
     value: 40 * millisecond,
-    text: '40秒'
+    text: 'OPTION_40_SECONDS'
   },
   {
     value: 50 * millisecond,
-    text: '50秒'
+    text: 'OPTION_50_SECONDS'
   },
   {
     value: 60 * millisecond,
-    text: '60秒'
+    text: 'OPTION_60_SECONDS'
   },
   {
     value: 2 * 60 * millisecond,
-    text: '120秒'
+    text: 'OPTION_120_SECONDS'
   }
 ];
 
 export const COMMUNICATION_OFFSET_2 = [
   {
     value: 0,
-    text: '无'
+    text: 'NONE'
   },
   {
     value: 10 * millisecond,
-    text: '10秒'
+    text: 'OPTION_10_SECONDS'
   },
   {
     value: 20 * millisecond,
-    text: '20秒'
+    text: 'OPTION_20_SECONDS'
   },
   {
     value: 30 * millisecond,
-    text: '30秒'
+    text: 'OPTION_30_SECONDS'
   },
   {
     value: 40 * millisecond,
-    text: '40秒'
+    text: 'OPTION_40_SECONDS'
   },
   {
     value: 50 * millisecond,
-    text: '50秒'
+    text: 'OPTION_50_SECONDS'
   },
   {
     value: 60 * millisecond,
-    text: '60秒'
+    text: 'OPTION_60_SECONDS'
   },
   {
     value: 70 * millisecond,
-    text: '70秒'
+    text: 'OPTION_70_SECONDS'
   },
   {
     value: 80 * millisecond,
-    text: '80秒'
+    text: 'OPTION_80_SECONDS'
   },
   {
     value: 90 * millisecond,
-    text: '90秒'
+    text: 'OPTION_90_SECONDS'
   },
   {
     value: 100 * millisecond,
-    text: '100秒'
+    text: 'OPTION_100_SECONDS'
   },
   {
     value: 110 * millisecond,
-    text: '110秒'
+    text: 'OPTION_110_SECONDS'
   },
   {
     value: 2 * 60 * millisecond,
-    text: '120秒'
+    text: 'OPTION_120_SECONDS'
   }
 ];
 
 export const GROUP_INTERVAL = [
   {
     value: 2 * 60 * millisecond,
-    text: '2分钟'
+    text: 'OPTION_2_MINUTES'
   }
 ];
 
 export const SAMPLE_PERIOD_1 = [
   {
     value: 60 * millisecond,
-    text: '1分钟'
+    text: 'OPTION_1_MINUTE'
   },
   {
     value: 2 * 60 * millisecond,
-    text: '2分钟'
+    text: 'OPTION_2_MINUTES'
   },
   {
     value: 5 * 60 * millisecond,
-    text: '5分钟'
+    text: 'OPTION_5_MINUTES'
   },
   {
     value: 10 * 60 * millisecond,
-    text: '10分钟'
+    text: 'OPTION_10_MINUTES'
   },
   {
     value: 20 * 60 * millisecond,
-    text: '20分钟'
+    text: 'OPTION_20_MINUTES'
   },
   {
     value: 30 * 60 * millisecond,
-    text: '30分钟'
+    text: 'OPTION_30_MINUTES'
   },
   {
     value: 60 * 60 * millisecond,
-    text: '1小时'
+    text: 'OPTION_1_HOUR'
   },
   {
     value: 2 * 60 * 60 * millisecond,
-    text: '2小时'
+    text: 'OPTION_2_HOURS'
   },
   {
     value: 4 * 60 * 60 * millisecond,
-    text: '4小时'
+    text: 'OPTION_4_HOURS'
   },
   {
     value: 6 * 60 * 60 * millisecond,
-    text: '6小时'
+    text: 'OPTION_6_HOURS'
   },
   {
     value: 8 * 60 * 60 * millisecond,
-    text: '8小时'
+    text: 'OPTION_8_HOURS'
   },
   {
     value: 12 * 60 * 60 * millisecond,
-    text: '12小时'
+    text: 'OPTION_12_HOURS'
   },
   {
     value: 24 * 60 * 60 * millisecond,
-    text: '24小时'
+    text: 'OPTION_24_HOURS'
   }
 ];
 
 export const SAMPLE_PERIOD_2 = [
   {
     value: 60 * millisecond,
-    text: '1分钟'
+    text: 'OPTION_1_MINUTE'
   },
   {
     value: 2 * 60 * millisecond,
-    text: '2分钟'
+    text: 'OPTION_2_MINUTES'
   },
   {
     value: 2.5 * 60 * millisecond,
-    text: '2.5分钟'
+    text: 'OPTION_2_5_MINUTES'
   },
   {
     value: 5 * 60 * millisecond,
-    text: '5分钟'
+    text: 'OPTION_5_MINUTES'
   },
   {
     value: 10 * 60 * millisecond,
-    text: '10分钟'
+    text: 'OPTION_10_MINUTES'
   },
 
   {
     value: 15 * 60 * millisecond,
-    text: '15分钟'
+    text: 'OPTION_15_MINUTES'
   },
   {
     value: 20 * 60 * millisecond,
-    text: '20分钟'
+    text: 'OPTION_20_MINUTES'
   },
   {
     value: 30 * 60 * millisecond,
-    text: '30分钟'
+    text: 'OPTION_30_MINUTES'
   },
   {
     value: 60 * 60 * millisecond,
-    text: '1小时'
+    text: 'OPTION_1_HOUR'
   },
   {
     value: 2 * 60 * 60 * millisecond,
-    text: '2小时'
+    text: 'OPTION_2_HOURS'
   },
   {
     value: 4 * 60 * 60 * millisecond,
-    text: '4小时'
+    text: 'OPTION_4_HOURS'
   },
   {
     value: 6 * 60 * 60 * millisecond,
-    text: '6小时'
+    text: 'OPTION_6_HOURS'
   },
   {
     value: 8 * 60 * 60 * millisecond,
-    text: '8小时'
+    text: 'OPTION_8_HOURS'
   },
   {
     value: 12 * 60 * 60 * millisecond,
-    text: '12小时'
+    text: 'OPTION_12_HOURS'
   },
   {
     value: 24 * 60 * 60 * millisecond,
-    text: '24小时'
+    text: 'OPTION_24_HOURS'
   }
 ];
 
 export const SAMPLE_OFFSET = [
   {
     value: 0,
-    text: '无'
+    text: 'NONE'
   },
   {
     value: 10 * millisecond,
-    text: '10秒'
+    text: 'OPTION_10_SECONDS'
   },
   {
     value: 30 * millisecond,
-    text: '30秒'
+    text: 'OPTION_30_SECONDS'
   },
   {
     value: 60 * millisecond,
-    text: '1分钟'
+    text: 'OPTION_1_MINUTE'
   },
   {
     value: 2 * 60 * millisecond,
-    text: '2分钟'
+    text: 'OPTION_2_MINUTES'
   },
   {
     value: 5 * 60 * millisecond,
-    text: '5分钟'
+    text: 'OPTION_5_MINUTES'
   },
   {
     value: 10 * 60 * millisecond,
-    text: '10分钟'
+    text: 'OPTION_10_MINUTES'
   },
   {
     value: 20 * 60 * millisecond,
-    text: '20分钟'
+    text: 'OPTION_20_MINUTES'
   },
   {
     value: 30 * 60 * millisecond,
-    text: '30分钟'
+    text: 'OPTION_30_MINUTES'
   },
   {
     value: 60 * 60 * millisecond,
-    text: '1小时'
+    text: 'OPTION_1_HOUR'
   },
   {
     value: 2 * 60 * 60 * millisecond,
-    text: '2小时'
+    text: 'OPTION_2_HOURS'
   },
   {
     value: 4 * 60 * 60 * millisecond,
-    text: '4小时'
+    text: 'OPTION_4_HOURS'
   },
   {
     value: 6 * 60 * 60 * millisecond,
-    text: '6小时'
+    text: 'OPTION_6_HOURS'
   },
   {
     value: 8 * 60 * 60 * millisecond,
-    text: '8小时'
+    text: 'OPTION_8_HOURS'
   },
   {
     value: 12 * 60 * 60 * millisecond,
-    text: '12小时'
+    text: 'OPTION_12_HOURS'
   },
   {
     value: 16 * 60 * 60 * millisecond,
-    text: '16小时'
+    text: 'OPTION_16_HOURS'
   },
   {
     value: 20 * 60 * 60 * millisecond,
-    text: '20小时'
+    text: 'OPTION_20_HOURS'
   }
 ];

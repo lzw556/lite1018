@@ -3,6 +3,7 @@ import * as React from 'react';
 import { bindDevice, unbindDevice, updateMeasurement } from '../../services';
 import { MonitoringPoint, MonitoringPointRow, UPDATE_MONITORING_POINT } from '../../types';
 import { UpdateForm } from './updateForm';
+import intl from 'react-intl-universal';
 
 export const WindTurbineMonitoringPointUpdate: React.FC<
   ModalProps & { monitoringPoint: MonitoringPointRow; onSuccess: () => void }
@@ -13,9 +14,9 @@ export const WindTurbineMonitoringPointUpdate: React.FC<
   return (
     <Modal
       {...{
-        title: UPDATE_MONITORING_POINT,
-        cancelText: '取消',
-        okText: '编辑',
+        title: intl.get(UPDATE_MONITORING_POINT),
+        cancelText: intl.get('CANCEL'),
+        okText: intl.get('EDIT'),
         ...props,
         onOk: () => {
           form.validateFields().then((values) => {

@@ -1,12 +1,13 @@
 import { FC } from 'react';
 import { Button, Result } from 'antd';
+import intl from 'react-intl-universal';
 
 const ServerErrorPage: FC = () => {
   return (
     <Result
       status='500'
       title='500'
-      subTitle='对不起，服务器出错了'
+      subTitle={intl.get('SERVER_ERROR_PRPMPT')}
       extra={
         <Button
           type='primary'
@@ -14,7 +15,7 @@ const ServerErrorPage: FC = () => {
             window.location.hash = '/';
           }}
         >
-          返回首页
+          {intl.get('RETURN_TO_HOME')}
         </Button>
       }
     />

@@ -10,6 +10,7 @@ import {
   generateChartOptions,
   transformDynamicData
 } from './dynamicDataHelper';
+import intl from 'react-intl-universal';
 
 export const DynamicDataContent = ({
   type,
@@ -78,11 +79,11 @@ export const DynamicDataContent = ({
               <Col span={24}>
                 <Row justify='end'>
                   <Col>
-                    <Label name={'属性'}>
+                    <Label name={intl.get('PROPERTY')}>
                       <Select
                         bordered={false}
                         defaultValue={fields[0].value}
-                        placeholder={'请选择属性'}
+                        placeholder={intl.get('PLEASE_SELECT_PROPERTY')}
                         style={{ width: '120px' }}
                         onChange={(value, option: any) =>
                           setField({
@@ -94,7 +95,7 @@ export const DynamicDataContent = ({
                       >
                         {fields.map(({ label, value, unit }) => (
                           <Select.Option key={value} value={value} data-unit={unit}>
-                            {label}
+                            {intl.get(label)}
                           </Select.Option>
                         ))}
                       </Select>

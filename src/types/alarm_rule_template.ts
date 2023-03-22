@@ -1,3 +1,5 @@
+import intl from 'react-intl-universal';
+
 export type AlarmRuleTemplate = {
   id: number;
   name: string;
@@ -23,19 +25,19 @@ export type AlarmRule = {
 export function getRuleMethodString(method: string) {
   switch (method) {
     case 'Max':
-      return '最大值';
+      return intl.get('MAX');
     case 'Min':
-      return '最小值';
+      return intl.get('MIN');
     case 'Mean':
-      return '平均值';
+      return intl.get('AVERAGE');
     case 'Current':
-      return '当前值';
+      return intl.get('CURRENT');
     case 'X':
-      return 'X轴';
+      return intl.get('AXIS_X');
     case 'Y':
-      return 'Y轴';
+      return intl.get('AXIS_Y');
     case 'Z':
-      return 'Z轴';
+      return intl.get('AXIS_Z');
   }
   return '';
 }

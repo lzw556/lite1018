@@ -12,6 +12,7 @@ import {
 import { MonitoringPointBatch } from './create';
 import { checkIsFlangePreload, FLANGE, getFlanges, PLEASE_SELECT_FLANGE } from '../../../flange';
 import { MONITORING_POINTS, WIND_TURBINE_ASSET_TYPE_ID } from '../../../asset/wind-turbine';
+import intl from 'react-intl-universal';
 
 export const SelectFlangeFormItem = ({
   flange,
@@ -55,12 +56,12 @@ export const SelectFlangeFormItem = ({
     <>
       {flanges?.length > 0 ? (
         <Form.Item
-          label={FLANGE}
+          label={intl.get(FLANGE)}
           name='asset_id'
-          rules={[{ required: true, message: PLEASE_SELECT_FLANGE }]}
+          rules={[{ required: true, message: intl.get(PLEASE_SELECT_FLANGE) }]}
         >
           <Select
-            placeholder={PLEASE_SELECT_FLANGE}
+            placeholder={intl.get(PLEASE_SELECT_FLANGE)}
             onChange={(id, option: any) => {
               setIsFlangePreload(checkIsFlangePreload(option));
             }}
@@ -76,12 +77,12 @@ export const SelectFlangeFormItem = ({
         <Form.Item name='asset_id' hidden={true} initialValue={flange?.id}></Form.Item>
       )}
       <Form.Item
-        label={MONITORING_POINT_TYPE}
+        label={intl.get(MONITORING_POINT_TYPE)}
         name='type'
-        rules={[{ required: true, message: PLEASE_SELECT_MONITORING_POINT_TYPE }]}
+        rules={[{ required: true, message: intl.get(PLEASE_SELECT_MONITORING_POINT_TYPE) }]}
       >
         <Select
-          placeholder={PLEASE_SELECT_MONITORING_POINT_TYPE}
+          placeholder={intl.get(PLEASE_SELECT_MONITORING_POINT_TYPE)}
           onChange={(id) => handlePointTypeChange(id)}
         >
           {MONITORING_POINTS.map(({ id, label }) => (
@@ -90,7 +91,7 @@ export const SelectFlangeFormItem = ({
               value={id}
               disabled={id === MonitoringPointTypeValue.LOOSENING_ANGLE && isFlangePreload}
             >
-              {label}
+              {intl.get(label)}
             </Select.Option>
           ))}
         </Select>

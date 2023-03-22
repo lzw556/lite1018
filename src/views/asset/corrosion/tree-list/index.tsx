@@ -17,6 +17,7 @@ import { getProject } from '../../../../utils/session';
 import { PageTitle } from '../../../../components/pageTitle';
 import { CREATE_MONITORING_POINT } from '../../../monitoring-point';
 import { getAreaAssets } from '../common/utils';
+import intl from 'react-intl-universal';
 
 export default function AreasTreeList() {
   const { hasPermission } = usePermission();
@@ -28,7 +29,7 @@ export default function AreasTreeList() {
 
   const renderResult = () => {
     if (generals.length === 0)
-      return <Empty description={NO_AREAS} image={Empty.PRESENTED_IMAGE_SIMPLE} />;
+      return <Empty description={intl.get(NO_AREAS)} image={Empty.PRESENTED_IMAGE_SIMPLE} />;
     return (
       <ShadowCard>
         <AreaTree assets={generals} onSuccess={refresh} />
@@ -39,10 +40,10 @@ export default function AreasTreeList() {
   const handleUpload = (data: any) => {
     return importAssets(getProject(), data).then((res) => {
       if (res.data.code === 200) {
-        message.success('导入成功');
+        message.success(intl.get('IMPORTED_SUCCESSFUL'));
         refresh();
       } else {
-        message.error(`导入失败: ${res.data.msg}`);
+        message.error(`${intl.get('FAILED_TO_IMPORT')}: ${res.data.msg}`);
       }
     });
   };
@@ -50,7 +51,7 @@ export default function AreasTreeList() {
   return (
     <Content>
       <PageTitle
-        items={[{ title: '资产树' }]}
+        items={[{ title: intl.get('MENU_ASSET_TREE') }]}
         actions={
           <ActionBar
             hasPermission={hasPermission(Permission.AssetAdd)}
@@ -60,7 +61,7 @@ export default function AreasTreeList() {
                 type='primary'
                 onClick={() => actionStatus.onAreaCreate()}
               >
-                {CREATE_AREA}
+                {intl.get(CREATE_AREA)}
                 <PlusOutlined />
               </Button>,
               generals.length > 0 && (
@@ -69,7 +70,7 @@ export default function AreasTreeList() {
                   type='primary'
                   onClick={() => actionStatus.onAreaAssetCreate()}
                 >
-                  {CREATE_AREA_ASSET}
+                  {intl.get(CREATE_AREA_ASSET)}
                   <PlusOutlined />
                 </Button>
               ),
@@ -79,7 +80,7 @@ export default function AreasTreeList() {
                   type='primary'
                   onClick={() => actionStatus.onMonitoringPointCreate()}
                 >
-                  {CREATE_MONITORING_POINT}
+                  {intl.get(CREATE_MONITORING_POINT)}
                   <PlusOutlined />
                 </Button>
               ),

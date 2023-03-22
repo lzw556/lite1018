@@ -1,65 +1,66 @@
 import { DeviceType } from '../types/device_type';
+import intl from 'react-intl-universal';
 
 export function GetFieldName(key: string) {
   switch (key) {
     case 'loosening_angle':
-      return '松动角度';
+      return intl.get('FIELD_LOOSENING_ANGLE');
     case 'attitude':
-      return '姿态指数';
+      return intl.get('FIELD_ATTITUDE');
     case 'motion':
-      return '移动指数';
+      return intl.get('FIELD_MOTION');
     case 'preload':
-      return '预紧力';
+      return intl.get('FIELD_PRELOAD');
     case 'defection':
-      return '缺陷位置';
+      return intl.get('FIELD_DEFECT_LOCATION');
     case 'length':
-      return '长度';
+      return intl.get('LENGTH');
     case 'temperature':
-      return '温度';
+      return intl.get('FIELD_TEMPERATURE');
     case 'tof':
-      return '飞行时间';
+      return intl.get('FIELD_TOF');
     case 'acceleration_x':
-      return '加速度X轴';
+      return intl.get('FIELD_ACCELERATION_X');
     case 'acceleration_y':
-      return '加速度Y轴';
+      return intl.get('FIELD_ACCELERATION_Y');
     case 'acceleration_z':
-      return '加速度Z轴';
+      return intl.get('FIELD_ACCELERATION_Z');
     case 'thickness':
-      return '厚度';
+      return intl.get('FIELD_THICKNESS');
     case 'corrosion_rate':
-      return '腐蚀率';
+      return intl.get('FIELD_CORROSION_RATE');
     case 'inclination':
-      return '倾斜角';
+      return intl.get('FIELD_INCLINATION');
     case 'pitch':
-      return '俯仰角';
+      return intl.get('FIELD_PITCH');
     case 'roll':
-      return '翻滚角';
+      return intl.get('FIELD_ROLL');
     case 'velocity_x':
-      return '速度X轴';
+      return intl.get('FIELD_VELOCITY_X');
     case 'velocity_y':
-      return '速度Y轴';
+      return intl.get('FIELD_VELOCITY_Y');
     case 'velocity_z':
-      return '速度Z轴';
+      return intl.get('FIELD_VELOCITY_Z');
     case 'displacement_x':
-      return '位移X轴';
+      return intl.get('FIELD_DISPLACEMENT_X');
     case 'displacement_y':
-      return '位移Y轴';
+      return intl.get('FIELD_DISPLACEMENT_Y');
     case 'displacement_z':
-      return '位移Z轴';
+      return intl.get('FIELD_DISPLACEMENT_Z');
     case 'enveloping_x':
-      return '真峰峰值X轴';
+      return intl.get('FIELD_ENVELOPING_X');
     case 'enveloping_y':
-      return '真峰峰值Y轴';
+      return intl.get('FIELD_ENVELOPING_Y');
     case 'enveloping_z':
-      return '真峰峰值Z轴';
+      return intl.get('FIELD_ENVELOPING_Z');
     case 'crest_factor_x':
-      return '波峰因数X轴';
+      return intl.get('FIELD_CREST_FACTOR_X');
     case 'crest_factor_y':
-      return '波峰因数Y轴';
+      return intl.get('FIELD_CREST_FACTOR_Y');
     case 'crest_factor_z':
-      return '波峰因数Z轴';
+      return intl.get('FIELD_CREST_FACTOR_Z');
     default:
-      return '未知属性';
+      return intl.get('FIELD_UNKOWN');
   }
 }
 

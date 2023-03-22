@@ -4,6 +4,8 @@ import { DownloadDeviceDataRequest } from '../../../../../apis/device';
 import dayjs, { Dayjs } from '../../../../../utils/dayjsUtils';
 import { Device } from '../../../../../types/device';
 import { getSpecificProperties } from '../../../util';
+import intl from 'react-intl-universal';
+import { useLocaleContext } from '../../../../../localeProvider';
 
 const { RangePicker } = DatePicker;
 const { Option } = Select;
@@ -20,6 +22,7 @@ const DownloadModal: FC<DownloadModalProps> = (props) => {
   const [startDate, setStartDate] = useState<Dayjs>(dayjs().startOf('day').subtract(7, 'd'));
   const [endDate, setEndDate] = useState<Dayjs>(dayjs().endOf('day'));
   const [form] = Form.useForm();
+  const { language } = useLocaleContext();
 
   useEffect(() => {
     if (visible) {
@@ -38,7 +41,8 @@ const DownloadModal: FC<DownloadModalProps> = (props) => {
         device.id,
         startDate.utc().unix(),
         endDate.utc().unix(),
-        filter
+        filter,
+        language === 'en-US' ? 'en' : 'zh'
       ).then((res) => {
         if (res.status === 200) {
           const url = window.URL.createObjectURL(new Blob([res.data]));
@@ -56,26 +60,30 @@ const DownloadModal: FC<DownloadModalProps> = (props) => {
   return (
     <Modal
       {...props}
-      width={390}
-      title={'数据下载'}
-      okText={'下载'}
+      width={430}
+      title={intl.get('DWONLOAD_DATA')}
+      okText={intl.get('DOWNLOAD')}
       onOk={onDownload}
-      cancelText={'取消'}
+      cancelText={intl.get('CANCEL')}
     >
-      <Form form={form}>
-        <Form.Item label={'设备属性'} name={'properties'} required>
-          <Select placeholder={'请选择设备属性'} mode={'multiple'} maxTagCount={2}>
+      <Form form={form} labelCol={{ span: 8 }}>
+        <Form.Item label={intl.get('PROPERTY')} name={'properties'} required>
+          <Select
+            placeholder={intl.get('PLEASE_SELECT_DEVICE_PROPERTY')}
+            mode={'multiple'}
+            maxTagCount={2}
+          >
             {getSpecificProperties(
               device.properties.filter((pro) => pro.key !== 'channel'),
               device.typeId
             ).map((item) => (
               <Option key={item.key} value={item.key}>
-                {item.name}
+                {intl.get(item.name)}
               </Option>
             ))}
           </Select>
         </Form.Item>
-        <Form.Item label={'时间范围'} required>
+        <Form.Item label={intl.get('DATE_RANGE')} required>
           <RangePicker
             allowClear={false}
             style={{ width: '252px' }}

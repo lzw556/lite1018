@@ -1,4 +1,4 @@
-import { Checkbox, Col, ConfigProvider, DatePicker, Row, Select, Space, Table } from 'antd';
+import { Checkbox, Col, DatePicker, Row, Select, Space, Table } from 'antd';
 import EChartsReact from 'echarts-for-react';
 import dayjs from '../../../../utils/dayjsUtils';
 import * as React from 'react';
@@ -16,6 +16,7 @@ import { isMobile } from '../../../../utils/deviceDetection';
 import { DownloadOutlined } from '@ant-design/icons';
 import usePermission, { Permission } from '../../../../permission/permission';
 import { DeviceType } from '../../../../types/device_type';
+import intl from 'react-intl-universal';
 
 const { Option } = Select;
 
@@ -106,31 +107,31 @@ const WaveDataChart: React.FC<{ device: Device }> = ({ device }) => {
   const getChartTitle = () => {
     switch (calculate) {
       case 'accelerationTimeDomain':
-        return '加速度时域(m/s²)';
+        return `${intl.get('FIELD_ACCELERATION_TIME_DOMAIN')}(m/s²)`;
       case 'accelerationFrequencyDomain':
-        return '加速度频域(m/s²)';
+        return `${intl.get('FIELD_ACCELERATION_FREQUENCY_DOMAIN')}(m/s²)`;
       case 'velocityTimeDomain':
-        return '速度时域(mm/s)';
+        return `${intl.get('FIELD_VELOCITY_TIME_DOMAIN')}(mm/s)`;
       case 'velocityFrequencyDomain':
-        return '速度频域(mm/s)';
+        return `${intl.get('FIELD_VELOCITY_FREQUENCY_DOMAIN')}(mm/s)`;
       case 'displacementTimeDomain':
-        return '位移时域(μm)';
+        return `${intl.get('FIELD_DISPLACEMENT_TIME_DOMAIN')}(μm)`;
       case 'displacementFrequencyDomain':
-        return '位移频域(μm)';
+        return `${intl.get('FIELD_DISPLACEMENT_FREQUENCY_DOMAIN')}(μm)`;
     }
     return '';
   };
 
   const columns = [
     {
-      title: '时间',
+      title: intl.get('TIMESTAMP'),
       dataIndex: 'timestamp',
       key: 'timestamp',
       width: '80%',
       render: (timestamp: number) => dayjs.unix(timestamp).local().format('YYYY-MM-DD HH:mm:ss')
     },
     {
-      title: '操作',
+      title: intl.get('OPERATION'),
       key: 'action',
       render: (text: any, record: any) => {
         if (hasPermission(Permission.DeviceRawDataDownload)) {
@@ -164,15 +165,12 @@ const WaveDataChart: React.FC<{ device: Device }> = ({ device }) => {
 
   const renderChart = () => {
     if (deviceData === undefined && !isLoading) {
-      return <EmptyLayout description='数据不足' />;
+      return <EmptyLayout description={intl.get('LOADING')} />;
     } else {
       let option: any = { ...defaultChartOption };
       if (deviceData) {
         const data = deviceData.values;
-        if (data === undefined || data.values === undefined) {
-          return <EmptyLayout description='数据不足' />;
-        }
-        const legends = ['X轴', 'Y轴', 'Z轴'];
+        const legends = [intl.get('AXIS_X'), intl.get('AXIS_Y'), intl.get('AXIS_Z')];
         let series: any[] = [
           {
             name: legends[dimension],
@@ -242,7 +240,7 @@ const WaveDataChart: React.FC<{ device: Device }> = ({ device }) => {
       }
       return (
         <EChartsReact
-          loadingOption={{ text: '正在加载数据, 请稍等...' }}
+          loadingOption={{ text: intl.get('LOADING') }}
           showLoading={isLoading}
           style={{ height: 500 }}
           option={option}
@@ -259,22 +257,22 @@ const WaveDataChart: React.FC<{ device: Device }> = ({ device }) => {
       onChange={setCalculate}
     >
       <Option key={'accelerationTimeDomain'} value={'accelerationTimeDomain'}>
-        加速度时域
+        {intl.get('FIELD_ACCELERATION_TIME_DOMAIN')}
       </Option>
       <Option key={'accelerationFrequencyDomain'} value={'accelerationFrequencyDomain'}>
-        加速度频域
+        {intl.get('FIELD_ACCELERATION_FREQUENCY_DOMAIN')}
       </Option>
       <Option key={'velocityTimeDomain'} value={'velocityTimeDomain'}>
-        速度时域
+        {intl.get('FIELD_VELOCITY_TIME_DOMAIN')}
       </Option>
       <Option key={'velocityFrequencyDomain'} value={'velocityFrequencyDomain'}>
-        速度频域
+        {intl.get('FIELD_VELOCITY_FREQUENCY_DOMAIN')}
       </Option>
       <Option key={'displacementTimeDomain'} value={'displacementTimeDomain'}>
-        位移时域
+        {intl.get('FIELD_DISPLACEMENT_TIME_DOMAIN')}
       </Option>
       <Option key={'displacementFrequencyDomain'} value={'displacementFrequencyDomain'}>
-        位移频域
+        {intl.get('FIELD_DISPLACEMENT_FREQUENCY_DOMAIN')}
       </Option>
     </Select>
   );
@@ -287,19 +285,19 @@ const WaveDataChart: React.FC<{ device: Device }> = ({ device }) => {
       }}
     >
       <Option key={0} value={0}>
-        X轴
+        {intl.get('AXIS_X')}
       </Option>
       <Option key={1} value={1}>
-        Y轴
+        {intl.get('AXIS_Y')}
       </Option>
       <Option key={2} value={2}>
-        Z轴
+        {intl.get('AXIS_Z')}
       </Option>
     </Select>
   );
   if (isMobile) {
     if (!deviceData?.timestamp) {
-      return <EmptyLayout description={'波形数据列表为空'} />;
+      return <EmptyLayout description={intl.get('NO_WAVEFORM_PROMPT')} />;
     }
 
     return (
@@ -344,7 +342,7 @@ const WaveDataChart: React.FC<{ device: Device }> = ({ device }) => {
                   setIsShowEnvelope(e.target.checked);
                 }}
               >
-                显示包络
+                {intl.get('SHOW_ENVELOPE')}
               </Checkbox>
             )}
           </Col>
@@ -381,28 +379,26 @@ const WaveDataChart: React.FC<{ device: Device }> = ({ device }) => {
           </Row>
           <Row justify={'space-between'} style={{ paddingTop: '0px' }}>
             <Col span={24}>
-              <ConfigProvider renderEmpty={() => <EmptyLayout description={'波形数据列表为空'} />}>
-                <Table
-                  size={'middle'}
-                  scroll={{ y: 500 }}
-                  showHeader={false}
-                  columns={columns}
-                  pagination={false}
-                  dataSource={dataSource}
-                  rowClassName={(record) =>
-                    record.timestamp === deviceData?.timestamp ? 'ant-table-row-selected' : ''
-                  }
-                  onRow={(record) => ({
-                    onClick: () => {
-                      if (record.timestamp !== deviceData?.timestamp) {
-                        fetchDeviceDataByTimestamp(record.timestamp);
-                      }
-                    },
-                    onMouseLeave: () => (window.document.body.style.cursor = 'default'),
-                    onMouseEnter: () => (window.document.body.style.cursor = 'pointer')
-                  })}
-                />
-              </ConfigProvider>
+              <Table
+                size={'middle'}
+                scroll={{ y: 500 }}
+                showHeader={false}
+                columns={columns}
+                pagination={false}
+                dataSource={dataSource}
+                rowClassName={(record) =>
+                  record.timestamp === deviceData?.timestamp ? 'ant-table-row-selected' : ''
+                }
+                onRow={(record) => ({
+                  onClick: () => {
+                    if (record.timestamp !== deviceData?.timestamp) {
+                      fetchDeviceDataByTimestamp(record.timestamp);
+                    }
+                  },
+                  onMouseLeave: () => (window.document.body.style.cursor = 'default'),
+                  onMouseEnter: () => (window.document.body.style.cursor = 'pointer')
+                })}
+              />
             </Col>
           </Row>
         </Col>
@@ -419,7 +415,7 @@ const WaveDataChart: React.FC<{ device: Device }> = ({ device }) => {
                           setIsShowEnvelope(e.target.checked);
                         }}
                       >
-                        显示包络
+                        {intl.get('SHOW_ENVELOPE')}
                       </Checkbox>
                     )}
                     {select_fields}

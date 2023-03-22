@@ -11,6 +11,7 @@ import {
   PLEASE_SELECT_GENERAL_PARENT,
   GENERAL_ASSET_TYPE_ID
 } from '../config';
+import intl from 'react-intl-universal';
 
 export const GeneralCreate: React.FC<ModalProps & { parentId?: number; onSuccess: () => void }> = (
   props
@@ -28,9 +29,9 @@ export const GeneralCreate: React.FC<ModalProps & { parentId?: number; onSuccess
   return (
     <Modal
       {...{
-        title: CREATE_GENERAL,
-        cancelText: '取消',
-        okText: '添加',
+        title: intl.get(CREATE_GENERAL),
+        cancelText: intl.get('CANCEL'),
+        okText: intl.get('CREATE'),
         ...props,
         onOk: () => {
           form.validateFields().then((values) => {
@@ -46,13 +47,13 @@ export const GeneralCreate: React.FC<ModalProps & { parentId?: number; onSuccess
       }}
     >
       <Form form={form} labelCol={{ span: 6 }} validateMessages={defaultValidateMessages}>
-        <Form.Item label={GENERAL_NAME} name='name' rules={[Rules.range(4, 50)]}>
-          <Input placeholder={PLEASE_INPUT_GENERAL_NAME} />
+        <Form.Item label={intl.get(GENERAL_NAME)} name='name' rules={[Rules.range(4, 50)]}>
+          <Input placeholder={intl.get(PLEASE_INPUT_GENERAL_NAME)} />
         </Form.Item>
         <Form.Item name='type' hidden={true} initialValue={GENERAL_ASSET_TYPE_ID}></Form.Item>
         {parents?.length > 0 && parentId === undefined ? (
-          <Form.Item label={GENERAL_PARENT} name='parent_id'>
-            <Select placeholder={PLEASE_SELECT_GENERAL_PARENT}>
+          <Form.Item label={intl.get(GENERAL_PARENT)} name='parent_id'>
+            <Select placeholder={intl.get(PLEASE_SELECT_GENERAL_PARENT)}>
               {parents.map(({ id, name, attributes }) => (
                 <Select.Option key={id} value={id} attributes={attributes}>
                   {name}

@@ -13,6 +13,7 @@ import { clearHistory, getDataOfMonitoringPoint } from '../services';
 import { MonitoringPointRow } from '../types';
 import { getSpecificProperties } from '../utils';
 import { generateChartOptionsOfHistoryDatas } from './monitor';
+import intl from 'react-intl-universal';
 
 export const MonitoringPointHistory = (point: MonitoringPointRow) => {
   const { id, properties, type } = point;
@@ -45,7 +46,7 @@ export const MonitoringPointHistory = (point: MonitoringPointRow) => {
     if (!options || options.length === 0) {
       return (
         <Col span={24}>
-          <Empty description='暂无数据' image={Empty.PRESENTED_IMAGE_SIMPLE} />
+          <Empty description={intl.get('NO_DATA_PROMPT')} image={Empty.PRESENTED_IMAGE_SIMPLE} />
         </Col>
       );
     } else {
@@ -64,11 +65,13 @@ export const MonitoringPointHistory = (point: MonitoringPointRow) => {
           <Col></Col>
           <Col>
             <Space direction={isMobile ? 'vertical' : 'horizontal'}>
-              <Label name={'属性'}>
+              <Label name={intl.get('PROPERTY')}>
                 <Select
                   bordered={false}
                   defaultValue={property}
-                  placeholder={'请选择属性'}
+                  placeholder={intl.get('PLEASE_SELECT_SOMETHING', {
+                    something: intl.get('PROPERTY')
+                  })}
                   style={{ width: isMobile ? '100%' : '120px' }}
                   onChange={(value: string) => {
                     setProperty(value);
@@ -76,7 +79,7 @@ export const MonitoringPointHistory = (point: MonitoringPointRow) => {
                 >
                   {getSpecificProperties(properties, type).map(({ name, key }) => (
                     <Select.Option key={key} value={key}>
-                      {name}
+                      {intl.get(name)}
                     </Select.Option>
                   ))}
                 </Select>
@@ -105,16 +108,14 @@ export const MonitoringPointHistory = (point: MonitoringPointRow) => {
                       if (range) {
                         const [from, to] = range;
                         Modal.confirm({
-                          title: '提示',
-                          content: `确定要删除${point.name}从${dayjs
-                            .unix(from)
-                            .local()
-                            .format('YYYY-MM-DD')}到${dayjs
-                            .unix(to)
-                            .local()
-                            .format('YYYY-MM-DD')}的数据吗？`,
-                          okText: '确定',
-                          cancelText: '取消',
+                          title: intl.get('PROMPT'),
+                          content: intl.get('DELETE_PROPERTY_DATA_PROMPT', {
+                            property: point.name,
+                            start: dayjs.unix(from).local().format('YYYY-MM-DD'),
+                            end: dayjs.unix(to).local().format('YYYY-MM-DD')
+                          }),
+                          okText: intl.get('OK'),
+                          cancelText: intl.get('CANCEL'),
                           onOk: (close) => {
                             clearHistory(id, from, to).then((_) => {
                               close();

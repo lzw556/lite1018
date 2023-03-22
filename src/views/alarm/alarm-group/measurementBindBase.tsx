@@ -14,6 +14,7 @@ import {
 } from '../../monitoring-point';
 import { bindMeasurementsToAlarmRule2 } from './services';
 import { AlarmRule } from './types';
+import intl from 'react-intl-universal';
 
 export const MeasurementBindBase: React.FC<
   ModalProps & { selectedRow: AlarmRule } & { onSuccess: () => void }
@@ -44,7 +45,9 @@ export const MeasurementBindBase: React.FC<
   const renderModalContent = () => {
     if (loading) return <Spin />;
     if (!treeData || treeData.length === 0)
-      return <Empty description='暂无数据' image={Empty.PRESENTED_IMAGE_SIMPLE} />;
+      return (
+        <Empty description={intl.get('NO_DATA_PROMPT')} image={Empty.PRESENTED_IMAGE_SIMPLE} />
+      );
     return (
       <Tree
         checkable={true}

@@ -1,5 +1,6 @@
 import { ColorDanger, ColorHealth, ColorInfo, ColorWarn } from '../../../constants/color';
 import { AssetChildrenStatistics } from '..';
+import intl from 'react-intl-universal';
 
 export type NameValue = { name: string; value: string | number; className?: string };
 export type AlarmState = 'normal' | 'info' | 'warn' | 'danger' | 'anomalous';
@@ -98,11 +99,11 @@ function mapAssetStatistics(statis: AssetChildrenStatistics) {
 function mapAssetStatisticsProperty(propertyName: keyof AssetChildrenStatistics) {
   switch (propertyName) {
     case 'deviceNum':
-      return '传感器';
+      return 'DEVICE';
     case 'monitoringPointNum':
-      return '监测点';
+      return 'MONITORING_POINT';
     case 'offlineDeviceNum':
-      return '离线传感器';
+      return 'OFFLINE_DEVICE';
     default:
       return propertyName;
   }
@@ -119,17 +120,17 @@ function mapAlarmStatistics(statis: Map<AlarmState, number>) {
 export function getAlarmStateText(state: AlarmState) {
   switch (state) {
     case 'normal':
-      return '正常';
+      return intl.get('ALARM_LEVEL_NORMAL');
     case 'info':
-      return '次要';
+      return intl.get('ALARM_LEVEL_INFO');
     case 'warn':
-      return '重要';
+      return intl.get('ALARM_LEVEL_WARN');
     case 'danger':
-      return '紧急';
+      return intl.get('ALARM_LEVEL_DANGER');
     case 'anomalous':
-      return '异常';
+      return intl.get('ABNORMAL');
     default:
-      return 'unkown';
+      return intl.get('UNKOWN');
   }
 }
 

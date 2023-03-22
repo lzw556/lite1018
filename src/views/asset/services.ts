@@ -42,14 +42,21 @@ export function getProjectStatistics() {
   return request.get<ProjectStatistics>(`/statistics/all`).then(GetResponse);
 }
 
-export function downloadHistory(id: number, from: number, to: number, pids: any, assetId?: number) {
+export function downloadHistory(
+  id: number,
+  from: number,
+  to: number,
+  pids: any,
+  lang: string,
+  assetId?: number
+) {
   if (assetId) {
     return request.download<any>(
-      `/assets/${assetId}/download/data?from=${from}&to=${to}&pids=${pids}`
+      `/assets/${assetId}/download/data?from=${from}&to=${to}&pids=${pids}&lang=${lang}`
     );
   } else {
     return request.download<any>(
-      `/monitoringPoints/${id}/download/data?from=${from}&to=${to}&pids=${pids}`
+      `/monitoringPoints/${id}/download/data?from=${from}&to=${to}&pids=${pids}&lang=${lang}`
     );
   }
 }

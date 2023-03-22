@@ -9,6 +9,7 @@ import EditCalibrateParas from './edit/editCalibrateParas';
 import { Device } from '../../types/device';
 import useSocket, { SocketTopic } from '../../socket';
 import { IsUpgrading } from '../../types/device_upgrade_status';
+import intl from 'react-intl-universal';
 
 export const CommandMenu = ({
   device,
@@ -80,40 +81,42 @@ export const CommandMenu = ({
     <Menu onClick={handelMenuClick} disabled={!device.state?.isOnline}>
       {!upgrading && (
         <>
-          <Menu.Item key={DeviceCommand.Reboot}>重启</Menu.Item>
+          <Menu.Item key={DeviceCommand.Reboot}>{intl.get('RESTART')}</Menu.Item>
           {typeId !== DeviceType.Router && typeId !== DeviceType.Gateway && (
             <>
-              <Menu.Item key={DeviceCommand.AcquireSensorData}>采集数据</Menu.Item>
+              <Menu.Item key={DeviceCommand.AcquireSensorData}>
+                {intl.get('ACQUIRE_SENSOR_DATA')}
+              </Menu.Item>
 
               {typeId === DeviceType.BoltElongationMultiChannels ? (
-                <Menu.SubMenu title='重置数据'>
+                <Menu.SubMenu title={intl.get('RESET_DATA')}>
                   <Menu.Item key={`[${DeviceCommand.ResetData},1]`}>1</Menu.Item>
                   <Menu.Item key={`[${DeviceCommand.ResetData},2]`}>2</Menu.Item>
                   <Menu.Item key={`[${DeviceCommand.ResetData},3]`}>3</Menu.Item>
                   <Menu.Item key={`[${DeviceCommand.ResetData},4]`}>4</Menu.Item>
                 </Menu.SubMenu>
               ) : (
-                <Menu.Item key={DeviceCommand.ResetData}>重置数据</Menu.Item>
+                <Menu.Item key={DeviceCommand.ResetData}>{intl.get('RESET_DATA')}</Menu.Item>
               )}
             </>
           )}
-          <Menu.Item key={DeviceCommand.Reset}>恢复出厂设置</Menu.Item>
+          <Menu.Item key={DeviceCommand.Reset}>{intl.get('RESTORE_FACTORY_SETTINGS')}</Menu.Item>
           {(typeId === DeviceType.HighTemperatureCorrosion ||
             typeId === DeviceType.NormalTemperatureCorrosion ||
             typeId === DeviceType.BoltElongation ||
             typeId === DeviceType.BoltElongationMultiChannels ||
             typeId === DeviceType.PressureTemperature) && (
-            <Menu.Item key={DeviceCommand.Calibrate}>校准</Menu.Item>
+            <Menu.Item key={DeviceCommand.Calibrate}>{intl.get('CALIBRATE')}</Menu.Item>
           )}
         </>
       )}
       {hasPermissions(Permission.DeviceUpgrade, Permission.DeviceFirmwares) && (
         <>
           <Menu.Item key={DeviceCommand.Upgrade} hidden={upgrading}>
-            固件升级
+            {intl.get('UPGRADE_FIRMWARE')}
           </Menu.Item>
           <Menu.Item key={DeviceCommand.CancelUpgrade} hidden={!upgrading}>
-            取消升级
+            {intl.get('CANCEL_UPGRADING_FIRMWARE')}
           </Menu.Item>
         </>
       )}

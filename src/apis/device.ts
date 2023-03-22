@@ -49,8 +49,14 @@ export function GetDeviceDataRequest(id: number, timestamp: number, filters: any
   return request.get<any>(`/devices/${id}/data/${timestamp}`, { ...filters }).then(GetResponse);
 }
 
-export function DownloadDeviceDataRequest(id: number, from: number, to: number, filters: any) {
-  return request.download<any>(`/devices/${id}/download/data`, { from, to, ...filters });
+export function DownloadDeviceDataRequest(
+  id: number,
+  from: number,
+  to: number,
+  filters: any,
+  lang: string
+) {
+  return request.download<any>(`/devices/${id}/download/data`, { from, to, ...filters, lang });
 }
 
 export function DownloadDeviceDataByTimestampRequest(id: number, timestamp: number, filters: any) {

@@ -7,6 +7,7 @@ import { AssetRow } from '../../asset/types';
 import { UPDATE_MONITORING_POINT } from '../../monitoring-point';
 import { bindMeasurementsToAlarmRule2 } from './services';
 import { AlarmRule } from './types';
+import intl from 'react-intl-universal';
 
 type MixinAssetRow = AssetRow & { pointIds: number[]; checked: boolean; indeterminate: boolean };
 
@@ -87,7 +88,9 @@ export const BindMonitoringPoints: React.FC<
   const renderModalContent = () => {
     if (loading) return <Spin />;
     if (assets.length === 0 || !asset)
-      return <Empty description='暂无数据' image={Empty.PRESENTED_IMAGE_SIMPLE} />;
+      return (
+        <Empty description={intl.get('NO_DATA_PROMPT')} image={Empty.PRESENTED_IMAGE_SIMPLE} />
+      );
     return (
       <>
         <Form.Item>
@@ -104,7 +107,7 @@ export const BindMonitoringPoints: React.FC<
                 checked={asset.checked}
                 indeterminate={asset.indeterminate}
               >
-                全选
+                {intl.get('SELECT_ALL')}
               </Checkbox>
             )}
             <Select
@@ -170,7 +173,7 @@ export const BindMonitoringPoints: React.FC<
   return (
     <Modal
       width={800}
-      title={UPDATE_MONITORING_POINT}
+      title={intl.get(UPDATE_MONITORING_POINT)}
       bodyStyle={{ maxHeight: 700, overflow: 'auto' }}
       {...props}
       okButtonProps={{ disabled: assets.length === 0 }}

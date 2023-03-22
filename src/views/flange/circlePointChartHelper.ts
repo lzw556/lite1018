@@ -13,6 +13,7 @@ import {
   getAlarmLevelColor,
   getAlarmStateText
 } from '../asset/common/statisticsHelper';
+import intl from 'react-intl-universal';
 
 export function buildCirclePointsChartOfFlange(
   measurements: MonitoringPointRow[],
@@ -54,7 +55,7 @@ export function buildCirclePointsChartOfFlange(
     measurements[0].type === MonitoringPointTypeValue.PRELOAD &&
     checkValidAttr(attributes, 'normal', min)
   ) {
-    const seriesName = `额定值 ${attributes?.normal?.value}${field?.unit}`;
+    const seriesName = `${intl.get('RATING')} ${attributes?.normal?.value}${field?.unit}`;
     const normal = getSeries(ColorHealth, attributes?.normal?.value, seriesName);
     legends.push({ name: seriesName, itemStyle: { color: ColorHealth } });
     series.push(normal.series);
@@ -64,28 +65,34 @@ export function buildCirclePointsChartOfFlange(
     measurements[0].type === MonitoringPointTypeValue.LOOSENING_ANGLE &&
     checkValidAttr(attributes, 'initial', min)
   ) {
-    const seriesName = `初始值 ${attributes?.initial?.value}${field?.unit}`;
+    const seriesName = `${intl.get('INITIAL_VALUE')} ${attributes?.initial?.value}${field?.unit}`;
     const initial = getSeries(ColorHealth, attributes?.initial?.value, seriesName);
     legends.push({ name: seriesName, itemStyle: { color: ColorHealth } });
     series.push(initial.series);
   }
 
   if (checkValidAttr(attributes, 'info', min)) {
-    const seriesName = `次要报警 ${attributes?.info?.value}${field?.unit}`;
+    const seriesName = `${intl.get('ALARM_LEVEL_INFO_TITLE')} ${attributes?.info?.value}${
+      field?.unit
+    }`;
     const info = getSeries(ColorInfo, attributes?.info?.value, seriesName);
     legends.push({ name: seriesName, itemStyle: { color: ColorInfo } });
     series.push(info.series);
   }
 
   if (checkValidAttr(attributes, 'warn', min)) {
-    const seriesName = `重要报警 ${attributes?.warn?.value}${field?.unit}`;
+    const seriesName = `${intl.get('ALARM_LEVEL_WARN_TITLE')} ${attributes?.warn?.value}${
+      field?.unit
+    }`;
     const warn = getSeries(ColorWarn, attributes?.warn?.value, seriesName);
     legends.push({ name: seriesName, itemStyle: { color: ColorWarn } });
     series.push(warn.series);
   }
 
   if (checkValidAttr(attributes, 'danger', min)) {
-    const seriesName = `紧急报警 ${attributes?.danger?.value}${field?.unit}`;
+    const seriesName = `${intl.get('ALARM_LEVEL_DANGER_TITLE')} ${attributes?.danger?.value}${
+      field?.unit
+    }`;
     const danger = getSeries(ColorDanger, attributes?.danger?.value, seriesName);
     legends.push({ name: seriesName, itemStyle: { color: ColorDanger } });
     series.push(danger.series);
@@ -269,7 +276,7 @@ function generateActuals(measurements: MonitoringPointRow[], isBig: boolean = fa
   };
   const series = {
     type: 'line',
-    name: '实际值',
+    name: intl.get('ACTUAL_VALUE'),
     data: [...seriesData, seriesData[0]],
     itemStyle: { color: 'rgb(0,130,252)' },
     tooltip: { show: false },

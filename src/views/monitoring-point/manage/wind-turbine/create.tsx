@@ -8,6 +8,7 @@ import { CREATE_MONITORING_POINT } from '../../types';
 import { MonitoringPointInfo } from '../DeviceSelection';
 import { MonitoringPointFormItem } from '../monitoringPointFormItem';
 import { SelectFlangeFormItem } from './selectFlangeFormItem';
+import intl from 'react-intl-universal';
 
 export type MonitoringPointBatch = {
   asset_id: number;
@@ -56,9 +57,9 @@ export const WindTurbineMonitoringPointCreate: React.FC<
   return (
     <Modal
       {...{
-        title: CREATE_MONITORING_POINT,
-        cancelText: '取消',
-        okText: '添加',
+        title: intl.get(CREATE_MONITORING_POINT),
+        cancelText: intl.get('CANCEL'),
+        okText: intl.get('CREATE'),
         ...props,
         width: 600,
         onOk: () => {
@@ -100,7 +101,7 @@ export const WindTurbineMonitoringPointCreate: React.FC<
         }
       }}
     >
-      <Form form={form} labelCol={{ span: 6 }} validateMessages={defaultValidateMessages}>
+      <Form form={form} labelCol={{ span: 8 }} validateMessages={defaultValidateMessages}>
         <SelectFlangeFormItem
           flange={flange}
           onSelect={(type: number, devices: Device[]) => {

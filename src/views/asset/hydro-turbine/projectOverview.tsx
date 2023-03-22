@@ -18,6 +18,7 @@ import { isMobile } from '../../../utils/deviceDetection';
 import { INVALID_MONITORING_POINT, MONITORING_POINT } from '../../monitoring-point';
 import { NameValueGroups } from '../../../components/name-values';
 import { rootPathState } from '../components';
+import intl from 'react-intl-universal';
 
 export type ProjectStatistics = {
   deviceOfflineNum: number;
@@ -50,24 +51,28 @@ export default function ProjectOverview() {
       }) => {
         setStatisticOfAsset(
           generatePieOptions(
-            `共${rootAssetNum}台`,
+            intl.get('TOTAL_WITH_NUMBER', { number: rootAssetNum }),
             generateProjectAlarmStatis(rootAssetNum, rootAssetAlarmNum)
           )
         );
         setStatisticOfMeasurement(
           generatePieOptions(
-            `共${monitoringPointNum}个`,
+            intl.get('TOTAL_WITH_NUMBER', { number: monitoringPointNum }),
             generateProjectAlarmStatis(monitoringPointNum, monitoringPointAlarmNum)
           )
         );
         setStatisticOfSensor(
-          generatePieOptions(`共${deviceNum}个`, [
+          generatePieOptions(intl.get('TOTAL_WITH_NUMBER', { number: deviceNum }), [
             {
-              name: '在线',
+              name: intl.get('ONLINE'),
               value: deviceNum - deviceOfflineNum,
               itemStyle: { color: ColorHealth }
             },
-            { name: '离线', value: deviceOfflineNum, itemStyle: { color: ColorOffline } }
+            {
+              name: intl.get('OFFLINE'),
+              value: deviceOfflineNum,
+              itemStyle: { color: ColorOffline }
+            }
           ])
         );
       }

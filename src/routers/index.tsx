@@ -21,13 +21,21 @@ import {
 } from '../views';
 import { PrimaryLayout } from '../views/layout/primaryLayout';
 import { isLogin } from '../utils/session';
-import { Spin } from 'antd';
+import { ConfigProvider, Spin } from 'antd';
 import {
   ASSET_CATEGORY,
   useAssetCategoryContext
 } from '../views/asset/components/assetCategoryContext';
 import { FLANGE_PATHNAME } from '../views/flange';
 import { MONITORING_POINT_PATHNAME } from '../views/monitoring-point';
+import { useLocaleContext } from '../localeProvider';
+import useForceUpdate from 'use-force-update';
+import intl from 'react-intl-universal';
+import en_US from '../locales/en-US.json';
+import zh_CN from '../locales/zh-CN.json';
+import zhCN from 'antd/es/locale/zh_CN';
+import enUS from 'antd/es/locale/en_US';
+import dayjs from '../utils/dayjsUtils';
 
 const AssetViewSwitch = lazy(() => import('../views/asset/components/assetViewSwitch'));
 const AlarmRuleGroups = lazy(() => import('../views/alarm/alarm-group/index'));
@@ -181,18 +189,39 @@ const AppRouter = () => {
     });
   }
   const Routes = () => useRoutes(routes);
+  const { language } = useLocaleContext();
+  const forceUpdate = useForceUpdate();
+
+  React.useEffect(() => {
+    intl.init({
+      locales: {
+        'en-US': en_US,
+        'zh-CN': zh_CN
+      },
+      currentLocale: language
+    });
+    if (language === 'zh-CN') {
+      dayjs.locale('zh-cn');
+    } else {
+      dayjs.locale('en');
+    }
+    forceUpdate();
+  }, [language, forceUpdate]);
+
   return (
-    <BrowserRouter>
-      <Suspense
-        fallback={
-          <div style={{ display: 'flex', justifyContent: 'center', alignContent: 'center' }}>
-            <Spin />
-          </div>
-        }
-      >
-        <Routes />
-      </Suspense>
-    </BrowserRouter>
+    <ConfigProvider locale={language === 'zh-CN' ? zhCN : enUS}>
+      <BrowserRouter>
+        <Suspense
+          fallback={
+            <div style={{ display: 'flex', justifyContent: 'center', alignContent: 'center' }}>
+              <Spin />
+            </div>
+          }
+        >
+          <Routes />
+        </Suspense>
+      </BrowserRouter>
+    </ConfigProvider>
   );
 };
 

@@ -18,6 +18,7 @@ import usePermission, { Permission } from '../../permission/permission';
 import { Store, useStore } from '../../hooks/store';
 import { store as reduxStore } from '../../store';
 import { PageTitle } from '../../components/pageTitle';
+import intl from 'react-intl-universal';
 
 const ProjectPage = () => {
   const [visible, setVisible] = useState(false);
@@ -71,7 +72,7 @@ const ProjectPage = () => {
 
   const onViewAccessToken = (token: string) => {
     Modal.info({
-      title: '访问凭证',
+      title: intl.get('ACCESS_CREDENTIALS'),
       content: (
         <Card size={'small'} style={{ backgroundColor: 'rgb(37, 43, 58)' }}>
           <Typography.Text style={{ color: '#fff' }} copyable={{ text: token }}>
@@ -80,19 +81,19 @@ const ProjectPage = () => {
         </Card>
       ),
       icon: null,
-      okText: '确定'
+      okText: intl.get('OK')
     });
   };
 
   const columns = [
     {
-      title: '项目名称',
+      title: intl.get('PROJECT_NAME'),
       dataIndex: 'name',
       key: 'name',
       width: '10%'
     },
     {
-      title: '访问凭证',
+      title: intl.get('ACCESS_CREDENTIALS'),
       dataIndex: 'token',
       key: 'token',
       width: '20%',
@@ -105,7 +106,7 @@ const ProjectPage = () => {
                 onViewAccessToken(token);
               }}
             >
-              点击查看
+              {intl.get('CLICK_TO_VIEW')}
             </Button>
           );
         }
@@ -116,18 +117,18 @@ const ProjectPage = () => {
               onGenAccessToken(record.id);
             }}
           >
-            点击生成访问凭证
+            {intl.get('CLICK_TO_GENERATE_ACCESS_CREDENTIAL')}
           </Button>
         );
       }
     },
     {
-      title: '描述',
+      title: intl.get('DESCRIPTION'),
       dataIndex: 'description',
       key: 'description'
     },
     {
-      title: '操作',
+      title: intl.get('OPERATION'),
       key: 'action',
       width: '20%',
       render: (_: any, record: any) => {
@@ -135,7 +136,7 @@ const ProjectPage = () => {
           <Space>
             {hasPermissions(Permission.ProjectAllocUser, Permission.ProjectAllocUserGet) && (
               <Button type={'link'} size={'small'} onClick={() => onAllocUser(record)}>
-                分配用户
+                {intl.get('ASSIGN_USERS')}
               </Button>
             )}
             <HasPermission value={Permission.ProjectEdit}>
@@ -144,7 +145,10 @@ const ProjectPage = () => {
               </Button>
             </HasPermission>
             <HasPermission value={Permission.ProjectDelete}>
-              <Popconfirm title={'确定要删除该项目吗?'} onConfirm={() => onDelete(record.id)}>
+              <Popconfirm
+                title={intl.get('DELETE_PROJECT_PROMPT')}
+                onConfirm={() => onDelete(record.id)}
+              >
                 <Button type={'text'} size={'small'} danger>
                   <DeleteOutlined />
                 </Button>
@@ -159,11 +163,11 @@ const ProjectPage = () => {
   return (
     <Content>
       <PageTitle
-        items={[{ title: '项目管理' }]}
+        items={[{ title: intl.get('MENU_PROJECT_MANAGEMENT') }]}
         actions={
           <HasPermission value={Permission.ProjectAdd}>
             <Button type={'primary'} onClick={() => setVisible(true)}>
-              添加项目
+              {intl.get('CREATE_PROJECT')}
               <PlusOutlined />
             </Button>
           </HasPermission>
@@ -171,7 +175,7 @@ const ProjectPage = () => {
       />
       <ShadowCard>
         <TableLayout
-          emptyText={'项目列表为空'}
+          emptyText={intl.get('NO_PROJECTS_PROMPT')}
           permissions={[
             Permission.ProjectEdit,
             Permission.ProjectDelete,

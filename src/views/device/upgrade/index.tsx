@@ -6,6 +6,7 @@ import { GetDeviceFirmwaresRequest } from '../../../apis/firmware';
 import dayjs from '../../../utils/dayjsUtils';
 import { DeviceUpgradeRequest } from '../../../apis/device';
 import { DeviceCommand } from '../../../types/device_command';
+import intl from 'react-intl-universal';
 
 export interface UpgradeModalProps {
   visible: boolean;
@@ -35,22 +36,22 @@ const UpgradeModal: FC<UpgradeModalProps> = ({ visible, device, onCancel, onSucc
       return (
         <>
           <Divider orientation={'left'} plain>
-            固件信息
+            {intl.get('FIRMWARE_INFO')}
           </Divider>
           <Row justify={'start'}>
             <Col span={4} style={{ color: '#8a8e99' }}>
-              固件版本
+              {intl.get('FIRMWARE_VERSION')}
             </Col>
             <Col span={6}>{firmware.version}</Col>
             <Col span={4} style={{ color: '#8a8e99' }}>
-              硬件版本
+              {intl.get('HARDWARE_VERSION')}
             </Col>
             <Col span={6}>{firmware.productId}</Col>
           </Row>
           <br />
           <Row justify={'start'}>
             <Col span={4} style={{ color: '#8a8e99' }}>
-              编译时间
+              {intl.get('BUILD_DATE')}
             </Col>
             <Col span={16}>
               {dayjs.unix(firmware.buildTime).local().format('YYYY-MM-DD HH:mm:ss')}
@@ -63,7 +64,7 @@ const UpgradeModal: FC<UpgradeModalProps> = ({ visible, device, onCancel, onSucc
 
   const onUpgrade = () => {
     if (firmware === undefined) {
-      message.success('请选择固件');
+      message.success(intl.get('PLEASE_SELECT_FIRMWARE'));
       return;
     }
     if (device) {
@@ -74,10 +75,10 @@ const UpgradeModal: FC<UpgradeModalProps> = ({ visible, device, onCancel, onSucc
       }).then((res) => {
         setIsLoading(false);
         if (res.code === 200) {
-          message.success('命令发送成功').then();
+          message.success(intl.get('COMMAND_SENT_SUCCESSFUL')).then();
           onSuccess();
         } else {
-          message.error('命令发送失败').then();
+          message.error(intl.get('FAILED_TO_SEND_COMMAND')).then();
         }
       });
     }
@@ -87,17 +88,17 @@ const UpgradeModal: FC<UpgradeModalProps> = ({ visible, device, onCancel, onSucc
     <Modal
       width={420}
       visible={visible}
-      title={'设备升级'}
-      okText={'升级'}
+      title={intl.get('DEVICE_UPGRADING')}
+      okText={intl.get('UPGRADE')}
       onOk={onUpgrade}
-      cancelText={'取消'}
+      cancelText={intl.get('CANCEL')}
       onCancel={onCancel}
       confirmLoading={isLoading}
     >
       <Form form={form}>
-        <Form.Item label={'选择固件版本'} name={'firmware'}>
+        <Form.Item label={intl.get('SELECT_FIRMWARE_VERSION')} name={'firmware'}>
           <Select
-            placeholder={'请选择固件版本'}
+            placeholder={intl.get('PLEASE_SELECT_FIRMWARE_VERSION')}
             onChange={(value) => {
               setFirmware(firmwares.find((item) => item.id === value));
             }}

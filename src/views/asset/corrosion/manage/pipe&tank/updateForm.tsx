@@ -15,6 +15,7 @@ import {
   AREA_ASSET_TYPES
 } from '../../config';
 import { convertRow } from '../../common/utils';
+import intl from 'react-intl-universal';
 
 export const UpdateForm = ({
   asset,
@@ -49,28 +50,28 @@ export const UpdateForm = ({
       style={style}
     >
       <Form.Item
-        label={AREA_ASSET_TYPE}
+        label={intl.get(AREA_ASSET_TYPE)}
         name='type'
-        rules={[{ required: true, message: PLEASE_SELECT_AREA_ASSET_TYPE }]}
+        rules={[{ required: true, message: intl.get(PLEASE_SELECT_AREA_ASSET_TYPE) }]}
       >
         <Radio.Group>
           {AREA_ASSET_TYPES.map((t) => (
             <Radio key={t.key} value={t.key}>
-              {t.label}
+              {intl.get(t.label)}
             </Radio>
           ))}
         </Radio.Group>
       </Form.Item>
-      <Form.Item label={AREA_ASSET_NAME} name='name' rules={[Rules.range(4, 50)]}>
-        <Input placeholder={PLEASE_INPUT_AREA_ASSET_NAME} />
+      <Form.Item label={intl.get(AREA_ASSET_NAME)} name='name' rules={[Rules.range(4, 50)]}>
+        <Input placeholder={intl.get(PLEASE_INPUT_AREA_ASSET_NAME)} />
       </Form.Item>
       {parents?.length > 0 ? (
         <Form.Item
-          label={AREA}
+          label={intl.get(AREA)}
           name='parent_id'
-          rules={[{ required: true, message: PLEASE_SELECT_AREA }]}
+          rules={[{ required: true, message: intl.get(PLEASE_SELECT_AREA) }]}
         >
-          <Select placeholder={PLEASE_SELECT_AREA}>
+          <Select placeholder={intl.get(PLEASE_SELECT_AREA)}>
             {parents.map(({ id, name, attributes }) => (
               <Select.Option key={id} value={id} attributes={attributes}>
                 {name}

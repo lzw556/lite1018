@@ -8,6 +8,7 @@ import { User } from '../../types/user';
 import ShadowCard from '../../components/shadowCard';
 import { isMobile } from '../../utils/deviceDetection';
 import { PageTitle } from '../../components/pageTitle';
+import intl from 'react-intl-universal';
 
 const MePage = () => {
   const [isPhoneEdit, setIsPhoneEdit] = useState<boolean>(false);
@@ -28,7 +29,7 @@ const MePage = () => {
         </Form.Item>
       );
     } else {
-      return user && user.phone.length ? user.phone : '尚未绑定';
+      return user && user.phone.length ? user.phone : intl.get('NOT_BOUND_PROMPT');
     }
   };
 
@@ -36,10 +37,10 @@ const MePage = () => {
     form.validateFields(['phone']).then((values) => {
       UpdateMyProfile({ phone: values.phone }).then((res) => {
         if (res.code === 200) {
-          message.success('保存成功').then();
+          message.success(intl.get('SAVED_SUCCESSFUL')).then();
           setUser(res.data);
         } else {
-          message.error('保存失败').then();
+          message.error(intl.get('FAILED_TO_SAVE')).then();
         }
         setIsPhoneEdit(false);
       });
@@ -54,7 +55,7 @@ const MePage = () => {
         </Form.Item>
       );
     } else {
-      return user && user.email.length ? user.email : '尚未绑定';
+      return user && user.email.length ? user.email : intl.get('NOT_BOUND_PROMPT');
     }
   };
 
@@ -62,10 +63,10 @@ const MePage = () => {
     form.validateFields(['email']).then((values) => {
       UpdateMyProfile({ email: values.email }).then((res) => {
         if (res.code === 200) {
-          message.success('保存成功').then();
+          message.success(intl.get('SAVED_SUCCESSFUL')).then();
           setUser(res.data);
         } else {
-          message.error('保存失败').then();
+          message.error(intl.get('FAILED_TO_SAVE')).then();
         }
         setIsEmailEdit(false);
       });
@@ -74,15 +75,15 @@ const MePage = () => {
 
   return (
     <Content>
-      <PageTitle items={[{ title: '用户中心' }]} />
+      <PageTitle items={[{ title: intl.get('MENU_USER_CENTER') }]} />
       <Row justify='center'>
         <Col span={24}>
-          <ShadowCard title='基本信息' bordered={false}>
+          <ShadowCard title={intl.get('BASIC_INFORMATION')} bordered={false}>
             <Form form={form}>
               <p>
                 <Row justify={'start'}>
                   <Col span={isMobile ? 5 : 2} className='ts-label'>
-                    账号名
+                    {intl.get('ACCOUNT_NAME')}
                   </Col>
                   <Col span={isMobile ? 15 : 5}>{user?.username}</Col>
                   {!isMobile && <Col span={2}></Col>}
@@ -91,14 +92,14 @@ const MePage = () => {
               <p>
                 <Row justify={'start'}>
                   <Col span={isMobile ? 5 : 2} className='ts-label'>
-                    手机号
+                    {intl.get('CELLPHONE')}
                   </Col>
                   <Col span={isMobile ? 15 : 5}>{renderPhone()}</Col>
                   <Col span={isMobile ? 3 : 2} offset={1}>
                     {isPhoneEdit ? (
-                      <a onClick={onSavePhone}>保存</a>
+                      <a onClick={onSavePhone}>{intl.get('SAVE')}</a>
                     ) : (
-                      <a onClick={() => setIsPhoneEdit(true)}>修改</a>
+                      <a onClick={() => setIsPhoneEdit(true)}>{intl.get('MODIFY')}</a>
                     )}
                   </Col>
                 </Row>
@@ -106,14 +107,14 @@ const MePage = () => {
               <p>
                 <Row justify={'start'}>
                   <Col span={isMobile ? 5 : 2} className='ts-label'>
-                    邮箱地址
+                    {intl.get('EMAIL')}
                   </Col>
                   <Col span={isMobile ? 15 : 5}>{renderEmail()}</Col>
                   <Col span={isMobile ? 3 : 2} offset={1}>
                     {isEmailEdit ? (
-                      <a onClick={onSaveEmail}>保存</a>
+                      <a onClick={onSaveEmail}>{intl.get('SAVE')}</a>
                     ) : (
-                      <a onClick={() => setIsEmailEdit(true)}>修改</a>
+                      <a onClick={() => setIsEmailEdit(true)}>{intl.get('MODIFY')}</a>
                     )}
                   </Col>
                 </Row>
@@ -121,14 +122,14 @@ const MePage = () => {
             </Form>
           </ShadowCard>
           <br />
-          <ShadowCard title='账号安全' bordered={false}>
+          <ShadowCard title={intl.get('ACCOUNT_SAFETY')} bordered={false}>
             <Row justify={'start'}>
               <Col span={isMobile ? 5 : 2} className='ts-label'>
-                密码
+                {intl.get('PASSWORD')}
               </Col>
               <Col span={isMobile ? 15 : 5}>****************</Col>
               <Col span={isMobile ? 3 : 2} offset={1}>
-                <a onClick={() => setIsPassEdit(true)}>修改</a>
+                <a onClick={() => setIsPassEdit(true)}>{intl.get('MODIFY')}</a>
               </Col>
             </Row>
           </ShadowCard>

@@ -11,6 +11,7 @@ import {
   PLEASE_INPUT_MONITORING_POINT_POSITION
 } from '../types';
 import { DeviceSelection, MonitoringPointInfo } from './DeviceSelection';
+import intl from 'react-intl-universal';
 
 export const MonitoringPointFormItem = ({
   devices,
@@ -51,24 +52,24 @@ export const MonitoringPointFormItem = ({
                   style={{ position: 'relative', top: -12 }}
                 />
                 <Form.Item
-                  label={MONITORING_POINT_NAME}
+                  label={intl.get(MONITORING_POINT_NAME)}
                   labelCol={{ span: 10 }}
                   {...restFields}
                   name={[name, 'name']}
                   rules={[Rules.range(4, 16)]}
                 >
-                  <Input placeholder={PLEASE_INPUT_MONITORING_POINT_NAME} />
+                  <Input placeholder={intl.get(PLEASE_INPUT_MONITORING_POINT_NAME)} />
                 </Form.Item>
                 <Form.Item name={[name, 'channel']} hidden={true}></Form.Item>
                 <Form.Item
-                  label={MONITORING_POINT_POSITION}
+                  label={intl.get(MONITORING_POINT_POSITION)}
                   labelCol={{ span: 12 }}
                   {...restFields}
                   name={[name, 'place']}
                   rules={[Rules.number]}
                 >
                   <Input
-                    placeholder={PLEASE_INPUT_MONITORING_POINT_POSITION}
+                    placeholder={intl.get(PLEASE_INPUT_MONITORING_POINT_POSITION)}
                     style={{ width: 100 }}
                   />
                 </Form.Item>
@@ -76,9 +77,9 @@ export const MonitoringPointFormItem = ({
             </>
           ))}
           <Form.ErrorList errors={errors} />
-          <Form.Item wrapperCol={{ offset: 6 }}>
+          <Form.Item wrapperCol={{ offset: 8 }}>
             <Popover
-              title='选择设备'
+              title={intl.get('SELECT_SENSOR')}
               content={
                 visible && (
                   <DeviceSelection
@@ -97,7 +98,7 @@ export const MonitoringPointFormItem = ({
               onOpenChange={(visible) => setVisible(visible)}
               overlayStyle={{ width: 400 }}
             >
-              <Button disabled={devices.length === 0}>选择传感器</Button>
+              <Button disabled={devices.length === 0}>{intl.get('SELECT_SENSOR')}</Button>
             </Popover>
           </Form.Item>
         </div>

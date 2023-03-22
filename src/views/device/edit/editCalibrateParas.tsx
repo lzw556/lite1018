@@ -1,7 +1,9 @@
 import { Button, Form, Input, Modal, Select } from 'antd';
-import { defaultValidateMessages, Rules } from '../../../constants/validator';
+import { defaultValidateMessages } from '../../../constants/validator';
 import { DeviceType } from '../../../types/device_type';
 import { Property } from '../../../types/property';
+import intl from 'react-intl-universal';
+import { FormInputItem } from '../../../components/formInputItem';
 
 const EditCalibrateParas = ({
   typeId,
@@ -41,14 +43,14 @@ const EditCalibrateParas = ({
       <Modal
         width={420}
         visible={visible}
-        title={'校准参数'}
+        title={intl.get('CALIBRATION_PARAMETERS')}
         footer={[
           <Button key='cancel' onClick={() => setVisible(false)}>
-            取消
+            {intl.get('CANCEL')}
           </Button>,
           isSPT && (
             <Button key='submit_0' onClick={() => handleSubmit(0)}>
-              零点校准
+              {intl.get('ZERO_CALIBRATE')}
             </Button>
           ),
           <Button
@@ -58,19 +60,31 @@ const EditCalibrateParas = ({
               handleSubmit();
             }}
           >
-            {isSPT ? `线性校准` : '校准'}
+            {isSPT ? intl.get('LINEAR_CALIBRATE') : intl.get('CALIBRATE')}
           </Button>
         ]}
       >
         <Form form={form} labelCol={{ span: 8 }} validateMessages={defaultValidateMessages}>
-          <Form.Item label={`${property.name}`} name='param' rules={[Rules.number]}>
-            <Input placeholder={`请输入${property.name}`} suffix={`${property.unit}`} />
-          </Form.Item>
+          <FormInputItem
+            label={`${intl.get(property.name).d(property.name)}`}
+            name='param'
+            requiredMessage={intl.get('PLEASE_INPUT_SOMETHING', {
+              something: intl.get(property.name).d(property.name)
+            })}
+            numericRule={{ isInteger: false }}
+          >
+            <Input
+              placeholder={intl.get('PLEASE_INPUT_SOMETHING', {
+                something: intl.get(property.name).d(property.name)
+              })}
+              suffix={`${property.unit}`}
+            />
+          </FormInputItem>
           {typeId === DeviceType.BoltElongationMultiChannels && (
             <Form.Item
-              label='通道号'
+              label={intl.get('CHANNEL')}
               name='channel'
-              rules={[{ required: true, message: `请选择通道号` }]}
+              rules={[{ required: true, message: intl.get('PLEASE_SELECT_CHANNEL') }]}
               initialValue={1}
             >
               <Select>
@@ -91,7 +105,7 @@ const EditCalibrateParas = ({
       </Modal>
     );
   } else {
-    return <p>参数错误</p>;
+    return <p>{intl.get('PARAMETER_ERROR_PROMPT')}</p>;
   }
 };
 

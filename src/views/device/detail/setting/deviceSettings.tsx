@@ -8,6 +8,7 @@ import { defaultValidateMessages } from '../../../../constants/validator';
 import { DeviceType } from '../../../../types/device_type';
 import { DeviceSettingContent } from '../../DeviceSettingContent';
 import { processArrayValuesInSensorSetting } from '../../../../components/formItems/deviceSettingFormItem';
+import intl from 'react-intl-universal';
 
 export interface DeviceSettingsProps {
   device: Device;
@@ -50,7 +51,7 @@ const DeviceSettings: FC<DeviceSettingsProps> = ({ device }) => {
             <Col>
               {device.typeId !== DeviceType.Router && (
                 <Button type={'primary'} onClick={onSave}>
-                  保存
+                  {intl.get('SAVE')}
                 </Button>
               )}
             </Col>

@@ -17,6 +17,7 @@ import { MonitoringPointDynamicData } from '../dynamicData/dynamicData';
 import { MonitoringPointHistory } from '../history';
 import { MonitoringPointMonitor } from '../monitor';
 import { MonitoringPointSet } from './settings/index';
+import intl from 'react-intl-universal';
 
 export default function MonitoringPointShow() {
   const { id } = useParams();
@@ -47,10 +48,14 @@ export default function MonitoringPointShow() {
     return <Empty description={INVALID_MONITORING_POINT} image={Empty.PRESENTED_IMAGE_SIMPLE} />;
 
   const items: TabsProps['items'] = [
-    { key: 'monitor', label: '监控', children: <MonitoringPointMonitor {...monitoringPoint} /> },
+    {
+      key: 'monitor',
+      label: intl.get('MONITOR'),
+      children: <MonitoringPointMonitor {...monitoringPoint} />
+    },
     {
       key: 'history',
-      label: '历史数据',
+      label: intl.get('HISTORY_DATA'),
       children: <MonitoringPointHistory {...monitoringPoint} />
     }
   ];
@@ -58,7 +63,7 @@ export default function MonitoringPointShow() {
   if (checkHasDynamicData(monitoringPoint.type)) {
     items.push({
       key: 'dynamicData',
-      label: config?.dynamicData?.title,
+      label: intl.get(config?.dynamicData?.title ?? ''),
       children: (
         <MonitoringPointDynamicData
           {...monitoringPoint}
@@ -70,7 +75,7 @@ export default function MonitoringPointShow() {
   if (checkHasWaveData(monitoringPoint.type)) {
     items.push({
       key: 'waveData',
-      label: config?.waveData?.title,
+      label: intl.get(config?.waveData?.title ?? ''),
       children: (
         <MonitoringPointDynamicData
           {...monitoringPoint}
@@ -82,7 +87,7 @@ export default function MonitoringPointShow() {
   if (hasPermission(Permission.MeasurementEdit)) {
     items.push({
       key: 'settings',
-      label: '配置信息',
+      label: intl.get('SETTINGS'),
       children: (
         <MonitoringPointSet
           point={monitoringPoint}
@@ -96,7 +101,7 @@ export default function MonitoringPointShow() {
   }
   items.push({
     key: 'alerts',
-    label: '报警记录',
+    label: intl.get('ALARM_RECORDS'),
     children: <FilterableAlarmRecordTable sourceId={monitoringPoint.id} />
   });
   console.log(state);

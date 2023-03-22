@@ -1,5 +1,5 @@
 import { DownloadOutlined } from '@ant-design/icons';
-import { Col, ConfigProvider, DatePicker, Row, Select, Space, Table } from 'antd';
+import { Col, DatePicker, Row, Select, Space, Table } from 'antd';
 import dayjs from '../../../../utils/dayjsUtils';
 import * as React from 'react';
 import { Device } from '../../../../types/device';
@@ -23,6 +23,7 @@ import { DownloadDeviceDataByTimestampRequest } from '../../../../apis/device';
 import { DeviceType } from '../../../../types/device_type';
 import { AXIS_THREE, DYNAMIC_DATA_ANGLEDIP, DYNAMIC_DATA_BOLTELONGATION } from './constants';
 import ShadowCard from '../../../../components/shadowCard';
+import intl from 'react-intl-universal';
 
 export const DynamicData: React.FC<Device> = ({ id, typeId }) => {
   const { fields, data_type } =
@@ -93,7 +94,7 @@ export const DynamicData: React.FC<Device> = ({ id, typeId }) => {
       ]
     };
     if (timestamp === 0 || !data || !data.values) {
-      return <EmptyLayout description='数据不足' />;
+      return <EmptyLayout description={intl.get('NO_DATA_PROMPT')} />;
     } else {
       let series: any = [];
       const values = data?.values;
@@ -103,13 +104,14 @@ export const DynamicData: React.FC<Device> = ({ id, typeId }) => {
       } else {
         items = (values as Values_ad)[field.value as Fields_ad];
       }
-      if (!items || items.length === 0) return <EmptyLayout description='数据不足' />;
+      if (!items || items.length === 0)
+        return <EmptyLayout description={intl.get('NO_DATA_PROMPT')} />;
       const isAcceleration = Number.isNaN(Number(items[0]));
       if (!isAcceleration) {
         series = [
           {
             type: 'line',
-            name: field.label,
+            name: intl.get(field.label),
             data: (items as number[]).map((item) => item.toFixed(3)),
             itemStyle: { color: LineChartStyles[0].itemStyle.normal.color }
           }
@@ -126,14 +128,14 @@ export const DynamicData: React.FC<Device> = ({ id, typeId }) => {
       }
       return (
         <EChartsReact
-          loadingOption={{ text: '正在加载数据, 请稍等...' }}
+          loadingOption={{ text: intl.get('LOADING') }}
           showLoading={isLoading2}
           style={{ height: 500 }}
           option={{
             legend: {
-              data: !isAcceleration ? [field.label] : AXIS_THREE.map((item) => item.label)
+              data: !isAcceleration ? [intl.get(field.label)] : AXIS_THREE.map((item) => item.label)
             },
-            title: { text: field.label, top: 0 },
+            title: { text: intl.get(field.label), top: 0 },
             tooltip: {
               trigger: 'axis',
               formatter: (paras: any) => {
@@ -212,7 +214,7 @@ export const DynamicData: React.FC<Device> = ({ id, typeId }) => {
   if (isLoading) return <p>loading...</p>;
   if (isMobile) {
     if (timestamps.length === 0) {
-      return <EmptyLayout description={'动态数据列表为空'} />;
+      return <EmptyLayout description={intl.get('NO_DYANAMIC_DATA_PROMPT')} />;
     }
     return (
       <>
@@ -255,11 +257,11 @@ export const DynamicData: React.FC<Device> = ({ id, typeId }) => {
         {timestamp !== 0 && <ShadowCard style={{ marginBottom: 10 }}>{renderMeta()}</ShadowCard>}
         <Row>
           <Col span={20}>
-            <Label name={'属性'}>
+            <Label name={intl.get('PROPERTY')}>
               <Select
                 bordered={false}
                 defaultValue={fields[0].value}
-                placeholder={'请选择属性'}
+                placeholder={intl.get('PLEASE_SELECT_PROPERTY')}
                 onChange={(value, option: any) =>
                   setField({
                     label: option.children,
@@ -302,50 +304,48 @@ export const DynamicData: React.FC<Device> = ({ id, typeId }) => {
           </Row>
           <Row justify={'space-between'} style={{ paddingTop: '0px' }}>
             <Col span={24}>
-              <ConfigProvider renderEmpty={() => <EmptyLayout description={'动态数据列表为空'} />}>
-                <Table
-                  size={'middle'}
-                  scroll={{ y: 600 }}
-                  showHeader={false}
-                  columns={[
-                    {
-                      title: '时间',
-                      dataIndex: 'timestamp',
-                      key: 'timestamp',
-                      width: '80%',
-                      render: (timestamp: number) =>
-                        dayjs.unix(timestamp).local().format('YYYY-MM-DD HH:mm:ss')
-                    },
-                    {
-                      title: '操作',
-                      key: 'action',
-                      render: (text: any, record: any) => {
-                        if (hasPermission(Permission.DeviceRawDataDownload)) {
-                          return (
-                            <Space size='middle'>
-                              <a onClick={() => onDownload(timestamp)}>下载</a>
-                            </Space>
-                          );
-                        }
+              <Table
+                size={'middle'}
+                scroll={{ y: 600 }}
+                showHeader={false}
+                columns={[
+                  {
+                    title: intl.get('TIMESTAMP'),
+                    dataIndex: 'timestamp',
+                    key: 'timestamp',
+                    width: '80%',
+                    render: (timestamp: number) =>
+                      dayjs.unix(timestamp).local().format('YYYY-MM-DD HH:mm:ss')
+                  },
+                  {
+                    title: intl.get('OPERATION'),
+                    key: 'action',
+                    render: (text: any, record: any) => {
+                      if (hasPermission(Permission.DeviceRawDataDownload)) {
+                        return (
+                          <Space size='middle'>
+                            <a onClick={() => onDownload(timestamp)}>下载</a>
+                          </Space>
+                        );
                       }
                     }
-                  ]}
-                  pagination={false}
-                  dataSource={timestamps}
-                  rowClassName={(record) =>
-                    record.timestamp === timestamp ? 'ant-table-row-selected' : ''
                   }
-                  onRow={(record) => ({
-                    onClick: () => {
-                      if (record.timestamp !== timestamp) {
-                        setTimestamp(record.timestamp);
-                      }
-                    },
-                    onMouseLeave: () => (window.document.body.style.cursor = 'default'),
-                    onMouseEnter: () => (window.document.body.style.cursor = 'pointer')
-                  })}
-                />
-              </ConfigProvider>
+                ]}
+                pagination={false}
+                dataSource={timestamps}
+                rowClassName={(record) =>
+                  record.timestamp === timestamp ? 'ant-table-row-selected' : ''
+                }
+                onRow={(record) => ({
+                  onClick: () => {
+                    if (record.timestamp !== timestamp) {
+                      setTimestamp(record.timestamp);
+                    }
+                  },
+                  onMouseLeave: () => (window.document.body.style.cursor = 'default'),
+                  onMouseEnter: () => (window.document.body.style.cursor = 'pointer')
+                })}
+              />
             </Col>
           </Row>
         </Col>
@@ -354,11 +354,11 @@ export const DynamicData: React.FC<Device> = ({ id, typeId }) => {
           <ShadowCard>
             <Row justify='end'>
               <Col>
-                <Label name={'属性'}>
+                <Label name={intl.get('PROPERTY')}>
                   <Select
                     bordered={false}
                     defaultValue={fields[0].value}
-                    placeholder={'请选择属性'}
+                    placeholder={intl.get('PLEASE_SELECT_PROPERTY')}
                     style={{ width: '120px' }}
                     onChange={(value, option: any) =>
                       setField({

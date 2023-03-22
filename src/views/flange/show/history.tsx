@@ -16,6 +16,7 @@ import {
   NO_MONITORING_POINTS
 } from '../../monitoring-point';
 import { FlangeHistoryChart } from '../historyChart';
+import intl from 'react-intl-universal';
 
 export const FlangeHistory = ({
   flange,
@@ -54,11 +55,11 @@ export const FlangeHistory = ({
           <Col></Col>
           <Col>
             <Space direction={isMobile ? 'vertical' : 'horizontal'}>
-              <Label name={'属性'}>
+              <Label name={intl.get('PROPERTY')}>
                 <Select
                   bordered={false}
                   defaultValue={property ?? properties[0].key}
-                  placeholder={'请选择属性'}
+                  placeholder={intl.get('PLEASE_SELECT_PROPERTY')}
                   style={{ width: isMobile ? '100%' : '120px' }}
                   onChange={(value: string) => {
                     setProperty(value);
@@ -66,7 +67,7 @@ export const FlangeHistory = ({
                 >
                   {properties.map(({ name, key }) => (
                     <Select.Option key={key} value={key}>
-                      {name}
+                      {intl.get(name)}
                     </Select.Option>
                   ))}
                 </Select>
@@ -103,7 +104,6 @@ export const FlangeHistory = ({
           onSuccess={() => setVisible(false)}
           onCancel={() => setVisible(false)}
           assetId={flange.id}
-          isFlangeProload={checkIsFlangePreload(flange)}
         />
       )}
     </Row>

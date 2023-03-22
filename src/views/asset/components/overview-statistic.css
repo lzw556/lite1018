@@ -1,5 +1,5 @@
 .overview-statistic .ant-statistic {
-  max-width: 120px;
+  max-width: 15em;
   text-align: center;
 }
 .overview-statistic .ant-statistic.info .ant-statistic-content {

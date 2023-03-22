@@ -14,6 +14,7 @@ import {
   MONITORING_POINTS,
   PLEASE_SELECT_GENERAL_PARENT
 } from '../../../asset/general';
+import intl from 'react-intl-universal';
 
 export const SelectParentFormItem = ({
   parent,
@@ -45,11 +46,11 @@ export const SelectParentFormItem = ({
     <>
       {parents?.length > 0 ? (
         <Form.Item
-          label={GENERAL_PARENT}
+          label={intl.get(GENERAL_PARENT)}
           name='asset_id'
-          rules={[{ required: true, message: PLEASE_SELECT_GENERAL_PARENT }]}
+          rules={[{ required: true, message: intl.get(PLEASE_SELECT_GENERAL_PARENT) }]}
         >
-          <Select placeholder={PLEASE_SELECT_GENERAL_PARENT}>
+          <Select placeholder={intl.get(PLEASE_SELECT_GENERAL_PARENT)}>
             {parents.map(({ id, name, attributes }) => (
               <Select.Option key={id} value={id} attributes={attributes}>
                 {name}
@@ -61,17 +62,17 @@ export const SelectParentFormItem = ({
         <Form.Item name='asset_id' hidden={true} initialValue={parent?.id}></Form.Item>
       )}
       <Form.Item
-        label={MONITORING_POINT_TYPE}
+        label={intl.get(MONITORING_POINT_TYPE)}
         name='type'
-        rules={[{ required: true, message: PLEASE_SELECT_MONITORING_POINT_TYPE }]}
+        rules={[{ required: true, message: intl.get(PLEASE_SELECT_MONITORING_POINT_TYPE) }]}
       >
         <Select
-          placeholder={PLEASE_SELECT_MONITORING_POINT_TYPE}
+          placeholder={intl.get(PLEASE_SELECT_MONITORING_POINT_TYPE)}
           onChange={(id) => handlePointTypeChange(id)}
         >
           {MONITORING_POINTS.map(({ id, label }) => (
             <Select.Option key={id} value={id}>
-              {label}
+              {intl.get(label)}
             </Select.Option>
           ))}
         </Select>

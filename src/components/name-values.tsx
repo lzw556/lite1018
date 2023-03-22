@@ -1,5 +1,6 @@
 import React from 'react';
 import './name-values.css';
+import intl from 'react-intl-universal';
 
 export const NameValueGroups = ({
   className,
@@ -16,7 +17,7 @@ export const NameValueGroups = ({
     <dl className={classes}>
       {items.map(({ name, value, className }) => (
         <div className={`name-value ${className}`} key={name}>
-          <dt>{name}</dt>
+          <dt>{intl.get(name).d(name)}</dt>
           <dd>{value}</dd>
         </div>
       ))}

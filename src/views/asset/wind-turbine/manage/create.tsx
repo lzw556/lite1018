@@ -9,6 +9,7 @@ import {
   WIND_TURBINE_ASSET_TYPE_ID,
   WIND_TURBINE_NAME
 } from '../config';
+import intl from 'react-intl-universal';
 
 export const WindTurbineCreate: React.FC<ModalProps & { onSuccess: () => void }> = (props) => {
   const { onSuccess } = props;
@@ -17,9 +18,9 @@ export const WindTurbineCreate: React.FC<ModalProps & { onSuccess: () => void }>
   return (
     <Modal
       {...{
-        title: CREATE_WIND_TURBINE,
-        cancelText: '取消',
-        okText: '添加',
+        title: intl.get(CREATE_WIND_TURBINE),
+        cancelText: intl.get('CANCEL'),
+        okText: intl.get('CREATE'),
         ...props,
         onOk: () => {
           form.validateFields().then((values) => {
@@ -34,9 +35,9 @@ export const WindTurbineCreate: React.FC<ModalProps & { onSuccess: () => void }>
         }
       }}
     >
-      <Form form={form} labelCol={{ span: 6 }} validateMessages={defaultValidateMessages}>
-        <Form.Item label={WIND_TURBINE_NAME} name='name' rules={[Rules.range(4, 50)]}>
-          <Input placeholder={PLEASE_INPUT_WIND_TURBINE_NAME} />
+      <Form form={form} labelCol={{ span: 8 }} validateMessages={defaultValidateMessages}>
+        <Form.Item label={intl.get(WIND_TURBINE_NAME)} name='name' rules={[Rules.range(4, 50)]}>
+          <Input placeholder={intl.get(PLEASE_INPUT_WIND_TURBINE_NAME)} />
         </Form.Item>
         <Form.Item name='type' hidden={true} initialValue={WIND_TURBINE_ASSET_TYPE_ID}></Form.Item>
       </Form>

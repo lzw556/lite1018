@@ -15,7 +15,8 @@ import {
   getAlarmStateText,
   useAssetCategoryContext
 } from '../../asset';
-import { MonitoringPointRow, MONITORING_POINT_TYPE } from '../types';
+import { MonitoringPointRow } from '../types';
+import intl from 'react-intl-universal';
 
 export const AlarmRuleSetting = (point: MonitoringPointRow) => {
   const [allRules, setAllRules] = React.useState<AlarmRule[]>();
@@ -25,16 +26,16 @@ export const AlarmRuleSetting = (point: MonitoringPointRow) => {
     return {
       rowKey: 'id',
       columns: [
-        { title: '名称', dataIndex: 'name', key: 'name', width: 400 },
+        { title: intl.get('NAME'), dataIndex: 'name', key: 'name', width: 400 },
         {
-          title: '资源指标',
+          title: intl.get('ALARM_METRIC'),
           dataIndex: 'metric',
           key: 'metric',
           render: (metric: any) => metric.name,
           width: 120
         },
         {
-          title: '触发条件',
+          title: intl.get('ALARM_CONDITION'),
           dataIndex: 'condition',
           key: 'condition',
           render: (_: any, record: any) => {
@@ -43,7 +44,7 @@ export const AlarmRuleSetting = (point: MonitoringPointRow) => {
           width: 150
         },
         {
-          title: '报警等级',
+          title: intl.get('ALAMR_LEVEL'),
           dataIndex: 'level',
           key: 'level',
           width: 100,
@@ -64,31 +65,34 @@ export const AlarmRuleSetting = (point: MonitoringPointRow) => {
   };
   const columns = [
     {
-      title: '状态',
+      title: intl.get('STATUS'),
       dataIndex: 'bindedStatus',
       key: 'bindedStatus',
       width: 100,
       render: (status: boolean) => (
-        <Tag color={status ? 'green' : 'geekblue'}>{status ? '已绑定' : '未绑定'}</Tag>
+        <Tag color={status ? 'green' : 'geekblue'}>
+          {status ? intl.get('BOUND') : intl.get('UNBOUND')}
+        </Tag>
       )
     },
     {
-      title: '名称',
+      title: intl.get('NAME'),
       dataIndex: 'name',
       key: 'name',
       width: 400
     },
     {
-      title: MONITORING_POINT_TYPE,
+      title: intl.get('MONITORING_POINT_TYPE'),
       dataIndex: 'type',
       key: 'type',
-      width: 120,
+      width: 200,
       render: (typeId: number) => {
-        return MONITORING_POINTS.get(category)?.find((m) => m.id === typeId)?.label ?? '-';
+        const label = MONITORING_POINTS.get(category)?.find((m) => m.id === typeId)?.label;
+        return label ? intl.get(label) : '-';
       }
     },
     {
-      title: '操作',
+      title: intl.get('OPERATION'),
       key: 'action',
       render: (_: any, row: AlarmRule) => {
         return (
@@ -97,7 +101,7 @@ export const AlarmRuleSetting = (point: MonitoringPointRow) => {
               <Button
                 type='link'
                 size='small'
-                title={`移除`}
+                title={intl.get('REMOVE')}
                 danger={true}
                 onClick={() => {
                   updateRow(row.id, { bindingStatus: true });
@@ -106,13 +110,13 @@ export const AlarmRuleSetting = (point: MonitoringPointRow) => {
                   );
                 }}
               >
-                {row.bindingStatus ? <Spin /> : '移除'}
+                {row.bindingStatus ? <Spin /> : intl.get('REMOVE')}
               </Button>
             ) : (
               <Button
                 type='link'
                 size='small'
-                title={`绑定`}
+                title={intl.get('BIND')}
                 onClick={() => {
                   updateRow(row.id, { bindingStatus: true });
                   bindMeasurementsToAlarmRule(row.id, { monitoring_point_ids: [point.id] }).then(
@@ -120,7 +124,7 @@ export const AlarmRuleSetting = (point: MonitoringPointRow) => {
                   );
                 }}
               >
-                {row.bindingStatus ? <Spin /> : '绑定'}
+                {row.bindingStatus ? <Spin /> : intl.get('BIND')}
               </Button>
             )}
           </Space>
@@ -177,8 +181,8 @@ export const AlarmRuleSetting = (point: MonitoringPointRow) => {
         image={Empty.PRESENTED_IMAGE_SIMPLE}
         description={
           <p>
-            还没有规则,去
-            <Link to='alarmRules'>添加</Link>
+            {intl.get('NO_RULES_PROMPT')}
+            <Link to='alarmRules'>{intl.get('CREATE_ONE')}</Link>
           </p>
         }
       />
@@ -195,7 +199,11 @@ export const AlarmRuleSetting = (point: MonitoringPointRow) => {
       size='small'
       pagination={false}
       loading={loading}
-      locale={{ emptyText: <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description='暂无数据' /> }}
+      locale={{
+        emptyText: (
+          <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={intl.get('NO_DATA_PROMPT')} />
+        )
+      }}
       scroll={isMobile ? { x: 600 } : undefined}
     />
   );

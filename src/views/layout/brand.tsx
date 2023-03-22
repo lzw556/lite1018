@@ -3,6 +3,7 @@ import * as React from 'react';
 import useImage from 'use-image';
 import { SITE_NAMES } from '../../config/assetCategory.config';
 import { useAssetCategoryContext } from '../asset/components/assetCategoryContext';
+import intl from 'react-intl-universal';
 
 export const Brand: React.FC<{
   height?: number;
@@ -24,7 +25,7 @@ export const Brand: React.FC<{
         />
       )}
       <strong style={brandNameStyle} className='title'>
-        {SITE_NAMES.get(category)}
+        {intl.get(SITE_NAMES.get(category) ?? '')}
       </strong>
     </Space>
   );

@@ -7,6 +7,7 @@ import { AllocMenusRequest } from '../../../apis/role';
 import '../../../assets/iconfont.css';
 import usePermission, { Permission } from '../../../permission/permission';
 import HasPermission from '../../../permission';
+import intl from 'react-intl-universal';
 
 export interface MenuDrawerProps extends DrawerProps {
   role: Role;
@@ -37,10 +38,10 @@ const MenuDrawer: FC<MenuDrawerProps> = (props) => {
   const renderExtra = () => {
     return (
       <Space>
-        <Button onClick={onCancel}>取消</Button>
+        <Button onClick={onCancel}>{intl.get('CANCEL')}</Button>
         <HasPermission value={Permission.RoleAllocMenus}>
           <Button type={'primary'} onClick={onSave}>
-            保存
+            {intl.get('SAVE')}
           </Button>
         </HasPermission>
       </Space>
@@ -77,7 +78,7 @@ const MenuDrawer: FC<MenuDrawerProps> = (props) => {
       .filter((item) => !item.hidden)
       .map((menu) => {
         const data: any = {
-          title: menu.title,
+          title: intl.get(menu.title).d(menu.title),
           key: menu.id
         };
         if (menu.children) {
@@ -93,7 +94,7 @@ const MenuDrawer: FC<MenuDrawerProps> = (props) => {
   return (
     <Drawer
       {...props}
-      title={role?.name}
+      title={intl.get(role?.name).d(role?.name)}
       placement={'right'}
       onClose={onCancel}
       extra={renderExtra()}

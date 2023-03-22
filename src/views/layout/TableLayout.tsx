@@ -1,6 +1,5 @@
-import { Col, ConfigProvider, Empty, Pagination, PaginationProps, Row, Table } from 'antd';
+import { Col, Empty, Pagination, PaginationProps, Row, Table } from 'antd';
 import { FC } from 'react';
-import zhCN from 'antd/es/locale/zh_CN';
 import usePermission, { PermissionType } from '../../permission/permission';
 import { PageResult } from '../../types/page';
 
@@ -62,7 +61,7 @@ const TableLayout: FC<TableLayoutProps> = (props) => {
   };
 
   return (
-    <ConfigProvider renderEmpty={renderEmpty} locale={zhCN}>
+    <>
       <Row justify='center'>
         <Col span={24}>
           <Table
@@ -92,7 +91,7 @@ const TableLayout: FC<TableLayoutProps> = (props) => {
           )}
         </Col>
       </Row>
-    </ConfigProvider>
+    </>
   );
 };
 

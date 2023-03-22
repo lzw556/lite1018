@@ -4,6 +4,7 @@ import { UpdateUserRequest } from '../../../apis/user';
 import { User } from '../../../types/user';
 import { Rules } from '../../../constants/validator';
 import RoleSelect from '../../../components/roleSelect';
+import intl from 'react-intl-universal';
 
 export interface EditUserProps {
   visible: boolean;
@@ -45,11 +46,11 @@ const EditUserModal = (props: EditUserProps) => {
   return (
     <Modal
       width={420}
-      title='用户编辑'
+      title={intl.get('EDIT_USER')}
       visible={visible}
-      cancelText='取消'
+      cancelText={intl.get('CANCEL')}
       onCancel={onCancel}
-      okText='保存'
+      okText={intl.get('SAVE')}
       onOk={onSave}
       confirmLoading={isLoading}
     >
@@ -57,18 +58,18 @@ const EditUserModal = (props: EditUserProps) => {
         {user.id !== 1 && (
           <Form.Item
             name={'role'}
-            label={'用户角色'}
+            label={intl.get('USER_ROLE')}
             initialValue={user.role ? user.role : null}
             rules={[Rules.required]}
           >
-            <RoleSelect placeholder={'请选择角色'} />
+            <RoleSelect placeholder={intl.get('PLEASE_SELECT_USER_ROLE')} />
           </Form.Item>
         )}
-        <Form.Item name={'phone'} label={'手机号码'} initialValue={user.phone}>
-          <Input placeholder='手机号码' />
+        <Form.Item name={'phone'} label={intl.get('CELLPHONE')} initialValue={user.phone}>
+          <Input placeholder={intl.get('CELLPHONE')} />
         </Form.Item>
-        <Form.Item name={'email'} label={'邮箱'} initialValue={user.email}>
-          <Input placeholder='邮箱' />
+        <Form.Item name={'email'} label={intl.get('EMAIL')} initialValue={user.email}>
+          <Input placeholder={intl.get('EMAIL')} />
         </Form.Item>
       </Form>
     </Modal>

@@ -1,10 +1,11 @@
-import { Form, Input, Modal, Select } from 'antd';
+import { Form, Input, Modal, Select, Typography } from 'antd';
 import '../../../App.css';
 import { AddUserRequest } from '../../../apis/user';
 import { useEffect, useState } from 'react';
-import { Rules } from '../../../constants/validator';
 import RoleSelect from '../../../components/roleSelect';
 import { GetProjectsRequest } from '../../../apis/project';
+import intl from 'react-intl-universal';
+import { FormInputItem } from '../../../components/formInputItem';
 
 export interface AddUserProps {
   visible: boolean;
@@ -55,55 +56,68 @@ const AddUserModal = (props: AddUserProps) => {
   return (
     <Modal
       width={420}
-      title='用户添加'
+      title={intl.get('CREATE_USER')}
       visible={visible}
-      cancelText='取消'
+      cancelText={intl.get('CANCEL')}
       onCancel={onCancel}
-      okText='确认'
+      okText={intl.get('OK')}
       onOk={onAdd}
       confirmLoading={isLoading}
     >
       <Form form={form} labelCol={{ span: 6 }}>
-        <Form.Item name='username' label={'用户名'} rules={[Rules.range(4, 16)]}>
-          <Input placeholder='用户名' />
-        </Form.Item>
+        <FormInputItem
+          name='username'
+          label={intl.get('USERNAME')}
+          requiredMessage={intl.get('PLEASE_INPUT_USERNAME')}
+          lengthLimit={{ min: 4, max: 16, label: intl.get('USERNAME').toLowerCase() }}
+        >
+          <Input placeholder={intl.get('USERNAME')} />
+        </FormInputItem>
         <Form.Item
           name='password'
-          label={'密码'}
-          rules={[{ required: true, message: '请输入密码' }]}
+          label={intl.get('PASSWORD')}
+          rules={[{ required: true, message: intl.get('PLEASE_INPUT_PASSWORD') }]}
         >
-          <Input.Password placeholder='密码' />
+          <Input.Password placeholder={intl.get('PASSWORD')} />
         </Form.Item>
         <Form.Item
           name='confirmPwd'
-          label={'确认密码'}
+          label={
+            <Typography.Text ellipsis={true} title={intl.get('CONFIRM_PASSWORD')}>
+              {intl.get('CONFIRM_PASSWORD')}
+            </Typography.Text>
+          }
           rules={[
-            { required: true, message: '请确认密码' },
+            { required: true, message: intl.get('PLEASE_CONFIRM_PASSWORD') },
             ({ getFieldValue }) => ({
               validator(_, value) {
                 if (!value || getFieldValue('password') === value) {
                   return Promise.resolve();
                 }
-                return Promise.reject(new Error('两次输入的密码不一致'));
+                return Promise.reject(new Error(intl.get('PASSWORDS_ARE_INCONSISTENT')));
               }
             })
           ]}
         >
-          <Input.Password placeholder='确认密码' />
+          <Input.Password placeholder={intl.get('CONFIRM_PASSWORD')} />
         </Form.Item>
-        <Form.Item name={'role'} label={'用户角色'} rules={[Rules.required]}>
-          <RoleSelect placeholder={'请选择用户角色'} />
+        <Form.Item
+          name={'role'}
+          label={intl.get('USER_ROLE')}
+          rules={[{ required: true, message: intl.get('PLEASE_SELECT_USER_ROLE') }]}
+        >
+          <RoleSelect placeholder={intl.get('PLEASE_SELECT_USER_ROLE')} />
         </Form.Item>
-        <Form.Item name='phone' label={'手机号码'} initialValue={''}>
-          <Input placeholder='手机号码' />
+        <Form.Item name='phone' label={intl.get('CELLPHONE')} initialValue={''}>
+          <Input placeholder={intl.get('CELLPHONE')} />
         </Form.Item>
-        <Form.Item name='email' label={'邮箱'} initialValue={''}>
-          <Input placeholder='邮箱' />
+        <Form.Item name='email' label={intl.get('EMAIL')} initialValue={''}>
+          <Input placeholder={intl.get('EMAIL')} />
         </Form.Item>
-        <Form.Item name={'projects'} label={'绑定项目'} initialValue={[]}>
+        <Form.Item name={'projects'} label={intl.get('BIND_PROJECT')} initialValue={[]}>
           <Select
             mode='multiple'
-            placeholder='请选择绑定项目'
+            placeholder={intl.get('PLEASE_SELECT_PROJECT_BOUND')}
             onDropdownVisibleChange={onSelectProjects}
           >
             {projects?.map((project: any) => (

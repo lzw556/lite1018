@@ -8,6 +8,7 @@ import { useActionBarStatus } from '../common/useActionBarStatus';
 import { getAsset } from '../../services';
 import { INVALID_GENERAL } from '../config';
 import { GeneralTree } from '../tree-list/tree';
+import intl from 'react-intl-universal';
 
 export default function GeneralShow() {
   const { id } = useParams();
@@ -29,7 +30,7 @@ export default function GeneralShow() {
   }, [id]);
 
   if (loading) return <Spin />;
-  if (wind === undefined) return <p>{INVALID_GENERAL}</p>;
+  if (wind === undefined) return <p>{intl.get(INVALID_GENERAL)}</p>;
 
   return (
     <Row gutter={[16, 16]}>

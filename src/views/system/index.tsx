@@ -9,6 +9,7 @@ import { ColorHealth } from '../../constants/color';
 import { Content } from 'antd/es/layout/layout';
 import { isMobile } from '../../utils/deviceDetection';
 import { PageTitle } from '../../components/pageTitle';
+import intl from 'react-intl-universal';
 
 const SystemPage = () => {
   const [data, setData] = useState<System>();
@@ -41,7 +42,7 @@ const SystemPage = () => {
       return data.server.cpu.cpus.map((item, index) => {
         return (
           <Form.Item
-            label={`Core${index}`}
+            label={`${intl.get('CPU_CORE')}${index}`}
             labelAlign={'left'}
             labelCol={{ span: 12 }}
             style={{ marginBottom: '2px' }}
@@ -62,15 +63,15 @@ const SystemPage = () => {
 
   return (
     <Content>
-      <PageTitle items={[{ title: '系统状态' }]} />
+      <PageTitle items={[{ title: intl.get('MENU_SYSTEM_STATUS') }]} />
       <Row justify={'space-between'}>
         <Col
           span={isMobile ? 24 : 12}
           style={{ paddingRight: isMobile ? 0 : '4px', marginBottom: isMobile ? 8 : 0 }}
         >
-          <ShadowCard title={'系统信息'} size={'small'} style={{ height: '256px' }}>
+          <ShadowCard title={intl.get('SYSTEM_INFO')} size={'small'} style={{ height: '256px' }}>
             <Form.Item
-              label={'操作系统'}
+              label={intl.get('OEPRATING_SYSTEM')}
               labelAlign={'left'}
               labelCol={{ span: 12 }}
               style={{ marginBottom: '4px' }}
@@ -78,15 +79,15 @@ const SystemPage = () => {
               {data ? data.server.os.goos : ''}
             </Form.Item>
             <Form.Item
-              label={'状态'}
+              label={intl.get('STATUS')}
               labelAlign={'left'}
               labelCol={{ span: 12 }}
               style={{ marginBottom: '4px' }}
             >
-              <Tag color={ColorHealth}>运行中</Tag>
+              <Tag color={ColorHealth}>{intl.get('RUNNING')}</Tag>
             </Form.Item>
             <Form.Item
-              label={'MQTT地址'}
+              label={intl.get('MQTT_ADDRESS')}
               labelAlign={'left'}
               labelCol={{ span: 12 }}
               style={{ marginBottom: '4px' }}
@@ -94,7 +95,7 @@ const SystemPage = () => {
               {data ? data.mqtt.address : ''}
             </Form.Item>
             <Form.Item
-              label={'MQTT账号'}
+              label={intl.get('MQTT_ACCOUNT')}
               labelAlign={'left'}
               labelCol={{ span: 12 }}
               style={{ marginBottom: '4px' }}
@@ -102,7 +103,7 @@ const SystemPage = () => {
               {data ? data.mqtt.username : ''}
             </Form.Item>
             <Form.Item
-              label={'MQTT密码'}
+              label={intl.get('MQTT_PASSWORD')}
               labelAlign={'left'}
               labelCol={{ span: 12 }}
               style={{ marginBottom: '4px' }}
@@ -115,15 +116,19 @@ const SystemPage = () => {
           span={isMobile ? 24 : 12}
           style={{ paddingLeft: isMobile ? 0 : '4px', marginBottom: isMobile ? 8 : 0 }}
         >
-          <ShadowCard title={'硬盘状态'} size={'small'} style={{ height: '256px' }}>
+          <ShadowCard
+            title={intl.get('HARD_DISK_STATUS')}
+            size={'small'}
+            style={{ height: '256px' }}
+          >
             <Row justify={'start'}>
               <Col span={6}>
-                <Statistic title={'总量(MB)'} value={data?.server.disk.totalMB} />
-                <Statistic title={'总量(GB)'} value={data?.server.disk.totalGB} />
+                <Statistic title={intl.get('TOTAL_AMOUNT_MB')} value={data?.server.disk.totalMB} />
+                <Statistic title={intl.get('TOTAL_AMOUNT_GB')} value={data?.server.disk.totalGB} />
               </Col>
               <Col span={6}>
-                <Statistic title={'使用(MB)'} value={data?.server.disk.usedMB} />
-                <Statistic title={'使用(GB)'} value={data?.server.disk.usedGB} />
+                <Statistic title={intl.get('USED_AMOUNT_MB')} value={data?.server.disk.usedMB} />
+                <Statistic title={intl.get('USED_AMOUNT_GB')} value={data?.server.disk.usedGB} />
               </Col>
               <Col span={12}>{renderUsedChart(data ? data.server.disk.usedPercent : 0)}</Col>
             </Row>
@@ -136,9 +141,13 @@ const SystemPage = () => {
           span={isMobile ? 24 : 12}
           style={{ paddingRight: isMobile ? 0 : '4px', marginBottom: isMobile ? 8 : 0 }}
         >
-          <ShadowCard title={'CPU运行状态'} size={'small'} style={{ height: '256px' }}>
+          <ShadowCard
+            title={intl.get('CPU_RUNNING_STATUS')}
+            size={'small'}
+            style={{ height: '256px' }}
+          >
             <Form.Item
-              label={'CPU核数'}
+              label={intl.get('CPU_CORE_AMOUNT')}
               labelAlign={'left'}
               labelCol={{ span: 12 }}
               style={{ marginBottom: '2px' }}
@@ -146,7 +155,7 @@ const SystemPage = () => {
               {data ? data.server.cpu.cores : ''}
             </Form.Item>
             <Form.Item
-              label={'CPU数量'}
+              label={intl.get('CPU_AMOUNT')}
               labelAlign={'left'}
               labelCol={{ span: 12 }}
               style={{ marginBottom: '2px' }}
@@ -160,11 +169,11 @@ const SystemPage = () => {
           span={isMobile ? 24 : 12}
           style={{ paddingLeft: isMobile ? 0 : '4px', marginBottom: isMobile ? 8 : 0 }}
         >
-          <ShadowCard title={'内存状态'} size={'small'} style={{ height: '256px' }}>
+          <ShadowCard title={intl.get('MEMORY_STATUS')} size={'small'} style={{ height: '256px' }}>
             <Row justify={'start'}>
               <Col span={12}>
-                <Statistic title={'总量(MB)'} value={data?.server.ram.totalMB} />
-                <Statistic title={'使用(MB)'} value={data?.server.ram.usedMB} />
+                <Statistic title={intl.get('TOTAL_AMOUNT_MB')} value={data?.server.ram.totalMB} />
+                <Statistic title={intl.get('USED_AMOUNT_MB')} value={data?.server.ram.usedMB} />
               </Col>
               <Col span={12}>{renderUsedChart(data ? data.server.ram.usedPercent : 0)}</Col>
             </Row>

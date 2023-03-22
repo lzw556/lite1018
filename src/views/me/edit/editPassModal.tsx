@@ -1,6 +1,7 @@
-import { Form, Input, Modal } from 'antd';
+import { Form, Input, Modal, Typography } from 'antd';
 import { FC, useState } from 'react';
 import { UpdateMyPass } from '../../../apis/profile';
+import intl from 'react-intl-universal';
 
 export interface EditPassProps {
   visible: boolean;
@@ -24,51 +25,64 @@ const EditPassModal: FC<EditPassProps> = ({ visible, onSuccess, onCancel }) => {
       })
       .catch((e) => {
         setIsLoading(false);
-      });
+      })
+      .finally(() => setIsLoading(false));
   };
 
   return (
     <Modal
       width={420}
       visible={visible}
-      title={'修改密码'}
-      okText={'确定'}
+      title={intl.get('MODIFY_PASSWORD')}
+      okText={intl.get('OK')}
       onOk={onSave}
-      cancelText={'取消'}
+      cancelText={intl.get('CANCEL')}
       onCancel={onCancel}
       confirmLoading={isLoading}
     >
       <Form form={form} labelCol={{ span: 6 }}>
         <Form.Item
-          label={'原密码'}
+          label={
+            <Typography.Text ellipsis={true} title={intl.get('OLD_PASSWORD')}>
+              {intl.get('OLD_PASSWORD')}
+            </Typography.Text>
+          }
           name='pwd'
-          rules={[{ required: true, message: '请输入原密码' }]}
+          rules={[{ required: true, message: intl.get('PLEASE_INPUT_OLD_PASSWORD') }]}
         >
-          <Input type={'password'} placeholder={'请输入原密码'} />
+          <Input type={'password'} placeholder={intl.get('PLEASE_INPUT_OLD_PASSWORD')} />
         </Form.Item>
         <Form.Item
-          label={'新密码'}
+          label={
+            <Typography.Text ellipsis={true} title={intl.get('NEW_PASSWORD')}>
+              {intl.get('NEW_PASSWORD')}
+            </Typography.Text>
+          }
           name='newPwd'
-          rules={[{ required: true, message: '请输入新密码' }]}
+          rules={[{ required: true, message: intl.get('PLEASE_INPUT_NEW_PASSWORD') }]}
         >
-          <Input type={'password'} placeholder={'请输入新密码'} />
+          <Input type={'password'} placeholder={intl.get('PLEASE_INPUT_NEW_PASSWORD')} />
         </Form.Item>
         <Form.Item
-          label={'确认新密码'}
+          label={
+            <Typography.Text ellipsis={true} title={intl.get('CONFIRM_PASSWORD')}>
+              {intl.get('CONFIRM_PASSWORD')}
+            </Typography.Text>
+          }
           name='confirmPwd'
           rules={[
-            { required: true, message: '请确认新密码' },
+            { required: true, message: intl.get('PLEASE_CONFIRM_PASSWORD') },
             ({ getFieldValue }) => ({
               validator(_, value) {
                 if (!value || getFieldValue('newPwd') === value) {
                   return Promise.resolve();
                 }
-                return Promise.reject(new Error('两次输入的密码不一致'));
+                return Promise.reject(new Error(intl.get('PASSWORDS_ARE_INCONSISTENT')));
               }
             })
           ]}
         >
-          <Input type={'password'} placeholder={'请确认新密码'} />
+          <Input type={'password'} placeholder={intl.get('PLEASE_CONFIRM_PASSWORD')} />
         </Form.Item>
       </Form>
     </Modal>

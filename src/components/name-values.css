@@ -17,11 +17,14 @@ dl.name-value-groups.horizontal {
   flex: 0 0 50%;
 }
 .name-value dt {
-  flex: 0 0 55%;
-  max-width: 10em;
+  flex: 0 0 70%;
+  max-width: 15em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   color: #8a8e99;
 }
 .name-value dd {
-  flex: 0 0 45%;
+  flex: 0 0 30%;
   margin: 0;
 }

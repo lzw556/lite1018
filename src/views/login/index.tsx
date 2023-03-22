@@ -10,6 +10,7 @@ import { persistor } from '../../store';
 import { KeyOutlined, UserOutlined } from '@ant-design/icons';
 import { Brand } from '../layout/brand';
 import { useNavigate } from 'react-router';
+import intl from 'react-intl-universal';
 
 const LoginPage: FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -21,7 +22,7 @@ const LoginPage: FC = () => {
     LoginRequest(values.username, values.password).then((res) => {
       setIsLoading(false);
       if (res.code === 200) {
-        message.success('登录成功').then();
+        message.success(intl.get('LOGIN_SUCCEEDED')).then();
         dispatch(userLoginSuccess(res.data));
         navigate('/');
       } else {
@@ -59,15 +60,21 @@ const LoginPage: FC = () => {
       </div>
       <div className={'ts-login-form'}>
         <Form onFinish={login}>
-          <Form.Item name='username' rules={[{ required: true, message: '请输入用户名' }]}>
-            <Input prefix={<UserOutlined />} placeholder='用户名' />
+          <Form.Item
+            name='username'
+            rules={[{ required: true, message: intl.get('PLEASE_INPUT_USERNAME') }]}
+          >
+            <Input prefix={<UserOutlined />} placeholder={intl.get('USERNAME')} />
           </Form.Item>
-          <Form.Item name='password' rules={[{ required: true, message: '请输入密码' }]}>
-            <Input prefix={<KeyOutlined />} placeholder='密码' type='password' />
+          <Form.Item
+            name='password'
+            rules={[{ required: true, message: intl.get('PLEASE_INPUT_PASSWORD') }]}
+          >
+            <Input prefix={<KeyOutlined />} placeholder={intl.get('PASSWORD')} type='password' />
           </Form.Item>
           <Form.Item>
             <Button type='primary' htmlType='submit' loading={isLoading}>
-              登 录
+              {intl.get('LOGIN')}
             </Button>
           </Form.Item>
         </Form>

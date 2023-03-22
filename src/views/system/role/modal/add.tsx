@@ -2,6 +2,7 @@ import RoleModal from './role';
 import { Form } from 'antd';
 import { FC, useEffect, useState } from 'react';
 import { AddRoleRequest } from '../../../../apis/role';
+import intl from 'react-intl-universal';
 
 export interface AddRoleModalProps {
   visible: boolean;
@@ -36,7 +37,7 @@ const AddRoleModal: FC<AddRoleModalProps> = (props) => {
       form={form}
       width={420}
       visible={visible}
-      title={'角色添加'}
+      title={intl.get('ADD_ROLE')}
       onOk={onAdd}
       onCancel={onCancel}
       confirmLoading={isLoading}

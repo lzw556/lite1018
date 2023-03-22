@@ -5,19 +5,17 @@ import './index.css';
 import reportWebVitals from './reportWebVitals';
 import { StoreContext } from 'redux-react-hook';
 import AppRouter from './routers';
-import 'dayjs/locale/zh-cn';
-import zhCN from 'antd/locale/zh_CN';
-import { ConfigProvider } from 'antd';
+import { LocaleProvider } from './localeProvider';
 import { AssetCategoryProvider } from './views/asset/components/assetCategoryContext';
 
 ReactDOM.render(
   <StoreContext.Provider value={store}>
     <PersistGate loading={null} persistor={persistor}>
-      <ConfigProvider locale={zhCN}>
+      <LocaleProvider>
         <AssetCategoryProvider>
           <AppRouter />
         </AssetCategoryProvider>
-      </ConfigProvider>
+      </LocaleProvider>
     </PersistGate>
   </StoreContext.Provider>,
   document.getElementById('root')

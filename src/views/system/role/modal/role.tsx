@@ -1,5 +1,6 @@
 import { Form, Input, Modal, ModalProps } from 'antd';
 import { FC } from 'react';
+import intl from 'react-intl-universal';
 
 export interface RoleModalProps extends ModalProps {
   form: any;
@@ -13,13 +14,13 @@ const RoleModal: FC<RoleModalProps> = (props) => {
       <Form form={form} labelCol={{ span: 6 }}>
         <Form.Item
           name='name'
-          label={'角色名称'}
-          rules={[{ required: true, message: '请输入角色名称' }]}
+          label={intl.get('ROLE_NAME')}
+          rules={[{ required: true, message: intl.get('PLEASE_INPUT_ROLE_NAME') }]}
         >
-          <Input placeholder='角色名称' />
+          <Input placeholder={intl.get('ROLE_NAME')} />
         </Form.Item>
-        <Form.Item name={'description'} label={'角色描述'}>
-          <Input placeholder={'角色描述'} />
+        <Form.Item name={'description'} label={intl.get('ROLE_DESCRIPTION')}>
+          <Input placeholder={intl.get('ROLE_DESCRIPTION')} />
         </Form.Item>
       </Form>
     </Modal>

@@ -6,6 +6,8 @@ import { DeviceType } from '../../../../types/device_type';
 import { isMobile } from '../../../../utils/deviceDetection';
 import { SingleDeviceStatus } from '../../SingleDeviceStatus';
 import DeviceUpgradeSpin from '../../spin/deviceUpgradeSpin';
+import intl from 'react-intl-universal';
+
 const { Text } = Typography;
 
 export const SingleDeviceDetail: React.FC<{ device: Device; upgradeStatus: any }> = ({
@@ -18,7 +20,7 @@ export const SingleDeviceDetail: React.FC<{ device: Device; upgradeStatus: any }
         <Col span={isMobile ? 12 : 9}>
           <Row>
             <Col span={isMobile ? 24 : 8} className='ts-detail-label'>
-              4G卡号
+              {intl.get('4G_CARD_NO')}
             </Col>
             <Col span={isMobile ? 24 : 16} className='ts-detail-content'>
               {device.information.iccid_4g}
@@ -31,21 +33,19 @@ export const SingleDeviceDetail: React.FC<{ device: Device; upgradeStatus: any }
         <Col span={isMobile ? 12 : 9}>
           <Row>
             <Col span={isMobile ? 24 : 8} className='ts-detail-label'>
-              IP地址
+              {intl.get('IP_ADDRESS')}
             </Col>
             <Col span={isMobile ? 24 : 16} className='ts-detail-content'>
               {device.information.ip_address ? (
                 <Space>
                   {device.information.ip_address}{' '}
-                  {isGateway && (
-                    <a
-                      href={`http://${device.information.ip_address}`}
-                      target={'_blank'}
-                      style={{ fontSize: '10pt' }}
-                    >
-                      访问管理界面
-                    </a>
-                  )}
+                  <a
+                    href={`http://${device.information.ip_address}`}
+                    target={'_blank'}
+                    style={{ fontSize: '10pt' }}
+                  >
+                    {intl.get('GO_TO_ADMIN_PORTAL')}
+                  </a>
                 </Space>
               ) : (
                 '-'
@@ -62,7 +62,7 @@ export const SingleDeviceDetail: React.FC<{ device: Device; upgradeStatus: any }
       <Col span={isMobile ? 12 : 9}>
         <Row>
           <Col span={isMobile ? 24 : 8} className='ts-detail-label'>
-            设备名称
+            {intl.get('DEVICE_NAME')}
           </Col>
           <Col span={isMobile ? 24 : 16} className='ts-detail-content'>
             <Space>
@@ -75,20 +75,25 @@ export const SingleDeviceDetail: React.FC<{ device: Device; upgradeStatus: any }
       <Col span={isMobile ? 12 : 9}>
         <Row>
           <Col span={isMobile ? 24 : 8} className='ts-detail-label'>
-            类型
+            {intl.get('TYPE')}
           </Col>
           <Col span={isMobile ? 24 : 16} className='ts-detail-content'>
-            {DeviceType.toString(device.typeId)}
+            {intl.get(DeviceType.toString(device.typeId))}
           </Col>
         </Row>
       </Col>
       <Col span={isMobile ? 12 : 9}>
         <Row>
           <Col span={isMobile ? 24 : 8} className='ts-detail-label'>
-            MAC地址
+            {intl.get('MAC_ADDRESS')}
           </Col>
           <Col span={isMobile ? 24 : 16} className='ts-detail-content'>
-            <Text copyable={{ text: device.macAddress, tooltips: ['复制', '复制成功'] }}>
+            <Text
+              copyable={{
+                text: device.macAddress,
+                tooltips: [intl.get('COPY'), intl.get('COPY_SUCCEEDED')]
+              }}
+            >
               {device.macAddress.toUpperCase().macSeparator()}
             </Text>
           </Col>
@@ -97,7 +102,7 @@ export const SingleDeviceDetail: React.FC<{ device: Device; upgradeStatus: any }
       <Col span={isMobile ? 12 : 9}>
         <Row>
           <Col span={isMobile ? 24 : 8} className='ts-detail-label'>
-            型号
+            {intl.get('MODEL')}
           </Col>
           <Col span={isMobile ? 24 : 16} className='ts-detail-content'>
             {device.information.model ? device.information.model : '-'}
@@ -107,7 +112,7 @@ export const SingleDeviceDetail: React.FC<{ device: Device; upgradeStatus: any }
       <Col span={isMobile ? 12 : 9}>
         <Row>
           <Col span={isMobile ? 24 : 8} className='ts-detail-label'>
-            状态
+            {intl.get('STATUS')}
           </Col>
           <Col span={isMobile ? 24 : 16} className='ts-detail-content'>
             <SingleDeviceStatus alertStates={device.alertStates} state={device.state} />
@@ -118,10 +123,10 @@ export const SingleDeviceDetail: React.FC<{ device: Device; upgradeStatus: any }
         <Col span={isMobile ? 12 : 9}>
           <Row>
             <Col span={isMobile ? 24 : 8} className='ts-detail-label'>
-              所属网络
+              {intl.get('NETWORK_BELONG_TO')}
             </Col>
             <Col span={isMobile ? 24 : 16} className='ts-detail-content'>
-              {device.network ? device.network.name : '无'}
+              {device.network ? device.network.name : intl.get('NONE')}
             </Col>
           </Row>
         </Col>
@@ -132,7 +137,7 @@ export const SingleDeviceDetail: React.FC<{ device: Device; upgradeStatus: any }
           <Col span={isMobile ? 12 : 9}>
             <Row>
               <Col span={isMobile ? 24 : 8} className='ts-detail-label'>
-                电池电压(mV)
+                {intl.get('BATTERY_VOLTAGE')}(mV)
               </Col>
               <Col span={isMobile ? 24 : 16} className='ts-detail-content'>
                 {device.state ? device.state.batteryVoltage : '-'}
@@ -140,22 +145,20 @@ export const SingleDeviceDetail: React.FC<{ device: Device; upgradeStatus: any }
             </Row>
           </Col>
         )}
-      {device.state && device.typeId !== DeviceType.BoltElongationMultiChannels && (
-        <Col span={isMobile ? 12 : 9}>
-          <Row>
-            <Col span={isMobile ? 24 : 8} className='ts-detail-label'>
-              信号强度(dB)
-            </Col>
-            <Col span={isMobile ? 24 : 16} className='ts-detail-content'>
-              {device.state ? device.state.signalLevel : '-'}
-            </Col>
-          </Row>
-        </Col>
-      )}
       <Col span={isMobile ? 12 : 9}>
         <Row>
           <Col span={isMobile ? 24 : 8} className='ts-detail-label'>
-            固件版本号
+            {intl.get('SIGNAL_STRENGTH')}(dB)
+          </Col>
+          <Col span={isMobile ? 24 : 16} className='ts-detail-content'>
+            {device.state ? device.state.signalLevel : '-'}
+          </Col>
+        </Row>
+      </Col>
+      <Col span={isMobile ? 12 : 9}>
+        <Row>
+          <Col span={isMobile ? 24 : 8} className='ts-detail-label'>
+            {intl.get('HARDWARE_VERSION')}
           </Col>
           <Col span={isMobile ? 24 : 16} className='ts-detail-content'>
             {device.information.firmware_version ? device.information.firmware_version : '-'}
@@ -165,7 +168,7 @@ export const SingleDeviceDetail: React.FC<{ device: Device; upgradeStatus: any }
       <Col span={isMobile ? 12 : 9}>
         <Row>
           <Col span={isMobile ? 24 : 8} className='ts-detail-label'>
-            最近连接时间
+            {intl.get('LAST_CONNECTED_TIME')}
           </Col>
           <Col span={isMobile ? 24 : 16} className='ts-detail-content'>
             {device.state.connectedAt
@@ -177,7 +180,7 @@ export const SingleDeviceDetail: React.FC<{ device: Device; upgradeStatus: any }
       <Col span={isMobile ? 12 : 9}>
         <Row>
           <Col span={isMobile ? 24 : 8} className='ts-detail-label'>
-            硬件版本
+            {intl.get('PRODUCT_ID')}
           </Col>
           <Col span={isMobile ? 24 : 16} className='ts-detail-content'>
             {device.information.product_id ? device.information.product_id : '-'}
@@ -188,7 +191,7 @@ export const SingleDeviceDetail: React.FC<{ device: Device; upgradeStatus: any }
         <Col span={isMobile ? 12 : 9}>
           <Row>
             <Col span={isMobile ? 24 : 8} className='ts-detail-label'>
-              最近一次采集时间
+              {intl.get('LAST_SAMPLE_TIME')}
             </Col>
             <Col span={isMobile ? 24 : 16} className='ts-detail-content'>
               {device.data && device.data.timestamp && device.data.timestamp > 0

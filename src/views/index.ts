@@ -17,3 +17,4 @@ export const Project = lazy(() => import('./project'));
 export const Unauthorized = lazy(() => import('./403'));
 export const NotFound = lazy(() => import('./404'));
 export const ServerError = lazy(() => import('./500'));
+export const Report = lazy(() => import('./report/list'));

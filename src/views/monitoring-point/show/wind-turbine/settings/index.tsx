@@ -5,6 +5,7 @@ import { getFlanges } from '../../../../flange';
 import { MonitoringPointRow } from '../../../types';
 import { AlarmRuleSetting } from '../../alarm';
 import { BasicSetting } from './basic';
+import intl from 'react-intl-universal';
 
 export const MonitoringPointSet = ({
   point,
@@ -20,8 +21,8 @@ export const MonitoringPointSet = ({
       <Radio.Group
         style={{ marginBottom: 16 }}
         options={[
-          { label: '基础信息', value: 'basic' },
-          { label: '报警规则', value: 'alarm' }
+          { label: intl.get('BASIC_INFORMATION'), value: 'basic' },
+          { label: intl.get('ALARM_RULES'), value: 'alarm' }
         ]}
         onChange={(e) => setType(e.target.value)}
         value={type}

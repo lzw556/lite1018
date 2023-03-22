@@ -6,6 +6,7 @@ import { GetDeviceRuntimeRequest } from '../../apis/device';
 import { DefaultMonitorDataOption, LineChartStyles } from '../../constants/chart';
 import { isMobile } from '../../utils/deviceDetection';
 import { DeviceType } from '../../types/device_type';
+import intl from 'react-intl-universal';
 
 export const RuntimeChart: React.FC<{ deviceId: number; deviceType: number }> = ({
   deviceId,
@@ -21,7 +22,7 @@ export const RuntimeChart: React.FC<{ deviceId: number; deviceType: number }> = 
     ).then((data) => {
       const batteryOption = {
         ...DefaultMonitorDataOption,
-        title: { text: '电池电压' },
+        title: { text: intl.get('BATTERY_VOLTAGE') },
         tooltip: {
           trigger: 'axis',
           formatter: '{b}<br/>{a}: {c}mV'
@@ -29,7 +30,7 @@ export const RuntimeChart: React.FC<{ deviceId: number; deviceType: number }> = 
         series: [
           {
             ...LineChartStyles[0],
-            name: '电池电压',
+            name: intl.get('BATTERY_VOLTAGE'),
             type: 'line',
             data: data.map((item: any) => item.batteryVoltage)
           }
@@ -44,7 +45,7 @@ export const RuntimeChart: React.FC<{ deviceId: number; deviceType: number }> = 
       };
       const signalOption = {
         ...DefaultMonitorDataOption,
-        title: { text: '信号强度' },
+        title: { text: intl.get('SIGNAL_STRENGTH') },
         tooltip: {
           trigger: 'axis',
           formatter: '{b}<br/>{a}: {c}dB'
@@ -52,7 +53,7 @@ export const RuntimeChart: React.FC<{ deviceId: number; deviceType: number }> = 
         series: [
           {
             ...LineChartStyles[0],
-            name: '信号强度',
+            name: intl.get('SIGNAL_STRENGTH'),
             type: 'line',
             data: data.map((item: any) => item.signalStrength)
           }
@@ -89,5 +90,5 @@ export const RuntimeChart: React.FC<{ deviceId: number; deviceType: number }> = 
       </Card>
     );
   }
-  return <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={'数据不足'} />;
+  return <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={intl.get('NO_DATA_PROMPT')} />;
 };

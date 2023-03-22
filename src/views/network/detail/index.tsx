@@ -3,7 +3,7 @@ import ShadowCard from '../../../components/shadowCard';
 import { Button, Col, Form, Input, message, Row } from 'antd';
 import { useEffect, useState } from 'react';
 import { Network } from '../../../types/network';
-import { useNavigate, useLocation, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import {
   ExportNetworkRequest,
   GetNetworkRequest,
@@ -21,10 +21,10 @@ import WsnFormItem from '../../../components/formItems/wsnFormItem';
 import { useProvisionMode } from '../useProvisionMode';
 import { PageTitle } from '../../../components/pageTitle';
 import { Link } from 'react-router-dom';
+import intl from 'react-intl-universal';
 
 const NetworkDetail = () => {
   const { hasPermission } = usePermission();
-  const location = useLocation();
   const { id } = useParams();
   const navigate = useNavigate();
   const [network, setNetwork] = useState<Network>();
@@ -63,18 +63,18 @@ const NetworkDetail = () => {
       case '0':
         NetworkSyncRequest(network.id).then((res) => {
           if (res.code === 200) {
-            message.success('发送成功');
+            message.success(intl.get('SENT_SUCCESSFUL'));
           } else {
-            message.error(`发送失败: ${res.msg}`);
+            message.error(`${intl.get('FAILED_TO_SEND')}${intl.get(res.msg).d(res.msg)}`);
           }
         });
         break;
       case '1':
         NetworkProvisionRequest(network.id).then((res) => {
           if (res.code === 200) {
-            message.success('发送成功');
+            message.success(intl.get('SENT_SUCCESSFUL'));
           } else {
-            message.error(`发送失败: ${res.msg}`);
+            message.error(`${intl.get('FAILED_TO_SEND')}${intl.get(res.msg).d(res.msg)}`);
           }
         });
         break;
@@ -110,8 +110,12 @@ const NetworkDetail = () => {
           <Col xl={8} xxl={6}>
             <ShadowCard style={{ marginLeft: 10, height: '100%' }}>
               <Form form={form} labelCol={{ span: 9 }} validateMessages={defaultValidateMessages}>
-                <Form.Item label={'名称'} name={'name'} rules={[Rules.range(4, 16)]}>
-                  <Input placeholder={'请输入网络名称'} />
+                <Form.Item label={intl.get('NAME')} name={'name'} rules={[Rules.range(4, 16)]}>
+                  <Input
+                    placeholder={intl.get('PLEASE_INPUT_SOMETHING', {
+                      something: intl.get('NETWORK_NAME')
+                    })}
+                  />
                 </Form.Item>
                 {provisionMode && (
                   <WsnFormItem mode={provisionMode} onModeChange={setProvisionMode} />
@@ -122,7 +126,7 @@ const NetworkDetail = () => {
                       <ButtonGroup>
                         {hasPermission(Permission.NetworkExport) && (
                           <Button type='primary' onClick={() => sendCommand(network, '2')}>
-                            导出网络
+                            {intl.get('EXPORT_NETWORK')}
                           </Button>
                         )}
                         {hasPermission(Permission.NetworkEdit) && (
@@ -131,12 +135,13 @@ const NetworkDetail = () => {
                             onClick={() => {
                               form.validateFields().then((values) => {
                                 UpdateNetworkRequest(network.id, values).then((res) => {
-                                  if (res.code === 200) message.success('保存成功');
+                                  if (res.code === 200)
+                                    message.success(intl.get('SAVED_SUCCESSFUL'));
                                 });
                               });
                             }}
                           >
-                            保存网络
+                            {intl.get('SAVE_NETWORK')}
                           </Button>
                         )}
                       </ButtonGroup>
@@ -149,12 +154,12 @@ const NetworkDetail = () => {
                   <ButtonGroup>
                     {hasPermission(Permission.NetworkSync) && (
                       <Button type='primary' onClick={() => sendCommand(network, '0')}>
-                        同步网络
+                        {intl.get('SYNC_NETWORK')}
                       </Button>
                     )}
                     {hasPermission(Permission.NetworkProvision) && (
                       <Button type='primary' onClick={() => sendCommand(network, '1')}>
-                        继续组网
+                        {intl.get('PROVISION')}
                       </Button>
                     )}
                   </ButtonGroup>
@@ -169,7 +174,12 @@ const NetworkDetail = () => {
 
   return (
     <Content style={{ display: 'flex', flexDirection: 'column' }}>
-      <PageTitle items={[{ title: <Link to='/networks'>网络列表</Link> }, { title: '网络详情' }]} />
+      <PageTitle
+        items={[
+          { title: <Link to='/networks'>{intl.get('MENU_NETWORK_LIST')}</Link> },
+          { title: intl.get('NETWORK_DETAIL') }
+        ]}
+      />
       {renderInformation()}
     </Content>
   );

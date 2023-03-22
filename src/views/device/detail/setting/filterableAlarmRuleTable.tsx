@@ -3,6 +3,7 @@ import * as React from 'react';
 import { PageResult } from '../../../../types/page';
 import { isMobile } from '../../../../utils/deviceDetection';
 import TableLayout from '../../../layout/TableLayout';
+import intl from 'react-intl-universal';
 
 export const FilterableAlarmRuleTable: React.FC<{
   dataSource: PageResult<any[]>;
@@ -12,18 +13,18 @@ export const FilterableAlarmRuleTable: React.FC<{
 }> = ({ dataSource, fetchData, rowSelection, onRemove }) => {
   const columns: any = [
     {
-      title: '规则名称',
+      title: intl.get('ALARM_RULE_NAME'),
       dataIndex: 'name',
       key: 'name'
     },
     {
-      title: '资源指标',
+      title: intl.get('ALARM_METRIC'),
       dataIndex: 'metric',
       key: 'metric',
       render: (metric: any) => metric.name
     },
     {
-      title: '触发条件',
+      title: intl.get('ALARM_CONDITION'),
       dataIndex: 'condition',
       key: 'condition',
       render: (_: any, record: any) => {
@@ -33,18 +34,18 @@ export const FilterableAlarmRuleTable: React.FC<{
   ];
   if (onRemove) {
     columns.push({
-      title: '操作',
+      title: intl.get('OPERATION'),
       key: 'action',
       render: (_: any) => {
         return (
           <Popconfirm
-            title={`确认要移除吗?`}
+            title={intl.get('REMOVE_CONFIRM_PROMPT')}
             onConfirm={() => onRemove(_.id)}
-            okText='移除'
-            cancelText='取消'
+            okText={intl.get('REMOVE')}
+            cancelText={intl.get('CANCEL')}
           >
             <Button type='text' size='small' danger>
-              移除
+              {intl.get('REMOVE')}
             </Button>
           </Popconfirm>
         );

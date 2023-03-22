@@ -6,6 +6,7 @@ import { getAsset, updateAsset } from '../../services';
 import { Asset, AssetRow } from '../../types';
 import { useAssetsContext } from '../../components/assetsContext';
 import { UpdateForm } from '../manage/updateForm';
+import intl from 'react-intl-universal';
 
 export const AreaSet = (wind: AssetRow) => {
   const [form] = Form.useForm<Asset>();
@@ -29,7 +30,7 @@ export const AreaSet = (wind: AssetRow) => {
               });
             }}
           >
-            保存
+            {intl.get('SAVE')}
           </Button>
         </Form.Item>
       </UpdateForm>

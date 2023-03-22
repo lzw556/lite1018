@@ -8,6 +8,7 @@ import TableLayout from '../../../layout/TableLayout';
 import HasPermission from '../../../../permission';
 import usePermission, { Permission } from '../../../../permission/permission';
 import { store } from '../../../../store';
+import intl from 'react-intl-universal';
 
 const { RangePicker } = DatePicker;
 
@@ -44,25 +45,34 @@ const DeviceEvent: FC<DeviceEventProps> = ({ device }) => {
 
   const columns: any = [
     {
-      title: '类型',
+      title: intl.get('TYPE'),
       dataIndex: 'name',
-      key: 'name'
+      key: 'name',
+      render: (text: string, record: any) => {
+        return intl.get(record.name);
+      }
     },
     {
-      title: '说明',
+      title: intl.get('EVENT_CONTENT'),
       dataIndex: 'content',
-      key: 'content'
+      key: 'content',
+      render: (text: string, record: any) => {
+        return record.content ? intl.get(record.content).d(record.content) : record.content;
+      }
     }
   ];
   if (isPlatformAccount) {
     columns.push({
-      title: '详情',
+      title: intl.get('DETAIL'),
       dataIndex: 'message',
-      key: 'message'
+      key: 'message',
+      render: (text: string, record: any) => {
+        return record.message ? intl.get(record.message).d(record.message) : record.message;
+      }
     });
   }
   columns.push({
-    title: '发生时间',
+    title: intl.get('OCCURRENCE'),
     dataIndex: 'timestamp',
     key: 'timestamp',
     render: (timestamp: number) => {
@@ -92,7 +102,7 @@ const DeviceEvent: FC<DeviceEventProps> = ({ device }) => {
             <Col span={6}>
               <HasPermission value={Permission.DeviceEventDelete}>
                 <Button disabled={selectedRowKeys.length === 0} onClick={() => onBatchDelete()}>
-                  批量删除
+                  {intl.get('BATCH_DELETE')}
                 </Button>
               </HasPermission>
             </Col>

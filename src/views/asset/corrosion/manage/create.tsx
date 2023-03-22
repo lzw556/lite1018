@@ -4,6 +4,7 @@ import { defaultValidateMessages, Rules } from '../../../../constants/validator'
 import { addAsset } from '../../services';
 import { Asset } from '../../types';
 import { CREATE_AREA, PLEASE_INPUT_AREA_NAME, AREA_NAME, AREA_ASSET_TYPE_ID } from '../config';
+import intl from 'react-intl-universal';
 
 export const AreaCreate: React.FC<ModalProps & { onSuccess: () => void }> = (props) => {
   const { onSuccess } = props;
@@ -12,9 +13,9 @@ export const AreaCreate: React.FC<ModalProps & { onSuccess: () => void }> = (pro
   return (
     <Modal
       {...{
-        title: CREATE_AREA,
-        cancelText: '取消',
-        okText: '添加',
+        title: intl.get(CREATE_AREA),
+        cancelText: intl.get('CANCEL'),
+        okText: intl.get('CREATE'),
         ...props,
         onOk: () => {
           form.validateFields().then((values) => {
@@ -30,8 +31,8 @@ export const AreaCreate: React.FC<ModalProps & { onSuccess: () => void }> = (pro
       }}
     >
       <Form form={form} labelCol={{ span: 6 }} validateMessages={defaultValidateMessages}>
-        <Form.Item label={AREA_NAME} name='name' rules={[Rules.range(4, 50)]}>
-          <Input placeholder={PLEASE_INPUT_AREA_NAME} />
+        <Form.Item label={intl.get(AREA_NAME)} name='name' rules={[Rules.range(4, 50)]}>
+          <Input placeholder={intl.get(PLEASE_INPUT_AREA_NAME)} />
         </Form.Item>
         <Form.Item name='type' hidden={true} initialValue={AREA_ASSET_TYPE_ID}></Form.Item>
       </Form>

@@ -5,6 +5,7 @@ import { AssetRow } from '../../../../asset';
 import { UpdateForm } from '../../../manage/wind-turbine/updateForm';
 import { bindDevice, unbindDevice, updateMeasurement } from '../../../services';
 import { MonitoringPoint, MonitoringPointRow } from '../../../types';
+import intl from 'react-intl-universal';
 
 export const BasicSetting = ({
   monitoringPoint,
@@ -22,7 +23,7 @@ export const BasicSetting = ({
       monitoringPoint={monitoringPoint}
       style={{ width: isMobile ? '100%' : '50%' }}
     >
-      <Form.Item wrapperCol={{ offset: 4 }}>
+      <Form.Item wrapperCol={{ offset: 10 }}>
         <Button
           type='primary'
           onClick={() => {
@@ -45,7 +46,7 @@ export const BasicSetting = ({
             });
           }}
         >
-          保存
+          {intl.get('SAVE')}
         </Button>
       </Form.Item>
     </UpdateForm>

@@ -9,6 +9,7 @@ import { getDisplayValue } from '../../../utils/format';
 import { getHistoryDatas } from '../historyDataHelper';
 import { getDataOfMonitoringPoint } from '../services';
 import { HistoryData, MonitoringPointRow } from '../types';
+import intl from 'react-intl-universal';
 
 export const MonitoringPointMonitor = (point: MonitoringPointRow) => {
   const { id, type } = point;
@@ -24,7 +25,7 @@ export const MonitoringPointMonitor = (point: MonitoringPointRow) => {
 
   if (loading) return <Spin />;
   if (!historyOptions || historyOptions.length === 0)
-    return <Empty description='暂无数据' image={Empty.PRESENTED_IMAGE_SIMPLE} />;
+    return <Empty description={intl.get('NO_DATA_PROMPT')} image={Empty.PRESENTED_IMAGE_SIMPLE} />;
 
   return (
     <Row gutter={[32, 32]}>
@@ -51,10 +52,9 @@ export function generateChartOptionsOfHistoryDatas(
           let relVal = params[0].name;
           for (let i = 0; i < params.length; i++) {
             let value = Number(params[i].value);
-            relVal += `<br/> ${params[i].marker} ${params[i].seriesName}: ${getDisplayValue(
-              value,
-              property.unit
-            )}`;
+            relVal += `<br/> ${params[i].marker} ${intl.get(
+              params[i].seriesName
+            )}: ${getDisplayValue(value, property.unit)}`;
           }
           return relVal;
         }
@@ -62,14 +62,14 @@ export function generateChartOptionsOfHistoryDatas(
       legend: { show: !!propertyKey },
       grid: { bottom: 20, left: 50 },
       title: {
-        text: `${property.name}${property.unit ? `(${property.unit})` : ''}`,
+        text: `${intl.get(property.name)}${property.unit ? `(${property.unit})` : ''}`,
         subtext: propertyKey
           ? ''
-          : `${seriesData.map(({ name, data }) => name + ' ' + data[data.length - 1])}`
+          : `${seriesData.map(({ name, data }) => intl.get(name) + ' ' + data[data.length - 1])}`
       },
       series: seriesData.map(({ name, data }, index) => ({
         type: 'line',
-        name,
+        name: intl.get(name),
         areaStyle: LineChartStyles[index].areaStyle,
         data
       })),

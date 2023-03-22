@@ -1,5 +1,6 @@
 import { Select, SelectProps } from 'antd';
 import { FC } from 'react';
+import intl from 'react-intl-universal';
 
 const { Option } = Select;
 
@@ -14,7 +15,7 @@ const CommunicationPeriodSelect: FC<CommunicationPeriodSelectProps> = (props) =>
     <Select {...props}>
       {periods.map((item) => (
         <Option key={item.value} value={item.value}>
-          {item.text}
+          {item.text ? intl.get(item.text).d(item.text) : item.text}
         </Option>
       ))}
     </Select>

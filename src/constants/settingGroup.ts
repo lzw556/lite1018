@@ -1,9 +1,11 @@
+import intl from 'react-intl-universal';
+
 export const SETTING_GROUPS = {
-  preload: '预紧力',
-  general: '通用',
-  network: '网络',
-  channel1: '通道1',
-  channel2: '通道2',
-  channel3: '通道3',
-  channel4: '通道4'
+  preload: intl.get('SETTING_GROUP_PRELOAD'),
+  general: intl.get('SETTING_GROUP_GENERAL'),
+  network: intl.get('SETTING_GROUP_NETWORK'),
+  channel1: intl.get('SETTING_GROUP_CHANNEL', { channel: 1 }),
+  channel2: intl.get('SETTING_GROUP_CHANNEL', { channel: 2 }),
+  channel3: intl.get('SETTING_GROUP_CHANNEL', { channel: 3 }),
+  channel4: intl.get('SETTING_GROUP_CHANNEL', { channel: 4 })
 };

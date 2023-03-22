@@ -26,6 +26,7 @@ import { FlangeMonitoringPointList } from './list';
 import { FlangeMonitor } from './monitor';
 import { FlangeSet } from './settings';
 import { FakeFlangeStatus } from './status';
+import intl from 'react-intl-universal';
 
 export default function FlangeShow() {
   const { id } = useParams();
@@ -57,12 +58,12 @@ export default function FlangeShow() {
   const items: TabsProps['items'] = [
     {
       key: 'monitor',
-      label: '监控',
+      label: intl.get('MONITOR'),
       children: <FlangeMonitor flange={flange} historyDatas={historyDatas} />
     },
     {
       key: 'monitoringPointList',
-      label: MONITORING_POINT_LIST,
+      label: intl.get(MONITORING_POINT_LIST),
       children: (
         <FlangeMonitoringPointList
           flange={flange}
@@ -75,21 +76,21 @@ export default function FlangeShow() {
     },
     {
       key: 'history',
-      label: '历史数据',
+      label: intl.get('HISTORY_DATA'),
       children: <FlangeHistory flange={flange} historyDatas={historyDatas} key={flange.id} />
     }
   ];
   if (checkIsFlangePreload(flange)) {
     items.push({
       key: 'flangeSatus',
-      label: '法兰螺栓状态',
+      label: intl.get('FLANGE_STATUS'),
       children: <FakeFlangeStatus {...flange} />
     });
   }
   if (hasPermission(Permission.AssetEdit)) {
     items.push({
       key: 'settings',
-      label: '配置信息',
+      label: intl.get('SETTINGS'),
       children: (
         <FlangeSet
           flange={flange}
@@ -129,7 +130,7 @@ export default function FlangeShow() {
                     type='primary'
                     onClick={() => actionStatus.onMonitoringPointCreate(flange)}
                   >
-                    {CREATE_MONITORING_POINT}
+                    {intl.get(CREATE_MONITORING_POINT)}
                     <PlusOutlined />
                   </Button>
                 ]}

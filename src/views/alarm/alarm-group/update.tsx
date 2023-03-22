@@ -5,12 +5,14 @@ import { Link } from 'react-router-dom';
 import { PageTitle } from '../../../components/pageTitle';
 import ShadowCard from '../../../components/shadowCard';
 import { MONITORING_POINTS } from '../../../config/assetCategory.config';
-import { defaultValidateMessages, Normalizes, Rules } from '../../../constants/validator';
+import { defaultValidateMessages, Rules } from '../../../constants/validator';
 import { isMobile } from '../../../utils/deviceDetection';
 import { useAssetCategoryContext } from '../../asset/components/assetCategoryContext';
 import { MONITORING_POINT_TYPE, PLEASE_SELECT_MONITORING_POINT_TYPE } from '../../monitoring-point';
 import { getAlarmRule, updateAlarmRule } from './services';
 import { AlarmRule } from './types';
+import intl from 'react-intl-universal';
+import { FormInputItem } from '../../../components/formInputItem';
 
 export default function UpdateAlarmRuleGroup() {
   const navigate = useNavigate();
@@ -38,7 +40,10 @@ export default function UpdateAlarmRuleGroup() {
   return (
     <>
       <PageTitle
-        items={[{ title: <Link to='/alarmRules'>报警规则</Link> }, { title: '编辑规则' }]}
+        items={[
+          { title: <Link to='/alarmRules'>{intl.get('ALARM_RULES')}</Link> },
+          { title: intl.get('EDIT_ALARM_RULE') }
+        ]}
       />
       <ShadowCard>
         <Form
@@ -48,23 +53,34 @@ export default function UpdateAlarmRuleGroup() {
           validateMessages={defaultValidateMessages}
         >
           <Form.Item
-            label={MONITORING_POINT_TYPE}
+            label={intl.get(MONITORING_POINT_TYPE)}
             name='type'
-            rules={[{ required: true, message: PLEASE_SELECT_MONITORING_POINT_TYPE }]}
+            rules={[{ required: true, message: intl.get(PLEASE_SELECT_MONITORING_POINT_TYPE) }]}
           >
             <Select disabled={true} style={{ width: isMobile ? '75%' : 435 }}>
               {MONITORING_POINTS.get(category)?.map(({ label, id }) => (
                 <Select.Option key={id} value={id}>
-                  {label}
+                  {intl.get(label)}
                 </Select.Option>
               ))}
             </Select>
           </Form.Item>
-          <Form.Item label='名称' name='name'>
-            <Input placeholder={`请填写名称`} style={{ width: isMobile ? '75%' : 435 }} />
-          </Form.Item>
-          <Form.Item label='描述' name='description'>
-            <Input placeholder={`请填写描述`} style={{ width: isMobile ? '75%' : 435 }} />
+          <FormInputItem
+            name='name'
+            label={intl.get('NAME')}
+            requiredMessage={intl.get('PLEASE_INPUT_NAME')}
+            lengthLimit={{ min: 4, max: 16, label: intl.get('NAME').toLowerCase() }}
+          >
+            <Input
+              placeholder={intl.get('PLEASE_INPUT_NAME')}
+              style={{ width: isMobile ? '75%' : 435 }}
+            />
+          </FormInputItem>
+          <Form.Item label={intl.get('DESCRIPTION')} name='description'>
+            <Input
+              placeholder={intl.get('PLEASE_INPUT_DESCRIPTION')}
+              style={{ width: isMobile ? '75%' : 435 }}
+            />
           </Form.Item>
           <Divider />
           <Form.List name='rules'>
@@ -75,89 +91,105 @@ export default function UpdateAlarmRuleGroup() {
                     {smallSize && (
                       <>
                         <Form.Item
-                          label='名称'
+                          label={intl.get('NAME')}
                           {...restFields}
                           name={[name, 'name']}
                           rules={index < rule.rules.length ? undefined : [Rules.range(4, 16)]}
                         >
                           <Input
-                            placeholder={`请填写名称`}
+                            placeholder={intl.get('PLEASE_INPUT_NAME')}
                             readOnly={index < rule.rules.length}
                             style={{ width: isMobile ? '75%' : 435 }}
                             disabled={true}
                           />
                         </Form.Item>
-                        <Form.Item label='指标'>
+                        <Form.Item label={intl.get('INDEX')}>
                           <Input
                             disabled={true}
                             value={rule.rules[index].metric.name}
                             style={{ width: isMobile ? '75%' : 435 }}
                           />
                         </Form.Item>
-                        <Form.Item
-                          label='周期'
+                        <FormInputItem
+                          label={intl.get('DURATION')}
                           {...restFields}
                           name={[name, 'duration']}
-                          normalize={Normalizes.number}
-                          rules={[Rules.required]}
+                          requiredMessage={intl.get('PLEASE_INPUT_SOMETHING', {
+                            something: intl.get('DURATION')
+                          })}
+                          numericRule={{
+                            isInteger: true,
+                            min: 1,
+                            message: intl.get('UNSIGNED_INTEGER_INPUT_PROMPT')
+                          }}
                           initialValue={1}
-                        >
-                          <InputNumber controls={false} style={{ width: isMobile ? '75%' : 435 }} />
-                        </Form.Item>
-                        <Form.Item
-                          label='条件'
+                          numericChildren={
+                            <InputNumber
+                              controls={false}
+                              style={{ width: isMobile ? '75%' : 435 }}
+                            />
+                          }
+                        />
+                        <FormInputItem
+                          label={intl.get('CONDITION')}
                           {...restFields}
                           name={[name, 'threshold']}
-                          rules={[Rules.required]}
-                        >
-                          <InputNumber
-                            style={{ width: isMobile ? '75%' : 435 }}
-                            addonBefore={
-                              <Form.Item
-                                {...restFields}
-                                name={[name, 'operation']}
-                                noStyle
-                                initialValue={'>='}
-                              >
-                                <Select style={{ width: 65 }}>
-                                  <Select.Option key={'>'} value={'>'}>
-                                    &gt;
-                                  </Select.Option>
-                                  <Select.Option key={'>='} value={'>='}>
-                                    &gt;=
-                                  </Select.Option>
-                                  <Select.Option key={'<'} value={'<'}>
-                                    &lt;
-                                  </Select.Option>
-                                  <Select.Option key={'<='} value={'<='}>
-                                    &lt;=
-                                  </Select.Option>
-                                </Select>
-                              </Form.Item>
-                            }
-                            controls={false}
-                            addonAfter={
-                              rule.rules.length > 0 && rule.rules[index]
-                                ? rule.rules[index].metric.unit
-                                : ''
-                            }
-                          />
-                        </Form.Item>
+                          requiredMessage={intl.get('PLEASE_INPUT_SOMETHING', {
+                            something: intl.get('CONDITION')
+                          })}
+                          numericRule={{
+                            isInteger: false
+                          }}
+                          numericChildren={
+                            <InputNumber
+                              style={{ width: isMobile ? '75%' : 435 }}
+                              addonBefore={
+                                <Form.Item
+                                  {...restFields}
+                                  name={[name, 'operation']}
+                                  noStyle
+                                  initialValue={'>='}
+                                >
+                                  <Select style={{ width: 65 }}>
+                                    <Select.Option key={'>'} value={'>'}>
+                                      &gt;
+                                    </Select.Option>
+                                    <Select.Option key={'>='} value={'>='}>
+                                      &gt;=
+                                    </Select.Option>
+                                    <Select.Option key={'<'} value={'<'}>
+                                      &lt;
+                                    </Select.Option>
+                                    <Select.Option key={'<='} value={'<='}>
+                                      &lt;=
+                                    </Select.Option>
+                                  </Select>
+                                </Form.Item>
+                              }
+                              controls={false}
+                              addonAfter={
+                                rule.rules.length > 0 && rule.rules[index]
+                                  ? rule.rules[index].metric.unit
+                                  : ''
+                              }
+                            />
+                          }
+                        />
                         <Form.Item
-                          label='等级'
+                          label={intl.get('SEVERITY')}
                           {...restFields}
                           name={[name, 'level']}
                           initialValue={3}
                         >
                           <Select style={{ width: isMobile ? '75%' : 435 }}>
                             <Select.Option key={1} value={1}>
-                              次要
+                              {intl.get('ALARM_LEVEL_INFO')}
                             </Select.Option>
                             <Select.Option key={2} value={2}>
-                              重要
+                              {intl.get('ALARM_LEVEL_WARN')}
                             </Select.Option>
                             <Select.Option key={3} value={3}>
-                              紧急
+                              {intl.get('ALARM_LEVEL_DANGER')}
                             </Select.Option>
                           </Select>
                         </Form.Item>
@@ -165,78 +197,93 @@ export default function UpdateAlarmRuleGroup() {
                     )}
                     {!smallSize && (
                       <>
-                        <Form.Item label='名称' {...restFields} name={[name, 'name']}>
+                        <FormInputItem
+                          label={intl.get('NAME')}
+                          {...restFields}
+                          name={[name, 'name']}
+                        >
                           <Input style={{ width: isMobile ? '75%' : 435 }} disabled={true} />
-                        </Form.Item>
+                        </FormInputItem>
                         <Row>
                           <Col xl={6} offset={1}>
                             <Form.Item
                               labelCol={{ span: 8 }}
-                              label='指标'
+                              label={intl.get('INDEX')}
                               style={{ marginBottom: 0 }}
                             >
                               <Input disabled={true} value={rule.rules[index].metric.name} />
                             </Form.Item>
                           </Col>
                           <Col xl={6}>
-                            <Form.Item
+                            <FormInputItem
                               labelCol={{ span: 8 }}
-                              label='周期'
+                              label={intl.get('DURATION')}
                               {...restFields}
                               name={[name, 'duration']}
+                              requiredMessage={intl.get('PLEASE_INPUT_SOMETHING', {
+                                something: intl.get('DURATION')
+                              })}
+                              numericRule={{
+                                isInteger: true,
+                                min: 1,
+                                message: intl.get('UNSIGNED_INTEGER_INPUT_PROMPT')
+                              }}
                               initialValue={1}
-                              rules={[Rules.required]}
                               style={{ marginBottom: 0 }}
-                            >
-                              <InputNumber controls={false} style={{ width: '100%' }} />
-                            </Form.Item>
+                            />
                           </Col>
                           <Col xl={6}>
-                            <Form.Item
+                            <FormInputItem
                               labelCol={{ span: 8 }}
-                              label='条件'
+                              label={intl.get('CONDITION')}
                               style={{ marginBottom: 0 }}
                               {...restFields}
                               name={[name, 'threshold']}
-                              rules={[Rules.required]}
-                            >
-                              <InputNumber
-                                addonBefore={
-                                  <Form.Item
-                                    {...restFields}
-                                    name={[name, 'operation']}
-                                    noStyle
-                                    initialValue={'>='}
-                                  >
-                                    <Select style={{ width: 65 }}>
-                                      <Select.Option key={'>'} value={'>'}>
-                                        &gt;
-                                      </Select.Option>
-                                      <Select.Option key={'>='} value={'>='}>
-                                        &gt;=
-                                      </Select.Option>
-                                      <Select.Option key={'<'} value={'<'}>
-                                        &lt;
-                                      </Select.Option>
-                                      <Select.Option key={'<='} value={'<='}>
-                                        &lt;=
-                                      </Select.Option>
-                                    </Select>
-                                  </Form.Item>
-                                }
-                                controls={false}
-                                addonAfter={
-                                  rule.rules.length > 0 && rule.rules[index]
-                                    ? rule.rules[index].metric.unit
-                                    : ''
-                                }
-                              />
-                            </Form.Item>
+                              requiredMessage={intl.get('PLEASE_INPUT_SOMETHING', {
+                                something: intl.get('CONDITION')
+                              })}
+                              numericRule={{
+                                isInteger: false
+                              }}
+                              numericChildren={
+                                <InputNumber
+                                  addonBefore={
+                                    <Form.Item
+                                      {...restFields}
+                                      name={[name, 'operation']}
+                                      noStyle
+                                      initialValue={'>='}
+                                    >
+                                      <Select style={{ width: 65 }}>
+                                        <Select.Option key={'>'} value={'>'}>
+                                          &gt;
+                                        </Select.Option>
+                                        <Select.Option key={'>='} value={'>='}>
+                                          &gt;=
+                                        </Select.Option>
+                                        <Select.Option key={'<'} value={'<'}>
+                                          &lt;
+                                        </Select.Option>
+                                        <Select.Option key={'<='} value={'<='}>
+                                          &lt;=
+                                        </Select.Option>
+                                      </Select>
+                                    </Form.Item>
+                                  }
+                                  controls={false}
+                                  addonAfter={
+                                    rule.rules.length > 0 && rule.rules[index]
+                                      ? rule.rules[index].metric.unit
+                                      : ''
+                                  }
+                                />
+                              }
+                            />
                           </Col>
                           <Col xl={5}>
                             <Form.Item
                               labelCol={{ span: 8 }}
-                              label='等级'
+                              label={intl.get('SEVERITY')}
                               {...restFields}
                               name={[name, 'level']}
                               initialValue={3}
@@ -244,13 +291,13 @@ export default function UpdateAlarmRuleGroup() {
                             >
                               <Select style={{ width: 120 }}>
                                 <Select.Option key={1} value={1}>
-                                  次要
+                                  {intl.get('ALARM_LEVEL_INFO')}
                                 </Select.Option>
                                 <Select.Option key={2} value={2}>
-                                  重要
+                                  {intl.get('ALARM_LEVEL_WARN')}
                                 </Select.Option>
                                 <Select.Option key={3} value={3}>
-                                  紧急
+                                  {intl.get('ALARM_LEVEL_DANGER')}
                                 </Select.Option>
                               </Select>
                             </Form.Item>
@@ -282,11 +329,11 @@ export default function UpdateAlarmRuleGroup() {
                 });
               }}
             >
-              保存
+              {intl.get('SAVE')}
             </Button>
             &nbsp;&nbsp;&nbsp;
             <Button type='primary' onClick={() => navigate(-1)}>
-              取消
+              {intl.get('CANCEL')}
             </Button>
           </Form.Item>
         </Form>

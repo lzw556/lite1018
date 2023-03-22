@@ -1,5 +1,6 @@
 import { Device } from './device';
 import { Asset } from './asset';
+import intl from 'react-intl-universal';
 
 export type Network = {
   id: number;
@@ -24,9 +25,9 @@ export namespace NetworkProvisioningMode {
   export function toString(mode: NetworkProvisioningMode) {
     switch (mode) {
       case NetworkProvisioningMode.Mode2:
-        return '组网模式2';
+        return intl.get('PROVISION_MODE') + '2';
       default:
-        return '组网模式1';
+        return intl.get('PROVISION_MODE') + '1';
     }
   }
 }

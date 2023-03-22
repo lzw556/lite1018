@@ -1,5 +1,5 @@
 import { Header } from 'antd/es/layout/layout';
-import { Button, Col, Divider, Drawer, Dropdown, Row, Space, Typography } from 'antd';
+import { Button, Col, Divider, Drawer, Dropdown, Menu, Row, Space, Typography } from 'antd';
 import '../../App.css';
 import './layout.css';
 import '../../assets/iconfont.css';
@@ -12,10 +12,13 @@ import ProjectSelect from '../../components/select/projectSelect';
 import { NavMenu } from './NavMenu';
 import { GetMyProjectRequest } from '../../apis/project';
 import { Brand } from './brand';
+import intl from 'react-intl-universal';
+import { Language, useLocaleContext } from '../../localeProvider';
 
 const { Text } = Typography;
 
 const HeaderLayout = (props: any) => {
+  const { setLocale, language } = useLocaleContext();
   const { menus } = props;
   const [currentUser] = useState<any>(store.getState().auth.data.user);
   const [now, setNow] = useState<string>(dayjs().format('YYYY-MM-DD HH:mm:ss'));
@@ -72,13 +75,39 @@ const HeaderLayout = (props: any) => {
                 onChange={onProjectChange}
               />
             )}
-            <Dropdown menu={{ items: [{ key: 'logout', label: '退出登录', onClick: onLogout }] }}>
+            <Dropdown
+              menu={{ items: [{ key: 'logout', label: intl.get('LOGOUT'), onClick: onLogout }] }}
+            >
               <Space>
-                <Button type={'text'} style={{ color: '#fff' }}>
+                <Button type={'text'} style={{ color: '#fff', paddingLeft: 0, paddingRight: 0 }}>
                   <UserOutlined />
                   {currentUser?.username}
                 </Button>
               </Space>
+            </Dropdown>
+            <Dropdown
+              overlay={
+                <Menu
+                  onClick={({ key }) => {
+                    if (key !== language) {
+                      setLocale((prev) => ({
+                        ...prev,
+                        language: key as Language
+                      }));
+                    }
+                  }}
+                >
+                  <Menu.Item key='zh-CN'>中</Menu.Item>
+                  <Menu.Item key='en-US'>EN</Menu.Item>
+                </Menu>
+              }
+            >
+              <Button
+                type={'text'}
+                style={{ color: '#fff', width: 60, paddingLeft: 0, paddingRight: 0 }}
+              >
+                {language === 'en-US' ? 'EN' : '中'}
+              </Button>
             </Dropdown>
           </Space>
         </Col>
@@ -88,7 +117,9 @@ const HeaderLayout = (props: any) => {
         <div className='logo'>
           <img src={logo} width={100} alt='ThetaSensors' style={{ verticalAlign: 'middle' }} />
         </div>
-        <Dropdown menu={{ items: [{ key: 'logout', label: '退出登录', onClick: onLogout }] }}>
+        <Dropdown
+          menu={{ items: [{ key: 'logout', label: intl.get('LOGOUT'), onClick: onLogout }] }}
+        >
           <UserOutlined />
         </Dropdown>
         <Drawer

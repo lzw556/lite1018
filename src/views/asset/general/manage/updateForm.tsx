@@ -12,6 +12,7 @@ import {
   GENERAL_ASSET_TYPE_ID
 } from '../config';
 import { convertRow, getValidParents } from '../common/utils';
+import intl from 'react-intl-universal';
 
 export const UpdateForm = ({
   general,
@@ -47,18 +48,18 @@ export const UpdateForm = ({
       validateMessages={defaultValidateMessages}
       style={style}
     >
-      <Form.Item label={GENERAL_NAME} name='name' rules={[Rules.range(4, 50)]}>
-        <Input placeholder={PLEASE_INPUT_GENERAL_NAME} />
+      <Form.Item label={intl.get(GENERAL_NAME)} name='name' rules={[Rules.range(4, 50)]}>
+        <Input placeholder={intl.get(PLEASE_INPUT_GENERAL_NAME)} />
       </Form.Item>
       <Form.Item name='type' hidden={true} initialValue={GENERAL_ASSET_TYPE_ID}></Form.Item>
       {parents?.length > 0 ? (
         <Form.Item
-          label={GENERAL_PARENT}
+          label={intl.get(GENERAL_PARENT)}
           name='parent_id'
-          rules={[{ required: true, message: PLEASE_SELECT_GENERAL_PARENT }]}
+          rules={[{ required: true, message: intl.get(PLEASE_SELECT_GENERAL_PARENT) }]}
           hidden={general.parentId === 0}
         >
-          <Select placeholder={PLEASE_SELECT_GENERAL_PARENT}>
+          <Select placeholder={intl.get(PLEASE_SELECT_GENERAL_PARENT)}>
             {parents.map(({ id, name, attributes }) => (
               <Select.Option key={id} value={id} attributes={attributes}>
                 {name}

@@ -4,6 +4,7 @@ import { isMobile } from '../../../utils/deviceDetection';
 import { Asset, AssetRow, updateAsset } from '../../asset';
 import { convertRow } from '../../asset/wind-turbine';
 import { UpdateForm } from '../manage/updateForm';
+import intl from 'react-intl-universal';
 
 export const FlangeSet = ({
   flange,
@@ -23,7 +24,7 @@ export const FlangeSet = ({
   }, [flange, form]);
   return (
     <UpdateForm flange={flange} form={form} style={{ width: isMobile ? '100%' : '50%' }}>
-      <Form.Item wrapperCol={{ offset: 5 }}>
+      <Form.Item wrapperCol={{ offset: 6 }}>
         <Button
           type='primary'
           onClick={() => {
@@ -46,7 +47,7 @@ export const FlangeSet = ({
             });
           }}
         >
-          保存
+          {intl.get('SAVE')}
         </Button>
       </Form.Item>
     </UpdateForm>

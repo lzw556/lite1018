@@ -5,6 +5,8 @@ import { defaultValidateMessages } from '../../../constants/validator';
 import { getFilename } from '../../../utils/format';
 import { MonitoringPointRow, getSpecificProperties } from '../../monitoring-point';
 import { downloadHistory } from '..';
+import { useLocaleContext } from '../../../localeProvider';
+import intl from 'react-intl-universal';
 
 const { Option } = Select;
 
@@ -13,13 +15,18 @@ export interface DownloadModalProps extends ModalProps {
   property?: any;
   onSuccess: () => void;
   assetId?: number;
-  isFlangeProload?: boolean;
+  virtualPoint?: MonitoringPointRow | undefined;
 }
 
 export const DownloadHistory: React.FC<DownloadModalProps> = (props) => {
   const { open, measurement, property, onSuccess, assetId } = props;
   const [range, setRange] = React.useState<[number, number]>();
   const [form] = Form.useForm();
+  const { language } = useLocaleContext();
+
+  const properties = props.virtualPoint
+    ? props.virtualPoint.properties.filter((pro) => pro.key === 'preload' || pro.key === 'pressure')
+    : getSpecificProperties(measurement.properties, measurement.type);
 
   React.useEffect(() => {
     if (open) {
@@ -33,17 +40,22 @@ export const DownloadHistory: React.FC<DownloadModalProps> = (props) => {
     form.validateFields().then((values) => {
       if (range) {
         const [from, to] = range;
-        downloadHistory(measurement.id, from, to, JSON.stringify(values.properties), assetId).then(
-          (res) => {
-            const url = window.URL.createObjectURL(new Blob([res.data]));
-            const link = document.createElement('a');
-            link.href = url;
-            link.setAttribute('download', getFilename(res));
-            document.body.appendChild(link);
-            link.click();
-            onSuccess();
-          }
-        );
+        downloadHistory(
+          measurement.id,
+          from,
+          to,
+          JSON.stringify(values.properties),
+          language === 'en-US' ? 'en' : 'zh',
+          assetId
+        ).then((res) => {
+          const url = window.URL.createObjectURL(new Blob([res.data]));
+          const link = document.createElement('a');
+          link.href = url;
+          link.setAttribute('download', getFilename(res));
+          document.body.appendChild(link);
+          link.click();
+          onSuccess();
+        });
       }
     });
   };
@@ -51,35 +63,31 @@ export const DownloadHistory: React.FC<DownloadModalProps> = (props) => {
   return (
     <Modal
       {...props}
-      width={390}
-      title={'数据下载'}
-      okText={'下载'}
+      width={430}
+      title={intl.get('DWONLOAD_DATA')}
+      okText={intl.get('DOWNLOAD')}
       onOk={onDownload}
-      cancelText={'取消'}
+      cancelText={intl.get('CANCEL')}
     >
-      <Form form={form} labelCol={{ span: 6 }} validateMessages={defaultValidateMessages}>
+      <Form form={form} labelCol={{ span: 8 }} validateMessages={defaultValidateMessages}>
         <Form.Item
-          label={'属性'}
+          label={intl.get('PROPERTY')}
           name={'properties'}
-          rules={[{ required: true, message: '请选择属性' }]}
+          rules={[{ required: true, message: intl.get('PLEASE_SELECT_PEROPRY') }]}
         >
-          <Select placeholder={'请选择属性'} mode={'multiple'} maxTagCount={2}>
-            {getSpecificProperties(measurement.properties, measurement.type)
-              .filter((pro) => {
-                if (props.isFlangeProload) {
-                  return pro.key === 'preload' || pro.key === 'pressure';
-                } else {
-                  return () => true;
-                }
-              })
-              .map((item) => (
-                <Option key={item.key} value={item.key}>
-                  {item.name}
-                </Option>
-              ))}
+          <Select
+            placeholder={intl.get('PLEASE_SELECT_PROPERTY')}
+            mode={'multiple'}
+            maxTagCount={2}
+          >
+            {properties.map((item) => (
+              <Option key={item.key} value={item.key}>
+                {intl.get(item.name).d(item.name)}
+              </Option>
+            ))}
           </Select>
         </Form.Item>
-        <Form.Item label={'时间范围'} required>
+        <Form.Item label={intl.get('DATE_RANGE')} required>
           <RangeDatePicker
             onChange={React.useCallback((range: [number, number]) => setRange(range), [])}
           />

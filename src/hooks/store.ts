@@ -21,6 +21,7 @@ export type Store = {
   };
   projectList: { pagedOptions: PagedOption; lastUpdate: number };
   accountList: { pagedOptions: PagedOption; lastUpdate: number };
+  reportList: { pagedOptions: PagedOption; lastUpdate: number };
 };
 
 export function useStore<ReturnType extends keyof Store>(
@@ -50,7 +51,8 @@ export function useStore<ReturnType extends keyof Store>(
       ]
     },
     projectList: { ...defaultOptions },
-    accountList: { ...defaultOptions }
+    accountList: { ...defaultOptions },
+    reportList: { ...defaultOptions }
   });
 
   const local = localStorage.getItem('store') || initial;

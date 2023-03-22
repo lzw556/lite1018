@@ -1,8 +1,10 @@
-import { Form, Input, message, Modal, ModalProps } from 'antd';
+import { Form, Input, message, Modal, ModalProps, Typography } from 'antd';
 import { Project } from '../../types/project';
 import { FC, useEffect, useState } from 'react';
-import { defaultValidateMessages, Rules } from '../../constants/validator';
+import { defaultValidateMessages } from '../../constants/validator';
 import { CreateProjectRequest, UpdateProjectRequest } from '../../apis/project';
+import intl from 'react-intl-universal';
+import { FormInputItem } from '../../components/formInputItem';
 
 export interface EditProjectModalProps extends ModalProps {
   project?: Project;
@@ -31,29 +33,35 @@ const EditProjectModal: FC<EditProjectModalProps> = (props) => {
   }, [visible]);
 
   const onAdd = () => {
-    setIsLoading(true);
-    form.validateFields().then((values) => {
-      CreateProjectRequest(values)
-        .then((_) => {
-          setIsLoading(false);
-          onSuccess();
-        })
-        .catch((_) => setIsLoading(false));
-    });
+    form
+      .validateFields()
+      .then((values) => {
+        setIsLoading(true);
+        CreateProjectRequest(values)
+          .then((_) => {
+            setIsLoading(false);
+            onSuccess();
+          })
+          .catch((_) => setIsLoading(false));
+      })
+      .finally(() => setIsLoading(false));
   };
 
   const onSave = () => {
-    setIsLoading(true);
     if (project) {
-      form.validateFields().then((values) => {
-        UpdateProjectRequest(project.id, values).then((_) => {
-          setIsLoading(false);
-          onSuccess();
-        });
-      });
+      form
+        .validateFields()
+        .then((values) => {
+          setIsLoading(true);
+          UpdateProjectRequest(project.id, values).then((_) => {
+            setIsLoading(false);
+            onSuccess();
+          });
+        })
+        .finally(() => setIsLoading(false));
     } else {
       setIsLoading(false);
-      message.error('项目不存在');
+      message.error(intl.get('PROJECT_DOES_NOT_EXIST'));
     }
   };
 
@@ -61,17 +69,29 @@ const EditProjectModal: FC<EditProjectModalProps> = (props) => {
     <Modal
       {...props}
       width={420}
-      title={project ? '项目编辑' : '项目添加'}
-      okText={project ? '更新' : '添加'}
+      title={project ? intl.get('EDIT_PROJECT') : intl.get('CREATE_PROJECT')}
+      okText={project ? intl.get('UPDATE') : intl.get('CREATE')}
       onOk={project ? onSave : onAdd}
       confirmLoading={isLoading}
     >
       <Form form={form} labelCol={{ span: 4 }} validateMessages={defaultValidateMessages}>
-        <Form.Item label={'名称'} name={'name'} rules={[Rules.range(4, 32)]}>
-          <Input placeholder={'请输入项目名称'} />
-        </Form.Item>
-        <Form.Item label={'描述'} name={'description'}>
-          <Input.TextArea placeholder={'请输入项目描述'} />
+        <FormInputItem
+          name='name'
+          label={intl.get('NAME')}
+          requiredMessage={intl.get('PLEASE_INPUT_PROJECT_NAME')}
+          lengthLimit={{ min: 4, max: 32, label: intl.get('NAME').toLowerCase() }}
+        >
+          <Input placeholder={intl.get('PLEASE_INPUT_PROJECT_NAME')} />
+        </FormInputItem>
+        <Form.Item
+          label={
+            <Typography.Text ellipsis={true} title={intl.get('DESCRIPTION')}>
+              {intl.get('DESCRIPTION')}
+            </Typography.Text>
+          }
+          name={'description'}
+        >
+          <Input.TextArea placeholder={intl.get('PLEASE_INPUT_PROJECT_DESCRIPTION')} />
         </Form.Item>
       </Form>
     </Modal>

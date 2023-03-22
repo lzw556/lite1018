@@ -1,6 +1,7 @@
 import { FC } from 'react';
 import { Button, Result } from 'antd';
 import { useNavigate } from 'react-router-dom';
+import intl from 'react-intl-universal';
 
 const NotFoundPage: FC = () => {
   const navigate = useNavigate();
@@ -8,7 +9,7 @@ const NotFoundPage: FC = () => {
     <Result
       status='404'
       title='404'
-      subTitle='对不起，您访问的页面不存在'
+      subTitle={intl.get('INVALID_PAGE_PROMPT')}
       extra={
         <Button
           type='primary'
@@ -16,7 +17,7 @@ const NotFoundPage: FC = () => {
             navigate('/');
           }}
         >
-          返回首页
+          {intl.get('RETURN_TO_HOME')}
         </Button>
       }
     />

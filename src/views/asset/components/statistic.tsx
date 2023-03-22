@@ -4,6 +4,7 @@ import ShadowCard from '../../../components/shadowCard';
 import { generateColProps } from '../../../utils/grid';
 import { getAssetStatistics, NameValue, AssetRow } from '..';
 import './overview-statistic.css';
+import intl from 'react-intl-universal';
 
 export const AssetAlarmStatistic = (asset: AssetRow) => {
   const [items, setItems] = React.useState<NameValue[]>([]);
@@ -14,9 +15,9 @@ export const AssetAlarmStatistic = (asset: AssetRow) => {
         getAssetStatistics(
           statistics,
           'monitoringPointNum',
-          ['danger', '紧急报警监测点'],
-          ['warn', '重要报警监测点'],
-          ['info', '次要报警监测点'],
+          ['danger', 'MONITORING_POINT_DANGER'],
+          ['warn', 'MONITORING_POINT_WARN'],
+          ['info', 'MONITORING_POINT_INFO'],
           'deviceNum',
           'offlineDeviceNum'
         ).statistics
@@ -29,7 +30,7 @@ export const AssetAlarmStatistic = (asset: AssetRow) => {
       <Row className='overview-statistic'>
         {items.map(({ name, value, className }, index) => (
           <Col span={4} key={index} {...generateColProps({ md: 12, lg: 12, xl: 4, xxl: 4 })}>
-            <Statistic title={name} value={value} className={className} />
+            <Statistic title={intl.get(name)} value={value} className={className} />
           </Col>
         ))}
       </Row>

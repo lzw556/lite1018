@@ -12,6 +12,7 @@ import {
   MonitoringPointTypeValue,
   Property
 } from '../monitoring-point';
+import intl from 'react-intl-universal';
 
 export const FlangeHistoryChart = ({
   historyDatas,
@@ -32,7 +33,9 @@ export const FlangeHistoryChart = ({
   if (points.length === 0) return <p>信息异常</p>;
 
   const title = showTitle
-    ? `${MONITORING_POINTS.find((m) => m.id === firstPoint.type)?.label}趋势图`
+    ? `${intl.get('OBJECT_TREND_CHART', {
+        object: intl.get(MONITORING_POINTS.find((m) => m.id === firstPoint.type)?.label ?? '')
+      })}`
     : '';
 
   return (
@@ -78,7 +81,7 @@ export function buildTrendChartOfFlange(
     title: {
       text: '',
       left: isMobile ? 0 : 80,
-      subtext: property ? `${property.name}(${property.unit})` : ''
+      subtext: property ? `${intl.get(property.name)}(${property.unit})` : ''
     },
     legend: { bottom: 0 },
     grid: { bottom: isMobile ? 120 : 60 },

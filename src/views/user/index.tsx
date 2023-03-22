@@ -16,6 +16,7 @@ import { Store, useStore } from '../../hooks/store';
 import { Role } from '../../types/role';
 import { PagingRolesRequest } from '../../apis/role';
 import { PageTitle } from '../../components/pageTitle';
+import intl from 'react-intl-universal';
 
 const UserPage = () => {
   const [addUserVisible, setAddUserVisible] = useState<boolean>(false);
@@ -73,31 +74,31 @@ const UserPage = () => {
 
   const columns = [
     {
-      title: '用户名',
+      title: intl.get('USERNAME'),
       dataIndex: 'username',
       key: 'username'
     },
     {
-      title: '手机号',
+      title: intl.get('CELLPHONE'),
       dataIndex: 'phone',
       key: 'phone'
     },
     {
-      title: '邮箱',
+      title: intl.get('EMAIL'),
       dataIndex: 'email',
       key: 'email'
     },
     {
-      title: '角色',
+      title: intl.get('ROLE'),
       dataIndex: 'role',
       render: (roleId: number) => {
         const role = roles.find((role) => role.id === roleId);
-        return role?.name;
+        return intl.get(role?.name || 'ROLE_ADMIN');
       },
       key: 'role'
     },
     {
-      title: '操作',
+      title: intl.get('OPERATION'),
       key: 'action',
       render: (text: any, record: any) => {
         if (record.id === 1) {
@@ -116,10 +117,10 @@ const UserPage = () => {
             <HasPermission value={Permission.UserDelete}>
               <Popconfirm
                 placement='left'
-                title='确认要删除该用户吗?'
+                title={intl.get('DELETE_USER_PROMPT')}
                 onConfirm={() => onDelete(record.id)}
-                okText='删除'
-                cancelText='取消'
+                okText={intl.get('DELETE')}
+                cancelText={intl.get('CANCEL')}
               >
                 <Button type='text' size='small' icon={<DeleteOutlined />} danger />
               </Popconfirm>
@@ -133,11 +134,11 @@ const UserPage = () => {
   return (
     <Content>
       <PageTitle
-        items={[{ title: '用户管理' }]}
+        items={[{ title: intl.get('MENU_USER_MANAGEMENT') }]}
         actions={
           <HasPermission value={Permission.UserAdd}>
             <Button type='primary' onClick={() => setAddUserVisible(true)}>
-              添加用户 <UserAddOutlined />
+              {intl.get('CREATE_USER')} <UserAddOutlined />
             </Button>
           </HasPermission>
         }

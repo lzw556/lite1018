@@ -3,6 +3,7 @@ import { Button } from 'antd';
 import * as React from 'react';
 import { AssetRow } from '..';
 import { SelectAssets } from './selectAssets';
+import intl from 'react-intl-universal';
 
 export const AssetExport: React.FC<{ winds: AssetRow[] }> = ({ winds }) => {
   const [visible, setVisible] = React.useState(false);
@@ -14,7 +15,7 @@ export const AssetExport: React.FC<{ winds: AssetRow[] }> = ({ winds }) => {
           setVisible(true);
         }}
       >
-        导出配置
+        {intl.get('EXPORT_SETTINGS')}
         <ExportOutlined />
       </Button>
       {visible && (

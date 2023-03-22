@@ -3,6 +3,7 @@ import { PagingRolesRequest } from '../apis/role';
 import { Role } from '../types/role';
 import { CaretDownOutlined } from '@ant-design/icons';
 import { Select, SelectProps } from 'antd';
+import intl from 'react-intl-universal';
 
 export interface RoleSelectProps extends SelectProps<any> {}
 
@@ -21,7 +22,7 @@ const RoleSelect: FC<RoleSelectProps> = (props) => {
     <Select {...props} suffixIcon={<CaretDownOutlined />}>
       {roles.map((item) => (
         <Option key={item.id} value={item.id}>
-          {item.name}
+          {intl.get(item.name).d(item.name)}
         </Option>
       ))}
     </Select>

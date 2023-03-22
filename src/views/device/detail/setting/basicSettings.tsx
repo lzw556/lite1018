@@ -6,6 +6,8 @@ import NetworkSelect from '../../../../components/select/networkSelect';
 import { defaultValidateMessages, Normalizes, Rules } from '../../../../constants/validator';
 import { Device } from '../../../../types/device';
 import { DeviceType } from '../../../../types/device_type';
+import intl from 'react-intl-universal';
+import { FormInputItem } from '../../../../components/formInputItem';
 
 interface BasicSettingsProps {
   device: Device;
@@ -35,9 +37,9 @@ export const BasicSettings: React.FC<BasicSettingsProps> = ({ device, onUpdate }
     }
     return (
       <>
-        <Form.Item label={'所属网络'} name={'network'} rules={[Rules.required]}>
+        <Form.Item label={intl.get('NETWORK_BELONG_TO')} name={'network'} rules={[Rules.required]}>
           <NetworkSelect
-            placeholder={'请选择设备所属网络'}
+            placeholder={intl.get('PLEASE_SELECT_NETWORK_BELONG_TO')}
             onChange={(value) => {
               setNetwork(value);
               form.resetFields(['parent']);
@@ -45,10 +47,10 @@ export const BasicSettings: React.FC<BasicSettingsProps> = ({ device, onUpdate }
           />
         </Form.Item>
         {network && (
-          <Form.Item label={'设备父节点'} name={'parent'} rules={[Rules.required]}>
+          <Form.Item label={intl.get('PARENT')} name={'parent'} rules={[Rules.required]}>
             <DeviceSelect
               filters={{ network_id: network }}
-              placeholder={'请选择设备所属父节点'}
+              placeholder={intl.get('PLEASE_SELECT_PARENT')}
               dispalyField='macAddress'
             />
           </Form.Item>
@@ -62,17 +64,30 @@ export const BasicSettings: React.FC<BasicSettingsProps> = ({ device, onUpdate }
       <Row justify={'start'}>
         <Col xxl={8} xl={10} xs={24}>
           <Form form={form} labelCol={{ xl: 7, xxl: 6 }} validateMessages={defaultValidateMessages}>
-            <Form.Item label={'设备名称'} name={'name'} rules={[Rules.range(4, 20)]}>
-              <Input placeholder={'请输入设备名称'} />
-            </Form.Item>
-            <Form.Item
-              label={'设备MAC地址'}
-              name='mac_address'
-              rules={[Rules.macAddress]}
-              normalize={Normalizes.macAddress}
-              required
+            <FormInputItem
+              label={intl.get('DEVICE_NAME')}
+              name='name'
+              requiredMessage={intl.get('PLEASE_INPUT_DEVICE_NAME')}
+              lengthLimit={{ min: 4, max: 20, label: intl.get('DEVICE_NAME') }}
             >
-              <Input placeholder={'请输入设备MAC地址'} />
+              <Input placeholder={intl.get('PLEASE_INPUT_DEVICE_NAME')} />
+            </FormInputItem>
+            <Form.Item
+              label={intl.get('MAC_ADDRESS')}
+              name='mac_address'
+              rules={[
+                {
+                  required: true,
+                  message: intl.get('PLEASE_INPUT_MAC_ADDRESS')
+                },
+                {
+                  pattern: /^([0-9a-fA-F]{2})(([0-9a-fA-F]{2}){5})$/,
+                  message: intl.get('MAC_ADDRESS_IS_INVALID')
+                }
+              ]}
+              normalize={Normalizes.macAddress}
+            >
+              <Input placeholder={intl.get('PLEASE_INPUT_MAC_ADDRESS')} />
             </Form.Item>
             {device && device.typeId !== DeviceType.Gateway && renderNetworkFormItem()}
           </Form>
@@ -95,7 +110,7 @@ export const BasicSettings: React.FC<BasicSettingsProps> = ({ device, onUpdate }
                   });
                 }}
               >
-                保存
+                {intl.get('SAVE')}
               </Button>
             </Col>
           </Row>

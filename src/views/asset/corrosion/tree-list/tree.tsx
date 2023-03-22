@@ -25,6 +25,7 @@ import { useActionBarStatus } from '../common/useActionBarStatus';
 import { sortAssetsByIndex } from '../common/utils';
 import { AreaIcon } from '../icon/icon';
 import './tree.css';
+import intl from 'react-intl-universal';
 
 export const AreaTree: React.FC<{
   assets: AssetRow[];
@@ -107,7 +108,7 @@ export const AreaTree: React.FC<{
             if (nameValues.length > 0) {
               alarmText = (
                 <Space style={{ fontSize: 14, color: '#8a8e99' }}>
-                  {nameValues.map(({ name, value }) => `${name}: ${value}`)}
+                  {nameValues.map(({ name, value }) => `${intl.get(name)}: ${value}`)}
                 </Space>
               );
             }
@@ -151,7 +152,7 @@ export const AreaTree: React.FC<{
                     {!isRoot && (
                       <HasPermission value={Permission.AssetDelete}>
                         <Popconfirm
-                          title={`确定要删除${name}吗?`}
+                          title={intl.get('DELETE_SOMETHING_PROMPT', { something: name })}
                           onConfirm={() => {
                             if (selectedNode?.type < 10000) {
                               deleteAsset(selectedNode?.id).then(() => {

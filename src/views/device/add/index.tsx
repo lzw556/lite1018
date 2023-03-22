@@ -4,7 +4,7 @@ import { useState } from 'react';
 import '../index.css';
 import { AddDeviceRequest, GetDefaultDeviceSettingsRequest } from '../../../apis/device';
 import ShadowCard from '../../../components/shadowCard';
-import { defaultValidateMessages, Normalizes, Rules } from '../../../constants/validator';
+import { defaultValidateMessages, Normalizes } from '../../../constants/validator';
 import NetworkSelect from '../../../components/select/networkSelect';
 import DeviceSelect from '../../../components/select/deviceSelect';
 import DeviceTypeSelect from '../../../components/select/deviceTypeSelect';
@@ -15,6 +15,8 @@ import { DeviceType } from '../../../types/device_type';
 import { DeviceSettingContent } from '../DeviceSettingContent';
 import { Link, useNavigate } from 'react-router-dom';
 import { PageTitle } from '../../../components/pageTitle';
+import intl from 'react-intl-universal';
+import { FormInputItem } from '../../../components/formInputItem';
 
 const AddDevicePage = () => {
   const [deviceSettings, setDeviceSettings] = useState<DeviceSetting[]>();
@@ -43,9 +45,13 @@ const AddDevicePage = () => {
     if (!DeviceType.isNB(deviceType) && deviceType !== DeviceType.BoltElongationMultiChannels) {
       return (
         <>
-          <Form.Item label={'所属网络'} name={'network'} rules={[Rules.required]}>
+          <Form.Item
+            label={intl.get('NETWORK_BELONG_TO')}
+            name={'network'}
+            rules={[{ required: true, message: intl.get('PLEASE_SELECT_NETWORK_BELONG_TO') }]}
+          >
             <NetworkSelect
-              placeholder={'请选择设备所属网络'}
+              placeholder={intl.get('PLEASE_SELECT_NETWORK_BELONG_TO')}
               onChange={(value) => {
                 setNetwork(value);
                 form.resetFields(['parent']);
@@ -53,10 +59,14 @@ const AddDevicePage = () => {
             />
           </Form.Item>
           {network && (
-            <Form.Item label={'设备父节点'} name={'parent'} rules={[Rules.required]}>
+            <Form.Item
+              label={intl.get('PARENT')}
+              name={'parent'}
+              rules={[{ required: true, message: intl.get('PLEASE_SELECT_PARENT') }]}
+            >
               <DeviceSelect
                 filters={{ network_id: network }}
-                placeholder={'请选择设备所属父节点'}
+                placeholder={intl.get('PLEASE_SELECT_PARENT')}
               />
             </Form.Item>
           )}
@@ -70,14 +80,17 @@ const AddDevicePage = () => {
     <>
       <Content>
         <PageTitle
-          items={[{ title: <Link to='/devices'>设备列表</Link> }, { title: '添加设备' }]}
+          items={[
+            { title: <Link to='/devices'>{intl.get('MENU_DEVICE_LSIT')}</Link> },
+            { title: intl.get('CREATE_DEVICE') }
+          ]}
         />
         <ShadowCard>
           {success && (
             <Result
               status='success'
-              title='设备创建成功!'
-              subTitle='您可以返回设备列表查看设备信息或者继续创建设备'
+              title={intl.get('CREATED_SUCCESSFUL')}
+              subTitle={intl.get('DEVICE_CREATED_NEXT_PROMPT')}
               extra={[
                 <Button
                   type='primary'
@@ -86,7 +99,7 @@ const AddDevicePage = () => {
                     navigate('/devices');
                   }}
                 >
-                  返回设备列表
+                  {intl.get('RETURN_TO_DEVICE_LIST')}
                 </Button>,
                 <Button
                   key='add'
@@ -95,7 +108,7 @@ const AddDevicePage = () => {
                     setSuccess(false);
                   }}
                 >
-                  继续创建设备
+                  {intl.get('CONTINUE_TO_CREATE_DEVICE')}
                 </Button>
               ]}
             />
@@ -110,25 +123,43 @@ const AddDevicePage = () => {
                     validateMessages={defaultValidateMessages}
                   >
                     <fieldset>
-                      <legend>基本信息</legend>
-                      <Form.Item label='设备名称' name='name' rules={[Rules.range(4, 20)]}>
-                        <Input placeholder={'请输入设备名称'} />
-                      </Form.Item>
+                      <legend>{intl.get('BASIC_INFORMATION')}</legend>
+                      <FormInputItem
+                        label={intl.get('DEVICE_NAME')}
+                        name='name'
+                        requiredMessage={intl.get('PLEASE_INPUT_DEVICE_NAME')}
+                        lengthLimit={{ min: 4, max: 20, label: intl.get('DEVICE_NAME') }}
+                      >
+                        <Input placeholder={intl.get('PLEASE_INPUT_DEVICE_NAME')} />
+                      </FormInputItem>
                       <Form.Item
-                        label='设备MAC地址'
+                        label={intl.get('MAC_ADDRESS')}
                         normalize={Normalizes.macAddress}
                         required
                         name='mac_address'
-                        rules={[Rules.macAddress]}
+                        rules={[
+                          {
+                            required: true,
+                            message: intl.get('PLEASE_INPUT_MAC_ADDRESS')
+                          },
+                          {
+                            pattern: /^([0-9a-fA-F]{2})(([0-9a-fA-F]{2}){5})$/,
+                            message: intl.get('MAC_ADDRESS_IS_INVALID')
+                          }
+                        ]}
                       >
-                        <Input placeholder={`请输入设备MAC地址`} />
+                        <Input placeholder={intl.get('PLEASE_INPUT_MAC_ADDRESS')} />
                       </Form.Item>
                     </fieldset>
                     <fieldset>
-                      <legend>设备类型</legend>
-                      <Form.Item label={'设备类型'} name={'type'} rules={[Rules.required]}>
+                      <legend>{intl.get('DEVICE_TYPE')}</legend>
+                      <Form.Item
+                        label={intl.get('DEVICE_TYPE')}
+                        name={'type'}
+                        rules={[{ required: true, message: intl.get('PLEASE_SELECT_DEVICE_TYPE') }]}
+                      >
                         <DeviceTypeSelect
-                          placeholder={'请选择设备类型'}
+                          placeholder={intl.get('PLEASE_SELECT_DEVICE_TYPE')}
                           onChange={fetchDeviceDefaultSettings}
                         />
                       </Form.Item>
@@ -145,7 +176,7 @@ const AddDevicePage = () => {
                 <Col span={isMobile ? 24 : 20} style={{ textAlign: 'right' }}>
                   <Space>
                     <Button type={'primary'} onClick={onSave}>
-                      保存
+                      {intl.get('SAVE')}
                     </Button>
                   </Space>
                 </Col>

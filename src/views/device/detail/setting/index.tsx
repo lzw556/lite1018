@@ -6,6 +6,7 @@ import DeviceSettings from './deviceSettings';
 import { DeviceType } from '../../../../types/device_type';
 import { BasicSettings } from './basicSettings';
 import { AlarmRuleSettings } from './alarmRuleSettings';
+import intl from 'react-intl-universal';
 
 export interface SettingPageProps {
   device: Device;
@@ -17,7 +18,10 @@ const SettingPage: React.FC<SettingPageProps> = ({ device, onUpdate }) => {
   const options = [];
   const { typeId } = device;
   if (typeId !== DeviceType.Router) {
-    options.push({ label: '基础信息', value: 'basic' }, { label: '设备配置', value: 'device' });
+    options.push(
+      { label: intl.get('BASIC_INFORMATION'), value: 'basic' },
+      { label: intl.get('DEVICE_SETTINGS'), value: 'device' }
+    );
     // if (typeId !== DeviceType.Gateway) {
     //   options.push({ label: '报警规则', value: 'alarm' })
     // }

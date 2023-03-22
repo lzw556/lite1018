@@ -1,6 +1,7 @@
 import { ImportOutlined, LoadingOutlined } from '@ant-design/icons';
 import { Button, message } from 'antd';
 import * as React from 'react';
+import intl from 'react-intl-universal';
 
 export const FileInput: React.FC<{
   onUpload: (data: any) => Promise<void>;
@@ -21,7 +22,7 @@ export const FileInput: React.FC<{
           top: 0,
           bottom: 0
         }}
-        title='导入配置'
+        title={intl.get('IMPORT_SETTINGS')}
         onChange={(e) => {
           const files = e.target.files;
           if (files && files.length > 0) {
@@ -37,7 +38,7 @@ export const FileInput: React.FC<{
                 onUpload(data).finally(() => setLoading(false));
               } catch (error) {
                 setLoading(false);
-                message.error('文件内部格式不正确');
+                message.error(intl.get('FILE_IS_INVALID'));
               } finally {
                 if (fileInput && fileInput.current) fileInput.current.value = '';
               }
@@ -50,7 +51,7 @@ export const FileInput: React.FC<{
         className={`ant-btn ant-btn-primary ${loading ? 'ant-btn-loading' : ''}`}
       >
         <span className='ant-btn-loading-icon'> {loading && <LoadingOutlined />}</span>
-        {loading ? '导入中...' : '导入配置'}
+        {loading ? '导入中...' : intl.get('IMPORT_SETTINGS')}
         <ImportOutlined />
       </Button>
     </div>

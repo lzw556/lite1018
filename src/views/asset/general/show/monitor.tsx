@@ -4,6 +4,7 @@ import ShadowCard from '../../../../components/shadowCard';
 import { generateColProps } from '../../../../utils/grid';
 import { NO_FLANGES, sortFlangesByAttributes, FlangeCard } from '../../../flange';
 import { AssetRow } from '../../types';
+import intl from 'react-intl-universal';
 
 export const GeneralMonitor = (wind: AssetRow) => {
   if (wind.children === undefined || wind.children.length === 0)

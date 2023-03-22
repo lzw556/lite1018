@@ -18,6 +18,7 @@ import { isMobile } from '../../../utils/deviceDetection';
 import { INVALID_MONITORING_POINT, MONITORING_POINT } from '../../monitoring-point';
 import { NameValueGroups } from '../../../components/name-values';
 import { rootPathState } from '../components';
+import intl from 'react-intl-universal';
 
 export type ProjectStatistics = {
   deviceOfflineNum: number;
@@ -50,24 +51,28 @@ export default function ProjectOverview() {
       }) => {
         setStatisticOfAsset(
           generatePieOptions(
-            `共${rootAssetNum}台`,
+            intl.get('TOTAL_WITH_NUMBER', { number: rootAssetNum }),
             generateProjectAlarmStatis(rootAssetNum, rootAssetAlarmNum)
           )
         );
         setStatisticOfMeasurement(
           generatePieOptions(
-            `共${monitoringPointNum}个`,
+            intl.get('TOTAL_WITH_NUMBER', { number: monitoringPointNum }),
             generateProjectAlarmStatis(monitoringPointNum, monitoringPointAlarmNum)
           )
         );
         setStatisticOfSensor(
-          generatePieOptions(`共${deviceNum}个`, [
+          generatePieOptions(intl.get('TOTAL_WITH_NUMBER', { number: deviceNum }), [
             {
-              name: '在线',
+              name: intl.get('ONLINE'),
               value: deviceNum - deviceOfflineNum,
               itemStyle: { color: ColorHealth }
             },
-            { name: '离线', value: deviceOfflineNum, itemStyle: { color: ColorOffline } }
+            {
+              name: intl.get('OFFLINE'),
+              value: deviceOfflineNum,
+              itemStyle: { color: ColorOffline }
+            }
           ])
         );
       }
@@ -124,7 +129,8 @@ export default function ProjectOverview() {
       <Empty
         description={
           <p>
-            {NO_WIND_TURBINES}, 去<Link to='/asset-management'>创建</Link>
+            {intl.get(NO_WIND_TURBINES)},
+            <Link to='/asset-management'>{intl.get('CREATE_ONE')}</Link>
           </p>
         }
         image={Empty.PRESENTED_IMAGE_SIMPLE}
@@ -136,13 +142,13 @@ export default function ProjectOverview() {
       {...{
         charts: [
           {
-            title: WIND_TURBINE,
+            title: intl.get(WIND_TURBINE),
             colProps,
             options: statisticOfAsset
           },
-          { title: MONITORING_POINT, colProps, options: statisticOfMeasurement },
-          { title: '传感器', colProps, options: statisticOfSensor },
-          { colProps: colProps2, render: <AlarmTrend title='报警趋势' /> }
+          { title: intl.get(MONITORING_POINT), colProps, options: statisticOfMeasurement },
+          { title: intl.get('SENSOR'), colProps, options: statisticOfSensor },
+          { colProps: colProps2, render: <AlarmTrend title={intl.get('ALARM_TREND')} /> }
         ],
         introductions: winds.map((item) => {
           const { alarmState, statistics } = getAssetStatistics(

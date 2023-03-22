@@ -8,6 +8,7 @@ import {
   ColorWarn
 } from '../../constants/color';
 import { Device } from '../../types/device';
+import intl from 'react-intl-universal';
 
 export const SingleDeviceStatus: React.FC<Pick<Device, 'alertStates' | 'state'>> = ({
   alertStates,
@@ -21,21 +22,21 @@ export const SingleDeviceStatus: React.FC<Pick<Device, 'alertStates' | 'state'>>
       });
       switch (maxLevel) {
         case 1:
-          return <Tag color={ColorInfo}>次要</Tag>;
+          return <Tag color={ColorInfo}>{intl.get('ALARM_LEVEL_INFO')}</Tag>;
         case 2:
-          return <Tag color={ColorWarn}>重要</Tag>;
+          return <Tag color={ColorWarn}>{intl.get('ALARM_LEVEL_WARN')}</Tag>;
         case 3:
-          return <Tag color={ColorDanger}>紧急</Tag>;
+          return <Tag color={ColorDanger}>{intl.get('ALARM_LEVEL_DANGER')}</Tag>;
         default:
           return null;
       }
     } else {
-      return <Tag color={ColorHealth}>正常</Tag>;
+      return <Tag color={ColorHealth}>{intl.get('ALARM_LEVEL_NORMAL')}</Tag>;
     }
   } else {
     return (
       <Tag color={ColorOffline} style={{ color: '#000' }}>
-        离线
+        {intl.get('OFFLINE')}
       </Tag>
     );
   }

@@ -4,6 +4,7 @@ import useSocket, { SocketTopic } from '../../socket';
 import _ from 'lodash';
 import { Device } from '../../types/device';
 import { isMobile } from '../../utils/deviceDetection';
+import intl from 'react-intl-universal';
 
 export interface DeviceTableProps {
   columns?: any;
@@ -67,7 +68,7 @@ const DeviceTable: FC<DeviceTableProps> = ({
   return (
     <TableLayout
       rowSelection={rowSelection}
-      emptyText={emptyText ? emptyText : '设备列表为空'}
+      emptyText={emptyText ? emptyText : intl.get('NO_DEVICES_PROMPT')}
       columns={columns}
       permissions={permissions}
       dataSource={data}

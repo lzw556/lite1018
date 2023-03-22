@@ -9,6 +9,7 @@ import { isMobile } from '../../utils/deviceDetection';
 import { getSpecificProperties } from './util';
 import { DeviceType } from '../../types/device_type';
 import Label from '../../components/label';
+import intl from 'react-intl-universal';
 
 export const RecentHistory: React.FC<{ device: Device }> = ({ device }) => {
   const isMultiChannels = device.typeId === DeviceType.BoltElongationMultiChannels;
@@ -51,7 +52,7 @@ export const RecentHistory: React.FC<{ device: Device }> = ({ device }) => {
           property.fields.forEach((field: any, index: number) => {
             series.push({
               ...LineChartStyles[index],
-              name: field.name,
+              name: intl.get(field.name).d(field.name),
               type: 'line',
               data: fields.get(field.name)
             });
@@ -59,13 +60,17 @@ export const RecentHistory: React.FC<{ device: Device }> = ({ device }) => {
             const value =
               datas && datas.length > 0 ? datas[datas.length - 1] : device.data?.values[field.key];
             if (value) {
-              subText += `${field.name} ${value.toFixed(property.precision)} `;
+              subText += `${intl.get(field.name).d(field.name)} ${value.toFixed(
+                property.precision
+              )} `;
             }
             if (value === 0 || value === '0') {
-              subText += `${field.name} ${value} `;
+              subText += `${intl.get(field.name).d(field.name)} ${value} `;
             }
           });
-          const title = `${property.name}` + (property.unit ? `(${property.unit})` : '');
+          const title =
+            `${intl.get(property.name).d(property.name)}` +
+            (property.unit ? `(${property.unit})` : '');
           return {
             ...DefaultMonitorDataOption,
             grid: { bottom: 20, left: 50 },
@@ -125,7 +130,7 @@ export const RecentHistory: React.FC<{ device: Device }> = ({ device }) => {
         );
       });
     }
-    return <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={'数据不足'} />;
+    return <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={intl.get('NO_DATA_PROMPT')} />;
   };
 
   // React.useEffect(() => {
@@ -152,7 +157,7 @@ export const RecentHistory: React.FC<{ device: Device }> = ({ device }) => {
           title={
             isMultiChannels && (
               <Space>
-                <Label name='当前通道号'>
+                <Label name={intl.get('CURRENT_CHANNEL')}>
                   <Select
                     onChange={(val) => setChannel(val)}
                     defaultValue={channel}

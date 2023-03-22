@@ -10,6 +10,7 @@ import { Device } from '../../../../types/device';
 import { PageResult } from '../../../../types/page';
 import { AlarmRuleSelection } from './alarmRuleSelection';
 import { FilterableAlarmRuleTable } from './filterableAlarmRuleTable';
+import intl from 'react-intl-universal';
 
 export const AlarmRuleSettings: React.FC<{ device: Device }> = ({ device }) => {
   const [crtRules, setCrtRules] = React.useState<any>([]);
@@ -60,7 +61,7 @@ export const AlarmRuleSettings: React.FC<{ device: Device }> = ({ device }) => {
     });
   };
 
-  if (!isLoaded) return <Spin tip='加载中' />;
+  if (!isLoaded) return <Spin tip={intl.get('LOADING')} />;
   if (isLoaded && crtRules.length === 0) {
     return (
       <Empty
@@ -68,7 +69,7 @@ export const AlarmRuleSettings: React.FC<{ device: Device }> = ({ device }) => {
         description={
           <>
             <p>
-              还没有规则,去
+              {intl.get('NO_RULES_GO_PROMPT')}
               <a
                 href='#!'
                 onClick={(e) => {
@@ -76,7 +77,7 @@ export const AlarmRuleSettings: React.FC<{ device: Device }> = ({ device }) => {
                   e.preventDefault();
                 }}
               >
-                添加
+                {intl.get('CREATE_ONE')}
               </a>
               {visible && (
                 <AlarmRuleSelection
@@ -104,7 +105,7 @@ export const AlarmRuleSettings: React.FC<{ device: Device }> = ({ device }) => {
                 setVisible(true);
               }}
             >
-              添加
+              {intl.get('CREATE')}
             </Button>
           </Col>
         </Row>

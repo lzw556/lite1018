@@ -4,6 +4,7 @@ import { cloneDeep, merge } from 'lodash';
 import * as React from 'react';
 import { ChartOptions, COMMON_OPTIONS, COMMON_OPTIONS_SERIES } from './common';
 import './chart.css';
+import intl from 'react-intl-universal';
 
 export const ChartContainer = <T,>({
   title,
@@ -30,7 +31,7 @@ export const ChartContainer = <T,>({
       <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
         <p style={{ textAlign: 'center' }}>{title}</p>
         <Empty
-          description='暂无数据'
+          description={intl.get('NO_DATA_PROMPT')}
           image={Empty.PRESENTED_IMAGE_SIMPLE}
           style={{
             flex: '1 0 auto',

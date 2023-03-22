@@ -26,6 +26,7 @@ import { useActionBarStatus } from '../common/useActionBarStatus';
 import { sortAssetsByIndex } from '../common/utils';
 import { GeneralIcon } from '../icon/icon';
 import './tree.css';
+import intl from 'react-intl-universal';
 
 export const GeneralTree: React.FC<{
   assets: AssetRow[];
@@ -103,7 +104,7 @@ export const GeneralTree: React.FC<{
             if (nameValues.length > 0) {
               alarmText = (
                 <Space style={{ fontSize: 14, color: '#8a8e99' }}>
-                  {nameValues.map(({ name, value }) => `${name}: ${value}`)}
+                  {nameValues.map(({ name, value }) => `${intl.get(name)}: ${value}`)}
                 </Space>
               );
             }
@@ -143,7 +144,7 @@ export const GeneralTree: React.FC<{
                     {!isRoot && (
                       <HasPermission value={Permission.AssetDelete}>
                         <Popconfirm
-                          title={`确定要删除${name}吗?`}
+                          title={intl.get('DELETE_SOMETHING_PROMPT', { something: name })}
                           onConfirm={() => {
                             if (selectedNode?.type < 10000) {
                               deleteAsset(selectedNode?.id).then(() => {
@@ -166,8 +167,8 @@ export const GeneralTree: React.FC<{
                       <Dropdown
                         menu={{
                           items: [
-                            { key: 'general-create', label: GENERAL },
-                            { key: 'monitoring-point-create', label: MONITORING_POINT }
+                            { key: 'general-create', label: intl.get(GENERAL) },
+                            { key: 'monitoring-point-create', label: intl.get(MONITORING_POINT) }
                           ],
                           onClick: ({ key }) => {
                             const type = selectedNode?.type;

@@ -3,6 +3,7 @@ import React from 'react';
 import { Asset, AssetRow, updateAsset } from '../../asset';
 import { UPDATE_FLANGE } from '../types';
 import { UpdateForm } from './updateForm';
+import intl from 'react-intl-universal';
 
 export const FlangeUpdate: React.FC<
   ModalProps & {
@@ -16,9 +17,9 @@ export const FlangeUpdate: React.FC<
   return (
     <Modal
       {...{
-        title: UPDATE_FLANGE,
-        cancelText: '取消',
-        okText: '编辑',
+        title: intl.get(UPDATE_FLANGE),
+        cancelText: intl.get('CANCEL'),
+        okText: intl.get('EDIT'),
         bodyStyle: { overflow: 'auto', maxHeight: 610 },
         ...props,
         onOk: () => {

@@ -4,6 +4,7 @@ import { updateAsset } from '../../services';
 import { Asset, AssetRow } from '../../types';
 import { UPDATE_WIND_TURBINE } from '../config';
 import { UpdateForm } from './updateForm';
+import intl from 'react-intl-universal';
 
 export const WindTurbineUpdate: React.FC<
   ModalProps & { asset: AssetRow; onSuccess: () => void }
@@ -14,9 +15,9 @@ export const WindTurbineUpdate: React.FC<
   return (
     <Modal
       {...{
-        title: UPDATE_WIND_TURBINE,
-        cancelText: '取消',
-        okText: '编辑',
+        title: intl.get(UPDATE_WIND_TURBINE),
+        cancelText: intl.get('CANCEL'),
+        okText: intl.get('EDIT'),
         ...props,
         onOk: () => {
           form.validateFields().then((values) => {

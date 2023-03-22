@@ -5,6 +5,7 @@ import { Rules } from '../../../constants/validator';
 import WsnFormItem from '../../../components/formItems/wsnFormItem';
 import { UpdateNetworkRequest } from '../../../apis/network';
 import { useProvisionMode } from '../useProvisionMode';
+import intl from 'react-intl-universal';
 
 export interface EditNetworkModalProps extends ModalProps {
   network: Network;
@@ -53,10 +54,20 @@ const EditNetworkModal: FC<EditNetworkModalProps> = (props) => {
   };
 
   return (
-    <Modal {...props} title={'网络编辑'} width={420} onOk={onSave} confirmLoading={isLoading}>
+    <Modal
+      {...props}
+      title={intl.get('EDIT_NETWORK')}
+      width={420}
+      onOk={onSave}
+      confirmLoading={isLoading}
+    >
       <Form form={form} labelCol={{ span: 7 }}>
-        <Form.Item label={'名称'} name={'name'} rules={[Rules.required]}>
-          <Input placeholder={'请输入网络名称'} />
+        <Form.Item label={intl.get('NAME')} name={'name'} rules={[Rules.required]}>
+          <Input
+            placeholder={intl.get('PLEASE_INPUT_SOMETHING', {
+              something: intl.get('NETWORK_NAME')
+            })}
+          />
         </Form.Item>
         {provisionMode && <WsnFormItem mode={provisionMode} onModeChange={setProvisionMode} />}
       </Form>

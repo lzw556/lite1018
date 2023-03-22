@@ -7,6 +7,7 @@ import { HistoryData, NO_MONITORING_POINTS } from '../../monitoring-point';
 import { CircleChart } from '../circleChart';
 import { FlangePreloadChart } from '../flangePreloadChart';
 import { FlangeHistoryChart } from '../historyChart';
+import intl from 'react-intl-universal';
 
 export const FlangeMonitor = ({
   flange,
@@ -21,7 +22,12 @@ export const FlangeMonitor = ({
   return (
     <Row gutter={[16, 16]}>
       <Col {...generateColProps({ xl: 12, xxl: 9 })}>
-        <CircleChart asset={flange} title='分布图' big={true} style={{ height: 550 }} />
+        <CircleChart
+          asset={flange}
+          title={intl.get('DISTRIBUTION_MAP')}
+          big={true}
+          style={{ height: 550 }}
+        />
       </Col>
       <Col {...generateColProps({ xl: 12, xxl: 15 })}>
         {checkIsFlangePreload(flange) ? (

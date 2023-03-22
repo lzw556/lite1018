@@ -2,6 +2,7 @@ import { Checkbox, Form, Input, Radio, Select } from 'antd';
 import { DeviceSetting, DeviceSettingValueType } from '../../types/device_setting';
 import { FC, useState } from 'react';
 import { Rules } from '../../constants/validator';
+import intl from 'react-intl-universal';
 
 export interface DeviceSettingFormItemProps {
   value: DeviceSetting;
@@ -25,10 +26,10 @@ const DeviceSettingFormItem: FC<DeviceSettingFormItemProps> = ({ value, editable
             }}
           >
             <Radio.Button key={'true'} value={true}>
-              启用
+              {intl.get('ENABLED')}
             </Radio.Button>
             <Radio.Button key={'false'} value={false}>
-              禁用
+              {intl.get('DISABLED')}
             </Radio.Button>
           </Radio.Group>
         );
@@ -38,7 +39,7 @@ const DeviceSettingFormItem: FC<DeviceSettingFormItemProps> = ({ value, editable
         return (
           <Checkbox.Group
             options={Object.keys(setting.options).map((value) => ({
-              label: setting.options[value],
+              label: intl.get(setting.options[value]),
               value: Number(value)
             }))}
             onChange={(value) => setSetting({ ...setting, value })}
@@ -50,14 +51,19 @@ const DeviceSettingFormItem: FC<DeviceSettingFormItemProps> = ({ value, editable
           {Object.keys(setting.options).map((key) => {
             return (
               <Option key={key} value={Number(key)}>
-                {setting.options[key]}
+                {intl.get(setting.options[key]).d(setting.options[key])}
               </Option>
             );
           })}
         </Select>
       );
     }
-    return <Input suffix={setting.unit} disabled={!editable} />;
+    return (
+      <Input
+        suffix={setting.unit ? intl.get(setting.unit).d(setting.unit) : ''}
+        disabled={!editable}
+      />
+    );
   };
 
   const renderChildren = () => {
@@ -84,8 +90,24 @@ const DeviceSettingFormItem: FC<DeviceSettingFormItemProps> = ({ value, editable
       case DeviceSettingValueType.uint16:
       case DeviceSettingValueType.uint32:
       case DeviceSettingValueType.float:
+        const ruleRequired = {
+          required: true,
+          message: intl.get('PLEASE_INPUT_SOMETHING', {
+            something: intl.get(setting.name).toLowerCase()
+          })
+        };
+        const ruleNumeric = {
+          type: 'number',
+          transform(value: number) {
+            if (value) {
+              return Number(value);
+            }
+            return value;
+          },
+          message: intl.get('PLEASE_INPUT_NUMERIC')
+        };
         if (setting.validator) {
-          return [{ ...Rules.number(), ...setting.validator }];
+          return [ruleRequired, ruleNumeric];
         }
         return [Rules.number()];
       case DeviceSettingValueType.uint64:
@@ -131,7 +153,7 @@ const DeviceSettingFormItem: FC<DeviceSettingFormItemProps> = ({ value, editable
   return (
     <>
       <Form.Item
-        label={setting.name}
+        label={intl.get(setting.name)}
         name={[setting.category, setting.key]}
         initialValue={setting.value}
         rules={renderRules(setting)}

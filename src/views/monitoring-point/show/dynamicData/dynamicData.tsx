@@ -12,6 +12,7 @@ import {
 } from '../../types';
 import { DynamicDataContent } from './dynamicDataContent';
 import { DynamicDataProperty, useDynamicDataRequest } from './dynamicDataHelper';
+import intl from 'react-intl-universal';
 
 export const MonitoringPointDynamicData: React.FC<MonitoringPointRow & { dataType?: DataType }> = (
   props
@@ -42,7 +43,7 @@ export const MonitoringPointDynamicData: React.FC<MonitoringPointRow & { dataTyp
         showHeader={false}
         columns={[
           {
-            title: '时间',
+            title: intl.get('TIMESTAMP'),
             dataIndex: 'timestamp',
             key: 'timestamp',
             width: '80%',
@@ -50,7 +51,7 @@ export const MonitoringPointDynamicData: React.FC<MonitoringPointRow & { dataTyp
               dayjs.unix(timestamp).local().format('YYYY-MM-DD HH:mm:ss')
           },
           {
-            title: '操作',
+            title: intl.get('OPERATION'),
             key: 'action',
             render: (text: any, record: any) => {
               if (hasPermission(Permission.DeviceRawDataDownload)) {
@@ -68,7 +69,7 @@ export const MonitoringPointDynamicData: React.FC<MonitoringPointRow & { dataTyp
                       });
                     }}
                   >
-                    <a>下载</a>
+                    <a>{intl.get('DOWNLOAD')}</a>
                   </Space>
                 );
               }
@@ -104,7 +105,10 @@ export const MonitoringPointDynamicData: React.FC<MonitoringPointRow & { dataTyp
           <Row>
             {timestamps.length === 0 && (
               <Col span={24}>
-                <Empty description='暂无数据' image={Empty.PRESENTED_IMAGE_SIMPLE} />
+                <Empty
+                  description={intl.get('NO_DATA_PROMPT')}
+                  image={Empty.PRESENTED_IMAGE_SIMPLE}
+                />
               </Col>
             )}
             {timestamps.length > 0 && <Col span={6}>{renderTimestampsList()}</Col>}

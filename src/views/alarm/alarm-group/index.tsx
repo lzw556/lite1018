@@ -12,7 +12,7 @@ import { Link } from 'react-router-dom';
 import { PageTitle } from '../../../components/pageTitle';
 import { MONITORING_POINTS } from '../../../config/assetCategory.config';
 import HasPermission from '../../../permission';
-import usePermission, { Permission } from '../../../permission/permission';
+import { Permission } from '../../../permission/permission';
 import {
   convertAlarmLevelToState,
   getAlarmLevelColor,
@@ -25,56 +25,56 @@ import { BindMonitoringPoints } from './bindMonitoringPoints';
 import { SelectRules } from './selectRules';
 import { deleteAlarmRule, getAlarmRules, importAlarmRules } from './services';
 import { AlarmRule } from './types';
+import intl from 'react-intl-universal';
 
 export default function AlarmRuleList() {
-  const { hasPermission } = usePermission();
   const category = useAssetCategoryContext();
   const [visible, setVisible] = React.useState(false);
   const [visibleExport, setVisibleExport] = React.useState(false);
   const [selectedRow, setSelectedRow] = React.useState<AlarmRule>();
-  let columns: any = [
+  const columns = [
     {
-      title: '名称',
+      title: intl.get('NAME'),
       dataIndex: 'name',
       key: 'name',
-      width: 400
+      width: 400,
+      render: (_: any, record: any) => {
+        return intl.get(record.name).d(record.name);
+      }
     },
     {
-      title: MONITORING_POINT_TYPE,
+      title: intl.get(MONITORING_POINT_TYPE),
       dataIndex: 'type',
       key: 'type',
-      width: 120,
+      width: 200,
       render: (typeId: number) => {
-        return MONITORING_POINTS.get(category)?.find((m) => m.id === typeId)?.label ?? '-';
+        const label = MONITORING_POINTS.get(category)?.find((m) => m.id === typeId)?.label;
+        return label ? intl.get(label) : '-';
       }
-    }
-  ];
-  if (hasPermission(Permission.AlarmRuleGroupEdit)) {
-    columns.push({
-      title: '操作',
+    },
+    {
+      title: intl.get('OPERATION'),
       key: 'action',
       render: (x: any, row: AlarmRule) => {
         return (
           <Space>
             {row.editable && (
               <>
-                <HasPermission value={Permission.AlarmRuleGroupEdit}>
-                  <Button type='text' size='small' title={`编辑`}>
-                    <Link to={`${row.id}`}>
-                      <EditOutlined />
-                    </Link>
-                  </Button>
-                </HasPermission>
+                <Button type='text' size='small' title={intl.get('EDIT')}>
+                  <Link to={`${row.id}`}>
+                    <EditOutlined />
+                  </Link>
+                </Button>
                 <HasPermission value={Permission.AlarmRuleDelete}>
                   <Popconfirm
-                    title={`确定要删除该规则吗?`}
+                    title={intl.get('DELETE_RULE_PROMPT')}
                     onConfirm={() => {
                       deleteAlarmRule(row.id).then(() => {
                         fetchAlarmRules();
                       });
                     }}
                   >
-                    <Button type='text' danger={true} size='small' title={`删除`}>
+                    <Button type='text' danger={true} size='small' title={intl.get('DELETE')}>
                       <DeleteOutlined />
                     </Button>
                   </Popconfirm>
@@ -82,7 +82,7 @@ export default function AlarmRuleList() {
               </>
             )}
             <HasPermission value={Permission.AlarmRuleGroupBind}>
-              <Button type='text' size='small' title={UPDATE_MONITORING_POINT}>
+              <Button type='text' size='small' title={intl.get(UPDATE_MONITORING_POINT)}>
                 <MoreOutlined
                   onClick={() => {
                     setSelectedRow(row);
@@ -94,31 +94,44 @@ export default function AlarmRuleList() {
           </Space>
         );
       }
-    });
-  }
+    }
+  ];
+
   const getRules = (dataSource: AlarmRule['rules']): TableProps<any> => {
     return {
       rowKey: 'id',
       columns: [
-        { title: '子规则名称', dataIndex: 'name', key: 'name', width: 400 },
         {
-          title: '资源指标',
+          title: intl.get('ALARM_SUB_RULE_NAME'),
+          dataIndex: 'name',
+          key: 'name',
+          width: 400,
+          render: (_: any, record: any) => {
+            return intl.get(record.name).d(record.name);
+          }
+        },
+        {
+          title: intl.get('ALARM_METRIC'),
           dataIndex: 'metric',
           key: 'metric',
-          render: (metric: any) => metric.name,
+          render: (metric: any) => {
+            return intl.get(metric.name).d(metric.name);
+          },
           width: 120
         },
         {
-          title: '触发条件',
+          title: intl.get('ALARM_CONDITION'),
           dataIndex: 'condition',
           key: 'condition',
           render: (_: any, record: any) => {
-            return `${record.operation} ${record.threshold} ${record.metric.unit}`;
+            return `${record.operation} ${record.threshold} ${
+              record.metric.unit ? intl.get(record.metric.unit).d(record.metric.unit) : ''
+            }`;
           },
           width: 150
         },
         {
-          title: '报警等级',
+          title: intl.get('ALARM_LEVEL'),
           dataIndex: 'level',
           key: 'level',
           width: 100,
@@ -146,7 +159,11 @@ export default function AlarmRuleList() {
     size: 'small',
     pagination: false,
     loading: true,
-    locale: { emptyText: <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description='暂无数据' /> }
+    locale: {
+      emptyText: (
+        <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={intl.get('NO_DATA_PROMPT')} />
+      )
+    }
   });
 
   const fetchAlarmRules = () => {
@@ -163,13 +180,13 @@ export default function AlarmRuleList() {
   return (
     <Content>
       <PageTitle
-        items={[{ title: '报警规则' }]}
+        items={[{ title: intl.get('ALARM_RULES') }]}
         actions={
           <>
             <HasPermission value={Permission.AlarmRuleGroupAdd}>
               <Link to='create'>
                 <Button type='primary'>
-                  添加规则
+                  {intl.get('CREATE_ALARM_RULE')}
                   <PlusOutlined />
                 </Button>
               </Link>
@@ -182,7 +199,7 @@ export default function AlarmRuleList() {
                     setVisibleExport(true);
                   }}
                 >
-                  导出配置
+                  {intl.get('EXPORT_SETTINGS')}
                   <ExportOutlined />
                 </Button>
               )}
@@ -192,10 +209,12 @@ export default function AlarmRuleList() {
                 onUpload={(data) => {
                   return importAlarmRules(data).then((res) => {
                     if (res.data.code === 200) {
-                      message.success('导入成功');
+                      message.success(intl.get('IMPORTED_SUCCESSFUL'));
                       fetchAlarmRules();
                     } else {
-                      message.error(`导入失败: ${res.data.msg}`);
+                      message.error(
+                        `${intl.get('FAILED_TO_IMPORT')}${intl.get(res.data.msg).d(res.data.msg)}`
+                      );
                     }
                   });
                 }}
