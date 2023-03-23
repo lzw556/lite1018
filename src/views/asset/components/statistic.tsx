@@ -15,9 +15,9 @@ export const AssetAlarmStatistic = (asset: AssetRow) => {
         getAssetStatistics(
           statistics,
           'monitoringPointNum',
-          ['danger', 'MONITORING_POINT_DANGER'],
-          ['warn', 'MONITORING_POINT_WARN'],
-          ['info', 'MONITORING_POINT_INFO'],
+          ['danger', 'MONITORING_POINT_CRITICAL'],
+          ['warn', 'MONITORING_POINT_MAJOR'],
+          ['info', 'MONITORING_POINT_MINOR'],
           'deviceNum',
           'offlineDeviceNum'
         ).statistics

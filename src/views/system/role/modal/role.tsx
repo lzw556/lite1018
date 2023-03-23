@@ -15,7 +15,7 @@ const RoleModal: FC<RoleModalProps> = (props) => {
         <Form.Item
           name='name'
           label={intl.get('ROLE_NAME')}
-          rules={[{ required: true, message: intl.get('PLEASE_INPUT_ROLE_NAME') }]}
+          rules={[{ required: true, message: intl.get('PLEASE_ENTER_ROLE_NAME') }]}
         >
           <Input placeholder={intl.get('ROLE_NAME')} />
         </Form.Item>

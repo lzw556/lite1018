@@ -64,7 +64,7 @@ const EditNetworkModal: FC<EditNetworkModalProps> = (props) => {
       <Form form={form} labelCol={{ span: 7 }}>
         <Form.Item label={intl.get('NAME')} name={'name'} rules={[Rules.required]}>
           <Input
-            placeholder={intl.get('PLEASE_INPUT_SOMETHING', {
+            placeholder={intl.get('PLEASE_ENTER_SOMETHING', {
               something: intl.get('NETWORK_NAME')
             })}
           />

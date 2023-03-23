@@ -310,8 +310,8 @@ const DevicePage = () => {
                   style={{ width: isMobile ? 'calc(100% - 80px)' : '256px' }}
                   placeholder={
                     store.searchTarget === 0
-                      ? intl.get('PLEASE_INPUT_DEVICE_NAME_TO_QUERY')
-                      : intl.get('PLEASE_INPUT_MAC_TO_QUERY')
+                      ? intl.get('PLEASE_ENTER_DEVICE_NAME_TO_QUERY')
+                      : intl.get('PLEASE_ENTER_MAC_TO_QUERY')
                   }
                   onSearch={(val) => {
                     setStore((prev) => ({

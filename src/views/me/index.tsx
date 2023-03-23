@@ -122,7 +122,7 @@ const MePage = () => {
             </Form>
           </ShadowCard>
           <br />
-          <ShadowCard title={intl.get('ACCOUNT_SAFETY')} bordered={false}>
+          <ShadowCard title={intl.get('ACCOUNT_SECURITY')} bordered={false}>
             <Row justify={'start'}>
               <Col span={isMobile ? 5 : 2} className='ts-label'>
                 {intl.get('PASSWORD')}

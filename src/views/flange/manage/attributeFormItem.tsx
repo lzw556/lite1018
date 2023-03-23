@@ -31,7 +31,7 @@ export const AttributeFormItem: React.FC<{ label: string; name: string }> = ({ l
                 }
                 return value;
               },
-              message: intl.get('PLEASE_INPUT_NUMERIC')
+              message: intl.get('PLEASE_ENTER_NUMERIC')
             }
           ]}
         >

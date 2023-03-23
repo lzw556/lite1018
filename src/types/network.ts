@@ -25,9 +25,9 @@ export namespace NetworkProvisioningMode {
   export function toString(mode: NetworkProvisioningMode) {
     switch (mode) {
       case NetworkProvisioningMode.Mode2:
-        return intl.get('PROVISION_MODE') + '2';
+        return intl.get('WSN_MODE') + '2';
       default:
-        return intl.get('PROVISION_MODE') + '1';
+        return intl.get('WSN_MODE') + '1';
     }
   }
 }

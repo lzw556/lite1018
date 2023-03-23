@@ -33,7 +33,7 @@ export const MonitoringPointFormItem = ({
         {
           validator: async (_, points) => {
             if (!points || points.length <= 0) {
-              return Promise.reject(new Error(PLEASE_CREATE_MONITORING_POINT));
+              return Promise.reject(new Error(intl.get(PLEASE_CREATE_MONITORING_POINT)));
             }
           }
         }
@@ -53,7 +53,7 @@ export const MonitoringPointFormItem = ({
                 />
                 <Form.Item
                   label={intl.get(MONITORING_POINT_NAME)}
-                  labelCol={{ span: 10 }}
+                  labelCol={{ span: 14 }}
                   {...restFields}
                   name={[name, 'name']}
                   rules={[Rules.range(4, 16)]}

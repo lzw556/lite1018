@@ -7,7 +7,7 @@ export const FLANGE_NAME = `FLANGE_NAME`;
 export const PLEASE_INPUT_FLANGE_NAME = `PLEASE_INPUT_FLANGE_NAME`;
 export const FLANGE_TYPE = `FLANGE_TYPE`;
 export const PLEASE_SELECT_FLANGE_TYPE = `PLEASE_SELECT_FLANGE_TYPE`;
-export const NO_FLANGES = `没有${FLANGE}`;
+export const NO_FLANGES = `NO_FLANGES`;
 
 export const FLANGE_ASSET_TYPE_ID = 102;
 
@@ -15,7 +15,7 @@ export const FLANGE_PATHNAME = 'flanges';
 
 export const FLANGE_TYPES = [
   { label: 'TOWER', value: 1 },
-  { label: 'LEAF_ROOT', value: 2 },
-  { label: 'HUB_ENGINE_ROOM', value: 3 },
+  { label: 'BLADE', value: 2 },
+  { label: 'HUB_AND_NACELLE', value: 3 },
   { label: 'PITCH_BEARING', value: 4 }
 ];

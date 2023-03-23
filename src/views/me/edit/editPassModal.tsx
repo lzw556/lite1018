@@ -48,9 +48,9 @@ const EditPassModal: FC<EditPassProps> = ({ visible, onSuccess, onCancel }) => {
             </Typography.Text>
           }
           name='pwd'
-          rules={[{ required: true, message: intl.get('PLEASE_INPUT_OLD_PASSWORD') }]}
+          rules={[{ required: true, message: intl.get('PLEASE_ENTER_OLD_PASSWORD') }]}
         >
-          <Input type={'password'} placeholder={intl.get('PLEASE_INPUT_OLD_PASSWORD')} />
+          <Input type={'password'} placeholder={intl.get('PLEASE_ENTER_OLD_PASSWORD')} />
         </Form.Item>
         <Form.Item
           label={
@@ -59,9 +59,9 @@ const EditPassModal: FC<EditPassProps> = ({ visible, onSuccess, onCancel }) => {
             </Typography.Text>
           }
           name='newPwd'
-          rules={[{ required: true, message: intl.get('PLEASE_INPUT_NEW_PASSWORD') }]}
+          rules={[{ required: true, message: intl.get('PLEASE_ENTER_NEW_PASSWORD') }]}
         >
-          <Input type={'password'} placeholder={intl.get('PLEASE_INPUT_NEW_PASSWORD')} />
+          <Input type={'password'} placeholder={intl.get('PLEASE_ENTER_NEW_PASSWORD')} />
         </Form.Item>
         <Form.Item
           label={

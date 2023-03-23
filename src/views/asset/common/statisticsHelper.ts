@@ -122,15 +122,15 @@ export function getAlarmStateText(state: AlarmState) {
     case 'normal':
       return intl.get('ALARM_LEVEL_NORMAL');
     case 'info':
-      return intl.get('ALARM_LEVEL_INFO');
+      return intl.get('ALARM_LEVEL_MINOR');
     case 'warn':
-      return intl.get('ALARM_LEVEL_WARN');
+      return intl.get('ALARM_LEVEL_MAJOR');
     case 'danger':
-      return intl.get('ALARM_LEVEL_DANGER');
+      return intl.get('ALARM_LEVEL_CRITICAL');
     case 'anomalous':
       return intl.get('ABNORMAL');
     default:
-      return intl.get('UNKOWN');
+      return intl.get('UNKNOWN');
   }
 }
 

@@ -45,7 +45,12 @@ export default function MonitoringPointShow() {
     monitoringPoint.bindingDevices === undefined ||
     monitoringPoint.bindingDevices.length === 0
   )
-    return <Empty description={INVALID_MONITORING_POINT} image={Empty.PRESENTED_IMAGE_SIMPLE} />;
+    return (
+      <Empty
+        description={intl.get(INVALID_MONITORING_POINT)}
+        image={Empty.PRESENTED_IMAGE_SIMPLE}
+      />
+    );
 
   const items: TabsProps['items'] = [
     {

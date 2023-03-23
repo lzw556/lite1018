@@ -42,7 +42,7 @@ const AddDevicePage = () => {
   };
 
   const renderNetwork = () => {
-    if (!DeviceType.isNB(deviceType) && deviceType !== DeviceType.BoltElongationMultiChannels) {
+    if (!DeviceType.isNB(deviceType) && !DeviceType.isMultiChannel(deviceType ?? 0)) {
       return (
         <>
           <Form.Item
@@ -127,10 +127,10 @@ const AddDevicePage = () => {
                       <FormInputItem
                         label={intl.get('DEVICE_NAME')}
                         name='name'
-                        requiredMessage={intl.get('PLEASE_INPUT_DEVICE_NAME')}
+                        requiredMessage={intl.get('PLEASE_ENTER_DEVICE_NAME')}
                         lengthLimit={{ min: 4, max: 20, label: intl.get('DEVICE_NAME') }}
                       >
-                        <Input placeholder={intl.get('PLEASE_INPUT_DEVICE_NAME')} />
+                        <Input placeholder={intl.get('PLEASE_ENTER_DEVICE_NAME')} />
                       </FormInputItem>
                       <Form.Item
                         label={intl.get('MAC_ADDRESS')}
@@ -140,7 +140,7 @@ const AddDevicePage = () => {
                         rules={[
                           {
                             required: true,
-                            message: intl.get('PLEASE_INPUT_MAC_ADDRESS')
+                            message: intl.get('PLEASE_ENTER_MAC_ADDRESS')
                           },
                           {
                             pattern: /^([0-9a-fA-F]{2})(([0-9a-fA-F]{2}){5})$/,
@@ -148,7 +148,7 @@ const AddDevicePage = () => {
                           }
                         ]}
                       >
-                        <Input placeholder={intl.get('PLEASE_INPUT_MAC_ADDRESS')} />
+                        <Input placeholder={intl.get('PLEASE_ENTER_MAC_ADDRESS')} />
                       </Form.Item>
                     </fieldset>
                     <fieldset>
@@ -164,11 +164,11 @@ const AddDevicePage = () => {
                         />
                       </Form.Item>
                       {deviceType && renderNetwork()}
-                      {deviceType && deviceType !== DeviceType.BoltElongationMultiChannels && (
+                      {deviceType && !DeviceType.isMultiChannel(deviceType) && (
                         <DeviceSettingContent settings={deviceSettings} deviceType={deviceType} />
                       )}
                     </fieldset>
-                    {deviceType && deviceType === DeviceType.BoltElongationMultiChannels && (
+                    {deviceType && DeviceType.isMultiChannel(deviceType) && (
                       <DeviceSettingContent settings={deviceSettings} deviceType={deviceType} />
                     )}
                   </Form>

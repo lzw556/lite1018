@@ -119,7 +119,7 @@ export const SingleDeviceDetail: React.FC<{ device: Device; upgradeStatus: any }
           </Col>
         </Row>
       </Col>
-      {device.state && device.typeId !== DeviceType.BoltElongationMultiChannels && (
+      {device.state && !DeviceType.isMultiChannel(device.typeId) && (
         <Col span={isMobile ? 12 : 9}>
           <Row>
             <Col span={isMobile ? 24 : 8} className='ts-detail-label'>
@@ -133,7 +133,7 @@ export const SingleDeviceDetail: React.FC<{ device: Device; upgradeStatus: any }
       )}
       {device.state &&
         device.typeId !== DeviceType.Gateway &&
-        device.typeId !== DeviceType.BoltElongationMultiChannels && (
+        !DeviceType.isMultiChannel(device.typeId) && (
           <Col span={isMobile ? 12 : 9}>
             <Row>
               <Col span={isMobile ? 24 : 8} className='ts-detail-label'>
@@ -168,7 +168,7 @@ export const SingleDeviceDetail: React.FC<{ device: Device; upgradeStatus: any }
       <Col span={isMobile ? 12 : 9}>
         <Row>
           <Col span={isMobile ? 24 : 8} className='ts-detail-label'>
-            {intl.get('LAST_CONNECTED_TIME')}
+            {intl.get('LAST_CONNECTION_TIME')}
           </Col>
           <Col span={isMobile ? 24 : 16} className='ts-detail-content'>
             {device.state.connectedAt
@@ -191,7 +191,7 @@ export const SingleDeviceDetail: React.FC<{ device: Device; upgradeStatus: any }
         <Col span={isMobile ? 12 : 9}>
           <Row>
             <Col span={isMobile ? 24 : 8} className='ts-detail-label'>
-              {intl.get('LAST_SAMPLE_TIME')}
+              {intl.get('LAST_SAMPLING_TIME')}
             </Col>
             <Col span={isMobile ? 24 : 16} className='ts-detail-content'>
               {device.data && device.data.timestamp && device.data.timestamp > 0

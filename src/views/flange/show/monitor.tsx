@@ -17,7 +17,9 @@ export const FlangeMonitor = ({
   historyDatas: { name: string; data: HistoryData }[] | undefined;
 }) => {
   if (flange.monitoringPoints === undefined || flange.monitoringPoints.length === 0)
-    return <Empty description={NO_MONITORING_POINTS} image={Empty.PRESENTED_IMAGE_SIMPLE} />;
+    return (
+      <Empty description={intl.get(NO_MONITORING_POINTS)} image={Empty.PRESENTED_IMAGE_SIMPLE} />
+    );
 
   return (
     <Row gutter={[16, 16]}>

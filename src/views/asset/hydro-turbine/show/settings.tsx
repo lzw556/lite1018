@@ -6,6 +6,7 @@ import { getAsset, updateAsset } from '../../services';
 import { Asset, AssetRow } from '../../types';
 import { useAssetsContext } from '../../components/assetsContext';
 import { UpdateForm } from '../manage/updateForm';
+import intl from 'react-intl-universal';
 
 export const WindTurbineSet = (wind: AssetRow) => {
   const [form] = Form.useForm<Asset>();
@@ -14,7 +15,7 @@ export const WindTurbineSet = (wind: AssetRow) => {
   return (
     <ShadowCard>
       <UpdateForm wind={wind} form={form} style={{ width: isMobile ? '100%' : '50%' }}>
-        <Form.Item wrapperCol={{ offset: 4 }}>
+        <Form.Item wrapperCol={{ offset: 8 }}>
           <Button
             type='primary'
             onClick={() => {
@@ -29,7 +30,7 @@ export const WindTurbineSet = (wind: AssetRow) => {
               });
             }}
           >
-            保存
+            {intl.get('SAVE')}
           </Button>
         </Form.Item>
       </UpdateForm>

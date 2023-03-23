@@ -24,6 +24,7 @@ export const CommandMenu = ({
   const [upgradeVisible, setUpgradeVisible] = useState(false);
   const [visibleCalibrate, setVisibleCalibrate] = useState(false);
   const { hasPermissions } = userPermission();
+  const chanels = DeviceType.isMultiChannel(typeId, true);
 
   useEffect(() => {
     PubSub.subscribe(SocketTopic.upgradeStatus, (msg: string, status: any) => {
@@ -87,13 +88,11 @@ export const CommandMenu = ({
               <Menu.Item key={DeviceCommand.AcquireSensorData}>
                 {intl.get('ACQUIRE_SENSOR_DATA')}
               </Menu.Item>
-
-              {typeId === DeviceType.BoltElongationMultiChannels ? (
+              {chanels.length > 0 ? (
                 <Menu.SubMenu title={intl.get('RESET_DATA')}>
-                  <Menu.Item key={`[${DeviceCommand.ResetData},1]`}>1</Menu.Item>
-                  <Menu.Item key={`[${DeviceCommand.ResetData},2]`}>2</Menu.Item>
-                  <Menu.Item key={`[${DeviceCommand.ResetData},3]`}>3</Menu.Item>
-                  <Menu.Item key={`[${DeviceCommand.ResetData},4]`}>4</Menu.Item>
+                  {chanels.map((c) => (
+                    <Menu.Item key={`[${DeviceCommand.ResetData},${c.value}]`}>{c.label}</Menu.Item>
+                  ))}
                 </Menu.SubMenu>
               ) : (
                 <Menu.Item key={DeviceCommand.ResetData}>{intl.get('RESET_DATA')}</Menu.Item>
@@ -104,7 +103,7 @@ export const CommandMenu = ({
           {(typeId === DeviceType.HighTemperatureCorrosion ||
             typeId === DeviceType.NormalTemperatureCorrosion ||
             typeId === DeviceType.BoltElongation ||
-            typeId === DeviceType.BoltElongationMultiChannels ||
+            DeviceType.isMultiChannel(typeId) ||
             typeId === DeviceType.PressureTemperature) && (
             <Menu.Item key={DeviceCommand.Calibrate}>{intl.get('CALIBRATE')}</Menu.Item>
           )}

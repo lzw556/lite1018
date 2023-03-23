@@ -1,11 +1,10 @@
-import intl from 'react-intl-universal';
-
 export enum DeviceType {
   Gateway = 1,
   Router = 257,
   BoltLoosening = 131073,
   BoltElongation = 196609,
-  BoltElongationMultiChannels = 196611,
+  BoltElongation4Channels = 196611,
+  BoltElongation8Channels = 196612,
   NormalTemperatureCorrosion = 262145,
   HighTemperatureCorrosion = 262401,
   VibrationTemperature3Axis = 327938,
@@ -24,11 +23,13 @@ export namespace DeviceType {
       case DeviceType.Gateway:
         return 'DEVICE_TYPE_GATEWAY';
       case DeviceType.Router:
-        return 'DEVICE_TYPE_ROUTER';
+        return 'DEVICE_TYPE_RELAY';
       case DeviceType.BoltElongation:
         return 'DEVICE_TYPE_BOLT_PRELOAD';
-      case DeviceType.BoltElongationMultiChannels:
-        return 'DEVICE_TYPE_MULTI_CHANNELS_BOLT_PRELOAD';
+      case DeviceType.BoltElongation4Channels:
+        return 'DEVICE_TYPE_4_CHANNEL_BOLT_PRELOAD';
+      case DeviceType.BoltElongation8Channels:
+        return 'DEVICE_TYPE_8_CHANNEL_BOLT_PRELOAD';
       case DeviceType.BoltLoosening:
         return 'DEVICE_TYPE_BOLT_LOOSENING';
       case DeviceType.HighTemperatureCorrosion:
@@ -60,7 +61,8 @@ export namespace DeviceType {
     return [
       DeviceType.BoltLoosening,
       DeviceType.BoltElongation,
-      DeviceType.BoltElongationMultiChannels,
+      DeviceType.BoltElongation4Channels,
+      DeviceType.BoltElongation8Channels,
       DeviceType.NormalTemperatureCorrosion,
       DeviceType.HighTemperatureCorrosion,
       DeviceType.VibrationTemperature3Axis,
@@ -82,5 +84,22 @@ export namespace DeviceType {
         return true;
     }
     return false;
+  }
+
+  export function isMultiChannel(type: number): boolean;
+  export function isMultiChannel(
+    type: number,
+    returnChannels: boolean
+  ): { label: string; value: number }[];
+  export function isMultiChannel(type: number, returnChannels: boolean = false) {
+    const channels = [1, 2, 3, 4, 5, 6, 7, 8].map((v) => ({ label: v.toString(), value: v }));
+    const is4Channel = type === DeviceType.BoltElongation4Channels;
+    const is8Channel = type === DeviceType.BoltElongation8Channels;
+    if (returnChannels) {
+      if (is4Channel) return channels.filter((c) => c.value < 5);
+      if (is8Channel) return channels;
+      return [];
+    }
+    return is4Channel || is8Channel;
   }
 }

@@ -12,7 +12,7 @@ import Label from '../../components/label';
 import intl from 'react-intl-universal';
 
 export const RecentHistory: React.FC<{ device: Device }> = ({ device }) => {
-  const isMultiChannels = device.typeId === DeviceType.BoltElongationMultiChannels;
+  const channels = DeviceType.isMultiChannel(device.typeId, true);
   const [historyOptions, setHistoryOptions] = React.useState<any>();
   const [channel, setChannel] = React.useState('1');
 
@@ -21,7 +21,7 @@ export const RecentHistory: React.FC<{ device: Device }> = ({ device }) => {
       device.id,
       dayjs().startOf('day').subtract(13, 'd').utc().unix(),
       dayjs().endOf('day').utc().unix(),
-      isMultiChannels ? { channel } : {}
+      channels.length > 0 ? { channel } : {}
     ).then((data) => {
       setHistoryOptions(
         getSpecificProperties(
@@ -115,7 +115,7 @@ export const RecentHistory: React.FC<{ device: Device }> = ({ device }) => {
         })
       );
     });
-  }, [device, channel, isMultiChannels]);
+  }, [device, channel, channels.length]);
 
   const renderDeviceHistoryDataChart = () => {
     if (historyOptions && historyOptions.length) {
@@ -155,7 +155,7 @@ export const RecentHistory: React.FC<{ device: Device }> = ({ device }) => {
         <Card
           bordered={false}
           title={
-            isMultiChannels && (
+            channels.length > 0 && (
               <Space>
                 <Label name={intl.get('CURRENT_CHANNEL')}>
                   <Select
@@ -163,13 +163,8 @@ export const RecentHistory: React.FC<{ device: Device }> = ({ device }) => {
                     defaultValue={channel}
                     bordered={false}
                   >
-                    {[
-                      { label: '1', key: 1 },
-                      { label: '2', key: 2 },
-                      { label: '3', key: 3 },
-                      { label: '4', key: 4 }
-                    ].map(({ label, key }) => (
-                      <Select.Option value={key} key={key}>
+                    {channels.map(({ label, value }) => (
+                      <Select.Option value={value} key={value}>
                         {label}
                       </Select.Option>
                     ))}

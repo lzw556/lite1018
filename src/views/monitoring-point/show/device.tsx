@@ -95,7 +95,7 @@ function SingleDeviceInfo(props: Device & { alertLevel?: number }) {
           <NameValueGroups
             items={[
               {
-                name: intl.get('LAST_CONNECTED_TIME'),
+                name: intl.get('LAST_CONNECTION_TIME'),
                 value: state?.connectedAt
                   ? dayjs.unix(state.connectedAt).local().format('YYYY-MM-DD HH:mm:ss')
                   : '-'
@@ -107,7 +107,7 @@ function SingleDeviceInfo(props: Device & { alertLevel?: number }) {
           <NameValueGroups
             items={[
               {
-                name: intl.get('LAST_SAMPLE_TIME'),
+                name: intl.get('LAST_SAMPLING_TIME'),
                 value: data?.timestamp
                   ? dayjs.unix(data.timestamp).local().format('YYYY-MM-DD HH:mm:ss')
                   : '-'

@@ -30,7 +30,7 @@ const AcknowledgeModal: FC<AcknowledgeModalProps> = (props) => {
   };
 
   return (
-    <Modal {...props} width={400} title={intl.get('ALARM_HANDLE')} onOk={onSave}>
+    <Modal {...props} width={400} title={intl.get('ALARM_PROCESSING')} onOk={onSave}>
       <Form form={form} labelCol={{ span: 6 }}>
         <Form.Item label={intl.get('ALARM_SOURCE')} name={['source', 'name']}>
           <Input disabled />
@@ -39,7 +39,7 @@ const AcknowledgeModal: FC<AcknowledgeModalProps> = (props) => {
           <Input disabled />
         </Form.Item>
         <Form.Item label={intl.get('ALARM_NOTE')} name={'note'} initialValue={''}>
-          <Input.TextArea placeholder={intl.get('PLEASE_INPUT_NOTE')} rows={4} />
+          <Input.TextArea placeholder={intl.get('PLEASE_ENTER_NOTE')} rows={4} />
         </Form.Item>
       </Form>
     </Modal>

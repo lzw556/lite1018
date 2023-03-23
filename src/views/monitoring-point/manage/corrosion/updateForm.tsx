@@ -37,10 +37,12 @@ export const UpdateForm = ({
   children?: JSX.Element;
   style?: React.CSSProperties;
 }) => {
-  const [deviceTypeId, setDeviceTypeId] = React.useState<number | undefined>(
+  const deviceTypeId =
     monitoringPoint?.bindingDevices && monitoringPoint?.bindingDevices.length > 0
       ? monitoringPoint?.bindingDevices[0].typeId
-      : undefined
+      : 0;
+  const [channels, setChannels] = React.useState<{ label: string; value: number }[]>(
+    DeviceType.isMultiChannel(deviceTypeId, true)
   );
   const [parents, setParents] = React.useState<AssetRow[]>([]);
 
@@ -95,23 +97,18 @@ export const UpdateForm = ({
               monitoringPoint.type
             )?.join(',')
           }}
-          onTypeChange={(type) => setDeviceTypeId(type)}
+          onTypeChange={(type) => setChannels(DeviceType.isMultiChannel(type ?? 0, true))}
         />
       </Form.Item>
-      {deviceTypeId === DeviceType.BoltElongationMultiChannels && (
+      {channels.length > 0 && (
         <Form.Item
-          label='通道号'
+          label={intl.get('CHANNEL')}
           name='channel'
-          rules={[{ required: true, message: `请选择通道号` }]}
+          rules={[{ required: true, message: intl.get('PLEASE_SELECT_CHANNEL') }]}
           initialValue={1}
         >
           <Select>
-            {[
-              { label: '1', value: 1 },
-              { label: '2', value: 2 },
-              { label: '3', value: 3 },
-              { label: '4', value: 4 }
-            ].map(({ label, value }) => (
+            {channels.map(({ label, value }) => (
               <Select.Option key={value} value={value}>
                 {label}
               </Select.Option>

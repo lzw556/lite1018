@@ -7,7 +7,8 @@ export const WIND_TURBINE_ASSET_TYPE_ID = 101;
 export const SENSORS = [
   DeviceType.BoltLoosening,
   DeviceType.BoltElongation,
-  DeviceType.BoltElongationMultiChannels
+  DeviceType.BoltElongation4Channels,
+  DeviceType.BoltElongation8Channels
 ];
 export const MONITORING_POINTS = [
   {

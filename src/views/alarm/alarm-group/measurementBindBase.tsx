@@ -109,7 +109,7 @@ export const MeasurementBindBase: React.FC<
   return (
     <Modal
       width={800}
-      title={UPDATE_MONITORING_POINT}
+      title={intl.get(UPDATE_MONITORING_POINT)}
       bodyStyle={{ maxHeight: 700, overflow: 'auto' }}
       {...props}
       onOk={() => {

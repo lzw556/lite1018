@@ -62,21 +62,17 @@ export const DeviceSelection: React.FC<{
         <Checkbox.Group value={selected.map((item) => item[0])}>
           <Row>
             {props.devices?.map(({ id, name, macAddress, typeId }) => {
+              const channels = DeviceType.isMultiChannel(typeId, true);
               const defaultCheckedList =
                 selected.filter((item) => item[0] === id).length > 0
                   ? selected.filter((item) => item[0] === id)[0][1]
                   : [];
-              const defaultIndeterminate =
-                defaultCheckedList.length > 0 && defaultCheckedList.length < 4;
               return (
-                <Col
-                  span={typeId === DeviceType.BoltElongationMultiChannels ? 24 : 12}
-                  key={macAddress}
-                >
-                  {typeId === DeviceType.BoltElongationMultiChannels ? (
+                <Col span={channels.length > 0 ? 24 : 12} key={macAddress}>
+                  {channels.length > 0 ? (
                     <div style={{ marginBottom: 10 }}>
                       <CheckAll
-                        all={{ label: name, value: id, indeterminate: defaultIndeterminate }}
+                        all={{ label: name, value: id }}
                         checkAllChange={(checkValues) => {
                           setSelected((prev) => {
                             const crt = prev.filter((item) => item[0] === id);
@@ -96,12 +92,10 @@ export const DeviceSelection: React.FC<{
                           });
                         }}
                         defaultCheckedList={defaultCheckedList}
-                        options={[
-                          { label: `${intl.get('CHANNEL')}1`, value: 1 },
-                          { label: `${intl.get('CHANNEL')}2`, value: 2 },
-                          { label: `${intl.get('CHANNEL')}3`, value: 3 },
-                          { label: `${intl.get('CHANNEL')}4`, value: 4 }
-                        ]}
+                        options={channels.map((c) => ({
+                          ...c,
+                          label: `${intl.get('CHANNEL')}${c.value}`
+                        }))}
                       />
                     </div>
                   ) : (
@@ -156,30 +150,27 @@ function CheckAll({
   options,
   checkAllChange
 }: {
-  all: { label: string; value: number; indeterminate: boolean };
+  all: { label: string; value: number };
   defaultCheckedList?: CheckboxValueType[];
   options: { label: string; value: number }[];
   checkAllChange: (checkValues: CheckboxValueType[]) => void;
 }) {
   const [checkedList, setCheckedList] = React.useState<CheckboxValueType[]>(defaultCheckedList);
-  const [indeterminate, setIndeterminate] = React.useState(all.indeterminate ?? false);
 
   const onChange = (list: CheckboxValueType[]) => {
     setCheckedList(list);
-    setIndeterminate(!!list.length && list.length < options.length);
     checkAllChange(list);
   };
 
   const onCheckAllChange = (e: CheckboxChangeEvent) => {
     const checkList = e.target.checked ? options.map(({ value }) => value) : [];
     setCheckedList(checkList);
-    setIndeterminate(false);
     checkAllChange(checkList);
   };
 
   return (
     <Space direction='vertical'>
-      <Checkbox indeterminate={indeterminate} onChange={onCheckAllChange} value={all.value}>
+      <Checkbox onChange={onCheckAllChange} value={all.value}>
         {all.label}
       </Checkbox>
       <Checkbox.Group

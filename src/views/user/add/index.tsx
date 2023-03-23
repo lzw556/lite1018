@@ -68,7 +68,7 @@ const AddUserModal = (props: AddUserProps) => {
         <FormInputItem
           name='username'
           label={intl.get('USERNAME')}
-          requiredMessage={intl.get('PLEASE_INPUT_USERNAME')}
+          requiredMessage={intl.get('PLEASE_ENTER_USERNAME')}
           lengthLimit={{ min: 4, max: 16, label: intl.get('USERNAME').toLowerCase() }}
         >
           <Input placeholder={intl.get('USERNAME')} />
@@ -76,7 +76,7 @@ const AddUserModal = (props: AddUserProps) => {
         <Form.Item
           name='password'
           label={intl.get('PASSWORD')}
-          rules={[{ required: true, message: intl.get('PLEASE_INPUT_PASSWORD') }]}
+          rules={[{ required: true, message: intl.get('PLEASE_ENTER_PASSWORD') }]}
         >
           <Input.Password placeholder={intl.get('PASSWORD')} />
         </Form.Item>

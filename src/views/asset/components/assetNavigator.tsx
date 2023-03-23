@@ -9,6 +9,7 @@ import { useAssetCategoryContext, AssetCategory, ASSET_CATEGORY } from '..';
 import { ROOT_ASSETS } from '../../../config/assetCategory.config';
 import { FLANGE_ASSET_TYPE_ID, FLANGE_PATHNAME } from '../../flange';
 import { AREA_ASSET_TYPES, AREA_ASSET_TYPE_PATHNAME } from '../corrosion';
+import intl from 'react-intl-universal';
 
 export const rootPathState = { from: { label: '总览', path: '/project-overview' } };
 
@@ -92,15 +93,18 @@ export const AssetNavigator = ({
         </Dropdown>
       );
     } else {
+      const name = asset.name;
+      const nameWithTranslation = intl.get(name);
+      const final = nameWithTranslation.length === 0 ? name : nameWithTranslation;
       return (
         <Space>
           {asset.id === 0 ? (
             <Link to={from.path} state={{ from }}>
-              {asset.name}
+              {final}
             </Link>
           ) : (
             <Link to={`${getPathFromType(category, asset.type)}${asset.id}`} state={{ from }}>
-              {asset.name}
+              {final}
             </Link>
           )}
           {assets.length > 0 && (

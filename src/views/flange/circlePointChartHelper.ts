@@ -72,7 +72,7 @@ export function buildCirclePointsChartOfFlange(
   }
 
   if (checkValidAttr(attributes, 'info', min)) {
-    const seriesName = `${intl.get('ALARM_LEVEL_INFO_TITLE')} ${attributes?.info?.value}${
+    const seriesName = `${intl.get('ALARM_LEVEL_MINOR_TITLE')} ${attributes?.info?.value}${
       field?.unit
     }`;
     const info = getSeries(ColorInfo, attributes?.info?.value, seriesName);
@@ -81,7 +81,7 @@ export function buildCirclePointsChartOfFlange(
   }
 
   if (checkValidAttr(attributes, 'warn', min)) {
-    const seriesName = `${intl.get('ALARM_LEVEL_WARN_TITLE')} ${attributes?.warn?.value}${
+    const seriesName = `${intl.get('ALARM_LEVEL_MAJOR_TITLE')} ${attributes?.warn?.value}${
       field?.unit
     }`;
     const warn = getSeries(ColorWarn, attributes?.warn?.value, seriesName);
@@ -90,7 +90,7 @@ export function buildCirclePointsChartOfFlange(
   }
 
   if (checkValidAttr(attributes, 'danger', min)) {
-    const seriesName = `${intl.get('ALARM_LEVEL_DANGER_TITLE')} ${attributes?.danger?.value}${
+    const seriesName = `${intl.get('ALARM_LEVEL_CRITICAL_TITLE')} ${attributes?.danger?.value}${
       field?.unit
     }`;
     const danger = getSeries(ColorDanger, attributes?.danger?.value, seriesName);

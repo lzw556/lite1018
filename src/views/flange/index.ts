@@ -1,9 +1,11 @@
 import { AssetRow } from '../asset';
 import { FLANGE_TYPES } from './types';
 
-export * from './manage/create';
-export * from './manage/update';
-export * from './show/index';
+export * from './manage/wind-turbine/create';
+export * from './manage/wind-turbine/update';
+export * from './manage/hydro-turbine/create';
+export * from './manage/hydro-turbine/update';
+export * from './show/wind-turbine/index';
 export * from './card';
 export * from './icon';
 export * from './monitoringPointsTable';

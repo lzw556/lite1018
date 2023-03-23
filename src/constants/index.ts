@@ -187,7 +187,7 @@ export const GROUP_INTERVAL = [
   }
 ];
 
-export const SAMPLE_PERIOD_1 = [
+export const SAMPLING_PERIOD_1 = [
   {
     value: 60 * millisecond,
     text: 'OPTION_1_MINUTE'
@@ -242,7 +242,7 @@ export const SAMPLE_PERIOD_1 = [
   }
 ];
 
-export const SAMPLE_PERIOD_2 = [
+export const SAMPLING_PERIOD_2 = [
   {
     value: 60 * millisecond,
     text: 'OPTION_1_MINUTE'
@@ -306,7 +306,7 @@ export const SAMPLE_PERIOD_2 = [
   }
 ];
 
-export const SAMPLE_OFFSET = [
+export const SAMPLING_OFFSET = [
   {
     value: 0,
     text: 'NONE'

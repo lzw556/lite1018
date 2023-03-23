@@ -69,10 +69,10 @@ const AddNetworkModal: FC<AddNetworkModalProps> = (props) => {
           <FormInputItem
             label={intl.get('NAME')}
             name={'name'}
-            requiredMessage={intl.get('PLEASE_INPUT_NETWORK_NAME')}
+            requiredMessage={intl.get('PLEASE_ENTER_NETWORK_NAME')}
             lengthLimit={{ min: 4, max: 16, label: intl.get('NETWORK').toLowerCase() }}
           >
-            <Input placeholder={intl.get('PLEASE_INPUT_NETWORK_NAME')} />
+            <Input placeholder={intl.get('PLEASE_ENTER_NETWORK_NAME')} />
           </FormInputItem>
           {provisionMode && <WsnFormItem mode={provisionMode} onModeChange={setProvisionMode} />}
         </fieldset>
@@ -89,7 +89,7 @@ const AddNetworkModal: FC<AddNetworkModalProps> = (props) => {
             rules={[
               {
                 required: true,
-                message: intl.get('PLEASE_INPUT_SOMETHING', { something: intl.get('MAC_ADDRESS') })
+                message: intl.get('PLEASE_ENTER_SOMETHING', { something: intl.get('MAC_ADDRESS') })
               },
               {
                 pattern: /^([0-9a-fA-F]{2})(([0-9a-fA-F]{2}){5})$/,
@@ -97,7 +97,7 @@ const AddNetworkModal: FC<AddNetworkModalProps> = (props) => {
               }
             ]}
           >
-            <Input placeholder={intl.get('PLEASE_INPUT_GATEWAY_MAC')} />
+            <Input placeholder={intl.get('PLEASE_ENTER_GATEWAY_MAC')} />
           </Form.Item>
           <IpnFormItem ipn={DEFAULT_IPN_SETTING} />
         </fieldset>

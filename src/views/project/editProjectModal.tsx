@@ -78,10 +78,10 @@ const EditProjectModal: FC<EditProjectModalProps> = (props) => {
         <FormInputItem
           name='name'
           label={intl.get('NAME')}
-          requiredMessage={intl.get('PLEASE_INPUT_PROJECT_NAME')}
+          requiredMessage={intl.get('PLEASE_ENTER_PROJECT_NAME')}
           lengthLimit={{ min: 4, max: 32, label: intl.get('NAME').toLowerCase() }}
         >
-          <Input placeholder={intl.get('PLEASE_INPUT_PROJECT_NAME')} />
+          <Input placeholder={intl.get('PLEASE_ENTER_PROJECT_NAME')} />
         </FormInputItem>
         <Form.Item
           label={
@@ -91,7 +91,7 @@ const EditProjectModal: FC<EditProjectModalProps> = (props) => {
           }
           name={'description'}
         >
-          <Input.TextArea placeholder={intl.get('PLEASE_INPUT_PROJECT_DESCRIPTION')} />
+          <Input.TextArea placeholder={intl.get('PLEASE_ENTER_PROJECT_DESCRIPTION')} />
         </Form.Item>
       </Form>
     </Modal>

@@ -50,10 +50,10 @@ const EditBaseInfoModel = (props: any) => {
         <FormInputItem
           label={intl.get('DEVICE_NAME')}
           name='name'
-          requiredMessage={intl.get('PLEASE_INPUT_DEVICE_NAME')}
+          requiredMessage={intl.get('PLEASE_ENTER_DEVICE_NAME')}
           lengthLimit={{ min: 4, max: 20, label: intl.get('DEVICE_NAME') }}
         >
-          <Input placeholder={intl.get('PLEASE_INPUT_DEVICE_NAME')} />
+          <Input placeholder={intl.get('PLEASE_ENTER_DEVICE_NAME')} />
         </FormInputItem>
         <Form.Item
           label={intl.get('MAC_ADDRESS')}
@@ -61,7 +61,7 @@ const EditBaseInfoModel = (props: any) => {
           rules={[
             {
               required: true,
-              message: intl.get('PLEASE_INPUT_MAC_ADDRESS')
+              message: intl.get('PLEASE_ENTER_MAC_ADDRESS')
             },
             {
               pattern: /^([0-9a-fA-F]{2})(([0-9a-fA-F]{2}){5})$/,
@@ -71,7 +71,7 @@ const EditBaseInfoModel = (props: any) => {
           normalize={Normalizes.macAddress}
           required
         >
-          <Input placeholder={intl.get('PLEASE_INPUT_MAC_ADDRESS')} />
+          <Input placeholder={intl.get('PLEASE_ENTER_MAC_ADDRESS')} />
         </Form.Item>
 
         {device && device.parent !== '' && device.parent !== device.macAddress && (

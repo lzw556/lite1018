@@ -72,7 +72,7 @@ const DeviceEvent: FC<DeviceEventProps> = ({ device }) => {
     });
   }
   columns.push({
-    title: intl.get('OCCURRENCE'),
+    title: intl.get('TIMESTAMP'),
     dataIndex: 'timestamp',
     key: 'timestamp',
     render: (timestamp: number) => {

@@ -32,17 +32,17 @@ const IpnFormItem: FC<IpnFromItemProps> = ({ ipn }) => {
             label={intl.get('IP_ADDRESS')}
             name={['ipn', 'ip_addr']}
             initialValue={ipn?.ip_addr}
-            rules={[{ required: true, message: intl.get('PLEASE_INPUT_IP_ADDRESS') }]}
+            rules={[{ required: true, message: intl.get('PLEASE_ENTER_IP_ADDRESS') }]}
           >
-            <Input placeholder={intl.get('PLEASE_INPUT_GATEWAY_IP_ADDRESS')} />
+            <Input placeholder={intl.get('PLEASE_ENTER_GATEWAY_IP_ADDRESS')} />
           </Form.Item>
           <Form.Item
             label={intl.get('SUBNET_MASK')}
             name={['ipn', 'subnet_mask']}
             initialValue={ipn?.subnet_mask}
-            rules={[{ required: true, message: intl.get('PLEASE_INPUT_GATEWAY_SUBNET_MASK') }]}
+            rules={[{ required: true, message: intl.get('PLEASE_ENTER_GATEWAY_SUBNET_MASK') }]}
           >
-            <Input placeholder={intl.get('PLEASE_INPUT_GATEWAY_SUBNET_MASK')} />
+            <Input placeholder={intl.get('PLEASE_ENTER_GATEWAY_SUBNET_MASK')} />
           </Form.Item>
           <Form.Item
             label={
@@ -52,9 +52,9 @@ const IpnFormItem: FC<IpnFromItemProps> = ({ ipn }) => {
             }
             name={['ipn', 'gateway_addr']}
             initialValue={ipn?.gateway_addr}
-            rules={[{ required: true, message: intl.get('PLEASE_INPUT_GATEWAY_ADDRESS') }]}
+            rules={[{ required: true, message: intl.get('PLEASE_ENTER_GATEWAY_ADDRESS') }]}
           >
-            <Input placeholder={intl.get('PLEASE_INPUT_GATEWAY_ADDRESS')} />
+            <Input placeholder={intl.get('PLEASE_ENTER_GATEWAY_ADDRESS')} />
           </Form.Item>
         </div>
       );
@@ -68,9 +68,9 @@ const IpnFormItem: FC<IpnFromItemProps> = ({ ipn }) => {
           label={intl.get('NTP_ADDRESS')}
           initialValue={ipn?.ntp_addr}
           name={['ipn', 'ntp_addr']}
-          rules={[{ required: true, message: intl.get('PLEASE_INPUT_NTP_SERVER_ADDRESS') }]}
+          rules={[{ required: true, message: intl.get('PLEASE_ENTER_NTP_SERVER_ADDRESS') }]}
         >
-          <Input placeholder={intl.get('PLEASE_INPUT_NTP_SERVER_ADDRESS')} />
+          <Input placeholder={intl.get('PLEASE_ENTER_NTP_SERVER_ADDRESS')} />
         </Form.Item>
       );
     }

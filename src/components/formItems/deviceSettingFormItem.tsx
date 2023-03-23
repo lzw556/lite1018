@@ -92,7 +92,7 @@ const DeviceSettingFormItem: FC<DeviceSettingFormItemProps> = ({ value, editable
       case DeviceSettingValueType.float:
         const ruleRequired = {
           required: true,
-          message: intl.get('PLEASE_INPUT_SOMETHING', {
+          message: intl.get('PLEASE_ENTER_SOMETHING', {
             something: intl.get(setting.name).toLowerCase()
           })
         };
@@ -104,7 +104,7 @@ const DeviceSettingFormItem: FC<DeviceSettingFormItemProps> = ({ value, editable
             }
             return value;
           },
-          message: intl.get('PLEASE_INPUT_NUMERIC')
+          message: intl.get('PLEASE_ENTER_NUMERIC')
         };
         if (setting.validator) {
           return [ruleRequired, ruleNumeric];

@@ -90,17 +90,17 @@ export default function CreateAlarmRuleGroup() {
           <FormInputItem
             name='name'
             label={intl.get('NAME')}
-            requiredMessage={intl.get('PLEASE_INPUT_NAME')}
+            requiredMessage={intl.get('PLEASE_ENTER_NAME')}
             lengthLimit={{ min: 4, max: 16, label: intl.get('NAME').toLowerCase() }}
           >
             <Input
-              placeholder={intl.get('PLEASE_INPUT_NAME')}
+              placeholder={intl.get('PLEASE_ENTER_NAME')}
               style={{ width: isMobile ? '75%' : 435 }}
             />
           </FormInputItem>
           <Form.Item label={intl.get('DESCRIPTION')} name='description' initialValue=''>
             <Input
-              placeholder={intl.get('PLEASE_INPUT_DESCRIPTION')}
+              placeholder={intl.get('PLEASE_ENTER_DESCRIPTION')}
               style={{ width: isMobile ? '75%' : 435 }}
             />
           </Form.Item>
@@ -117,7 +117,7 @@ export default function CreateAlarmRuleGroup() {
                           {...restFields}
                           name={[name, 'name']}
                           dependencies={index === 0 ? undefined : ['user', index - 1, 'name']}
-                          requiredMessage={intl.get('PLEASE_INPUT_NAME')}
+                          requiredMessage={intl.get('PLEASE_ENTER_NAME')}
                           lengthLimit={{
                             min: 4,
                             max: 16,
@@ -125,7 +125,7 @@ export default function CreateAlarmRuleGroup() {
                           }}
                         >
                           <Input
-                            placeholder={intl.get('PLEASE_INPUT_NAME')}
+                            placeholder={intl.get('PLEASE_ENTER_NAME')}
                             style={{ width: isMobile ? '75%' : 435 }}
                           />
                         </FormInputItem>
@@ -189,13 +189,13 @@ export default function CreateAlarmRuleGroup() {
                               label={intl.get('DURATION')}
                               {...restFields}
                               name={[name, 'duration']}
-                              requiredMessage={intl.get('PLEASE_INPUT_SOMETHING', {
+                              requiredMessage={intl.get('PLEASE_ENTER_SOMETHING', {
                                 something: intl.get('DURATION')
                               })}
                               numericRule={{
                                 isInteger: true,
                                 min: 1,
-                                message: intl.get('UNSIGNED_INTEGER_INPUT_PROMPT')
+                                message: intl.get('UNSIGNED_INTEGER_ENTER_PROMPT')
                               }}
                               initialValue={1}
                               style={{ marginBottom: 0 }}
@@ -208,7 +208,7 @@ export default function CreateAlarmRuleGroup() {
                               style={{ marginBottom: 0 }}
                               {...restFields}
                               name={[name, 'threshold']}
-                              requiredMessage={intl.get('PLEASE_INPUT_SOMETHING', {
+                              requiredMessage={intl.get('PLEASE_ENTER_SOMETHING', {
                                 something: intl.get('CONDITION')
                               })}
                               numericRule={{
@@ -258,13 +258,13 @@ export default function CreateAlarmRuleGroup() {
                             >
                               <Select style={{ width: 120 }}>
                                 <Select.Option key={1} value={1}>
-                                  {intl.get('ALARM_LEVEL_INFO')}
+                                  {intl.get('ALARM_LEVEL_MINOR')}
                                 </Select.Option>
                                 <Select.Option key={2} value={2}>
-                                  {intl.get('ALARM_LEVEL_WARN')}
+                                  {intl.get('ALARM_LEVEL_MAJOR')}
                                 </Select.Option>
                                 <Select.Option key={3} value={3}>
-                                  {intl.get('ALARM_LEVEL_DANGER')}
+                                  {intl.get('ALARM_LEVEL_CRITICAL')}
                                 </Select.Option>
                               </Select>
                             </Form.Item>
@@ -279,7 +279,7 @@ export default function CreateAlarmRuleGroup() {
                           {...restFields}
                           name={[name, 'name']}
                           dependencies={index === 0 ? undefined : ['user', index - 1, 'name']}
-                          requiredMessage={intl.get('PLEASE_INPUT_NAME')}
+                          requiredMessage={intl.get('PLEASE_ENTER_NAME')}
                           lengthLimit={{
                             min: 4,
                             max: 16,
@@ -287,7 +287,7 @@ export default function CreateAlarmRuleGroup() {
                           }}
                         >
                           <Input
-                            placeholder={intl.get('PLEASE_INPUT_NAME')}
+                            placeholder={intl.get('PLEASE_ENTER_NAME')}
                             style={{ width: isMobile ? '75%' : 435 }}
                           />
                         </FormInputItem>
@@ -341,13 +341,13 @@ export default function CreateAlarmRuleGroup() {
                           label={intl.get('DURATION')}
                           {...restFields}
                           name={[name, 'duration']}
-                          requiredMessage={intl.get('PLEASE_INPUT_SOMETHING', {
+                          requiredMessage={intl.get('PLEASE_ENTER_SOMETHING', {
                             something: intl.get('DURATION')
                           })}
                           numericRule={{
                             isInteger: true,
                             min: 1,
-                            message: intl.get('UNSIGNED_INTEGER_INPUT_PROMPT')
+                            message: intl.get('UNSIGNED_INTEGER_ENTER_PROMPT')
                           }}
                           initialValue={1}
                           numericChildren={
@@ -361,7 +361,7 @@ export default function CreateAlarmRuleGroup() {
                           label={intl.get('CONDITION')}
                           {...restFields}
                           name={[name, 'threshold']}
-                          requiredMessage={intl.get('PLEASE_INPUT_SOMETHING', {
+                          requiredMessage={intl.get('PLEASE_ENTER_SOMETHING', {
                             something: intl.get('CONDITION')
                           })}
                           numericRule={{
@@ -408,13 +408,13 @@ export default function CreateAlarmRuleGroup() {
                         >
                           <Select style={{ width: isMobile ? '75%' : 435 }}>
                             <Select.Option key={1} value={1}>
-                              {intl.get('ALARM_LEVEL_INFO')}
+                              {intl.get('ALARM_LEVEL_MINOR')}
                             </Select.Option>
                             <Select.Option key={2} value={2}>
-                              {intl.get('ALARM_LEVEL_WARN')}
+                              {intl.get('ALARM_LEVEL_MAJOR')}
                             </Select.Option>
                             <Select.Option key={3} value={3}>
-                              {intl.get('ALARM_LEVEL_DANGER')}
+                              {intl.get('ALARM_LEVEL_CRITICAL')}
                             </Select.Option>
                           </Select>
                         </Form.Item>

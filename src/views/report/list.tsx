@@ -2,7 +2,6 @@ import { Col, Row } from 'antd';
 import { Content } from 'antd/lib/layout/layout';
 import moment from 'moment';
 import React, { useCallback, useEffect, useState } from 'react';
-import MyBreadcrumb from '../../components/myBreadcrumb';
 import { RangeDatePicker } from '../../components/rangeDatePicker';
 import ShadowCard from '../../components/shadowCard';
 import { Store, useStore } from '../../hooks/store';
@@ -13,6 +12,7 @@ import request from '../../utils/request';
 import { GetResponse } from '../../utils/response';
 import TableLayout from '../layout/TableLayout';
 import intl from 'react-intl-universal';
+import { PageTitle } from '../../components/pageTitle';
 
 export default function ReportList() {
   const [dataSource, setDataSource] = useState<PageResult<Report[]>>();
@@ -57,7 +57,7 @@ export default function ReportList() {
 
   return (
     <Content>
-      <MyBreadcrumb />
+      <PageTitle items={[{ title: intl.get('MENU_REPORTS') }]} />
       <ShadowCard>
         <Row gutter={[0, 20]}>
           <Col span={24}>

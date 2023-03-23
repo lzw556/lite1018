@@ -128,5 +128,5 @@ export const WindTurbineMonitoringPointCreate: React.FC<
 };
 
 function getPointName(name: string, channel?: number) {
-  return `${name}${channel ? `-通道${channel}` : ''}`;
+  return `${name}${channel ? `-${intl.get('CHANNEL')}${channel}` : ''}`;
 }

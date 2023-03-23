@@ -22,11 +22,11 @@ export const SingleDeviceStatus: React.FC<Pick<Device, 'alertStates' | 'state'>>
       });
       switch (maxLevel) {
         case 1:
-          return <Tag color={ColorInfo}>{intl.get('ALARM_LEVEL_INFO')}</Tag>;
+          return <Tag color={ColorInfo}>{intl.get('ALARM_LEVEL_MINOR')}</Tag>;
         case 2:
-          return <Tag color={ColorWarn}>{intl.get('ALARM_LEVEL_WARN')}</Tag>;
+          return <Tag color={ColorWarn}>{intl.get('ALARM_LEVEL_MAJOR')}</Tag>;
         case 3:
-          return <Tag color={ColorDanger}>{intl.get('ALARM_LEVEL_DANGER')}</Tag>;
+          return <Tag color={ColorDanger}>{intl.get('ALARM_LEVEL_CRITICAL')}</Tag>;
         default:
           return null;
       }

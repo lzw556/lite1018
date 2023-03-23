@@ -62,7 +62,9 @@ export const DynamicData: React.FC<Device> = ({ id, typeId }) => {
         link.href = url;
         link.setAttribute(
           'download',
-          `${dayjs.unix(timestamp).local().format('YYYY-MM-DD_hh-mm-ss')}${field.label}.csv`
+          `${dayjs.unix(timestamp).local().format('YYYY-MM-DD_hh-mm-ss')}${intl.get(
+            field.label
+          )}.csv`
         );
         document.body.appendChild(link);
         link.click();

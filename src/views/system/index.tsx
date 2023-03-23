@@ -147,7 +147,7 @@ const SystemPage = () => {
             style={{ height: '256px' }}
           >
             <Form.Item
-              label={intl.get('CPU_CORE_AMOUNT')}
+              label={intl.get('NUMBER_OF_CPU_CORES')}
               labelAlign={'left'}
               labelCol={{ span: 12 }}
               style={{ marginBottom: '2px' }}
@@ -155,7 +155,7 @@ const SystemPage = () => {
               {data ? data.server.cpu.cores : ''}
             </Form.Item>
             <Form.Item
-              label={intl.get('CPU_AMOUNT')}
+              label={intl.get('NUMBER_OF_CPUS')}
               labelAlign={'left'}
               labelCol={{ span: 12 }}
               style={{ marginBottom: '2px' }}

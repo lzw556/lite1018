@@ -80,8 +80,8 @@ const WsnFormItem: FC<NetworkFormItemProps> = ({ mode, onModeChange }) => {
     <div>
       <Form.Item
         label={
-          <Typography.Text ellipsis={true} title={intl.get('PROVISION_MODE')}>
-            {intl.get('PROVISION_MODE')}
+          <Typography.Text ellipsis={true} title={intl.get('WSN_MODE')}>
+            {intl.get('WSN_MODE')}
           </Typography.Text>
         }
         name={'mode'}
@@ -89,7 +89,7 @@ const WsnFormItem: FC<NetworkFormItemProps> = ({ mode, onModeChange }) => {
       >
         <Select
           placeholder={intl.get('PLEASE_SELECT_SOMETHING', {
-            something: intl.get('PROVISION_MODE')
+            something: intl.get('WSN_MODE')
           })}
           onChange={(value) => onModeChange?.(value)}
         >
@@ -112,7 +112,7 @@ const WsnFormItem: FC<NetworkFormItemProps> = ({ mode, onModeChange }) => {
         rules={[
           {
             required: true,
-            message: intl.get('PLEASE_INPUT_SOMETHING', {
+            message: intl.get('PLEASE_ENTER_SOMETHING', {
               something: intl.get('SETTING_COMMUNICATION_PERIOD')
             })
           },
@@ -130,7 +130,7 @@ const WsnFormItem: FC<NetworkFormItemProps> = ({ mode, onModeChange }) => {
         dependencies={[['wsn', 'communication_period']]}
       >
         <InputNumber
-          placeholder={intl.get('PLEASE_INPUT_SOMETHING', {
+          placeholder={intl.get('PLEASE_ENTER_SOMETHING', {
             something: intl.get('COMMUNICATION_OFFSET')
           })}
           controls={false}

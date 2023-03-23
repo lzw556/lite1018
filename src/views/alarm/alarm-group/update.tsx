@@ -68,17 +68,17 @@ export default function UpdateAlarmRuleGroup() {
           <FormInputItem
             name='name'
             label={intl.get('NAME')}
-            requiredMessage={intl.get('PLEASE_INPUT_NAME')}
+            requiredMessage={intl.get('PLEASE_ENTER_NAME')}
             lengthLimit={{ min: 4, max: 16, label: intl.get('NAME').toLowerCase() }}
           >
             <Input
-              placeholder={intl.get('PLEASE_INPUT_NAME')}
+              placeholder={intl.get('PLEASE_ENTER_NAME')}
               style={{ width: isMobile ? '75%' : 435 }}
             />
           </FormInputItem>
           <Form.Item label={intl.get('DESCRIPTION')} name='description'>
             <Input
-              placeholder={intl.get('PLEASE_INPUT_DESCRIPTION')}
+              placeholder={intl.get('PLEASE_ENTER_DESCRIPTION')}
               style={{ width: isMobile ? '75%' : 435 }}
             />
           </Form.Item>
@@ -97,7 +97,7 @@ export default function UpdateAlarmRuleGroup() {
                           rules={index < rule.rules.length ? undefined : [Rules.range(4, 16)]}
                         >
                           <Input
-                            placeholder={intl.get('PLEASE_INPUT_NAME')}
+                            placeholder={intl.get('PLEASE_ENTER_NAME')}
                             readOnly={index < rule.rules.length}
                             style={{ width: isMobile ? '75%' : 435 }}
                             disabled={true}
@@ -114,13 +114,13 @@ export default function UpdateAlarmRuleGroup() {
                           label={intl.get('DURATION')}
                           {...restFields}
                           name={[name, 'duration']}
-                          requiredMessage={intl.get('PLEASE_INPUT_SOMETHING', {
+                          requiredMessage={intl.get('PLEASE_ENTER_SOMETHING', {
                             something: intl.get('DURATION')
                           })}
                           numericRule={{
                             isInteger: true,
                             min: 1,
-                            message: intl.get('UNSIGNED_INTEGER_INPUT_PROMPT')
+                            message: intl.get('UNSIGNED_INTEGER_ENTER_PROMPT')
                           }}
                           initialValue={1}
                           numericChildren={
@@ -134,7 +134,7 @@ export default function UpdateAlarmRuleGroup() {
                           label={intl.get('CONDITION')}
                           {...restFields}
                           name={[name, 'threshold']}
-                          requiredMessage={intl.get('PLEASE_INPUT_SOMETHING', {
+                          requiredMessage={intl.get('PLEASE_ENTER_SOMETHING', {
                             something: intl.get('CONDITION')
                           })}
                           numericRule={{
@@ -220,13 +220,13 @@ export default function UpdateAlarmRuleGroup() {
                               label={intl.get('DURATION')}
                               {...restFields}
                               name={[name, 'duration']}
-                              requiredMessage={intl.get('PLEASE_INPUT_SOMETHING', {
+                              requiredMessage={intl.get('PLEASE_ENTER_SOMETHING', {
                                 something: intl.get('DURATION')
                               })}
                               numericRule={{
                                 isInteger: true,
                                 min: 1,
-                                message: intl.get('UNSIGNED_INTEGER_INPUT_PROMPT')
+                                message: intl.get('UNSIGNED_INTEGER_ENTER_PROMPT')
                               }}
                               initialValue={1}
                               style={{ marginBottom: 0 }}
@@ -239,7 +239,7 @@ export default function UpdateAlarmRuleGroup() {
                               style={{ marginBottom: 0 }}
                               {...restFields}
                               name={[name, 'threshold']}
-                              requiredMessage={intl.get('PLEASE_INPUT_SOMETHING', {
+                              requiredMessage={intl.get('PLEASE_ENTER_SOMETHING', {
                                 something: intl.get('CONDITION')
                               })}
                               numericRule={{

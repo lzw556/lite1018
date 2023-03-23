@@ -62,13 +62,13 @@ const LoginPage: FC = () => {
         <Form onFinish={login}>
           <Form.Item
             name='username'
-            rules={[{ required: true, message: intl.get('PLEASE_INPUT_USERNAME') }]}
+            rules={[{ required: true, message: intl.get('PLEASE_ENTER_USERNAME') }]}
           >
             <Input prefix={<UserOutlined />} placeholder={intl.get('USERNAME')} />
           </Form.Item>
           <Form.Item
             name='password'
-            rules={[{ required: true, message: intl.get('PLEASE_INPUT_PASSWORD') }]}
+            rules={[{ required: true, message: intl.get('PLEASE_ENTER_PASSWORD') }]}
           >
             <Input prefix={<KeyOutlined />} placeholder={intl.get('PASSWORD')} type='password' />
           </Form.Item>

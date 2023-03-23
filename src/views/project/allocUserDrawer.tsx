@@ -86,7 +86,7 @@ const AllocUserDrawer: FC<AllocUserDrawerProps> = (props) => {
       <Row justify={'center'}>
         <Col span={24}>
           <Search
-            placeholder={intl.get('PLEASE_INPUT_USERNAME_TO_SEARCH')}
+            placeholder={intl.get('PLEASE_ENTER_USERNAME_TO_SEARCH')}
             onChange={(e) => onChange(e.target.value)}
           />
         </Col>

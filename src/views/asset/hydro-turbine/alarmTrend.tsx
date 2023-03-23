@@ -4,6 +4,7 @@ import * as React from 'react';
 import { GetAlertStatisticsRequest } from '../../../apis/statistic';
 import { ColorDanger, ColorInfo, ColorWarn } from '../../../constants/color';
 import { ChartContainer } from '../../../components/charts/chartContainer';
+import intl from 'react-intl-universal';
 
 type Statistics = { timestamp: number; info: number; warn: number; critical: number };
 export const AlarmTrend: React.FC<{ title: string }> = ({ title }) => {
@@ -57,19 +58,19 @@ export const AlarmTrend: React.FC<{ title: string }> = ({ title }) => {
       series: [
         {
           type: 'bar',
-          name: '次要',
+          name: intl.get('ALARM_LEVEL_INFO'),
           data: info,
           color: ColorInfo
         },
         {
           type: 'bar',
-          name: '重要',
+          name: intl.get('ALARM_LEVEL_WARN'),
           data: warn,
           color: ColorWarn
         },
         {
           type: 'bar',
-          name: '紧急',
+          name: intl.get('ALARM_LEVEL_DANGER'),
           data: danger,
           color: ColorDanger
         }

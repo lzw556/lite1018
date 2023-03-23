@@ -98,7 +98,7 @@ const DeviceDetailPage = () => {
       tabs.push({ key: 'settings', tab: 'SETTINGS' });
     }
     if (hasPermission(Permission.DeviceRuntimeDataGet)) {
-      tabs.push({ key: 'ta', tab: 'HISTORY_STATUS' });
+      tabs.push({ key: 'ta', tab: 'STATUS_HISTORY' });
     }
     switch (device.typeId) {
       case DeviceType.VibrationTemperature3Axis:

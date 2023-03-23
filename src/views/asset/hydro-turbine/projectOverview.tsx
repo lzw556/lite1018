@@ -129,7 +129,8 @@ export default function ProjectOverview() {
       <Empty
         description={
           <p>
-            {NO_HYDRO_TURBINES}, 去<Link to='/asset-management'>创建</Link>
+            {intl.get(NO_HYDRO_TURBINES)},
+            <Link to='/asset-management'>{intl.get('CREATE_ONE')}</Link>
           </p>
         }
         image={Empty.PRESENTED_IMAGE_SIMPLE}
@@ -141,21 +142,21 @@ export default function ProjectOverview() {
       {...{
         charts: [
           {
-            title: HYDRO_TURBINE,
+            title: intl.get(HYDRO_TURBINE),
             colProps,
             options: statisticOfAsset
           },
-          { title: MONITORING_POINT, colProps, options: statisticOfMeasurement },
-          { title: '传感器', colProps, options: statisticOfSensor },
-          { colProps: colProps2, render: <AlarmTrend title='报警趋势' /> }
+          { title: intl.get(MONITORING_POINT), colProps, options: statisticOfMeasurement },
+          { title: intl.get('SENSOR'), colProps, options: statisticOfSensor },
+          { colProps: colProps2, render: <AlarmTrend title={intl.get('ALARM_TREND')} /> }
         ],
         introductions: winds.map((item) => {
           const { alarmState, statistics } = getAssetStatistics(
             item.statistics,
-            'monitoringPointNum',
-            ['anomalous', INVALID_MONITORING_POINT],
-            'deviceNum',
-            'offlineDeviceNum'
+            ['monitoringPointNum', intl.get('MONITORING_POINT')],
+            ['anomalous', intl.get(INVALID_MONITORING_POINT)],
+            ['deviceNum', intl.get('DEVICE')],
+            ['offlineDeviceNum', intl.get('OFFLINE_DEVICE')]
           );
           return (
             <Introduction

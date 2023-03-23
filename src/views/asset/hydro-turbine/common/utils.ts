@@ -12,7 +12,7 @@ export function convertRow(values?: AssetRow): Asset | null {
   };
 }
 
-export function getWinds(assets: AssetRow[]) {
+export function getHydros(assets: AssetRow[]) {
   return assets.filter((a) => a.type === HYDRO_TURBINE_ASSET_TYPE_ID);
 }
 

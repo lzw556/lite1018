@@ -21,12 +21,14 @@ const EditCalibrateParas = ({
   const [form] = Form.useForm();
   const typeParaMapping = new Map();
   typeParaMapping.set(DeviceType.BoltElongation, 'preload');
-  typeParaMapping.set(DeviceType.BoltElongationMultiChannels, 'preload');
+  typeParaMapping.set(DeviceType.BoltElongation4Channels, 'preload');
+  typeParaMapping.set(DeviceType.BoltElongation8Channels, 'preload');
   typeParaMapping.set(DeviceType.NormalTemperatureCorrosion, 'thickness');
   typeParaMapping.set(DeviceType.HighTemperatureCorrosion, 'thickness');
   typeParaMapping.set(DeviceType.PressureTemperature, 'pressure');
   const property = properties.find((pro) => pro.key === typeParaMapping.get(typeId));
   const isSPT = typeId === DeviceType.PressureTemperature;
+  const channels = DeviceType.isMultiChannel(typeId, true);
 
   function handleSubmit(param?: number) {
     if (param !== undefined) {
@@ -68,19 +70,19 @@ const EditCalibrateParas = ({
           <FormInputItem
             label={`${intl.get(property.name).d(property.name)}`}
             name='param'
-            requiredMessage={intl.get('PLEASE_INPUT_SOMETHING', {
+            requiredMessage={intl.get('PLEASE_ENTER_SOMETHING', {
               something: intl.get(property.name).d(property.name)
             })}
             numericRule={{ isInteger: false }}
           >
             <Input
-              placeholder={intl.get('PLEASE_INPUT_SOMETHING', {
+              placeholder={intl.get('PLEASE_ENTER_SOMETHING', {
                 something: intl.get(property.name).d(property.name)
               })}
               suffix={`${property.unit}`}
             />
           </FormInputItem>
-          {typeId === DeviceType.BoltElongationMultiChannels && (
+          {channels.length > 0 && (
             <Form.Item
               label={intl.get('CHANNEL')}
               name='channel'
@@ -88,12 +90,7 @@ const EditCalibrateParas = ({
               initialValue={1}
             >
               <Select>
-                {[
-                  { label: '1', value: 1 },
-                  { label: '2', value: 2 },
-                  { label: '3', value: 3 },
-                  { label: '4', value: 4 }
-                ].map(({ label, value }) => (
+                {channels.map(({ label, value }) => (
                   <Select.Option key={value} value={value}>
                     {label}
                   </Select.Option>

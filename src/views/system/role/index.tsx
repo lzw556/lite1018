@@ -79,7 +79,7 @@ const RolePage = () => {
                   onAllocMenus(record.id);
                 }}
               >
-                {intl.get('ASSIGN_MENUS')}
+                {intl.get('ASSIGN_MENU')}
               </Button>
             )}
           </Space>

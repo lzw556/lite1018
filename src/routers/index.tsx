@@ -17,7 +17,8 @@ import {
   User,
   ImportNetwork,
   AlarmRecord,
-  AddDevice
+  AddDevice,
+  Report
 } from '../views';
 import { PrimaryLayout } from '../views/layout/primaryLayout';
 import { isLogin } from '../utils/session';
@@ -36,6 +37,7 @@ import zh_CN from '../locales/zh-CN.json';
 import zhCN from 'antd/es/locale/zh_CN';
 import enUS from 'antd/es/locale/en_US';
 import dayjs from '../utils/dayjsUtils';
+import 'dayjs/locale/zh-cn';
 
 const AssetViewSwitch = lazy(() => import('../views/asset/components/assetViewSwitch'));
 const AlarmRuleGroups = lazy(() => import('../views/alarm/alarm-group/index'));
@@ -64,7 +66,7 @@ const WindTurbines = lazy(() => import('../views/asset/wind-turbine/projectOverv
 const WindTurbinesTreeList = lazy(() => import('../views/asset/wind-turbine/tree-list/index'));
 const WindTurbinesTableList = lazy(() => import('../views/asset/wind-turbine/table-list/index'));
 const WindTurbineShow = lazy(() => import('../views/asset/wind-turbine/show/index'));
-const WindTurbineFlangeShow = lazy(() => import('../views/flange/show/index'));
+const WindTurbineFlangeShow = lazy(() => import('../views/flange/show/wind-turbine/index'));
 const WindTurbineMonitoringPointShow = lazy(
   () => import('../views/monitoring-point/show/wind-turbine/index')
 );
@@ -74,9 +76,9 @@ const HydroTurbines = lazy(() => import('../views/asset/hydro-turbine/projectOve
 const HydroTurbinesTreeList = lazy(() => import('../views/asset/hydro-turbine/tree-list/index'));
 const HydroTurbinesTableList = lazy(() => import('../views/asset/hydro-turbine/table-list/index'));
 const HydroTurbineShow = lazy(() => import('../views/asset/hydro-turbine/show/index'));
-const HydroTurbineFlangeShow = lazy(() => import('../views/flange/show/index'));
+const HydroTurbineFlangeShow = lazy(() => import('../views/flange/show/hydro-turbine/index'));
 const HydroTurbineMonitoringPointShow = lazy(
-  () => import('../views/monitoring-point/show/wind-turbine/index')
+  () => import('../views/monitoring-point/show/hydro-turbine/index')
 );
 
 const AppRouter = () => {
@@ -178,7 +180,8 @@ const AppRouter = () => {
         { path: 'users', element: <User /> },
         { path: 'me', element: <Me /> },
         { path: 'roles', element: <Role /> },
-        { path: 'systeminfo', element: <System /> }
+        { path: 'systeminfo', element: <System /> },
+        { path: 'Reports', element: <Report /> }
       ]
     }
   ];

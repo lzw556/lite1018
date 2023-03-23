@@ -29,10 +29,7 @@ export const BasicSettings: React.FC<BasicSettingsProps> = ({ device, onUpdate }
   }, [form, device]);
 
   const renderNetworkFormItem = () => {
-    if (
-      DeviceType.isNB(device.typeId) ||
-      device.typeId === DeviceType.BoltElongationMultiChannels
-    ) {
+    if (DeviceType.isNB(device.typeId) || DeviceType.isMultiChannel(device.typeId)) {
       return <></>;
     }
     return (
@@ -67,10 +64,10 @@ export const BasicSettings: React.FC<BasicSettingsProps> = ({ device, onUpdate }
             <FormInputItem
               label={intl.get('DEVICE_NAME')}
               name='name'
-              requiredMessage={intl.get('PLEASE_INPUT_DEVICE_NAME')}
+              requiredMessage={intl.get('PLEASE_ENTER_DEVICE_NAME')}
               lengthLimit={{ min: 4, max: 20, label: intl.get('DEVICE_NAME') }}
             >
-              <Input placeholder={intl.get('PLEASE_INPUT_DEVICE_NAME')} />
+              <Input placeholder={intl.get('PLEASE_ENTER_DEVICE_NAME')} />
             </FormInputItem>
             <Form.Item
               label={intl.get('MAC_ADDRESS')}
@@ -78,7 +75,7 @@ export const BasicSettings: React.FC<BasicSettingsProps> = ({ device, onUpdate }
               rules={[
                 {
                   required: true,
-                  message: intl.get('PLEASE_INPUT_MAC_ADDRESS')
+                  message: intl.get('PLEASE_ENTER_MAC_ADDRESS')
                 },
                 {
                   pattern: /^([0-9a-fA-F]{2})(([0-9a-fA-F]{2}){5})$/,
@@ -87,7 +84,7 @@ export const BasicSettings: React.FC<BasicSettingsProps> = ({ device, onUpdate }
               ]}
               normalize={Normalizes.macAddress}
             >
-              <Input placeholder={intl.get('PLEASE_INPUT_MAC_ADDRESS')} />
+              <Input placeholder={intl.get('PLEASE_ENTER_MAC_ADDRESS')} />
             </Form.Item>
             {device && device.typeId !== DeviceType.Gateway && renderNetworkFormItem()}
           </Form>

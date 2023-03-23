@@ -31,17 +31,17 @@ const HistoryDataPage: FC<DeviceDataProps> = ({ device }) => {
   const [range, setRange] = useState<[number, number]>();
   const [dataSource, setDataSource] = useState<any>();
   const [downloadVisible, setDownloadVisible] = useState<boolean>(false);
-  const isMultiChannels = device.typeId === DeviceType.BoltElongationMultiChannels;
+  const channels = DeviceType.isMultiChannel(device.typeId, true);
   const [channel, setChannel] = useState('1');
 
   const fetchDeviceData = useCallback(() => {
     if (range) {
       const [from, to] = range;
-      FindDeviceDataRequest(device.id, from, to, isMultiChannels ? { channel } : {}).then(
+      FindDeviceDataRequest(device.id, from, to, channels.length > 0 ? { channel } : {}).then(
         setDataSource
       );
     }
-  }, [device.id, range, channel, isMultiChannels]);
+  }, [device.id, range, channel, channels.length]);
 
   useEffect(() => {
     fetchDeviceData();
@@ -136,20 +136,15 @@ const HistoryDataPage: FC<DeviceDataProps> = ({ device }) => {
           <Row justify='end'>
             <Col span={24} style={{ textAlign: 'right' }}>
               <Space style={{ textAlign: 'center' }} wrap={true}>
-                {isMultiChannels && (
+                {channels.length > 0 && (
                   <Label name={intl.get('CURRENT_CHANNEL')}>
                     <Select
                       onChange={(val) => setChannel(val)}
                       defaultValue={channel}
                       bordered={false}
                     >
-                      {[
-                        { label: '1', key: 1 },
-                        { label: '2', key: 2 },
-                        { label: '3', key: 3 },
-                        { label: '4', key: 4 }
-                      ].map(({ label, key }) => (
-                        <Select.Option value={key} key={key}>
+                      {channels.map(({ label, value }) => (
+                        <Select.Option value={value} key={value}>
                           {label}
                         </Select.Option>
                       ))}
@@ -222,7 +217,7 @@ const HistoryDataPage: FC<DeviceDataProps> = ({ device }) => {
           onSuccess={() => {
             setDownloadVisible(false);
           }}
-          channel={isMultiChannels ? channel : undefined}
+          channel={channels.length > 0 ? channel : undefined}
         />
       )}
       {/*<RemoveModal visible={removeVisible} device={device} onCancel={() => setRemoveVisible(false)} onSuccess={() => {*/}

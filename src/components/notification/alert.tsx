@@ -30,21 +30,21 @@ const AlertMessageNotification = () => {
       case 1:
         api.info({
           key: `${record.monitoringPoint.id}-${record.level}`,
-          message: intl.get('ALARM_LEVEL_INFO_TITLE'),
+          message: intl.get('ALARM_LEVEL_MINOR_TITLE'),
           description: <div>{renderDescription(record)}</div>
         });
         break;
       case 2:
         api.warning({
           key: `${record.monitoringPoint.id}-${record.level}`,
-          message: intl.get('ALARM_LEVEL_WARN_TITLE'),
+          message: intl.get('ALARM_LEVEL_MAJOR_TITLE'),
           description: <div>{renderDescription(record)}</div>
         });
         break;
       case 3:
         api.error({
           key: `${record.monitoringPoint.id}-${record.level}`,
-          message: intl.get('ALARM_LEVEL_DANGER_TITLE'),
+          message: intl.get('ALARM_LEVEL_CRITICAL_TITLE'),
           description: <div>{renderDescription(record)}</div>
         });
         break;

@@ -52,9 +52,10 @@ export function generateChartOptionsOfHistoryDatas(
           let relVal = params[0].name;
           for (let i = 0; i < params.length; i++) {
             let value = Number(params[i].value);
-            relVal += `<br/> ${params[i].marker} ${intl.get(
-              params[i].seriesName
-            )}: ${getDisplayValue(value, property.unit)}`;
+            relVal += `<br/> ${params[i].marker} ${params[i].seriesName}: ${getDisplayValue(
+              value,
+              property.unit
+            )}`;
           }
           return relVal;
         }

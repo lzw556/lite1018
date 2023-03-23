@@ -29,7 +29,7 @@ export const FormInputItem: React.FC<
     rules.push({
       type: isInteger ? 'integer' : 'number',
       min,
-      message: message ?? intl.get('PLEASE_INPUT_NUMERIC')
+      message: message ?? intl.get('PLEASE_ENTER_NUMERIC')
     });
     if (others && others.length > 0) {
       rules.push(...others);

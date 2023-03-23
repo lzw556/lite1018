@@ -26,6 +26,7 @@ import { sortAssetsByIndex } from '../common/utils';
 import { HYDRO_TURBINE_ASSET_TYPE_ID } from '../config';
 import { WindTurbineIcon } from '../icon/icon';
 import './tree.css';
+import intl from 'react-intl-universal';
 
 export const WindTurbineTree: React.FC<{
   assets: AssetRow[];
@@ -107,7 +108,7 @@ export const WindTurbineTree: React.FC<{
             if (nameValues.length > 0) {
               alarmText = (
                 <Space style={{ fontSize: 14, color: '#8a8e99' }}>
-                  {nameValues.map(({ name, value }) => `${name}: ${value}`)}
+                  {nameValues.map(({ name, value }) => `${intl.get(name)}: ${value}`)}
                 </Space>
               );
             }
@@ -154,7 +155,7 @@ export const WindTurbineTree: React.FC<{
                     </Button>
                     <HasPermission value={Permission.AssetDelete}>
                       <Popconfirm
-                        title={`确定要删除${name}吗?`}
+                        title={intl.get('DELETE_SOMETHING_PROMPT', { something: name })}
                         onConfirm={() => {
                           if (selectedNode?.type < 10000) {
                             deleteAsset(selectedNode?.id).then(() => {

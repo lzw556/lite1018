@@ -112,7 +112,7 @@ const NetworkDetail = () => {
               <Form form={form} labelCol={{ span: 9 }} validateMessages={defaultValidateMessages}>
                 <Form.Item label={intl.get('NAME')} name={'name'} rules={[Rules.range(4, 16)]}>
                   <Input
-                    placeholder={intl.get('PLEASE_INPUT_SOMETHING', {
+                    placeholder={intl.get('PLEASE_ENTER_SOMETHING', {
                       something: intl.get('NETWORK_NAME')
                     })}
                   />

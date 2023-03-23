@@ -4,6 +4,8 @@ export * from './manage/general/create';
 export * from './manage/general/update';
 export * from './manage/corrosion/create';
 export * from './manage/corrosion/update';
+export * from './manage/hydro-turbine/create';
+export * from './manage/hydro-turbine/update';
 export * from './columns';
 export * from './historyDataHelper';
 export * from './icon';

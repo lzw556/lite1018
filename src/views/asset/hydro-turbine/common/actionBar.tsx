@@ -1,12 +1,12 @@
 import { Space } from 'antd';
 import * as React from 'react';
-import { FlangeCreate, FlangeUpdate } from '../../../flange';
+import { HydroFlangeCreate, HydroFlangeUpdate } from '../../../flange';
 import {
-  WindTurbineMonitoringPointCreate,
-  WindTurbineMonitoringPointUpdate
+  HydroTurbineMonitoringPointCreate,
+  HydroTurbineMonitoringPointUpdate
 } from '../../../monitoring-point';
-import { WindTurbineCreate } from '../manage/create';
-import { WindTurbineUpdate } from '../manage/update';
+import { HydroTurbineCreate } from '../manage/create';
+import { HydroTurbineUpdate } from '../manage/update';
 
 export enum AssetAction {
   HYDRO_TURBINE_CREATE,
@@ -39,7 +39,7 @@ export const ActionBar: React.FC<{
     <Space wrap={true} style={props.style}>
       {hasPermission && actions}
       {visible && type === AssetAction.HYDRO_TURBINE_CREATE && (
-        <WindTurbineCreate
+        <HydroTurbineCreate
           {...{
             visible,
             onCancel: () => setVisible && setVisible(false),
@@ -51,7 +51,7 @@ export const ActionBar: React.FC<{
         />
       )}
       {visible && type === AssetAction.HYDRO_TURBINE_UPDATE && (
-        <WindTurbineUpdate
+        <HydroTurbineUpdate
           {...{
             visible,
             onCancel: () => setVisible && setVisible(false),
@@ -64,7 +64,7 @@ export const ActionBar: React.FC<{
         />
       )}
       {visible && type === AssetAction.FLANGE_CREATE && (
-        <FlangeCreate
+        <HydroFlangeCreate
           {...{
             visible,
             onCancel: () => setVisible && setVisible(false),
@@ -77,7 +77,7 @@ export const ActionBar: React.FC<{
         />
       )}
       {visible && type === AssetAction.FLANGE_UPDATE && (
-        <FlangeUpdate
+        <HydroFlangeUpdate
           {...{
             visible,
             onCancel: () => setVisible && setVisible(false),
@@ -90,7 +90,7 @@ export const ActionBar: React.FC<{
         />
       )}
       {visible && type === AssetAction.MONITORING_POINT_CREATE && (
-        <WindTurbineMonitoringPointCreate
+        <HydroTurbineMonitoringPointCreate
           {...{
             visible,
             onCancel: () => setVisible && setVisible(false),
@@ -103,7 +103,7 @@ export const ActionBar: React.FC<{
         />
       )}
       {visible && type === AssetAction.MONITORING_POINT_UPDATE && (
-        <WindTurbineMonitoringPointUpdate
+        <HydroTurbineMonitoringPointUpdate
           {...{
             visible,
             onCancel: () => setVisible && setVisible(false),

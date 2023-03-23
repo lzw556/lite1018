@@ -152,10 +152,10 @@ export default function ProjectOverview() {
         introductions: winds.map((item) => {
           const { alarmState, statistics } = getAssetStatistics(
             item.statistics,
-            'monitoringPointNum',
-            ['anomalous', INVALID_MONITORING_POINT],
-            'deviceNum',
-            'offlineDeviceNum'
+            ['monitoringPointNum', intl.get('MONITORING_POINT')],
+            ['anomalous', intl.get(INVALID_MONITORING_POINT)],
+            ['deviceNum', intl.get('DEVICE')],
+            ['offlineDeviceNum', intl.get('OFFLINE_DEVICE')]
           );
           return (
             <Introduction

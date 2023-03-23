@@ -1,6 +1,6 @@
 import { Space } from 'antd';
 import * as React from 'react';
-import { FlangeCreate, FlangeUpdate } from '../../../flange';
+import { WindFlangeCreate, WindFlangeUpdate } from '../../../flange';
 import {
   WindTurbineMonitoringPointCreate,
   WindTurbineMonitoringPointUpdate
@@ -64,7 +64,7 @@ export const ActionBar: React.FC<{
         />
       )}
       {visible && type === AssetAction.FLANGE_CREATE && (
-        <FlangeCreate
+        <WindFlangeCreate
           {...{
             visible,
             onCancel: () => setVisible && setVisible(false),
@@ -77,7 +77,7 @@ export const ActionBar: React.FC<{
         />
       )}
       {visible && type === AssetAction.FLANGE_UPDATE && (
-        <FlangeUpdate
+        <WindFlangeUpdate
           {...{
             visible,
             onCancel: () => setVisible && setVisible(false),

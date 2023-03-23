@@ -84,15 +84,15 @@ export const FilterableAlarmRecordTable: React.FC<{ sourceId?: number }> = ({ so
       key: -1,
       children: [
         {
-          title: intl.get('ALARM_STATUS_UNHANDLED'),
+          title: intl.get('ALARM_STATUS_UNPROCESSED'),
           key: 0
         },
         {
-          title: intl.get('ALARM_STATUS_HANDLED'),
+          title: intl.get('ALARM_STATUS_PROCESSED'),
           key: 1
         },
         {
-          title: intl.get('ALARM_STATUS_AUTO_HANDLED'),
+          title: intl.get('ALARM_STATUS_AUTO_PROCESSED'),
           key: 2
         }
       ]
@@ -137,11 +137,11 @@ export const FilterableAlarmRecordTable: React.FC<{ sourceId?: number }> = ({ so
       render: (level: number) => {
         switch (level) {
           case 1:
-            return <Tag color={ColorInfo}>{intl.get('ALARM_LEVEL_INFO')}</Tag>;
+            return <Tag color={ColorInfo}>{intl.get('ALARM_LEVEL_MINOR')}</Tag>;
           case 2:
-            return <Tag color={ColorWarn}>{intl.get('ALARM_LEVEL_WARN')}</Tag>;
+            return <Tag color={ColorWarn}>{intl.get('ALARM_LEVEL_MAJOR')}</Tag>;
           case 3:
-            return <Tag color={ColorDanger}>{intl.get('ALARM_LEVEL_DANGER')}</Tag>;
+            return <Tag color={ColorDanger}>{intl.get('ALARM_LEVEL_CRITICAL')}</Tag>;
         }
       }
     },
@@ -166,7 +166,7 @@ export const FilterableAlarmRecordTable: React.FC<{ sourceId?: number }> = ({ so
         if (source) {
           return source.name;
         }
-        return intl.get('UNKOWN_SOURCE');
+        return intl.get('UNKNOWN_SOURCE');
       }
     },
     {
@@ -216,11 +216,11 @@ export const FilterableAlarmRecordTable: React.FC<{ sourceId?: number }> = ({ so
       render: (status: number) => {
         switch (status) {
           case 1:
-            return <Tag color='blue'>{intl.get('ALARM_STATUS_HANDLED')}</Tag>;
+            return <Tag color='blue'>{intl.get('ALARM_STATUS_PROCESSED')}</Tag>;
           case 2:
-            return <Tag color='green'>{intl.get('ALARM_STATUS_AUTO_HANDLED')}</Tag>;
+            return <Tag color='green'>{intl.get('ALARM_STATUS_AUTO_PROCESSED')}</Tag>;
           default:
-            return <Tag>{intl.get('ALARM_STATUS_UNHANDLED')}</Tag>;
+            return <Tag>{intl.get('ALARM_STATUS_UNPROCESSED')}</Tag>;
         }
       }
     },
@@ -235,7 +235,7 @@ export const FilterableAlarmRecordTable: React.FC<{ sourceId?: number }> = ({ so
             {record.status === 0 ? (
               <HasPermission value={Permission.AlarmRecordAcknowledge}>
                 <Button type='link' ghost size={'small'} onClick={() => onAcknowledge(record)}>
-                  {intl.get('MARK_HANDLED')}
+                  {intl.get('MARK_PROCESSED')}
                 </Button>
               </HasPermission>
             ) : (
@@ -247,7 +247,7 @@ export const FilterableAlarmRecordTable: React.FC<{ sourceId?: number }> = ({ so
                   size={'small'}
                   onClick={() => onViewAcknowledge(record.id)}
                 >
-                  {intl.get('VIEW_HANDLE_DETAIL')}
+                  {intl.get('ALARM_PROCESSING_DETAIL')}
                 </Button>
               </HasPermission>
             )}
@@ -278,7 +278,7 @@ export const FilterableAlarmRecordTable: React.FC<{ sourceId?: number }> = ({ so
                 bordered={false}
                 mode={'multiple'}
                 value={store.alertLevels}
-                style={{ width: 250 }}
+                style={{ width: 260 }}
                 onChange={(value) => {
                   if (value.length) {
                     setStore((prev) => ({ ...prev, alertLevels: value }));
@@ -288,13 +288,13 @@ export const FilterableAlarmRecordTable: React.FC<{ sourceId?: number }> = ({ so
                 }}
               >
                 <Option key={1} value={1}>
-                  {intl.get('ALARM_LEVEL_INFO')}
+                  {intl.get('ALARM_LEVEL_MINOR')}
                 </Option>
                 <Option key={2} value={2}>
-                  {intl.get('ALARM_LEVEL_WARN')}
+                  {intl.get('ALARM_LEVEL_MAJOR')}
                 </Option>
                 <Option key={3} value={3}>
-                  {intl.get('ALARM_LEVEL_DANGER')}
+                  {intl.get('ALARM_LEVEL_CRITICAL')}
                 </Option>
               </Select>
             </Label>

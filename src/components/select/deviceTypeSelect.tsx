@@ -47,7 +47,7 @@ const DeviceTypeSelect: FC<DeviceTypeSelectProps> = (props) => {
               {intl.get(DeviceType.toString(DeviceType.Gateway))}
             </Option>
           </OptGroup>
-          <OptGroup label={intl.get('ROUTER')} key={'router'}>
+          <OptGroup label={intl.get('RELAY')} key={'router'}>
             <Option key={257} value={257}>
               {intl.get(DeviceType.toString(DeviceType.Router))}
             </Option>

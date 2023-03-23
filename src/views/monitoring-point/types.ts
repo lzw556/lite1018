@@ -3,7 +3,7 @@ import { DeviceType } from '../../types/device_type';
 
 export const MONITORING_POINT = 'MONITORING_POINT';
 export const CREATE_MONITORING_POINT = `CREATE_MONITORING_POINT`;
-export const PLEASE_CREATE_MONITORING_POINT = `请${CREATE_MONITORING_POINT}`;
+export const PLEASE_CREATE_MONITORING_POINT = `PLEASE_CREATE_MONITORING_POINT`;
 export const UPDATE_MONITORING_POINT = `UPDATE_MONITORING_POINT`;
 export const DELETE_MONITORING_POINT = `DELETE_MONITORING_POINT`;
 export const MONITORING_POINT_NAME = `MONITORING_POINT_NAME`;
@@ -14,7 +14,7 @@ export const MONITORING_POINT_TYPE = `MONITORING_POINT_TYPE`;
 export const PLEASE_SELECT_MONITORING_POINT_TYPE = `PLEASE_SELECT_MONITORING_POINT_TYPE`;
 export const MONITORING_POINT_LIST = `MONITORING_POINT_LIST`;
 export const INVALID_MONITORING_POINT = `ABNORMAL_MONITORING_POINT`;
-export const NO_MONITORING_POINTS = `没有${MONITORING_POINT}`;
+export const NO_MONITORING_POINTS = `NO_MONITORING_POINTS`;
 
 export const MONITORING_POINT_PATHNAME = 'monitoring-points';
 
@@ -123,7 +123,10 @@ export const MONITORING_POINT_TYPE_VALUE_DEVICE_TYPE_ID_MAPPING = new Map([
   ],
   [
     MonitoringPointTypeValue.PRELOAD,
-    [DeviceType.BoltElongation, DeviceType.BoltElongationMultiChannels]
+    [
+      DeviceType.BoltElongation,
+      [DeviceType.BoltElongation4Channels, DeviceType.BoltElongation8Channels]
+    ]
   ],
   [
     MonitoringPointTypeValue.VIBRATION,
@@ -139,7 +142,10 @@ export const MONITORING_POINT_TYPE_VALUE_DEVICE_TYPE_ID_MAPPING = new Map([
   [MonitoringPointTypeValue.TEMPERATURE, [DeviceType.Temperature]],
   [
     MonitoringPointTypeValue.FLANGE_PRELOAD,
-    [DeviceType.BoltElongation, DeviceType.BoltElongationMultiChannels]
+    [
+      DeviceType.BoltElongation,
+      [DeviceType.BoltElongation4Channels, DeviceType.BoltElongation8Channels]
+    ]
   ]
 ]);
 

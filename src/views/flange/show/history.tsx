@@ -1,7 +1,7 @@
 import { DownloadOutlined } from '@ant-design/icons';
 import { Button, Col, Empty, Row, Select, Space } from 'antd';
 import React from 'react';
-import { useHistoryDatas } from '.';
+import { useHistoryDatas } from './wind-turbine';
 import { checkIsFlangePreload } from '..';
 import Label from '../../../components/label';
 import { oneWeekNumberRange, RangeDatePicker } from '../../../components/rangeDatePicker';
@@ -44,7 +44,9 @@ export const FlangeHistory = ({
   }
 
   if (realPoints.length === 0)
-    return <Empty description={NO_MONITORING_POINTS} image={Empty.PRESENTED_IMAGE_SIMPLE} />;
+    return (
+      <Empty description={intl.get(NO_MONITORING_POINTS)} image={Empty.PRESENTED_IMAGE_SIMPLE} />
+    );
 
   const properties = getSpecificProperties(firstPoint.properties, firstPoint.type);
 
