@@ -1,7 +1,6 @@
 import { Form, Modal, ModalProps, Select } from 'antd';
 import * as React from 'react';
 import { RangeDatePicker } from '../../../components/rangeDatePicker';
-import { defaultValidateMessages } from '../../../constants/validator';
 import { getFilename } from '../../../utils/format';
 import { MonitoringPointRow, getSpecificProperties } from '../../monitoring-point';
 import { downloadHistory } from '..';
@@ -69,7 +68,7 @@ export const DownloadHistory: React.FC<DownloadModalProps> = (props) => {
       onOk={onDownload}
       cancelText={intl.get('CANCEL')}
     >
-      <Form form={form} labelCol={{ span: 8 }} validateMessages={defaultValidateMessages}>
+      <Form form={form} labelCol={{ span: 8 }}>
         <Form.Item
           label={intl.get('PROPERTY')}
           name={'properties'}

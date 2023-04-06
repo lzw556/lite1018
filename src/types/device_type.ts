@@ -12,6 +12,7 @@ export enum DeviceType {
   VibrationTemperature3AxisNB = 327941,
   VibrationTemperature3AxisAdvancedNB = 327942,
   Temperature = 393217,
+  Pressure = 524289,
   PressureTemperature = 524290,
   AngleDip = 589825,
   AngleDipNB = 589826
@@ -46,8 +47,10 @@ export namespace DeviceType {
         return 'DEVICE_TYPE_VIBRATION_PRO_NB';
       case DeviceType.Temperature:
         return 'DEVICE_TYPE_TEMPERATURE';
-      case DeviceType.PressureTemperature:
+      case DeviceType.Pressure:
         return 'DEVICE_TYPE_PRESSURE';
+      case DeviceType.PressureTemperature:
+        return 'DEVICE_TYPE_PRESSURE_TEMPERATURE';
       case DeviceType.AngleDip:
         return 'DEVICE_TYPE_INCLINATION';
       case DeviceType.AngleDipNB:
@@ -70,6 +73,7 @@ export namespace DeviceType {
       DeviceType.VibrationTemperature3AxisNB,
       DeviceType.VibrationTemperature3AxisAdvancedNB,
       DeviceType.Temperature,
+      DeviceType.Pressure,
       DeviceType.PressureTemperature,
       DeviceType.AngleDip,
       DeviceType.AngleDipNB

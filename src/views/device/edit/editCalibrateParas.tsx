@@ -1,5 +1,4 @@
 import { Button, Form, Input, Modal, Select } from 'antd';
-import { defaultValidateMessages } from '../../../constants/validator';
 import { DeviceType } from '../../../types/device_type';
 import { Property } from '../../../types/property';
 import intl from 'react-intl-universal';
@@ -8,13 +7,13 @@ import { FormInputItem } from '../../../components/formInputItem';
 const EditCalibrateParas = ({
   typeId,
   properties,
-  visible,
+  open,
   setVisible,
   onUpdate
 }: {
   typeId: number;
   properties: Property[];
-  visible: boolean;
+  open: boolean;
   setVisible: React.Dispatch<React.SetStateAction<boolean>>;
   onUpdate: (val: { param: number; channel?: number }) => void;
 }) => {
@@ -25,6 +24,7 @@ const EditCalibrateParas = ({
   typeParaMapping.set(DeviceType.BoltElongation8Channels, 'preload');
   typeParaMapping.set(DeviceType.NormalTemperatureCorrosion, 'thickness');
   typeParaMapping.set(DeviceType.HighTemperatureCorrosion, 'thickness');
+  typeParaMapping.set(DeviceType.Pressure, 'pressure');
   typeParaMapping.set(DeviceType.PressureTemperature, 'pressure');
   const property = properties.find((pro) => pro.key === typeParaMapping.get(typeId));
   const isSPT = typeId === DeviceType.PressureTemperature;
@@ -44,7 +44,7 @@ const EditCalibrateParas = ({
     return (
       <Modal
         width={420}
-        visible={visible}
+        open={open}
         title={intl.get('CALIBRATION_PARAMETERS')}
         footer={[
           <Button key='cancel' onClick={() => setVisible(false)}>
@@ -66,7 +66,7 @@ const EditCalibrateParas = ({
           </Button>
         ]}
       >
-        <Form form={form} labelCol={{ span: 8 }} validateMessages={defaultValidateMessages}>
+        <Form form={form} labelCol={{ span: 8 }}>
           <FormInputItem
             label={`${intl.get(property.name).d(property.name)}`}
             name='param'

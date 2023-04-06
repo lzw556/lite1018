@@ -208,7 +208,7 @@ const HistoryDataPage: FC<DeviceDataProps> = ({ device }) => {
       </Row>
       {device && (
         <DownloadModal
-          visible={downloadVisible}
+          open={downloadVisible}
           device={device}
           property={property}
           onCancel={() => {
@@ -220,10 +220,6 @@ const HistoryDataPage: FC<DeviceDataProps> = ({ device }) => {
           channel={channels.length > 0 ? channel : undefined}
         />
       )}
-      {/*<RemoveModal visible={removeVisible} device={device} onCancel={() => setRemoveVisible(false)} onSuccess={() => {*/}
-      {/*    setRemoveVisible(false)*/}
-      {/*    setRefreshKey(refreshKey + 1)*/}
-      {/*}}/>*/}
     </Content>
   );
 };

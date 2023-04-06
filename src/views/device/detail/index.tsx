@@ -1,12 +1,11 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
-import { Button, Col, Dropdown, message, Row } from 'antd';
+import { Col, message, Row } from 'antd';
 import { Device } from '../../../types/device';
 import { GetDeviceRequest } from '../../../apis/device';
 import { Content } from 'antd/lib/layout/layout';
 import InformationCard from './information';
 import ShadowCard from '../../../components/shadowCard';
-import { DownOutlined } from '@ant-design/icons';
 import SettingPage from './setting';
 import { DeviceType } from '../../../types/device_type';
 import HasPermission from '../../../permission';
@@ -17,13 +16,11 @@ import useSocket, { SocketTopic } from '../../../socket';
 import { RecentHistory } from '../RecentHistory';
 import { RuntimeChart } from '../RuntimeChart';
 import DeviceEvent from './event';
-import { isMobile } from '../../../utils/deviceDetection';
 import { FilterableAlarmRecordTable } from '../../../components/alarm/filterableAlarmRecordTable';
 import { DynamicData } from './dynamicData';
-import { CommandMenu } from '../commandMenu';
+import { CommandDropdown } from '../commandDropdown';
 import { isNumber } from 'lodash';
 import { PageTitle } from '../../../components/pageTitle';
-
 import intl from 'react-intl-universal';
 import { useLocaleContext } from '../../../localeProvider';
 
@@ -36,8 +33,7 @@ const DeviceDetailPage = () => {
   const [device, setDevice] = useState<Device>();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [currentKey, setCurrentKey] = useState<string>('');
-  const { hasPermission, hasPermissions } = userPermission();
-  const [tabs, setTabs] = useState<any>([]);
+  const tabs = useDeviceTabs(device?.typeId);
 
   const contents = new Map<string, any>([
     [
@@ -79,55 +75,6 @@ const DeviceDetailPage = () => {
     fetchDevice();
   }, [fetchDevice]);
 
-  const getDeviceTabs = useCallback((device: Device) => {
-    const tabTitleList = [
-      {
-        key: 'monitor',
-        tab: 'MONITOR'
-      },
-      {
-        key: 'historyData',
-        tab: 'HISTORY_DATA'
-      }
-    ];
-    let tabs = [];
-    if (hasPermission(Permission.DeviceEventList)) {
-      tabs.push({ key: 'events', tab: 'EVENTS' });
-    }
-    if (hasPermissions(Permission.DeviceSettingsGet, Permission.DeviceSettingsEdit)) {
-      tabs.push({ key: 'settings', tab: 'SETTINGS' });
-    }
-    if (hasPermission(Permission.DeviceRuntimeDataGet)) {
-      tabs.push({ key: 'ta', tab: 'STATUS_HISTORY' });
-    }
-    switch (device.typeId) {
-      case DeviceType.VibrationTemperature3Axis:
-      case DeviceType.VibrationTemperature3AxisNB:
-      case DeviceType.VibrationTemperature3AxisAdvanced:
-      case DeviceType.VibrationTemperature3AxisAdvancedNB:
-        if (hasPermission(Permission.DeviceData)) {
-          tabs.unshift(...tabTitleList, { key: 'waveData', tab: 'WAVEFORM_DATA' });
-        }
-        break;
-      case DeviceType.Gateway:
-      case DeviceType.Router:
-        return tabs;
-      case DeviceType.BoltElongation:
-      case DeviceType.AngleDip:
-      case DeviceType.AngleDipNB:
-        if (hasPermission(Permission.DeviceData)) {
-          tabs.unshift(...tabTitleList, { key: 'dynamicData', tab: 'DYNAMIC_DATA' });
-        }
-        break;
-      default:
-        if (hasPermission(Permission.DeviceData)) {
-          tabs.unshift(...tabTitleList);
-        }
-        break;
-    }
-    return tabs;
-  }, []);
-
   useEffect(() => {
     if (device) {
       PubSub.subscribe(SocketTopic.connectionState, (msg: any, state: any) => {
@@ -135,17 +82,18 @@ const DeviceDetailPage = () => {
           setDevice({ ...device, state: { ...device.state, isOnline: state.isOnline } });
         }
       });
-      const tabList = getDeviceTabs(device);
-      setTabs(tabList);
-      if (tabList.length > 0 && !currentKey) {
-        setCurrentKey(tabList[0].key);
-      }
     }
     return () => {
       PubSub.unsubscribe(SocketTopic.upgradeStatus);
       PubSub.unsubscribe(SocketTopic.connectionState);
     };
-  }, [device]);
+  }, [device, PubSub]);
+
+  useEffect(() => {
+    if (tabs.length > 0 && currentKey === '') {
+      setCurrentKey(tabs[0].key);
+    }
+  }, [tabs, currentKey]);
 
   return (
     <Content>
@@ -157,15 +105,7 @@ const DeviceDetailPage = () => {
           ]}
           actions={
             <HasPermission value={Permission.DeviceCommand}>
-              <Dropdown
-                overlay={<CommandMenu device={device} initialUpgradeCode={location.state} />}
-                trigger={isMobile ? ['click'] : ['hover']}
-              >
-                <Button type={'primary'}>
-                  {intl.get('DEVICE_COMMANDS')}
-                  <DownOutlined />
-                </Button>
-              </Dropdown>
+              <CommandDropdown device={device} initialUpgradeCode={location.state} />
             </HasPermission>
           }
         />
@@ -174,7 +114,7 @@ const DeviceDetailPage = () => {
         <Col span={24}>
           {device && <InformationCard device={device} isLoading={isLoading} />}
           <br />
-          {device && (
+          {device && tabs.length > 0 && (
             <ShadowCard
               size={'small'}
               tabList={tabs.map((tab: any) => ({ ...tab, tab: intl.get(tab.tab) }))}
@@ -192,3 +132,54 @@ const DeviceDetailPage = () => {
 };
 
 export default DeviceDetailPage;
+
+export function useDeviceTabs(deviceTypeId?: number) {
+  const { hasPermission, hasPermissions } = userPermission();
+  if (deviceTypeId === undefined) return [];
+  const tabTitleList = [
+    {
+      key: 'monitor',
+      tab: 'MONITOR'
+    },
+    {
+      key: 'historyData',
+      tab: 'HISTORY_DATA'
+    }
+  ];
+  let tabs = [];
+  if (hasPermission(Permission.DeviceEventList)) {
+    tabs.push({ key: 'events', tab: 'EVENTS' });
+  }
+  if (hasPermissions(Permission.DeviceSettingsGet, Permission.DeviceSettingsEdit)) {
+    tabs.push({ key: 'settings', tab: 'SETTINGS' });
+  }
+  if (hasPermission(Permission.DeviceRuntimeDataGet)) {
+    tabs.push({ key: 'ta', tab: 'STATUS_HISTORY' });
+  }
+  switch (deviceTypeId) {
+    case DeviceType.VibrationTemperature3Axis:
+    case DeviceType.VibrationTemperature3AxisNB:
+    case DeviceType.VibrationTemperature3AxisAdvanced:
+    case DeviceType.VibrationTemperature3AxisAdvancedNB:
+      if (hasPermission(Permission.DeviceData)) {
+        tabs.unshift(...tabTitleList, { key: 'waveData', tab: 'WAVEFORM_DATA' });
+      }
+      break;
+    case DeviceType.Gateway:
+    case DeviceType.Router:
+      return tabs;
+    case DeviceType.BoltElongation:
+    case DeviceType.AngleDip:
+    case DeviceType.AngleDipNB:
+      if (hasPermission(Permission.DeviceData)) {
+        tabs.unshift(...tabTitleList, { key: 'dynamicData', tab: 'DYNAMIC_DATA' });
+      }
+      break;
+    default:
+      if (hasPermission(Permission.DeviceData)) {
+        tabs.unshift(...tabTitleList);
+      }
+      break;
+  }
+  return tabs;
+}

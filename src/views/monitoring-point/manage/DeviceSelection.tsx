@@ -7,7 +7,7 @@ import { Device } from '../../../types/device';
 import intl from 'react-intl-universal';
 
 export type MonitoringPointInfo = {
-  place: string;
+  place?: string;
   name: string;
   dev_id: number;
   dev_name: string;
@@ -36,7 +36,6 @@ export const DeviceSelection: React.FC<{
           const point: MonitoringPointInfo = {
             dev_id: deviceId,
             dev_name: device ? device.name : deviceId.toString(),
-            place: '',
             name: '',
             dev_type: device ? device.typeId : 0
           };

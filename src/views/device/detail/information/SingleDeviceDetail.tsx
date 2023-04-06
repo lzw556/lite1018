@@ -7,6 +7,8 @@ import { isMobile } from '../../../../utils/deviceDetection';
 import { SingleDeviceStatus } from '../../SingleDeviceStatus';
 import DeviceUpgradeSpin from '../../spin/deviceUpgradeSpin';
 import intl from 'react-intl-universal';
+import { Link } from 'react-router-dom';
+import { toMac } from '../../../../utils/format';
 
 const { Text } = Typography;
 
@@ -39,13 +41,13 @@ export const SingleDeviceDetail: React.FC<{ device: Device; upgradeStatus: any }
               {device.information.ip_address ? (
                 <Space>
                   {device.information.ip_address}{' '}
-                  <a
-                    href={`http://${device.information.ip_address}`}
+                  <Link
+                    to={`http://${device.information.ip_address}`}
                     target={'_blank'}
                     style={{ fontSize: '10pt' }}
                   >
                     {intl.get('GO_TO_ADMIN_PORTAL')}
-                  </a>
+                  </Link>
                 </Space>
               ) : (
                 '-'
@@ -94,7 +96,7 @@ export const SingleDeviceDetail: React.FC<{ device: Device; upgradeStatus: any }
                 tooltips: [intl.get('COPY'), intl.get('COPY_SUCCEEDED')]
               }}
             >
-              {device.macAddress.toUpperCase().macSeparator()}
+              {toMac(device.macAddress.toUpperCase())}
             </Text>
           </Col>
         </Row>

@@ -90,35 +90,36 @@ export const Permission = {
   AlarmRuleGroupImport: { path: 'alarmRuleGroups/import', method: 'POST' }
 };
 
-let enforcer: Enforcer | null = null;
-let subject: null = null;
-const model = newModel(`
-[request_definition]
-r = sub, obj, act
-
-[policy_definition]
-p = sub, obj, act
-
-[role_definition]
-g = _, _
-
-[policy_effect]
-e = some(where (p.eft == allow))
-
-[matchers]
-m = g(r.sub, p.sub) && keyMatch2(r.obj, p.obj) && r.act == p.act || r.sub == "admin"`);
-
 const usePermission = () => {
+  const [enforcer, setEnforcer] = React.useState<Enforcer | null>(null);
+  const [subject, setSubject] = React.useState<null>(null);
+
   React.useEffect(() => {
+    const model = newModel(`
+  [request_definition]
+  r = sub, obj, act
+
+  [policy_definition]
+  p = sub, obj, act
+
+  [role_definition]
+  g = _, _
+
+  [policy_effect]
+  e = some(where (p.eft == allow))
+
+  [matchers]
+  m = g(r.sub, p.sub) && keyMatch2(r.obj, p.obj) && r.act == p.act || r.sub == "admin"`);
     const data = getPermission();
     if (data && data.subject.length > 0) {
       const adapter = new MemoryAdapter(data.rules);
       newEnforcer(model, adapter).then((value) => {
-        enforcer = value;
-        subject = data.subject;
+        setEnforcer(value);
+        setSubject(data.subject);
       });
     }
   }, []);
+
   return {
     hasPermission: (value: PermissionType) => {
       return !!(enforcer && enforcer.enforceSync(subject, value.path, value.method));

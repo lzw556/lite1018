@@ -2,21 +2,22 @@ import { Menu } from 'antd';
 import * as React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu as MenuItem } from '../../types/menu';
-import { dfsTransformTree } from '../../utils/tree';
+import { mapTree } from '../../utils/tree';
 import intl from 'react-intl-universal';
 
 export const NavMenu: React.FC<{
   menus: MenuItem[];
 }> = ({ menus }) => {
   const { pathname, state } = useLocation();
-  const items = dfsTransformTree(menus, (m) => {
+  const [openKeys, setOpenKeys] = React.useState<string[]>(getInitialOpenKeys());
+  const items = mapTree(menus, (m) => {
     let state = undefined;
     if (
       m.name === 'project-overview' ||
       m.name === 'asset-management' ||
       m.name === 'measurement-management'
     ) {
-      state = { from: { path: m.path, label: m.title } };
+      state = { from: { path: m.path, label: intl.get(m.title) } };
     }
     const label = m.path ? (
       <Link to={`${m.name}`} state={state}>
@@ -41,6 +42,17 @@ export const NavMenu: React.FC<{
   const from = state?.from?.path?.replace('/', '');
   const selectedKeys = from ? [from] : menuPaths.length > 0 ? menuPaths : undefined;
 
+  function getInitialOpenKeys() {
+    const local = localStorage.getItem('menuOpenKeys');
+    return local ? JSON.parse(local) : undefined;
+  }
+
+  React.useEffect(() => {
+    if (openKeys) {
+      localStorage.setItem('menuOpenKeys', JSON.stringify(openKeys));
+    }
+  }, [openKeys]);
+
   return (
     <Menu
       mode='inline'
@@ -48,6 +60,11 @@ export const NavMenu: React.FC<{
       items={items}
       defaultSelectedKeys={['project-overview']}
       selectedKeys={selectedKeys}
+      openKeys={openKeys}
+      onOpenChange={(openKeys) => {
+        setOpenKeys(openKeys);
+        console.log(openKeys);
+      }}
     />
   );
 

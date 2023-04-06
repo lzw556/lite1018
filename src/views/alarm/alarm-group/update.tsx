@@ -5,19 +5,19 @@ import { Link } from 'react-router-dom';
 import { PageTitle } from '../../../components/pageTitle';
 import ShadowCard from '../../../components/shadowCard';
 import { MONITORING_POINTS } from '../../../config/assetCategory.config';
-import { defaultValidateMessages, Rules } from '../../../constants/validator';
 import { isMobile } from '../../../utils/deviceDetection';
-import { useAssetCategoryContext } from '../../asset/components/assetCategoryContext';
-import { MONITORING_POINT_TYPE, PLEASE_SELECT_MONITORING_POINT_TYPE } from '../../monitoring-point';
 import { getAlarmRule, updateAlarmRule } from './services';
 import { AlarmRule } from './types';
 import intl from 'react-intl-universal';
 import { FormInputItem } from '../../../components/formInputItem';
+import { useAppConfigContext } from '../../asset';
+import { MONITORING_POINT } from '../../monitoring-point';
+import { translateMetricName } from '.';
 
 export default function UpdateAlarmRuleGroup() {
   const navigate = useNavigate();
   const { id } = useParams();
-  const category = useAssetCategoryContext();
+  const config = useAppConfigContext();
 
   const [form] = Form.useForm();
   const [rule, setRule] = React.useState<AlarmRule>();
@@ -46,19 +46,21 @@ export default function UpdateAlarmRuleGroup() {
         ]}
       />
       <ShadowCard>
-        <Form
-          form={form}
-          labelCol={{ span: 3 }}
-          wrapperCol={{ span: 18 }}
-          validateMessages={defaultValidateMessages}
-        >
+        <Form form={form} labelCol={{ span: 3 }} wrapperCol={{ span: 18 }}>
           <Form.Item
-            label={intl.get(MONITORING_POINT_TYPE)}
+            label={intl.get('OBJECT_TYPE', { object: intl.get(MONITORING_POINT) })}
             name='type'
-            rules={[{ required: true, message: intl.get(PLEASE_SELECT_MONITORING_POINT_TYPE) }]}
+            rules={[
+              {
+                required: true,
+                message: intl.get('PLEASE_SELECT_SOMETHING', {
+                  something: intl.get('OBJECT_TYPE', { object: intl.get(MONITORING_POINT) })
+                })
+              }
+            ]}
           >
             <Select disabled={true} style={{ width: isMobile ? '75%' : 435 }}>
-              {MONITORING_POINTS.get(category)?.map(({ label, id }) => (
+              {MONITORING_POINTS.get(config)?.map(({ label, id }) => (
                 <Select.Option key={id} value={id}>
                   {intl.get(label)}
                 </Select.Option>
@@ -90,14 +92,8 @@ export default function UpdateAlarmRuleGroup() {
                   <div key={key} style={{ position: 'relative' }}>
                     {smallSize && (
                       <>
-                        <Form.Item
-                          label={intl.get('NAME')}
-                          {...restFields}
-                          name={[name, 'name']}
-                          rules={index < rule.rules.length ? undefined : [Rules.range(4, 16)]}
-                        >
+                        <Form.Item label={intl.get('NAME')} {...restFields} name={[name, 'name']}>
                           <Input
-                            placeholder={intl.get('PLEASE_ENTER_NAME')}
                             readOnly={index < rule.rules.length}
                             style={{ width: isMobile ? '75%' : 435 }}
                             disabled={true}
@@ -106,7 +102,7 @@ export default function UpdateAlarmRuleGroup() {
                         <Form.Item label={intl.get('INDEX')}>
                           <Input
                             disabled={true}
-                            value={rule.rules[index].metric.name}
+                            value={translateMetricName(rule.rules[index].metric.name)}
                             style={{ width: isMobile ? '75%' : 435 }}
                           />
                         </Form.Item>
@@ -183,13 +179,13 @@ export default function UpdateAlarmRuleGroup() {
                         >
                           <Select style={{ width: isMobile ? '75%' : 435 }}>
                             <Select.Option key={1} value={1}>
-                              {intl.get('ALARM_LEVEL_INFO')}
+                              {intl.get('ALARM_LEVEL_MINOR')}
                             </Select.Option>
                             <Select.Option key={2} value={2}>
-                              {intl.get('ALARM_LEVEL_WARN')}
+                              {intl.get('ALARM_LEVEL_MAJOR')}
                             </Select.Option>
                             <Select.Option key={3} value={3}>
-                              {intl.get('ALARM_LEVEL_DANGER')}
+                              {intl.get('ALARM_LEVEL_CRITICAL')}
                             </Select.Option>
                           </Select>
                         </Form.Item>
@@ -211,7 +207,10 @@ export default function UpdateAlarmRuleGroup() {
                               label={intl.get('INDEX')}
                               style={{ marginBottom: 0 }}
                             >
-                              <Input disabled={true} value={rule.rules[index].metric.name} />
+                              <Input
+                                disabled={true}
+                                value={translateMetricName(rule.rules[index].metric.name)}
+                              />
                             </Form.Item>
                           </Col>
                           <Col xl={6}>
@@ -291,13 +290,13 @@ export default function UpdateAlarmRuleGroup() {
                             >
                               <Select style={{ width: 120 }}>
                                 <Select.Option key={1} value={1}>
-                                  {intl.get('ALARM_LEVEL_INFO')}
+                                  {intl.get('ALARM_LEVEL_MINOR')}
                                 </Select.Option>
                                 <Select.Option key={2} value={2}>
-                                  {intl.get('ALARM_LEVEL_WARN')}
+                                  {intl.get('ALARM_LEVEL_MAJOR')}
                                 </Select.Option>
                                 <Select.Option key={3} value={3}>
-                                  {intl.get('ALARM_LEVEL_DANGER')}
+                                  {intl.get('ALARM_LEVEL_CRITICAL')}
                                 </Select.Option>
                               </Select>
                             </Form.Item>
@@ -311,7 +310,7 @@ export default function UpdateAlarmRuleGroup() {
               </>
             )}
           </Form.List>
-          <Form.Item wrapperCol={{ offset: 2 }}>
+          <Form.Item wrapperCol={{ offset: 3 }}>
             <Button
               type='primary'
               onClick={() => {

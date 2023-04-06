@@ -95,7 +95,13 @@ export const FakeFlangeStatus: React.FC<AssetRow> = (props) => {
   };
 
   const renderSelectedTimestampRelation = () => {
-    if (!timestamp) return <Empty description='请选择时间' image={Empty.PRESENTED_IMAGE_SIMPLE} />;
+    if (!timestamp)
+      return (
+        <Empty
+          description={intl.get('PLEASE_SELECT_SOMETHING', { something: intl.get('TIMESTAMP') })}
+          image={Empty.PRESENTED_IMAGE_SIMPLE}
+        />
+      );
     if (loading2) return <Spin />;
     return (
       <SingleFlangeStatus

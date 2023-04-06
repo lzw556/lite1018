@@ -7,24 +7,24 @@ import intl from 'react-intl-universal';
 
 export interface EditRoleModalProps {
   role: Role;
-  visible: boolean;
+  open: boolean;
   onCancel: () => void;
   onSuccess: () => void;
 }
 
 const EditRoleModal: FC<EditRoleModalProps> = (props) => {
-  const { visible, role, onCancel, onSuccess } = props;
+  const { open, role, onCancel, onSuccess } = props;
   const [form] = Form.useForm();
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   useEffect(() => {
-    if (visible) {
+    if (open) {
       form.setFieldsValue({
         name: role?.name,
         description: role?.description
       });
     }
-  }, [visible]);
+  }, [open, form, role]);
 
   const onSave = () => {
     form.validateFields().then((values) => {
@@ -40,7 +40,7 @@ const EditRoleModal: FC<EditRoleModalProps> = (props) => {
     <RoleModal
       form={form}
       width={420}
-      visible={visible}
+      open={open}
       title={intl.get('EDIT_ROLE')}
       onOk={onSave}
       onCancel={onCancel}

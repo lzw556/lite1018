@@ -1,7 +1,13 @@
 import React from 'react';
 import { ChartContainer } from '../../components/charts/chartContainer';
 import { getDisplayValue, roundValue } from '../../utils/format';
-import { MonitoringPointRow, MonitoringPointTypeValue, getRealPoints } from '../monitoring-point';
+import {
+  MonitoringPointRow,
+  MonitoringPointTypeValue,
+  getRealPoints,
+  MONITORING_POINT
+} from '../monitoring-point';
+import intl from 'react-intl-universal';
 
 export const FlangePreloadChart = ({ points }: { points: MonitoringPointRow[] }) => {
   return (
@@ -24,7 +30,7 @@ export function buildFlangePreloadChart(points: MonitoringPointRow[]) {
   const property = reals[0].properties[0];
   series.push({
     type: 'scatter',
-    name: `监测点`,
+    name: intl.get(MONITORING_POINT),
     data: reals.map(({ attributes, data }, n) => [
       attributes ? attributes?.index - 1 : 1,
       roundValue((data?.values[property.key] as number) || NaN)
@@ -33,7 +39,7 @@ export function buildFlangePreloadChart(points: MonitoringPointRow[]) {
 
   series.push({
     type: 'line',
-    name: `螺栓`,
+    name: intl.get('BOLT'),
     data: (fakes[0].data?.values[property.key] as number[]).map((val, index) => [
       index,
       roundValue(val)

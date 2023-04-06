@@ -17,12 +17,12 @@ import './layout.css';
 import '../../App.css';
 import { Menu } from '../../types/menu';
 import { MENUS_HIDDEN } from '../../config/assetCategory.config';
-import { AssetCategory, useAssetCategoryContext } from '../asset';
+import { AppConfig, useAppConfigContext } from '../asset';
 
 export const PrimaryLayout = () => {
   const [menus, setMenus] = React.useState<Menu[]>();
   const dispatch = useDispatch();
-  const category = useAssetCategoryContext();
+  const config = useAppConfigContext();
 
   React.useEffect(() => {
     if (isLogin()) {
@@ -32,13 +32,18 @@ export const PrimaryLayout = () => {
           payload: data
         });
       });
+    }
+  }, [dispatch]);
+
+  React.useEffect(() => {
+    if (isLogin()) {
       GetMyMenusRequest().then((data) => {
-        const filters = hideMenus(data, category);
+        const filters = hideMenus(data, config);
         setMenus(filters);
         dispatch(setMenusAction(filters));
       });
     }
-  }, [dispatch, category]);
+  }, [dispatch, config]);
 
   if (!isLogin()) {
     return <Navigate to='/login' />;
@@ -71,7 +76,7 @@ export const PrimaryLayout = () => {
   );
 };
 
-function hideMenus(menus: Menu[], category: AssetCategory) {
-  const filter = (m: Menu) => !MENUS_HIDDEN.get(category)?.includes(m.name);
+function hideMenus(menus: Menu[], config: AppConfig) {
+  const filter = (m: Menu) => !MENUS_HIDDEN.get(config)?.includes(m.name);
   return menus.filter(filter).map((m) => ({ ...m, children: m.children.filter(filter) }));
 }

@@ -2,7 +2,7 @@ import { Space } from 'antd';
 import * as React from 'react';
 import useImage from 'use-image';
 import { SITE_NAMES } from '../../config/assetCategory.config';
-import { useAssetCategoryContext } from '../asset/components/assetCategoryContext';
+import { useAppConfigContext } from '../asset/components/appConfigContext';
 import intl from 'react-intl-universal';
 
 export const Brand: React.FC<{
@@ -12,7 +12,7 @@ export const Brand: React.FC<{
   brandNameStyle: React.CSSProperties;
   gap?: number;
 }> = ({ height, width, logoImgAlt, brandNameStyle, gap = 30 }) => {
-  const category = useAssetCategoryContext();
+  const config = useAppConfigContext();
   const [image, status] = useImage('res/logo.png');
 
   return (
@@ -25,7 +25,7 @@ export const Brand: React.FC<{
         />
       )}
       <strong style={brandNameStyle} className='title'>
-        {intl.get(SITE_NAMES.get(category) ?? '')}
+        {intl.get(SITE_NAMES.get(config) ?? '')}
       </strong>
     </Space>
   );

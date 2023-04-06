@@ -1,6 +1,6 @@
 import { Col, Empty, Row } from 'antd';
 import React from 'react';
-import { MonitoringPointRow, NO_MONITORING_POINTS } from '../../monitoring-point';
+import { MonitoringPointRow, MONITORING_POINT } from '../../monitoring-point';
 import { AssetRow } from '../../asset';
 import { MonitoringPointsTable } from '../monitoringPointsTable';
 import intl from 'react-intl-universal';
@@ -18,7 +18,10 @@ export const FlangeMonitoringPointList = ({
 
   if (monitoringPoints === undefined || monitoringPoints.length === 0)
     return (
-      <Empty description={intl.get(NO_MONITORING_POINTS)} image={Empty.PRESENTED_IMAGE_SIMPLE} />
+      <Empty
+        description={intl.get('NO_ASSET_PROMPT', { assetTypeLabel: intl.get(MONITORING_POINT) })}
+        image={Empty.PRESENTED_IMAGE_SIMPLE}
+      />
     );
   return (
     <Row gutter={[0, 16]}>

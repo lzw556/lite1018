@@ -8,17 +8,17 @@ export const AlarmRuleSelection: React.FC<{
   isLoaded: boolean;
   dataSource: PageResult<any[]>;
   fetchData: (current: number, size: number, crtRules?: any) => void;
-  visible: boolean;
+  open: boolean;
   setVisible: React.Dispatch<React.SetStateAction<boolean>>;
   onSelect: (ids: string[]) => void;
-}> = ({ visible, setVisible, onSelect, isLoaded, dataSource, fetchData }) => {
+}> = ({ open, setVisible, onSelect, isLoaded, dataSource, fetchData }) => {
   const [selectedRowKeys, setSelectedRowKeys] = React.useState<string[]>([]);
 
   if (!isLoaded) return <Spin tip={intl.get('LOADING')} />;
   if (dataSource && dataSource.result) {
     return (
       <Modal
-        visible={visible}
+        open={open}
         title={intl.get('ALARM_RULES')}
         okText={intl.get('OK')}
         cancelText={intl.get('CANCEL')}

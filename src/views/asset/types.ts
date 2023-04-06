@@ -50,6 +50,10 @@ export type AssetRow = {
   };
 };
 
+export type AssetTreeNode = (Omit<AssetRow, 'children'> | MonitoringPointRow) & {
+  children: (AssetRow | (Omit<MonitoringPointRow, 'id'> & { id: string | number }))[];
+};
+
 export type AssetChildrenStatistics = {
   alarmNum: [number, number, number] | null;
   assetId: number;
@@ -57,3 +61,76 @@ export type AssetChildrenStatistics = {
   monitoringPointNum: number;
   offlineDeviceNum: number;
 };
+
+export enum AssetCategoryKey {
+  GENERAL = 100,
+  WIND_TURBINE = 101,
+  FLANGE = 102,
+  HYDRO_TURBINE = 111,
+  AREA = 201,
+  SUB_AREA = 202,
+  PIPE = 221,
+  TANK = 222,
+  AREA_ASSET = 9990
+}
+
+export function isAssetCategoryKey(key?: number) {
+  if (key === undefined) return false;
+  return Object.values(AssetCategoryKey)
+    .filter((v) => Number.isInteger(v))
+    .includes(key);
+}
+
+export enum AssertOfAssetCategory {
+  IS_ASSET,
+  IS_WIND_LIKE,
+  IS_FLANGE,
+  IS_AREA,
+  IS_PIPE,
+  IS_AREA_ASSET,
+  IS_GENERAL
+}
+
+export function AssertAssetCategory(key: number, assert: AssertOfAssetCategory) {
+  switch (assert) {
+    case AssertOfAssetCategory.IS_ASSET:
+      return isAssetCategoryKey(key);
+    case AssertOfAssetCategory.IS_WIND_LIKE:
+      return key === AssetCategoryKey.WIND_TURBINE || key === AssetCategoryKey.HYDRO_TURBINE;
+    case AssertOfAssetCategory.IS_FLANGE:
+      return key === AssetCategoryKey.FLANGE;
+    case AssertOfAssetCategory.IS_AREA:
+      return key === AssetCategoryKey.AREA;
+    case AssertOfAssetCategory.IS_PIPE:
+      return key === AssetCategoryKey.TANK || key === AssetCategoryKey.PIPE;
+    case AssertOfAssetCategory.IS_AREA_ASSET:
+      return key === AssetCategoryKey.AREA_ASSET;
+    case AssertOfAssetCategory.IS_GENERAL:
+      return key === AssetCategoryKey.GENERAL;
+    default:
+      return false;
+  }
+}
+
+export enum AssetCategoryLabel {
+  GENERAL = 'ASSET',
+  WIND_TURBINE = 'WIND_TURBINE',
+  FLANGE = 'FLANGE',
+  HYDRO_TURBINE = 'HYDRO_TURBINE',
+  AREA = 'AREA',
+  SUB_AREA = 'SUB_AREA',
+  PIPE = 'PIPE',
+  TANK = 'TANK'
+}
+
+export type AssetCategoryDic = {
+  key: AssetCategoryKey;
+  label: AssetCategoryLabel;
+  options?: AssetCategoryDic[];
+};
+export type AssetCategoryChain = AssetCategoryDic & {
+  isLeaf?: boolean;
+  isChild?: boolean;
+};
+
+export const ASSET_PATHNAME = 'assets';

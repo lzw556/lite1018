@@ -1,6 +1,6 @@
 import G6 from '@antv/g6';
 import { ColorHealth, ColorInfo, ColorWarn } from '../../constants/color';
-import '../../string-extension';
+import { toMac } from '../../utils/format';
 
 const Color = require('color');
 
@@ -12,7 +12,6 @@ G6.registerNode(
       if (cfg.data.state) {
         hexColor = cfg.data.state.isOnline ? ColorHealth : ColorWarn;
       }
-      console.log(cfg);
       const rect = group.addShape('rect', {
         attrs: {
           x: 0,
@@ -40,7 +39,7 @@ G6.registerNode(
           x: 8,
           y: 30,
           fontSize: 8,
-          text: cfg.id.toUpperCase().macSeparator(),
+          text: toMac(cfg.id.toUpperCase()),
           textBaseline: 'center',
           fill: '#fff'
         }

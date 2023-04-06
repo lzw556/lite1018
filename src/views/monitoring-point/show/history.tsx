@@ -21,7 +21,7 @@ export const MonitoringPointHistory = (point: MonitoringPointRow) => {
   const [historyOptions, setHistoryOptions] = React.useState<any>();
   const [range, setRange] = React.useState<[number, number]>();
   const [property, setProperty] = React.useState(properties[0].key);
-  const [visible, setVisible] = React.useState(false);
+  const [open, setVisible] = React.useState(false);
   React.useEffect(() => {
     if (range) fetchData(id, range, property, type);
   }, [id, range, property, type]);
@@ -135,10 +135,10 @@ export const MonitoringPointHistory = (point: MonitoringPointRow) => {
         </Row>
       </Col>
       {renderChart(historyOptions)}
-      {visible && (
+      {open && (
         <DownloadHistory
           measurement={point}
-          open={visible}
+          open={open}
           onSuccess={() => setVisible(false)}
           onCancel={() => setVisible(false)}
         />

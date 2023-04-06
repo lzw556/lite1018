@@ -6,12 +6,7 @@ import { Permission } from '../../permission/permission';
 import { isMobile } from '../../utils/deviceDetection';
 import { convertAlarmLevelToState, getAlarmLevelColor, getAlarmStateText } from '../asset';
 import { deleteMeasurement } from './services';
-import {
-  DELETE_MONITORING_POINT,
-  MonitoringPointRow,
-  MONITORING_POINT_PATHNAME,
-  UPDATE_MONITORING_POINT
-} from './types';
+import { MonitoringPointRow, MONITORING_POINT, MONITORING_POINT_PATHNAME } from './types';
 import intl from 'react-intl-universal';
 
 export const useMonitoringPointTableColumns = () => {
@@ -23,7 +18,11 @@ export const useMonitoringPointTableColumns = () => {
       key: 'name',
       width: isMobile ? 300 : 400,
       render: (name: string, row: MonitoringPointRow) => (
-        <Link to={`/${MONITORING_POINT_PATHNAME}/${row.id}`} state={state}>
+        <Link
+          to={`/${MONITORING_POINT_PATHNAME}/${row.id}`}
+          state={state}
+          key={`${name}-${row.id}`}
+        >
           {name}
         </Link>
       )
@@ -33,9 +32,13 @@ export const useMonitoringPointTableColumns = () => {
       dataIndex: 'alertLevel',
       key: 'alertLevel',
       width: 120,
-      render: (level: number) => {
+      render: (level: number, row: MonitoringPointRow) => {
         const alarmState = convertAlarmLevelToState(level);
-        return <Tag color={getAlarmLevelColor(alarmState)}>{getAlarmStateText(alarmState)}</Tag>;
+        return (
+          <Tag color={getAlarmLevelColor(alarmState)} key={`alertLevel-${row.id}`}>
+            {getAlarmStateText(alarmState)}
+          </Tag>
+        );
       }
     },
     {
@@ -45,7 +48,11 @@ export const useMonitoringPointTableColumns = () => {
       width: 200,
       render: (name: string, row: MonitoringPointRow) =>
         row.bindingDevices && row.bindingDevices.length > 0
-          ? row.bindingDevices.map(({ id, name }) => <Link to={`/devices/${id}`}>{name}</Link>)
+          ? row.bindingDevices.map(({ id, name }) => (
+              <Link to={`/devices/${id}`} key={`devices-${row.id}`}>
+                {name}
+              </Link>
+            ))
           : ''
     }
   ];
@@ -61,7 +68,11 @@ export const useMonitoringPointTableOperationColumn = (
     render: (row: MonitoringPointRow) => (
       <Space>
         <HasPermission value={Permission.MeasurementEdit}>
-          <Button type='text' size='small' title={intl.get(UPDATE_MONITORING_POINT)}>
+          <Button
+            type='text'
+            size='small'
+            title={intl.get('EDIT_SOMETHING', { something: intl.get(MONITORING_POINT) })}
+          >
             <EditOutlined onClick={() => onUpdate(row)} />
           </Button>
         </HasPermission>
@@ -76,7 +87,7 @@ export const useMonitoringPointTableOperationColumn = (
               type='text'
               danger={true}
               size='small'
-              title={intl.get(DELETE_MONITORING_POINT)}
+              title={intl.get('DELETE_SOMETHING', { something: intl.get(MONITORING_POINT) })}
             >
               <DeleteOutlined />
             </Button>

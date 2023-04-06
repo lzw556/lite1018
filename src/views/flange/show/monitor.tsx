@@ -3,7 +3,7 @@ import React from 'react';
 import { checkIsFlangePreload } from '..';
 import { generateColProps } from '../../../utils/grid';
 import { AssetRow } from '../../asset';
-import { HistoryData, NO_MONITORING_POINTS } from '../../monitoring-point';
+import { HistoryData, MONITORING_POINT } from '../../monitoring-point';
 import { CircleChart } from '../circleChart';
 import { FlangePreloadChart } from '../flangePreloadChart';
 import { FlangeHistoryChart } from '../historyChart';
@@ -18,7 +18,10 @@ export const FlangeMonitor = ({
 }) => {
   if (flange.monitoringPoints === undefined || flange.monitoringPoints.length === 0)
     return (
-      <Empty description={intl.get(NO_MONITORING_POINTS)} image={Empty.PRESENTED_IMAGE_SIMPLE} />
+      <Empty
+        description={intl.get('NO_ASSET_PROMPT', { assetTypeLabel: intl.get(MONITORING_POINT) })}
+        image={Empty.PRESENTED_IMAGE_SIMPLE}
+      />
     );
 
   return (
@@ -26,7 +29,7 @@ export const FlangeMonitor = ({
       <Col {...generateColProps({ xl: 12, xxl: 9 })}>
         <CircleChart
           asset={flange}
-          title={intl.get('DISTRIBUTION_MAP')}
+          title={intl.get('BOLT_DIAGRAM')}
           big={true}
           style={{ height: 550 }}
         />

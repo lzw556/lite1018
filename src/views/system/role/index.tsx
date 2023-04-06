@@ -25,12 +25,9 @@ const RolePage = () => {
   const [refreshKey, setRefreshKey] = useState(0);
   const { hasPermission } = usePermission();
 
-  const fetchRoles = useCallback(
-    (current, size) => {
-      PagingRolesRequest(current, size).then(setDataSource);
-    },
-    [refreshKey]
-  );
+  const fetchRoles = useCallback((current, size) => {
+    PagingRolesRequest(current, size).then(setDataSource);
+  }, []);
 
   useEffect(() => {
     fetchRoles(1, 10);
@@ -107,7 +104,7 @@ const RolePage = () => {
         />
       </ShadowCard>
       <AddRoleModal
-        visible={addVisible}
+        open={addVisible}
         onCancel={() => setAddVisible(false)}
         onSuccess={() => {
           setAddVisible(false);
@@ -117,7 +114,7 @@ const RolePage = () => {
       {role && (
         <EditRoleModal
           role={role}
-          visible={editVisible}
+          open={editVisible}
           onCancel={() => setEditVisible(false)}
           onSuccess={() => {
             setEditVisible(false);
@@ -125,13 +122,11 @@ const RolePage = () => {
           }}
         />
       )}
-      {role && (
-        <MenuDrawer role={role} visible={menuVisible} onCancel={() => setMenuVisible(false)} />
-      )}
+      {role && <MenuDrawer role={role} open={menuVisible} onCancel={() => setMenuVisible(false)} />}
       {role && (
         <PermissionDrawer
           role={role}
-          visible={permissionVisible}
+          open={permissionVisible}
           onCancel={() => setPermissionVisible(false)}
         />
       )}

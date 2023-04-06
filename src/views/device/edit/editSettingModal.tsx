@@ -2,28 +2,27 @@ import { Form, Modal, ModalProps } from 'antd';
 import { Device } from '../../../types/device';
 import { GetDeviceSettingRequest, UpdateDeviceSettingRequest } from '../../../apis/device';
 import { useEffect, useState } from 'react';
-import { defaultValidateMessages } from '../../../constants/validator';
 import { DeviceSettingContent } from '../DeviceSettingContent';
 import { processArrayValuesInSensorSetting } from '../../../components/formItems/deviceSettingFormItem';
 import intl from 'react-intl-universal';
 
 export interface EditSettingProps extends ModalProps {
   device: Device;
-  visible: boolean;
+  open: boolean;
   onSuccess: () => void;
 }
 
 const EditSettingModal = (props: EditSettingProps) => {
-  const { device, visible, onCancel, onSuccess } = props;
+  const { device, open, onCancel, onSuccess } = props;
   const [form] = Form.useForm();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [settings, setSettings] = useState<any[]>([]);
 
   useEffect(() => {
-    if (visible) {
+    if (open) {
       GetDeviceSettingRequest(device.id).then(setSettings);
     }
-  }, [visible]);
+  }, [open, device.id]);
 
   const onSave = () => {
     form.validateFields().then((values) => {
@@ -41,7 +40,7 @@ const EditSettingModal = (props: EditSettingProps) => {
   return (
     <Modal
       width={520}
-      visible={visible}
+      open={open}
       title={intl.get('DEVICE_SETTINGS')}
       okText={intl.get('UPDATE')}
       onOk={onSave}
@@ -49,7 +48,7 @@ const EditSettingModal = (props: EditSettingProps) => {
       onCancel={onCancel}
       confirmLoading={isLoading}
     >
-      <Form form={form} labelCol={{ span: 8 }} validateMessages={defaultValidateMessages}>
+      <Form form={form} labelCol={{ span: 8 }}>
         <DeviceSettingContent deviceType={device.typeId} settings={settings} />
       </Form>
     </Modal>

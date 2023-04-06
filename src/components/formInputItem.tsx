@@ -9,6 +9,7 @@ export const FormInputItem: React.FC<
     lengthLimit?: { min: number; max: number; label: string };
     numericRule?: { isInteger?: boolean; min?: number; message?: string; others?: Rule[] };
     numericChildren?: JSX.Element;
+    placeholder?: string;
   }
 > = ({
   name,
@@ -18,6 +19,7 @@ export const FormInputItem: React.FC<
   lengthLimit,
   numericRule,
   numericChildren,
+  placeholder,
   ...rest
 }) => {
   const rules: any = [];
@@ -35,7 +37,7 @@ export const FormInputItem: React.FC<
       rules.push(...others);
     }
   }
-  console.log(rules);
+
   if (lengthLimit !== undefined) {
     const { min, max, label } = lengthLimit;
     rules.push({
@@ -54,7 +56,7 @@ export const FormInputItem: React.FC<
         numericChildren !== undefined ? (
           numericChildren
         ) : (
-          <InputNumber controls={false} style={{ width: '100%' }} />
+          <InputNumber controls={false} style={{ width: '100%' }} placeholder={placeholder} />
         )
       ) : (
         children

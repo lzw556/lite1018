@@ -10,7 +10,7 @@ import { Content } from 'antd/es/layout/layout';
 import * as React from 'react';
 import { Link } from 'react-router-dom';
 import { PageTitle } from '../../../components/pageTitle';
-import { MONITORING_POINTS } from '../../../config/assetCategory.config';
+import { MONITORING_POINTS, useAssetCategoryChain } from '../../../config/assetCategory.config';
 import HasPermission from '../../../permission';
 import { Permission } from '../../../permission/permission';
 import {
@@ -18,37 +18,37 @@ import {
   getAlarmLevelColor,
   getAlarmStateText
 } from '../../asset/common/statisticsHelper';
-import { useAssetCategoryContext } from '../../asset/components/assetCategoryContext';
+import { useAppConfigContext } from '../../asset/components/appConfigContext';
 import { FileInput } from '../../asset/components/fileInput';
-import { MONITORING_POINT_TYPE, UPDATE_MONITORING_POINT } from '../../monitoring-point';
 import { BindMonitoringPoints } from './bindMonitoringPoints';
 import { SelectRules } from './selectRules';
 import { deleteAlarmRule, getAlarmRules, importAlarmRules } from './services';
 import { AlarmRule } from './types';
 import intl from 'react-intl-universal';
+import { MONITORING_POINT } from '../../monitoring-point';
+import { AssertAssetCategory, AssertOfAssetCategory } from '../../asset';
+import { BindMonitoringPoints2 } from './bindMonitoringPoints2';
 
 export default function AlarmRuleList() {
-  const category = useAssetCategoryContext();
-  const [visible, setVisible] = React.useState(false);
-  const [visibleExport, setVisibleExport] = React.useState(false);
+  const config = useAppConfigContext();
+  const { root } = useAssetCategoryChain();
+  const [open, setVisible] = React.useState(false);
+  const [openExport, setVisibleExport] = React.useState(false);
   const [selectedRow, setSelectedRow] = React.useState<AlarmRule>();
   const columns = [
     {
       title: intl.get('NAME'),
       dataIndex: 'name',
       key: 'name',
-      width: 400,
-      render: (_: any, record: any) => {
-        return intl.get(record.name).d(record.name);
-      }
+      width: 400
     },
     {
-      title: intl.get(MONITORING_POINT_TYPE),
+      title: intl.get('OBJECT_TYPE', { object: intl.get(MONITORING_POINT) }),
       dataIndex: 'type',
       key: 'type',
       width: 200,
       render: (typeId: number) => {
-        const label = MONITORING_POINTS.get(category)?.find((m) => m.id === typeId)?.label;
+        const label = MONITORING_POINTS.get(config)?.find((m) => m.id === typeId)?.label;
         return label ? intl.get(label) : '-';
       }
     },
@@ -82,7 +82,11 @@ export default function AlarmRuleList() {
               </>
             )}
             <HasPermission value={Permission.AlarmRuleGroupBind}>
-              <Button type='text' size='small' title={intl.get(UPDATE_MONITORING_POINT)}>
+              <Button
+                type='text'
+                size='small'
+                title={intl.get('EDIT_SOMETHING', { something: intl.get(MONITORING_POINT) })}
+              >
                 <MoreOutlined
                   onClick={() => {
                     setSelectedRow(row);
@@ -102,20 +106,17 @@ export default function AlarmRuleList() {
       rowKey: 'id',
       columns: [
         {
-          title: intl.get('ALARM_SUB_RULE_NAME'),
+          title: intl.get('NAME'),
           dataIndex: 'name',
           key: 'name',
-          width: 400,
-          render: (_: any, record: any) => {
-            return intl.get(record.name).d(record.name);
-          }
+          width: 400
         },
         {
           title: intl.get('ALARM_METRIC'),
           dataIndex: 'metric',
           key: 'metric',
           render: (metric: any) => {
-            return intl.get(metric.name).d(metric.name);
+            return translateMetricName(metric.name);
           },
           width: 120
         },
@@ -124,9 +125,7 @@ export default function AlarmRuleList() {
           dataIndex: 'condition',
           key: 'condition',
           render: (_: any, record: any) => {
-            return `${record.operation} ${record.threshold} ${
-              record.metric.unit ? intl.get(record.metric.unit).d(record.metric.unit) : ''
-            }`;
+            return `${record.operation} ${record.threshold} ${record.metric.unit}`;
           },
           width: 150
         },
@@ -220,9 +219,9 @@ export default function AlarmRuleList() {
                 }}
               />
             </HasPermission>
-            {visibleExport && (
+            {openExport && (
               <SelectRules
-                open={visibleExport}
+                open={openExport}
                 onCancel={() => setVisibleExport(false)}
                 rules={result.dataSource as AlarmRule[]}
                 onSuccess={() => setVisibleExport(false)}
@@ -232,10 +231,23 @@ export default function AlarmRuleList() {
         }
       />
       <Table {...result} />
-      {visible && selectedRow && (
+      {open && selectedRow && AssertAssetCategory(root.key, AssertOfAssetCategory.IS_WIND_LIKE) && (
         <BindMonitoringPoints
           {...{
-            open: visible,
+            open: open,
+            onCancel: () => setVisible(false),
+            selectedRow,
+            onSuccess: () => {
+              setVisible(false);
+              fetchAlarmRules();
+            }
+          }}
+        />
+      )}
+      {open && selectedRow && !AssertAssetCategory(root.key, AssertOfAssetCategory.IS_WIND_LIKE) && (
+        <BindMonitoringPoints2
+          {...{
+            open: open,
             onCancel: () => setVisible(false),
             selectedRow,
             onSuccess: () => {
@@ -247,4 +259,17 @@ export default function AlarmRuleList() {
       )}
     </Content>
   );
+}
+
+export function translateMetricName(name: string) {
+  debugger;
+  if (!name) return name;
+  if (name.indexOf(':')) {
+    return name
+      .split(':')
+      .map((n) => intl.get(n))
+      .join(':');
+  } else {
+    return intl.get(name);
+  }
 }

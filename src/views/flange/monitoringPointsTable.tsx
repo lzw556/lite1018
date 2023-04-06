@@ -3,6 +3,7 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import usePermission, { Permission } from '../../permission/permission';
 import { isMobile } from '../../utils/deviceDetection';
+import { getPathFromType } from '../asset';
 import { AssetRow } from '../asset/types';
 import {
   MonitoringPointRow,
@@ -12,7 +13,6 @@ import {
   getRealPoints,
   sortMonitoringPointByAttributes
 } from '../monitoring-point';
-import { FLANGE_PATHNAME } from './types';
 
 export const MonitoringPointsTable = ({
   asset,
@@ -45,7 +45,7 @@ export const MonitoringPointsTable = ({
     <>
       {showTitle && (
         <Link
-          to={`/${FLANGE_PATHNAME}/${id}`}
+          to={`${getPathFromType(asset.type)}${id}`}
           state={state}
           style={{ display: 'block', marginBottom: 8, fontSize: 16 }}
         >
@@ -54,7 +54,7 @@ export const MonitoringPointsTable = ({
       )}
       <Table
         {...{
-          rowKey: 'id',
+          rowKey: (record) => record.id,
           columns,
           size: 'small',
           dataSource,

@@ -13,10 +13,12 @@ import {
 import { DynamicDataContent } from './dynamicDataContent';
 import { DynamicDataProperty, useDynamicDataRequest } from './dynamicDataHelper';
 import intl from 'react-intl-universal';
+import { useLocaleContext } from '../../../../localeProvider';
 
 export const MonitoringPointDynamicData: React.FC<MonitoringPointRow & { dataType?: DataType }> = (
   props
 ) => {
+  const { language } = useLocaleContext();
   const [range, setRange] = React.useState<[number, number]>();
   const { hasPermission } = usePermission();
   const {
@@ -59,7 +61,11 @@ export const MonitoringPointDynamicData: React.FC<MonitoringPointRow & { dataTyp
                   <Space
                     size='middle'
                     onClick={() => {
-                      downloadRawHistory(props.id, text.timestamp).then((res) => {
+                      downloadRawHistory(
+                        props.id,
+                        text.timestamp,
+                        language === 'en-US' ? 'en' : 'zh'
+                      ).then((res) => {
                         const url = window.URL.createObjectURL(new Blob([res.data]));
                         const link = document.createElement('a');
                         link.href = url;

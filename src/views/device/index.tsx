@@ -3,7 +3,7 @@ import {
   Col,
   Dropdown,
   Input,
-  Menu,
+  MenuProps,
   Modal,
   Popconfirm,
   Row,
@@ -27,7 +27,6 @@ import { Device } from '../../types/device';
 import EditBaseInfoModel from './edit/editBaseInfoModel';
 import Label from '../../components/label';
 import ShadowCard from '../../components/shadowCard';
-import '../../string-extension';
 import { IsUpgrading } from '../../types/device_upgrade_status';
 import '../../assets/iconfont.css';
 import HasPermission from '../../permission';
@@ -44,11 +43,12 @@ import { Link } from 'react-router-dom';
 import { AlarmRuleSettings } from './detail/setting/alarmRuleSettings';
 import { Store, useStore } from '../../hooks/store';
 import { Normalizes } from '../../constants/validator';
-import { CommandMenu } from './commandMenu';
 import { PageTitle } from '../../components/pageTitle';
 import { SENSORS } from '../../config/assetCategory.config';
-import { useAssetCategoryContext } from '../asset/components/assetCategoryContext';
+import { useAppConfigContext } from '../asset/components/appConfigContext';
 import intl from 'react-intl-universal';
+import { CommandDropdown } from './commandDropdown';
+import { toMac } from '../../utils/format';
 
 const { Search } = Input;
 const { Option } = Select;
@@ -59,10 +59,10 @@ const DevicePage = () => {
   const [editSettingVisible, setEditSettingVisible] = useState<boolean>(false);
   const [editBaseInfoVisible, setEditBaseInfoVisible] = useState<boolean>(false);
   const [dataSource, setDataSource] = useState<PageResult<any>>();
-  const { hasPermission, hasPermissions } = usePermission();
-  const [visibleAlarmRules, setVisibleAlarmRules] = useState(false);
+  const { hasPermission } = usePermission();
+  const [openAlarmRules, setVisibleAlarmRules] = useState(false);
   const [store, setStore, gotoPage] = useStore('deviceList');
-  const category = useAssetCategoryContext();
+  const config = useAppConfigContext();
 
   const fetchDevices = (store: Store['deviceList']) => {
     const {
@@ -94,23 +94,16 @@ const DevicePage = () => {
     });
   };
 
-  const renderEditMenus = (record: Device) => {
+  const renderEditMenus = (record: Device): MenuProps => {
     const isUpgrading = record.upgradeStatus && IsUpgrading(record.upgradeStatus.code);
-    return (
-      <Menu
-        onClick={(e) => {
-          onEdit(record.id, e.key);
-        }}
-        disabled={isUpgrading}
-      >
-        {hasPermission(Permission.DeviceEdit) && (
-          <Menu.Item key={1}>{intl.get('EDIT_DEVICE_INFO')}</Menu.Item>
-        )}
-        {hasPermission(Permission.DeviceSettingsEdit) && record.typeId !== DeviceType.Router && (
-          <Menu.Item key={2}>{intl.get('EDIT_DEVICE_SETTINGS')}</Menu.Item>
-        )}
-      </Menu>
-    );
+    const items: MenuProps['items'] = [];
+    if (hasPermission(Permission.DeviceEdit)) {
+      items.push({ key: '1', label: intl.get('EDIT_DEVICE_INFO') });
+    }
+    if (hasPermission(Permission.DeviceSettingsEdit) && record.typeId !== DeviceType.Router) {
+      items.push({ key: '2', label: intl.get('EDIT_DEVICE_SETTINGS') });
+    }
+    return { items, onClick: ({ key }) => onEdit(record.id, key), disabled: isUpgrading };
   };
 
   const columns = [
@@ -144,7 +137,7 @@ const DevicePage = () => {
       dataIndex: 'macAddress',
       key: 'macAddress',
       render: (text: string) => {
-        return <Text>{text.toUpperCase().macSeparator()}</Text>;
+        return <Text>{toMac(text.toUpperCase())}</Text>;
       }
     },
     {
@@ -186,7 +179,7 @@ const DevicePage = () => {
         const isUpgrading = record.upgradeStatus && IsUpgrading(record.upgradeStatus.code);
         return (
           <Space>
-            <Dropdown overlay={renderEditMenus(record)} trigger={isMobile ? ['click'] : ['hover']}>
+            <Dropdown menu={renderEditMenus(record)} trigger={isMobile ? ['click'] : ['hover']}>
               <Button
                 type='text'
                 size='small'
@@ -199,21 +192,12 @@ const DevicePage = () => {
                 }
               />
             </Dropdown>
-            <Dropdown
-              overlay={<CommandMenu device={record} />}
-              trigger={isMobile ? ['click'] : ['hover']}
-            >
-              <Button
-                type='text'
-                icon={<CodeOutlined />}
-                hidden={
-                  !(
-                    hasPermission(Permission.DeviceCommand) ||
-                    hasPermissions(Permission.DeviceUpgrade, Permission.DeviceFirmwares)
-                  )
-                }
+            <HasPermission value={Permission.DeviceCommand}>
+              <CommandDropdown
+                device={record}
+                target={<Button type='text' icon={<CodeOutlined />} />}
               />
-            </Dropdown>
+            </HasPermission>
             <HasPermission value={Permission.DeviceDelete}>
               <Popconfirm
                 placement='left'
@@ -286,7 +270,7 @@ const DevicePage = () => {
                   defaultValue={store.filters?.type}
                 >
                   {[DeviceType.Gateway, DeviceType.Router]
-                    .concat(SENSORS.get(category) ?? [])
+                    .concat(SENSORS.get(config) ?? [])
                     .map((d) => {
                       return (
                         <Select.Option key={d} value={d}>
@@ -353,7 +337,7 @@ const DevicePage = () => {
       </ShadowCard>
       <EditBaseInfoModel
         device={device}
-        visible={editBaseInfoVisible}
+        open={editBaseInfoVisible}
         onSuccess={() => {
           setDevice(undefined);
           setEditBaseInfoVisible(false);
@@ -367,7 +351,7 @@ const DevicePage = () => {
       {device && (
         <EditSettingModal
           device={device}
-          visible={editSettingVisible}
+          open={editSettingVisible}
           onSuccess={() => {
             setDevice(undefined);
             setEditSettingVisible(false);
@@ -379,10 +363,10 @@ const DevicePage = () => {
           }}
         />
       )}
-      {visibleAlarmRules && device && (
+      {openAlarmRules && device && (
         <Modal
           title={intl.get('ALARM_RULES')}
-          visible={visibleAlarmRules}
+          open={openAlarmRules}
           onCancel={() => {
             setVisibleAlarmRules(false);
             setDevice(undefined);

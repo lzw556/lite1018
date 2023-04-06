@@ -10,6 +10,7 @@ import { generateColProps } from '../../../utils/grid';
 import { convertAlarmLevelToState, getAlarmLevelColor, getAlarmStateText } from '../../asset';
 import { MonitoringPointRow } from '../types';
 import intl from 'react-intl-universal';
+import { toMac } from '../../../utils/format';
 
 export const RelatedDevices = (point: MonitoringPointRow) => {
   const { bindingDevices: devices = [], alertLevel } = point;
@@ -58,9 +59,7 @@ function SingleDeviceInfo(props: Device & { alertLevel?: number }) {
         </Col>
         <Col {...colProps}>
           <NameValueGroups
-            items={[
-              { name: intl.get('MAC_ADDRESS'), value: macAddress.toUpperCase().macSeparator() }
-            ]}
+            items={[{ name: intl.get('MAC_ADDRESS'), value: toMac(macAddress.toUpperCase()) }]}
           />
         </Col>
         <Col {...colProps}>

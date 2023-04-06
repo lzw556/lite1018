@@ -108,7 +108,7 @@ function typeOf(t: any) {
 }
 
 function filterNull(params: any) {
-  Object.keys(params).map((key) => {
+  Object.keys(params).forEach((key) => {
     if (params[key] === null) {
       delete params[key];
     } else if (typeOf(params[key]) === 'string') {

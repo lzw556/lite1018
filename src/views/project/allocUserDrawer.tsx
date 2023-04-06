@@ -12,20 +12,20 @@ export interface AllocUserDrawerProps extends DrawerProps {
 }
 
 const AllocUserDrawer: FC<AllocUserDrawerProps> = (props) => {
-  const { project, visible, onSuccess } = props;
+  const { project, open, onSuccess } = props;
   const [dataSource, setDataSource] = useState<AllocUser[]>([]);
   const [treeData, setTreeData] = useState<any>();
   const [checkedKeys, setCheckedKeys] = useState<any[]>([]);
 
   const fetchUsers = useCallback(() => {
     GetAllocUsersRequest(project.id).then(setDataSource);
-  }, []);
+  }, [project.id]);
 
   useEffect(() => {
-    if (visible) {
+    if (open) {
       fetchUsers();
     }
-  }, [visible, fetchUsers]);
+  }, [open, fetchUsers]);
 
   useEffect(() => {
     if (dataSource) {

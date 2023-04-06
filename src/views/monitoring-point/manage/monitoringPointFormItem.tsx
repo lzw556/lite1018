@@ -1,17 +1,10 @@
 import { MinusCircleOutlined } from '@ant-design/icons';
 import { Button, Form, Input, Popover, Space } from 'antd';
 import React from 'react';
-import { Rules } from '../../../constants/validator';
 import { Device } from '../../../types/device';
-import {
-  MONITORING_POINT_NAME,
-  MONITORING_POINT_POSITION,
-  PLEASE_CREATE_MONITORING_POINT,
-  PLEASE_INPUT_MONITORING_POINT_NAME,
-  PLEASE_INPUT_MONITORING_POINT_POSITION
-} from '../types';
 import { DeviceSelection, MonitoringPointInfo } from './DeviceSelection';
 import intl from 'react-intl-universal';
+import { FormInputItem } from '../../../components/formInputItem';
 
 export const MonitoringPointFormItem = ({
   devices,
@@ -24,7 +17,7 @@ export const MonitoringPointFormItem = ({
   onRemove: (index: number) => void;
   initialSelected: MonitoringPointInfo[];
 }) => {
-  const [visible, setVisible] = React.useState(false);
+  const [open, setVisible] = React.useState(false);
 
   return (
     <Form.List
@@ -33,7 +26,7 @@ export const MonitoringPointFormItem = ({
         {
           validator: async (_, points) => {
             if (!points || points.length <= 0) {
-              return Promise.reject(new Error(intl.get(PLEASE_CREATE_MONITORING_POINT)));
+              return Promise.reject(new Error(intl.get('PLEASE_CREATE_MONITORING_POINT')));
             }
           }
         }
@@ -51,37 +44,45 @@ export const MonitoringPointFormItem = ({
                   }}
                   style={{ position: 'relative', top: -12 }}
                 />
-                <Form.Item
-                  label={intl.get(MONITORING_POINT_NAME)}
-                  labelCol={{ span: 14 }}
+                <FormInputItem
+                  label={intl.get('NAME')}
+                  labelCol={{ span: 7 }}
                   {...restFields}
                   name={[name, 'name']}
-                  rules={[Rules.range(4, 16)]}
+                  requiredMessage={intl.get('PLEASE_ENTER_NAME')}
+                  lengthLimit={{ min: 4, max: 50, label: intl.get('NAME').toLowerCase() }}
                 >
-                  <Input placeholder={intl.get(PLEASE_INPUT_MONITORING_POINT_NAME)} />
+                  <Input placeholder={intl.get('PLEASE_ENTER_NAME')} />
+                </FormInputItem>
+                <Form.Item name={[name, 'channel']} hidden={true}>
+                  <Input />
                 </Form.Item>
-                <Form.Item name={[name, 'channel']} hidden={true}></Form.Item>
-                <Form.Item
-                  label={intl.get(MONITORING_POINT_POSITION)}
-                  labelCol={{ span: 12 }}
+                <FormInputItem
+                  label={intl.get('POSITION')}
+                  labelCol={{ span: 10 }}
                   {...restFields}
                   name={[name, 'place']}
-                  rules={[Rules.number]}
-                >
-                  <Input
-                    placeholder={intl.get(PLEASE_INPUT_MONITORING_POINT_POSITION)}
-                    style={{ width: 100 }}
-                  />
-                </Form.Item>
+                  requiredMessage={intl.get('PLEASE_ENTER_SOMETHING', {
+                    something: intl.get('POSITION')
+                  })}
+                  numericRule={{
+                    isInteger: true,
+                    min: 1,
+                    message: intl.get('UNSIGNED_INTEGER_ENTER_PROMPT')
+                  }}
+                  placeholder={intl.get('PLEASE_ENTER_SOMETHING', {
+                    something: intl.get('POSITION')
+                  })}
+                />
               </Space>
             </>
           ))}
-          <Form.ErrorList errors={errors} />
-          <Form.Item wrapperCol={{ offset: 8 }}>
+
+          <Form.Item wrapperCol={{ offset: 4 }}>
             <Popover
               title={intl.get('SELECT_SENSOR')}
               content={
-                visible && (
+                open && (
                   <DeviceSelection
                     devices={devices}
                     onSelect={(selecteds) => {
@@ -94,11 +95,12 @@ export const MonitoringPointFormItem = ({
               }
               trigger={['click']}
               placement='rightTop'
-              open={visible}
-              onOpenChange={(visible) => setVisible(visible)}
+              open={open}
+              onOpenChange={(open) => setVisible(open)}
               overlayStyle={{ width: 400 }}
             >
               <Button disabled={devices.length === 0}>{intl.get('SELECT_SENSOR')}</Button>
+              <Form.ErrorList errors={errors} />
             </Popover>
           </Form.Item>
         </div>

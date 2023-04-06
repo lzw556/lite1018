@@ -80,45 +80,47 @@ const MePage = () => {
         <Col span={24}>
           <ShadowCard title={intl.get('BASIC_INFORMATION')} bordered={false}>
             <Form form={form}>
-              <p>
-                <Row justify={'start'}>
-                  <Col span={isMobile ? 5 : 2} className='ts-label'>
-                    {intl.get('ACCOUNT_NAME')}
-                  </Col>
-                  <Col span={isMobile ? 15 : 5}>{user?.username}</Col>
-                  {!isMobile && <Col span={2}></Col>}
-                </Row>
-              </p>
-              <p>
-                <Row justify={'start'}>
-                  <Col span={isMobile ? 5 : 2} className='ts-label'>
-                    {intl.get('CELLPHONE')}
-                  </Col>
-                  <Col span={isMobile ? 15 : 5}>{renderPhone()}</Col>
-                  <Col span={isMobile ? 3 : 2} offset={1}>
-                    {isPhoneEdit ? (
-                      <a onClick={onSavePhone}>{intl.get('SAVE')}</a>
-                    ) : (
-                      <a onClick={() => setIsPhoneEdit(true)}>{intl.get('MODIFY')}</a>
-                    )}
-                  </Col>
-                </Row>
-              </p>
-              <p>
-                <Row justify={'start'}>
-                  <Col span={isMobile ? 5 : 2} className='ts-label'>
-                    {intl.get('EMAIL')}
-                  </Col>
-                  <Col span={isMobile ? 15 : 5}>{renderEmail()}</Col>
-                  <Col span={isMobile ? 3 : 2} offset={1}>
-                    {isEmailEdit ? (
-                      <a onClick={onSaveEmail}>{intl.get('SAVE')}</a>
-                    ) : (
-                      <a onClick={() => setIsEmailEdit(true)}>{intl.get('MODIFY')}</a>
-                    )}
-                  </Col>
-                </Row>
-              </p>
+              <Row gutter={[0, 16]}>
+                <Col span={24}>
+                  <Row>
+                    <Col span={isMobile ? 5 : 2} className='ts-label'>
+                      {intl.get('ACCOUNT_NAME')}
+                    </Col>
+                    <Col span={isMobile ? 15 : 5}>{user?.username}</Col>
+                    {!isMobile && <Col span={2}></Col>}
+                  </Row>
+                </Col>
+                <Col span={24}>
+                  <Row>
+                    <Col span={isMobile ? 5 : 2} className='ts-label'>
+                      {intl.get('CELLPHONE')}
+                    </Col>
+                    <Col span={isMobile ? 15 : 5}>{renderPhone()}</Col>
+                    <Col span={isMobile ? 3 : 2} offset={1}>
+                      {isPhoneEdit ? (
+                        <a onClick={onSavePhone}>{intl.get('SAVE')}</a>
+                      ) : (
+                        <a onClick={() => setIsPhoneEdit(true)}>{intl.get('MODIFY')}</a>
+                      )}
+                    </Col>
+                  </Row>
+                </Col>
+                <Col span={24}>
+                  <Row>
+                    <Col span={isMobile ? 5 : 2} className='ts-label'>
+                      {intl.get('EMAIL')}
+                    </Col>
+                    <Col span={isMobile ? 15 : 5}>{renderEmail()}</Col>
+                    <Col span={isMobile ? 3 : 2} offset={1}>
+                      {isEmailEdit ? (
+                        <a onClick={onSaveEmail}>{intl.get('SAVE')}</a>
+                      ) : (
+                        <a onClick={() => setIsEmailEdit(true)}>{intl.get('MODIFY')}</a>
+                      )}
+                    </Col>
+                  </Row>
+                </Col>
+              </Row>
             </Form>
           </ShadowCard>
           <br />
@@ -136,7 +138,7 @@ const MePage = () => {
         </Col>
       </Row>
       <EditPassModal
-        visible={isPassEdit}
+        open={isPassEdit}
         onSuccess={() => {
           setIsPassEdit(false);
         }}

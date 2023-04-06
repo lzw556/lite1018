@@ -71,13 +71,13 @@ const DeviceSettingFormItem: FC<DeviceSettingFormItemProps> = ({ value, editable
       setting.children &&
       setting.children.map((child) => {
         if (setting.value === child.show) {
-          return <DeviceSettingFormItem editable={editable} value={child} />;
+          return <DeviceSettingFormItem editable={editable} value={child} key={child.key} />;
         } else if (
           setting.options &&
           Array.isArray(setting.value) &&
           setting.value.includes(child.show)
         ) {
-          return <DeviceSettingFormItem editable={editable} value={child} />;
+          return <DeviceSettingFormItem editable={editable} value={child} key={child.key} />;
         }
         return null;
       })

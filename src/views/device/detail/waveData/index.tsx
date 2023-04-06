@@ -1,4 +1,4 @@
-import { Checkbox, Col, DatePicker, Row, Select, Space, Table } from 'antd';
+import { Checkbox, Col, Row, Select, Space, Table } from 'antd';
 import EChartsReact from 'echarts-for-react';
 import dayjs from '../../../../utils/dayjsUtils';
 import * as React from 'react';
@@ -17,6 +17,8 @@ import { DownloadOutlined } from '@ant-design/icons';
 import usePermission, { Permission } from '../../../../permission/permission';
 import { DeviceType } from '../../../../types/device_type';
 import intl from 'react-intl-universal';
+import { RangeDatePicker } from '../../../../components/rangeDatePicker';
+import { useLocaleContext } from '../../../../localeProvider';
 
 const { Option } = Select;
 
@@ -48,14 +50,13 @@ const defaultChartOption = {
 };
 
 const WaveDataChart: React.FC<{ device: Device }> = ({ device }) => {
-  const [beginDate, setBeginDate] = React.useState(dayjs().subtract(3, 'days').startOf('day'));
-  const [endDate, setEndDate] = React.useState(dayjs().endOf('day'));
+  const { language } = useLocaleContext();
+  const [range, setRange] = React.useState<[number, number]>();
   const [dataSource, setDataSource] = React.useState<any>();
   const [deviceData, setDeviceData] = React.useState<any>();
   const [calculate, setCalculate] = React.useState<string>('accelerationTimeDomain');
   const [dimension, setDimension] = React.useState<number>(0);
   const [isLoading, setIsLoading] = React.useState(false);
-  const [isLoadingPage, setIsLoadingPage] = React.useState(false);
   const [isShowEnvelope, setIsShowEnvelope] = React.useState(false);
   const [dataType] = useState(
     device.typeId === DeviceType.VibrationTemperature3AxisAdvanced ? 16842758 : 16842753
@@ -74,25 +75,22 @@ const WaveDataChart: React.FC<{ device: Device }> = ({ device }) => {
           setIsLoading(false);
         });
     },
-    [calculate, dimension]
+    [calculate, dimension, dataType, device.id]
   );
 
   const fetchDeviceWaveDataTimestamps = useCallback(() => {
-    setIsLoadingPage(true);
-    FindDeviceDataRequest(device.id, beginDate.utc().unix(), endDate.utc().unix(), {
-      data_type: dataType
-    })
-      .then((data) => {
-        setIsLoadingPage(false);
+    if (range) {
+      const [from, to] = range;
+      FindDeviceDataRequest(device.id, from, to, {
+        data_type: dataType
+      }).then((data) => {
         setDataSource(data);
         if (data.length > 0) {
           fetchDeviceDataByTimestamp(data[0].timestamp);
         }
-      })
-      .catch((_) => {
-        setIsLoadingPage(false);
       });
-  }, [beginDate, endDate, device.id]);
+    }
+  }, [range, device.id, dataType, fetchDeviceDataByTimestamp]);
 
   React.useEffect(() => {
     fetchDeviceWaveDataTimestamps();
@@ -102,7 +100,7 @@ const WaveDataChart: React.FC<{ device: Device }> = ({ device }) => {
     if (deviceData) {
       fetchDeviceDataByTimestamp(deviceData.timestamp);
     }
-  }, [fetchDeviceDataByTimestamp]);
+  }, [fetchDeviceDataByTimestamp, deviceData]);
 
   const getChartTitle = () => {
     switch (calculate) {
@@ -137,7 +135,7 @@ const WaveDataChart: React.FC<{ device: Device }> = ({ device }) => {
         if (hasPermission(Permission.DeviceRawDataDownload)) {
           return (
             <Space size='middle'>
-              <a onClick={() => onDownload(record.timestamp)}>下载</a>
+              <a onClick={() => onDownload(record.timestamp)}>{intl.get('DOWNLOAD')}</a>
             </Space>
           );
         }
@@ -145,10 +143,15 @@ const WaveDataChart: React.FC<{ device: Device }> = ({ device }) => {
     }
   ];
   const onDownload = (timestamp: number) => {
-    DownloadDeviceDataByTimestampRequest(device.id, timestamp, {
-      calculate,
-      data_type: dataType
-    }).then((res) => {
+    DownloadDeviceDataByTimestampRequest(
+      device.id,
+      timestamp,
+      {
+        calculate,
+        data_type: dataType
+      },
+      language === 'en-US' ? 'en' : 'zh'
+    ).then((res) => {
       if (res.status === 200) {
         const url = window.URL.createObjectURL(new Blob([res.data]));
         const link = document.createElement('a');
@@ -216,7 +219,7 @@ const WaveDataChart: React.FC<{ device: Device }> = ({ device }) => {
           legend: {
             data: [legends[dimension]],
             itemStyle: {
-              color: LineChartStyles[dimension].itemStyle.normal.color
+              color: LineChartStyles[dimension].itemStyle.color
             }
           },
           title: { text: `${getChartTitle()} ${data.frequency / 1000}KHz`, top: 0 },
@@ -249,6 +252,8 @@ const WaveDataChart: React.FC<{ device: Device }> = ({ device }) => {
       );
     }
   };
+
+  const handleRangeChange = React.useCallback((range: [number, number]) => setRange(range), []);
 
   const select_fields = (
     <Select
@@ -304,16 +309,7 @@ const WaveDataChart: React.FC<{ device: Device }> = ({ device }) => {
       <>
         <Row style={{ marginBottom: 8 }}>
           <Col span={24}>
-            <DatePicker.RangePicker
-              allowClear={false}
-              value={[beginDate, endDate]}
-              onChange={(date, dateString) => {
-                if (dateString) {
-                  setBeginDate(dayjs(dateString[0]).startOf('day'));
-                  setEndDate(dayjs(dateString[1]).endOf('day'));
-                }
-              }}
-            />
+            <RangeDatePicker onChange={handleRangeChange} />
           </Col>
         </Row>
         <Row style={{ marginBottom: 8 }} align='middle'>
@@ -365,16 +361,7 @@ const WaveDataChart: React.FC<{ device: Device }> = ({ device }) => {
         <Col xl={6} xxl={4} style={{ maxHeight: 500 }}>
           <Row justify={'center'} style={{ width: '100%' }}>
             <Col span={24}>
-              <DatePicker.RangePicker
-                allowClear={false}
-                value={[beginDate, endDate]}
-                onChange={(date, dateString) => {
-                  if (dateString) {
-                    setBeginDate(dayjs(dateString[0]).startOf('day'));
-                    setEndDate(dayjs(dateString[1]).endOf('day'));
-                  }
-                }}
-              />
+              <RangeDatePicker onChange={handleRangeChange} />
             </Col>
           </Row>
           <Row justify={'space-between'} style={{ paddingTop: '0px' }}>

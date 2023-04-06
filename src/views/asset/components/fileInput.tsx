@@ -51,7 +51,7 @@ export const FileInput: React.FC<{
         className={`ant-btn ant-btn-primary ${loading ? 'ant-btn-loading' : ''}`}
       >
         <span className='ant-btn-loading-icon'> {loading && <LoadingOutlined />}</span>
-        {loading ? '导入中...' : intl.get('IMPORT_SETTINGS')}
+        {loading ? intl.get('IMPORTING_PROMPT') : intl.get('IMPORT_SETTINGS')}
         <ImportOutlined />
       </Button>
     </div>

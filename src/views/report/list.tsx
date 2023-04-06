@@ -1,6 +1,5 @@
 import { Col, Row } from 'antd';
 import { Content } from 'antd/lib/layout/layout';
-import moment from 'moment';
 import React, { useCallback, useEffect, useState } from 'react';
 import { RangeDatePicker } from '../../components/rangeDatePicker';
 import ShadowCard from '../../components/shadowCard';
@@ -13,6 +12,7 @@ import { GetResponse } from '../../utils/response';
 import TableLayout from '../layout/TableLayout';
 import intl from 'react-intl-universal';
 import { PageTitle } from '../../components/pageTitle';
+import dayjs from '../../utils/dayjsUtils';
 
 export default function ReportList() {
   const [dataSource, setDataSource] = useState<PageResult<Report[]>>();
@@ -44,13 +44,32 @@ export default function ReportList() {
       title: intl.get('REPORT_DATE'),
       dataIndex: 'reportDate',
       key: 'reportDate',
-      render: (text: number) => moment.unix(text).local().format('yyyy-MM-DD')
+      render: (text: number) => dayjs.unix(text).local().format('YYYY-MM-DD')
     },
     {
-      title: '操作',
+      title: intl.get('OPERATION'),
       key: 'action',
       render: (text: any, record: any) => {
-        return null;
+        return (
+          <a
+            href='#!'
+            onClick={(e) => {
+              e.preventDefault();
+              downloadReport(record.filename).then((res) => {
+                if (res.status === 200) {
+                  const url = window.URL.createObjectURL(new Blob([res.data as any]));
+                  const link = document.createElement('a');
+                  link.href = url;
+                  link.setAttribute('download', record.filename);
+                  document.body.appendChild(link);
+                  link.click();
+                }
+              });
+            }}
+          >
+            {intl.get('DOWNLOAD')}
+          </a>
+        );
       }
     }
   ];
@@ -85,6 +104,10 @@ export default function ReportList() {
 
 export function getReports(page: number, size: number, from: number, to: number) {
   return request.get<PageResult<Report[]>>('/reports', { page, size, from, to }).then(GetResponse);
+}
+
+export function downloadReport(filename: string) {
+  return request.download<any>(`/reports/${filename}`);
 }
 
 type Report = {

@@ -4,7 +4,8 @@ import { ChartContainer } from '../../../../components/charts/chartContainer';
 import Label from '../../../../components/label';
 import { isMobile } from '../../../../utils/deviceDetection';
 import { getDisplayValue, roundValue } from '../../../../utils/format';
-import { Property } from '../../../monitoring-point';
+import { MONITORING_POINT, Property } from '../../../monitoring-point';
+import intl from 'react-intl-universal';
 
 export type FlangeStatusData = {
   timestamp: number;
@@ -39,11 +40,11 @@ export function SingleFlangeStatus({
         <Col span={24}>
           <Row justify='end'>
             <Col>
-              <Label name={'属性'}>
+              <Label name={intl.get('PROPERTY')}>
                 <Select
                   bordered={false}
                   defaultValue={property}
-                  placeholder={'请选择属性'}
+                  placeholder={intl.get('PLEASE_SELECT_PROPERTY')}
                   style={{ width: isMobile ? '100%' : '120px' }}
                   onChange={(value: string) => {
                     setProperty(value);
@@ -53,7 +54,7 @@ export function SingleFlangeStatus({
                     .filter((pro) => pro.key === 'preload' || pro.key === 'pressure')
                     .map(({ name, key }) => (
                       <Select.Option key={key} value={key}>
-                        {name}
+                        {intl.get(name)}
                       </Select.Option>
                     ))}
                 </Select>
@@ -87,7 +88,7 @@ function generateFlangeStatusChartOptions(propertyKey: string, origialData?: Fla
     if (propertyInputDatas.length > 0) {
       series.push({
         type: 'scatter',
-        name: `监测点`,
+        name: intl.get(MONITORING_POINT),
         data: propertyInputDatas.map(({ index, value }) => [index - 1, roundValue(value)])
       });
     }
@@ -104,7 +105,7 @@ function generateFlangeStatusChartOptions(propertyKey: string, origialData?: Fla
         xAxisDatas = fakeDatas.map((value, index) => index + 1);
         series.push({
           type: 'line',
-          name: `螺栓`,
+          name: intl.get('BOLT'),
           data: fakeDatas.map((value, index) => [index, roundValue(value)])
         });
       }

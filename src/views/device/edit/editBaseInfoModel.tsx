@@ -2,13 +2,13 @@ import { Form, Input, Modal } from 'antd';
 import { useEffect, useState } from 'react';
 import { UpdateDeviceRequest } from '../../../apis/device';
 import NetworkSelect from '../../../components/select/networkSelect';
-import { defaultValidateMessages, Normalizes, Rules } from '../../../constants/validator';
+import { Normalizes, Rules } from '../../../constants/validator';
 import DeviceSelect from '../../../components/select/deviceSelect';
 import intl from 'react-intl-universal';
 import { FormInputItem } from '../../../components/formInputItem';
 
 const EditBaseInfoModel = (props: any) => {
-  const { visible, device, onCancel, onSuccess } = props;
+  const { open, device, onCancel, onSuccess } = props;
   const [form] = Form.useForm();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [network, setNetwork] = useState<number>();
@@ -38,7 +38,7 @@ const EditBaseInfoModel = (props: any) => {
   return (
     <Modal
       width={420}
-      visible={visible}
+      open={open}
       title={intl.get('DEVICE_INFO')}
       okText={intl.get('UPDATE')}
       onOk={onSave}
@@ -46,7 +46,7 @@ const EditBaseInfoModel = (props: any) => {
       onCancel={onCancel}
       confirmLoading={isLoading}
     >
-      <Form form={form} labelCol={{ span: 8 }} validateMessages={defaultValidateMessages}>
+      <Form form={form} labelCol={{ span: 8 }}>
         <FormInputItem
           label={intl.get('DEVICE_NAME')}
           name='name'

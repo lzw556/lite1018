@@ -4,26 +4,24 @@ import * as React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { PageTitle } from '../../../components/pageTitle';
 import ShadowCard from '../../../components/shadowCard';
-import { defaultValidateMessages } from '../../../constants/validator';
 import { isMobile } from '../../../utils/deviceDetection';
 import { getPropertiesByMeasurementType } from './services';
 import { AlarmRule } from './types';
 import { addAlarmRule } from './services';
 import {
-  MONITORING_POINT_TYPE,
-  PLEASE_SELECT_MONITORING_POINT_TYPE,
   Property,
   getSpecificProperties,
-  removeDulpicateProperties
+  removeDulpicateProperties,
+  MONITORING_POINT
 } from '../../monitoring-point';
-import { useAssetCategoryContext } from '../../asset/components/assetCategoryContext';
+import { useAppConfigContext } from '../../asset/components/appConfigContext';
 import { MONITORING_POINTS } from '../../../config/assetCategory.config';
 import { FormInputItem } from '../../../components/formInputItem';
 import intl from 'react-intl-universal';
 
 export default function CreateAlarmRuleGroup() {
   const navigate = useNavigate();
-  const category = useAssetCategoryContext();
+  const config = useAppConfigContext();
   const [form] = Form.useForm();
   const [properties, setProperties] = React.useState<Property[]>([]);
   const [metric, setMetric] = React.useState<{ key: string; name: string; unit: string }[]>([]);
@@ -43,23 +41,27 @@ export default function CreateAlarmRuleGroup() {
         ]}
       />
       <ShadowCard>
-        <Form
-          form={form}
-          labelCol={{ span: 3 }}
-          wrapperCol={{ span: 18 }}
-          validateMessages={defaultValidateMessages}
-        >
+        <Form form={form} labelCol={{ span: 3 }} wrapperCol={{ span: 18 }}>
           <Form.Item
-            label={intl.get(MONITORING_POINT_TYPE)}
+            label={intl.get('OBJECT_TYPE', { object: intl.get(MONITORING_POINT) })}
             name='type'
-            rules={[{ required: true, message: intl.get(PLEASE_SELECT_MONITORING_POINT_TYPE) }]}
+            rules={[
+              {
+                required: true,
+                message: intl.get('PLEASE_SELECT_SOMETHING', {
+                  something: intl.get('OBJECT_TYPE', { object: intl.get(MONITORING_POINT) })
+                })
+              }
+            ]}
           >
             <Select
               style={{ width: isMobile ? '75%' : 435 }}
-              placeholder={intl.get(PLEASE_SELECT_MONITORING_POINT_TYPE)}
+              placeholder={intl.get('PLEASE_SELECT_SOMETHING', {
+                something: intl.get('OBJECT_TYPE', { object: intl.get(MONITORING_POINT) })
+              })}
               onChange={(e) => {
                 getPropertiesByMeasurementType(e).then((res) => {
-                  const measurementType = MONITORING_POINTS.get(category)?.find(
+                  const measurementType = MONITORING_POINTS.get(config)?.find(
                     ({ id }) => e === id
                   )?.id;
                   if (measurementType) {
@@ -80,7 +82,7 @@ export default function CreateAlarmRuleGroup() {
                 }
               }}
             >
-              {MONITORING_POINTS.get(category)?.map(({ label, id }) => (
+              {MONITORING_POINTS.get(config)?.map(({ label, id }) => (
                 <Select.Option key={id} value={id}>
                   {intl.get(label)}
                 </Select.Option>
@@ -176,9 +178,13 @@ export default function CreateAlarmRuleGroup() {
                                   }}
                                   options={properties.map((p) => ({
                                     ...p,
-                                    name: intl.get(p.name)
+                                    label: intl.get(p.name),
+                                    fields: p.fields.map((field) => ({
+                                      ...field,
+                                      label: intl.get(field.name)
+                                    }))
                                   }))}
-                                  fieldNames={{ label: 'name', value: 'key', children: 'fields' }}
+                                  fieldNames={{ value: 'key', children: 'fields' }}
                                 />
                               </Form.Item>
                             </Col>
@@ -332,8 +338,15 @@ export default function CreateAlarmRuleGroup() {
                                   }
                                 }
                               }}
-                              options={properties.map((p) => ({ ...p, name: intl.get(p.name) }))}
-                              fieldNames={{ label: 'name', value: 'key', children: 'fields' }}
+                              options={properties.map((p) => ({
+                                ...p,
+                                label: intl.get(p.name),
+                                fields: p.fields.map((field) => ({
+                                  ...field,
+                                  label: intl.get(field.name)
+                                }))
+                              }))}
+                              fieldNames={{ value: 'key', children: 'fields' }}
                             />
                           </Form.Item>
                         )}

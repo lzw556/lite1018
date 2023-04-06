@@ -42,7 +42,6 @@ const ImportNetworkPage = () => {
       if (typeof reader.result === 'string') {
         const json = JSON.parse(reader.result);
         if (checkJSONFormat(json)) {
-          console.log(json.deviceList);
           setNetwork({ wsn: json.wsn, devices: json.deviceList });
         } else {
           message.error(intl.get('INVALID_FILE_FORMAT')).then();
@@ -96,20 +95,19 @@ const ImportNetworkPage = () => {
     }
   };
 
-  const tree: any = (root: any) => {
-    return network.devices
-      .slice(1)
-      .filter((node: any) => node.parentAddress === root.address)
-      .map((item: any) => {
-        return {
-          id: item.address,
-          data: item,
-          children: tree(item)
-        };
-      });
-  };
-
   useEffect(() => {
+    const tree: any = (root: any) => {
+      return network.devices
+        .slice(1)
+        .filter((node: any) => node.parentAddress === root.address)
+        .map((item: any) => {
+          return {
+            id: item.address,
+            data: item,
+            children: tree(item)
+          };
+        });
+    };
     if (network?.devices && network?.devices.length) {
       if (!graph) {
         const graphInstance = new G6.TreeGraph({
@@ -163,10 +161,9 @@ const ImportNetworkPage = () => {
         setGraph(graphInstance);
       }
     }
-  }, [network]);
+  }, [network, graph]);
 
   useEffect(() => {
-    console.log(network?.wsn);
     setNetworkSettings(
       network?.wsn
         ? ({

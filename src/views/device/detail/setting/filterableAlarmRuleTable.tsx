@@ -4,6 +4,7 @@ import { PageResult } from '../../../../types/page';
 import { isMobile } from '../../../../utils/deviceDetection';
 import TableLayout from '../../../layout/TableLayout';
 import intl from 'react-intl-universal';
+import { translateMetricName } from '../../../alarm/alarm-group';
 
 export const FilterableAlarmRuleTable: React.FC<{
   dataSource: PageResult<any[]>;
@@ -21,7 +22,7 @@ export const FilterableAlarmRuleTable: React.FC<{
       title: intl.get('ALARM_METRIC'),
       dataIndex: 'metric',
       key: 'metric',
-      render: (metric: any) => metric.name
+      render: (metric: any) => translateMetricName(metric.name)
     },
     {
       title: intl.get('ALARM_CONDITION'),

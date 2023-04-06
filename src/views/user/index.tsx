@@ -93,7 +93,7 @@ const UserPage = () => {
       dataIndex: 'role',
       render: (roleId: number) => {
         const role = roles.find((role) => role.id === roleId);
-        return intl.get(role?.name || 'ROLE_ADMIN');
+        return role?.name ? intl.get(role?.name) : '';
       },
       key: 'role'
     },
@@ -160,13 +160,13 @@ const UserPage = () => {
         </Col>
       </Row>
       <AddUserModal
-        visible={addUserVisible}
+        open={addUserVisible}
         onCancel={() => setAddUserVisible(false)}
         onSuccess={onAddUserSuccess}
       />
       <EditUserModal
         user={user}
-        visible={editUserVisible}
+        open={editUserVisible}
         onCancel={() => setEditUserVisible(false)}
         onSuccess={onEditUserSuccess}
       />

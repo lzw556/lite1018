@@ -3,7 +3,7 @@ import { FC, useEffect, useState } from 'react';
 import IpnFormItem from '../../../components/formItems/ipnFormItem';
 import WsnFormItem from '../../../components/formItems/wsnFormItem';
 import { DEFAULT_IPN_SETTING } from '../../../types/ipn_setting';
-import { defaultValidateMessages, Normalizes, Rules } from '../../../constants/validator';
+import { Normalizes } from '../../../constants/validator';
 import { CreateNetworkRequest } from '../../../apis/network';
 import { NetworkProvisioningMode } from '../../../types/network';
 import { useProvisionMode } from '../useProvisionMode';
@@ -15,17 +15,17 @@ export interface AddNetworkModalProps extends ModalProps {
 }
 
 const AddNetworkModal: FC<AddNetworkModalProps> = (props) => {
-  const { visible, onSuccess } = props;
+  const { open, onSuccess } = props;
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [provisionMode, setProvisionMode, settings] = useProvisionMode();
   const [form] = Form.useForm();
 
   useEffect(() => {
-    if (visible) {
+    if (open) {
       form.resetFields();
     }
-    setProvisionMode(visible ? NetworkProvisioningMode.Mode2 : undefined);
-  }, [visible, form, setProvisionMode]);
+    setProvisionMode(open ? NetworkProvisioningMode.Mode2 : undefined);
+  }, [open, form, setProvisionMode]);
 
   useEffect(() => {
     if (settings) {
@@ -62,7 +62,7 @@ const AddNetworkModal: FC<AddNetworkModalProps> = (props) => {
       cancelText={intl.get('CANCEL')}
       confirmLoading={isLoading}
     >
-      <Form form={form} labelCol={{ span: 7 }} validateMessages={defaultValidateMessages}>
+      <Form form={form} labelCol={{ span: 7 }}>
         <fieldset>
           <legend>{intl.get('BASIC_INFORMATION')}</legend>
 

@@ -67,7 +67,7 @@ const useSocket = () => {
         }
       });
     }
-  }, [socket]);
+  }, []);
   return {
     PubSub
   };

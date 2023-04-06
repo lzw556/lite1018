@@ -1,5 +1,5 @@
 import { DownloadOutlined } from '@ant-design/icons';
-import { Col, DatePicker, Row, Select, Space, Table } from 'antd';
+import { Col, Row, Select, Space, Table } from 'antd';
 import dayjs from '../../../../utils/dayjsUtils';
 import * as React from 'react';
 import { Device } from '../../../../types/device';
@@ -24,21 +24,23 @@ import { DeviceType } from '../../../../types/device_type';
 import { AXIS_THREE, DYNAMIC_DATA_ANGLEDIP, DYNAMIC_DATA_BOLTELONGATION } from './constants';
 import ShadowCard from '../../../../components/shadowCard';
 import intl from 'react-intl-universal';
+import { oneWeekNumberRange, RangeDatePicker } from '../../../../components/rangeDatePicker';
+import { useLocaleContext } from '../../../../localeProvider';
 
 export const DynamicData: React.FC<Device> = ({ id, typeId }) => {
+  const { language } = useLocaleContext();
   const { fields, data_type } =
     typeId === DeviceType.AngleDip ? DYNAMIC_DATA_ANGLEDIP : DYNAMIC_DATA_BOLTELONGATION;
-  const [beginDate, setBeginDate] = React.useState(dayjs().subtract(3, 'days').startOf('day'));
-  const [endDate, setEndDate] = React.useState(dayjs().endOf('day'));
-  const [isLoading, timestamps, fetchTimestamps] = useFindingDeviceData();
+  const [range, setRange] = React.useState<[number, number]>(oneWeekNumberRange);
+  const [isLoading, timestamps, fetchTimestamps] = useFindingDeviceData(range);
   const [timestamp, setTimestamp] = React.useState(0);
   const [field, setField] = React.useState(fields[0]);
   const { hasPermission } = usePermission();
   React.useEffect(() => {
-    fetchTimestamps(id, beginDate.utc().unix(), endDate.utc().unix(), {
+    fetchTimestamps(id, {
       data_type
     });
-  }, [id, beginDate, endDate, fetchTimestamps, data_type]);
+  }, [id, fetchTimestamps, data_type]);
 
   React.useEffect(() => {
     if (timestamps.length > 0) setTimestamp(timestamps[0].timestamp);
@@ -52,10 +54,26 @@ export const DynamicData: React.FC<Device> = ({ id, typeId }) => {
     }
   }, [timestamp, id, fetchData, data_type]);
 
+  const handleChange = React.useCallback((range: [number, number]) => {
+    if (checkIsRangeChanged(range)) {
+      setRange(range);
+    }
+  }, []);
+
+  function checkIsRangeChanged(range?: [number, number]) {
+    if (range === undefined) return false;
+    return range[0] !== oneWeekNumberRange[0] || range[1] !== oneWeekNumberRange[1];
+  }
+
   const onDownload = (timestamp: number) => {
-    DownloadDeviceDataByTimestampRequest(id, timestamp, {
-      data_type
-    }).then((res) => {
+    DownloadDeviceDataByTimestampRequest(
+      id,
+      timestamp,
+      {
+        data_type
+      },
+      language === 'en-US' ? 'en' : 'zh'
+    ).then((res) => {
       if (res.status === 200) {
         const url = window.URL.createObjectURL(new Blob([res.data]));
         const link = document.createElement('a');
@@ -115,7 +133,7 @@ export const DynamicData: React.FC<Device> = ({ id, typeId }) => {
             type: 'line',
             name: intl.get(field.label),
             data: (items as number[]).map((item) => item.toFixed(3)),
-            itemStyle: { color: LineChartStyles[0].itemStyle.normal.color }
+            itemStyle: { color: LineChartStyles[0].itemStyle.color }
           }
         ];
       } else {
@@ -125,7 +143,7 @@ export const DynamicData: React.FC<Device> = ({ id, typeId }) => {
           data: (items as Fields_be_axis[])
             .map((item) => item[axis.value])
             .map((item) => item.toFixed(3)),
-          itemStyle: { color: LineChartStyles[index].itemStyle.normal.color }
+          itemStyle: { color: LineChartStyles[index].itemStyle.color }
         }));
       }
       return (
@@ -222,16 +240,7 @@ export const DynamicData: React.FC<Device> = ({ id, typeId }) => {
       <>
         <Row style={{ marginBottom: 8 }}>
           <Col span={24}>
-            <DatePicker.RangePicker
-              allowClear={false}
-              value={[beginDate, endDate]}
-              onChange={(date, dateString) => {
-                if (dateString) {
-                  setBeginDate(dayjs(dateString[0]).startOf('day'));
-                  setEndDate(dayjs(dateString[1]).endOf('day'));
-                }
-              }}
-            />
+            <RangeDatePicker onChange={handleChange} />
           </Col>
         </Row>
         <Row style={{ marginBottom: 8 }} align='middle'>
@@ -292,16 +301,7 @@ export const DynamicData: React.FC<Device> = ({ id, typeId }) => {
         <Col xl={6} xxl={4} style={{ maxHeight: 500 }}>
           <Row justify={'center'} style={{ width: '100%' }}>
             <Col span={24}>
-              <DatePicker.RangePicker
-                allowClear={false}
-                value={[beginDate, endDate]}
-                onChange={(date, dateString) => {
-                  if (dateString) {
-                    setBeginDate(dayjs(dateString[0]).startOf('day'));
-                    setEndDate(dayjs(dateString[1]).endOf('day'));
-                  }
-                }}
-              />
+              <RangeDatePicker onChange={handleChange} />
             </Col>
           </Row>
           <Row justify={'space-between'} style={{ paddingTop: '0px' }}>
@@ -326,7 +326,7 @@ export const DynamicData: React.FC<Device> = ({ id, typeId }) => {
                       if (hasPermission(Permission.DeviceRawDataDownload)) {
                         return (
                           <Space size='middle'>
-                            <a onClick={() => onDownload(timestamp)}>下载</a>
+                            <a onClick={() => onDownload(timestamp)}>{intl.get('DOWNLOAD')}</a>
                           </Space>
                         );
                       }

@@ -116,7 +116,7 @@ const WsnFormItem: FC<NetworkFormItemProps> = ({ mode, onModeChange }) => {
               something: intl.get('SETTING_COMMUNICATION_PERIOD')
             })
           },
-          { type: 'integer', min: 0, message: intl.get('UNSIGNED_INTEGER_INPUT_PROMPT') },
+          { type: 'integer', min: 0, message: intl.get('UNSIGNED_INTEGER_ENTER_PROMPT') },
           ({ getFieldValue }) => ({
             validator(_, value) {
               const wsn = getFieldValue('wsn');

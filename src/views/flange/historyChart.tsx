@@ -4,7 +4,6 @@ import dayjs from '../../utils/dayjsUtils';
 import { isMobile } from '../../utils/deviceDetection';
 import { getDisplayValue } from '../../utils/format';
 import { AssetRow } from '../asset/types';
-import { MONITORING_POINTS } from '../asset/wind-turbine';
 import {
   getHistoryDatas,
   getRealPoints,
@@ -13,6 +12,8 @@ import {
   Property
 } from '../monitoring-point';
 import intl from 'react-intl-universal';
+import { MONITORING_POINTS } from '../../config/assetCategory.config';
+import { useAppConfigContext } from '../asset';
 
 export const FlangeHistoryChart = ({
   historyDatas,
@@ -25,16 +26,19 @@ export const FlangeHistoryChart = ({
   propertyKey?: string;
   showTitle?: boolean;
 }) => {
+  const config = useAppConfigContext();
   const points = getRealPoints(flange.monitoringPoints);
   const firstPoint = points[0];
   const selectedProperty =
     firstPoint.properties.find((p) => p.key === propertyKey) ?? firstPoint.properties[0];
 
-  if (points.length === 0) return <p>信息异常</p>;
+  if (points.length === 0) return <p>{intl.get('PARAMETER_ERROR_PROMPT')}</p>;
 
   const title = showTitle
     ? `${intl.get('OBJECT_TREND_CHART', {
-        object: intl.get(MONITORING_POINTS.find((m) => m.id === firstPoint.type)?.label ?? '')
+        object: intl.get(
+          MONITORING_POINTS.get(config)?.find((m) => m.id === firstPoint.type)?.label ?? ''
+        )
       })}`
     : '';
 

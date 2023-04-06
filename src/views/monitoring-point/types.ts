@@ -2,19 +2,8 @@ import { Device } from '../../types/device';
 import { DeviceType } from '../../types/device_type';
 
 export const MONITORING_POINT = 'MONITORING_POINT';
-export const CREATE_MONITORING_POINT = `CREATE_MONITORING_POINT`;
-export const PLEASE_CREATE_MONITORING_POINT = `PLEASE_CREATE_MONITORING_POINT`;
-export const UPDATE_MONITORING_POINT = `UPDATE_MONITORING_POINT`;
-export const DELETE_MONITORING_POINT = `DELETE_MONITORING_POINT`;
-export const MONITORING_POINT_NAME = `MONITORING_POINT_NAME`;
-export const PLEASE_INPUT_MONITORING_POINT_NAME = `PLEASE_INPUT_MONITORING_POINT_NAME`;
-export const MONITORING_POINT_POSITION = `MONITORING_POINT_POSITION`;
-export const PLEASE_INPUT_MONITORING_POINT_POSITION = `PLEASE_INPUT_MONITORING_POINT_POSITION`;
-export const MONITORING_POINT_TYPE = `MONITORING_POINT_TYPE`;
-export const PLEASE_SELECT_MONITORING_POINT_TYPE = `PLEASE_SELECT_MONITORING_POINT_TYPE`;
 export const MONITORING_POINT_LIST = `MONITORING_POINT_LIST`;
 export const INVALID_MONITORING_POINT = `ABNORMAL_MONITORING_POINT`;
-export const NO_MONITORING_POINTS = `NO_MONITORING_POINTS`;
 
 export const MONITORING_POINT_PATHNAME = 'monitoring-points';
 
@@ -25,6 +14,7 @@ export enum MonitoringPointTypeValue {
   VIBRATION = 10401,
   ANGLE_DIP = 10501,
   PRESSURE = 10601,
+  PRESSURE_TEMPERATURE = 10602,
   FLANGE_PRELOAD = 10311,
   TEMPERATURE = 10811
 }
@@ -52,18 +42,18 @@ const dynamic_preload: { dynamicData?: DynamicData; waveData?: WaveData } = {
     serverDatatype: 'raw',
     title: 'DYNAMIC_DATA',
     fields: [
-      { label: '预紧力', value: 'dynamic_preload', unit: 'kN' },
-      { label: '应力', value: 'dynamic_pressure', unit: 'MPa' },
-      { label: '长度', value: 'dynamic_length', unit: 'mm' },
-      { label: '飞行时间', value: 'dynamic_tof', unit: 'ns' },
-      { label: '加速度', value: 'dynamic_acceleration', unit: 'g' }
+      { label: 'FIELD_PRELOAD', value: 'dynamic_preload', unit: 'kN' },
+      { label: 'FIELD_PRESSURE', value: 'dynamic_pressure', unit: 'MPa' },
+      { label: 'FIELD_LENGTH', value: 'dynamic_length', unit: 'mm' },
+      { label: 'FIELD_TOF', value: 'dynamic_tof', unit: 'ns' },
+      { label: 'FIELD_ACCELERATION', value: 'dynamic_acceleration', unit: 'g' }
     ],
     metaData: [
-      { label: '预紧力', value: 'min_preload', unit: 'kN' },
-      { label: '长度', value: 'min_length', unit: 'mm' },
-      { label: '温度', value: 'temperature', unit: '℃' },
-      { label: '飞行时间', value: 'min_tof', unit: 'ns' },
-      { label: '缺陷位置', value: 'defect_location', unit: 'mm' }
+      { label: 'FIELD_PRELOAD', value: 'min_preload', unit: 'kN' },
+      { label: 'FIELD_LENGTH', value: 'min_length', unit: 'mm' },
+      { label: 'FIELD_TEMPERATURE', value: 'temperature', unit: '℃' },
+      { label: 'FIELD_TOF', value: 'min_tof', unit: 'ns' },
+      { label: 'FIELD_DEFECT_LOCATION', value: 'defect_location', unit: 'mm' }
     ]
   },
   waveData: {
@@ -71,11 +61,11 @@ const dynamic_preload: { dynamicData?: DynamicData; waveData?: WaveData } = {
     title: 'WAVEFORM_DATA',
     fields: [{ label: 'mv', value: 'mv', unit: '' }],
     metaData: [
-      { label: '预紧力', value: 'preload', unit: 'kN' },
-      { label: '应力', value: 'pressure', unit: 'MPa' },
-      { label: '飞行时间', value: 'tof', unit: 'ns' },
-      { label: '温度', value: 'temperature', unit: '℃' },
-      { label: '长度', value: 'length', unit: 'mm' }
+      { label: 'FIELD_PRELOAD', value: 'preload', unit: 'kN' },
+      { label: 'FIELD_PRESSURE', value: 'pressure', unit: 'MPa' },
+      { label: 'FIELD_TOF', value: 'tof', unit: 'ns' },
+      { label: 'FIELD_TEMPERATURE', value: 'temperature', unit: '℃' },
+      { label: 'FIELD_LENGTH', value: 'length', unit: 'mm' }
     ]
   }
 };
@@ -85,11 +75,11 @@ const dynamic_thickness: { dynamicData?: DynamicData; waveData?: WaveData } = {
     title: 'WAVEFORM_DATA',
     fields: [{ label: 'mv', value: 'mv', unit: '' }],
     metaData: [
-      { label: '厚度', value: 'thickness', unit: 'mm' },
-      { label: '温度', value: 'temp', unit: '℃' },
-      { label: '飞行时间', value: 'tof', unit: 'ns' },
-      { label: '环境温度', value: 'envTemp', unit: '℃' },
-      { label: '信号强度', value: 'sigStrength', unit: '' }
+      { label: 'FIELD_THICKNESS', value: 'thickness', unit: 'mm' },
+      { label: 'FIELD_TEMPERATURE', value: 'temp', unit: '℃' },
+      { label: 'FIELD_TOF', value: 'tof', unit: 'ns' },
+      { label: 'FIELD_ENVIRONMENT_TEMPERATURE', value: 'envTemp', unit: '℃' },
+      { label: 'FIELD_SIGNAL_STRENGTH', value: 'sigStrength', unit: '' }
     ]
   }
 };
@@ -98,12 +88,20 @@ const dynamic_vibration: { dynamicData?: DynamicData; waveData?: WaveData } = {
     serverDatatype: 'raw',
     title: 'WAVEFORM_DATA',
     fields: [
-      { label: '加速度时域', value: 'accelerationTimeDomain', unit: 'm/s²' },
-      { label: '加速度频域', value: 'accelerationFrequencyDomain', unit: 'm/s²' },
-      { label: '速度时域', value: 'velocityTimeDomain', unit: 'mm/s' },
-      { label: '速度频域', value: 'velocityFrequencyDomain', unit: 'mm/s' },
-      { label: '位移时域', value: 'displacementTimeDomain', unit: 'μm' },
-      { label: '位移频域', value: 'displacementFrequencyDomain', unit: 'μm' }
+      { label: 'FIELD_ACCELERATION_TIME_DOMAIN', value: 'accelerationTimeDomain', unit: 'm/s²' },
+      {
+        label: 'FIELD_ACCELERATION_FREQUENCY_DOMAIN',
+        value: 'accelerationFrequencyDomain',
+        unit: 'm/s²'
+      },
+      { label: 'FIELD_VELOCITY_TIME_DOMAIN', value: 'velocityTimeDomain', unit: 'mm/s' },
+      { label: 'FIELD_VELOCITY_FREQUENCY_DOMAIN', value: 'velocityFrequencyDomain', unit: 'mm/s' },
+      { label: 'FIELD_DISPLACEMENT_TIME_DOMAIN', value: 'displacementTimeDomain', unit: 'μm' },
+      {
+        label: 'FIELD_DISPLACEMENT_FREQUENCY_DOMAIN',
+        value: 'displacementFrequencyDomain',
+        unit: 'μm'
+      }
     ],
     metaData: []
   }
@@ -138,7 +136,11 @@ export const MONITORING_POINT_TYPE_VALUE_DEVICE_TYPE_ID_MAPPING = new Map([
     ]
   ],
   [MonitoringPointTypeValue.ANGLE_DIP, [DeviceType.AngleDip]],
-  [MonitoringPointTypeValue.PRESSURE, [DeviceType.PressureTemperature]],
+  [MonitoringPointTypeValue.PRESSURE, [DeviceType.Pressure]],
+  [
+    MonitoringPointTypeValue.PRESSURE_TEMPERATURE,
+    [DeviceType.Pressure, DeviceType.PressureTemperature]
+  ],
   [MonitoringPointTypeValue.TEMPERATURE, [DeviceType.Temperature]],
   [
     MonitoringPointTypeValue.FLANGE_PRELOAD,
@@ -217,6 +219,7 @@ export type MonitoringPointRow = {
     values: { [propName: string]: number | number[] };
   };
   alertLevel?: number;
+  parentId: number;
 };
 
 export type HistoryData = {

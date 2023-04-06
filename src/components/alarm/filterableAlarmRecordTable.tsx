@@ -19,6 +19,7 @@ import Label from '../label';
 import { RangeDatePicker } from '../rangeDatePicker';
 import { Store, useStore } from '../../hooks/store';
 import intl from 'react-intl-universal';
+import { translateMetricName } from '../../views/alarm/alarm-group';
 
 const { Option } = Select;
 
@@ -175,9 +176,9 @@ export const FilterableAlarmRecordTable: React.FC<{ sourceId?: number }> = ({ so
       key: 'metric',
       width: '15%',
       render: (metric: any, record: any) => {
-        return `${metric.name} ${record.operation} ${record.threshold}${metric.unit} ${intl.get(
-          'ALARM_VALUE'
-        )}: ${record.value}${metric.unit}`;
+        return `${translateMetricName(metric.name)} ${record.operation} ${record.threshold}${
+          metric.unit
+        } ${intl.get('ALARM_VALUE')}: ${record.value}${metric.unit}`;
       }
     },
     {
@@ -340,7 +341,7 @@ export const FilterableAlarmRecordTable: React.FC<{ sourceId?: number }> = ({ so
       </Row>
       {alarmRecord && (
         <AcknowledgeModal
-          visible={alarmRecord}
+          open={alarmRecord}
           record={alarmRecord}
           onCancel={() => setAlarmRecord(undefined)}
           onSuccess={() => {
@@ -351,7 +352,7 @@ export const FilterableAlarmRecordTable: React.FC<{ sourceId?: number }> = ({ so
       )}
       {acknowledge && (
         <AcknowledgeViewModal
-          visible={acknowledge}
+          open={acknowledge}
           acknowledge={acknowledge}
           onCancel={() => setAcknowledge(undefined)}
         />

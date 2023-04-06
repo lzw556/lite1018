@@ -13,15 +13,16 @@ import {
   convertAlarmLevelToState,
   getAlarmLevelColor,
   getAlarmStateText,
-  useAssetCategoryContext
+  useAppConfigContext
 } from '../../asset';
 import { MonitoringPointRow } from '../types';
 import intl from 'react-intl-universal';
+import { translateMetricName } from '../../alarm/alarm-group';
 
 export const AlarmRuleSetting = (point: MonitoringPointRow) => {
   const [allRules, setAllRules] = React.useState<AlarmRule[]>();
   const [loading, setLoading] = React.useState(true);
-  const category = useAssetCategoryContext();
+  const config = useAppConfigContext();
   const getRules = (dataSource: AlarmRule['rules']): TableProps<any> => {
     return {
       rowKey: 'id',
@@ -31,7 +32,7 @@ export const AlarmRuleSetting = (point: MonitoringPointRow) => {
           title: intl.get('ALARM_METRIC'),
           dataIndex: 'metric',
           key: 'metric',
-          render: (metric: any) => metric.name,
+          render: (metric: any) => translateMetricName(metric.name),
           width: 120
         },
         {
@@ -82,12 +83,12 @@ export const AlarmRuleSetting = (point: MonitoringPointRow) => {
       width: 400
     },
     {
-      title: intl.get('MONITORING_POINT_TYPE'),
+      title: intl.get('TYPE'),
       dataIndex: 'type',
       key: 'type',
       width: 200,
       render: (typeId: number) => {
-        const label = MONITORING_POINTS.get(category)?.find((m) => m.id === typeId)?.label;
+        const label = MONITORING_POINTS.get(config)?.find((m) => m.id === typeId)?.label;
         return label ? intl.get(label) : '-';
       }
     },
@@ -182,7 +183,7 @@ export const AlarmRuleSetting = (point: MonitoringPointRow) => {
         description={
           <p>
             {intl.get('NO_RULES_PROMPT')}
-            <Link to='alarmRules'>{intl.get('CREATE_ONE')}</Link>
+            <Link to='/alarmRules'>{intl.get('CREATE_ONE')}</Link>
           </p>
         }
       />

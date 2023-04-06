@@ -4,6 +4,7 @@ import { GetMyProjectRequest, GetMyProjectsRequest } from '../../apis/project';
 import { store } from '../../store';
 import { Project } from '../../types/project';
 import { getProject } from '../../utils/session';
+import intl from 'react-intl-universal';
 
 export const ValidateProject = ({ children }: { children: JSX.Element }) => {
   const [projects, setProjects] = React.useState<{
@@ -43,12 +44,17 @@ export const ValidateProject = ({ children }: { children: JSX.Element }) => {
     }
   }, [result]);
 
-  if (error) return <Result status='500' title='内部错误' subTitle={error} />;
+  if (error) return <Result status='500' title={intl.get('ERROR_UNKNOWN')} subTitle={error} />;
   if (loading || result === null) return <Spin />;
-  if (result.length === 0) return <Result status='500' title='不存在项目' />;
+  if (result.length === 0)
+    return <Result status='500' title={intl.get('PROJECT_DOES_NOT_EXIST')} />;
   if (selectError)
     return (
-      <Result status='500' title='未找到项目' subTitle='为了更好的体验，请先联系管理员创建项目' />
+      <Result
+        status='500'
+        title={intl.get('FAILED_TO_FIND_ONE_PROJECT')}
+        subTitle={intl.get('CONNECT_ADMIN_PROMPT')}
+      />
     );
   return children;
 };

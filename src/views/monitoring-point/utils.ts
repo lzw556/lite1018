@@ -147,3 +147,12 @@ export function getRealPoints(measurements?: MonitoringPointRow[]) {
   if (!measurements) return [];
   return measurements.filter((point) => point.type !== MonitoringPointTypeValue.FLANGE_PRELOAD);
 }
+
+export function pickId(id: string | number) {
+  if (typeof id === 'number') {
+    return id;
+  } else if (id.indexOf('-') > -1) {
+    return Number(id.substring(0, id.indexOf('-')));
+  }
+  return 0;
+}

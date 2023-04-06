@@ -4,65 +4,53 @@ import * as echarts from 'echarts';
 export const LineChartStyles = [
   {
     itemStyle: {
-      normal: {
-        color: 'rgb(0,130,252)'
-      }
+      color: 'rgb(0,130,252)'
     },
     areaStyle: {
-      normal: {
-        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-          {
-            offset: 0,
-            color: 'rgb(0,130,252)'
-          },
-          {
-            offset: 1,
-            color: 'rgb(255,255,255)'
-          }
-        ])
-      }
+      color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+        {
+          offset: 0,
+          color: 'rgb(0,130,252)'
+        },
+        {
+          offset: 1,
+          color: 'rgb(255,255,255)'
+        }
+      ])
     }
   },
   {
     itemStyle: {
-      normal: {
-        color: 'rgb(253,216,69)'
-      }
+      color: 'rgb(253,216,69)'
     },
     areaStyle: {
-      normal: {
-        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-          {
-            offset: 0,
-            color: 'rgb(253,216,69)'
-          },
-          {
-            offset: 1,
-            color: 'rgb(255,255,255)'
-          }
-        ])
-      }
+      color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+        {
+          offset: 0,
+          color: 'rgb(253,216,69)'
+        },
+        {
+          offset: 1,
+          color: 'rgb(255,255,255)'
+        }
+      ])
     }
   },
   {
     itemStyle: {
-      normal: {
-        color: 'rgb(34,237,124)'
-      }
+      color: 'rgb(34,237,124)'
     },
     areaStyle: {
-      normal: {
-        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-          {
-            offset: 0,
-            color: 'rgb(34,237,124)'
-          },
-          {
-            offset: 1,
-            color: 'rgb(255,255,255)'
-          }
-        ])
-      }
+      color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+        {
+          offset: 0,
+          color: 'rgb(34,237,124)'
+        },
+        {
+          offset: 1,
+          color: 'rgb(255,255,255)'
+        }
+      ])
     }
   }
 ];

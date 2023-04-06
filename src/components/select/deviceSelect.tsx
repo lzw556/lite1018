@@ -2,7 +2,7 @@ import { Select, SelectProps, Typography } from 'antd';
 import { FC, useEffect, useState } from 'react';
 import { Device } from '../../types/device';
 import { GetDevicesRequest } from '../../apis/device';
-import '../../string-extension';
+import { toMac } from '../../utils/format';
 
 export interface DeviceSelectProps extends SelectProps<any> {
   filters?: any;
@@ -33,7 +33,7 @@ const DeviceSelect: FC<DeviceSelectProps> = (props) => {
           <Typography.Text strong>{device.name}</Typography.Text>
           <br />
           <Typography.Text type={'secondary'}>
-            {device.macAddress.toUpperCase().macSeparator()}
+            {toMac(device.macAddress.toUpperCase())}
           </Typography.Text>
         </Option>
       ))}

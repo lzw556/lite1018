@@ -1,11 +1,11 @@
 import { Network } from '../../../types/network';
 import { Form, Input, Modal, ModalProps } from 'antd';
 import { FC, useEffect, useState } from 'react';
-import { Rules } from '../../../constants/validator';
 import WsnFormItem from '../../../components/formItems/wsnFormItem';
 import { UpdateNetworkRequest } from '../../../apis/network';
 import { useProvisionMode } from '../useProvisionMode';
 import intl from 'react-intl-universal';
+import { FormInputItem } from '../../../components/formInputItem';
 
 export interface EditNetworkModalProps extends ModalProps {
   network: Network;
@@ -13,20 +13,20 @@ export interface EditNetworkModalProps extends ModalProps {
 }
 
 const EditNetworkModal: FC<EditNetworkModalProps> = (props) => {
-  const { visible, network, onSuccess } = props;
+  const { open, network, onSuccess } = props;
   const [form] = Form.useForm();
   const [provisionMode, setProvisionMode, settings] = useProvisionMode(network);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    if (visible) {
+    if (open) {
       form.resetFields();
       form.setFieldsValue({ name: network.name });
     }
     setProvisionMode(
-      visible && network !== undefined ? (network.mode === 0 ? 1 : network.mode) : undefined
+      open && network !== undefined ? (network.mode === 0 ? 1 : network.mode) : undefined
     );
-  }, [visible, network, form, setProvisionMode]);
+  }, [open, network, form, setProvisionMode]);
 
   useEffect(() => {
     if (settings) {
@@ -62,13 +62,14 @@ const EditNetworkModal: FC<EditNetworkModalProps> = (props) => {
       confirmLoading={isLoading}
     >
       <Form form={form} labelCol={{ span: 7 }}>
-        <Form.Item label={intl.get('NAME')} name={'name'} rules={[Rules.required]}>
-          <Input
-            placeholder={intl.get('PLEASE_ENTER_SOMETHING', {
-              something: intl.get('NETWORK_NAME')
-            })}
-          />
-        </Form.Item>
+        <FormInputItem
+          label={intl.get('NAME')}
+          name='name'
+          requiredMessage={intl.get('PLEASE_ENTER_NAME')}
+          lengthLimit={{ min: 4, max: 16, label: intl.get('NAME').toLowerCase() }}
+        >
+          <Input placeholder={intl.get('PLEASE_ENTER_NAME')} />
+        </FormInputItem>
         {provisionMode && <WsnFormItem mode={provisionMode} onModeChange={setProvisionMode} />}
       </Form>
     </Modal>

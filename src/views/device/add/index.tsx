@@ -4,7 +4,7 @@ import { useState } from 'react';
 import '../index.css';
 import { AddDeviceRequest, GetDefaultDeviceSettingsRequest } from '../../../apis/device';
 import ShadowCard from '../../../components/shadowCard';
-import { defaultValidateMessages, Normalizes } from '../../../constants/validator';
+import { Normalizes } from '../../../constants/validator';
 import NetworkSelect from '../../../components/select/networkSelect';
 import DeviceSelect from '../../../components/select/deviceSelect';
 import DeviceTypeSelect from '../../../components/select/deviceTypeSelect';
@@ -117,11 +117,7 @@ const AddDevicePage = () => {
             <Col span={isMobile ? 24 : 16}>
               <Row>
                 <Col span={isMobile ? 24 : 20}>
-                  <Form
-                    form={form}
-                    labelCol={{ span: 8 }}
-                    validateMessages={defaultValidateMessages}
-                  >
+                  <Form form={form} labelCol={{ span: 8 }}>
                     <fieldset>
                       <legend>{intl.get('BASIC_INFORMATION')}</legend>
                       <FormInputItem

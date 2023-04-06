@@ -3,7 +3,6 @@ import { FC, useEffect, useState } from 'react';
 import { Device } from '../../../../types/device';
 import '../../index.css';
 import ShadowCard from '../../../../components/shadowCard';
-import '../../../../string-extension';
 import useSocket, { SocketTopic } from '../../../../socket';
 import { SingleDeviceDetail } from './SingleDeviceDetail';
 
@@ -25,7 +24,7 @@ const InformationCard: FC<GatewayInformationProps> = ({ device, isLoading }) => 
     return () => {
       PubSub.unsubscribe(SocketTopic.upgradeStatus);
     };
-  }, []);
+  }, [PubSub, device.macAddress]);
 
   return (
     <ShadowCard>

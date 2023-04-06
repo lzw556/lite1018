@@ -62,15 +62,15 @@ export const SelectAssets: React.FC<{ winds: AssetRow[]; onSuccess: () => void }
     >
       <Form form={form}>
         <Form.Item name='asset_ids' noStyle>
-          <Checkbox.Group style={{ width: '100%' }} onChange={(values) => setSelected(values)}>
-            <Row>
+          <Row>
+            <Checkbox.Group style={{ width: '100%' }} onChange={(values) => setSelected(values)}>
               {props.winds.map(({ id, name }) => (
                 <Col span={8} key={id}>
                   <Checkbox value={id}>{name}</Checkbox>
                 </Col>
               ))}
-            </Row>
-          </Checkbox.Group>
+            </Checkbox.Group>
+          </Row>
         </Form.Item>
       </Form>
     </Modal>

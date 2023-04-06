@@ -45,15 +45,12 @@ export const ChartContainer = <T,>({
   return (
     <div className='chart-container'>
       {title && <h3 className='chart-title'>{title}</h3>}
-      {clickHandler && (
-        <EChartsReact
-          option={_ops}
-          style={style}
-          notMerge={true}
-          onEvents={{ click: clickHandler }}
-        />
-      )}
-      {!clickHandler && <EChartsReact option={_ops} style={style} notMerge={true} />}
+      <EChartsReact
+        option={_ops}
+        style={style}
+        notMerge={true}
+        onEvents={{ click: clickHandler ?? (() => {}) }}
+      />
     </div>
   );
 };

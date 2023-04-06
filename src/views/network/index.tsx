@@ -12,7 +12,7 @@ import ShadowCard from '../../components/shadowCard';
 import './index.css';
 import TableLayout from '../layout/TableLayout';
 import AddNetworkModal from './modal/addNetworkModal';
-import { Button, Col, Dropdown, Menu, message, Popconfirm, Row, Space } from 'antd';
+import { Button, Col, Dropdown, MenuProps, message, Popconfirm, Row, Space } from 'antd';
 import { CodeOutlined, DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
 import { Network, NetworkProvisioningMode } from '../../types/network';
 import EditNetworkModal from './modal/editNetworkModal';
@@ -103,24 +103,18 @@ const NetworkPage = () => {
     });
   };
 
-  const renderCommandMenus = (record: Network) => {
-    return (
-      <Menu
-        onClick={(e) => {
-          onCommand(record, e.key);
-        }}
-      >
-        {hasPermission(Permission.NetworkSync) && (
-          <Menu.Item key={0}>{intl.get('SYNC_NETWORK')}</Menu.Item>
-        )}
-        {hasPermission(Permission.NetworkProvision) && (
-          <Menu.Item key={1}>{intl.get('PROVISION')}</Menu.Item>
-        )}
-        {hasPermission(Permission.NetworkExport) && (
-          <Menu.Item key={2}>{intl.get('EXPORT_NETWORK')}</Menu.Item>
-        )}
-      </Menu>
-    );
+  const renderCommandMenus = () => {
+    const items: MenuProps['items'] = [];
+    if (hasPermission(Permission.NetworkSync)) {
+      items.push({ key: '0', label: intl.get('SYNC_NETWORK') });
+    }
+    if (hasPermission(Permission.NetworkProvision)) {
+      items.push({ key: '1', label: intl.get('PROVISION') });
+    }
+    if (hasPermission(Permission.NetworkExport)) {
+      items.push({ key: '2', label: intl.get('EXPORT_NETWORK') });
+    }
+    return items;
   };
 
   const onEdit = (id: number) => {
@@ -186,7 +180,14 @@ const NetworkPage = () => {
             />
           )}
           {
-            <Dropdown overlay={renderCommandMenus(record)}>
+            <Dropdown
+              menu={{
+                items: renderCommandMenus(),
+                onClick: ({ key }) => {
+                  onCommand(record, key);
+                }
+              }}
+            >
               <Button
                 type='text'
                 icon={<CodeOutlined />}
@@ -250,20 +251,22 @@ const NetworkPage = () => {
           </Col>
         </Row>
       </ShadowCard>
-      <AddNetworkModal
-        visible={addVisible}
-        onCancel={() => setAddVisible(false)}
-        onSuccess={() => {
-          setAddVisible(false);
-          if (dataSource) {
-            const { size, page, total } = dataSource;
-            gotoPage({ size, total, index: page }, 'next');
-          }
-        }}
-      />
-      {network && (
+      {addVisible && (
+        <AddNetworkModal
+          open={addVisible}
+          onCancel={() => setAddVisible(false)}
+          onSuccess={() => {
+            setAddVisible(false);
+            if (dataSource) {
+              const { size, page, total } = dataSource;
+              gotoPage({ size, total, index: page }, 'next');
+            }
+          }}
+        />
+      )}
+      {network && editVisible && (
         <EditNetworkModal
-          visible={editVisible}
+          open={editVisible}
           network={network}
           onCancel={() => setEditVisible(false)}
           onSuccess={() => {

@@ -4,12 +4,12 @@ import { UpdateMyPass } from '../../../apis/profile';
 import intl from 'react-intl-universal';
 
 export interface EditPassProps {
-  visible: boolean;
+  open: boolean;
   onCancel?: () => void;
   onSuccess: () => void;
 }
 
-const EditPassModal: FC<EditPassProps> = ({ visible, onSuccess, onCancel }) => {
+const EditPassModal: FC<EditPassProps> = ({ open, onSuccess, onCancel }) => {
   const [form] = Form.useForm();
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
@@ -32,7 +32,7 @@ const EditPassModal: FC<EditPassProps> = ({ visible, onSuccess, onCancel }) => {
   return (
     <Modal
       width={420}
-      visible={visible}
+      open={open}
       title={intl.get('MODIFY_PASSWORD')}
       okText={intl.get('OK')}
       onOk={onSave}

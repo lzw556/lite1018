@@ -3,6 +3,7 @@ import DeviceSettingFormItem from '../../components/formItems/deviceSettingFormI
 import { SETTING_GROUPS } from '../../constants/settingGroup';
 import { DeviceSetting } from '../../types/device_setting';
 import { DeviceType } from '../../types/device_type';
+import intl from 'react-intl-universal';
 
 export const DeviceSettingContent: React.FC<{
   deviceType: DeviceType;
@@ -23,9 +24,20 @@ export const DeviceSettingContent: React.FC<{
         return (
           <>
             {groups.map((group) => {
+              let groupName = '';
+              if (group) {
+                const label = SETTING_GROUPS[group];
+                if (label) {
+                  groupName = intl.get(label);
+                } else if (group.indexOf('channel') > -1) {
+                  groupName = intl.get('SETTING_GROUP_CHANNEL', {
+                    channel: group.replace('channel', '')
+                  });
+                }
+              }
               return (
-                <fieldset>
-                  <legend>{(group && SETTING_GROUPS[group]) || group}</legend>
+                <fieldset key={group}>
+                  <legend>{groupName}</legend>
                   {settings
                     .filter((setting) => setting.group === group)
                     .map((setting) => (

@@ -9,7 +9,7 @@ import { DeviceCommand } from '../../../types/device_command';
 import intl from 'react-intl-universal';
 
 export interface UpgradeModalProps {
-  visible: boolean;
+  open: boolean;
   device: Device;
   onCancel?: () => void;
   onSuccess: () => void;
@@ -17,19 +17,19 @@ export interface UpgradeModalProps {
 
 const { Option } = Select;
 
-const UpgradeModal: FC<UpgradeModalProps> = ({ visible, device, onCancel, onSuccess }) => {
+const UpgradeModal: FC<UpgradeModalProps> = ({ open, device, onCancel, onSuccess }) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [firmware, setFirmware] = useState<any>();
   const [firmwares, setFirmwares] = useState<Firmware[]>([]);
   const [form] = Form.useForm();
 
   useEffect(() => {
-    if (device && visible) {
+    if (device && open) {
       form.resetFields();
       setFirmware(undefined);
       GetDeviceFirmwaresRequest(device.id).then(setFirmwares);
     }
-  }, [device, visible]);
+  }, [device, open, form]);
 
   const renderFirmware = () => {
     if (firmware) {
@@ -87,7 +87,7 @@ const UpgradeModal: FC<UpgradeModalProps> = ({ visible, device, onCancel, onSucc
   return (
     <Modal
       width={420}
-      visible={visible}
+      open={open}
       title={intl.get('DEVICE_UPGRADING')}
       okText={intl.get('UPGRADE')}
       onOk={onUpgrade}

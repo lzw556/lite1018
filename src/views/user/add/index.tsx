@@ -8,7 +8,7 @@ import intl from 'react-intl-universal';
 import { FormInputItem } from '../../../components/formInputItem';
 
 export interface AddUserProps {
-  visible: boolean;
+  open: boolean;
   onCancel?: () => void;
   onSuccess: () => void;
 }
@@ -16,23 +16,22 @@ export interface AddUserProps {
 const { Option } = Select;
 
 const AddUserModal = (props: AddUserProps) => {
-  const { visible, onCancel, onSuccess } = props;
+  const { open, onCancel, onSuccess } = props;
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [projects, setProjects] = useState<any>();
   const [form] = Form.useForm();
 
   useEffect(() => {
-    if (visible) {
+    if (open) {
       form.resetFields();
     }
-  }, [visible]);
+  }, [open, form]);
 
   const onAdd = () => {
     setIsLoading(true);
     form
       .validateFields()
       .then((values) => {
-        console.log(values);
         AddUserRequest(values)
           .then((_) => {
             setIsLoading(false);
@@ -57,7 +56,7 @@ const AddUserModal = (props: AddUserProps) => {
     <Modal
       width={420}
       title={intl.get('CREATE_USER')}
-      visible={visible}
+      open={open}
       cancelText={intl.get('CANCEL')}
       onCancel={onCancel}
       okText={intl.get('OK')}

@@ -1,7 +1,7 @@
 import { DownloadOutlined } from '@ant-design/icons';
 import { Button, Col, Empty, Row, Select, Space } from 'antd';
 import React from 'react';
-import { useHistoryDatas } from './wind-turbine';
+import { useHistoryDatas } from '.';
 import { checkIsFlangePreload } from '..';
 import Label from '../../../components/label';
 import { oneWeekNumberRange, RangeDatePicker } from '../../../components/rangeDatePicker';
@@ -13,7 +13,7 @@ import {
   getRealPoints,
   getSpecificProperties,
   HistoryData,
-  NO_MONITORING_POINTS
+  MONITORING_POINT
 } from '../../monitoring-point';
 import { FlangeHistoryChart } from '../historyChart';
 import intl from 'react-intl-universal';
@@ -27,7 +27,7 @@ export const FlangeHistory = ({
 }) => {
   const realPoints = getRealPoints(flange.monitoringPoints);
   const [range, setRange] = React.useState<[number, number]>();
-  const [visible, setVisible] = React.useState(false);
+  const [open, setVisible] = React.useState(false);
   const [property, setProperty] = React.useState<string | undefined>();
   const internalHistorys = useHistoryDatas(flange, range) ?? historyDatas;
   const firstPoint = realPoints[0];
@@ -45,7 +45,10 @@ export const FlangeHistory = ({
 
   if (realPoints.length === 0)
     return (
-      <Empty description={intl.get(NO_MONITORING_POINTS)} image={Empty.PRESENTED_IMAGE_SIMPLE} />
+      <Empty
+        description={intl.get('NO_ASSET_PROMPT', { assetTypeLabel: intl.get(MONITORING_POINT) })}
+        image={Empty.PRESENTED_IMAGE_SIMPLE}
+      />
     );
 
   const properties = getSpecificProperties(firstPoint.properties, firstPoint.type);
@@ -99,10 +102,10 @@ export const FlangeHistory = ({
           showTitle={false}
         />
       </Col>
-      {visible && realPoints.length > 0 && (
+      {open && realPoints.length > 0 && (
         <DownloadHistory
           measurement={firstPoint}
-          open={visible}
+          open={open}
           onSuccess={() => setVisible(false)}
           onCancel={() => setVisible(false)}
           assetId={flange.id}

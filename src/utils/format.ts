@@ -26,3 +26,10 @@ export function roundValue(value: number, precision?: number) {
   if (Number.isNaN(value) || value === 0) return value;
   return round(value, precision ?? 3);
 }
+
+export function toMac(mac: string) {
+  if (mac.length === 12) {
+    return mac.replace(/\w(?=(\w{2})+$)/g, '$&-');
+  }
+  return mac;
+}

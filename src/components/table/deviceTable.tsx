@@ -63,7 +63,7 @@ const DeviceTable: FC<DeviceTableProps> = ({
       PubSub.unsubscribe(SocketTopic.connectionState);
       PubSub.unsubscribe(SocketTopic.upgradeStatus);
     };
-  }, [data]);
+  }, [data, PubSub]);
 
   return (
     <TableLayout

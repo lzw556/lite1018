@@ -11,20 +11,6 @@ export interface TopologyViewProps {
 const TopologyView: FC<TopologyViewProps> = ({ network }) => {
   const [graph, setGraph] = useState<TreeGraph | undefined>();
 
-  const tree: any = (root: Device) => {
-    console.log(network.nodes);
-    return network.nodes
-      .filter((device) => device.macAddress !== device.parent)
-      .filter((device) => device.parent === root.macAddress)
-      .map((device) => {
-        return {
-          id: device.macAddress,
-          data: device,
-          children: tree(device)
-        };
-      });
-  };
-
   useEffect(() => {
     function handleResize() {
       if (graph) {
@@ -42,6 +28,18 @@ const TopologyView: FC<TopologyViewProps> = ({ network }) => {
   }, [graph]);
 
   useEffect(() => {
+    const tree: any = (root: Device) => {
+      return network.nodes
+        .filter((device) => device.macAddress !== device.parent)
+        .filter((device) => device.parent === root.macAddress)
+        .map((device) => {
+          return {
+            id: device.macAddress,
+            data: device,
+            children: tree(device)
+          };
+        });
+    };
     if (!graph) {
       const graphInstance = new G6.TreeGraph({
         container: 'container',
@@ -93,7 +91,7 @@ const TopologyView: FC<TopologyViewProps> = ({ network }) => {
       graphInstance.fitView();
       setGraph(graphInstance);
     }
-  }, []);
+  }, [graph, network]);
 
   return <div id={'container'} style={{ width: '100%', height: '100%' }} />;
 };

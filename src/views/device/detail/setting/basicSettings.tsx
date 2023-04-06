@@ -3,7 +3,7 @@ import * as React from 'react';
 import { UpdateDeviceRequest } from '../../../../apis/device';
 import DeviceSelect from '../../../../components/select/deviceSelect';
 import NetworkSelect from '../../../../components/select/networkSelect';
-import { defaultValidateMessages, Normalizes, Rules } from '../../../../constants/validator';
+import { Normalizes, Rules } from '../../../../constants/validator';
 import { Device } from '../../../../types/device';
 import { DeviceType } from '../../../../types/device_type';
 import intl from 'react-intl-universal';
@@ -60,7 +60,7 @@ export const BasicSettings: React.FC<BasicSettingsProps> = ({ device, onUpdate }
     <>
       <Row justify={'start'}>
         <Col xxl={8} xl={10} xs={24}>
-          <Form form={form} labelCol={{ xl: 7, xxl: 6 }} validateMessages={defaultValidateMessages}>
+          <Form form={form} labelCol={{ xl: 7, xxl: 6 }}>
             <FormInputItem
               label={intl.get('DEVICE_NAME')}
               name='name'

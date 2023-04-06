@@ -3,7 +3,7 @@ import { Role } from '../../../types/role';
 import { FC, useEffect, useState } from 'react';
 import { GetPermissionsWithGroupRequest } from '../../../apis/permission';
 import { AllocPermissionsRequest } from '../../../apis/role';
-import usePermission, { Permission } from '../../../permission/permission';
+import { Permission } from '../../../permission/permission';
 import HasPermission from '../../../permission';
 import intl from 'react-intl-universal';
 
@@ -13,13 +13,26 @@ export interface PermissionDrawerProps extends DrawerProps {
 }
 
 const PermissionDrawer: FC<PermissionDrawerProps> = (props) => {
-  const { role, visible, onCancel } = props;
+  const { role, open, onCancel } = props;
   const [permissions, setPermissions] = useState<any>();
   const [checkPermissions, setCheckPermissions] = useState<any[]>([]);
-  const { hasPermission } = usePermission();
 
   useEffect(() => {
-    if (visible) {
+    const convertCheckPermissions = (data: any) => {
+      const ps = role.permissions.map((item: any) => `${item[0]}::${item[1]}`);
+      const checked: any[] = [];
+      Object.keys(data).forEach((key) => {
+        data[key]
+          .filter((item: any) => {
+            return ps.includes(`${item.path}::${item.method}`);
+          })
+          .forEach((item: any) => {
+            checked.push(item.id);
+          });
+      });
+      setCheckPermissions(checked);
+    };
+    if (open) {
       GetPermissionsWithGroupRequest().then((res) => {
         if (res.code === 200) {
           setPermissions(res.data);
@@ -27,7 +40,7 @@ const PermissionDrawer: FC<PermissionDrawerProps> = (props) => {
         }
       });
     }
-  }, [visible]);
+  }, [open, role.permissions]);
 
   const onSave = () => {
     AllocPermissionsRequest(
@@ -36,21 +49,6 @@ const PermissionDrawer: FC<PermissionDrawerProps> = (props) => {
     ).then((_) => {
       onCancel();
     });
-  };
-
-  const convertCheckPermissions = (data: any) => {
-    const ps = role.permissions.map((item: any) => `${item[0]}::${item[1]}`);
-    const checked: any[] = [];
-    Object.keys(data).forEach((key) => {
-      data[key]
-        .filter((item: any) => {
-          return ps.includes(`${item.path}::${item.method}`);
-        })
-        .forEach((item: any) => {
-          checked.push(item.id);
-        });
-    });
-    setCheckPermissions(checked);
   };
 
   const renderExtra = () => {
@@ -89,7 +87,7 @@ const PermissionDrawer: FC<PermissionDrawerProps> = (props) => {
   };
 
   const convertPermissionTree = () => {
-    if (permissions && visible) {
+    if (permissions && open) {
       return (
         <Tree
           defaultExpandAll={true}

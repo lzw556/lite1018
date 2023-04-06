@@ -21,7 +21,7 @@ import { PageTitle } from '../../components/pageTitle';
 import intl from 'react-intl-universal';
 
 const ProjectPage = () => {
-  const [visible, setVisible] = useState(false);
+  const [open, setVisible] = useState(false);
   const [allocVisible, setAllocVisible] = useState(false);
   const [dataSource, setDataSource] = useState<PageResult<any>>();
   const [project, setProject] = useState<Project>();
@@ -189,9 +189,9 @@ const ProjectPage = () => {
           columns={columns}
         />
       </ShadowCard>
-      {visible && (
+      {open && (
         <EditProjectModal
-          visible={visible}
+          open={open}
           project={project}
           onSuccess={() => {
             setVisible(false);
@@ -210,7 +210,7 @@ const ProjectPage = () => {
       {allocVisible && project && (
         <AllocUserDrawer
           project={project}
-          visible={allocVisible}
+          open={allocVisible}
           onSuccess={() => {
             setAllocVisible(false);
             setProject(undefined);

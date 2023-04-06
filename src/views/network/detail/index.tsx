@@ -11,17 +11,16 @@ import {
   NetworkSyncRequest,
   UpdateNetworkRequest
 } from '../../../apis/network';
-import '../../../string-extension';
 import TopologyView from './topologyView';
 import '../index.css';
 import usePermission, { Permission } from '../../../permission/permission';
 import ButtonGroup from 'antd/lib/button/button-group';
-import { defaultValidateMessages, Rules } from '../../../constants/validator';
 import WsnFormItem from '../../../components/formItems/wsnFormItem';
 import { useProvisionMode } from '../useProvisionMode';
 import { PageTitle } from '../../../components/pageTitle';
 import { Link } from 'react-router-dom';
 import intl from 'react-intl-universal';
+import { FormInputItem } from '../../../components/formInputItem';
 
 const NetworkDetail = () => {
   const { hasPermission } = usePermission();
@@ -109,14 +108,15 @@ const NetworkDetail = () => {
           </Col>
           <Col xl={8} xxl={6}>
             <ShadowCard style={{ marginLeft: 10, height: '100%' }}>
-              <Form form={form} labelCol={{ span: 9 }} validateMessages={defaultValidateMessages}>
-                <Form.Item label={intl.get('NAME')} name={'name'} rules={[Rules.range(4, 16)]}>
-                  <Input
-                    placeholder={intl.get('PLEASE_ENTER_SOMETHING', {
-                      something: intl.get('NETWORK_NAME')
-                    })}
-                  />
-                </Form.Item>
+              <Form form={form} labelCol={{ span: 9 }}>
+                <FormInputItem
+                  label={intl.get('NAME')}
+                  name='name'
+                  requiredMessage={intl.get('PLEASE_ENTER_NAME')}
+                  lengthLimit={{ min: 4, max: 16, label: intl.get('NAME').toLowerCase() }}
+                >
+                  <Input placeholder={intl.get('PLEASE_ENTER_NAME')} />
+                </FormInputItem>
                 {provisionMode && (
                   <WsnFormItem mode={provisionMode} onModeChange={setProvisionMode} />
                 )}

@@ -1,13 +1,12 @@
 import { Checkbox, Col, Empty, Form, Input, Modal, ModalProps, Row, Select, Spin } from 'antd';
 import * as React from 'react';
-import { ROOT_ASSETS } from '../../../config/assetCategory.config';
-import { useAssetCategoryContext } from '../../asset';
 import { getAssets } from '../../asset/services';
 import { AssetRow } from '../../asset/types';
-import { UPDATE_MONITORING_POINT } from '../../monitoring-point';
 import { bindMeasurementsToAlarmRule2 } from './services';
 import { AlarmRule } from './types';
 import intl from 'react-intl-universal';
+import { useAssetCategoryChain } from '../../../config/assetCategory.config';
+import { MONITORING_POINT } from '../../monitoring-point';
 
 type MixinAssetRow = AssetRow & { pointIds: number[]; checked: boolean; indeterminate: boolean };
 
@@ -18,7 +17,7 @@ export const BindMonitoringPoints: React.FC<
   const [assets, setAssets] = React.useState<MixinAssetRow[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [asset, setAsset] = React.useState<MixinAssetRow>();
-  const category = useAssetCategoryContext();
+  const { root } = useAssetCategoryChain();
 
   React.useEffect(() => {
     const filterValidPoints = ({ children }: AssetRow) =>
@@ -31,7 +30,7 @@ export const BindMonitoringPoints: React.FC<
           monitoringPoints.some(({ type }) => type === props.selectedRow.type)
       );
 
-    getAssets({ type: ROOT_ASSETS.get(category) }).then((data) => {
+    getAssets({ type: root.key, parent_id: 0 }).then((data) => {
       setLoading(false);
       const assets = data.filter(filterValidPoints).map((asset) => {
         const pointIds: number[] = [];
@@ -57,7 +56,7 @@ export const BindMonitoringPoints: React.FC<
       });
       setAssets(assets);
     });
-  }, [props.selectedRow, form, category]);
+  }, [props.selectedRow, form, root.key]);
 
   React.useEffect(() => {
     if (assets.length > 0) {
@@ -136,32 +135,34 @@ export const BindMonitoringPoints: React.FC<
                   );
                 }}
               >
-                {children &&
-                  children
-                    .filter(({ monitoringPoints }) =>
-                      monitoringPoints?.some(({ type }) => type === props.selectedRow.type)
-                    )
-                    .map(({ id, name, monitoringPoints }) => (
-                      <Row key={id} gutter={[0, 16]} style={{ marginBottom: 16 }}>
-                        <Col span={24}>{name}</Col>
-                        <Col span={24}>
-                          <Row>
-                            {monitoringPoints &&
-                              monitoringPoints.map(({ id, name, type }) => {
-                                if (type === props.selectedRow.type) {
-                                  return (
-                                    <Col key={id} span={8}>
-                                      <Checkbox value={id}>{name}</Checkbox>
-                                    </Col>
-                                  );
-                                } else {
-                                  return null;
-                                }
-                              })}
-                          </Row>
-                        </Col>
-                      </Row>
-                    ))}
+                <Row key={id} gutter={[0, 16]} style={{ marginBottom: 16 }}>
+                  {children &&
+                    children
+                      .filter(({ monitoringPoints }) =>
+                        monitoringPoints?.some(({ type }) => type === props.selectedRow.type)
+                      )
+                      .map(({ id, name, monitoringPoints }) => (
+                        <React.Fragment key={id}>
+                          <Col span={24}>{name}</Col>
+                          <Col span={24}>
+                            <Row>
+                              {monitoringPoints &&
+                                monitoringPoints.map(({ id, name, type }) => {
+                                  if (type === props.selectedRow.type) {
+                                    return (
+                                      <Col key={id} span={8}>
+                                        <Checkbox value={id}>{name}</Checkbox>
+                                      </Col>
+                                    );
+                                  } else {
+                                    return null;
+                                  }
+                                })}
+                            </Row>
+                          </Col>
+                        </React.Fragment>
+                      ))}
+                </Row>
               </Checkbox.Group>
             </Form.Item>
           </div>
@@ -173,7 +174,7 @@ export const BindMonitoringPoints: React.FC<
   return (
     <Modal
       width={800}
-      title={intl.get(UPDATE_MONITORING_POINT)}
+      title={intl.get('EDIT_SOMETHING', { something: intl.get(MONITORING_POINT) })}
       bodyStyle={{ maxHeight: 700, overflow: 'auto' }}
       {...props}
       okButtonProps={{ disabled: assets.length === 0 }}

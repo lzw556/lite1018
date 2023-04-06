@@ -14,7 +14,7 @@ export const DYNAMIC_DATA_BOLTELONGATION = {
     { label: intl.get('FIELD_PRESSURE'), value: 'min_length', unit: 'mm' },
     { label: intl.get('FIELD_TEMPERATURE'), value: 'temperature', unit: '℃' },
     { label: intl.get('FIELD_TOF'), value: 'min_tof', unit: 'ns' },
-    { label: intl.get('FILED_DEFECT_LOCATION'), value: 'defect_location', unit: 'mm' }
+    { label: intl.get('FIELD_DEFECT_LOCATION'), value: 'defect_location', unit: 'mm' }
   ] as const
 };
 

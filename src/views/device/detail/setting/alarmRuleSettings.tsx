@@ -22,7 +22,7 @@ export const AlarmRuleSettings: React.FC<{ device: Device }> = ({ device }) => {
     dataSource: {} as PageResult<[]>
   });
   const [isLoaded, setIsLoaded] = React.useState(false);
-  const [visible, setVisible] = React.useState(false);
+  const [open, setVisible] = React.useState(false);
   const fetchCrtRules = React.useCallback(
     (current: number, size: number) => {
       PagingAlarmRuleDeviceRequest(device.id, current, size).then((res) => {
@@ -34,7 +34,7 @@ export const AlarmRuleSettings: React.FC<{ device: Device }> = ({ device }) => {
   );
   React.useEffect(() => {
     fetchCrtRules(1, 10);
-  }, []);
+  }, [fetchCrtRules]);
   const fetchAllRules = React.useCallback(
     (current: number, size: number, crtRules: any) => {
       PagingAlarmRuleRequest({ category: 1, source_type: device.typeId }, current, size).then(
@@ -49,11 +49,11 @@ export const AlarmRuleSettings: React.FC<{ device: Device }> = ({ device }) => {
         }
       );
     },
-    [device.id]
+    [device.typeId]
   );
   React.useEffect(() => {
     fetchAllRules(1, 10, crtRules);
-  }, [crtRules]);
+  }, [crtRules, fetchAllRules]);
 
   const AddRules = (ids: number[]) => {
     AddAlarmRuleToDeviceRequest(device.id, ids).then((res: any) => {
@@ -79,11 +79,11 @@ export const AlarmRuleSettings: React.FC<{ device: Device }> = ({ device }) => {
               >
                 {intl.get('CREATE_ONE')}
               </a>
-              {visible && (
+              {open && (
                 <AlarmRuleSelection
                   {...rules}
                   fetchData={fetchAllRules}
-                  visible={visible}
+                  open={open}
                   setVisible={setVisible}
                   onSelect={(ids) => AddRules(ids.map((id) => Number(id)))}
                 />
@@ -118,11 +118,11 @@ export const AlarmRuleSettings: React.FC<{ device: Device }> = ({ device }) => {
             })
           }
         />
-        {visible && (
+        {open && (
           <AlarmRuleSelection
             {...rules}
             fetchData={fetchAllRules}
-            visible={visible}
+            open={open}
             setVisible={setVisible}
             onSelect={(ids) => AddRules(ids.map((id) => Number(id)))}
           />

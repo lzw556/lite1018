@@ -7,26 +7,26 @@ import RoleSelect from '../../../components/roleSelect';
 import intl from 'react-intl-universal';
 
 export interface EditUserProps {
-  visible: boolean;
+  open: boolean;
   onCancel?: () => void;
   onSuccess: () => void;
   user: User;
 }
 
 const EditUserModal = (props: EditUserProps) => {
-  const { visible, onCancel, onSuccess, user } = props;
+  const { open, onCancel, onSuccess, user } = props;
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [form] = Form.useForm();
 
   useEffect(() => {
-    if (visible) {
+    if (open) {
       form.setFieldsValue({
         phone: user.phone,
         email: user.email,
         role: user.role
       });
     }
-  }, [visible, user]);
+  }, [open, user, form]);
 
   const onSave = () => {
     setIsLoading(true);
@@ -47,7 +47,7 @@ const EditUserModal = (props: EditUserProps) => {
     <Modal
       width={420}
       title={intl.get('EDIT_USER')}
-      visible={visible}
+      open={open}
       cancelText={intl.get('CANCEL')}
       onCancel={onCancel}
       okText={intl.get('SAVE')}

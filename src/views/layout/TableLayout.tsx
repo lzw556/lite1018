@@ -1,4 +1,4 @@
-import { Col, Empty, Pagination, PaginationProps, Row, Table } from 'antd';
+import { Col, Pagination, PaginationProps, Row, Table } from 'antd';
 import { FC } from 'react';
 import usePermission, { PermissionType } from '../../permission/permission';
 import { PageResult } from '../../types/page';
@@ -22,7 +22,6 @@ const TableLayout: FC<TableLayoutProps> = (props) => {
     permissions,
     rowSelection,
     dataSource,
-    emptyText,
     onPageChange,
     expandable,
     scroll,
@@ -35,10 +34,6 @@ const TableLayout: FC<TableLayoutProps> = (props) => {
     onChange: onPageChange
   };
   const { hasPermission } = usePermission();
-
-  const renderEmpty = () => {
-    return <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={emptyText} />;
-  };
 
   const renderColumns = () => {
     if (

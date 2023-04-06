@@ -2,6 +2,7 @@ import { Form, Input, Modal, ModalProps } from 'antd';
 import { AcknowledgeAlarmRecordRequest } from '../../../apis/alarm';
 import { FC, useEffect } from 'react';
 import intl from 'react-intl-universal';
+import { translateMetricName } from '../alarm-group';
 
 export interface AcknowledgeModalProps extends ModalProps {
   record: any;
@@ -15,13 +16,11 @@ const AcknowledgeModal: FC<AcknowledgeModalProps> = (props) => {
   useEffect(() => {
     form.setFieldsValue({
       source: record.source,
-      content: `${intl.get(record.metric.name).d(record.metric.name)} ${record.operation} ${
-        record.threshold
-      }${intl.get(record.metric.unit).d(record.metric.unit)} ${intl.get('ALARM_VALUE')}: ${
-        record.value
-      }${intl.get(record.metric.unit).d(record.metric.unit)}`
+      content: `${translateMetricName(record.metric.name)} ${record.operation} ${record.threshold}${
+        record.metric.unit
+      } ${intl.get('ALARM_VALUE')}: ${record.value}${record.metric.unit}`
     });
-  }, [record]);
+  }, [record, form]);
 
   const onSave = () => {
     form.validateFields().then((values) => {

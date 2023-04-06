@@ -1,149 +1,126 @@
-import { Breadcrumb, Dropdown, Space } from 'antd';
+import { Breadcrumb, Dropdown, MenuProps, Space } from 'antd';
 import * as React from 'react';
-import { Link } from 'react-router-dom';
-import { AssetRow } from '../types';
+import { Link, useLocation } from 'react-router-dom';
+import {
+  AssertAssetCategory,
+  AssertOfAssetCategory,
+  AssetRow,
+  AssetTreeNode,
+  ASSET_PATHNAME,
+  isAssetCategoryKey
+} from '../types';
 import { DownOutlined } from '@ant-design/icons';
-import { forEachTreeNode, Node } from '../../../utils/tree';
-import { getRealPoints, MONITORING_POINT_PATHNAME } from '../../monitoring-point';
-import { useAssetCategoryContext, AssetCategory, ASSET_CATEGORY } from '..';
-import { ROOT_ASSETS } from '../../../config/assetCategory.config';
-import { FLANGE_ASSET_TYPE_ID, FLANGE_PATHNAME } from '../../flange';
-import { AREA_ASSET_TYPES, AREA_ASSET_TYPE_PATHNAME } from '../corrosion';
+import { mapTree, tree2List } from '../../../utils/tree';
+import { MONITORING_POINT_PATHNAME, pickId } from '../../monitoring-point';
 import intl from 'react-intl-universal';
+import { FLANGE_PATHNAME } from '../../flange';
+import { combineMonitoringPointToAsset } from '../common/utils';
+import { useAssetsContext } from './assetsContext';
 
-export const rootPathState = { from: { label: '总览', path: '/project-overview' } };
+export const rootPathState = { from: { label: intl.get('OVERVIEW'), path: '/project-overview' } };
 
-type BreadcrumbItemData = Node & { type?: number };
-export const AssetNavigator = ({
-  id,
-  parentId,
-  assets,
-  from = rootPathState.from
-}: Pick<Node, 'id' | 'parentId'> & { assets: AssetRow[] } & {
-  from: { label: string; path: string };
-}) => {
-  const category = useAssetCategoryContext();
-  const [items, setItems] = React.useState<[number, boolean, Node[]][]>([]);
+export type TreeFlatListItem = AssetTreeNode & { path: number[] };
+
+export const AssetNavigator = ({ id }: { id: string | number }) => {
+  const [items, setItems] = React.useState<any>([]);
+  const { assets } = useAssetsContext();
+  const { state } = useLocation();
+  const from = state?.from;
 
   React.useEffect(() => {
-    const findParent = (id: number, source: Node[], paths: { parentId: number; id: number }[]) => {
-      const item = source.filter((node) => (node.type || 0) < 10000).find((item) => item.id === id);
-      if (item) {
-        paths.push({ parentId: item.parentId, id: item.id });
-        if (item.parentId !== -1) {
-          findParent(item.parentId, source, paths);
-        }
-      }
-    };
     if (assets.length > 0) {
-      const node = {
+      const root = {
         id: 0,
-        name: from.label || '总览',
-        parentId: -1,
-        children: assets.filter((asset) => asset.parentId === 0)
-      };
-      const arr: Node[] = [];
-      forEachTreeNode(node, (node) => {
-        arr.push(node);
-        const points = getRealPoints(node.monitoringPoints);
-        if (points.length > 0)
-          arr.push(...points.map((point) => ({ ...point, parentId: point.assetId })));
-      });
-      if (arr.length > 0) {
-        const paths: { parentId: number; id: number }[] = [{ parentId, id }];
-        findParent(parentId, arr, paths);
+        name: from.label || intl.get('OVERVIEW'),
+        children: assets
+      } as AssetRow;
+      const list: TreeFlatListItem[] = tree2List(
+        mapTree([root], (node) => combineMonitoringPointToAsset(node))
+      );
+      if (list.length > 0) {
+        const paths = list.find((item) => item.id === id)?.path;
         setItems(
           paths
-            .reverse()
-            .map(({ parentId, id }, index) => [
-              id,
-              paths.length - 1 === index,
-              arr.filter((item) => item.parentId === parentId)
-            ])
+            ?.map((id) => list.find((item) => id === item.id))
+            .map((mix, index) => ({
+              title: mix && (
+                <BreadcrumbItemTitle isLast={paths.length - 1 === index} mix={mix} list={list} />
+              )
+            }))
         );
       }
     }
-  }, [assets, id, from.label, parentId]);
+  }, [id, from, assets]);
 
-  const renderBreadcrumbItemDDMenu = (assets: BreadcrumbItemData[]) => {
-    return assets.map((asset) => ({
-      key: asset.id,
-      label: (
-        <Link to={`${getPathFromType(category, asset.type)}${asset.id}`} state={{ from }}>
-          {asset.name}
-        </Link>
-      )
-    }));
-  };
+  if (items === undefined || items.length === 0) return null;
+  return <Breadcrumb items={items} />;
+};
 
-  const renderChildrenOfItem = (
-    asset: BreadcrumbItemData,
-    isLast: boolean,
-    assets: BreadcrumbItemData[]
-  ) => {
-    const items = renderBreadcrumbItemDDMenu(assets);
-    const downIcon = <DownOutlined style={{ fontSize: '10px', cursor: 'pointer' }} />;
-    if (isLast) {
+function BreadcrumbItemTitle({
+  mix,
+  isLast,
+  list
+}: {
+  isLast: boolean;
+  mix: TreeFlatListItem;
+  list: TreeFlatListItem[];
+}) {
+  const { id, name, parentId } = mix;
+  const downIcon = <DownOutlined style={{ fontSize: '10px', cursor: 'pointer' }} />;
+  const siblings = list.filter((item) => item.id !== id && item.parentId === parentId);
+  const items: MenuProps['items'] = siblings.map((mix: any) => ({
+    key: mix.id,
+    label: <ItemLink {...mix} />
+  }));
+  if (isLast) {
+    if (siblings.length > 0) {
       return (
         <Dropdown menu={{ items }} trigger={['click']}>
           <Space>
-            <span>{asset.name}</span>
-            {assets.length > 0 && downIcon}
+            <span>{name}</span>
+            {downIcon}
           </Space>
         </Dropdown>
       );
     } else {
-      const name = asset.name;
-      const nameWithTranslation = intl.get(name);
-      const final = nameWithTranslation.length === 0 ? name : nameWithTranslation;
       return (
         <Space>
-          {asset.id === 0 ? (
-            <Link to={from.path} state={{ from }}>
-              {final}
-            </Link>
-          ) : (
-            <Link to={`${getPathFromType(category, asset.type)}${asset.id}`} state={{ from }}>
-              {final}
-            </Link>
-          )}
-          {assets.length > 0 && (
-            <Dropdown menu={{ items }} trigger={['click']} placement='bottomRight'>
-              {downIcon}
-            </Dropdown>
-          )}
+          <span>{name}</span>
         </Space>
       );
     }
-  };
-
-  const renderBreadcrumbItem = ([id, isLast, assets]: [
-    id: number,
-    isLast: boolean,
-    assets: BreadcrumbItemData[]
-  ]) => {
-    const asset = assets.find((asset) => asset.id === id);
-    if (!asset) return null;
-    const restAssets = assets.filter((asset) => asset.id !== id);
+  } else {
     return (
-      <Breadcrumb.Item key={asset.id} className='asset-navigator-item'>
-        {renderChildrenOfItem(asset, isLast, restAssets)}
-      </Breadcrumb.Item>
+      <Space>
+        <ItemLink {...mix} />
+        {siblings.length > 0 && id !== 0 && (
+          <Dropdown menu={{ items }} trigger={['click']} placement='bottomRight'>
+            {downIcon}
+          </Dropdown>
+        )}
+      </Space>
     );
-  };
+  }
+}
 
-  if (items.length === 0) return null;
-  return <Breadcrumb className='asset-navigator'>{items.map(renderBreadcrumbItem)}</Breadcrumb>;
-};
+function ItemLink({ id, type, name }: TreeFlatListItem) {
+  const { state } = useLocation();
+  const from = state?.from;
+  return (
+    <Link to={id === 0 ? from.path : `${getPathFromType(type)}${pickId(id)}`} state={{ from }}>
+      {name}
+    </Link>
+  );
+}
 
-export function getPathFromType(category: AssetCategory, type?: number) {
+export function getPathFromType(type?: number) {
   let pathname = null;
-  if (type === ROOT_ASSETS.get(category)) {
-    pathname = `/${ASSET_CATEGORY[category]}/`;
-  } else if (type === FLANGE_ASSET_TYPE_ID) {
-    pathname = `/${FLANGE_PATHNAME}/`;
-  } else if (type && AREA_ASSET_TYPES.map((t) => t.key).includes(type)) {
-    pathname = `/${AREA_ASSET_TYPE_PATHNAME}/`;
+  if (isAssetCategoryKey(type)) {
+    if (AssertAssetCategory(type ?? 0, AssertOfAssetCategory.IS_FLANGE)) {
+      pathname = `/${FLANGE_PATHNAME}/`;
+    } else {
+      pathname = `/${ASSET_PATHNAME}/`;
+    }
   } else {
     pathname = `/${MONITORING_POINT_PATHNAME}/`;
   }

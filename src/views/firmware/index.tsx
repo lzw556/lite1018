@@ -93,7 +93,7 @@ const FirmwarePage = () => {
       title: intl.get('BUILD_DATE'),
       dataIndex: 'buildTime',
       key: 'buildTime',
-      render: (text: number) => dayjs.unix(text).local().format('yyyy-MM-DD HH:mm:ss')
+      render: (text: number) => dayjs.unix(text).local().format('YYYY-MM-DD HH:mm:ss')
     },
     {
       title: intl.get('OPERATION'),

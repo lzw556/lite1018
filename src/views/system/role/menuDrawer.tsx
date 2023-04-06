@@ -5,7 +5,7 @@ import { GetMenusTreeRequest } from '../../../apis/menu';
 import { Menu } from '../../../types/menu';
 import { AllocMenusRequest } from '../../../apis/role';
 import '../../../assets/iconfont.css';
-import usePermission, { Permission } from '../../../permission/permission';
+import { Permission } from '../../../permission/permission';
 import HasPermission from '../../../permission';
 import intl from 'react-intl-universal';
 
@@ -15,19 +15,18 @@ export interface MenuDrawerProps extends DrawerProps {
 }
 
 const MenuDrawer: FC<MenuDrawerProps> = (props) => {
-  const { role, visible, onCancel } = props;
+  const { role, open, onCancel } = props;
   const [menus, setMenus] = useState<Menu[]>();
   const [checkMenus, setCheckMenus] = useState<number[]>([]);
-  const { hasPermission } = usePermission();
 
   useEffect(() => {
-    if (visible) {
+    if (open) {
       GetMenusTreeRequest().then((data) => {
         setMenus(data);
         setCheckMenus(role.menus);
       });
     }
-  }, [visible]);
+  }, [open, role.menus]);
 
   const onSave = () => {
     AllocMenusRequest(role.id, checkMenus).then((_) => {
@@ -58,7 +57,7 @@ const MenuDrawer: FC<MenuDrawerProps> = (props) => {
   };
 
   const renderMenusTree = () => {
-    if (menus && visible) {
+    if (menus && open) {
       return (
         <Tree
           defaultExpandAll={true}

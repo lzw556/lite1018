@@ -23,14 +23,9 @@ import {
 import { PrimaryLayout } from '../views/layout/primaryLayout';
 import { isLogin } from '../utils/session';
 import { ConfigProvider, Spin } from 'antd';
-import {
-  ASSET_CATEGORY,
-  useAssetCategoryContext
-} from '../views/asset/components/assetCategoryContext';
 import { FLANGE_PATHNAME } from '../views/flange';
 import { MONITORING_POINT_PATHNAME } from '../views/monitoring-point';
 import { useLocaleContext } from '../localeProvider';
-import useForceUpdate from 'use-force-update';
 import intl from 'react-intl-universal';
 import en_US from '../locales/en-US.json';
 import zh_CN from '../locales/zh-CN.json';
@@ -38,51 +33,22 @@ import zhCN from 'antd/es/locale/zh_CN';
 import enUS from 'antd/es/locale/en_US';
 import dayjs from '../utils/dayjsUtils';
 import 'dayjs/locale/zh-cn';
+import { AssetsContextProvider, ASSET_PATHNAME } from '../views/asset';
 
-const AssetViewSwitch = lazy(() => import('../views/asset/components/assetViewSwitch'));
 const AlarmRuleGroups = lazy(() => import('../views/alarm/alarm-group/index'));
 const CreateAlarmRuleGroups = lazy(() => import('../views/alarm/alarm-group/create'));
 const UpdateAlarmRuleGroups = lazy(() => import('../views/alarm/alarm-group/update'));
 
-//general
-const Generals = lazy(() => import('../views/asset/general/projectOverview'));
-const GeneralsTreeList = lazy(() => import('../views/asset/general/tree-list/index'));
-const GeneralShow = lazy(() => import('../views/asset/general/show/index'));
-const GeneralMonitoringPointShow = lazy(
-  () => import('../views/monitoring-point/show/general/index')
-);
-
-//corrosion
-const Areas = lazy(() => import('../views/asset/corrosion/projectOverview'));
-const AreasTreeList = lazy(() => import('../views/asset/corrosion/tree-list/index'));
-const AreasTableList = lazy(() => import('../views/asset/corrosion/table-list/index'));
-const AreaShow = lazy(() => import('../views/asset/corrosion/show/index'));
-const AreaMonitoringPointShow = lazy(
-  () => import('../views/monitoring-point/show/corrosion/index')
-);
-
 //wind-turbine
-const WindTurbines = lazy(() => import('../views/asset/wind-turbine/projectOverview'));
-const WindTurbinesTreeList = lazy(() => import('../views/asset/wind-turbine/tree-list/index'));
-const WindTurbinesTableList = lazy(() => import('../views/asset/wind-turbine/table-list/index'));
-const WindTurbineShow = lazy(() => import('../views/asset/wind-turbine/show/index'));
-const WindTurbineFlangeShow = lazy(() => import('../views/flange/show/wind-turbine/index'));
-const WindTurbineMonitoringPointShow = lazy(
-  () => import('../views/monitoring-point/show/wind-turbine/index')
-);
-
-//hydro-turbine
-const HydroTurbines = lazy(() => import('../views/asset/hydro-turbine/projectOverview'));
-const HydroTurbinesTreeList = lazy(() => import('../views/asset/hydro-turbine/tree-list/index'));
-const HydroTurbinesTableList = lazy(() => import('../views/asset/hydro-turbine/table-list/index'));
-const HydroTurbineShow = lazy(() => import('../views/asset/hydro-turbine/show/index'));
-const HydroTurbineFlangeShow = lazy(() => import('../views/flange/show/hydro-turbine/index'));
-const HydroTurbineMonitoringPointShow = lazy(
-  () => import('../views/monitoring-point/show/hydro-turbine/index')
-);
+const Assets = lazy(() => import('../views/asset/projectOverview'));
+const AssetsTreeList = lazy(() => import('../views/asset/tree-list/index'));
+const AssetsTableList = lazy(() => import('../views/asset/table-list/index'));
+const AssetShow = lazy(() => import('../views/asset/show/index'));
+const FlangeShow = lazy(() => import('../views/flange/show/index'));
+const MonitoringPointShow = lazy(() => import('../views/monitoring-point/show/index'));
 
 const AppRouter = () => {
-  const category = useAssetCategoryContext();
+  const [initDone, setInitDone] = React.useState(false);
   const routes: RouteObject[] = [
     { path: '/403', element: <Unauthorized /> },
     { path: '*', element: <NotFound /> },
@@ -94,75 +60,57 @@ const AppRouter = () => {
         {
           index: true,
           element: (
-            <AssetViewSwitch
-              general={<Generals />}
-              windTurbine={<WindTurbines />}
-              hydroTurbine={<HydroTurbines />}
-              corrosion={<Areas />}
-            />
+            <AssetsContextProvider>
+              <Assets />
+            </AssetsContextProvider>
           )
         },
         {
           path: 'project-overview',
           element: (
-            <AssetViewSwitch
-              general={<Generals />}
-              windTurbine={<WindTurbines />}
-              hydroTurbine={<HydroTurbines />}
-              corrosion={<Areas />}
-            />
+            <AssetsContextProvider>
+              <Assets />
+            </AssetsContextProvider>
           )
         },
         {
-          path: `${ASSET_CATEGORY[category]}/:id`,
+          path: `${ASSET_PATHNAME}/:id`,
           element: (
-            <AssetViewSwitch
-              general={<GeneralShow />}
-              windTurbine={<WindTurbineShow />}
-              hydroTurbine={<HydroTurbineShow />}
-              corrosion={<AreaShow />}
-            />
+            <AssetsContextProvider>
+              <AssetShow />
+            </AssetsContextProvider>
           )
         },
         {
           path: `${FLANGE_PATHNAME}/:id`,
           element: (
-            <AssetViewSwitch
-              windTurbine={<WindTurbineFlangeShow />}
-              hydroTurbine={<HydroTurbineFlangeShow />}
-            />
+            <AssetsContextProvider>
+              <FlangeShow />
+            </AssetsContextProvider>
           )
         },
         {
           path: `${MONITORING_POINT_PATHNAME}/:id`,
           element: (
-            <AssetViewSwitch
-              general={<GeneralMonitoringPointShow />}
-              windTurbine={<WindTurbineMonitoringPointShow />}
-              hydroTurbine={<HydroTurbineMonitoringPointShow />}
-              corrosion={<AreaMonitoringPointShow />}
-            />
+            <AssetsContextProvider>
+              <MonitoringPointShow />
+            </AssetsContextProvider>
           )
         },
         {
           path: 'asset-management',
           element: (
-            <AssetViewSwitch
-              general={<GeneralsTreeList />}
-              windTurbine={<WindTurbinesTreeList />}
-              hydroTurbine={<HydroTurbinesTreeList />}
-              corrosion={<AreasTreeList />}
-            />
+            <AssetsContextProvider>
+              <AssetsTreeList />
+            </AssetsContextProvider>
           )
         },
         {
           path: 'measurement-management',
           element: (
-            <AssetViewSwitch
-              windTurbine={<WindTurbinesTableList />}
-              hydroTurbine={<HydroTurbinesTableList />}
-              corrosion={<AreasTableList />}
-            />
+            <AssetsContextProvider>
+              <AssetsTableList />
+            </AssetsContextProvider>
           )
         },
         { path: 'devices', element: <Device /> },
@@ -193,7 +141,6 @@ const AppRouter = () => {
   }
   const Routes = () => useRoutes(routes);
   const { language } = useLocaleContext();
-  const forceUpdate = useForceUpdate();
 
   React.useEffect(() => {
     intl.init({
@@ -203,28 +150,32 @@ const AppRouter = () => {
       },
       currentLocale: language
     });
+    setInitDone(true);
     if (language === 'zh-CN') {
       dayjs.locale('zh-cn');
     } else {
       dayjs.locale('en');
     }
-    forceUpdate();
-  }, [language, forceUpdate]);
+  }, [language]);
 
   return (
-    <ConfigProvider locale={language === 'zh-CN' ? zhCN : enUS}>
-      <BrowserRouter>
-        <Suspense
-          fallback={
-            <div style={{ display: 'flex', justifyContent: 'center', alignContent: 'center' }}>
-              <Spin />
-            </div>
-          }
-        >
-          <Routes />
-        </Suspense>
-      </BrowserRouter>
-    </ConfigProvider>
+    <>
+      {initDone && (
+        <ConfigProvider locale={language === 'zh-CN' ? zhCN : enUS}>
+          <BrowserRouter>
+            <Suspense
+              fallback={
+                <div style={{ display: 'flex', justifyContent: 'center', alignContent: 'center' }}>
+                  <Spin />
+                </div>
+              }
+            >
+              <Routes />
+            </Suspense>
+          </BrowserRouter>
+        </ConfigProvider>
+      )}
+    </>
   );
 };
 

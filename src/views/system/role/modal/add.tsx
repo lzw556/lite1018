@@ -5,22 +5,22 @@ import { AddRoleRequest } from '../../../../apis/role';
 import intl from 'react-intl-universal';
 
 export interface AddRoleModalProps {
-  visible: boolean;
+  open: boolean;
   onCancel: () => void;
   onSuccess: () => void;
 }
 
 const AddRoleModal: FC<AddRoleModalProps> = (props) => {
-  const { visible, onCancel, onSuccess } = props;
+  const { open, onCancel, onSuccess } = props;
   const [form] = Form.useForm();
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   useEffect(() => {
-    if (visible) {
+    if (open) {
       form.resetFields();
       form.setFieldsValue({ description: '' });
     }
-  }, [visible]);
+  }, [open, form]);
 
   const onAdd = () => {
     form.validateFields().then((values) => {
@@ -36,7 +36,7 @@ const AddRoleModal: FC<AddRoleModalProps> = (props) => {
     <RoleModal
       form={form}
       width={420}
-      visible={visible}
+      open={open}
       title={intl.get('ADD_ROLE')}
       onOk={onAdd}
       onCancel={onCancel}

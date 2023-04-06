@@ -46,6 +46,7 @@ const SystemPage = () => {
             labelAlign={'left'}
             labelCol={{ span: 12 }}
             style={{ marginBottom: '2px' }}
+            key={item}
           >
             <Progress
               status={'normal'}

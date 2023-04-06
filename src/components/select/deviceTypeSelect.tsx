@@ -3,7 +3,7 @@ import { Select, SelectProps } from 'antd';
 import { FC, useEffect } from 'react';
 import { CaretDownOutlined } from '@ant-design/icons';
 import { SENSORS } from '../../config/assetCategory.config';
-import { useAssetCategoryContext } from '../../views/asset/components/assetCategoryContext';
+import { useAppConfigContext } from '../../views/asset/components/appConfigContext';
 import intl from 'react-intl-universal';
 
 const { Option, OptGroup } = Select;
@@ -15,16 +15,16 @@ export interface DeviceTypeSelectProps extends SelectProps<any> {
 
 const DeviceTypeSelect: FC<DeviceTypeSelectProps> = (props) => {
   const { sensors, children, onChange } = props;
-  const category = useAssetCategoryContext();
+  const config = useAppConfigContext();
 
   useEffect(() => {
     if (onChange && sensors) {
       onChange(sensors[0]);
     }
-  }, []);
+  }, [onChange, sensors]);
 
   const renderSensors = () => {
-    return SENSORS.get(category)?.map((item) => (
+    return SENSORS.get(config)?.map((item) => (
       <Option key={item} value={item}>
         {DeviceType.toString(item)}
       </Option>
@@ -53,7 +53,7 @@ const DeviceTypeSelect: FC<DeviceTypeSelectProps> = (props) => {
             </Option>
           </OptGroup>
           <OptGroup label={intl.get('SENSOR')} key={'sensor'}>
-            {SENSORS.get(category)?.map((item) => (
+            {SENSORS.get(config)?.map((item) => (
               <Option key={item} value={item}>
                 {intl.get(DeviceType.toString(item))}
               </Option>

@@ -1,5 +1,5 @@
 import { Header } from 'antd/es/layout/layout';
-import { Button, Col, Divider, Drawer, Dropdown, Menu, Row, Space, Typography } from 'antd';
+import { Button, Col, Divider, Drawer, Dropdown, Row, Space, Typography } from 'antd';
 import '../../App.css';
 import './layout.css';
 import '../../assets/iconfont.css';
@@ -22,7 +22,7 @@ const HeaderLayout = (props: any) => {
   const { menus } = props;
   const [currentUser] = useState<any>(store.getState().auth.data.user);
   const [now, setNow] = useState<string>(dayjs().format('YYYY-MM-DD HH:mm:ss'));
-  const [visible, setVisible] = useState(false);
+  const [open, setVisible] = useState(false);
 
   setInterval(() => {
     setNow(dayjs().format('YYYY-MM-DD HH:mm:ss'));
@@ -31,6 +31,7 @@ const HeaderLayout = (props: any) => {
   const onLogout = () => {
     persistor.purge().then((_) => {
       window.location.reload();
+      localStorage.clear();
     });
   };
 
@@ -86,21 +87,20 @@ const HeaderLayout = (props: any) => {
               </Space>
             </Dropdown>
             <Dropdown
-              overlay={
-                <Menu
-                  onClick={({ key }) => {
-                    if (key !== language) {
-                      setLocale((prev) => ({
-                        ...prev,
-                        language: key as Language
-                      }));
-                    }
-                  }}
-                >
-                  <Menu.Item key='zh-CN'>中</Menu.Item>
-                  <Menu.Item key='en-US'>EN</Menu.Item>
-                </Menu>
-              }
+              menu={{
+                items: [
+                  { key: 'zh-CN', label: '中' },
+                  { key: 'en-US', label: 'EN' }
+                ],
+                onClick: ({ key }) => {
+                  if (key !== language) {
+                    setLocale((prev) => ({
+                      ...prev,
+                      language: key as Language
+                    }));
+                  }
+                }
+              }}
             >
               <Button
                 type={'text'}
@@ -123,7 +123,7 @@ const HeaderLayout = (props: any) => {
           <UserOutlined />
         </Dropdown>
         <Drawer
-          open={visible}
+          open={open}
           placement='left'
           width='60%'
           closable={false}

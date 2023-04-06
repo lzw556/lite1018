@@ -1,7 +1,7 @@
 import { Device } from '../../../../types/device';
 import { FC, useCallback, useEffect, useState } from 'react';
-import { Col, Row, Space, DatePicker, Button } from 'antd';
-import dayjs, { Dayjs } from '../../../../utils/dayjsUtils';
+import { Col, Row, Space, Button } from 'antd';
+import dayjs from '../../../../utils/dayjsUtils';
 import { Content } from 'antd/es/layout/layout';
 import { BatchDeleteDeviceEventsRequest, PagingDeviceEventsRequest } from '../../../../apis/device';
 import TableLayout from '../../../layout/TableLayout';
@@ -9,16 +9,14 @@ import HasPermission from '../../../../permission';
 import usePermission, { Permission } from '../../../../permission/permission';
 import { store } from '../../../../store';
 import intl from 'react-intl-universal';
-
-const { RangePicker } = DatePicker;
+import { RangeDatePicker } from '../../../../components/rangeDatePicker';
 
 export interface DeviceEventProps {
   device: Device;
 }
 
 const DeviceEvent: FC<DeviceEventProps> = ({ device }) => {
-  const [startDate, setStartDate] = useState<Dayjs>(dayjs().startOf('day').subtract(7, 'd'));
-  const [endDate, setEndDate] = useState<Dayjs>(dayjs().endOf('day'));
+  const [range, setRange] = useState<[number, number]>();
   const [dataSource, setDataSource] = useState<any>();
   const [selectedRowKeys, setSelectedRowKeys] = useState<any[]>([]);
   const { hasPermission } = usePermission();
@@ -28,15 +26,12 @@ const DeviceEvent: FC<DeviceEventProps> = ({ device }) => {
 
   const fetchDeviceEvents = useCallback(
     (current: number, size: number) => {
-      PagingDeviceEventsRequest(
-        device.id,
-        startDate.utc().unix(),
-        endDate.utc().unix(),
-        current,
-        size
-      ).then(setDataSource);
+      if (range) {
+        const [from, to] = range;
+        PagingDeviceEventsRequest(device.id, from, to, current, size).then(setDataSource);
+      }
     },
-    [startDate, endDate]
+    [range, device.id]
   );
 
   useEffect(() => {
@@ -112,15 +107,8 @@ const DeviceEvent: FC<DeviceEventProps> = ({ device }) => {
           <Row justify='end'>
             <Col span={24} style={{ textAlign: 'right' }}>
               <Space style={{ textAlign: 'center' }}>
-                <RangePicker
-                  allowClear={false}
-                  value={[startDate, endDate]}
-                  onChange={(date, dateString) => {
-                    if (date) {
-                      setStartDate(dayjs(date[0]));
-                      setEndDate(dayjs(date[1]));
-                    }
-                  }}
+                <RangeDatePicker
+                  onChange={useCallback((range: [number, number]) => setRange(range), [])}
                 />
               </Space>
             </Col>

@@ -1,13 +1,13 @@
-import { DatePicker, Form, Modal, ModalProps, Select } from 'antd';
-import { FC, useEffect, useState } from 'react';
+import { Form, Modal, ModalProps, Select } from 'antd';
+import { FC, useEffect } from 'react';
 import { DownloadDeviceDataRequest } from '../../../../../apis/device';
-import dayjs, { Dayjs } from '../../../../../utils/dayjsUtils';
 import { Device } from '../../../../../types/device';
 import { getSpecificProperties } from '../../../util';
 import intl from 'react-intl-universal';
 import { useLocaleContext } from '../../../../../localeProvider';
+import { RangeDatePicker } from '../../../../../components/rangeDatePicker';
+import React from 'react';
 
-const { RangePicker } = DatePicker;
 const { Option } = Select;
 
 export interface DownloadModalProps extends ModalProps {
@@ -18,42 +18,44 @@ export interface DownloadModalProps extends ModalProps {
 }
 
 const DownloadModal: FC<DownloadModalProps> = (props) => {
-  const { visible, device, property, onSuccess } = props;
-  const [startDate, setStartDate] = useState<Dayjs>(dayjs().startOf('day').subtract(7, 'd'));
-  const [endDate, setEndDate] = useState<Dayjs>(dayjs().endOf('day'));
+  const { open, device, property, onSuccess } = props;
+  const [range, setRange] = React.useState<[number, number]>();
   const [form] = Form.useForm();
   const { language } = useLocaleContext();
 
   useEffect(() => {
-    if (visible) {
+    if (open) {
       form.setFieldsValue({
         properties: property ? [property.key] : []
       });
     }
-  }, [visible]);
+  }, [open, form, property]);
 
   const onDownload = () => {
     form.validateFields(['properties']).then((values) => {
       const pids = JSON.stringify(values.properties);
       const channel = props.channel;
       const filter = channel ? { pids, channel } : { pids };
-      DownloadDeviceDataRequest(
-        device.id,
-        startDate.utc().unix(),
-        endDate.utc().unix(),
-        filter,
-        language === 'en-US' ? 'en' : 'zh'
-      ).then((res) => {
-        if (res.status === 200) {
-          const url = window.URL.createObjectURL(new Blob([res.data]));
-          const link = document.createElement('a');
-          link.href = url;
-          link.setAttribute('download', `${device.name}.xlsx`);
-          document.body.appendChild(link);
-          link.click();
-          onSuccess();
-        }
-      });
+      if (range) {
+        const [from, to] = range;
+        DownloadDeviceDataRequest(
+          device.id,
+          from,
+          to,
+          filter,
+          language === 'en-US' ? 'en' : 'zh'
+        ).then((res) => {
+          if (res.status === 200) {
+            const url = window.URL.createObjectURL(new Blob([res.data]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', `${device.name}.xlsx`);
+            document.body.appendChild(link);
+            link.click();
+            onSuccess();
+          }
+        });
+      }
     });
   };
 
@@ -84,16 +86,8 @@ const DownloadModal: FC<DownloadModalProps> = (props) => {
           </Select>
         </Form.Item>
         <Form.Item label={intl.get('DATE_RANGE')} required>
-          <RangePicker
-            allowClear={false}
-            style={{ width: '252px' }}
-            value={[startDate, endDate]}
-            onChange={(_, dateString) => {
-              if (dateString) {
-                setStartDate(dayjs(dateString[0]).startOf('day'));
-                setEndDate(dayjs(dateString[1]).endOf('day'));
-              }
-            }}
+          <RangeDatePicker
+            onChange={React.useCallback((range: [number, number]) => setRange(range), [])}
           />
         </Form.Item>
       </Form>

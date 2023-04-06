@@ -1,7 +1,6 @@
 import { Form, Input, message, Modal, ModalProps, Typography } from 'antd';
 import { Project } from '../../types/project';
 import { FC, useEffect, useState } from 'react';
-import { defaultValidateMessages } from '../../constants/validator';
 import { CreateProjectRequest, UpdateProjectRequest } from '../../apis/project';
 import intl from 'react-intl-universal';
 import { FormInputItem } from '../../components/formInputItem';
@@ -12,12 +11,12 @@ export interface EditProjectModalProps extends ModalProps {
 }
 
 const EditProjectModal: FC<EditProjectModalProps> = (props) => {
-  const { project, visible, onSuccess } = props;
+  const { project, open, onSuccess } = props;
   const [isLoading, setIsLoading] = useState(false);
   const [form] = Form.useForm();
 
   useEffect(() => {
-    if (visible) {
+    if (open) {
       if (project) {
         form.setFieldsValue({
           name: project.name,
@@ -30,7 +29,7 @@ const EditProjectModal: FC<EditProjectModalProps> = (props) => {
         });
       }
     }
-  }, [visible]);
+  }, [open, form, project]);
 
   const onAdd = () => {
     form
@@ -74,7 +73,7 @@ const EditProjectModal: FC<EditProjectModalProps> = (props) => {
       onOk={project ? onSave : onAdd}
       confirmLoading={isLoading}
     >
-      <Form form={form} labelCol={{ span: 4 }} validateMessages={defaultValidateMessages}>
+      <Form form={form} labelCol={{ span: 4 }}>
         <FormInputItem
           name='name'
           label={intl.get('NAME')}

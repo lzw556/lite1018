@@ -1,7 +1,7 @@
 import React from 'react';
 import { useLocation } from 'react-router-dom';
-import { AssetCategory, AssetRow, getAssets } from '..';
-import { ROOT_ASSETS } from '../../../config/assetCategory.config';
+import { AssetRow, getAssets } from '..';
+import { useAssetCategoryChain } from '../../../config/assetCategory.config';
 
 const AssetsContext = React.createContext<{
   assets: AssetRow[];
@@ -10,18 +10,14 @@ const AssetsContext = React.createContext<{
 
 export const useAssetsContext = () => React.useContext(AssetsContext);
 
-export function AssetsContextProvider({
-  category,
-  children
-}: {
-  category: AssetCategory;
-  children?: JSX.Element;
-}) {
+export function AssetsContextProvider({ children }: { children?: JSX.Element }) {
   const { pathname } = useLocation();
   const [assets, setAssets] = React.useState<AssetRow[]>([]);
+
+  const { root } = useAssetCategoryChain();
   const refresh = React.useCallback(() => {
-    getAssets({ type: ROOT_ASSETS.get(category) }).then(setAssets);
-  }, [category]);
+    getAssets({ type: root.key, parent_id: 0 }).then(setAssets);
+  }, [root.key]);
   React.useEffect(() => {
     refresh();
   }, [pathname, refresh]);

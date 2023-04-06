@@ -1,7 +1,7 @@
-import dayjs from '../utils/dayjsUtils';
 import * as React from 'react';
 import { PagedOption } from '../types/props';
 import { Filters } from '../views/device/util';
+import { oneWeekNumberRange } from '../components/rangeDatePicker';
 
 export type Store = {
   deviceList: {
@@ -45,10 +45,7 @@ export function useStore<ReturnType extends keyof Store>(
     alarmRecordList: {
       ...defaultOptions,
       alertLevels: [1, 2, 3],
-      range: [
-        dayjs().subtract(1, 'd').startOf('day').utc().unix(),
-        dayjs().endOf('day').utc().unix()
-      ]
+      range: oneWeekNumberRange
     },
     projectList: { ...defaultOptions },
     accountList: { ...defaultOptions },
