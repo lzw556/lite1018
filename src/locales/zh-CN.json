@@ -908,5 +908,6 @@
   "WIND_TURBINE_BOLT_MONITORING_SYSTEM": "风电螺栓监测系统",
   "WIND_TURBINE_LC": "风机",
   "WSN_MODE": "组网模式",
-  "ZERO_CALIBRATE": "零点校准"
+  "ZERO_CALIBRATE": "零点校准",
+  "DEVICE_TYPE_WIRED_VIBRATION": "有线三轴振动温度传感器(MEMS)"
 }

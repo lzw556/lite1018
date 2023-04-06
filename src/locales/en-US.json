@@ -908,5 +908,6 @@
   "WIND_TURBINE_BOLT_MONITORING_SYSTEM": "Wind Turbine Bolt Monitoring System",
   "WIND_TURBINE_LC": "wind turbine",
   "WSN_MODE": "WSN Mode",
-  "ZERO_CALIBRATE": "Zero Calibrate"
+  "ZERO_CALIBRATE": "Zero Calibrate",
+  "DEVICE_TYPE_WIRED_VIBRATION": "Wired 3-Axis Vibration (MEMS)"
 }
