@@ -2,6 +2,7 @@ import { DeviceType } from '../types/device_type';
 
 export const FIRST_CLASS_PROPERTIES = [
   { typeId: DeviceType.BoltLoosening, properties: ['loosening_angle', 'attitude', 'motion'] },
+  { typeId: DeviceType.BoltLooseningWIRED, properties: ['loosening_angle', 'attitude', 'motion'] },
   { typeId: DeviceType.BoltElongation, properties: ['preload', 'pressure', 'temperature'] },
   {
     typeId: DeviceType.BoltElongation4Channels,
@@ -28,7 +29,10 @@ export const FIRST_CLASS_PROPERTIES = [
     properties: ['thickness', 'temperature', 'annualized_corrosion_rate']
   },
   { typeId: DeviceType.Pressure, properties: ['pressure'] },
+  { typeId: DeviceType.PressureGuoDa, properties: ['pressure'] },
+  { typeId: DeviceType.PressureWoErKe, properties: ['pressure', 'temperature'] },
   { typeId: DeviceType.PressureTemperature, properties: ['pressure', 'temperature'] },
+  { typeId: DeviceType.PressureTemperatureWIRED, properties: ['pressure', 'temperature'] },
   { typeId: DeviceType.AngleDip, properties: ['inclination', 'pitch', 'roll'] },
   { typeId: DeviceType.AngleDipNB, properties: ['inclination', 'pitch', 'roll'] },
   {
@@ -40,6 +44,7 @@ export const FIRST_CLASS_PROPERTIES = [
     properties: ['vibration_severity_y', 'enveloping_pk2pk_y', 'temperature']
   },
   { typeId: DeviceType.Temperature, properties: ['temperature'] },
+  { typeId: DeviceType.TemperatureWIRED, properties: ['temperature'] },
   {
     typeId: DeviceType.VibrationTemperature3AxisWIRED,
     properties: ['vibration_severity_y', 'enveloping_pk2pk_y', 'temperature']

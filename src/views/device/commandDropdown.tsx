@@ -109,7 +109,10 @@ export const CommandDropdown = ({
       typeId === DeviceType.BoltElongation ||
       DeviceType.isMultiChannel(typeId) ||
       typeId === DeviceType.Pressure ||
-      typeId === DeviceType.PressureTemperature
+      typeId === DeviceType.PressureGuoDa ||
+      typeId === DeviceType.PressureWoErKe ||
+      typeId === DeviceType.PressureTemperature ||
+      typeId === DeviceType.PressureTemperatureWIRED
     ) {
       items.push({ key: DeviceCommand.Calibrate, label: intl.get('CALIBRATE') });
     }

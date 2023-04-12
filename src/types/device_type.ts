@@ -2,6 +2,7 @@ export enum DeviceType {
   Gateway = 1,
   Router = 257,
   BoltLoosening = 131073,
+  BoltLooseningWIRED = 131329,
   BoltElongation = 196609,
   BoltElongation4Channels = 196611,
   BoltElongation8Channels = 196612,
@@ -13,8 +14,12 @@ export enum DeviceType {
   VibrationTemperature3AxisAdvancedNB = 327942,
   VibrationTemperature3AxisWIRED = 328193,
   Temperature = 393217,
+  TemperatureWIRED = 393473,
   Pressure = 524289,
+  PressureGuoDa = 16777217,
+  PressureWoErKe = 16777218,
   PressureTemperature = 524290,
+  PressureTemperatureWIRED = 524546,
   AngleDip = 589825,
   AngleDipNB = 589826
 }
@@ -34,6 +39,8 @@ export namespace DeviceType {
         return 'DEVICE_TYPE_8_CHANNEL_BOLT_PRELOAD';
       case DeviceType.BoltLoosening:
         return 'DEVICE_TYPE_BOLT_LOOSENING';
+      case DeviceType.BoltLooseningWIRED:
+        return 'DEVICE_TYPE_WIRED_BOLT_LOOSENING';
       case DeviceType.HighTemperatureCorrosion:
         return 'DEVICE_TYPE_HIGH_TEMPATURE_CORROSION';
       case DeviceType.NormalTemperatureCorrosion:
@@ -50,10 +57,18 @@ export namespace DeviceType {
         return 'DEVICE_TYPE_WIRED_VIBRATION';
       case DeviceType.Temperature:
         return 'DEVICE_TYPE_TEMPERATURE';
+      case DeviceType.TemperatureWIRED:
+        return 'DEVICE_TYPE_WIRED_TEMPERATURE';
       case DeviceType.Pressure:
         return 'DEVICE_TYPE_PRESSURE';
+      case DeviceType.PressureGuoDa:
+        return 'DEVICE_TYPE_GUODA_PRESSURE';
+      case DeviceType.PressureWoErKe:
+        return 'DEVICE_TYPE_WOERKE_PRESSURE';
       case DeviceType.PressureTemperature:
         return 'DEVICE_TYPE_PRESSURE_TEMPERATURE';
+      case DeviceType.PressureTemperatureWIRED:
+        return 'DEVICE_TYPE_WIRED_PRESSURE_TEMPERATURE';
       case DeviceType.AngleDip:
         return 'DEVICE_TYPE_INCLINATION';
       case DeviceType.AngleDipNB:
@@ -66,6 +81,7 @@ export namespace DeviceType {
   export function sensors() {
     return [
       DeviceType.BoltLoosening,
+      DeviceType.BoltLooseningWIRED,
       DeviceType.BoltElongation,
       DeviceType.BoltElongation4Channels,
       DeviceType.BoltElongation8Channels,
@@ -77,8 +93,12 @@ export namespace DeviceType {
       DeviceType.VibrationTemperature3AxisAdvancedNB,
       DeviceType.VibrationTemperature3AxisWIRED,
       DeviceType.Temperature,
+      DeviceType.TemperatureWIRED,
       DeviceType.Pressure,
+      DeviceType.PressureGuoDa,
+      DeviceType.PressureWoErKe,
       DeviceType.PressureTemperature,
+      DeviceType.PressureTemperatureWIRED,
       DeviceType.AngleDip,
       DeviceType.AngleDipNB
     ];

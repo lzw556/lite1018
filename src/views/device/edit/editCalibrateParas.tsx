@@ -25,9 +25,12 @@ const EditCalibrateParas = ({
   typeParaMapping.set(DeviceType.NormalTemperatureCorrosion, 'thickness');
   typeParaMapping.set(DeviceType.HighTemperatureCorrosion, 'thickness');
   typeParaMapping.set(DeviceType.Pressure, 'pressure');
+  typeParaMapping.set(DeviceType.PressureGuoDa, 'pressure');
+  typeParaMapping.set(DeviceType.PressureWoErKe, 'pressure');
   typeParaMapping.set(DeviceType.PressureTemperature, 'pressure');
+  typeParaMapping.set(DeviceType.PressureTemperatureWIRED, 'pressure');
   const property = properties.find((pro) => pro.key === typeParaMapping.get(typeId));
-  const isSPT = typeId === DeviceType.PressureTemperature;
+  const isSPT = typeId === DeviceType.PressureTemperature || DeviceType.PressureTemperatureWIRED;
   const channels = DeviceType.isMultiChannel(typeId, true);
 
   function handleSubmit(param?: number) {

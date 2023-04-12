@@ -6,6 +6,7 @@ export const SITE_NAME = 'HYDRO_TURBINE_BOLT_MONITORING_SYSTEM';
 
 export const SENSORS = [
   DeviceType.BoltLoosening,
+  DeviceType.BoltLooseningWIRED,
   DeviceType.BoltElongation,
   DeviceType.BoltElongation4Channels,
   DeviceType.BoltElongation8Channels

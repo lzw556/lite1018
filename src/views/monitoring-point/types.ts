@@ -114,7 +114,10 @@ export const MONITORING_POINT_TYPE_VALUE_DYNAMIC_MAPPING = new Map([
 ]);
 
 export const MONITORING_POINT_TYPE_VALUE_DEVICE_TYPE_ID_MAPPING = new Map([
-  [MonitoringPointTypeValue.LOOSENING_ANGLE, [DeviceType.BoltLoosening]],
+  [
+    MonitoringPointTypeValue.LOOSENING_ANGLE,
+    [DeviceType.BoltLoosening, DeviceType.BoltLooseningWIRED]
+  ],
   [
     MonitoringPointTypeValue.THICKNESS,
     [DeviceType.NormalTemperatureCorrosion, DeviceType.HighTemperatureCorrosion]
@@ -137,12 +140,21 @@ export const MONITORING_POINT_TYPE_VALUE_DEVICE_TYPE_ID_MAPPING = new Map([
     ]
   ],
   [MonitoringPointTypeValue.ANGLE_DIP, [DeviceType.AngleDip]],
-  [MonitoringPointTypeValue.PRESSURE, [DeviceType.Pressure]],
+  [
+    MonitoringPointTypeValue.PRESSURE,
+    [
+      DeviceType.Pressure,
+      DeviceType.PressureTemperature,
+      DeviceType.PressureTemperatureWIRED,
+      DeviceType.PressureGuoDa,
+      DeviceType.PressureWoErKe
+    ]
+  ],
   [
     MonitoringPointTypeValue.PRESSURE_TEMPERATURE,
-    [DeviceType.Pressure, DeviceType.PressureTemperature]
+    [DeviceType.PressureTemperature, DeviceType.PressureTemperatureWIRED, DeviceType.PressureWoErKe]
   ],
-  [MonitoringPointTypeValue.TEMPERATURE, [DeviceType.Temperature]],
+  [MonitoringPointTypeValue.TEMPERATURE, [DeviceType.Temperature, DeviceType.TemperatureWIRED]],
   [
     MonitoringPointTypeValue.FLANGE_PRELOAD,
     [
