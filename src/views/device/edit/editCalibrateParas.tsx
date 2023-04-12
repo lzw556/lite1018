@@ -49,6 +49,7 @@ const EditCalibrateParas = ({
         width={420}
         open={open}
         title={intl.get('CALIBRATION_PARAMETERS')}
+        onCancel={() => setVisible(false)}
         footer={[
           <Button key='cancel' onClick={() => setVisible(false)}>
             {intl.get('CANCEL')}
