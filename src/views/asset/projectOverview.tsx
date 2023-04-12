@@ -159,7 +159,7 @@ export default function ProjectOverview() {
           return (
             <Introduction
               {...{
-                count: <NameValueGroups items={statistics} />,
+                count: <NameValueGroups items={statistics} col={{ span: 18 }} />,
                 title: {
                   name: item.name,
                   path: `/${ASSET_PATHNAME}/${item.id}`,

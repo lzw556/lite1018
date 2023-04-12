@@ -18,6 +18,7 @@ const InformationCard: FC<GatewayInformationProps> = ({ device, isLoading }) => 
   useEffect(() => {
     PubSub.subscribe(SocketTopic.upgradeStatus, (msg: string, status: any) => {
       if (device.macAddress === status.macAddress) {
+        console.log('upgradeStatus:', status);
         setUpgradeStatus({ code: status.code, progress: status.progress });
       }
     });

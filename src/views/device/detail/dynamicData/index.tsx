@@ -26,6 +26,8 @@ import ShadowCard from '../../../../components/shadowCard';
 import intl from 'react-intl-universal';
 import { oneWeekNumberRange, RangeDatePicker } from '../../../../components/rangeDatePicker';
 import { useLocaleContext } from '../../../../localeProvider';
+import { NameValueGroups } from '../../../../components/name-values';
+import { getMetaProperty } from '../../../monitoring-point/show/dynamicData/dynamicDataContent';
 
 export const DynamicData: React.FC<Device> = ({ id, typeId }) => {
   const { language } = useLocaleContext();
@@ -191,41 +193,21 @@ export const DynamicData: React.FC<Device> = ({ id, typeId }) => {
       const meta = data.values.metadata;
       if ('min_preload' in meta) {
         return (
-          <Row>
-            {DYNAMIC_DATA_BOLTELONGATION.metaData.map((item) => (
-              <Col span={isMobile ? 12 : 8}>
-                <Row>
-                  <Col span={isMobile ? 24 : 8} className='ts-detail-label'>
-                    {item.label}
-                  </Col>
-                  <Col span={isMobile ? 24 : 16} className='ts-detail-content'>
-                    {meta[item.value] !== null && meta[item.value] !== undefined
-                      ? `${meta[item.value] !== 0 ? meta[item.value].toFixed(3) : 0}${item.unit}`
-                      : '-'}
-                  </Col>
-                </Row>
-              </Col>
-            ))}
-          </Row>
+          <NameValueGroups
+            items={DYNAMIC_DATA_BOLTELONGATION.metaData.map(({ label, value, unit }) => ({
+              name: label,
+              value: getMetaProperty(meta, value, unit)
+            }))}
+          />
         );
       } else {
         return (
-          <Row>
-            {DYNAMIC_DATA_ANGLEDIP.metaData.map((item) => (
-              <Col span={isMobile ? 12 : 8}>
-                <Row>
-                  <Col span={isMobile ? 24 : 8} className='ts-detail-label'>
-                    {item.label}
-                  </Col>
-                  <Col span={isMobile ? 24 : 16} className='ts-detail-content'>
-                    {meta[item.value] !== null && meta[item.value] !== undefined
-                      ? `${meta[item.value] !== 0 ? meta[item.value].toFixed(3) : 0}${item.unit}`
-                      : '-'}
-                  </Col>
-                </Row>
-              </Col>
-            ))}
-          </Row>
+          <NameValueGroups
+            items={DYNAMIC_DATA_ANGLEDIP.metaData.map(({ label, value, unit }) => ({
+              name: label,
+              value: getMetaProperty(meta, value, unit)
+            }))}
+          />
         );
       }
     }

@@ -1,25 +1,40 @@
 import React from 'react';
 import './name-values.css';
+import { Col, ColProps, Row, RowProps } from 'antd';
 
 export const NameValueGroups = ({
-  className,
   items,
-  horizontal
+  namePercentage,
+  col,
+  gutter
 }: {
   className?: string;
-  horizontal?: boolean;
+  namePercentage?: number;
+  col?: ColProps;
+  gutter?: RowProps['gutter'];
   items: { name: string; value: React.ReactNode; className?: string }[];
 }) => {
-  let classes = `name-value-groups ${className}`;
-  if (horizontal) classes += ` horizontal`;
+  let nameStyle: React.CSSProperties | undefined,
+    valueStyle: React.CSSProperties | undefined = undefined;
+  if (namePercentage) {
+    nameStyle = { flexBasis: `${namePercentage}%` };
+    valueStyle = { flexBasis: `${100 - namePercentage}%` };
+  }
   return (
-    <dl className={classes}>
-      {items.map(({ name, value, className }) => (
-        <div className={`name-value ${className}`} key={name}>
-          <dt>{name}</dt>
-          <dd>{value}</dd>
-        </div>
-      ))}
+    <dl className='name-value-groups'>
+      <Row gutter={gutter}>
+        {items.map(({ name, value, className }) => (
+          <Col
+            className={`${className ? `name-value ${className}` : 'name-value'}`}
+            key={name}
+            {...(col ? col : { span: 24 })}
+          >
+            <dt style={{ ...nameStyle }}>{name}</dt>
+            <dd style={{ flex: '1 1 auto' }}></dd>
+            <dd style={{ ...valueStyle }}>{value}</dd>
+          </Col>
+        ))}
+      </Row>
     </dl>
   );
 };

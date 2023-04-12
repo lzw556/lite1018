@@ -1,4 +1,4 @@
-import { Col, Row, Tag } from 'antd';
+import { Tag } from 'antd';
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { NameValueGroups } from '../../../components/name-values';
@@ -34,87 +34,43 @@ export const RelatedDevices = (point: MonitoringPointRow) => {
 };
 
 function SingleDeviceInfo(props: Device & { alertLevel?: number }) {
-  const colProps = generateColProps({ xxl: 8, xl: 8, lg: 12, md: 12 });
+  const colProps = generateColProps({ xxl: 8, xl: 12, lg: 12, md: 12 });
   const { id, name, typeId, information, state, macAddress, data, alertLevel } = props;
 
   return (
     <ShadowCard>
-      <Row>
-        <Col {...colProps}>
-          <NameValueGroups
-            items={[
-              { name: intl.get('DEVICE_NAME'), value: <Link to={`/devices/${id}`}>{name}</Link> }
-            ]}
-          />
-        </Col>
-        <Col {...colProps}>
-          <NameValueGroups
-            items={[{ name: intl.get('TYPE'), value: intl.get(DeviceType.toString(typeId)) }]}
-          />
-        </Col>
-        <Col {...colProps}>
-          <NameValueGroups
-            items={[{ name: intl.get('MODEL'), value: information?.model ?? '-' }]}
-          />
-        </Col>
-        <Col {...colProps}>
-          <NameValueGroups
-            items={[{ name: intl.get('MAC_ADDRESS'), value: toMac(macAddress.toUpperCase()) }]}
-          />
-        </Col>
-        <Col {...colProps}>
-          <NameValueGroups
-            items={[
-              { name: `${intl.get('BATTERY_VOLTAGE')}(mV)`, value: state?.batteryVoltage ?? '-' }
-            ]}
-          />
-        </Col>
-        <Col {...colProps}>
-          <NameValueGroups
-            items={[
-              { name: `${intl.get('SIGNAL_STRENGTH')}(dB)`, value: state?.signalLevel ?? '-' }
-            ]}
-          />
-        </Col>
-        <Col {...colProps}>
-          <NameValueGroups
-            items={[
-              {
-                name: intl.get('STATUS'),
-                value: (
-                  <Tag color={getAlarmLevelColor(convertAlarmLevelToState(alertLevel || 0))}>
-                    {getAlarmStateText(convertAlarmLevelToState(alertLevel || 0))}
-                  </Tag>
-                )
-              }
-            ]}
-          />
-        </Col>
-        <Col {...colProps}>
-          <NameValueGroups
-            items={[
-              {
-                name: intl.get('LAST_CONNECTION_TIME'),
-                value: state?.connectedAt
-                  ? dayjs.unix(state.connectedAt).local().format('YYYY-MM-DD HH:mm:ss')
-                  : '-'
-              }
-            ]}
-          />
-        </Col>
-        <Col {...colProps}>
-          <NameValueGroups
-            items={[
-              {
-                name: intl.get('LAST_SAMPLING_TIME'),
-                value: data?.timestamp
-                  ? dayjs.unix(data.timestamp).local().format('YYYY-MM-DD HH:mm:ss')
-                  : '-'
-              }
-            ]}
-          />
-        </Col>
-      </Row>
+      <NameValueGroups
+        gutter={{ xxl: 304, xl: 256, lg: 256, md: 256 }}
+        col={{ ...colProps }}
+        items={[
+          { name: intl.get('DEVICE_NAME'), value: <Link to={`/devices/${id}`}>{name}</Link> },
+          { name: intl.get('TYPE'), value: intl.get(DeviceType.toString(typeId)) },
+          { name: intl.get('MODEL'), value: information?.model ?? '-' },
+          { name: intl.get('MAC_ADDRESS'), value: toMac(macAddress.toUpperCase()) },
+          { name: `${intl.get('BATTERY_VOLTAGE')}(mV)`, value: state?.batteryVoltage ?? '-' },
+          { name: `${intl.get('SIGNAL_STRENGTH')}(dB)`, value: state?.signalLevel ?? '-' },
+          {
+            name: intl.get('STATUS'),
+            value: (
+              <Tag color={getAlarmLevelColor(convertAlarmLevelToState(alertLevel || 0))}>
+                {getAlarmStateText(convertAlarmLevelToState(alertLevel || 0))}
+              </Tag>
+            )
+          },
+          {
+            name: intl.get('LAST_CONNECTION_TIME'),
+            value: state?.connectedAt
+              ? dayjs.unix(state.connectedAt).local().format('YYYY-MM-DD HH:mm:ss')
+              : '-'
+          },
+          {
+            name: intl.get('LAST_SAMPLING_TIME'),
+            value: data?.timestamp
+              ? dayjs.unix(data.timestamp).local().format('YYYY-MM-DD HH:mm:ss')
+              : '-'
+          }
+        ]}
+      />
     </ShadowCard>
   );
 }

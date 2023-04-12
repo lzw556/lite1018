@@ -7,6 +7,7 @@ import dayjs from '../../../utils/dayjsUtils';
 import { DeviceUpgradeRequest } from '../../../apis/device';
 import { DeviceCommand } from '../../../types/device_command';
 import intl from 'react-intl-universal';
+import { NameValueGroups } from '../../../components/name-values';
 
 export interface UpgradeModalProps {
   open: boolean;
@@ -35,26 +36,20 @@ const UpgradeModal: FC<UpgradeModalProps> = ({ open, device, onCancel, onSuccess
     if (firmware) {
       return (
         <>
-          <Divider orientation={'left'} plain>
-            {intl.get('FIRMWARE_INFO')}
-          </Divider>
-          <Row justify={'start'}>
-            <Col span={4} style={{ color: '#8a8e99' }}>
-              {intl.get('FIRMWARE_VERSION')}
-            </Col>
-            <Col span={6}>{firmware.version}</Col>
-            <Col span={4} style={{ color: '#8a8e99' }}>
-              {intl.get('HARDWARE_VERSION')}
-            </Col>
-            <Col span={6}>{firmware.productId}</Col>
-          </Row>
-          <br />
-          <Row justify={'start'}>
-            <Col span={4} style={{ color: '#8a8e99' }}>
-              {intl.get('BUILD_DATE')}
-            </Col>
-            <Col span={16}>
-              {dayjs.unix(firmware.buildTime).local().format('YYYY-MM-DD HH:mm:ss')}
+          <Divider />
+          <Row gutter={[0, 16]}>
+            <Col span={24}>
+              <NameValueGroups
+                namePercentage={30}
+                items={[
+                  { name: intl.get('FIRMWARE_VERSION'), value: firmware.version },
+                  { name: intl.get('HARDWARE_VERSION'), value: firmware.productId },
+                  {
+                    name: intl.get('BUILD_DATE'),
+                    value: dayjs.unix(firmware.buildTime).local().format('YYYY-MM-DD HH:mm:ss')
+                  }
+                ]}
+              />
             </Col>
           </Row>
         </>

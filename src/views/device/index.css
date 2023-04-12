@@ -4,14 +4,6 @@
   box-shadow: 0 -1px 0 0 #e8e8e8 inset;
 }
 
-.ts-detail-label {
-  line-height: 30px;
-  color: #8a8e99;
-}
-.ts-detail-content {
-  line-height: 30px;
-}
-
 .ts-setting-grid {
   width: 50%;
 }

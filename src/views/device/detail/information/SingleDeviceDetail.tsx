@@ -1,14 +1,14 @@
-import { Col, Row, Space, Typography } from 'antd';
+import { Space, Typography } from 'antd';
 import dayjs from '../../../../utils/dayjsUtils';
 import * as React from 'react';
 import { Device } from '../../../../types/device';
 import { DeviceType } from '../../../../types/device_type';
-import { isMobile } from '../../../../utils/deviceDetection';
 import { SingleDeviceStatus } from '../../SingleDeviceStatus';
 import DeviceUpgradeSpin from '../../spin/deviceUpgradeSpin';
 import intl from 'react-intl-universal';
 import { Link } from 'react-router-dom';
 import { toMac } from '../../../../utils/format';
+import { NameValueGroups } from '../../../../components/name-values';
 
 const { Text } = Typography;
 
@@ -16,194 +16,105 @@ export const SingleDeviceDetail: React.FC<{ device: Device; upgradeStatus: any }
   device,
   upgradeStatus
 }) => {
-  const render = (isGateway: boolean) => {
-    if (device.information.iccid_4g) {
-      return (
-        <Col span={isMobile ? 12 : 9}>
-          <Row>
-            <Col span={isMobile ? 24 : 8} className='ts-detail-label'>
-              {intl.get('4G_CARD_NO')}
-            </Col>
-            <Col span={isMobile ? 24 : 16} className='ts-detail-content'>
-              {device.information.iccid_4g}
-            </Col>
-          </Row>
-        </Col>
-      );
-    } else if (device.information.ip_address) {
-      return (
-        <Col span={isMobile ? 12 : 9}>
-          <Row>
-            <Col span={isMobile ? 24 : 8} className='ts-detail-label'>
-              {intl.get('IP_ADDRESS')}
-            </Col>
-            <Col span={isMobile ? 24 : 16} className='ts-detail-content'>
-              {device.information.ip_address ? (
-                <Space>
-                  {device.information.ip_address}{' '}
-                  <Link
-                    to={`http://${device.information.ip_address}`}
-                    target={'_blank'}
-                    style={{ fontSize: '10pt' }}
-                  >
-                    {intl.get('GO_TO_ADMIN_PORTAL')}
-                  </Link>
-                </Space>
-              ) : (
-                '-'
-              )}
-            </Col>
-          </Row>
-        </Col>
-      );
+  const items = [
+    {
+      name: intl.get('DEVICE_NAME'),
+      value: (
+        <Space>
+          {device.name}
+          {upgradeStatus && <DeviceUpgradeSpin status={upgradeStatus} />}
+        </Space>
+      )
+    },
+    {
+      name: intl.get('TYPE'),
+      value: intl.get(DeviceType.toString(device.typeId))
+    },
+    {
+      name: intl.get('MAC_ADDRESS'),
+      value: (
+        <Text
+          copyable={{
+            text: device.macAddress,
+            tooltips: [intl.get('COPY'), intl.get('COPY_SUCCEEDED')]
+          }}
+        >
+          {toMac(device.macAddress.toUpperCase())}
+        </Text>
+      )
+    },
+    {
+      name: intl.get('MODEL'),
+      value: device.information.model ? device.information.model : '-'
+    },
+    {
+      name: intl.get('STATUS'),
+      value: <SingleDeviceStatus alertStates={device.alertStates} state={device.state} />
     }
-  };
-
+  ];
+  if (device.state && !DeviceType.isMultiChannel(device.typeId)) {
+    items.push({
+      name: intl.get('NETWORK_BELONG_TO'),
+      value: device.network ? device.network.name : intl.get('NONE')
+    });
+    if (device.typeId !== DeviceType.Gateway) {
+      items.push({
+        name: `${intl.get('BATTERY_VOLTAGE')}(mV)`,
+        value: device.state ? device.state.batteryVoltage : '-'
+      });
+    }
+  }
+  items.push({
+    name: `${intl.get('SIGNAL_STRENGTH')}(dB)`,
+    value: device.state ? device.state.signalLevel : '-'
+  });
+  items.push({
+    name: intl.get('HARDWARE_VERSION'),
+    value: device.information.firmware_version ? device.information.firmware_version : '-'
+  });
+  items.push({
+    name: intl.get('LAST_CONNECTION_TIME'),
+    value: device.state.connectedAt
+      ? dayjs(device.state.connectedAt * 1000).format('YYYY-MM-DD HH:mm:ss')
+      : '-'
+  });
+  items.push({
+    name: intl.get('PRODUCT_ID'),
+    value: device.information.product_id ? device.information.product_id : '-'
+  });
+  if (device.typeId !== DeviceType.Gateway && device.typeId !== DeviceType.Router) {
+    items.push({
+      name: intl.get('LAST_SAMPLING_TIME'),
+      value:
+        device.data && device.data.timestamp && device.data.timestamp > 0
+          ? dayjs.unix(device.data.timestamp).local().format('YYYY-MM-DD HH:mm:ss')
+          : '-'
+    });
+  }
+  if (device.information.iccid_4g) {
+    items.push({ name: intl.get('4G_CARD_NO'), value: device.information.iccid_4g });
+  } else if (device.information.ip_address) {
+    items.push({
+      name: intl.get('IP_ADDRESS'),
+      value: (
+        <Space>
+          {device.information.ip_address}{' '}
+          <Link
+            to={`http://${device.information.ip_address}`}
+            target={'_blank'}
+            style={{ fontSize: '10pt' }}
+          >
+            {intl.get('GO_TO_ADMIN_PORTAL')}
+          </Link>
+        </Space>
+      )
+    });
+  }
   return (
-    <Row justify={'start'}>
-      <Col span={isMobile ? 12 : 9}>
-        <Row>
-          <Col span={isMobile ? 24 : 8} className='ts-detail-label'>
-            {intl.get('DEVICE_NAME')}
-          </Col>
-          <Col span={isMobile ? 24 : 16} className='ts-detail-content'>
-            <Space>
-              {device.name}
-              {upgradeStatus && <DeviceUpgradeSpin status={upgradeStatus} />}
-            </Space>
-          </Col>
-        </Row>
-      </Col>
-      <Col span={isMobile ? 12 : 9}>
-        <Row>
-          <Col span={isMobile ? 24 : 8} className='ts-detail-label'>
-            {intl.get('TYPE')}
-          </Col>
-          <Col span={isMobile ? 24 : 16} className='ts-detail-content'>
-            {intl.get(DeviceType.toString(device.typeId))}
-          </Col>
-        </Row>
-      </Col>
-      <Col span={isMobile ? 12 : 9}>
-        <Row>
-          <Col span={isMobile ? 24 : 8} className='ts-detail-label'>
-            {intl.get('MAC_ADDRESS')}
-          </Col>
-          <Col span={isMobile ? 24 : 16} className='ts-detail-content'>
-            <Text
-              copyable={{
-                text: device.macAddress,
-                tooltips: [intl.get('COPY'), intl.get('COPY_SUCCEEDED')]
-              }}
-            >
-              {toMac(device.macAddress.toUpperCase())}
-            </Text>
-          </Col>
-        </Row>
-      </Col>
-      <Col span={isMobile ? 12 : 9}>
-        <Row>
-          <Col span={isMobile ? 24 : 8} className='ts-detail-label'>
-            {intl.get('MODEL')}
-          </Col>
-          <Col span={isMobile ? 24 : 16} className='ts-detail-content'>
-            {device.information.model ? device.information.model : '-'}
-          </Col>
-        </Row>
-      </Col>
-      <Col span={isMobile ? 12 : 9}>
-        <Row>
-          <Col span={isMobile ? 24 : 8} className='ts-detail-label'>
-            {intl.get('STATUS')}
-          </Col>
-          <Col span={isMobile ? 24 : 16} className='ts-detail-content'>
-            <SingleDeviceStatus alertStates={device.alertStates} state={device.state} />
-          </Col>
-        </Row>
-      </Col>
-      {device.state && !DeviceType.isMultiChannel(device.typeId) && (
-        <Col span={isMobile ? 12 : 9}>
-          <Row>
-            <Col span={isMobile ? 24 : 8} className='ts-detail-label'>
-              {intl.get('NETWORK_BELONG_TO')}
-            </Col>
-            <Col span={isMobile ? 24 : 16} className='ts-detail-content'>
-              {device.network ? device.network.name : intl.get('NONE')}
-            </Col>
-          </Row>
-        </Col>
-      )}
-      {device.state &&
-        device.typeId !== DeviceType.Gateway &&
-        !DeviceType.isMultiChannel(device.typeId) && (
-          <Col span={isMobile ? 12 : 9}>
-            <Row>
-              <Col span={isMobile ? 24 : 8} className='ts-detail-label'>
-                {intl.get('BATTERY_VOLTAGE')}(mV)
-              </Col>
-              <Col span={isMobile ? 24 : 16} className='ts-detail-content'>
-                {device.state ? device.state.batteryVoltage : '-'}
-              </Col>
-            </Row>
-          </Col>
-        )}
-      <Col span={isMobile ? 12 : 9}>
-        <Row>
-          <Col span={isMobile ? 24 : 8} className='ts-detail-label'>
-            {intl.get('SIGNAL_STRENGTH')}(dB)
-          </Col>
-          <Col span={isMobile ? 24 : 16} className='ts-detail-content'>
-            {device.state ? device.state.signalLevel : '-'}
-          </Col>
-        </Row>
-      </Col>
-      <Col span={isMobile ? 12 : 9}>
-        <Row>
-          <Col span={isMobile ? 24 : 8} className='ts-detail-label'>
-            {intl.get('HARDWARE_VERSION')}
-          </Col>
-          <Col span={isMobile ? 24 : 16} className='ts-detail-content'>
-            {device.information.firmware_version ? device.information.firmware_version : '-'}
-          </Col>
-        </Row>
-      </Col>
-      <Col span={isMobile ? 12 : 9}>
-        <Row>
-          <Col span={isMobile ? 24 : 8} className='ts-detail-label'>
-            {intl.get('LAST_CONNECTION_TIME')}
-          </Col>
-          <Col span={isMobile ? 24 : 16} className='ts-detail-content'>
-            {device.state.connectedAt
-              ? dayjs(device.state.connectedAt * 1000).format('YYYY-MM-DD HH:mm:ss')
-              : '-'}
-          </Col>
-        </Row>
-      </Col>
-      <Col span={isMobile ? 12 : 9}>
-        <Row>
-          <Col span={isMobile ? 24 : 8} className='ts-detail-label'>
-            {intl.get('PRODUCT_ID')}
-          </Col>
-          <Col span={isMobile ? 24 : 16} className='ts-detail-content'>
-            {device.information.product_id ? device.information.product_id : '-'}
-          </Col>
-        </Row>
-      </Col>
-      {device.typeId !== DeviceType.Gateway && device.typeId !== DeviceType.Router && (
-        <Col span={isMobile ? 12 : 9}>
-          <Row>
-            <Col span={isMobile ? 24 : 8} className='ts-detail-label'>
-              {intl.get('LAST_SAMPLING_TIME')}
-            </Col>
-            <Col span={isMobile ? 24 : 16} className='ts-detail-content'>
-              {device.data && device.data.timestamp && device.data.timestamp > 0
-                ? dayjs.unix(device.data.timestamp).local().format('YYYY-MM-DD HH:mm:ss')
-                : '-'}
-            </Col>
-          </Row>
-        </Col>
-      )}
-      {render(device.typeId === DeviceType.Gateway)}
-    </Row>
+    <NameValueGroups
+      items={items}
+      gutter={{ xxl: 304, xl: 256, lg: 256, md: 256 }}
+      col={{ xxl: 8, xl: 12, lg: 12, md: 12 }}
+    />
   );
 };
