@@ -1,6 +1,5 @@
 import { Header } from 'antd/es/layout/layout';
 import { Button, Col, Divider, Drawer, Dropdown, Row, Space, Typography } from 'antd';
-import '../../App.css';
 import './layout.css';
 import '../../assets/iconfont.css';
 import logo from '../../assets/images/logo-dark.png';

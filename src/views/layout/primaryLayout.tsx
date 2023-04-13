@@ -14,7 +14,6 @@ import HeaderLayout from './HeaderLayout';
 import { NavMenu } from './NavMenu';
 import { ValidateProject } from './validateProject';
 import './layout.css';
-import '../../App.css';
 import { Menu } from '../../types/menu';
 import { MENUS_HIDDEN } from '../../config/assetCategory.config';
 import { AppConfig, useAppConfigContext } from '../asset';

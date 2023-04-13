@@ -1,7 +1,6 @@
 import { Skeleton } from 'antd';
 import { FC, useEffect, useState } from 'react';
 import { Device } from '../../../../types/device';
-import '../../index.css';
 import ShadowCard from '../../../../components/shadowCard';
 import useSocket, { SocketTopic } from '../../../../socket';
 import { SingleDeviceDetail } from './SingleDeviceDetail';

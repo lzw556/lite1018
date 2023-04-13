@@ -1,5 +1,4 @@
 import { Form, Input, Modal, Select, Typography } from 'antd';
-import '../../../App.css';
 import { AddUserRequest } from '../../../apis/user';
 import { useEffect, useState } from 'react';
 import RoleSelect from '../../../components/roleSelect';

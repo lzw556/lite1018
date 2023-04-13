@@ -12,7 +12,6 @@ import {
   UpdateNetworkRequest
 } from '../../../apis/network';
 import TopologyView from './topologyView';
-import '../index.css';
 import usePermission, { Permission } from '../../../permission/permission';
 import ButtonGroup from 'antd/lib/button/button-group';
 import WsnFormItem from '../../../components/formItems/wsnFormItem';

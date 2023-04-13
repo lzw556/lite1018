@@ -4,7 +4,6 @@ import dayjs from '../../../../utils/dayjsUtils';
 import * as React from 'react';
 import { useCallback, useState } from 'react';
 import { LineChartStyles } from '../../../../constants/chart';
-import '../../../../index.css';
 import { EmptyLayout } from '../../../layout';
 import { Device } from '../../../../types/device';
 import {

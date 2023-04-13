@@ -4,7 +4,6 @@ import { Role } from '../../../types/role';
 import { GetMenusTreeRequest } from '../../../apis/menu';
 import { Menu } from '../../../types/menu';
 import { AllocMenusRequest } from '../../../apis/role';
-import '../../../assets/iconfont.css';
 import { Permission } from '../../../permission/permission';
 import HasPermission from '../../../permission';
 import intl from 'react-intl-universal';

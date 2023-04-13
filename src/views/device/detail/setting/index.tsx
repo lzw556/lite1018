@@ -1,7 +1,6 @@
 import { Radio } from 'antd';
 import { Device } from '../../../../types/device';
 import * as React from 'react';
-import '../../index.css';
 import DeviceSettings from './deviceSettings';
 import { DeviceType } from '../../../../types/device_type';
 import { BasicSettings } from './basicSettings';

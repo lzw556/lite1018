@@ -9,7 +9,6 @@ import {
   NetworkProvisionRequest
 } from '../../apis/network';
 import ShadowCard from '../../components/shadowCard';
-import './index.css';
 import TableLayout from '../layout/TableLayout';
 import AddNetworkModal from './modal/addNetworkModal';
 import { Button, Col, Dropdown, MenuProps, message, Popconfirm, Row, Space } from 'antd';

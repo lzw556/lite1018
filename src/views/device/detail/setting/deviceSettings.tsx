@@ -1,7 +1,6 @@
 import { Device } from '../../../../types/device';
 import { FC, useEffect, useState } from 'react';
 import { GetDeviceSettingRequest, UpdateDeviceSettingRequest } from '../../../../apis/device';
-import '../../index.css';
 import { Button, Col, Form, Row, Skeleton } from 'antd';
 import { DeviceSetting } from '../../../../types/device_setting';
 import { DeviceType } from '../../../../types/device_type';

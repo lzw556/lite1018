@@ -2,7 +2,6 @@ import React, { FC, useEffect, useState } from 'react';
 import { Button, Col, Form, Input, message, Row } from 'antd';
 import { LoginRequest } from '../../apis/user';
 import ad from '../../assets/images/login-ad-dark.png';
-import '../../App.css';
 import './login.css';
 import { userLoginSuccess } from '../../store/actions/userLoginSuccess';
 import { useDispatch } from 'redux-react-hook';

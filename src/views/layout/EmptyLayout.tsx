@@ -1,5 +1,4 @@
 import { Empty, EmptyProps } from 'antd';
-import '../../App.css';
 
 export interface EmptyLayoutProps extends EmptyProps {
   description: string;

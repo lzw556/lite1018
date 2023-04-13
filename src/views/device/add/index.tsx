@@ -1,7 +1,6 @@
 import { Button, Col, Form, Input, Result, Row, Space } from 'antd';
 import { Content } from 'antd/es/layout/layout';
 import { useState } from 'react';
-import '../index.css';
 import { AddDeviceRequest, GetDefaultDeviceSettingsRequest } from '../../../apis/device';
 import ShadowCard from '../../../components/shadowCard';
 import { Normalizes } from '../../../constants/validator';
