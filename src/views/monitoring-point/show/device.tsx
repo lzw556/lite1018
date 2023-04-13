@@ -40,7 +40,7 @@ function SingleDeviceInfo(props: Device & { alertLevel?: number }) {
   return (
     <ShadowCard>
       <NameValueGroups
-        gutter={{ xxl: 304, xl: 256, lg: 256, md: 256 }}
+        divider={40}
         col={{ ...colProps }}
         items={[
           { name: intl.get('DEVICE_NAME'), value: <Link to={`/devices/${id}`}>{name}</Link> },

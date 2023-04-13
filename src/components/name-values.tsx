@@ -6,10 +6,12 @@ export const NameValueGroups = ({
   items,
   namePercentage,
   col,
-  gutter
+  gutter,
+  divider
 }: {
   className?: string;
   namePercentage?: number;
+  divider?: number;
   col?: ColProps;
   gutter?: RowProps['gutter'];
   items: { name: string; value: React.ReactNode; className?: string }[];
@@ -32,6 +34,7 @@ export const NameValueGroups = ({
             <dt style={{ ...nameStyle }}>{name}</dt>
             <dd style={{ flex: '1 1 auto' }}></dd>
             <dd style={{ ...valueStyle }}>{value}</dd>
+            {divider && <dd style={{ flex: `0 0 ${divider}%` }}></dd>}
           </Col>
         ))}
       </Row>

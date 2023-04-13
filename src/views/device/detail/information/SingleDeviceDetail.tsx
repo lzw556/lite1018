@@ -69,7 +69,7 @@ export const SingleDeviceDetail: React.FC<{ device: Device; upgradeStatus: any }
     value: device.state ? device.state.signalLevel : '-'
   });
   items.push({
-    name: intl.get('HARDWARE_VERSION'),
+    name: intl.get('FIRMWARE_VERSION'),
     value: device.information.firmware_version ? device.information.firmware_version : '-'
   });
   items.push({
@@ -110,11 +110,5 @@ export const SingleDeviceDetail: React.FC<{ device: Device; upgradeStatus: any }
       )
     });
   }
-  return (
-    <NameValueGroups
-      items={items}
-      gutter={{ xxl: 304, xl: 256, lg: 256, md: 256 }}
-      col={{ xxl: 8, xl: 12, lg: 12, md: 12 }}
-    />
-  );
+  return <NameValueGroups items={items} divider={40} col={{ xxl: 8, xl: 12, lg: 12, md: 12 }} />;
 };
