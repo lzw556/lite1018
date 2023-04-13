@@ -39,11 +39,7 @@ const LoginPage: FC = () => {
       <div className={'logo'}>
         <Row justify='center' align='bottom'>
           <Col span={24}>
-            <Brand
-              height={80}
-              gap={48}
-              brandNameStyle={{ fontSize: 42, color: '#fff', letterSpacing: '10pt' }}
-            />
+            <Brand height={80} gap={48} brandNameStyle={{ fontSize: 42, letterSpacing: 12 }} />
           </Col>
         </Row>
         <br />

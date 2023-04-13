@@ -16,7 +16,7 @@ export const Brand: React.FC<{
   const [image, status] = useImage('res/logo.png');
 
   return (
-    <Space className={'ts-title'} size={gap}>
+    <Space size={gap}>
       {status === 'loaded' && (
         <img
           src={image?.src}
@@ -24,7 +24,7 @@ export const Brand: React.FC<{
           style={{ width, height, display: 'block' }}
         />
       )}
-      <strong style={brandNameStyle} className='title'>
+      <strong style={{ ...brandNameStyle, color: '#fff' }} className='title'>
         {intl.get(SITE_NAMES.get(config) ?? '')}
       </strong>
     </Space>

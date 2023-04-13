@@ -56,16 +56,14 @@ const HeaderLayout = (props: any) => {
           <Brand
             height={36}
             brandNameStyle={{
-              fontSize: '14pt',
-              color: '#fff',
-              letterSpacing: '2pt',
-              verticalAlign: -2
+              fontSize: 18,
+              letterSpacing: 2
             }}
           />
         </Col>
         <Col span={12} style={{ textAlign: 'right' }}>
           <Space>
-            <Text style={{ color: 'white' }} strong>
+            <Text style={{ color: 'white', fontFamily: 'monospace' }} strong>
               {now}
             </Text>
             {currentUser && (

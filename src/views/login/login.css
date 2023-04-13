@@ -14,12 +14,6 @@
   display: inline-block;
 }
 
-#login-page .title {
-  font-size: 32px;
-  color: white;
-  letter-spacing: 10pt;
-}
-
 #login-page .ad {
   background-image: url('../../assets/images/login-ad-dark.png');
 }

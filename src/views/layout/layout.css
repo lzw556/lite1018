@@ -6,24 +6,6 @@
   line-height: 60px;
 }
 
-.ts-header .ts-title {
-  color: white;
-  font-weight: 600;
-  letter-spacing: 2pt;
-  font-size: 14pt;
-}
-
-.ts-header .ts-menu {
-  color: white;
-  font-size: 10pt;
-  letter-spacing: 1pt;
-}
-
-.ts-breadcrumb {
-  font-weight: 600;
-  font-size: 14pt;
-}
-
 .ts-console {
   position: fixed;
   height: 100%;

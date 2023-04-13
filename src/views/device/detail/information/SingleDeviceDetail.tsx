@@ -99,11 +99,7 @@ export const SingleDeviceDetail: React.FC<{ device: Device; upgradeStatus: any }
       value: (
         <Space>
           {device.information.ip_address}{' '}
-          <Link
-            to={`http://${device.information.ip_address}`}
-            target={'_blank'}
-            style={{ fontSize: '10pt' }}
-          >
+          <Link to={`http://${device.information.ip_address}`} target={'_blank'}>
             {intl.get('GO_TO_ADMIN_PORTAL')}
           </Link>
         </Space>

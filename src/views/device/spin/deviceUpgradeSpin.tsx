@@ -10,6 +10,7 @@ export interface DeviceUpgradeSpinProps {
 }
 
 const DeviceUpgradeSpin: FC<DeviceUpgradeSpinProps> = ({ status }) => {
+  const style = { fontSize: 12, fontWeight: 400 };
   const render = () => {
     const DOWNLOAD_COMPLETE_TEXT = intl.get('FIRMWARE_DOWNLOADING_FINISHED_PROMPT');
     switch (status.code) {
@@ -17,7 +18,7 @@ const DeviceUpgradeSpin: FC<DeviceUpgradeSpinProps> = ({ status }) => {
         return (
           <>
             <Spin size={'small'} indicator={<LoadingOutlined />} spinning={true} />
-            <Text strong style={{ fontSize: '9pt', color: '#8a8e99' }}>
+            <Text strong style={{ ...style, color: '#8a8e99' }}>
               {intl.get('CONNECTING')}
             </Text>
           </>
@@ -40,7 +41,7 @@ const DeviceUpgradeSpin: FC<DeviceUpgradeSpinProps> = ({ status }) => {
             <Text
               strong
               style={{
-                fontSize: '9pt',
+                ...style,
                 color: '#8a8e99'
               }}
             >
@@ -60,7 +61,7 @@ const DeviceUpgradeSpin: FC<DeviceUpgradeSpinProps> = ({ status }) => {
             />
             <Text
               style={{
-                fontSize: '9pt',
+                ...style,
                 color: '#8a8e99'
               }}
             >
@@ -78,12 +79,7 @@ const DeviceUpgradeSpin: FC<DeviceUpgradeSpinProps> = ({ status }) => {
               strokeWidth={12}
               width={16}
             />
-            <Text
-              style={{
-                fontSize: '9pt'
-              }}
-              type={'warning'}
-            >
+            <Text style={style} type={'warning'}>
               {intl.get('UPGRADING_IS_CANCELLED')}
             </Text>
           </>
@@ -99,7 +95,7 @@ const DeviceUpgradeSpin: FC<DeviceUpgradeSpinProps> = ({ status }) => {
               width={16}
               status={'exception'}
             />
-            <Text style={{ fontSize: '9pt' }} type={'danger'}>
+            <Text style={style} type={'danger'}>
               {intl.get('UPGRADE_FIRMWARE_SUCCESSFUL')}
             </Text>
           </>
@@ -108,7 +104,7 @@ const DeviceUpgradeSpin: FC<DeviceUpgradeSpinProps> = ({ status }) => {
         return (
           <>
             <Progress type='circle' percent={status.progress} strokeWidth={12} width={16} />
-            <Text style={{ fontSize: '9pt' }} type={'success'}>
+            <Text style={style} type={'success'}>
               {intl.get('FAILED_TO_UPGRADE_FIRMWARE')}
             </Text>
           </>

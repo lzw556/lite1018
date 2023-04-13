@@ -11,7 +11,7 @@ export const PageTitle = ({
   return (
     <Row justify='space-between' align='middle' style={{ marginBottom: 10 }}>
       <Col>
-        {items && <Breadcrumb items={items} style={{ fontSize: '16pt', fontWeight: 'bold' }} />}
+        {items && <Breadcrumb items={items} style={{ fontSize: 16, fontWeight: 'bold' }} />}
       </Col>
       {actions && (
         <Col>
