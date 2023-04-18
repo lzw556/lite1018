@@ -60,7 +60,7 @@ export default function ReportList() {
                   const url = window.URL.createObjectURL(new Blob([res.data as any]));
                   const link = document.createElement('a');
                   link.href = url;
-                  link.setAttribute('download', record.filename);
+                  link.setAttribute('download', `${record.name}.pdf`);
                   document.body.appendChild(link);
                   link.click();
                 }

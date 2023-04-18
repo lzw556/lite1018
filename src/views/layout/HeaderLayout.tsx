@@ -86,7 +86,7 @@ const HeaderLayout = (props: any) => {
             <Dropdown
               menu={{
                 items: [
-                  { key: 'zh-CN', label: '中' },
+                  { key: 'zh-CN', label: '中文' },
                   { key: 'en-US', label: 'EN' }
                 ],
                 onClick: ({ key }) => {
@@ -103,7 +103,7 @@ const HeaderLayout = (props: any) => {
                 type={'text'}
                 style={{ color: '#fff', width: 60, paddingLeft: 0, paddingRight: 0 }}
               >
-                {language === 'en-US' ? 'EN' : '中'}
+                {language === 'en-US' ? 'EN' : '中文'}
               </Button>
             </Dropdown>
           </Space>

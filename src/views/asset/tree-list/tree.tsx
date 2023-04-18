@@ -4,7 +4,7 @@ import { combineMonitoringPointToAsset } from '../common/utils';
 import './tree.css';
 import intl from 'react-intl-universal';
 import { AssertAssetCategory, AssertOfAssetCategory, AssetRow } from '../types';
-import { generateDatasOfMeasurement, MonitoringPointIcon } from '../../monitoring-point';
+import { generateDatasOfMeasurement, MonitoringPointIcon, pickId } from '../../monitoring-point';
 import { mapTree } from '../../../utils/tree';
 import { convertAlarmLevelToState } from '../common/statisticsHelper';
 import { isMobile } from '../../../utils/deviceDetection';
@@ -86,7 +86,7 @@ export const AssetTree: React.FC<{
               {!isMobile && alarmText}
               {selectedNode?.key === props.key && (
                 <NodeActions
-                  id={selectedNode.id}
+                  id={pickId(selectedNode.id)}
                   type={selectedNode.type}
                   name={selectedNode.name}
                   onSuccess={onSuccess}

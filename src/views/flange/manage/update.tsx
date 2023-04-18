@@ -18,7 +18,7 @@ export const FlangeUpdate: React.FC<
       {...{
         title: intl.get('EDIT_SOMETHING', { something: intl.get('FLANGE') }),
         cancelText: intl.get('CANCEL'),
-        okText: intl.get('EDIT'),
+        okText: intl.get('SAVE'),
         bodyStyle: { overflow: 'auto', maxHeight: 610 },
         ...props,
         onOk: () => {

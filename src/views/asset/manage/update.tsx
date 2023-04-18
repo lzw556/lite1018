@@ -20,7 +20,7 @@ export const UpdateAsset: React.FC<ModalProps & { asset: AssetRow; onSuccess: ()
       {...{
         title: intl.get('EDIT_SOMETHING', { something: intl.get(label) }),
         cancelText: intl.get('CANCEL'),
-        okText: intl.get('EDIT'),
+        okText: intl.get('SAVE'),
         ...props,
         onOk: () => {
           form.validateFields().then((values) => {

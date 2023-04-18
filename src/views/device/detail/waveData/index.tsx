@@ -16,7 +16,7 @@ import { DownloadOutlined } from '@ant-design/icons';
 import usePermission, { Permission } from '../../../../permission/permission';
 import { DeviceType } from '../../../../types/device_type';
 import intl from 'react-intl-universal';
-import { RangeDatePicker } from '../../../../components/rangeDatePicker';
+import { RangeDatePicker, oneWeekNumberRange } from '../../../../components/rangeDatePicker';
 import { useLocaleContext } from '../../../../localeProvider';
 
 const { Option } = Select;
@@ -50,7 +50,7 @@ const defaultChartOption = {
 
 const WaveDataChart: React.FC<{ device: Device }> = ({ device }) => {
   const { language } = useLocaleContext();
-  const [range, setRange] = React.useState<[number, number]>();
+  const [range, setRange] = React.useState<[number, number]>(oneWeekNumberRange);
   const [dataSource, setDataSource] = React.useState<any>();
   const [deviceData, setDeviceData] = React.useState<any>();
   const [calculate, setCalculate] = React.useState<string>('accelerationTimeDomain');
@@ -91,15 +91,20 @@ const WaveDataChart: React.FC<{ device: Device }> = ({ device }) => {
     }
   }, [range, device.id, dataType, fetchDeviceDataByTimestamp]);
 
+  const handleChange = React.useCallback((range: [number, number]) => {
+    if (checkIsRangeChanged(range)) {
+      setRange(range);
+    }
+  }, []);
+
+  function checkIsRangeChanged(range?: [number, number]) {
+    if (range === undefined) return false;
+    return range[0] !== oneWeekNumberRange[0] || range[1] !== oneWeekNumberRange[1];
+  }
+
   React.useEffect(() => {
     fetchDeviceWaveDataTimestamps();
   }, [fetchDeviceWaveDataTimestamps]);
-
-  React.useEffect(() => {
-    if (deviceData) {
-      fetchDeviceDataByTimestamp(deviceData.timestamp);
-    }
-  }, [fetchDeviceDataByTimestamp, deviceData]);
 
   const getChartTitle = () => {
     switch (calculate) {
@@ -252,8 +257,6 @@ const WaveDataChart: React.FC<{ device: Device }> = ({ device }) => {
     }
   };
 
-  const handleRangeChange = React.useCallback((range: [number, number]) => setRange(range), []);
-
   const select_fields = (
     <Select
       defaultValue={calculate}
@@ -308,7 +311,7 @@ const WaveDataChart: React.FC<{ device: Device }> = ({ device }) => {
       <>
         <Row style={{ marginBottom: 8 }}>
           <Col span={24}>
-            <RangeDatePicker onChange={handleRangeChange} />
+            <RangeDatePicker onChange={handleChange} />
           </Col>
         </Row>
         <Row style={{ marginBottom: 8 }} align='middle'>
@@ -360,7 +363,7 @@ const WaveDataChart: React.FC<{ device: Device }> = ({ device }) => {
         <Col xl={6} xxl={4} style={{ maxHeight: 500 }}>
           <Row justify={'center'} style={{ width: '100%' }}>
             <Col span={24}>
-              <RangeDatePicker onChange={handleRangeChange} />
+              <RangeDatePicker onChange={handleChange} />
             </Col>
           </Row>
           <Row justify={'space-between'} style={{ paddingTop: '0px' }}>
@@ -384,6 +387,7 @@ const WaveDataChart: React.FC<{ device: Device }> = ({ device }) => {
                   onMouseLeave: () => (window.document.body.style.cursor = 'default'),
                   onMouseEnter: () => (window.document.body.style.cursor = 'pointer')
                 })}
+                rowKey='timestamp'
               />
             </Col>
           </Row>

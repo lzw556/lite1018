@@ -14,7 +14,7 @@ import { isMobile } from '../../utils/deviceDetection';
 import { NameValueGroups } from '../../components/name-values';
 import { AlarmTrend } from './alarmTrend';
 import { INVALID_MONITORING_POINT, MONITORING_POINT } from '../monitoring-point';
-import { ASSET_PATHNAME } from './types';
+import { ASSET_PATHNAME, AssertAssetCategory, AssertOfAssetCategory } from './types';
 import { useAssetCategoryChain } from '../../config/assetCategory.config';
 
 export type ProjectStatistics = {
@@ -166,7 +166,11 @@ export default function ProjectOverview() {
                   state: state ?? rootPathState
                 },
                 alarmState,
-                icon: { svg: <AssetIcon />, small: true }
+                icon: {
+                  svg: <AssetIcon />,
+                  small: true,
+                  focus: !AssertAssetCategory(root.key, AssertOfAssetCategory.IS_WIND_LIKE)
+                }
               }}
             />
           );

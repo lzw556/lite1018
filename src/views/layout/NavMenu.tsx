@@ -29,9 +29,9 @@ export const NavMenu: React.FC<{
     const key = m.name;
     const icon = m.icon ? <span className={`iconfont ${m.icon}`} /> : null;
     if (m.children && m.children.length > 0) {
-      return { label, key, icon, children: m.children.sort(sortMenus) };
+      return { label, key, icon, sort: m.sort, children: m.children.sort(sortMenus) };
     } else {
-      return { label, key, icon };
+      return { label, key, icon, sort: m.sort };
     }
   });
 

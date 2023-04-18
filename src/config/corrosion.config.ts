@@ -2,7 +2,7 @@ import { DeviceType } from '../types/device_type';
 import { AssetCategoryChain, AssetCategoryKey, AssetCategoryLabel } from '../views/asset';
 import { MonitoringPointTypeText, MonitoringPointTypeValue } from '../views/monitoring-point';
 
-export const SITE_NAME = 'IOT_CLOUD_MONITORING_SYSTEM';
+export const SITE_NAME = 'CORROSION_MONITORING_SYSTEM';
 
 export const SENSORS = [DeviceType.NormalTemperatureCorrosion, DeviceType.HighTemperatureCorrosion];
 export const MONITORING_POINTS = [

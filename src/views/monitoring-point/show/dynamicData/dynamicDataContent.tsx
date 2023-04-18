@@ -29,8 +29,10 @@ export const DynamicDataContent = ({
   const renderMeta = () => {
     return (
       <NameValueGroups
+        col={{ span: 12 }}
+        divider={50}
         items={type.metaData.map(({ label, value, unit }) => ({
-          name: label,
+          name: intl.get(label),
           value: getMetaProperty(values.metadata, value, unit)
         }))}
       />
@@ -75,7 +77,7 @@ export const DynamicDataContent = ({
                       >
                         {fields.map(({ label, value, unit }) => (
                           <Select.Option key={value} value={value} data-unit={unit}>
-                            {intl.get(label)}
+                            {intl.get(label).d(label)}
                           </Select.Option>
                         ))}
                       </Select>

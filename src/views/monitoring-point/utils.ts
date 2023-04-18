@@ -114,7 +114,7 @@ export function generatePropertyColumns(measurement: MonitoringPointRow) {
         width: 120
       }))
       .concat({
-        title: intl.get('SAMPLE_TIME'),
+        title: intl.get('SAMPLING_TIME'),
         key: 'timestamp',
         render: (measurement: MonitoringPointRow) => {
           return measurement.data && measurement.data.timestamp
