@@ -6,9 +6,11 @@ import * as Corrosion from './corrosion.config';
 import * as General from './general.config';
 import * as Hydro from './hydro.config';
 import * as Wind from './wind.config';
+import * as CorrosionWirelessHart from './corrosionWirelessHart.config';
 
 export const SITE_NAMES: Map<AppConfig, string> = new Map([
   ['corrosion', Corrosion.SITE_NAME],
+  ['corrosionWirelessHART', CorrosionWirelessHart.SITE_NAME],
   ['general', General.SITE_NAME],
   ['hydroTurbine', Hydro.SITE_NAME],
   ['windTurbine', Wind.SITE_NAME]
@@ -16,6 +18,7 @@ export const SITE_NAMES: Map<AppConfig, string> = new Map([
 
 export const SENSORS: Map<AppConfig, DeviceType[]> = new Map([
   ['corrosion', Corrosion.SENSORS],
+  ['corrosionWirelessHART', CorrosionWirelessHart.SENSORS],
   ['general', General.SENSORS],
   ['hydroTurbine', Hydro.SENSORS],
   ['windTurbine', Wind.SENSORS]
@@ -23,6 +26,7 @@ export const SENSORS: Map<AppConfig, DeviceType[]> = new Map([
 
 export const MONITORING_POINTS: Map<AppConfig, MonitoringPointType[]> = new Map([
   ['corrosion', Corrosion.MONITORING_POINTS],
+  ['corrosionWirelessHART', CorrosionWirelessHart.MONITORING_POINTS],
   ['general', General.MONITORING_POINTS],
   ['hydroTurbine', Hydro.MONITORING_POINTS],
   ['windTurbine', Wind.MONITORING_POINTS]
@@ -30,6 +34,7 @@ export const MONITORING_POINTS: Map<AppConfig, MonitoringPointType[]> = new Map(
 
 export const MENUS_HIDDEN: Map<AppConfig, string[]> = new Map([
   ['corrosion', Corrosion.MENUS_HIDDEN],
+  ['corrosionWirelessHART', CorrosionWirelessHart.MENUS_HIDDEN],
   ['general', General.MENUS_HIDDEN],
   ['hydroTurbine', Hydro.MENUS_HIDDEN],
   ['windTurbine', Wind.MENUS_HIDDEN]
@@ -37,6 +42,7 @@ export const MENUS_HIDDEN: Map<AppConfig, string[]> = new Map([
 
 export const ASSET_CATEGORY_CHAINS: Map<AppConfig, AssetCategoryChain[]> = new Map([
   ['corrosion', Corrosion.ASSET_CATEGORY_CHAIN],
+  ['corrosionWirelessHART', CorrosionWirelessHart.ASSET_CATEGORY_CHAIN],
   ['general', General.ASSET_CATEGORY_CHAIN],
   ['hydroTurbine', Hydro.ASSET_CATEGORY_CHAIN],
   ['windTurbine', Wind.ASSET_CATEGORY_CHAIN]

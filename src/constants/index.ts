@@ -376,3 +376,38 @@ export const SAMPLING_OFFSET = [
     text: 'OPTION_20_HOURS'
   }
 ];
+
+export const WIRELESS_HART_POLLING_PERIOD = [
+  {
+    value: 30 * millisecond,
+    text: 'OPTION_30_SECONDS'
+  },
+  {
+    value: 60 * millisecond,
+    text: 'OPTION_1_MINUTE'
+  },
+  {
+    value: 2 * 60 * millisecond,
+    text: 'OPTION_2_MINUTES'
+  },
+  {
+    value: 5 * 60 * millisecond,
+    text: 'OPTION_5_MINUTES'
+  },
+  {
+    value: 10 * 60 * millisecond,
+    text: 'OPTION_10_MINUTES'
+  },
+  {
+    value: 30 * 60 * millisecond,
+    text: 'OPTION_30_MINUTES'
+  },
+  {
+    value: 60 * 60 * millisecond,
+    text: 'OPTION_1_HOUR'
+  },
+  {
+    value: 2 * 60 * 60 * millisecond,
+    text: 'OPTION_2_HOURS'
+  }
+];

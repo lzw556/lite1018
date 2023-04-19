@@ -42,16 +42,20 @@ const DeviceTypeSelect: FC<DeviceTypeSelectProps> = (props) => {
     } else {
       return (
         <Select {...props}>
-          <OptGroup label={intl.get('GATEWAY')} key={'gateway'}>
-            <Option key={1} value={1}>
-              {intl.get(DeviceType.toString(DeviceType.Gateway))}
-            </Option>
-          </OptGroup>
-          <OptGroup label={intl.get('RELAY')} key={'router'}>
-            <Option key={257} value={257}>
-              {intl.get(DeviceType.toString(DeviceType.Router))}
-            </Option>
-          </OptGroup>
+          {config !== 'corrosionWirelessHART' && (
+            <>
+              <OptGroup label={intl.get('GATEWAY')} key={'gateway'}>
+                <Option key={1} value={1}>
+                  {intl.get(DeviceType.toString(DeviceType.Gateway))}
+                </Option>
+              </OptGroup>
+              <OptGroup label={intl.get('RELAY')} key={'router'}>
+                <Option key={257} value={257}>
+                  {intl.get(DeviceType.toString(DeviceType.Router))}
+                </Option>
+              </OptGroup>
+            </>
+          )}
           <OptGroup label={intl.get('SENSOR')} key={'sensor'}>
             {SENSORS.get(config)?.map((item) => (
               <Option key={item} value={item}>

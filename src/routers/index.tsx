@@ -18,7 +18,13 @@ import {
   ImportNetwork,
   AlarmRecord,
   AddDevice,
-  Report
+  Report,
+  DeviceWirelessHart,
+  DeviceDetailWirelessHart,
+  AddDeviceWirelessHart,
+  NetworkWirelessHart,
+  NetworkDetailWirelessHart,
+  ImportNetworkWirelessHart
 } from '../views';
 import { PrimaryLayout } from '../views/layout/primaryLayout';
 import { isLogin } from '../utils/session';
@@ -33,7 +39,7 @@ import zhCN from 'antd/es/locale/zh_CN';
 import enUS from 'antd/es/locale/en_US';
 import dayjs from '../utils/dayjsUtils';
 import 'dayjs/locale/zh-cn';
-import { AssetsContextProvider, ASSET_PATHNAME } from '../views/asset';
+import { AssetsContextProvider, ASSET_PATHNAME, useAppConfigContext } from '../views/asset';
 
 const AlarmRuleGroups = lazy(() => import('../views/alarm/alarm-group/index'));
 const CreateAlarmRuleGroups = lazy(() => import('../views/alarm/alarm-group/create'));
@@ -48,6 +54,8 @@ const FlangeShow = lazy(() => import('../views/flange/show/index'));
 const MonitoringPointShow = lazy(() => import('../views/monitoring-point/show/index'));
 
 const AppRouter = () => {
+  const config = useAppConfigContext();
+  const isWirelessHart = config === 'corrosionWirelessHART';
   const [initDone, setInitDone] = React.useState(false);
   const routes: RouteObject[] = [
     { path: '/403', element: <Unauthorized /> },
@@ -113,12 +121,24 @@ const AppRouter = () => {
             </AssetsContextProvider>
           )
         },
-        { path: 'devices', element: <Device /> },
-        { path: 'devices/:id', element: <DeviceDetail /> },
-        { path: 'devices/create', element: <AddDevice /> },
-        { path: 'networks', element: <Network /> },
-        { path: 'networks/:id', element: <NetworkDetail /> },
-        { path: 'importNetwork', element: <ImportNetwork /> },
+        { path: 'devices', element: isWirelessHart ? <DeviceWirelessHart /> : <Device /> },
+        {
+          path: 'devices/:id',
+          element: isWirelessHart ? <DeviceDetailWirelessHart /> : <DeviceDetail />
+        },
+        {
+          path: 'devices/create',
+          element: isWirelessHart ? <AddDeviceWirelessHart /> : <AddDevice />
+        },
+        { path: 'networks', element: isWirelessHart ? <NetworkWirelessHart /> : <Network /> },
+        {
+          path: 'networks/:id',
+          element: isWirelessHart ? <NetworkDetailWirelessHart /> : <NetworkDetail />
+        },
+        {
+          path: 'importNetwork',
+          element: isWirelessHart ? <ImportNetworkWirelessHart /> : <ImportNetwork />
+        },
         { path: 'firmwares', element: <Firmware /> },
         { path: 'alerts', element: <AlarmRecord /> },
         { path: 'alarmRules', element: <AlarmRuleGroups /> },

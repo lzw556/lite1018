@@ -2,7 +2,12 @@ import { Spin } from 'antd';
 import React from 'react';
 import request from '../../../utils/request';
 
-export type AppConfig = 'windTurbine' | 'general' | 'hydroTurbine' | 'corrosion';
+export type AppConfig =
+  | 'windTurbine'
+  | 'general'
+  | 'hydroTurbine'
+  | 'corrosion'
+  | 'corrosionWirelessHART';
 
 const AppConfigContext = React.createContext<AppConfig>('windTurbine');
 

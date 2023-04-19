@@ -1,11 +1,13 @@
 import { DeviceType } from './device_type';
 import { Property } from './property';
-import { AlertState } from './alert_state';
 import { Network } from './network';
 
 export type Device = {
   id: number;
   name: string;
+  ipAddress: string;
+  ipPort: number;
+  pollingPeriod: number;
   macAddress: string;
   parent: string;
   typeId: DeviceType;
@@ -19,4 +21,5 @@ export type Device = {
   properties: Property[];
   dataTypes: number[];
   data?: any;
+  tag?: string;
 };
