@@ -7,13 +7,15 @@ import * as General from './general.config';
 import * as Hydro from './hydro.config';
 import * as Wind from './wind.config';
 import * as CorrosionWirelessHart from './corrosionWirelessHart.config';
+import * as WindPro from './windpro.config';
 
 export const SITE_NAMES: Map<AppConfig, string> = new Map([
   ['corrosion', Corrosion.SITE_NAME],
   ['corrosionWirelessHART', CorrosionWirelessHart.SITE_NAME],
   ['general', General.SITE_NAME],
   ['hydroTurbine', Hydro.SITE_NAME],
-  ['windTurbine', Wind.SITE_NAME]
+  ['windTurbine', Wind.SITE_NAME],
+  ['windTurbinePro', WindPro.SITE_NAME]
 ]);
 
 export const SENSORS: Map<AppConfig, DeviceType[]> = new Map([
@@ -21,7 +23,8 @@ export const SENSORS: Map<AppConfig, DeviceType[]> = new Map([
   ['corrosionWirelessHART', CorrosionWirelessHart.SENSORS],
   ['general', General.SENSORS],
   ['hydroTurbine', Hydro.SENSORS],
-  ['windTurbine', Wind.SENSORS]
+  ['windTurbine', Wind.SENSORS],
+  ['windTurbinePro', WindPro.SENSORS]
 ]);
 
 export const MONITORING_POINTS: Map<AppConfig, MonitoringPointType[]> = new Map([
@@ -29,7 +32,8 @@ export const MONITORING_POINTS: Map<AppConfig, MonitoringPointType[]> = new Map(
   ['corrosionWirelessHART', CorrosionWirelessHart.MONITORING_POINTS],
   ['general', General.MONITORING_POINTS],
   ['hydroTurbine', Hydro.MONITORING_POINTS],
-  ['windTurbine', Wind.MONITORING_POINTS]
+  ['windTurbine', Wind.MONITORING_POINTS],
+  ['windTurbinePro', WindPro.MONITORING_POINTS]
 ]);
 
 export const MENUS_HIDDEN: Map<AppConfig, string[]> = new Map([
@@ -37,7 +41,8 @@ export const MENUS_HIDDEN: Map<AppConfig, string[]> = new Map([
   ['corrosionWirelessHART', CorrosionWirelessHart.MENUS_HIDDEN],
   ['general', General.MENUS_HIDDEN],
   ['hydroTurbine', Hydro.MENUS_HIDDEN],
-  ['windTurbine', Wind.MENUS_HIDDEN]
+  ['windTurbine', Wind.MENUS_HIDDEN],
+  ['windTurbinePro', WindPro.MENUS_HIDDEN]
 ]);
 
 export const ASSET_CATEGORY_CHAINS: Map<AppConfig, AssetCategoryChain[]> = new Map([
@@ -45,7 +50,8 @@ export const ASSET_CATEGORY_CHAINS: Map<AppConfig, AssetCategoryChain[]> = new M
   ['corrosionWirelessHART', CorrosionWirelessHart.ASSET_CATEGORY_CHAIN],
   ['general', General.ASSET_CATEGORY_CHAIN],
   ['hydroTurbine', Hydro.ASSET_CATEGORY_CHAIN],
-  ['windTurbine', Wind.ASSET_CATEGORY_CHAIN]
+  ['windTurbine', Wind.ASSET_CATEGORY_CHAIN],
+  ['windTurbinePro', WindPro.ASSET_CATEGORY_CHAIN]
 ]);
 
 export function useAssetCategoryChain() {
