@@ -65,7 +65,7 @@ export const SelectRules: React.FC<{ rules: AlarmRule[]; onSuccess: () => void }
       <Form form={form}>
         <Form.Item name='asset_ids' noStyle>
           <Checkbox.Group style={{ width: '100%' }} onChange={(values) => setSelected(values)}>
-            <Row>
+            <Row style={{ width: '100%' }}>
               {props.rules.map(({ id, name }) => (
                 <Col span={8} key={id}>
                   <Checkbox value={id}>{intl.get(name).d(name)}</Checkbox>

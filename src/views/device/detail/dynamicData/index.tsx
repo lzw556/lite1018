@@ -194,6 +194,8 @@ export const DynamicData: React.FC<Device> = ({ id, typeId }) => {
       if ('min_preload' in meta) {
         return (
           <NameValueGroups
+            col={{ span: 12 }}
+            divider={50}
             items={DYNAMIC_DATA_BOLTELONGATION.metaData.map(({ label, value, unit }) => ({
               name: label,
               value: getMetaProperty(meta, value, unit)
@@ -203,6 +205,8 @@ export const DynamicData: React.FC<Device> = ({ id, typeId }) => {
       } else {
         return (
           <NameValueGroups
+            col={{ span: 12 }}
+            divider={50}
             items={DYNAMIC_DATA_ANGLEDIP.metaData.map(({ label, value, unit }) => ({
               name: label,
               value: getMetaProperty(meta, value, unit)

@@ -58,8 +58,8 @@ export const DeviceSelection: React.FC<{
   return (
     <>
       <div style={{ overflow: 'auto', maxHeight: 300 }}>
-        <Checkbox.Group value={selected.map((item) => item[0])}>
-          <Row>
+        <Checkbox.Group style={{ width: '100%' }} value={selected.map((item) => item[0])}>
+          <Row style={{ width: '100%' }}>
             {props.devices?.map(({ id, name, macAddress, typeId }) => {
               const channels = DeviceType.isMultiChannel(typeId, true);
               const defaultCheckedList =
