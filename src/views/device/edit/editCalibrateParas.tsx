@@ -30,7 +30,8 @@ const EditCalibrateParas = ({
   typeParaMapping.set(DeviceType.PressureTemperature, 'pressure');
   typeParaMapping.set(DeviceType.PressureTemperatureWIRED, 'pressure');
   const property = properties.find((pro) => pro.key === typeParaMapping.get(typeId));
-  const isSPT = typeId === DeviceType.PressureTemperature || DeviceType.PressureTemperatureWIRED;
+  const isSPT =
+    typeId === DeviceType.PressureTemperature || typeId === DeviceType.PressureTemperatureWIRED;
   const channels = DeviceType.isMultiChannel(typeId, true);
 
   function handleSubmit(param?: number) {
