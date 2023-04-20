@@ -41,9 +41,13 @@ export const DynamicDataContent = ({
 
   const renderChart = () => {
     if (loading) return <Spin />;
+    const _field = {
+      ...field,
+      label: intl.get(field.label)
+    };
     return (
       <ChartContainer
-        options={generateChartOptions(transformDynamicData(values, field), field) as any}
+        options={generateChartOptions(transformDynamicData(values, _field), _field) as any}
         title=''
       />
     );
@@ -67,13 +71,12 @@ export const DynamicDataContent = ({
                         defaultValue={fields[0].value}
                         placeholder={intl.get('PLEASE_SELECT_PROPERTY')}
                         style={{ width: '120px' }}
-                        onChange={(value, option: any) =>
-                          setField({
-                            label: option.children,
-                            value: option.key,
-                            unit: option.props['data-unit']
-                          } as any)
-                        }
+                        onChange={(value) => {
+                          const field = fields.find((f) => f.value === value);
+                          if (field) {
+                            setField(field);
+                          }
+                        }}
                       >
                         {fields.map(({ label, value, unit }) => (
                           <Select.Option key={value} value={value} data-unit={unit}>

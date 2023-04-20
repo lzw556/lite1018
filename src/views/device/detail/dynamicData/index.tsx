@@ -141,7 +141,7 @@ export const DynamicData: React.FC<Device> = ({ id, typeId }) => {
       } else {
         series = AXIS_THREE.map((axis, index) => ({
           type: 'line',
-          name: axis.label,
+          name: intl.get(axis.label),
           data: (items as Fields_be_axis[])
             .map((item) => item[axis.value])
             .map((item) => item.toFixed(3)),
@@ -155,7 +155,9 @@ export const DynamicData: React.FC<Device> = ({ id, typeId }) => {
           style={{ height: 500 }}
           option={{
             legend: {
-              data: !isAcceleration ? [intl.get(field.label)] : AXIS_THREE.map((item) => item.label)
+              data: !isAcceleration
+                ? [intl.get(field.label)]
+                : AXIS_THREE.map((item) => intl.get(item.label))
             },
             title: { text: intl.get(field.label), top: 0 },
             tooltip: {
@@ -197,7 +199,7 @@ export const DynamicData: React.FC<Device> = ({ id, typeId }) => {
             col={{ span: 12 }}
             divider={50}
             items={DYNAMIC_DATA_BOLTELONGATION.metaData.map(({ label, value, unit }) => ({
-              name: label,
+              name: intl.get(label),
               value: getMetaProperty(meta, value, unit)
             }))}
           />
@@ -208,7 +210,7 @@ export const DynamicData: React.FC<Device> = ({ id, typeId }) => {
             col={{ span: 12 }}
             divider={50}
             items={DYNAMIC_DATA_ANGLEDIP.metaData.map(({ label, value, unit }) => ({
-              name: label,
+              name: intl.get(label),
               value: getMetaProperty(meta, value, unit)
             }))}
           />
@@ -259,17 +261,16 @@ export const DynamicData: React.FC<Device> = ({ id, typeId }) => {
                 bordered={false}
                 defaultValue={fields[0].value}
                 placeholder={intl.get('PLEASE_SELECT_PROPERTY')}
-                onChange={(value, option: any) =>
-                  setField({
-                    label: option.children,
-                    value: option.key,
-                    unit: option.props['data-unit']
-                  } as any)
-                }
+                onChange={(value) => {
+                  const field = fields.find((f) => f.value === value);
+                  if (field) {
+                    setField(field);
+                  }
+                }}
               >
                 {fields.map(({ label, value, unit }) => (
                   <Select.Option key={value} value={value} data-unit={unit}>
-                    {label}
+                    {intl.get(label)}
                   </Select.Option>
                 ))}
               </Select>
@@ -348,17 +349,16 @@ export const DynamicData: React.FC<Device> = ({ id, typeId }) => {
                     defaultValue={fields[0].value}
                     placeholder={intl.get('PLEASE_SELECT_PROPERTY')}
                     style={{ width: '120px' }}
-                    onChange={(value, option: any) =>
-                      setField({
-                        label: option.children,
-                        value: option.key,
-                        unit: option.props['data-unit']
-                      } as any)
-                    }
+                    onChange={(value) => {
+                      const field = fields.find((f) => f.value === value);
+                      if (field) {
+                        setField(field);
+                      }
+                    }}
                   >
                     {fields.map(({ label, value, unit }) => (
                       <Select.Option key={value} value={value} data-unit={unit}>
-                        {label}
+                        {intl.get(label)}
                       </Select.Option>
                     ))}
                   </Select>

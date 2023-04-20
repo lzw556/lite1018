@@ -106,11 +106,30 @@ const dynamic_vibration: { dynamicData?: DynamicData; waveData?: WaveData } = {
     metaData: []
   }
 };
+const dynamic_angle: { dynamicData?: DynamicData; waveData?: WaveData } = {
+  dynamicData: {
+    serverDatatype: 'raw',
+    title: 'DYNAMIC_DATA',
+    fields: [
+      { label: 'FIELD_INCLINATION', value: 'dynamic_inclination', unit: '°' },
+      { label: 'FIELD_PITCH', value: 'dynamic_pitch', unit: '°' },
+      { label: 'FIELD_ROLL', value: 'dynamic_roll', unit: '°' },
+      { label: 'FIELD_WAGGLE', value: 'dynamic_waggle', unit: 'g' }
+    ],
+    metaData: [
+      { label: 'FIELD_INCLINATION', value: 'mean_inclination', unit: '°' },
+      { label: 'FIELD_PITCH', value: 'mean_pitch', unit: '°' },
+      { label: 'FIELD_ROLL', value: 'mean_roll', unit: '°' },
+      { label: 'FIELD_WAGGLE', value: 'mean_waggle', unit: 'g' }
+    ]
+  }
+};
 export const MONITORING_POINT_TYPE_VALUE_DYNAMIC_MAPPING = new Map([
   [MonitoringPointTypeValue.LOOSENING_ANGLE, dynamic_preload],
   [MonitoringPointTypeValue.THICKNESS, dynamic_thickness],
   [MonitoringPointTypeValue.PRELOAD, dynamic_preload],
-  [MonitoringPointTypeValue.VIBRATION, dynamic_vibration]
+  [MonitoringPointTypeValue.VIBRATION, dynamic_vibration],
+  [MonitoringPointTypeValue.ANGLE_DIP, dynamic_angle]
 ]);
 
 export const MONITORING_POINT_TYPE_VALUE_DEVICE_TYPE_ID_MAPPING = new Map([
