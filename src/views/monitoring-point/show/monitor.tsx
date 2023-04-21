@@ -19,7 +19,11 @@ export const MonitoringPointMonitor = (point: MonitoringPointRow) => {
     const [from, to] = oneWeekNumberRange;
     getDataOfMonitoringPoint(id, from, to).then((data) => {
       setLoading(false);
-      if (data.length > 0) setHistoryOptions(generateChartOptionsOfHistoryDatas(data, type));
+      if (data.length > 0) {
+        setHistoryOptions(generateChartOptionsOfHistoryDatas(data, type));
+      } else {
+        setHistoryOptions(undefined);
+      }
     });
   }, [id, type]);
 
