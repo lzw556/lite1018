@@ -161,11 +161,11 @@ export const CommandDropdown = ({
           properties={device.properties}
           onUpdate={(paras) => {
             setVisibleCalibrate(false);
-            SendDeviceCommandRequest(typeId, DeviceCommand.Calibrate, paras).then((res) => {
+            SendDeviceCommandRequest(id, DeviceCommand.Calibrate, paras).then((res) => {
               if (res.code === 200) {
                 message.success(intl.get('COMMAND_SENT_SUCCESSFUL')).then();
               } else {
-                message.error(res.msg).then();
+                message.error(intl.get(res.msg).d(res.msg)).then();
               }
             });
           }}
