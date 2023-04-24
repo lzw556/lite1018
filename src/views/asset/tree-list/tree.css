@@ -1,9 +1,9 @@
 .asset-list-tree .ant-space-item {
-  overflow: auto;
   font-size: 16px;
 }
 .asset-list-tree .icon-svg {
-  height: 1em;
-  width: 1em;
-  font-size: 16px;
+  position: relative;
+  top: 2px;
+  height: 18px;
+  width: 18px;
 }

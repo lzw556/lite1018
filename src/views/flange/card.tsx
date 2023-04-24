@@ -31,7 +31,7 @@ export const FlangeCard = (flange: AssetRow) => {
         },
         alarmState,
         icon: { svg: <FlangeIcon />, small: true, focus: true },
-        count: <NameValueGroups gutter={80} col={{ span: 12 }} items={statistics} />,
+        count: <NameValueGroups col={{ span: 12 }} divider={20} items={statistics} />,
         chart: <CircleChart asset={flange} style={{ left: '-24px', top: '-20px', height: 450 }} />,
         horizontal: true
       }}

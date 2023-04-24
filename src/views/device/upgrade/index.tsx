@@ -40,6 +40,7 @@ const UpgradeModal: FC<UpgradeModalProps> = ({ open, device, onCancel, onSuccess
           <Row gutter={[0, 16]}>
             <Col span={24}>
               <NameValueGroups
+                col={{ span: 18 }}
                 namePercentage={30}
                 items={[
                   { name: intl.get('FIRMWARE_VERSION'), value: firmware.version },

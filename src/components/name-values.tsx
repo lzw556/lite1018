@@ -1,19 +1,16 @@
 import React from 'react';
 import './name-values.css';
-import { Col, ColProps, Row, RowProps } from 'antd';
+import { Col, ColProps, Row } from 'antd';
 
 export const NameValueGroups = ({
   items,
   namePercentage,
   col,
-  gutter,
   divider
 }: {
-  className?: string;
   namePercentage?: number;
   divider?: number;
-  col?: ColProps;
-  gutter?: RowProps['gutter'];
+  col: ColProps;
   items: { name: string; value: React.ReactNode; className?: string }[];
 }) => {
   let nameStyle: React.CSSProperties | undefined,
@@ -24,12 +21,12 @@ export const NameValueGroups = ({
   }
   return (
     <dl className='name-value-groups'>
-      <Row gutter={gutter}>
+      <Row>
         {items.map(({ name, value, className }) => (
           <Col
             className={`${className ? `name-value ${className}` : 'name-value'}`}
             key={name}
-            {...(col ? col : { span: 24 })}
+            {...col}
           >
             <dt style={{ ...nameStyle }}>{name}</dt>
             <dd style={{ flex: '1 1 auto' }}></dd>
