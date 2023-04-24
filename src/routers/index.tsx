@@ -1,5 +1,5 @@
 import React, { lazy, Suspense } from 'react';
-import { BrowserRouter, RouteObject, useRoutes } from 'react-router-dom';
+import { HashRouter, RouteObject, useRoutes } from 'react-router-dom';
 import {
   Device,
   DeviceDetail,
@@ -182,7 +182,7 @@ const AppRouter = () => {
     <>
       {initDone && (
         <ConfigProvider locale={language === 'zh-CN' ? zhCN : enUS}>
-          <BrowserRouter>
+          <HashRouter>
             <Suspense
               fallback={
                 <div style={{ display: 'flex', justifyContent: 'center', alignContent: 'center' }}>
@@ -192,7 +192,7 @@ const AppRouter = () => {
             >
               <Routes />
             </Suspense>
-          </BrowserRouter>
+          </HashRouter>
         </ConfigProvider>
       )}
     </>
