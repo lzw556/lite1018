@@ -66,12 +66,12 @@ export const MonitoringPointCreate: React.FC<
             try {
               addMonitoringPoints({
                 monitoring_points: values.monitoring_points.map(
-                  ({ dev_id, place, name, channel }) => {
+                  ({ dev_id, place, name, channel, initial_thickness, critial_thickenss }) => {
                     if (channel !== undefined) {
                       return {
                         name,
                         type: values.type,
-                        attributes: { index: Number(place) },
+                        attributes: { index: Number(place), initial_thickness, critial_thickenss },
                         device_binding: {
                           device_id: dev_id,
                           process_id: 2,
@@ -83,7 +83,7 @@ export const MonitoringPointCreate: React.FC<
                       return {
                         name,
                         type: values.type,
-                        attributes: { index: Number(place) },
+                        attributes: { index: Number(place), initial_thickness, critial_thickenss },
                         device_binding: { device_id: dev_id },
                         asset_id: values.asset_id
                       };
@@ -115,7 +115,7 @@ export const MonitoringPointCreate: React.FC<
           form={form}
         />
         <MonitoringPointFormItem
-          key={selectedPointType}
+          selectedPointType={selectedPointType}
           devices={devices}
           onSelect={setSelectPoints}
           onRemove={(index) => setSelectPoints((prev) => prev.filter((p, i) => index !== i))}

@@ -1,4 +1,4 @@
-import { Form, Input, Select } from 'antd';
+import { Form, Input, InputNumber, Select } from 'antd';
 import { FormInstance } from 'antd/lib/form/Form';
 import React from 'react';
 import DeviceSelect from '../../../components/select/deviceSelect';
@@ -14,7 +14,8 @@ import {
   MonitoringPoint,
   MonitoringPointRow,
   MONITORING_POINT,
-  MONITORING_POINT_TYPE_VALUE_DEVICE_TYPE_ID_MAPPING
+  MONITORING_POINT_TYPE_VALUE_DEVICE_TYPE_ID_MAPPING,
+  MonitoringPointTypeValue
 } from '../types';
 import { convertRow } from '../utils';
 import intl from 'react-intl-universal';
@@ -170,6 +171,50 @@ export const UpdateForm = ({
           something: intl.get('POSITION')
         })}
       />
+      {monitoringPoint.type === MonitoringPointTypeValue.THICKNESS && (
+        <>
+          <FormInputItem
+            label={intl.get('INITIAL_THICKNESS')}
+            name={['attributes', 'initial_thickness']}
+            requiredMessage={intl.get('PLEASE_ENTER_SOMETHING', {
+              something: intl.get('INITIAL_THICKNESS')
+            })}
+            numericRule={{
+              message: intl.get('PLEASE_ENTER_NUMERIC')
+            }}
+            numericChildren={
+              <InputNumber
+                placeholder={intl.get('PLEASE_ENTER_SOMETHING', {
+                  something: intl.get('INITIAL_THICKNESS')
+                })}
+                style={{ width: '100%' }}
+                controls={false}
+                addonAfter='mm'
+              />
+            }
+          />
+          <FormInputItem
+            label={intl.get('CRITICAL_THICKNESS')}
+            name={['attributes', 'critial_thickenss']}
+            requiredMessage={intl.get('PLEASE_ENTER_SOMETHING', {
+              something: intl.get('CRITICAL_THICKNESS')
+            })}
+            numericRule={{
+              message: intl.get('PLEASE_ENTER_NUMERIC')
+            }}
+            numericChildren={
+              <InputNumber
+                placeholder={intl.get('PLEASE_ENTER_SOMETHING', {
+                  something: intl.get('CRITICAL_THICKNESS')
+                })}
+                style={{ width: '100%' }}
+                controls={false}
+                addonAfter='mm'
+              />
+            }
+          />
+        </>
+      )}
       {children}
     </Form>
   );

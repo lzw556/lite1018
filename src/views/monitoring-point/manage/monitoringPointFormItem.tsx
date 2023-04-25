@@ -1,21 +1,24 @@
 import { MinusCircleOutlined } from '@ant-design/icons';
-import { Button, Form, Input, Popover, Space } from 'antd';
+import { Button, Form, Input, InputNumber, Popover, Space } from 'antd';
 import React from 'react';
 import { Device } from '../../../types/device';
 import { DeviceSelection, MonitoringPointInfo } from './DeviceSelection';
 import intl from 'react-intl-universal';
 import { FormInputItem } from '../../../components/formInputItem';
+import { MonitoringPointTypeValue } from '../types';
 
 export const MonitoringPointFormItem = ({
   devices,
   onSelect,
   onRemove,
-  initialSelected
+  initialSelected,
+  selectedPointType
 }: {
   devices: Device[];
   onSelect: (points: MonitoringPointInfo[]) => void;
   onRemove: (index: number) => void;
   initialSelected: MonitoringPointInfo[];
+  selectedPointType?: number;
 }) => {
   const [open, setVisible] = React.useState(false);
 
@@ -75,6 +78,54 @@ export const MonitoringPointFormItem = ({
                   })}
                 />
               </Space>
+              {selectedPointType === MonitoringPointTypeValue.THICKNESS && (
+                <Space>
+                  <FormInputItem
+                    label={intl.get('INITIAL_THICKNESS')}
+                    labelCol={{ span: 8 }}
+                    {...restFields}
+                    name={[name, 'initial_thickness']}
+                    requiredMessage={intl.get('PLEASE_ENTER_SOMETHING', {
+                      something: intl.get('INITIAL_THICKNESS')
+                    })}
+                    numericRule={{
+                      message: intl.get('PLEASE_ENTER_NUMERIC')
+                    }}
+                    numericChildren={
+                      <InputNumber
+                        placeholder={intl.get('PLEASE_ENTER_SOMETHING', {
+                          something: intl.get('INITIAL_THICKNESS')
+                        })}
+                        style={{ width: '100%' }}
+                        controls={false}
+                        addonAfter='mm'
+                      />
+                    }
+                  />
+                  <FormInputItem
+                    label={intl.get('CRITICAL_THICKNESS')}
+                    labelCol={{ span: 8 }}
+                    {...restFields}
+                    name={[name, 'critial_thickenss']}
+                    requiredMessage={intl.get('PLEASE_ENTER_SOMETHING', {
+                      something: intl.get('CRITICAL_THICKNESS')
+                    })}
+                    numericRule={{
+                      message: intl.get('PLEASE_ENTER_NUMERIC')
+                    }}
+                    numericChildren={
+                      <InputNumber
+                        placeholder={intl.get('PLEASE_ENTER_SOMETHING', {
+                          something: intl.get('CRITICAL_THICKNESS')
+                        })}
+                        style={{ width: '100%' }}
+                        controls={false}
+                        addonAfter='mm'
+                      />
+                    }
+                  />
+                </Space>
+              )}
             </>
           ))}
 

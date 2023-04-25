@@ -121,7 +121,11 @@ export const SelectParentFormItem = ({
             <Select.Option
               key={id}
               value={id}
-              disabled={id === MonitoringPointTypeValue.LOOSENING_ANGLE && isFlangePreload}
+              disabled={
+                (id === MonitoringPointTypeValue.LOOSENING_ANGLE ||
+                  id === MonitoringPointTypeValue.ANGLE_DIP) &&
+                isFlangePreload
+              }
             >
               {intl.get(label)}
             </Select.Option>
