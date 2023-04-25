@@ -12,6 +12,7 @@ import { IsUpgrading } from '../../types/device_upgrade_status';
 import intl from 'react-intl-universal';
 import { DownOutlined } from '@ant-design/icons';
 import { isMobile } from '../../utils/deviceDetection';
+import { useAppConfigContext } from '../asset';
 
 export const CommandDropdown = ({
   device,
@@ -22,6 +23,7 @@ export const CommandDropdown = ({
   target?: JSX.Element;
   initialUpgradeCode?: number;
 }) => {
+  const config = useAppConfigContext();
   const { id, typeId, macAddress } = device;
   const { PubSub } = useSocket();
   const [upgradedCode, setUpgradeCode] = useState(initialUpgradeCode ?? device.upgradeStatus?.code);
@@ -118,7 +120,7 @@ export const CommandDropdown = ({
     }
   }
   if (hasPermissions(Permission.DeviceUpgrade, Permission.DeviceFirmwares)) {
-    if (!upgrading) {
+    if (!upgrading && config !== 'corrosionWirelessHART') {
       items.push({ key: DeviceCommand.Upgrade, label: intl.get('UPGRADE_FIRMWARE') });
     } else {
       items.push({
