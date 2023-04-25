@@ -125,10 +125,7 @@ export default function ProjectOverview() {
       <Empty
         description={
           <p>
-            {intl.get('NO_ASSET_PROMPT', {
-              assetTypeLabel: intl.get(root.label).toLowerCase()
-            })}
-            ,<Link to='/asset-management'>{intl.get('CREATE_ONE')}</Link>
+            <Link to='/asset-management'>{intl.get('CREATE_ONE')}</Link>
           </p>
         }
         image={Empty.PRESENTED_IMAGE_SIMPLE}

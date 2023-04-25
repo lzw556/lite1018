@@ -182,7 +182,6 @@ export const AlarmRuleSetting = (point: MonitoringPointRow) => {
         image={Empty.PRESENTED_IMAGE_SIMPLE}
         description={
           <p>
-            {intl.get('NO_RULES_PROMPT')}
             <Link to='/alarmRules'>{intl.get('CREATE_ONE')}</Link>
           </p>
         }

@@ -40,7 +40,8 @@ export default function AlarmRuleList() {
       title: intl.get('NAME'),
       dataIndex: 'name',
       key: 'name',
-      width: 400
+      width: 400,
+      render: (name: string) => intl.get(name).d(name)
     },
     {
       title: intl.get('OBJECT_TYPE', { object: intl.get(MONITORING_POINT) }),
@@ -109,7 +110,8 @@ export default function AlarmRuleList() {
           title: intl.get('NAME'),
           dataIndex: 'name',
           key: 'name',
-          width: 400
+          width: 400,
+          render: (name: string) => intl.get(name).d(name)
         },
         {
           title: intl.get('ALARM_METRIC'),
@@ -262,7 +264,6 @@ export default function AlarmRuleList() {
 }
 
 export function translateMetricName(name: string) {
-  debugger;
   if (!name) return name;
   if (name.indexOf(':')) {
     return name

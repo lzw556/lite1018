@@ -6,6 +6,7 @@ import { DeviceType } from '../../../../types/device_type';
 import { BasicSettings } from './basicSettings';
 import { AlarmRuleSettings } from './alarmRuleSettings';
 import intl from 'react-intl-universal';
+import { useAppConfigContext } from '../../../asset';
 
 export interface SettingPageProps {
   device: Device;
@@ -13,17 +14,15 @@ export interface SettingPageProps {
 }
 
 const SettingPage: React.FC<SettingPageProps> = ({ device, onUpdate }) => {
+  const config = useAppConfigContext();
   const [type, setType] = React.useState('basic');
   const options = [];
   const { typeId } = device;
   if (typeId !== DeviceType.Router) {
-    options.push(
-      { label: intl.get('BASIC_INFORMATION'), value: 'basic' },
-      { label: intl.get('DEVICE_SETTINGS'), value: 'device' }
-    );
-    // if (typeId !== DeviceType.Gateway) {
-    //   options.push({ label: '报警规则', value: 'alarm' })
-    // }
+    options.push({ label: intl.get('BASIC_INFORMATION'), value: 'basic' });
+    if (!(config === 'corrosionWirelessHART' && typeId === DeviceType.Gateway)) {
+      options.push({ label: intl.get('DEVICE_SETTINGS'), value: 'device' });
+    }
   }
   if (options.length === 0) {
     return <BasicSettings device={device} onUpdate={onUpdate} />;
