@@ -49,6 +49,7 @@ export function generateChartOptionsOfHistoryDatas(
 ) {
   const optionsData = getHistoryDatas(data, measurementType, propertyKey);
   return optionsData.map(({ times, seriesData, property }) => {
+    const unit = property.unit ? intl.get(property.unit).d(property.unit) : property.unit;
     return {
       tooltip: {
         trigger: 'axis',
@@ -58,7 +59,7 @@ export function generateChartOptionsOfHistoryDatas(
             let value = Number(params[i].value);
             relVal += `<br/> ${params[i].marker} ${params[i].seriesName}: ${getDisplayValue(
               value,
-              property.unit
+              unit
             )}`;
           }
           return relVal;
@@ -67,7 +68,7 @@ export function generateChartOptionsOfHistoryDatas(
       legend: { show: !!propertyKey },
       grid: { bottom: 20, left: 50 },
       title: {
-        text: `${intl.get(property.name)}${property.unit ? `(${property.unit})` : ''}`,
+        text: `${intl.get(property.name)}${unit ? `(${unit})` : ''}`,
         subtext: propertyKey
           ? ''
           : `${seriesData.map(({ name, data }) => intl.get(name) + ' ' + data[data.length - 1])}`

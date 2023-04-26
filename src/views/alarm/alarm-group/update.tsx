@@ -166,6 +166,10 @@ export default function UpdateAlarmRuleGroup() {
                               addonAfter={
                                 rule.rules.length > 0 && rule.rules[index]
                                   ? rule.rules[index].metric.unit
+                                    ? intl
+                                        .get(rule.rules[index].metric.unit)
+                                        .d(rule.rules[index].metric.unit)
+                                    : rule.rules[index].metric.unit
                                   : ''
                               }
                             />
@@ -273,6 +277,10 @@ export default function UpdateAlarmRuleGroup() {
                                   addonAfter={
                                     rule.rules.length > 0 && rule.rules[index]
                                       ? rule.rules[index].metric.unit
+                                        ? intl
+                                            .get(rule.rules[index].metric.unit)
+                                            .d(rule.rules[index].metric.unit)
+                                        : rule.rules[index].metric.unit
                                       : ''
                                   }
                                 />

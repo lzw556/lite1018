@@ -120,8 +120,10 @@ export const CommandDropdown = ({
     }
   }
   if (hasPermissions(Permission.DeviceUpgrade, Permission.DeviceFirmwares)) {
-    if (!upgrading && config !== 'corrosionWirelessHART') {
-      items.push({ key: DeviceCommand.Upgrade, label: intl.get('UPGRADE_FIRMWARE') });
+    if (!upgrading) {
+      if (config !== 'corrosionWirelessHART') {
+        items.push({ key: DeviceCommand.Upgrade, label: intl.get('UPGRADE_FIRMWARE') });
+      }
     } else {
       items.push({
         key: DeviceCommand.CancelUpgrade,

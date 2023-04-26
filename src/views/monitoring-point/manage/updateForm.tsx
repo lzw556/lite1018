@@ -195,7 +195,7 @@ export const UpdateForm = ({
           />
           <FormInputItem
             label={intl.get('CRITICAL_THICKNESS')}
-            name={['attributes', 'critial_thickenss']}
+            name={['attributes', 'critical_thickness']}
             requiredMessage={intl.get('PLEASE_ENTER_SOMETHING', {
               something: intl.get('CRITICAL_THICKNESS')
             })}

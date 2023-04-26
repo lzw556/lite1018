@@ -106,7 +106,7 @@ export const MonitoringPointFormItem = ({
                     label={intl.get('CRITICAL_THICKNESS')}
                     labelCol={{ span: 8 }}
                     {...restFields}
-                    name={[name, 'critial_thickenss']}
+                    name={[name, 'critical_thickness']}
                     requiredMessage={intl.get('PLEASE_ENTER_SOMETHING', {
                       something: intl.get('CRITICAL_THICKNESS')
                     })}

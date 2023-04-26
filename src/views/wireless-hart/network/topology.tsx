@@ -3,6 +3,7 @@ import { FC, useEffect, useState } from 'react';
 import { Network } from '../../../types/network';
 import { Device } from '../../../types/device';
 import '../../../components/shape/shape';
+import { toMac } from '../../../utils/format';
 
 export interface TopologyViewProps {
   network: Network;
@@ -34,7 +35,7 @@ export const TopologyView: FC<TopologyViewProps> = ({ network }) => {
         .filter((device) => device.parent === root.macAddress)
         .map((device) => {
           return {
-            id: device.macAddress,
+            id: toMac(device.macAddress),
             data: device,
             children: tree(device)
           };

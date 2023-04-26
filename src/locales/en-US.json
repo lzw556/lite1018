@@ -935,5 +935,6 @@
   "FIELD_SHORT_TERM_CORROSION_RATE": "Short Term Corrosion Rate",
   "FIELD_LONG_TERM_CORROSION_RATE": "Long Term Corrosion Rate",
   "FIELD_CORROSION_LOSS": "Corrosion Loss",
-  "FILED_RESIDUAL_LIFE": "Residual Life"
+  "FIELD_RESIDUAL_LIFE": "Residual Life",
+  "ERROR_DEVICE_TAG_EXISTS": "Device tag alread exists."
 }

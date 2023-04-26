@@ -1,6 +1,5 @@
 import G6 from '@antv/g6';
 import { ColorHealth, ColorInfo, ColorWarn } from '../../constants/color';
-import { toMac } from '../../utils/format';
 
 const Color = require('color');
 
@@ -39,7 +38,7 @@ G6.registerNode(
           x: 8,
           y: 30,
           fontSize: 8,
-          text: toMac(cfg.id.toUpperCase()),
+          text: cfg.id,
           textBaseline: 'center',
           fill: '#fff'
         }

@@ -14,7 +14,7 @@ export type MonitoringPointInfo = {
   dev_type: number;
   channel?: number;
   initial_thickness?: number;
-  critial_thickenss?: number;
+  critical_thickness?: number;
 };
 
 export const DeviceSelection: React.FC<{

@@ -1,4 +1,4 @@
-import { Button, Col, Form, Input, Row, Select } from 'antd';
+import { Button, Col, Form, Input, Row } from 'antd';
 import * as React from 'react';
 import { UpdateDeviceRequest } from '../../../../apis/device';
 import DeviceSelect from '../../../../components/select/deviceSelect';
@@ -8,7 +8,6 @@ import { Device } from '../../../../types/device';
 import { DeviceType } from '../../../../types/device_type';
 import intl from 'react-intl-universal';
 import { FormInputItem } from '../../../../components/formInputItem';
-import { WIRELESS_HART_POLLING_PERIOD } from '../../../../constants';
 
 interface BasicSettingsProps {
   device: Device;
@@ -109,48 +108,6 @@ export const BasicSettings: React.FC<BasicSettingsProps> = ({ device, onUpdate }
                   })}
                 />
               </FormInputItem>
-            )}
-            {device && device.typeId === DeviceType.Gateway && (
-              <>
-                <FormInputItem
-                  label={intl.get('IP_ADDRESS')}
-                  name='ip_address'
-                  requiredMessage={intl.get('PLEASE_ENTER_SOMETHING', {
-                    something: intl.get('IP_ADDRESS')
-                  })}
-                  lengthLimit={{ min: 4, max: 16, label: intl.get('NETWORK').toLowerCase() }}
-                >
-                  <Input
-                    placeholder={intl.get('PLEASE_ENTER_SOMETHING', {
-                      something: intl.get('IP_ADDRESS')
-                    })}
-                  />
-                </FormInputItem>
-                <FormInputItem
-                  label={intl.get('PORT')}
-                  name='ip_port'
-                  requiredMessage={intl.get('PLEASE_ENTER_SOMETHING', {
-                    something: intl.get('PORT')
-                  })}
-                  numericRule={{
-                    isInteger: true,
-                    min: 1,
-                    message: intl.get('UNSIGNED_INTEGER_ENTER_PROMPT')
-                  }}
-                  placeholder={intl.get('PLEASE_ENTER_SOMETHING', {
-                    something: intl.get('PORT')
-                  })}
-                />
-                <Form.Item label={intl.get('POLLING_PERIOD')} name='polling_period'>
-                  <Select>
-                    {WIRELESS_HART_POLLING_PERIOD.map(({ value, text }) => (
-                      <Select.Option value={value} key={value}>
-                        {intl.get(text)}
-                      </Select.Option>
-                    ))}
-                  </Select>
-                </Form.Item>
-              </>
             )}
             {device && device.typeId !== DeviceType.Gateway && renderNetworkFormItem()}
           </Form>

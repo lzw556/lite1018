@@ -157,6 +157,8 @@ export default function CreateAlarmRuleGroup() {
                                           key: selected.join('.'),
                                           name: selectOptions.map(({ name }) => name).join(':'),
                                           unit: property.unit
+                                            ? intl.get(property.unit).d(property.unit)
+                                            : property.unit
                                         };
                                         setMetric((prev) => {
                                           if (prev.length === 0) {
@@ -247,7 +249,11 @@ export default function CreateAlarmRuleGroup() {
                                   }
                                   controls={false}
                                   addonAfter={
-                                    metric.length > 0 && metric[index] ? metric[index].unit : ''
+                                    metric.length > 0 && metric[index]
+                                      ? metric[index].unit
+                                        ? intl.get(metric[index].unit).d(metric[index].unit)
+                                        : metric[index].unit
+                                      : ''
                                   }
                                 />
                               }
@@ -319,6 +325,8 @@ export default function CreateAlarmRuleGroup() {
                                       key: selected.join('.'),
                                       name: selectOptions.map(({ name }) => name).join(':'),
                                       unit: property.unit
+                                        ? intl.get(property.unit).d(property.unit)
+                                        : property.unit
                                     };
                                     setMetric((prev) => {
                                       if (prev.length === 0) {
@@ -408,7 +416,11 @@ export default function CreateAlarmRuleGroup() {
                               }
                               controls={false}
                               addonAfter={
-                                metric.length > 0 && metric[index] ? metric[index].unit : ''
+                                metric.length > 0 && metric[index]
+                                  ? metric[index].unit
+                                    ? intl.get(metric[index].unit).d(metric[index].unit)
+                                    : metric[index].unit
+                                  : ''
                               }
                             />
                           }

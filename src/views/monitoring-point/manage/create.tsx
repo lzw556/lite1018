@@ -7,7 +7,7 @@ import { MonitoringPointInfo } from './DeviceSelection';
 import { MonitoringPointFormItem } from './monitoringPointFormItem';
 import { SelectParentFormItem } from './selectParentFormItem';
 import intl from 'react-intl-universal';
-import { MONITORING_POINT } from '../types';
+import { MONITORING_POINT, MonitoringPointTypeValue } from '../types';
 
 export type MonitoringPointBatch = {
   asset_id: number;
@@ -66,12 +66,12 @@ export const MonitoringPointCreate: React.FC<
             try {
               addMonitoringPoints({
                 monitoring_points: values.monitoring_points.map(
-                  ({ dev_id, place, name, channel, initial_thickness, critial_thickenss }) => {
+                  ({ dev_id, place, name, channel, initial_thickness, critical_thickness }) => {
                     if (channel !== undefined) {
                       return {
                         name,
                         type: values.type,
-                        attributes: { index: Number(place), initial_thickness, critial_thickenss },
+                        attributes: { index: Number(place), initial_thickness, critical_thickness },
                         device_binding: {
                           device_id: dev_id,
                           process_id: 2,
@@ -83,8 +83,11 @@ export const MonitoringPointCreate: React.FC<
                       return {
                         name,
                         type: values.type,
-                        attributes: { index: Number(place), initial_thickness, critial_thickenss },
-                        device_binding: { device_id: dev_id },
+                        attributes: { index: Number(place), initial_thickness, critical_thickness },
+                        device_binding:
+                          values.type === MonitoringPointTypeValue.THICKNESS
+                            ? { device_id: dev_id, process_id: 11 }
+                            : { device_id: dev_id },
                         asset_id: values.asset_id
                       };
                     }
