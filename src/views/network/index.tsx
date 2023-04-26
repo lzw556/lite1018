@@ -270,6 +270,7 @@ const NetworkPage = () => {
           onCancel={() => setEditVisible(false)}
           onSuccess={() => {
             setEditVisible(false);
+            message.success(intl.get('SAVED_SUCCESSFUL'));
             fetchNetworks(store);
           }}
         />
