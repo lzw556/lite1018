@@ -11,6 +11,9 @@ import { isMobile } from '../../../utils/deviceDetection';
 import { AssetIcon } from '../icon/icon';
 import { NodeActions } from './nodeActions';
 import { FlangeIcon } from '../../flange';
+import { useActionBarStatus } from '../common/useActionBarStatus';
+import { ActionBar } from '../common/actionBar';
+import usePermission, { Permission } from '../../../permission/permission';
 
 export const AssetTree: React.FC<{
   assets: AssetRow[];
@@ -19,6 +22,8 @@ export const AssetTree: React.FC<{
 }> = ({ assets, onSuccess, rootId }) => {
   const [treedata, setTreedata] = React.useState<any>();
   const [selectedNode, setSelectedNode] = React.useState<any>();
+  const actionStatus = useActionBarStatus();
+  const { hasPermission } = usePermission();
 
   const getTreedata = React.useCallback((assets: AssetRow[]) => {
     if (assets.length > 0) {
@@ -91,6 +96,7 @@ export const AssetTree: React.FC<{
                   name={selectedNode.name}
                   onSuccess={onSuccess}
                   rootId={rootId}
+                  actionStatus={actionStatus}
                 />
               )}
             </Space>
@@ -101,6 +107,12 @@ export const AssetTree: React.FC<{
         }}
         defaultExpandAll={true}
         height={780}
+      />
+      <ActionBar
+        hasPermission={hasPermission(Permission.AssetAdd)}
+        actions={[]}
+        {...actionStatus}
+        onSuccess={onSuccess}
       />
     </>
   );

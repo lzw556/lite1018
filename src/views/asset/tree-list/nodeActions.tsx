@@ -2,7 +2,7 @@ import { ArrowRightOutlined, DeleteOutlined, EditOutlined, PlusOutlined } from '
 import { Button, Dropdown, Popconfirm } from 'antd';
 import React from 'react';
 import HasPermission from '../../../permission';
-import usePermission, { Permission } from '../../../permission/permission';
+import { Permission } from '../../../permission/permission';
 import intl from 'react-intl-universal';
 import {
   deleteMeasurement,
@@ -12,9 +12,7 @@ import {
 } from '../../monitoring-point';
 import { deleteAsset, getAsset } from '../services';
 import { AssertAssetCategory, AssertOfAssetCategory } from '../types';
-import { useActionBarStatus } from '../common/useActionBarStatus';
 import { useAssetCategoryChain } from '../../../config/assetCategory.config';
-import { ActionBar } from '../common/actionBar';
 import { Link, useLocation } from 'react-router-dom';
 import { getPathFromType } from '../components';
 
@@ -23,17 +21,18 @@ export const NodeActions = ({
   type,
   name,
   onSuccess,
-  rootId
+  rootId,
+  actionStatus
 }: {
   id: number;
   type: number;
   name: string;
   onSuccess?: () => void;
   rootId?: number;
+  actionStatus: any;
 }) => {
   const { state } = useLocation();
-  const { hasPermission } = usePermission();
-  const actionStatus = useActionBarStatus();
+
   const {
     onAssetCreate,
     onAssetUpdate,
@@ -51,7 +50,7 @@ export const NodeActions = ({
   const isNodePipe = AssertAssetCategory(type, AssertOfAssetCategory.IS_PIPE);
   const isNodeRootAsset = rootId === id && isNodeAsset;
   return (
-    <>
+    <div style={{ height: 24, lineHeight: '24px' }}>
       <HasPermission value={Permission.AssetAdd}>
         <Button type='text' size='small'>
           <EditOutlined
@@ -132,13 +131,7 @@ export const NodeActions = ({
           </Button>
         </Link>
       )}
-      <ActionBar
-        hasPermission={hasPermission(Permission.AssetAdd)}
-        actions={[]}
-        {...actionStatus}
-        onSuccess={onSuccess}
-      />
-    </>
+    </div>
   );
 };
 
