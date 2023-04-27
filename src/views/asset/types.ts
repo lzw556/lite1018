@@ -66,6 +66,7 @@ export enum AssetCategoryKey {
   GENERAL = 100,
   WIND_TURBINE = 101,
   FLANGE = 102,
+  TOWER = 103,
   HYDRO_TURBINE = 111,
   AREA = 201,
   SUB_AREA = 202,
@@ -116,6 +117,7 @@ export enum AssetCategoryLabel {
   GENERAL = 'ASSET',
   WIND_TURBINE = 'WIND_TURBINE',
   FLANGE = 'FLANGE',
+  TOWER = 'TOWER',
   HYDRO_TURBINE = 'HYDRO_TURBINE',
   AREA = 'AREA',
   SUB_AREA = 'SUB_AREA',
@@ -126,11 +128,11 @@ export enum AssetCategoryLabel {
 export type AssetCategoryDic = {
   key: AssetCategoryKey;
   label: AssetCategoryLabel;
-  options?: AssetCategoryDic[];
 };
 export type AssetCategoryChain = AssetCategoryDic & {
   isLeaf?: boolean;
   isChild?: boolean;
+  group?: AssetCategoryDic;
 };
 
 export const ASSET_PATHNAME = 'assets';

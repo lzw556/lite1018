@@ -8,7 +8,13 @@ import { MONITORING_POINT } from '../../monitoring-point';
 import { ActionBar } from '../common/actionBar';
 import { getParents } from '../common/utils';
 import { importAssets } from '../services';
-import { AssertAssetCategory, AssertOfAssetCategory, AssetCategoryKey, AssetRow } from '../types';
+import {
+  AssertAssetCategory,
+  AssertOfAssetCategory,
+  AssetCategoryChain,
+  AssetCategoryKey,
+  AssetRow
+} from '../types';
 import { AssetExport } from './assetExport';
 import { FileInput } from './fileInput';
 
@@ -31,7 +37,7 @@ export function CreateAssetActionBar({
 }) {
   const { hasPermission } = usePermission();
   const { last, root, isChild } = useAssetCategoryChain();
-  const parents = getParents(roots, undefined, !isChild(last.key));
+  const parents = getParents(roots, last);
   const actions: React.ReactNode[] = [];
 
   const shouldHide = (key: AssetCategoryKey) => hiddens.includes(key);
@@ -61,24 +67,32 @@ export function CreateAssetActionBar({
       </Button>
     );
   }
-  if (roots.length > 0 && !isChild(last.key) && !shouldHide(last.key)) {
-    actions.push(
-      <Button
-        key={last.key}
-        type='primary'
-        onClick={() => {
-          if (AssertAssetCategory(last.key, AssertOfAssetCategory.IS_FLANGE)) {
-            actionStatus.onFlangeCreate(lastParent?.id);
-          } else if (AssertAssetCategory(last.key, AssertOfAssetCategory.IS_AREA_ASSET)) {
-            actionStatus.onAreaAssetCreate();
-          }
-        }}
-      >
-        {intl.get('CREATE_SOMETHING', { something: intl.get(last.label) })}
-        <PlusOutlined />
-      </Button>
-    );
-  }
+  const groupdChains: AssetCategoryChain[] = [];
+  last.forEach(({ group }) => {
+    if (group && !groupdChains.map((c) => c.key).includes(group.key)) {
+      groupdChains.push({ key: group.key, label: group.label });
+    }
+  });
+  groupdChains.forEach(({ key, label }) => {
+    if (!isChild(key) && !shouldHide(key)) {
+      actions.push(
+        <Button
+          key={key}
+          type='primary'
+          onClick={() => {
+            if (AssertAssetCategory(key, AssertOfAssetCategory.IS_FLANGE)) {
+              actionStatus.onFlangeCreate(lastParent?.id);
+            } else if (AssertAssetCategory(key, AssertOfAssetCategory.IS_AREA_ASSET)) {
+              actionStatus.onAreaAssetCreate();
+            }
+          }}
+        >
+          {intl.get('CREATE_SOMETHING', { something: intl.get(label) })}
+          <PlusOutlined />
+        </Button>
+      );
+    }
+  });
   if (parents.length > 0) {
     actions.push(
       <Button

@@ -2,13 +2,7 @@ import { Form, FormInstance, Input, Select } from 'antd';
 import React from 'react';
 import { GetDevicesRequest } from '../../../apis/device';
 import { Device } from '../../../types/device';
-import {
-  AssertAssetCategory,
-  AssertOfAssetCategory,
-  AssetRow,
-  getAssets,
-  useAppConfigContext
-} from '../../asset';
+import { AssetRow, getAssets, useAppConfigContext } from '../../asset';
 import {
   MonitoringPointTypeValue,
   MONITORING_POINT,
@@ -32,23 +26,16 @@ export const SelectParentFormItem = ({
   const [parents, setParents] = React.useState<AssetRow[]>([]);
   const [isFlangePreload, setIsFlangePreload] = React.useState(checkIsFlangePreload(parent));
   const config = useAppConfigContext();
-  const {
-    root,
-    last: { key, label }
-  } = useAssetCategoryChain();
+  const { root, last } = useAssetCategoryChain();
+  const memoedLast = React.useRef(last);
 
   React.useEffect(() => {
     if (parent === undefined) {
-      let paras: any = { type: key };
-      const isLastAreaAsset = AssertAssetCategory(key, AssertOfAssetCategory.IS_AREA_ASSET);
-      if (AssertAssetCategory(key, AssertOfAssetCategory.IS_GENERAL)) {
-        paras = { type: key, parent_id: 0 };
-      } else if (isLastAreaAsset) {
-        paras = { type: root.key };
-      }
-      getAssets(paras).then((assets) => setParents(getParents(assets, undefined, isLastAreaAsset)));
+      getAssets({ type: root.key, parent_id: 0 }).then((assets) => {
+        setParents(getParents(assets, memoedLast.current));
+      });
     }
-  }, [parent, key, root.key]);
+  }, [parent, root.key]);
 
   const handlePointTypeChange = React.useCallback(
     (type: number) => {
@@ -72,17 +59,17 @@ export const SelectParentFormItem = ({
     <>
       {parents?.length > 0 ? (
         <Form.Item
-          label={intl.get(label)}
+          label={intl.get('ASSET')}
           name='asset_id'
           rules={[
             {
               required: true,
-              message: intl.get('PLEASE_SELECT_SOMETHING', { something: intl.get(label) })
+              message: intl.get('PLEASE_SELECT_SOMETHING', { something: intl.get('ASSET') })
             }
           ]}
         >
           <Select
-            placeholder={intl.get('PLEASE_SELECT_SOMETHING', { something: intl.get(label) })}
+            placeholder={intl.get('PLEASE_SELECT_SOMETHING', { something: intl.get('ASSET') })}
             onChange={(id, option: any) => {
               setIsFlangePreload(checkIsFlangePreload(option));
             }}

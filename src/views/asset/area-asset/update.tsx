@@ -33,7 +33,7 @@ export const UpdateAreaAsset: React.FC<ModalProps & { asset: AssetRow; onSuccess
   return (
     <Modal
       {...{
-        title: intl.get('EDIT_SOMETHING', { something: intl.get(last.label) }),
+        title: intl.get('EDIT_SOMETHING', { something: intl.get('ASSET') }),
         cancelText: intl.get('CANCEL'),
         okText: intl.get('SAVE'),
         ...props,
@@ -62,7 +62,7 @@ export const UpdateAreaAsset: React.FC<ModalProps & { asset: AssetRow; onSuccess
           ]}
         >
           <Radio.Group>
-            {last.options?.map((t) => (
+            {last.map((t) => (
               <Radio key={t.key} value={t.key}>
                 {intl.get(t.label)}
               </Radio>

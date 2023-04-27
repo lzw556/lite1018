@@ -29,5 +29,10 @@ export const ASSET_CATEGORY_CHAIN: AssetCategoryChain[] = [
     key: AssetCategoryKey.FLANGE,
     label: AssetCategoryLabel.FLANGE,
     isLeaf: true
+  },
+  {
+    key: AssetCategoryKey.TOWER,
+    label: AssetCategoryLabel.TOWER,
+    isLeaf: true
   }
 ];

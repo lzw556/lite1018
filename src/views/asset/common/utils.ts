@@ -1,6 +1,6 @@
 import { excludeTreeNode } from '../../../utils/tree';
 import { getRealPoints } from '../../monitoring-point';
-import { Asset, AssetRow, AssetTreeNode } from '../types';
+import { Asset, AssetCategoryChain, AssetRow, AssetTreeNode } from '../types';
 
 export function convertRow(values?: AssetRow): Asset | null {
   if (!values) return null;
@@ -13,10 +13,26 @@ export function convertRow(values?: AssetRow): Asset | null {
   };
 }
 
-export function getParents(assets: AssetRow[], assetId?: number, filterRoot?: boolean) {
+export function getParents(
+  assets: AssetRow[],
+  lastAssets?: AssetCategoryChain[],
+  assetId?: number
+) {
   const parents: AssetRow[] = [];
-  excludeTreeNode(assets, (asset) => parents.push(asset), assetId);
-  return parents.filter((a) => (filterRoot ? a.parentId !== 0 : true));
+  excludeTreeNode(
+    assets,
+    (asset) => {
+      if (lastAssets === undefined) {
+        parents.push(asset);
+      } else {
+        if (lastAssets.map(({ key }) => key).includes(asset.type)) {
+          parents.push(asset);
+        }
+      }
+    },
+    assetId
+  );
+  return parents;
 }
 
 export function sortAssetsByIndex(assets: AssetRow[]) {

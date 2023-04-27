@@ -27,7 +27,7 @@ export const UpdateAssetForm = ({
   React.useEffect(() => {
     if (asset.parentId !== 0) {
       getAssets({ type: key, parent_id: 0 }).then((assets) =>
-        setParents(getParents(assets, asset.id))
+        setParents(getParents(assets, undefined, asset.id))
       );
     }
   }, [asset.parentId, key, asset.id]);

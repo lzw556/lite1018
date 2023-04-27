@@ -4,7 +4,6 @@ import { sortFlangesByAttributes, MonitoringPointsTable } from '../../flange';
 import { MonitoringPointRow } from '../../monitoring-point';
 import { AssetRow } from '../types';
 import intl from 'react-intl-universal';
-import { useAssetCategoryChain } from '../../../config/assetCategory.config';
 
 export const WindTurbineMonitoringPointList = ({
   wind,
@@ -16,12 +15,11 @@ export const WindTurbineMonitoringPointList = ({
   onDeleteSuccess: () => void;
 }) => {
   const { children } = wind;
-  const { last } = useAssetCategoryChain();
 
   if (children === undefined || children.length === 0)
     return (
       <Empty
-        description={intl.get('NO_ASSET_PROMPT', { assetTypeLabel: intl.get(last.label) })}
+        description={intl.get('NO_ASSET_PROMPT', { assetTypeLabel: intl.get('ASSET') })}
         image={Empty.PRESENTED_IMAGE_SIMPLE}
       />
     );

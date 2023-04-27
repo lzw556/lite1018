@@ -26,7 +26,7 @@ export const CreateAreaAsset: React.FC<
   return (
     <Modal
       {...{
-        title: intl.get('CREATE_SOMETHING', { something: intl.get(last.label) }),
+        title: intl.get('CREATE_SOMETHING', { something: intl.get('ASSET') }),
         cancelText: intl.get('CANCEL'),
         okText: intl.get('CREATE'),
         ...props,
@@ -55,7 +55,7 @@ export const CreateAreaAsset: React.FC<
           ]}
         >
           <Radio.Group>
-            {last.options?.map((t) => (
+            {last.map((t) => (
               <Radio key={t.key} value={t.key}>
                 {intl.get(t.label)}
               </Radio>
