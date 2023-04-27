@@ -1,7 +1,12 @@
 import { Form, Modal, ModalProps } from 'antd';
 import * as React from 'react';
 import { bindDevice, unbindDevice, updateMeasurement } from '../services';
-import { MonitoringPoint, MonitoringPointRow, MONITORING_POINT } from '../types';
+import {
+  MonitoringPoint,
+  MonitoringPointRow,
+  MONITORING_POINT,
+  MonitoringPointTypeValue
+} from '../types';
 import { UpdateForm } from './updateForm';
 import intl from 'react-intl-universal';
 
@@ -26,7 +31,12 @@ export const MonitoringPointUpdate: React.FC<
                 if (bindingDevices[0].id !== values.device_id) {
                   //replace
                   unbindDevice(id, bindingDevices[0].id);
-                  bindDevice(id, values.device_id, values.channel);
+                  bindDevice(
+                    id,
+                    values.device_id,
+                    values.channel,
+                    values.type === MonitoringPointTypeValue.THICKNESS ? 11 : undefined
+                  );
                 }
               } else {
                 bindDevice(id, values.device_id, values.channel);

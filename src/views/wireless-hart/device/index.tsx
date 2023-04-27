@@ -273,15 +273,13 @@ const DevicePage = () => {
                   }}
                   defaultValue={store.filters?.type}
                 >
-                  {[DeviceType.Gateway, DeviceType.Router]
-                    .concat(SENSORS.get(config) ?? [])
-                    .map((d) => {
-                      return (
-                        <Select.Option key={d} value={d}>
-                          {intl.get(DeviceType.toString(d))}
-                        </Select.Option>
-                      );
-                    })}
+                  {[DeviceType.Gateway].concat(SENSORS.get(config) ?? []).map((d) => {
+                    return (
+                      <Select.Option key={d} value={d}>
+                        {intl.get(DeviceType.toString(d))}
+                      </Select.Option>
+                    );
+                  })}
                 </Select>
               </Label>
               <Input.Group compact>

@@ -19,6 +19,12 @@ export type Store = {
     alertLevels: number[];
     lastUpdate: number;
   };
+  monitoringPointAlarmRecordList: {
+    pagedOptions: PagedOption;
+    range: [number, number];
+    alertLevels: number[];
+    lastUpdate: number;
+  };
   projectList: { pagedOptions: PagedOption; lastUpdate: number };
   accountList: { pagedOptions: PagedOption; lastUpdate: number };
   reportList: { pagedOptions: PagedOption; lastUpdate: number };
@@ -43,6 +49,11 @@ export function useStore<ReturnType extends keyof Store>(
     networkList: { ...defaultOptions },
     firmwareList: { ...defaultOptions },
     alarmRecordList: {
+      ...defaultOptions,
+      alertLevels: [1, 2, 3],
+      range: oneWeekNumberRange
+    },
+    monitoringPointAlarmRecordList: {
       ...defaultOptions,
       alertLevels: [1, 2, 3],
       range: oneWeekNumberRange

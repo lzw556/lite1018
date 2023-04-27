@@ -153,8 +153,10 @@ export function useDeviceTabs(deviceTypeId?: number) {
   if (hasPermissions(Permission.DeviceSettingsGet, Permission.DeviceSettingsEdit)) {
     tabs.push({ key: 'settings', tab: 'SETTINGS' });
   }
-  if (hasPermission(Permission.DeviceRuntimeDataGet)) {
-    tabs.push({ key: 'ta', tab: 'STATUS_HISTORY' });
+  if (deviceTypeId !== DeviceType.Gateway) {
+    if (hasPermission(Permission.DeviceRuntimeDataGet)) {
+      tabs.push({ key: 'ta', tab: 'STATUS_HISTORY' });
+    }
   }
   switch (deviceTypeId) {
     case DeviceType.VibrationTemperature3Axis:

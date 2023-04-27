@@ -13,12 +13,15 @@ export const MENUS_HIDDEN = [];
 export const ASSET_CATEGORY_CHAIN: AssetCategoryChain[] = [
   { key: AssetCategoryKey.AREA, label: AssetCategoryLabel.AREA },
   {
-    key: AssetCategoryKey.AREA_ASSET,
-    label: AssetCategoryLabel.GENERAL,
+    key: AssetCategoryKey.PIPE,
+    label: AssetCategoryLabel.PIPE,
     isLeaf: true,
-    options: [
-      { key: AssetCategoryKey.PIPE, label: AssetCategoryLabel.PIPE },
-      { key: AssetCategoryKey.TANK, label: AssetCategoryLabel.TANK }
-    ]
+    group: { key: AssetCategoryKey.AREA_ASSET, label: AssetCategoryLabel.GENERAL }
+  },
+  {
+    key: AssetCategoryKey.TANK,
+    label: AssetCategoryLabel.TANK,
+    isLeaf: true,
+    group: { key: AssetCategoryKey.AREA_ASSET, label: AssetCategoryLabel.GENERAL }
   }
 ];

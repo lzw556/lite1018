@@ -23,12 +23,15 @@ import { translateMetricName } from '../../views/alarm/alarm-group';
 
 const { Option } = Select;
 
-export const FilterableAlarmRecordTable: React.FC<{ sourceId?: number }> = ({ sourceId }) => {
+export const FilterableAlarmRecordTable: React.FC<{
+  sourceId?: number;
+  storeKey?: 'alarmRecordList' | 'monitoringPointAlarmRecordList';
+}> = ({ sourceId, storeKey = 'alarmRecordList' }) => {
   const [dataSource, setDataSource] = React.useState<PageResult<any[]>>();
   const [alarmRecord, setAlarmRecord] = React.useState<any>();
   const [acknowledge, setAcknowledge] = React.useState<any>();
   const [status, setStatus] = React.useState<any>([0, 1, 2]);
-  const [store, setStore, gotoPage] = useStore('alarmRecordList');
+  const [store, setStore, gotoPage] = useStore(storeKey);
 
   const fetchAlarmRecords = (status: any, store: Store['alarmRecordList'], sourceId?: number) => {
     const {

@@ -55,7 +55,7 @@ export const UpdateForm = ({
   }, [monitoringPoint, form]);
 
   return (
-    <Form form={form} labelCol={{ span: 4 }} style={style}>
+    <Form form={form} labelCol={{ span: 6 }} style={style}>
       <FormInputItem
         label={intl.get('NAME')}
         name='name'
@@ -197,6 +197,52 @@ export const UpdateForm = ({
                 style={{ width: '100%' }}
                 controls={false}
                 addonAfter='mm'
+              />
+            }
+          />
+          <FormInputItem
+            label={intl.get('CORROSION_RATE_SHORT_TERM')}
+            name={['attributes', 'corrosion_rate_short_term']}
+            requiredMessage={intl.get('PLEASE_ENTER_SOMETHING', {
+              something: intl.get('CORROSION_RATE_SHORT_TERM')
+            })}
+            initialValue={30}
+            numericRule={{
+              isInteger: true,
+              min: 1,
+              message: intl.get('UNSIGNED_INTEGER_ENTER_PROMPT')
+            }}
+            numericChildren={
+              <InputNumber
+                placeholder={intl.get('PLEASE_ENTER_SOMETHING', {
+                  something: intl.get('CORROSION_RATE_SHORT_TERM')
+                })}
+                style={{ width: '100%' }}
+                controls={false}
+                addonAfter={intl.get('UNIT_DAY')}
+              />
+            }
+          />
+          <FormInputItem
+            label={intl.get('CORROSION_RATE_LONG_TERM')}
+            name={['attributes', 'corrosion_rate_long_term']}
+            requiredMessage={intl.get('PLEASE_ENTER_SOMETHING', {
+              something: intl.get('CORROSION_RATE_LONG_TERM')
+            })}
+            initialValue={365}
+            numericRule={{
+              isInteger: true,
+              min: 1,
+              message: intl.get('UNSIGNED_INTEGER_ENTER_PROMPT')
+            }}
+            numericChildren={
+              <InputNumber
+                placeholder={intl.get('PLEASE_ENTER_SOMETHING', {
+                  something: intl.get('CORROSION_RATE_LONG_TERM')
+                })}
+                style={{ width: '100%' }}
+                controls={false}
+                addonAfter={intl.get('UNIT_DAY')}
               />
             }
           />

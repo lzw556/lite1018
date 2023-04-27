@@ -60,9 +60,7 @@ export const RecentHistory: React.FC<{ device: Device }> = ({ device }) => {
             const value =
               datas && datas.length > 0 ? datas[datas.length - 1] : device.data?.values[field.key];
             if (value) {
-              subText += `${intl.get(field.name).d(field.name)} ${value.toFixed(
-                property.precision
-              )} `;
+              subText += `${intl.get(field.name).d(field.name)} ${value.toFixed(3)} `;
             }
             if (value === 0 || value === '0') {
               subText += `${intl.get(field.name).d(field.name)} ${value} `;

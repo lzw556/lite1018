@@ -3,7 +3,7 @@ import React from 'react';
 import { isMobile } from '../../../../utils/deviceDetection';
 import { AssetRow } from '../../../asset';
 import { bindDevice, unbindDevice, updateMeasurement } from '../../services';
-import { MonitoringPoint, MonitoringPointRow } from '../../types';
+import { MonitoringPoint, MonitoringPointRow, MonitoringPointTypeValue } from '../../types';
 import intl from 'react-intl-universal';
 import { UpdateForm } from '../../manage/updateForm';
 
@@ -34,7 +34,12 @@ export const BasicSetting = ({
                   if (bindingDevices[0].id !== values.device_id) {
                     //replace
                     unbindDevice(id, bindingDevices[0].id);
-                    bindDevice(id, values.device_id, values.channel);
+                    bindDevice(
+                      id,
+                      values.device_id,
+                      values.channel,
+                      values.type === MonitoringPointTypeValue.THICKNESS ? 11 : undefined
+                    );
                   }
                 } else {
                   bindDevice(id, values.device_id, values.channel);

@@ -29,7 +29,6 @@ const AlertMessageNotification = () => {
 
   useEffect(() => {
     const renderNotification = (record: any) => {
-      console.log(`notification ${record}`);
       switch (record.level) {
         case 1:
           api.info({
@@ -67,7 +66,11 @@ const AlertMessageNotification = () => {
         <>
           <p>{`${intl.get('ALARM_MONITORING_POINTS')}: ${record.monitoringPoint.name}`}</p>
           <p>{`${intl.get('ALARM_PROPERTIES')}: ${translateMetricName(record.metric.name)}`}</p>
-          <p>{`${intl.get('ALARM_VALUE')}: ${record.value}`}</p>
+          <p>{`${intl.get('ALARM_VALUE')}: ${record.value}${
+            record.metric.unit
+              ? intl.get(record.metric.unit).d(record.metric.unit)
+              : record.metric.unit
+          }`}</p>
         </>
       );
     };

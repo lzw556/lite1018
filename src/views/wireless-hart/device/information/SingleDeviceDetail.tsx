@@ -59,10 +59,12 @@ export const SingleDeviceDetail: React.FC<{ device: Device; upgradeStatus: any }
       value: device.ipPort.toString() ?? '-'
     });
   }
-  items.push({
-    name: intl.get('MODEL'),
-    value: device.information.model ? device.information.model : '-'
-  });
+  if (device.typeId !== DeviceType.Gateway) {
+    items.push({
+      name: intl.get('MODEL'),
+      value: device.information.model ? device.information.model : '-'
+    });
+  }
   items.push({
     name: intl.get('STATUS'),
     value: <SingleDeviceStatus alertStates={device.alertStates} state={device.state} />
@@ -79,24 +81,28 @@ export const SingleDeviceDetail: React.FC<{ device: Device; upgradeStatus: any }
       });
     }
   }
-  items.push({
-    name: `${intl.get('SIGNAL_STRENGTH')}(dB)`,
-    value: device.state ? device.state.signalLevel : '-'
-  });
-  items.push({
-    name: intl.get('FIRMWARE_VERSION'),
-    value: device.information.firmware_version ? device.information.firmware_version : '-'
-  });
+  if (device.typeId !== DeviceType.Gateway) {
+    items.push({
+      name: `${intl.get('SIGNAL_STRENGTH')}(dB)`,
+      value: device.state ? device.state.signalLevel : '-'
+    });
+    items.push({
+      name: intl.get('FIRMWARE_VERSION'),
+      value: device.information.firmware_version ? device.information.firmware_version : '-'
+    });
+  }
   items.push({
     name: intl.get('LAST_CONNECTION_TIME'),
     value: device.state.connectedAt
       ? dayjs(device.state.connectedAt * 1000).format('YYYY-MM-DD HH:mm:ss')
       : '-'
   });
-  items.push({
-    name: intl.get('PRODUCT_ID'),
-    value: device.information.product_id ? device.information.product_id : '-'
-  });
+  if (device.typeId !== DeviceType.Gateway) {
+    items.push({
+      name: intl.get('PRODUCT_ID'),
+      value: device.information.product_id ? device.information.product_id : '-'
+    });
+  }
   if (device.typeId !== DeviceType.Gateway && device.typeId !== DeviceType.Router) {
     items.push({
       name: intl.get('LAST_SAMPLING_TIME'),

@@ -106,7 +106,12 @@ export default function MonitoringPointShow() {
   items.push({
     key: 'alerts',
     label: intl.get('ALARM_RECORDS'),
-    children: <FilterableAlarmRecordTable sourceId={monitoringPoint.id} />
+    children: (
+      <FilterableAlarmRecordTable
+        sourceId={monitoringPoint.id}
+        storeKey='monitoringPointAlarmRecordList'
+      />
+    )
   });
 
   return (
