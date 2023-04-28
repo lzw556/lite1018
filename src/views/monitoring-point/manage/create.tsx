@@ -66,7 +66,14 @@ export const MonitoringPointCreate: React.FC<
             try {
               addMonitoringPoints({
                 monitoring_points: values.monitoring_points.map(
-                  ({ dev_id, place, name, channel, initial_thickness, critical_thickness }) => {
+                  ({
+                    dev_id,
+                    place,
+                    name,
+                    channel,
+                    initial_thickness = 0,
+                    critical_thickness = 0
+                  }) => {
                     if (channel !== undefined) {
                       return {
                         name,
