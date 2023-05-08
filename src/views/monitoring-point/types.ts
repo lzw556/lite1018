@@ -12,11 +12,12 @@ export enum MonitoringPointTypeValue {
   THICKNESS = 10201,
   PRELOAD = 10301,
   VIBRATION = 10401,
-  ANGLE_DIP = 10501,
   PRESSURE = 10601,
   PRESSURE_TEMPERATURE = 10602,
   FLANGE_PRELOAD = 10311,
-  TEMPERATURE = 10811
+  TEMPERATURE = 10811,
+  TOWER_INCLINATION = 10511,
+  TOWER_BASE_SETTLEMENT = 10512
 }
 
 export enum MonitoringPointTypeText {
@@ -24,10 +25,12 @@ export enum MonitoringPointTypeText {
   THICKNESS = 'FIELD_THICKNESS',
   PRELOAD = 'SETTING_GROUP_PRELOAD',
   VIBRATION = 'VIBRATION',
-  ANGLE_DIP = 'DEVICE_TYPE_INCLINATION',
   PRESSURE = 'FIELD_PRESSURE2',
+  PRESSURE_TEMPERATURE = 'DEVICE_TYPE_PRESSURE_TEMPERATURE',
   FLANGE_PRELOAD = 'FLANGE_PRELOAD',
-  TEMPERATURE = 'DEVICE_TYPE_TEMPERATURE'
+  TEMPERATURE = 'DEVICE_TYPE_TEMPERATURE',
+  TOWER_INCLINATION = 'TOWER_INCLINATION',
+  TOWER_BASE_SETTLEMENT = 'TOWER_BASE_SETTLEMENT'
 }
 
 export type MonitoringPointType = {
@@ -111,9 +114,13 @@ const dynamic_angle: { dynamicData?: DynamicData; waveData?: WaveData } = {
     serverDatatype: 'raw',
     title: 'DYNAMIC_DATA',
     fields: [
-      { label: 'FIELD_INCLINATION', value: 'dynamic_inclination', unit: '°' },
-      { label: 'FIELD_PITCH', value: 'dynamic_pitch', unit: '°' },
-      { label: 'FIELD_ROLL', value: 'dynamic_roll', unit: '°' },
+      { label: 'FIELD_DISPLACEMENT_RADIAL', value: 'dynamic_displacement_radial', unit: 'mm' },
+      { label: 'FIELD_DISPLACEMENT_EW', value: 'dynamic_displacement_ew', unit: 'mm' },
+      { label: 'FIELD_DISPLACEMENT_NS', value: 'dynamic_displacement_ns', unit: 'mm' },
+      { label: 'FIELD_INCLINATION_RADIAL', value: 'dynamic_inclination_radial', unit: '°' },
+      { label: 'FIELD_INCLINATION_EW', value: 'dynamic_inclination_ew', unit: '°' },
+      { label: 'FIELD_INCLINATION_NS', value: 'dynamic_inclination_ns', unit: '°' },
+      { label: 'FIELD_DIRECTION', value: 'dynamic_direction', unit: '°' },
       { label: 'FIELD_WAGGLE', value: 'dynamic_waggle', unit: 'g' }
     ],
     metaData: [
@@ -129,7 +136,8 @@ export const MONITORING_POINT_TYPE_VALUE_DYNAMIC_MAPPING = new Map([
   [MonitoringPointTypeValue.THICKNESS, dynamic_thickness],
   [MonitoringPointTypeValue.PRELOAD, dynamic_preload],
   [MonitoringPointTypeValue.VIBRATION, dynamic_vibration],
-  [MonitoringPointTypeValue.ANGLE_DIP, dynamic_angle]
+  [MonitoringPointTypeValue.TOWER_INCLINATION, dynamic_angle],
+  [MonitoringPointTypeValue.TOWER_BASE_SETTLEMENT, dynamic_angle]
 ]);
 
 export const MONITORING_POINT_TYPE_VALUE_DEVICE_TYPE_ID_MAPPING = new Map([
@@ -158,7 +166,8 @@ export const MONITORING_POINT_TYPE_VALUE_DEVICE_TYPE_ID_MAPPING = new Map([
       DeviceType.VibrationTemperature3AxisWIRED
     ]
   ],
-  [MonitoringPointTypeValue.ANGLE_DIP, [DeviceType.AngleDip]],
+  [MonitoringPointTypeValue.TOWER_INCLINATION, [DeviceType.AngleDip]],
+  [MonitoringPointTypeValue.TOWER_BASE_SETTLEMENT, [DeviceType.AngleDip]],
   [
     MonitoringPointTypeValue.PRESSURE,
     [
@@ -183,6 +192,14 @@ export const MONITORING_POINT_TYPE_VALUE_DEVICE_TYPE_ID_MAPPING = new Map([
   ]
 ]);
 
+export const MONITORING_POINT_TYPE_VALUE_ASSET_CATEGORY_KEY_MAPPING = new Map([
+  [102, [MonitoringPointTypeValue.LOOSENING_ANGLE, MonitoringPointTypeValue.PRELOAD]],
+  [
+    103,
+    [MonitoringPointTypeValue.TOWER_INCLINATION, MonitoringPointTypeValue.TOWER_BASE_SETTLEMENT]
+  ]
+]);
+
 export const MONITORING_POINT_FIRST_CLASS_FIELDS_MAPPING = new Map([
   [
     MonitoringPointTypeValue.LOOSENING_ANGLE,
@@ -194,7 +211,14 @@ export const MONITORING_POINT_FIRST_CLASS_FIELDS_MAPPING = new Map([
     MonitoringPointTypeValue.VIBRATION,
     ['vibration_severity_y', 'enveloping_pk2pk_y', 'temperature']
   ],
-  [MonitoringPointTypeValue.ANGLE_DIP, ['inclination', 'pitch', 'roll', 'waggle']],
+  [
+    MonitoringPointTypeValue.TOWER_INCLINATION,
+    ['displacement_radial', 'inclination_radial', 'direction', 'waggle']
+  ],
+  [
+    MonitoringPointTypeValue.TOWER_BASE_SETTLEMENT,
+    ['displacement_radial', 'inclination_radial', 'direction', 'waggle']
+  ],
   [MonitoringPointTypeValue.PRESSURE, ['pressure', 'temperature']],
   [MonitoringPointTypeValue.TEMPERATURE, ['temperature']],
   [MonitoringPointTypeValue.FLANGE_PRELOAD, ['preload', 'pressure', 'tof', 'temperature']]
@@ -243,7 +267,7 @@ export type MonitoringPointRow = {
   type: number;
   assetId: number;
   bindingDevices?: (Device & { channel?: number })[];
-  attributes?: { index: number };
+  attributes?: { index: number; tower_install_height?: number; tower_base_radius?: number };
   assetName: string;
   properties: Property[];
   data?: {

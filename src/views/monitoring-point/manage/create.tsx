@@ -7,7 +7,8 @@ import { MonitoringPointInfo } from './DeviceSelection';
 import { MonitoringPointFormItem } from './monitoringPointFormItem';
 import { SelectParentFormItem } from './selectParentFormItem';
 import intl from 'react-intl-universal';
-import { MONITORING_POINT, MonitoringPointTypeValue } from '../types';
+import { MONITORING_POINT } from '../types';
+import { getProcessId } from '../utils';
 
 export type MonitoringPointBatch = {
   asset_id: number;
@@ -71,17 +72,40 @@ export const MonitoringPointCreate: React.FC<
                     place,
                     name,
                     channel,
-                    initial_thickness = 0,
-                    critical_thickness = 0
+                    initial_thickness,
+                    critical_thickness,
+                    tower_base_radius,
+                    tower_install_angle,
+                    tower_install_height
                   }) => {
+                    let attributes: any = { index: Number(place) };
+                    if (initial_thickness != null) {
+                      attributes.initial_thickness = initial_thickness;
+                    }
+                    if (critical_thickness != null) {
+                      attributes.critical_thickness = critical_thickness;
+                    }
+                    if (tower_base_radius != null) {
+                      attributes.tower_base_radius = tower_base_radius;
+                    }
+                    if (tower_install_angle != null) {
+                      attributes.tower_install_angle = tower_install_angle;
+                    }
+                    if (tower_install_height != null) {
+                      attributes.tower_install_height = tower_install_height;
+                    }
+                    const process_id = getProcessId({
+                      monitoringPointType: values.type,
+                      isChannel: !!channel
+                    });
                     if (channel !== undefined) {
                       return {
                         name,
                         type: values.type,
-                        attributes: { index: Number(place), initial_thickness, critical_thickness },
+                        attributes,
                         device_binding: {
                           device_id: dev_id,
-                          process_id: 2,
+                          process_id,
                           parameters: { channel }
                         },
                         asset_id: values.asset_id
@@ -90,11 +114,8 @@ export const MonitoringPointCreate: React.FC<
                       return {
                         name,
                         type: values.type,
-                        attributes: { index: Number(place), initial_thickness, critical_thickness },
-                        device_binding:
-                          values.type === MonitoringPointTypeValue.THICKNESS
-                            ? { device_id: dev_id, process_id: 11 }
-                            : { device_id: dev_id },
+                        attributes,
+                        device_binding: { device_id: dev_id, process_id },
                         asset_id: values.asset_id
                       };
                     }
@@ -123,6 +144,7 @@ export const MonitoringPointCreate: React.FC<
             }
           }}
           form={form}
+          key={parent?.id}
         />
         <MonitoringPointFormItem
           selectedPointType={selectedPointType}

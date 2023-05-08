@@ -1,11 +1,13 @@
 import { MinusCircleOutlined } from '@ant-design/icons';
-import { Button, Form, Input, InputNumber, Popover } from 'antd';
+import { Button, Form, Input, Popover } from 'antd';
 import React from 'react';
 import { Device } from '../../../types/device';
 import { DeviceSelection, MonitoringPointInfo } from './DeviceSelection';
 import intl from 'react-intl-universal';
 import { FormInputItem } from '../../../components/formInputItem';
 import { MonitoringPointTypeValue } from '../types';
+import { ThicknessFieldsOfCreation } from './thicknessFieldsOfCreation';
+import { AngleFieldsOfCreation } from './angleFieldsOfCreation';
 
 export const MonitoringPointFormItem = ({
   devices,
@@ -53,7 +55,7 @@ export const MonitoringPointFormItem = ({
                   onRemove(index);
                 }}
               />
-              <Form.Item label={intl.get('NAME')} style={{ marginBottom: 0 }}>
+              <Form.Item required label={intl.get('NAME')} style={{ marginBottom: 0 }}>
                 <FormInputItem
                   {...restFields}
                   name={[name, 'name']}
@@ -85,104 +87,15 @@ export const MonitoringPointFormItem = ({
                 />
               </Form.Item>
               {selectedPointType === MonitoringPointTypeValue.THICKNESS && (
-                <>
-                  <Form.Item
-                    label={`${intl.get('FIELD_THICKNESS')}(mm)`}
-                    style={{ marginBottom: 0 }}
-                  >
-                    <FormInputItem
-                      {...restFields}
-                      name={[name, 'initial_thickness']}
-                      requiredMessage={intl.get('PLEASE_ENTER_SOMETHING', {
-                        something: intl.get('INITIAL_THICKNESS')
-                      })}
-                      numericRule={{
-                        message: intl.get('PLEASE_ENTER_NUMERIC')
-                      }}
-                      style={{ display: 'inline-block', width: 200, marginRight: 20 }}
-                      numericChildren={
-                        <InputNumber
-                          placeholder={intl.get('PLEASE_ENTER_SOMETHING', {
-                            something: intl.get('INITIAL_THICKNESS')
-                          })}
-                          style={{ width: '100%' }}
-                          controls={false}
-                        />
-                      }
-                    />
-                    <FormInputItem
-                      {...restFields}
-                      name={[name, 'critical_thickness']}
-                      requiredMessage={intl.get('PLEASE_ENTER_SOMETHING', {
-                        something: intl.get('CRITICAL_THICKNESS')
-                      })}
-                      numericRule={{
-                        message: intl.get('PLEASE_ENTER_NUMERIC')
-                      }}
-                      style={{ display: 'inline-block', width: 200 }}
-                      numericChildren={
-                        <InputNumber
-                          placeholder={intl.get('PLEASE_ENTER_SOMETHING', {
-                            something: intl.get('CRITICAL_THICKNESS')
-                          })}
-                          style={{ width: '100%' }}
-                          controls={false}
-                        />
-                      }
-                    />
-                  </Form.Item>
-                  <Form.Item
-                    label={`${intl.get('FIELD_CORROSION_RATE')}(${intl.get('UNIT_DAY')})`}
-                    style={{ marginBottom: 0 }}
-                  >
-                    <FormInputItem
-                      {...restFields}
-                      name={[name, 'corrosion_rate_short_term']}
-                      requiredMessage={intl.get('PLEASE_ENTER_SOMETHING', {
-                        something: intl.get('CORROSION_RATE_SHORT_TERM')
-                      })}
-                      initialValue={30}
-                      numericRule={{
-                        isInteger: true,
-                        min: 1,
-                        message: intl.get('UNSIGNED_INTEGER_ENTER_PROMPT')
-                      }}
-                      style={{ display: 'inline-block', width: 200, marginRight: 20 }}
-                      numericChildren={
-                        <InputNumber
-                          placeholder={intl.get('PLEASE_ENTER_SOMETHING', {
-                            something: intl.get('CORROSION_RATE_SHORT_TERM')
-                          })}
-                          style={{ width: '100%' }}
-                          controls={false}
-                        />
-                      }
-                    />
-                    <FormInputItem
-                      {...restFields}
-                      name={[name, 'corrosion_rate_long_term']}
-                      requiredMessage={intl.get('PLEASE_ENTER_SOMETHING', {
-                        something: intl.get('CORROSION_RATE_LONG_TERM')
-                      })}
-                      initialValue={365}
-                      numericRule={{
-                        isInteger: true,
-                        min: 1,
-                        message: intl.get('UNSIGNED_INTEGER_ENTER_PROMPT')
-                      }}
-                      style={{ display: 'inline-block', width: 200 }}
-                      numericChildren={
-                        <InputNumber
-                          placeholder={intl.get('PLEASE_ENTER_SOMETHING', {
-                            something: intl.get('CORROSION_RATE_LONG_TERM')
-                          })}
-                          style={{ width: '100%' }}
-                          controls={false}
-                        />
-                      }
-                    />
-                  </Form.Item>
-                </>
+                <ThicknessFieldsOfCreation name={name} restFields={restFields} />
+              )}
+              {(selectedPointType === MonitoringPointTypeValue.TOWER_INCLINATION ||
+                selectedPointType === MonitoringPointTypeValue.TOWER_BASE_SETTLEMENT) && (
+                <AngleFieldsOfCreation
+                  type={selectedPointType}
+                  name={name}
+                  restFields={restFields}
+                />
               )}
             </div>
           ))}

@@ -73,6 +73,9 @@ export function CreateAssetActionBar({
       groupdChains.push({ key: group.key, label: group.label });
     }
   });
+  if (groupdChains.length === 0) {
+    groupdChains.push(...last);
+  }
   groupdChains.forEach(({ key, label }) => {
     if (!isChild(key) && !shouldHide(key)) {
       actions.push(
@@ -82,6 +85,8 @@ export function CreateAssetActionBar({
           onClick={() => {
             if (AssertAssetCategory(key, AssertOfAssetCategory.IS_FLANGE)) {
               actionStatus.onFlangeCreate(lastParent?.id);
+            } else if (AssertAssetCategory(key, AssertOfAssetCategory.IS_TOWER)) {
+              actionStatus.onTowerCreate(lastParent?.id);
             } else if (AssertAssetCategory(key, AssertOfAssetCategory.IS_AREA_ASSET)) {
               actionStatus.onAreaAssetCreate();
             }

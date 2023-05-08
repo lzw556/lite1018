@@ -7,7 +7,13 @@ export const FormInputItem: React.FC<
   FormItemProps & {
     requiredMessage?: string;
     lengthLimit?: { min: number; max: number; label: string };
-    numericRule?: { isInteger?: boolean; min?: number; message?: string; others?: Rule[] };
+    numericRule?: {
+      isInteger?: boolean;
+      min?: number;
+      max?: number;
+      message?: string;
+      others?: Rule[];
+    };
     numericChildren?: JSX.Element;
     placeholder?: string;
   }
@@ -27,10 +33,11 @@ export const FormInputItem: React.FC<
     rules.push({ required: true, message: requiredMessage });
   }
   if (numericRule !== undefined) {
-    const { isInteger, min, message, others } = numericRule;
+    const { isInteger, min, max, message, others } = numericRule;
     rules.push({
       type: isInteger ? 'integer' : 'number',
       min,
+      max,
       message: message ?? intl.get('PLEASE_ENTER_NUMERIC')
     });
     if (others && others.length > 0) {

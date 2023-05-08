@@ -123,6 +123,7 @@ export const MonitoringPointDynamicData: React.FC<MonitoringPointRow & { dataTyp
                 key={props.dataType}
                 type={dynamicDataType}
                 data={{ values: dynamicData.values, loading: dynamicData.loading }}
+                monitoringPoint={{ ...props }}
               />
             )}
           </Row>

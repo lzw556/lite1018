@@ -11,6 +11,7 @@ import { PageTitle } from '../../../components/pageTitle';
 import intl from 'react-intl-universal';
 import { FormInputItem } from '../../../components/formInputItem';
 import { WIRELESS_HART_POLLING_PERIOD } from '../../../constants';
+import { toMac } from '../../../utils/format';
 
 const { Dragger } = Upload;
 
@@ -22,7 +23,8 @@ export interface NetworkRequestForm {
 
 const ImportNetworkPage = () => {
   const [height] = useState<number>(window.innerHeight - 190);
-  const [network, setNetwork] = useState<any>();
+  const [devices, setDevices] = useState<any>([]);
+  const [gateway, setGateway] = useState<any>();
   const [success, setSuccess] = useState<boolean>(false);
   const [form] = Form.useForm();
   const [graph, setGraph] = useState<TreeGraph | undefined>();
@@ -39,8 +41,7 @@ const ImportNetworkPage = () => {
       if (typeof reader.result === 'string') {
         const json = JSON.parse(reader.result);
         if (checkJSONFormat(json)) {
-          debugger;
-          setNetwork({ wsn: json.wsn, devices: json.deviceList });
+          setDevices(json.deviceList);
         } else {
           message.error(intl.get('INVALID_FILE_FORMAT')).then();
         }
@@ -65,26 +66,37 @@ const ImportNetworkPage = () => {
     };
   }, [graph]);
 
+  useEffect(() => {
+    if (devices.length > 0) {
+      setGateway(devices.find((d: any) => d.type === 1));
+    }
+  }, [devices]);
+
   const onSave = () => {
-    if (network === undefined) {
+    if (gateway === undefined) {
       message.error(intl.get('PLEASE_UPLOAD_FILE'));
       return;
     }
-    const nodes = network.devices;
-    if (nodes && nodes.length) {
+    if (devices.length > 0) {
       form.validateFields().then((values) => {
-        // const req: NetworkRequestForm = {
-        //   devices: nodes.map((n: any) => {
-        //     return {
-        //       name: n.name,
-        //       mac_address: n.address,
-        //       parent_address: n.parentAddress,
-        //       type_id: n.type,
-        //       settings: n.settings
-        //     };
-        //   })
-        // };
-        // ImportNetworkRequest(req).then((_) => setSuccess(true));
+        console.log(values);
+        console.log(devices);
+        const req: any = {
+          devices: devices.map((n: any) => {
+            if (n.type === 1) {
+              return { ...n, ...values.gateway };
+            } else {
+              return {
+                name: n.name,
+                mac_address: n.address,
+                parent_address: n.parentAddress,
+                type_id: n.type,
+                settings: n.settings
+              };
+            }
+          })
+        };
+        ImportNetworkRequest(req).then((_) => setSuccess(true));
       });
     } else {
       message.error(intl.get('DO_NOT_IMPORT_EMPTY_NETWORK')).then();
@@ -93,18 +105,18 @@ const ImportNetworkPage = () => {
 
   useEffect(() => {
     const tree: any = (root: any) => {
-      return network.devices
+      return devices
         .slice(1)
         .filter((node: any) => node.parentAddress === root.address)
         .map((item: any) => {
           return {
-            id: item.address,
+            id: toMac(item.address),
             data: item,
             children: tree(item)
           };
         });
     };
-    if (network?.devices && network?.devices.length) {
+    if (gateway) {
       if (!graph) {
         const graphInstance = new G6.TreeGraph({
           container: 'container',
@@ -148,36 +160,37 @@ const ImportNetworkPage = () => {
           }
         });
         graphInstance.data({
-          id: network.gateway.ipAddress,
-          data: network.devices[0],
-          children: tree(network.devices[0])
+          id: gateway.ipAddress,
+          data: gateway,
+          children: tree(gateway)
         });
         graphInstance.render();
         graphInstance.fitView();
         setGraph(graphInstance);
       }
     }
-  }, [network, graph]);
+  }, [gateway, graph, devices]);
 
   useEffect(() => {
-    if (network !== undefined) {
+    if (gateway) {
       form.setFieldsValue({
-        name: network.name,
+        name: gateway.name,
         gateway: {
-          ip_address: network.gateway.ipAddress,
-          ip_port: network.gateway.ipPort,
-          polling_period: network.gateway.pollingPeriod
+          ip_address: gateway.ipAddress,
+          ip_port: gateway.ipPort,
+          polling_period: gateway.pollingPeriod
         }
       });
     }
-  }, [network, form]);
+  }, [gateway, form]);
 
   const renderAction = () => {
-    if (network) {
+    if (gateway) {
       return (
         <a
           onClick={() => {
-            setNetwork(undefined);
+            setGateway(undefined);
+            setGraph(undefined);
             form.resetFields();
           }}
         >
@@ -214,7 +227,7 @@ const ImportNetworkPage = () => {
                   extra={renderAction()}
                 >
                   <div className='graph' style={{ height: `${height - 56}px`, width: '100%' }}>
-                    {network?.devices.length ? (
+                    {gateway ? (
                       <div id={'container'} style={{ width: '100%', height: '100%' }} />
                     ) : (
                       <Dragger
@@ -239,55 +252,59 @@ const ImportNetworkPage = () => {
                   title={intl.get('EDIT')}
                   style={{ height: `${height}px` }}
                 >
-                  <FormInputItem
-                    label={intl.get('NAME')}
-                    name='name'
-                    requiredMessage={intl.get('PLEASE_ENTER_NAME')}
-                    lengthLimit={{ min: 4, max: 16, label: intl.get('NAME').toLowerCase() }}
-                  >
-                    <Input placeholder={intl.get('PLEASE_ENTER_NAME')} />
-                  </FormInputItem>
-                  <FormInputItem
-                    label={intl.get('IP_ADDRESS')}
-                    name={['gateway', 'ip_address']}
-                    requiredMessage={intl.get('PLEASE_ENTER_SOMETHING', {
-                      something: intl.get('IP_ADDRESS')
-                    })}
-                    lengthLimit={{ min: 4, max: 16, label: intl.get('NETWORK').toLowerCase() }}
-                  >
-                    <Input
-                      placeholder={intl.get('PLEASE_ENTER_SOMETHING', {
-                        something: intl.get('IP_ADDRESS')
-                      })}
-                    />
-                  </FormInputItem>
-                  <FormInputItem
-                    label={intl.get('PORT')}
-                    name={['gateway', 'ip_port']}
-                    requiredMessage={intl.get('PLEASE_ENTER_SOMETHING', {
-                      something: intl.get('PORT')
-                    })}
-                    numericRule={{
-                      isInteger: true,
-                      min: 1,
-                      message: intl.get('UNSIGNED_INTEGER_ENTER_PROMPT')
-                    }}
-                    placeholder={intl.get('PLEASE_ENTER_SOMETHING', {
-                      something: intl.get('PORT')
-                    })}
-                  />
-                  <Form.Item
-                    label={intl.get('POLLING_PERIOD')}
-                    name={['gateway', 'polling_period']}
-                  >
-                    <Select>
-                      {WIRELESS_HART_POLLING_PERIOD.map(({ value, text }) => (
-                        <Select.Option value={value} key={value}>
-                          {intl.get(text)}
-                        </Select.Option>
-                      ))}
-                    </Select>
-                  </Form.Item>
+                  {gateway && (
+                    <>
+                      <FormInputItem
+                        label={intl.get('NAME')}
+                        name='name'
+                        requiredMessage={intl.get('PLEASE_ENTER_NAME')}
+                        lengthLimit={{ min: 4, max: 16, label: intl.get('NAME').toLowerCase() }}
+                      >
+                        <Input placeholder={intl.get('PLEASE_ENTER_NAME')} />
+                      </FormInputItem>
+                      <FormInputItem
+                        label={intl.get('IP_ADDRESS')}
+                        name={['gateway', 'ip_address']}
+                        requiredMessage={intl.get('PLEASE_ENTER_SOMETHING', {
+                          something: intl.get('IP_ADDRESS')
+                        })}
+                        lengthLimit={{ min: 4, max: 16, label: intl.get('NETWORK').toLowerCase() }}
+                      >
+                        <Input
+                          placeholder={intl.get('PLEASE_ENTER_SOMETHING', {
+                            something: intl.get('IP_ADDRESS')
+                          })}
+                        />
+                      </FormInputItem>
+                      <FormInputItem
+                        label={intl.get('PORT')}
+                        name={['gateway', 'ip_port']}
+                        requiredMessage={intl.get('PLEASE_ENTER_SOMETHING', {
+                          something: intl.get('PORT')
+                        })}
+                        numericRule={{
+                          isInteger: true,
+                          min: 1,
+                          message: intl.get('UNSIGNED_INTEGER_ENTER_PROMPT')
+                        }}
+                        placeholder={intl.get('PLEASE_ENTER_SOMETHING', {
+                          something: intl.get('PORT')
+                        })}
+                      />
+                      <Form.Item
+                        label={intl.get('POLLING_PERIOD')}
+                        name={['gateway', 'polling_period']}
+                      >
+                        <Select>
+                          {WIRELESS_HART_POLLING_PERIOD.map(({ value, text }) => (
+                            <Select.Option value={value} key={value}>
+                              {intl.get(text)}
+                            </Select.Option>
+                          ))}
+                        </Select>
+                      </Form.Item>
+                    </>
+                  )}
                 </Card>
               </Col>
             </Row>
@@ -304,7 +321,7 @@ const ImportNetworkPage = () => {
                   key='add'
                   onClick={() => {
                     form.resetFields();
-                    setNetwork({ devices: [], wsn: {} });
+                    setDevices([]);
                     setSuccess(false);
                   }}
                 >

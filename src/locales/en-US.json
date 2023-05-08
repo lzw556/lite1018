@@ -938,5 +938,21 @@
   "FIELD_RESIDUAL_LIFE": "Residual Life",
   "ERROR_DEVICE_TAG_EXISTS": "Device tag alread exists.",
   "CORROSION_RATE_SHORT_TERM": " Corrosion rate short term",
-  "CORROSION_RATE_LONG_TERM": "Corrosion rate long term"
+  "CORROSION_RATE_LONG_TERM": "Corrosion rate long term",
+  "TOWER_BASE_RADIUS": "Tower base radius",
+  "TOWER_INSTALL_HEIGHT": "Tower install height",
+  "TOWER_INSTALL_ANGLE": "Tower intsall angle",
+  "TOWER_INCLINATION": "Tower Inclination",
+  "TOWER_BASE_SETTLEMENT": "Tower Base Settlement",
+  "FIELD_DIRECTION": "Direction",
+  "SCATTERGRAM": "Scattergram",
+  "VALIDATOR_NUMBER_MORE": "{name} must be greater than {min}",
+  "FIELD_INCLINATION_COMBINED": "Inclination",
+  "FIELD_INCLINATION_RADIAL": "Radial",
+  "FIELD_INCLINATION_EW": "East-west",
+  "FIELD_INCLINATION_NS": "North-south",
+  "FIELD_DISPLACEMENT_COMBINED": "Displacement",
+  "FIELD_DISPLACEMENT_RADIAL": "Radial",
+  "FIELD_DISPLACEMENT_EW": "East-west",
+  "FIELD_DISPLACEMENT_NS": "North-south"
 }

@@ -7,7 +7,8 @@ import {
   MonitoringPointTypeValue,
   MONITORING_POINT_FIRST_CLASS_FIELDS_MAPPING,
   MONITORING_POINT_TYPE_VALUE_DYNAMIC_MAPPING,
-  Property
+  Property,
+  MonitoringPointTypeText
 } from './types';
 import intl from 'react-intl-universal';
 
@@ -129,8 +130,8 @@ export function generatePropertyColumns(measurement: MonitoringPointRow) {
 
 export function sortMonitoringPointByAttributes(measurements: MonitoringPointRow[]) {
   return measurements.sort((prev, next) => {
-    const { index: prevIndex } = prev.attributes || { index: 8 };
-    const { index: nextIndex } = next.attributes || { index: 8 };
+    const { index: prevIndex } = prev.attributes || { index: 88 };
+    const { index: nextIndex } = next.attributes || { index: 88 };
     return prevIndex - nextIndex;
   });
 }
@@ -155,4 +156,37 @@ export function pickId(id: string | number) {
     return Number(id.substring(0, id.indexOf('-')));
   }
   return 0;
+}
+
+export function getProcessId({
+  monitoringPointType,
+  isChannel
+}: {
+  monitoringPointType?: number;
+  isChannel?: boolean;
+}) {
+  if (isChannel) {
+    return 2;
+  }
+  if (monitoringPointType === MonitoringPointTypeValue.THICKNESS) {
+    return 11;
+  }
+  if (
+    monitoringPointType === MonitoringPointTypeValue.TOWER_INCLINATION ||
+    monitoringPointType === MonitoringPointTypeValue.TOWER_BASE_SETTLEMENT
+  ) {
+    return 21;
+  }
+  return 1;
+}
+
+export function getMonitoringPointType(type: number) {
+  for (const key in MonitoringPointTypeValue) {
+    if (!Number.isNaN(Number(key)) && type === Number(key)) {
+      const _key: keyof typeof MonitoringPointTypeValue = MonitoringPointTypeValue[
+        key
+      ] as keyof typeof MonitoringPointTypeValue;
+      return MonitoringPointTypeText[_key];
+    }
+  }
 }

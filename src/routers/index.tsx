@@ -40,6 +40,7 @@ import enUS from 'antd/es/locale/en_US';
 import dayjs from '../utils/dayjsUtils';
 import 'dayjs/locale/zh-cn';
 import { AssetsContextProvider, ASSET_PATHNAME, useAppConfigContext } from '../views/asset';
+import { TOWER_PATHNAME } from '../views/tower';
 
 const AlarmRuleGroups = lazy(() => import('../views/alarm/alarm-group/index'));
 const CreateAlarmRuleGroups = lazy(() => import('../views/alarm/alarm-group/create'));
@@ -51,6 +52,7 @@ const AssetsTreeList = lazy(() => import('../views/asset/tree-list/index'));
 const AssetsTableList = lazy(() => import('../views/asset/table-list/index'));
 const AssetShow = lazy(() => import('../views/asset/show/index'));
 const FlangeShow = lazy(() => import('../views/flange/show/index'));
+const TowerShow = lazy(() => import('../views/tower/show/index'));
 const MonitoringPointShow = lazy(() => import('../views/monitoring-point/show/index'));
 
 const AppRouter = () => {
@@ -94,6 +96,14 @@ const AppRouter = () => {
           element: (
             <AssetsContextProvider>
               <FlangeShow />
+            </AssetsContextProvider>
+          )
+        },
+        {
+          path: `${TOWER_PATHNAME}/:id`,
+          element: (
+            <AssetsContextProvider>
+              <TowerShow />
             </AssetsContextProvider>
           )
         },

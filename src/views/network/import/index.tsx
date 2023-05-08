@@ -12,6 +12,7 @@ import { Network } from '../../../types/network';
 import { useNavigate } from 'react-router';
 import { PageTitle } from '../../../components/pageTitle';
 import intl from 'react-intl-universal';
+import { toMac } from '../../../utils/format';
 
 const { Dragger } = Upload;
 
@@ -102,7 +103,7 @@ const ImportNetworkPage = () => {
         .filter((node: any) => node.parentAddress === root.address)
         .map((item: any) => {
           return {
-            id: item.address,
+            id: toMac(item.address.toUpperCase()),
             data: item,
             children: tree(item)
           };
@@ -198,6 +199,7 @@ const ImportNetworkPage = () => {
         <a
           onClick={() => {
             setNetwork(undefined);
+            setGraph(undefined);
             form.resetFields();
           }}
         >

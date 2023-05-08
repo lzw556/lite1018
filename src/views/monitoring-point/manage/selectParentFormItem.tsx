@@ -6,7 +6,8 @@ import { AssetRow, getAssets, useAppConfigContext } from '../../asset';
 import {
   MonitoringPointTypeValue,
   MONITORING_POINT,
-  MONITORING_POINT_TYPE_VALUE_DEVICE_TYPE_ID_MAPPING
+  MONITORING_POINT_TYPE_VALUE_DEVICE_TYPE_ID_MAPPING,
+  MONITORING_POINT_TYPE_VALUE_ASSET_CATEGORY_KEY_MAPPING
 } from '../types';
 import { MonitoringPointBatch } from './create';
 import { checkIsFlangePreload } from '../../flange';
@@ -28,6 +29,10 @@ export const SelectParentFormItem = ({
   const config = useAppConfigContext();
   const { root, last } = useAssetCategoryChain();
   const memoedLast = React.useRef(last);
+  const [selectedParent, setSelectedParent] = React.useState<AssetRow | undefined>(parent);
+  const [monitoringPointTypes, setMonitoringPointTypes] = React.useState<
+    MonitoringPointTypeValue[]
+  >([]);
 
   React.useEffect(() => {
     if (parent === undefined) {
@@ -55,6 +60,18 @@ export const SelectParentFormItem = ({
     }
   }, [form, handlePointTypeChange, isFlangePreload]);
 
+  React.useEffect(() => {
+    if (selectedParent) {
+      const types =
+        MONITORING_POINT_TYPE_VALUE_ASSET_CATEGORY_KEY_MAPPING.get(selectedParent.type) ?? [];
+      setMonitoringPointTypes(types);
+      const selectedType = form.getFieldValue('type');
+      if (!types.includes(selectedType)) {
+        form.setFieldValue('type', undefined);
+      }
+    }
+  }, [selectedParent, form]);
+
   return (
     <>
       {parents?.length > 0 ? (
@@ -71,6 +88,7 @@ export const SelectParentFormItem = ({
           <Select
             placeholder={intl.get('PLEASE_SELECT_SOMETHING', { something: intl.get('ASSET') })}
             onChange={(id, option: any) => {
+              setSelectedParent(parents.find((a) => a.id === id));
               setIsFlangePreload(checkIsFlangePreload(option));
             }}
           >
@@ -99,24 +117,30 @@ export const SelectParentFormItem = ({
         ]}
       >
         <Select
+          disabled={!selectedParent}
           placeholder={intl.get('PLEASE_SELECT_SOMETHING', {
             something: intl.get('OBJECT_TYPE', { object: intl.get(MONITORING_POINT) })
           })}
           onChange={(id) => handlePointTypeChange(id)}
         >
-          {MONITORING_POINTS.get(config)?.map(({ id, label }) => (
-            <Select.Option
-              key={id}
-              value={id}
-              disabled={
-                (id === MonitoringPointTypeValue.LOOSENING_ANGLE ||
-                  id === MonitoringPointTypeValue.ANGLE_DIP) &&
-                isFlangePreload
-              }
-            >
-              {intl.get(label)}
-            </Select.Option>
-          ))}
+          {MONITORING_POINTS.get(config)
+            ?.filter((t) =>
+              monitoringPointTypes.length > 0 ? monitoringPointTypes?.includes(t.id) : true
+            )
+            .map(({ id, label }) => (
+              <Select.Option
+                key={id}
+                value={id}
+                disabled={
+                  (id === MonitoringPointTypeValue.LOOSENING_ANGLE ||
+                    id === MonitoringPointTypeValue.TOWER_INCLINATION ||
+                    id === MonitoringPointTypeValue.TOWER_BASE_SETTLEMENT) &&
+                  isFlangePreload
+                }
+              >
+                {intl.get(label)}
+              </Select.Option>
+            ))}
         </Select>
       </Form.Item>
     </>

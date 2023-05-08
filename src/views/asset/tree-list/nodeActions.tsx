@@ -14,7 +14,7 @@ import { deleteAsset, getAsset } from '../services';
 import { AssertAssetCategory, AssertOfAssetCategory } from '../types';
 import { useAssetCategoryChain } from '../../../config/assetCategory.config';
 import { Link, useLocation } from 'react-router-dom';
-import { getPathFromType } from '../components';
+import { getPathFromType, useAppConfigContext } from '../components';
 
 export const NodeActions = ({
   id,
@@ -32,7 +32,6 @@ export const NodeActions = ({
   actionStatus: any;
 }) => {
   const { state } = useLocation();
-
   const {
     onAssetCreate,
     onAssetUpdate,
@@ -41,7 +40,9 @@ export const NodeActions = ({
     onMonitoringPointCreate,
     onMonitoringPointUpdate,
     onAreaAssetCreate,
-    onAreaAssetUpdate
+    onAreaAssetUpdate,
+    onTowerCreate,
+    onTowerUpdate
   } = actionStatus;
   const isNodeAsset = AssertAssetCategory(type, AssertOfAssetCategory.IS_ASSET);
   const isNodeWind = AssertAssetCategory(type, AssertOfAssetCategory.IS_WIND_LIKE);
@@ -49,6 +50,7 @@ export const NodeActions = ({
   const isNodeArea = AssertAssetCategory(type, AssertOfAssetCategory.IS_AREA);
   const isNodePipe = AssertAssetCategory(type, AssertOfAssetCategory.IS_PIPE);
   const isNodeRootAsset = rootId === id && isNodeAsset;
+  const isNodeTower = AssertAssetCategory(type, AssertOfAssetCategory.IS_TOWER);
   return (
     <div style={{ height: 24, lineHeight: '24px' }}>
       <HasPermission value={Permission.AssetAdd}>
@@ -60,6 +62,8 @@ export const NodeActions = ({
                   .then((asset) => {
                     if (isNodeFlange) {
                       onFlangeUpdate?.(asset);
+                    } else if (isNodeTower) {
+                      onTowerUpdate?.(asset);
                     } else if (isNodePipe) {
                       onAreaAssetUpdate?.(asset);
                     } else {
@@ -110,8 +114,17 @@ export const NodeActions = ({
               getAsset(id)
                 .then((asset) => {
                   if (isNodeWind) {
-                    onFlangeCreate?.(asset.id);
-                  } else if (isNodeFlange || e.key === 'monitoring-point-create' || isNodePipe) {
+                    if (e.key === 'tower-create') {
+                      onTowerCreate?.(asset.id);
+                    } else {
+                      onFlangeCreate?.(asset.id);
+                    }
+                  } else if (
+                    isNodeFlange ||
+                    e.key === 'monitoring-point-create' ||
+                    isNodePipe ||
+                    isNodeTower
+                  ) {
                     onMonitoringPointCreate?.(asset);
                   } else if (e.key === 'general-create') {
                     onAssetCreate?.(asset.id);
@@ -136,7 +149,9 @@ export const NodeActions = ({
 };
 
 function AddAction({ type, onClick }: { type: number; onClick: (handler: any) => void }) {
+  const config = useAppConfigContext();
   const { isLeaf, isChild } = useAssetCategoryChain();
+  const isNodeWind = AssertAssetCategory(type, AssertOfAssetCategory.IS_WIND_LIKE);
   const isNodeLeaf = isLeaf(type);
   const isNodeChild = isChild(type);
   if (isNodeLeaf && isNodeChild) {
@@ -146,6 +161,22 @@ function AddAction({ type, onClick }: { type: number; onClick: (handler: any) =>
           items: [
             { key: 'general-create', label: intl.get('ASSET') },
             { key: 'monitoring-point-create', label: intl.get(MONITORING_POINT) }
+          ],
+          onClick
+        }}
+      >
+        <Button type='text' size='small'>
+          <PlusOutlined />
+        </Button>
+      </Dropdown>
+    );
+  } else if (isNodeWind && config === 'windTurbinePro') {
+    return (
+      <Dropdown
+        menu={{
+          items: [
+            { key: 'flange-create', label: intl.get('FLANGE') },
+            { key: 'tower-create', label: intl.get('TOWER') }
           ],
           onClick
         }}

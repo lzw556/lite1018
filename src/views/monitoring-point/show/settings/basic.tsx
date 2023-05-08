@@ -3,9 +3,10 @@ import React from 'react';
 import { isMobile } from '../../../../utils/deviceDetection';
 import { AssetRow } from '../../../asset';
 import { bindDevice, unbindDevice, updateMeasurement } from '../../services';
-import { MonitoringPoint, MonitoringPointRow, MonitoringPointTypeValue } from '../../types';
+import { MonitoringPoint, MonitoringPointRow } from '../../types';
 import intl from 'react-intl-universal';
 import { UpdateForm } from '../../manage/updateForm';
+import { getProcessId } from '../../utils';
 
 export const BasicSetting = ({
   monitoringPoint,
@@ -30,19 +31,18 @@ export const BasicSetting = ({
             form.validateFields().then((values) => {
               try {
                 const { id, bindingDevices } = monitoringPoint;
+                const processId = getProcessId({
+                  monitoringPointType: values.type,
+                  isChannel: !!values.channel
+                });
                 if (bindingDevices && bindingDevices.length > 0) {
                   if (bindingDevices[0].id !== values.device_id) {
                     //replace
                     unbindDevice(id, bindingDevices[0].id);
-                    bindDevice(
-                      id,
-                      values.device_id,
-                      values.channel,
-                      values.type === MonitoringPointTypeValue.THICKNESS ? 11 : undefined
-                    );
+                    bindDevice(id, values.device_id, values.channel, processId);
                   }
                 } else {
-                  bindDevice(id, values.device_id, values.channel);
+                  bindDevice(id, values.device_id, values.channel, processId);
                 }
                 updateMeasurement(id, values).then(onUpdateSuccess);
               } catch (error) {

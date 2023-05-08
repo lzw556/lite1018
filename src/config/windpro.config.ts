@@ -19,7 +19,14 @@ export const MONITORING_POINTS = [
     label: MonitoringPointTypeText.LOOSENING_ANGLE
   },
   { id: MonitoringPointTypeValue.PRELOAD, label: MonitoringPointTypeText.PRELOAD },
-  { id: MonitoringPointTypeValue.ANGLE_DIP, label: MonitoringPointTypeText.ANGLE_DIP }
+  {
+    id: MonitoringPointTypeValue.TOWER_INCLINATION,
+    label: MonitoringPointTypeText.TOWER_INCLINATION
+  },
+  {
+    id: MonitoringPointTypeValue.TOWER_BASE_SETTLEMENT,
+    label: MonitoringPointTypeText.TOWER_BASE_SETTLEMENT
+  }
 ];
 export const MENUS_HIDDEN = [];
 

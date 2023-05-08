@@ -3,8 +3,9 @@ import React from 'react';
 import ShadowCard from '../../../components/shadowCard';
 import { generateColProps } from '../../../utils/grid';
 import { sortFlangesByAttributes, FlangeCard } from '../../flange';
-import { AssetRow } from '../types';
+import { AssetCategoryKey, AssetRow } from '../types';
 import intl from 'react-intl-universal';
+import { TowerCard } from '../../tower/card';
 
 export const WindTurbineMonitor = (wind: AssetRow) => {
   if (wind.children === undefined || wind.children.length === 0)
@@ -21,7 +22,7 @@ export const WindTurbineMonitor = (wind: AssetRow) => {
     <Row gutter={[16, 16]}>
       {sortFlangesByAttributes(wind.children).map((a) => (
         <Col {...generateColProps({ md: 12, lg: 12, xl: 12, xxl: 8 })} key={a.id}>
-          <FlangeCard {...a} />
+          {a.type === AssetCategoryKey.FLANGE ? <FlangeCard {...a} /> : <TowerCard {...a} />}
         </Col>
       ))}
     </Row>

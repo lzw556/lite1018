@@ -31,7 +31,7 @@ export function bindDevice(
   //TODO
   return request.post(`/monitoringPoints/${id}/bindDevice`, {
     device_id,
-    process_id: channel ? 2 : processId,
+    process_id: processId,
     parameters: channel ? { channel } : {}
   });
 }

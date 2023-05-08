@@ -6,6 +6,7 @@ import { CreateAreaAsset } from '../area-asset/create';
 import { UpdateAreaAsset } from '../area-asset/update';
 import { CreateAsset } from '../manage/create';
 import { UpdateAsset } from '../manage/update';
+import { CreateTower, UpdateTower } from '../../tower';
 
 export enum AssetAction {
   ASSET_CREATE,
@@ -15,7 +16,9 @@ export enum AssetAction {
   MONITORING_POINT_CREATE,
   MONITORING_POINT_UPDATE,
   AREA_ASSET_CREATE,
-  AREA_ASSET_UPDATE
+  AREA_ASSET_UPDATE,
+  TOWER_CREATE,
+  TOWER_UPDATE
 }
 
 export const ActionBar: React.FC<{
@@ -132,6 +135,32 @@ export const ActionBar: React.FC<{
       )}
       {open && type === AssetAction.AREA_ASSET_UPDATE && (
         <UpdateAreaAsset
+          {...{
+            open,
+            onCancel: () => setVisible && setVisible(false),
+            ...payload,
+            onSuccess: () => {
+              if (onSuccess) onSuccess();
+              setVisible && setVisible(false);
+            }
+          }}
+        />
+      )}
+      {open && type === AssetAction.TOWER_CREATE && (
+        <CreateTower
+          {...{
+            open,
+            onCancel: () => setVisible && setVisible(false),
+            ...payload,
+            onSuccess: () => {
+              if (onSuccess) onSuccess();
+              setVisible && setVisible(false);
+            }
+          }}
+        />
+      )}
+      {open && type === AssetAction.TOWER_UPDATE && (
+        <UpdateTower
           {...{
             open,
             onCancel: () => setVisible && setVisible(false),

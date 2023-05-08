@@ -47,11 +47,17 @@ export function combineMonitoringPointToAsset(asset: AssetRow): AssetTreeNode {
   const points = getRealPoints(asset.monitoringPoints);
   const children = [
     ...sortAssetsByIndex(asset.children ?? []),
-    ...points.map((p) => ({
-      ...p,
-      parentId: p.assetId,
-      id: `${p.id}-${p.type}`
-    }))
+    ...points
+      .map((p) => ({
+        ...p,
+        parentId: p.assetId,
+        id: `${p.id}-${p.type}`
+      }))
+      .sort((prev, next) => {
+        const { index: prevIndex } = prev.attributes || { index: 88 };
+        const { index: nextIndex } = next.attributes || { index: 88 };
+        return prevIndex - nextIndex;
+      })
   ];
   return { ...asset, children };
 }

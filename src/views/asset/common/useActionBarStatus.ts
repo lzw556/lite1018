@@ -59,6 +59,19 @@ export function useActionBarStatus() {
     setAction({ type: AssetAction.AREA_ASSET_UPDATE, payload: { asset } });
   };
 
+  const handleCreateTower = (paras?: number) => {
+    setVisible(true);
+    setAction({
+      type: AssetAction.TOWER_CREATE,
+      payload: { parentId: paras }
+    });
+  };
+
+  const handleUpdateTower = (tower: AssetRow) => {
+    setVisible(true);
+    setAction({ type: AssetAction.TOWER_UPDATE, payload: { tower } });
+  };
+
   return {
     open,
     setVisible,
@@ -70,6 +83,8 @@ export function useActionBarStatus() {
     onMonitoringPointCreate: handleMonitoringPointCreate,
     onMonitoringPointUpdate: handleMonitoringPointUpdate,
     onAreaAssetCreate: handleAreaAssetCreate,
-    onAreaAssetUpdate: handleAreaAssetUpdate
+    onAreaAssetUpdate: handleAreaAssetUpdate,
+    onTowerCreate: handleCreateTower,
+    onTowerUpdate: handleUpdateTower
   };
 }

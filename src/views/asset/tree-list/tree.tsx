@@ -14,6 +14,7 @@ import { FlangeIcon } from '../../flange';
 import { useActionBarStatus } from '../common/useActionBarStatus';
 import { ActionBar } from '../common/actionBar';
 import usePermission, { Permission } from '../../../permission/permission';
+import { TowerIcon } from '../../tower';
 
 export const AssetTree: React.FC<{
   assets: AssetRow[];
@@ -43,9 +44,15 @@ export const AssetTree: React.FC<{
                 mix.type ?? 0,
                 AssertOfAssetCategory.IS_FLANGE
               );
+              const isNodeTower = AssertAssetCategory(
+                mix.type ?? 0,
+                AssertOfAssetCategory.IS_TOWER
+              );
               if (isNodeAsset) {
                 if (isNodeFlange) {
                   return <FlangeIcon className={`${alarmState} focus`} />;
+                } else if (isNodeTower) {
+                  return <TowerIcon className={`${alarmState} focus`} />;
                 } else {
                   return <AssetIcon className={`${alarmState}`} />;
                 }

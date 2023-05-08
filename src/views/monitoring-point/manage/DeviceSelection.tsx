@@ -15,6 +15,9 @@ export type MonitoringPointInfo = {
   channel?: number;
   initial_thickness?: number;
   critical_thickness?: number;
+  tower_install_angle?: number;
+  tower_install_height?: number;
+  tower_base_radius?: number;
 };
 
 export const DeviceSelection: React.FC<{

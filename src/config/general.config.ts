@@ -13,7 +13,14 @@ export const MONITORING_POINTS = [
   { id: MonitoringPointTypeValue.THICKNESS, label: MonitoringPointTypeText.THICKNESS },
   { id: MonitoringPointTypeValue.PRELOAD, label: MonitoringPointTypeText.PRELOAD },
   { id: MonitoringPointTypeValue.VIBRATION, label: MonitoringPointTypeText.VIBRATION },
-  { id: MonitoringPointTypeValue.ANGLE_DIP, label: MonitoringPointTypeText.ANGLE_DIP },
+  {
+    id: MonitoringPointTypeValue.TOWER_INCLINATION,
+    label: MonitoringPointTypeText.TOWER_INCLINATION
+  },
+  {
+    id: MonitoringPointTypeValue.TOWER_BASE_SETTLEMENT,
+    label: MonitoringPointTypeText.TOWER_BASE_SETTLEMENT
+  },
   { id: MonitoringPointTypeValue.PRESSURE, label: MonitoringPointTypeText.PRESSURE },
   { id: MonitoringPointTypeValue.TEMPERATURE, label: MonitoringPointTypeText.TEMPERATURE }
 ];

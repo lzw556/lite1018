@@ -135,7 +135,7 @@ export const BindMonitoringPoints: React.FC<
                   );
                 }}
               >
-                <Row key={id} gutter={[0, 16]} style={{ marginBottom: 16 }}>
+                <Row key={id} gutter={[0, 16]} style={{ marginBottom: 16, width: '100%' }}>
                   {children &&
                     children
                       .filter(({ monitoringPoints }) =>

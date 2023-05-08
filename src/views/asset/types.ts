@@ -89,7 +89,8 @@ export enum AssertOfAssetCategory {
   IS_AREA,
   IS_PIPE,
   IS_AREA_ASSET,
-  IS_GENERAL
+  IS_GENERAL,
+  IS_TOWER
 }
 
 export function AssertAssetCategory(key: number, assert: AssertOfAssetCategory) {
@@ -108,6 +109,8 @@ export function AssertAssetCategory(key: number, assert: AssertOfAssetCategory) 
       return key === AssetCategoryKey.AREA_ASSET;
     case AssertOfAssetCategory.IS_GENERAL:
       return key === AssetCategoryKey.GENERAL;
+    case AssertOfAssetCategory.IS_TOWER:
+      return key === AssetCategoryKey.TOWER;
     default:
       return false;
   }

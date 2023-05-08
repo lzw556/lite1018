@@ -16,6 +16,7 @@ import intl from 'react-intl-universal';
 import { FLANGE_PATHNAME } from '../../flange';
 import { combineMonitoringPointToAsset } from '../common/utils';
 import { useAssetsContext } from './assetsContext';
+import { TOWER_PATHNAME } from '../../tower';
 
 export const rootPathState = { from: { label: intl.get('OVERVIEW'), path: '/project-overview' } };
 
@@ -118,6 +119,8 @@ export function getPathFromType(type?: number) {
   if (isAssetCategoryKey(type)) {
     if (AssertAssetCategory(type ?? 0, AssertOfAssetCategory.IS_FLANGE)) {
       pathname = `/${FLANGE_PATHNAME}/`;
+    } else if (AssertAssetCategory(type ?? 0, AssertOfAssetCategory.IS_TOWER)) {
+      pathname = `/${TOWER_PATHNAME}/`;
     } else {
       pathname = `/${ASSET_PATHNAME}/`;
     }

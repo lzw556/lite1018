@@ -10,21 +10,24 @@ import dayjs from '../../../utils/dayjsUtils';
 import { isMobile } from '../../../utils/deviceDetection';
 import { DownloadHistory } from '../../asset';
 import { clearHistory, getDataOfMonitoringPoint } from '../services';
-import { MonitoringPointRow } from '../types';
-import { getSpecificProperties } from '../utils';
-import { generateChartOptionsOfHistoryDatas } from './monitor';
+import { HistoryData, MonitoringPointRow, MonitoringPointTypeValue } from '../types';
+import { getMonitoringPointType, getSpecificProperties } from '../utils';
 import intl from 'react-intl-universal';
+import { generateChartOptionsOfHistoryDatas } from './monitor';
+import { CircleChart } from '../../tower/circleChart';
 
 export const MonitoringPointHistory = (point: MonitoringPointRow) => {
-  const { id, properties, type } = point;
+  const { id, name, properties, type, attributes } = point;
   const [loading, setLoading] = React.useState(true);
-  const [historyOptions, setHistoryOptions] = React.useState<any>();
+  const [historyData, setHistoryData] = React.useState<HistoryData>();
   const [range, setRange] = React.useState<[number, number]>();
-  const [property, setProperty] = React.useState(properties[0].key);
+  const sortedProperties = getSpecificProperties(properties, type);
+  const [property, setProperty] = React.useState(sortedProperties[0].key);
   const [open, setVisible] = React.useState(false);
-  React.useEffect(() => {
-    if (range) fetchData(id, range, property, type);
-  }, [id, range, property, type]);
+  const isAngle =
+    type === MonitoringPointTypeValue.TOWER_INCLINATION ||
+    type === MonitoringPointTypeValue.TOWER_BASE_SETTLEMENT;
+  const typeLabel = getMonitoringPointType(type);
 
   const fetchData = (id: number, range: [number, number], property: string, type: number) => {
     if (range) {
@@ -33,34 +36,57 @@ export const MonitoringPointHistory = (point: MonitoringPointRow) => {
       getDataOfMonitoringPoint(id, from, to).then((data) => {
         setLoading(false);
         if (data.length > 0) {
-          setHistoryOptions(generateChartOptionsOfHistoryDatas(data, type, property));
+          setHistoryData(data);
         } else {
-          setHistoryOptions(null);
+          setHistoryData(undefined);
         }
       });
     }
   };
 
-  const renderChart = (options: any) => {
+  React.useEffect(() => {
+    if (range) fetchData(id, range, property, type);
+  }, [id, range, property, type]);
+
+  const renderChart = () => {
     if (loading) return <Spin />;
-    if (!options || options.length === 0) {
+    if (!historyData || historyData.length === 0) {
       return (
         <Col span={24}>
           <Empty description={intl.get('NO_DATA_PROMPT')} image={Empty.PRESENTED_IMAGE_SIMPLE} />
         </Col>
       );
     } else {
-      return historyOptions.map((ops: any, index: number) => (
-        <Col span={24} key={index}>
-          <ChartContainer title='' options={ops} style={{ height: '500px' }} />
-        </Col>
-      ));
+      return generateChartOptionsOfHistoryDatas(historyData, type, property).map(
+        (ops: any, index: number) => (
+          <Col span={24} key={index}>
+            <ChartContainer title='' options={ops} style={{ height: '500px' }} />
+          </Col>
+        )
+      );
     }
   };
 
   return (
     <Row gutter={[32, 32]}>
-      <Col span={24}>
+      {isAngle && historyData && (
+        <Col span={8}>
+          <CircleChart
+            data={[
+              {
+                name,
+                history: historyData,
+                typeLabel: typeLabel ? intl.get(typeLabel) : '',
+                height: attributes?.tower_install_height,
+                radius: attributes?.tower_base_radius
+              }
+            ]}
+            style={{ height: 550 }}
+            large={true}
+          />
+        </Col>
+      )}
+      <Col span={isAngle ? 16 : 24}>
         <Row justify='space-between'>
           <Col></Col>
           <Col>
@@ -77,7 +103,7 @@ export const MonitoringPointHistory = (point: MonitoringPointRow) => {
                     setProperty(value);
                   }}
                 >
-                  {getSpecificProperties(properties, type).map(({ name, key }) => (
+                  {sortedProperties.map(({ name, key }) => (
                     <Select.Option key={key} value={key}>
                       {intl.get(name)}
                     </Select.Option>
@@ -133,8 +159,11 @@ export const MonitoringPointHistory = (point: MonitoringPointRow) => {
             </Space>
           </Col>
         </Row>
+        <br />
+        <Row>
+          <Col span={24}>{renderChart()}</Col>
+        </Row>
       </Col>
-      {renderChart(historyOptions)}
       {open && (
         <DownloadHistory
           measurement={point}
