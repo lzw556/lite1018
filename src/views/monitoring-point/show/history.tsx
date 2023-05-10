@@ -86,7 +86,7 @@ export const MonitoringPointHistory = (point: MonitoringPointRow) => {
           />
         </Col>
       )}
-      <Col span={isAngle ? 16 : 24}>
+      <Col span={isAngle && historyData ? 16 : 24}>
         <Row justify='space-between'>
           <Col></Col>
           <Col>
