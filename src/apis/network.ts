@@ -46,7 +46,7 @@ export function UpdateNetworkSettingRequest(gatewayId: number, wsn: any) {
 }
 
 export function UpdateNetworkRequest(id: number, params: any) {
-  return request.put<Network>(`/networks/${id}`, params).then((res) => res.data);
+  return request.put<Network>(`/networks/${id}`, params).then(PutResponse);
 }
 
 export function NetworkSyncRequest(id: number) {

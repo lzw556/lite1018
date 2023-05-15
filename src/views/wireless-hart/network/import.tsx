@@ -79,19 +79,25 @@ const ImportNetworkPage = () => {
     }
     if (devices.length > 0) {
       form.validateFields().then((values) => {
-        console.log(values);
-        console.log(devices);
         const req: any = {
           devices: devices.map((n: any) => {
             if (n.type === 1) {
-              return { ...n, ...values.gateway };
+              return {
+                name: n.name,
+                mac_address: n.address,
+                parent_address: n.parentAddress,
+                settings: n.settings,
+                type_id: n.type,
+                ...values.gateway
+              };
             } else {
               return {
                 name: n.name,
                 mac_address: n.address,
                 parent_address: n.parentAddress,
                 type_id: n.type,
-                settings: n.settings
+                settings: n.settings,
+                tag: n.tag
               };
             }
           })

@@ -14,7 +14,7 @@ export const ThicknessFieldsOfCreation = ({
 }) => {
   return (
     <>
-      <Form.Item label={`${intl.get('FIELD_THICKNESS')}(mm)`} style={{ marginBottom: 0 }}>
+      <Form.Item required label={`${intl.get('FIELD_THICKNESS')}(mm)`} style={{ marginBottom: 0 }}>
         <FormInputItem
           {...restFields}
           name={[name, 'initial_thickness']}
@@ -57,6 +57,7 @@ export const ThicknessFieldsOfCreation = ({
         />
       </Form.Item>
       <Form.Item
+        required
         label={`${intl.get('FIELD_CORROSION_RATE')}(${intl.get('UNIT_DAY')})`}
         style={{ marginBottom: 0 }}
       >

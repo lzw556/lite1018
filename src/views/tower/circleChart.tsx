@@ -42,20 +42,18 @@ export const CircleChart = ({
   } else if (dynamicData && dynamicData.length > 0) {
     transformedData.push(...dynamicData);
   }
-  if (transformedData.length > 0) {
-    circleChartOptions = buildCirclePointsChartOfTower({
-      datas: transformedData,
-      titles: [
-        intl.get('SCATTERGRAM'),
-        intl.get('FIELD_DISPLACEMENT_RADIAL'),
-        intl.get('FIELD_DIRECTION')
-      ],
-      lang: language,
-      large,
-      hideTitle,
-      hideSubTitle
-    });
-  }
+  circleChartOptions = buildCirclePointsChartOfTower({
+    datas: transformedData,
+    titles: [
+      intl.get('SCATTERGRAM'),
+      intl.get('FIELD_DISPLACEMENT_RADIAL'),
+      intl.get('FIELD_DIRECTION')
+    ],
+    lang: language,
+    large,
+    hideTitle,
+    hideSubTitle
+  });
 
   return circleChartOptions ? (
     <ChartContainer title='' options={circleChartOptions} style={style} />

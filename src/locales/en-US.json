@@ -954,5 +954,6 @@
   "FIELD_DISPLACEMENT_COMBINED": "Displacement",
   "FIELD_DISPLACEMENT_RADIAL": "Radial",
   "FIELD_DISPLACEMENT_EW": "East-west",
-  "FIELD_DISPLACEMENT_NS": "North-south"
+  "FIELD_DISPLACEMENT_NS": "North-south",
+  "ERROR_DEVICE_GATEWAY_EXISTS": " Gateway exists."
 }

@@ -151,7 +151,7 @@ const AddDevicePage = () => {
                         requiredMessage={intl.get('PLEASE_ENTER_SOMETHING', {
                           something: intl.get('DEVICE_TAG')
                         })}
-                        lengthLimit={{ min: 4, max: 20, label: intl.get('DEVICE_TAG') }}
+                        lengthLimit={{ min: 4, max: 60, label: intl.get('DEVICE_TAG') }}
                       >
                         <Input
                           placeholder={intl.get('PLEASE_ENTER_SOMETHING', {

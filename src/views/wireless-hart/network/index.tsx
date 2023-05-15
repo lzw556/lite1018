@@ -12,7 +12,7 @@ import {
   PagingNetworksRequest
 } from '../../../apis/network';
 import { Link } from 'react-router-dom';
-import { Button, Col, Popconfirm, Row, Space, message } from 'antd';
+import { Button, Col, Popconfirm, Row, Space } from 'antd';
 import { DeleteOutlined, EditOutlined, ExportOutlined, PlusOutlined } from '@ant-design/icons';
 import { PageTitle } from '../../../components/pageTitle';
 import HasPermission from '../../../permission';
@@ -195,7 +195,6 @@ export default function NetworkManage() {
           onCancel={() => setEditVisible(false)}
           onSuccess={() => {
             setEditVisible(false);
-            message.success(intl.get('SAVED_SUCCESSFUL'));
             fetchNetworks(store);
           }}
         />
