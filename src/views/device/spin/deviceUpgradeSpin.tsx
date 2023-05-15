@@ -96,7 +96,7 @@ const DeviceUpgradeSpin: FC<DeviceUpgradeSpinProps> = ({ status }) => {
               status={'exception'}
             />
             <Text style={style} type={'danger'}>
-              {intl.get('UPGRADE_FIRMWARE_SUCCESSFUL')}
+              {intl.get('FAILED_TO_UPGRADE_FIRMWARE')}
             </Text>
           </>
         );
@@ -105,7 +105,7 @@ const DeviceUpgradeSpin: FC<DeviceUpgradeSpinProps> = ({ status }) => {
           <>
             <Progress type='circle' percent={status.progress} strokeWidth={12} width={16} />
             <Text style={style} type={'success'}>
-              {intl.get('FAILED_TO_UPGRADE_FIRMWARE')}
+              {intl.get('UPGRADE_FIRMWARE_SUCCESSFUL')}
             </Text>
           </>
         );
