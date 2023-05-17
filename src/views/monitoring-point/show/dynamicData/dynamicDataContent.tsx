@@ -34,7 +34,7 @@ export const DynamicDataContent = ({
   const { values, loading } = data;
   const [field, setField] = React.useState(fields[0]);
   const isAngle = 'dynamic_direction' in values && 'dynamic_displacement' in values;
-  const displacements = values['dynamic_displacement_radial'] as number[];
+  const displacements = (isAngle ? values['dynamic_displacement_radial'] : []) as number[];
   const angles = displacements.map((d, i) => [
     roundValue(d),
     roundValue(values['dynamic_direction'][i] as number)
