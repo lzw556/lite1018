@@ -20,24 +20,18 @@ export const BindMonitoringPoints: React.FC<
   const { root } = useAssetCategoryChain();
 
   React.useEffect(() => {
-    const filterValidPoints = ({ children }: AssetRow) =>
-      children &&
-      children.length > 0 &&
-      children.some(
-        ({ monitoringPoints }) =>
-          monitoringPoints &&
-          monitoringPoints.length > 0 &&
-          monitoringPoints.some(({ type }) => type === props.selectedRow.type)
-      );
-
     getAssets({ type: root.key, parent_id: 0 }).then((data) => {
       setLoading(false);
-      const assets = data.filter(filterValidPoints).map((asset) => {
+      const assets = data.map((asset) => {
         const pointIds: number[] = [];
         if (asset.children && asset.children.length > 0) {
           asset.children.forEach((sub) => {
             if (sub.monitoringPoints && sub.monitoringPoints.length > 0)
-              pointIds.push(...sub.monitoringPoints.map(({ id }) => id));
+              pointIds.push(
+                ...sub.monitoringPoints
+                  .filter((m) => m.type === props.selectedRow.type)
+                  .map(({ id }) => id)
+              );
           });
         }
         const initialIds = (props.selectedRow.monitoringPoints || [])
@@ -190,6 +184,7 @@ export const BindMonitoringPoints: React.FC<
               props.onSuccess()
             );
           }
+          console.log(monitoring_point_ids);
         });
       }}
     >
