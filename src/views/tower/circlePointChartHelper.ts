@@ -18,7 +18,7 @@ export function buildCirclePointsChartOfTower({
   hideSubTitle?: boolean;
 }) {
   const [title, displacement, direction] = titles;
-  let max = 100;
+  let max = undefined;
   const titleOptions: any = [];
   const series: any = [];
   datas.forEach(({ name, data, height, radius, typeLabel }) => {
@@ -53,8 +53,7 @@ export function buildCirclePointsChartOfTower({
       name,
       symbolSize: 6
     });
-    const maxinum = getMaxRadius(displacements, height || radius);
-    max = Math.max(max, maxinum);
+    max = getMaxRadius(displacements, height || radius);
   });
   return {
     title: titleOptions,
@@ -117,10 +116,22 @@ export function buildCirclePointsChartOfTower({
 }
 
 export function getDataOfCircleChart(
-  datas: { name: string; history: HistoryData; typeLabel: string }[]
+  datas: {
+    name: string;
+    history: HistoryData;
+    typeLabel: string;
+    height?: number;
+    radius?: number;
+  }[]
 ) {
-  const ret: { name: string; typeLabel: string; data: number[][] }[] = [];
-  datas.forEach(({ name, history, typeLabel }) => {
+  const ret: {
+    name: string;
+    typeLabel: string;
+    data: number[][];
+    height?: number;
+    radius?: number;
+  }[] = [];
+  datas.forEach(({ name, history, typeLabel, height, radius }) => {
     if (history.length === 0) return [];
     const directions: number[] = [];
     const displacements: number[] = [];
@@ -139,12 +150,14 @@ export function getDataOfCircleChart(
       displacements.length === 0 ||
       directions.length !== displacements.length
     ) {
-      ret.push({ name, typeLabel, data: [] });
+      ret.push({ name, typeLabel, data: [], height, radius });
     } else {
       ret.push({
         name,
         typeLabel,
-        data: directions.map((data, index) => [displacements[index], data])
+        data: directions.map((data, index) => [displacements[index], data]),
+        height,
+        radius
       });
     }
   });
