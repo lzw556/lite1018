@@ -2,7 +2,7 @@ import { Checkbox, Col, Row, Select, Space, Table } from 'antd';
 import EChartsReact from 'echarts-for-react';
 import dayjs from '../../../../utils/dayjsUtils';
 import * as React from 'react';
-import { useCallback, useState } from 'react';
+import { useState } from 'react';
 import { LineChartStyles } from '../../../../constants/chart';
 import { EmptyLayout } from '../../../layout';
 import { Device } from '../../../../types/device';
@@ -52,6 +52,7 @@ const WaveDataChart: React.FC<{ device: Device }> = ({ device }) => {
   const { language } = useLocaleContext();
   const [range, setRange] = React.useState<[number, number]>(oneWeekNumberRange);
   const [dataSource, setDataSource] = React.useState<any>();
+  const [selectedTimestamp, setSelectedTimestamp] = React.useState<number>();
   const [deviceData, setDeviceData] = React.useState<any>();
   const [calculate, setCalculate] = React.useState<string>('accelerationTimeDomain');
   const [dimension, setDimension] = React.useState<number>(0);
@@ -62,34 +63,34 @@ const WaveDataChart: React.FC<{ device: Device }> = ({ device }) => {
   );
   const { hasPermission } = usePermission();
 
-  const fetchDeviceDataByTimestamp = useCallback(
-    (timestamp: number) => {
-      setIsLoading(true);
-      GetDeviceDataRequest(device.id, timestamp, { calculate, dimension, data_type: dataType })
-        .then((data) => {
-          setIsLoading(false);
-          setDeviceData(data);
-        })
-        .catch((e) => {
-          setIsLoading(false);
-        });
-    },
-    [calculate, dimension, dataType, device.id]
-  );
-
-  const fetchDeviceWaveDataTimestamps = useCallback(() => {
+  const fetchDeviceWaveDataTimestamps = (id: number, range: [number, number], dataType: number) => {
     if (range) {
       const [from, to] = range;
-      FindDeviceDataRequest(device.id, from, to, {
+      FindDeviceDataRequest(id, from, to, {
         data_type: dataType
       }).then((data) => {
         setDataSource(data);
-        if (data.length > 0) {
-          fetchDeviceDataByTimestamp(data[0].timestamp);
-        }
       });
     }
-  }, [range, device.id, dataType, fetchDeviceDataByTimestamp]);
+  };
+
+  const fetchDeviceDataByTimestamp = (
+    id: number,
+    timestamp: number,
+    dataType: number,
+    dimension: number,
+    calculate: any
+  ) => {
+    setIsLoading(true);
+    GetDeviceDataRequest(id, timestamp, { calculate, dimension, data_type: dataType })
+      .then((data) => {
+        setIsLoading(false);
+        setDeviceData(data);
+      })
+      .catch((e) => {
+        setIsLoading(false);
+      });
+  };
 
   const handleChange = React.useCallback((range: [number, number]) => {
     if (checkIsRangeChanged(range)) {
@@ -103,8 +104,20 @@ const WaveDataChart: React.FC<{ device: Device }> = ({ device }) => {
   }
 
   React.useEffect(() => {
-    fetchDeviceWaveDataTimestamps();
-  }, [fetchDeviceWaveDataTimestamps]);
+    fetchDeviceWaveDataTimestamps(device.id, range, dataType);
+  }, [device.id, range, dataType]);
+
+  React.useEffect(() => {
+    if (dataSource && dataSource.length > 0) {
+      setSelectedTimestamp(dataSource[0].timestamp);
+    }
+  }, [dataSource]);
+
+  React.useEffect(() => {
+    if (selectedTimestamp) {
+      fetchDeviceDataByTimestamp(device.id, selectedTimestamp, dataType, dimension, calculate);
+    }
+  }, [calculate, dimension, dataType, device.id, selectedTimestamp]);
 
   const getChartTitle = () => {
     switch (calculate) {
@@ -321,7 +334,7 @@ const WaveDataChart: React.FC<{ device: Device }> = ({ device }) => {
               defaultValue={deviceData?.timestamp}
               onChange={(value) => {
                 if (value !== deviceData?.timestamp) {
-                  fetchDeviceDataByTimestamp(value);
+                  setSelectedTimestamp(value);
                 }
               }}
             >
@@ -381,7 +394,7 @@ const WaveDataChart: React.FC<{ device: Device }> = ({ device }) => {
                 onRow={(record) => ({
                   onClick: () => {
                     if (record.timestamp !== deviceData?.timestamp) {
-                      fetchDeviceDataByTimestamp(record.timestamp);
+                      setSelectedTimestamp(record.timestamp);
                     }
                   },
                   onMouseLeave: () => (window.document.body.style.cursor = 'default'),
