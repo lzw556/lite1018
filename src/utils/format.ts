@@ -33,3 +33,26 @@ export function toMac(mac: string) {
   }
   return mac;
 }
+
+export function computeScale(datas: number[], precision: number) {
+  const nums = datas
+    .filter((n) => n != null && !Number.isNaN(n))
+    .map((n) => roundValue(n, precision));
+  const min = Math.min(...nums);
+  const max = Math.max(...nums);
+  const getLeftData = (min: number, max: number) => {
+    const diff = max - min;
+    const increment = diff / 2;
+    const decrement = diff * 1.5;
+    const lessMin = min >= 0 && min - decrement < 0 ? 0 : min - decrement;
+    return {
+      max: max + increment,
+      min: lessMin,
+      interval: (max + increment - lessMin) / 5,
+      axisLabel: {
+        formatter: (val: number) => (Number.isInteger(val) ? val : val.toFixed(precision))
+      }
+    };
+  };
+  return min === max ? null : getLeftData(min, max);
+}
