@@ -40,6 +40,7 @@ export const DeviceSettingContent: React.FC<{
                   <legend>{groupName}</legend>
                   {settings
                     .filter((setting) => setting.group === group)
+                    .sort((prev, next) => prev.sort - next.sort)
                     .map((setting) => (
                       <DeviceSettingFormItem editable={true} value={setting} key={setting.key} />
                     ))}
@@ -52,9 +53,11 @@ export const DeviceSettingContent: React.FC<{
     } else {
       return (
         <>
-          {settings.map((setting) => (
-            <DeviceSettingFormItem editable={true} value={setting} key={setting.key} />
-          ))}
+          {settings
+            .sort((prev, next) => prev.sort - next.sort)
+            .map((setting) => (
+              <DeviceSettingFormItem editable={true} value={setting} key={setting.key} />
+            ))}
         </>
       );
     }

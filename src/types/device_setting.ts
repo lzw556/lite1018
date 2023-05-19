@@ -33,4 +33,5 @@ export type DeviceSetting = {
   group?: keyof typeof SETTING_GROUPS;
   validator: any;
   optionType: string;
+  sort: number;
 };
