@@ -57,17 +57,19 @@ export const SingleDeviceDetail: React.FC<{ device: Device; upgradeStatus: any }
       name: intl.get('NETWORK_BELONG_TO'),
       value: device.network ? device.network.name : intl.get('NONE')
     });
-    if (device.typeId !== DeviceType.Gateway) {
+    if (device.typeId !== DeviceType.Gateway && !DeviceType.isWiredSensor(device.typeId)) {
       items.push({
         name: `${intl.get('BATTERY_VOLTAGE')}(mV)`,
         value: device.state ? device.state.batteryVoltage : '-'
       });
     }
   }
-  items.push({
-    name: `${intl.get('SIGNAL_STRENGTH')}(dB)`,
-    value: device.state ? device.state.signalLevel : '-'
-  });
+  if (!DeviceType.isWiredSensor(device.typeId)) {
+    items.push({
+      name: `${intl.get('SIGNAL_STRENGTH')}(dB)`,
+      value: device.state ? device.state.signalLevel : '-'
+    });
+  }
   items.push({
     name: intl.get('FIRMWARE_VERSION'),
     value: device.information.firmware_version ? device.information.firmware_version : '-'

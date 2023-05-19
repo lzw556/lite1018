@@ -130,4 +130,13 @@ export namespace DeviceType {
     }
     return is4Channel || is8Channel;
   }
+
+  export function isWiredSensor(type: number) {
+    return (
+      type === DeviceType.BoltLooseningWIRED ||
+      type === DeviceType.VibrationTemperature3AxisWIRED ||
+      type === DeviceType.TemperatureWIRED ||
+      type === DeviceType.PressureTemperatureWIRED
+    );
+  }
 }

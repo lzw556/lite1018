@@ -153,7 +153,7 @@ export function useDeviceTabs(deviceTypeId?: number) {
   if (hasPermissions(Permission.DeviceSettingsGet, Permission.DeviceSettingsEdit)) {
     tabs.push({ key: 'settings', tab: 'SETTINGS' });
   }
-  if (hasPermission(Permission.DeviceRuntimeDataGet)) {
+  if (hasPermission(Permission.DeviceRuntimeDataGet) && !DeviceType.isWiredSensor(deviceTypeId)) {
     tabs.push({ key: 'ta', tab: 'STATUS_HISTORY' });
   }
   switch (deviceTypeId) {
