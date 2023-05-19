@@ -69,12 +69,12 @@ export function getDynamicData<T>(
 export function getDynamicDataVibration<T>(
   id: MonitoringPoint['id'],
   timestamp: number,
-  dataType: DataType,
-  filter: { field: string; axis: number }
+  dataType?: DataType,
+  filter?: { field: string; axis: number }
 ) {
   return request
     .get<{ timestamp: number; values: T }>(
-      `/monitoringPoints/${id}/data/${timestamp}?type=${dataType}&calculate=${filter.field}&dimension=${filter.axis}`
+      `/monitoringPoints/${id}/data/${timestamp}?type=${dataType}&calculate=${filter?.field}&dimension=${filter?.axis}`
     )
     .then(GetResponse);
 }

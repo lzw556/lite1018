@@ -8,12 +8,18 @@ import { downloadRawHistory } from '../../services';
 import {
   DataType,
   MonitoringPointRow,
-  MONITORING_POINT_TYPE_VALUE_DYNAMIC_MAPPING
+  MONITORING_POINT_TYPE_VALUE_DYNAMIC_MAPPING,
+  MonitoringPointTypeValue
 } from '../../types';
 import { DynamicDataContent } from './dynamicDataContent';
-import { DynamicDataProperty, useDynamicDataRequest } from './dynamicDataHelper';
+import {
+  DynamicDataProperty,
+  VibrationWaveFormDataType,
+  useDynamicDataRequest
+} from './dynamicDataHelper';
 import intl from 'react-intl-universal';
 import { useLocaleContext } from '../../../../localeProvider';
+import { VibrationDynamicDataContent } from './vibrationDynamicDataContent';
 
 export const MonitoringPointDynamicData: React.FC<MonitoringPointRow & { dataType?: DataType }> = (
   props
@@ -21,11 +27,7 @@ export const MonitoringPointDynamicData: React.FC<MonitoringPointRow & { dataTyp
   const { language } = useLocaleContext();
   const [range, setRange] = React.useState<[number, number]>();
   const { hasPermission } = usePermission();
-  const {
-    all: { timestamps, loading },
-    selected: { timestamp, dynamicData, setTimestamp }
-  } = useDynamicDataRequest<DynamicDataProperty>(props.id, props.dataType, range);
-
+  const isVibration = props.type === MonitoringPointTypeValue.VIBRATION;
   const getDynamicDataType = () => {
     const config = MONITORING_POINT_TYPE_VALUE_DYNAMIC_MAPPING.get(props.type);
     if (props.dataType === 'raw') {
@@ -36,6 +38,25 @@ export const MonitoringPointDynamicData: React.FC<MonitoringPointRow & { dataTyp
   };
 
   const dynamicDataType = getDynamicDataType();
+  const [vibrationFilters, setVibrationFilters] = React.useState<
+    { field: string; axis: number } | undefined
+  >(
+    isVibration
+      ? {
+          field: dynamicDataType?.fields[0].value!,
+          axis: 0
+        }
+      : undefined
+  );
+  const {
+    all: { timestamps, loading },
+    selected: { timestamp, dynamicData, setTimestamp }
+  } = useDynamicDataRequest<DynamicDataProperty | VibrationWaveFormDataType>(
+    props.id,
+    props.dataType,
+    range,
+    vibrationFilters
+  );
 
   const renderTimestampsList = () => {
     return (
@@ -118,12 +139,39 @@ export const MonitoringPointDynamicData: React.FC<MonitoringPointRow & { dataTyp
               </Col>
             )}
             {timestamps.length > 0 && <Col span={6}>{renderTimestampsList()}</Col>}
-            {timestamp && dynamicDataType && dynamicData.values && (
+            {timestamp && dynamicDataType && dynamicData.values && !isVibration && (
               <DynamicDataContent
                 key={props.dataType}
                 type={dynamicDataType}
-                data={{ values: dynamicData.values, loading: dynamicData.loading }}
+                data={{
+                  values: dynamicData.values as DynamicDataProperty,
+                  loading: dynamicData.loading
+                }}
                 monitoringPoint={{ ...props }}
+              />
+            )}
+            {timestamp && dynamicDataType && dynamicData.values && isVibration && (
+              <VibrationDynamicDataContent
+                key={props.dataType}
+                type={dynamicDataType}
+                data={{
+                  values: dynamicData.values as VibrationWaveFormDataType,
+                  loading: dynamicData.loading
+                }}
+                onFieldChange={(field) =>
+                  setVibrationFilters((prev) => {
+                    if (prev) {
+                      return { ...prev, field };
+                    }
+                  })
+                }
+                onAxisChange={(axis) =>
+                  setVibrationFilters((prev) => {
+                    if (prev) {
+                      return { ...prev, axis };
+                    }
+                  })
+                }
               />
             )}
           </Row>

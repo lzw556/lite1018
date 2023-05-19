@@ -1,11 +1,21 @@
 import * as React from 'react';
 import { AXIS_THREE } from '../../../device/detail/dynamicData/constants';
-import { getDataOfMonitoringPoint, getDynamicData } from '../../services';
+import { getDataOfMonitoringPoint, getDynamicData, getDynamicDataVibration } from '../../services';
 import { DataType } from '../../types';
+import { LineChartStyles } from '../../../../constants/chart';
 
 export type DynamicDataType = {
   fields: { label: string; value: string; unit: string }[];
   metaData: { label: string; value: string; unit: string }[];
+};
+
+export type VibrationWaveFormDataType = {
+  frequency: number;
+  highEnvelopes: number[];
+  lowEnvelopes: number[];
+  values: number[];
+  xAxis: number[];
+  xAxisUnit: string;
 };
 
 export type DynamicDataProperty = {
@@ -15,7 +25,8 @@ export type DynamicDataProperty = {
 export function useDynamicDataRequest<T>(
   id: number,
   dataType?: DataType,
-  range?: [number, number]
+  range?: [number, number],
+  vibrationFilters?: { field: string; axis: number }
 ) {
   const [timestamps, setTimestamps] = React.useState<{
     dataType?: DataType;
@@ -49,12 +60,19 @@ export function useDynamicDataRequest<T>(
   React.useEffect(() => {
     if (timestamp && timestamp.dataType === dataType) {
       setLoading2(true);
-      getDynamicData<T>(id, timestamp.data, dataType).then((data) => {
-        setDynamicData(data);
-        setLoading2(false);
-      });
+      if (vibrationFilters) {
+        getDynamicDataVibration<T>(id, timestamp.data, dataType, vibrationFilters).then((data) => {
+          setDynamicData(data);
+          setLoading2(false);
+        });
+      } else {
+        getDynamicData<T>(id, timestamp.data, dataType).then((data) => {
+          setDynamicData(data);
+          setLoading2(false);
+        });
+      }
     }
-  }, [id, timestamp, dataType]);
+  }, [id, timestamp, dataType, vibrationFilters]);
 
   return {
     all: { timestamps: timestamps.data, loading },
@@ -197,4 +215,100 @@ export function combineDynamicDataDC(
   origin: DynamicDataProperty & { mv: number[]; tof: number[] }
 ) {
   return { ...origin, mv: origin.mv.map((item, index) => [origin.tof[index], item]) };
+}
+
+export function generateVibrationChartOptions(
+  dimension: number,
+  legends: [string, string, string],
+  fieldLabel: string,
+  data: VibrationWaveFormDataType,
+  isShowEnvelope: boolean
+) {
+  const { frequency, values, xAxis, xAxisUnit, highEnvelopes, lowEnvelopes } = data;
+  let series: any[] = [
+    {
+      name: legends[dimension],
+      type: 'line',
+      data: values,
+      itemStyle: LineChartStyles[dimension].itemStyle,
+      showSymbol: false
+    }
+  ];
+  if (isShowEnvelope) {
+    series = [
+      {
+        name: legends[dimension],
+        type: 'line',
+        data: highEnvelopes,
+        lineStyle: {
+          opacity: 0
+        },
+        areaStyle: {
+          color: '#ccc'
+        },
+        stack: 'confidence-band',
+        symbol: 'none'
+      },
+      {
+        name: legends[dimension],
+        type: 'line',
+        data: lowEnvelopes,
+        lineStyle: {
+          opacity: 0
+        },
+        areaStyle: {
+          color: '#ccc'
+        },
+        stack: 'confidence-band',
+        symbol: 'none'
+      },
+      ...series
+    ];
+  }
+
+  return {
+    grid: {
+      left: '2%',
+      right: '8%',
+      bottom: '12%',
+      containLabel: true,
+      borderWidth: '0'
+    },
+    yAxis: { type: 'value' },
+    animation: false,
+    smooth: true,
+    dataZoom: [
+      {
+        type: 'slider',
+        show: true,
+        startValue: 0,
+        endValue: 3000,
+        height: '32',
+        zoomLock: false
+      }
+    ],
+    legend: {
+      data: [legends[dimension]],
+      itemStyle: {
+        color: LineChartStyles[dimension].itemStyle.color
+      }
+    },
+    title: { text: `${fieldLabel} ${frequency / 1000}KHz`, top: 0 },
+    tooltip: {
+      trigger: 'axis',
+      axisPointer: {
+        type: 'cross',
+        crossStyle: {
+          color: '#999'
+        }
+      },
+      formatter: `{b} ${data.xAxisUnit}<br/>${legends[dimension]}: {c}`
+    },
+    xAxis: {
+      type: 'category',
+      data: xAxis,
+      name: xAxisUnit
+    },
+    series: series
+  };
 }
