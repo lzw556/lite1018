@@ -53,7 +53,7 @@ export function buildCirclePointsChartOfTower({
       name,
       symbolSize: 6
     });
-    max = getMaxRadius(displacements, height || radius);
+    max = getMaxRadius(displacements, radius ? 10 : undefined);
   });
   return {
     title: titleOptions,
@@ -165,6 +165,6 @@ export function getDataOfCircleChart(
 }
 
 export function getMaxRadius(displacements: number[], heightOrRadius: number = 0) {
-  // return Math.max(Math.max(...displacements), heightOrRadius * 0.05 * 1000);
-  return 1.5 * Math.max(...displacements);
+  const max = Math.max(...displacements);
+  return max >= heightOrRadius && heightOrRadius > 0 ? 1.5 * max : heightOrRadius;
 }
