@@ -99,6 +99,41 @@ export function clearHistory(id: number, from: number, to: number, type: string 
   return request.delete(url);
 }
 
-export function downloadRawHistory(id: number, timestamp: number, lang: string) {
-  return request.download<any>(`/monitoringPoints/${id}/download/data/${timestamp}`, { lang });
+export function downloadRawHistory(id: number, timestamp: number, lang: string, type?: DataType) {
+  return request.download<any>(`/monitoringPoints/${id}/download/data/${timestamp}`, {
+    lang,
+    type
+  });
+}
+
+export type ThicknessAnalysis = {
+  b_1_month: number;
+  b_3_months: number;
+  b_6_months: number;
+  b_1_year: number;
+  b_all: number;
+  k_1_month: number;
+  k_3_months: number;
+  k_6_months: number;
+  k_1_year: number;
+  k_all: number;
+  residual_life_1_month: number;
+  residual_life_3_months: number;
+  residual_life_6_months: number;
+  residual_life_1_year: number;
+  residual_life_all: number;
+  corrosion_rate_1_month: number;
+  corrosion_rate_3_months: number;
+  corrosion_rate_6_months: number;
+  corrosion_rate_1_year: number;
+  corrosion_rate_all: number;
+};
+
+export function getThicknessAnalysis(id: number, from: number, to: number) {
+  return request
+    .get<{
+      data: HistoryData;
+      analysisResult: ThicknessAnalysis;
+    }>(`monitoringPoints/${id}/analysisResult?from=${from}&to=${to}`)
+    .then(GetResponse);
 }

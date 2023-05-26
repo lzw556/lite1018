@@ -307,7 +307,10 @@ export function generateVibrationChartOptions(
     xAxis: {
       type: 'category',
       data: xAxis,
-      name: xAxisUnit
+      name: xAxisUnit,
+      axisLabel: {
+        hideOverlap: true
+      }
     },
     series: series
   };

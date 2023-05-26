@@ -267,7 +267,13 @@ export type MonitoringPointRow = {
   type: number;
   assetId: number;
   bindingDevices?: (Device & { channel?: number })[];
-  attributes?: { index: number; tower_install_height?: number; tower_base_radius?: number };
+  attributes?: {
+    index: number;
+    tower_install_height?: number;
+    tower_base_radius?: number;
+    initial_thickness?: number;
+    critical_thickness?: number;
+  };
   assetName: string;
   properties: Property[];
   data?: {

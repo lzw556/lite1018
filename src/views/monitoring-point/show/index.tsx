@@ -9,7 +9,8 @@ import { getMeasurement } from '../services';
 import {
   INVALID_MONITORING_POINT,
   MonitoringPointRow,
-  MONITORING_POINT_TYPE_VALUE_DYNAMIC_MAPPING
+  MONITORING_POINT_TYPE_VALUE_DYNAMIC_MAPPING,
+  MonitoringPointTypeValue
 } from '../types';
 import { checkHasDynamicData, checkHasWaveData } from '../utils';
 import { MonitoringPointSet } from './settings/index';
@@ -18,6 +19,7 @@ import { MonitoringPointMonitor } from './monitor';
 import { MonitoringPointHistory } from './history';
 import { MonitoringPointDynamicData } from './dynamicData/dynamicData';
 import { RelatedDevices } from './device';
+import { ThicknessAnalysis } from './thicknessAnalysis';
 
 export default function MonitoringPointShow() {
   const { id } = useParams();
@@ -63,6 +65,13 @@ export default function MonitoringPointShow() {
       children: <MonitoringPointHistory {...monitoringPoint} />
     }
   ];
+  if (monitoringPoint.type === MonitoringPointTypeValue.THICKNESS) {
+    items.push({
+      key: 'analysis',
+      label: intl.get('ANALYSIS'),
+      children: <ThicknessAnalysis {...monitoringPoint} />
+    });
+  }
   const config = MONITORING_POINT_TYPE_VALUE_DYNAMIC_MAPPING.get(monitoringPoint.type);
   if (checkHasDynamicData(monitoringPoint.type)) {
     items.push({

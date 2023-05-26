@@ -165,5 +165,6 @@ export function getDataOfCircleChart(
 }
 
 export function getMaxRadius(displacements: number[], heightOrRadius: number = 0) {
-  return Math.max(Math.max(...displacements), heightOrRadius * 0.05 * 1000);
+  // return Math.max(Math.max(...displacements), heightOrRadius * 0.05 * 1000);
+  return 1.5 * Math.max(...displacements);
 }
