@@ -122,6 +122,9 @@ export const ThicknessAnalysis = (props: MonitoringPointRow) => {
                   options={{
                     ...o,
                     yAxis: {
+                      axisLabel: {
+                        formatter: (val: number) => (Number.isInteger(val) ? val : val.toFixed(3))
+                      },
                       min: ({ min }: { min: number; max: number }) => {
                         if (attributes?.initial_thickness && attributes.critical_thickness) {
                           return (
