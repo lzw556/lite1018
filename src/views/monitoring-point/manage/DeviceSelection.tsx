@@ -181,7 +181,7 @@ function CheckAll({
         options={options}
         value={checkedList}
         onChange={onChange}
-        style={{ marginLeft: 30 }}
+        style={{ marginLeft: 30, whiteSpace: 'nowrap' }}
       />
     </Space>
   );
