@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { Col, message, Row } from 'antd';
 import { Device } from '../../../types/device';
 import { GetDeviceRequest } from '../../../apis/device';
@@ -23,6 +23,7 @@ import { isNumber } from 'lodash';
 import { PageTitle } from '../../../components/pageTitle';
 import intl from 'react-intl-universal';
 import { useLocaleContext } from '../../../localeProvider';
+import { SelfLink } from '../../../components/selfLink';
 
 const DeviceDetailPage = () => {
   const { id } = useParams();
@@ -100,7 +101,7 @@ const DeviceDetailPage = () => {
       {device && (
         <PageTitle
           items={[
-            { title: <Link to='/devices'>{intl.get('MENU_DEVICE_LSIT')}</Link> },
+            { title: <SelfLink to='/devices'>{intl.get('MENU_DEVICE_LSIT')}</SelfLink> },
             { title: intl.get('DEVICE_DETAIL') }
           ]}
           actions={

@@ -1,6 +1,5 @@
 import { Button, Empty, Space, Spin, Table, TableProps, Tag } from 'antd';
 import * as React from 'react';
-import { Link } from 'react-router-dom';
 import { MONITORING_POINTS } from '../../../config/assetCategory.config';
 import { isMobile } from '../../../utils/deviceDetection';
 import {
@@ -18,6 +17,7 @@ import {
 import { MonitoringPointRow } from '../types';
 import intl from 'react-intl-universal';
 import { translateMetricName } from '../../alarm/alarm-group';
+import { SelfLink } from '../../../components/selfLink';
 
 export const AlarmRuleSetting = (point: MonitoringPointRow) => {
   const [allRules, setAllRules] = React.useState<AlarmRule[]>();
@@ -182,7 +182,7 @@ export const AlarmRuleSetting = (point: MonitoringPointRow) => {
         image={Empty.PRESENTED_IMAGE_SIMPLE}
         description={
           <p>
-            <Link to='/alarmRules'>{intl.get('CREATE_ONE')}</Link>
+            <SelfLink to='/alarmRules'>{intl.get('CREATE_ONE')}</SelfLink>
           </p>
         }
       />

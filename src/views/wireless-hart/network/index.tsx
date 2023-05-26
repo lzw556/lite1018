@@ -11,7 +11,6 @@ import {
   GetNetworkRequest,
   PagingNetworksRequest
 } from '../../../apis/network';
-import { Link } from 'react-router-dom';
 import { Button, Col, Popconfirm, Row, Space } from 'antd';
 import { DeleteOutlined, EditOutlined, ExportOutlined, PlusOutlined } from '@ant-design/icons';
 import { PageTitle } from '../../../components/pageTitle';
@@ -21,6 +20,7 @@ import TableLayout from '../../layout/TableLayout';
 import { isMobile } from '../../../utils/deviceDetection';
 import { CreateNetwork } from './create';
 import { UpdateNetwork } from './update';
+import { SelfLink } from '../../../components/selfLink';
 
 export default function NetworkManage() {
   const { hasPermission } = usePermission();
@@ -87,7 +87,7 @@ export default function NetworkManage() {
       key: 'name',
       render: (text: string, record: Network) => {
         if (hasPermission(Permission.NetworkDetail)) {
-          return <Link to={`${record.id}`}>{text}</Link>;
+          return <SelfLink to={`${record.id}`}>{text}</SelfLink>;
         }
         return text;
       }

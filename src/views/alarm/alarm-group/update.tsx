@@ -1,7 +1,6 @@
 import { Button, Col, Divider, Form, Input, InputNumber, Row, Select } from 'antd';
 import * as React from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Link } from 'react-router-dom';
 import { PageTitle } from '../../../components/pageTitle';
 import ShadowCard from '../../../components/shadowCard';
 import { MONITORING_POINTS } from '../../../config/assetCategory.config';
@@ -13,6 +12,7 @@ import { FormInputItem } from '../../../components/formInputItem';
 import { useAppConfigContext } from '../../asset';
 import { MONITORING_POINT } from '../../monitoring-point';
 import { translateMetricName } from '.';
+import { SelfLink } from '../../../components/selfLink';
 
 export default function UpdateAlarmRuleGroup() {
   const navigate = useNavigate();
@@ -41,7 +41,7 @@ export default function UpdateAlarmRuleGroup() {
     <>
       <PageTitle
         items={[
-          { title: <Link to='/alarmRules'>{intl.get('ALARM_RULES')}</Link> },
+          { title: <SelfLink to='/alarmRules'>{intl.get('ALARM_RULES')}</SelfLink> },
           { title: intl.get('EDIT_ALARM_RULE') }
         ]}
       />

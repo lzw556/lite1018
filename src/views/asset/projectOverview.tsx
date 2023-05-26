@@ -1,6 +1,6 @@
 import { Empty } from 'antd';
 import * as React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { AssetIcon } from './icon/icon';
 import intl from 'react-intl-universal';
 import { Introduction, OverviewPage, rootPathState, useAssetsContext } from './components';
@@ -16,6 +16,7 @@ import { AlarmTrend } from './alarmTrend';
 import { INVALID_MONITORING_POINT, MONITORING_POINT } from '../monitoring-point';
 import { ASSET_PATHNAME, AssertAssetCategory, AssertOfAssetCategory } from './types';
 import { useAssetCategoryChain } from '../../config/assetCategory.config';
+import { SelfLink } from '../../components/selfLink';
 
 export type ProjectStatistics = {
   deviceOfflineNum: number;
@@ -125,7 +126,7 @@ export default function ProjectOverview() {
       <Empty
         description={
           <p>
-            <Link to='/asset-management'>{intl.get('CREATE_ONE')}</Link>
+            <SelfLink to='/asset-management'>{intl.get('CREATE_ONE')}</SelfLink>
           </p>
         }
         image={Empty.PRESENTED_IMAGE_SIMPLE}

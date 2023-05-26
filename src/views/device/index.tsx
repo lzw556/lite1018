@@ -37,7 +37,6 @@ import DeviceUpgradeSpin from './spin/deviceUpgradeSpin';
 import { SingleDeviceStatus } from './SingleDeviceStatus';
 import { getValueOfFirstClassProperty, omitSpecificKeys } from './util';
 import { isMobile } from '../../utils/deviceDetection';
-import { Link } from 'react-router-dom';
 import { AlarmRuleSettings } from './detail/setting/alarmRuleSettings';
 import { Store, useStore } from '../../hooks/store';
 import { Normalizes } from '../../constants/validator';
@@ -47,6 +46,7 @@ import { useAppConfigContext } from '../asset/components/appConfigContext';
 import intl from 'react-intl-universal';
 import { CommandDropdown } from './commandDropdown';
 import { toMac } from '../../utils/format';
+import { SelfLink } from '../../components/selfLink';
 
 const { Search } = Input;
 const { Option } = Select;
@@ -121,7 +121,7 @@ const DevicePage = () => {
         return (
           <Space>
             {hasPermission(Permission.DeviceDetail) ? (
-              <Link to={`${record.id}`}>{text}</Link>
+              <SelfLink to={`${record.id}`}>{text}</SelfLink>
             ) : (
               text
             )}
@@ -224,12 +224,12 @@ const DevicePage = () => {
       <PageTitle
         items={[{ title: intl.get('MENU_DEVICE_LSIT') }]}
         actions={
-          <Link to='create'>
+          <SelfLink to='create'>
             <Button type='primary'>
               {intl.get('CREATE_DEVICE')}
               <PlusOutlined />
             </Button>
-          </Link>
+          </SelfLink>
         }
       />
       <ShadowCard>

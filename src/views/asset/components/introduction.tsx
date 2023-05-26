@@ -1,7 +1,7 @@
 import * as React from 'react';
-import { Link } from 'react-router-dom';
 import { AlarmState } from '..';
 import './introduction.css';
+import { SelfLink } from '../../../components/selfLink';
 
 export type IntroductionProps = {
   count: JSX.Element;
@@ -23,9 +23,9 @@ export const Introduction: React.FC<IntroductionProps> = (props) => {
     <div className={`introduction ${alarmState} ${focus ? 'focus' : ''}`}>
       <div className='introduction-title'>
         <h3>
-          <Link to={path} state={state}>
+          <SelfLink to={path} state={state}>
             {name}
-          </Link>
+          </SelfLink>
         </h3>
       </div>
       {count}

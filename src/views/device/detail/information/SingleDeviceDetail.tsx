@@ -6,9 +6,9 @@ import { DeviceType } from '../../../../types/device_type';
 import { SingleDeviceStatus } from '../../SingleDeviceStatus';
 import DeviceUpgradeSpin from '../../spin/deviceUpgradeSpin';
 import intl from 'react-intl-universal';
-import { Link } from 'react-router-dom';
 import { toMac } from '../../../../utils/format';
 import { NameValueGroups } from '../../../../components/name-values';
+import { SelfLink } from '../../../../components/selfLink';
 
 const { Text } = Typography;
 
@@ -101,9 +101,9 @@ export const SingleDeviceDetail: React.FC<{ device: Device; upgradeStatus: any }
       value: (
         <Space>
           {device.information.ip_address}{' '}
-          <Link to={`http://${device.information.ip_address}`} target={'_blank'}>
+          <SelfLink to={`http://${device.information.ip_address}`} target={'_blank'}>
             {intl.get('GO_TO_ADMIN_PORTAL')}
-          </Link>
+          </SelfLink>
         </Space>
       )
     });

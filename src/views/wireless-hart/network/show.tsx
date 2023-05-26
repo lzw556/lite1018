@@ -13,10 +13,10 @@ import { TopologyView } from './topology';
 import usePermission, { Permission } from '../../../permission/permission';
 import ButtonGroup from 'antd/lib/button/button-group';
 import { PageTitle } from '../../../components/pageTitle';
-import { Link } from 'react-router-dom';
 import intl from 'react-intl-universal';
 import { FormInputItem } from '../../../components/formInputItem';
 import { WIRELESS_HART_POLLING_PERIOD } from '../../../constants';
+import { SelfLink } from '../../../components/selfLink';
 
 export default function ShowNetwork() {
   const { hasPermission } = usePermission();
@@ -168,7 +168,7 @@ export default function ShowNetwork() {
     <Content style={{ display: 'flex', flexDirection: 'column' }}>
       <PageTitle
         items={[
-          { title: <Link to='/networks'>{intl.get('MENU_NETWORK_LIST')}</Link> },
+          { title: <SelfLink to='/networks'>{intl.get('MENU_NETWORK_LIST')}</SelfLink> },
           { title: intl.get('NETWORK_DETAIL') }
         ]}
       />

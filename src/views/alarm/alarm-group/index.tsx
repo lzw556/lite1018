@@ -8,7 +8,6 @@ import {
 import { Button, Empty, message, Popconfirm, Space, Table, TableProps, Tag } from 'antd';
 import { Content } from 'antd/es/layout/layout';
 import * as React from 'react';
-import { Link } from 'react-router-dom';
 import { PageTitle } from '../../../components/pageTitle';
 import { MONITORING_POINTS, useAssetCategoryChain } from '../../../config/assetCategory.config';
 import HasPermission from '../../../permission';
@@ -28,6 +27,7 @@ import intl from 'react-intl-universal';
 import { MONITORING_POINT } from '../../monitoring-point';
 import { AssertAssetCategory, AssertOfAssetCategory } from '../../asset';
 import { BindMonitoringPoints2 } from './bindMonitoringPoints2';
+import { SelfLink } from '../../../components/selfLink';
 
 export default function AlarmRuleList() {
   const config = useAppConfigContext();
@@ -62,9 +62,9 @@ export default function AlarmRuleList() {
             {row.editable && (
               <>
                 <Button type='text' size='small' title={intl.get('EDIT')}>
-                  <Link to={`${row.id}`}>
+                  <SelfLink to={`${row.id}`}>
                     <EditOutlined />
-                  </Link>
+                  </SelfLink>
                 </Button>
                 <HasPermission value={Permission.AlarmRuleDelete}>
                   <Popconfirm
@@ -185,12 +185,12 @@ export default function AlarmRuleList() {
         actions={
           <>
             <HasPermission value={Permission.AlarmRuleGroupAdd}>
-              <Link to='create'>
+              <SelfLink to='create'>
                 <Button type='primary'>
                   {intl.get('CREATE_ALARM_RULE')}
                   <PlusOutlined />
                 </Button>
-              </Link>
+              </SelfLink>
             </HasPermission>
             <HasPermission value={Permission.AlarmRuleGroupExport}>
               {result.dataSource && result.dataSource.length > 0 && (

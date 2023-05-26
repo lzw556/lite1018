@@ -17,9 +17,9 @@ import ButtonGroup from 'antd/lib/button/button-group';
 import WsnFormItem from '../../../components/formItems/wsnFormItem';
 import { useProvisionMode } from '../useProvisionMode';
 import { PageTitle } from '../../../components/pageTitle';
-import { Link } from 'react-router-dom';
 import intl from 'react-intl-universal';
 import { FormInputItem } from '../../../components/formInputItem';
+import { SelfLink } from '../../../components/selfLink';
 
 const NetworkDetail = () => {
   const { hasPermission } = usePermission();
@@ -175,7 +175,7 @@ const NetworkDetail = () => {
     <Content style={{ display: 'flex', flexDirection: 'column' }}>
       <PageTitle
         items={[
-          { title: <Link to='/networks'>{intl.get('MENU_NETWORK_LIST')}</Link> },
+          { title: <SelfLink to='/networks'>{intl.get('MENU_NETWORK_LIST')}</SelfLink> },
           { title: intl.get('NETWORK_DETAIL') }
         ]}
       />

@@ -13,8 +13,9 @@ import {
 import { deleteAsset, getAsset } from '../services';
 import { AssertAssetCategory, AssertOfAssetCategory } from '../types';
 import { useAssetCategoryChain } from '../../../config/assetCategory.config';
-import { Link, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { getPathFromType, useAppConfigContext } from '../components';
+import { SelfLink } from '../../../components/selfLink';
 
 export const NodeActions = ({
   id,
@@ -138,11 +139,11 @@ export const NodeActions = ({
         )}
       </HasPermission>
       {!isNodeRootAsset && (
-        <Link to={`${getPathFromType(type)}${pickId(id)}`} state={state}>
+        <SelfLink to={`${getPathFromType(type)}${pickId(id)}`} state={state}>
           <Button type='text' size='small'>
             <ArrowRightOutlined />
           </Button>
-        </Link>
+        </SelfLink>
       )}
     </div>
   );

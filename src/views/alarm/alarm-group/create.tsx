@@ -1,7 +1,7 @@
 import { MinusCircleOutlined } from '@ant-design/icons';
 import { Button, Cascader, Col, Divider, Form, Input, InputNumber, Row, Select } from 'antd';
 import * as React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { PageTitle } from '../../../components/pageTitle';
 import ShadowCard from '../../../components/shadowCard';
 import { isMobile } from '../../../utils/deviceDetection';
@@ -18,6 +18,7 @@ import { useAppConfigContext } from '../../asset/components/appConfigContext';
 import { MONITORING_POINTS } from '../../../config/assetCategory.config';
 import { FormInputItem } from '../../../components/formInputItem';
 import intl from 'react-intl-universal';
+import { SelfLink } from '../../../components/selfLink';
 
 export default function CreateAlarmRuleGroup() {
   const navigate = useNavigate();
@@ -36,7 +37,7 @@ export default function CreateAlarmRuleGroup() {
     <>
       <PageTitle
         items={[
-          { title: <Link to='/alarmRules'>{intl.get('ALARM_RULES')}</Link> },
+          { title: <SelfLink to='/alarmRules'>{intl.get('ALARM_RULES')}</SelfLink> },
           { title: intl.get('CREATE_ALARM_RULE') }
         ]}
       />

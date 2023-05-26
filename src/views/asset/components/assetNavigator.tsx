@@ -1,6 +1,6 @@
 import { Breadcrumb, Dropdown, MenuProps, Space } from 'antd';
 import * as React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import {
   AssertAssetCategory,
   AssertOfAssetCategory,
@@ -17,6 +17,7 @@ import { FLANGE_PATHNAME } from '../../flange';
 import { combineMonitoringPointToAsset } from '../common/utils';
 import { useAssetsContext } from './assetsContext';
 import { TOWER_PATHNAME } from '../../tower';
+import { SelfLink } from '../../../components/selfLink';
 
 export const rootPathState = { from: { label: intl.get('OVERVIEW'), path: '/project-overview' } };
 
@@ -108,9 +109,9 @@ function ItemLink({ id, type, name }: TreeFlatListItem) {
   const { state } = useLocation();
   const from = state?.from;
   return (
-    <Link to={id === 0 ? from.path : `${getPathFromType(type)}${pickId(id)}`} state={{ from }}>
+    <SelfLink to={id === 0 ? from.path : `${getPathFromType(type)}${pickId(id)}`} state={{ from }}>
       {name}
-    </Link>
+    </SelfLink>
   );
 }
 

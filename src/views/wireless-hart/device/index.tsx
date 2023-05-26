@@ -31,7 +31,6 @@ import { PageResult } from '../../../types/page';
 import DeviceTable from '../../../components/table/deviceTable';
 import NetworkSelect from '../../../components/select/networkSelect';
 import { isMobile } from '../../../utils/deviceDetection';
-import { Link } from 'react-router-dom';
 import { Store, useStore } from '../../../hooks/store';
 import { Normalizes } from '../../../constants/validator';
 import { PageTitle } from '../../../components/pageTitle';
@@ -46,6 +45,7 @@ import { CommandDropdown } from '../../device/commandDropdown';
 import { AlarmRuleSettings } from '../../device/detail/setting/alarmRuleSettings';
 import EditSettingModal from '../../device/edit/editSettingModal';
 import EditBaseInfoModel from './update';
+import { SelfLink } from '../../../components/selfLink';
 
 const { Search } = Input;
 const { Option } = Select;
@@ -119,7 +119,7 @@ const DevicePage = () => {
         return (
           <Space>
             {hasPermission(Permission.DeviceDetail) ? (
-              <Link to={`${record.id}`}>{text}</Link>
+              <SelfLink to={`${record.id}`}>{text}</SelfLink>
             ) : (
               text
             )}
@@ -230,12 +230,12 @@ const DevicePage = () => {
       <PageTitle
         items={[{ title: intl.get('MENU_DEVICE_LSIT') }]}
         actions={
-          <Link to='create'>
+          <SelfLink to='create'>
             <Button type='primary'>
               {intl.get('CREATE_DEVICE')}
               <PlusOutlined />
             </Button>
-          </Link>
+          </SelfLink>
         }
       />
       <ShadowCard>

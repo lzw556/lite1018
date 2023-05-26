@@ -20,10 +20,10 @@ import { PageResult } from '../../types/page';
 import usePermission, { Permission } from '../../permission/permission';
 import HasPermission from '../../permission';
 import { isMobile } from '../../utils/deviceDetection';
-import { Link } from 'react-router-dom';
 import { Store, useStore } from '../../hooks/store';
 import { PageTitle } from '../../components/pageTitle';
 import intl from 'react-intl-universal';
+import { SelfLink } from '../../components/selfLink';
 
 const NetworkPage = () => {
   const { hasPermission, hasPermissions } = usePermission();
@@ -130,7 +130,7 @@ const NetworkPage = () => {
       key: 'name',
       render: (text: string, record: Network) => {
         if (hasPermission(Permission.NetworkDetail)) {
-          return <Link to={`${record.id}`}>{text}</Link>;
+          return <SelfLink to={`${record.id}`}>{text}</SelfLink>;
         }
         return text;
       }

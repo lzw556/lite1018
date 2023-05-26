@@ -1,9 +1,10 @@
 import { Menu } from 'antd';
 import * as React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { Menu as MenuItem } from '../../types/menu';
 import { mapTree } from '../../utils/tree';
 import intl from 'react-intl-universal';
+import { SelfLink } from '../../components/selfLink';
 
 export const NavMenu: React.FC<{
   menus: MenuItem[];
@@ -20,9 +21,9 @@ export const NavMenu: React.FC<{
       state = { from: { path: m.path, label: intl.get(m.title) } };
     }
     const label = m.path ? (
-      <Link to={`${m.name}`} state={state}>
+      <SelfLink to={`${m.name}`} state={state}>
         {intl.get(m.title)}
-      </Link>
+      </SelfLink>
     ) : (
       intl.get(m.title)
     );

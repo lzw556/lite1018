@@ -1,6 +1,6 @@
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import { Button, Popconfirm, Space, Tag } from 'antd';
-import { Link, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import HasPermission from '../../permission';
 import { Permission } from '../../permission/permission';
 import { isMobile } from '../../utils/deviceDetection';
@@ -8,6 +8,7 @@ import { convertAlarmLevelToState, getAlarmLevelColor, getAlarmStateText } from 
 import { deleteMeasurement } from './services';
 import { MonitoringPointRow, MONITORING_POINT, MONITORING_POINT_PATHNAME } from './types';
 import intl from 'react-intl-universal';
+import { SelfLink } from '../../components/selfLink';
 
 export const useMonitoringPointTableColumns = () => {
   const { state } = useLocation();
@@ -18,13 +19,13 @@ export const useMonitoringPointTableColumns = () => {
       key: 'name',
       width: isMobile ? 300 : 400,
       render: (name: string, row: MonitoringPointRow) => (
-        <Link
+        <SelfLink
           to={`/${MONITORING_POINT_PATHNAME}/${row.id}`}
           state={state}
           key={`${name}-${row.id}`}
         >
           {name}
-        </Link>
+        </SelfLink>
       )
     },
     {
@@ -49,9 +50,9 @@ export const useMonitoringPointTableColumns = () => {
       render: (name: string, row: MonitoringPointRow) =>
         row.bindingDevices && row.bindingDevices.length > 0
           ? row.bindingDevices.map(({ id, name }) => (
-              <Link to={`/devices/${id}`} key={`devices-${row.id}`}>
+              <SelfLink to={`/devices/${id}`} key={`devices-${row.id}`}>
                 {name}
-              </Link>
+              </SelfLink>
             ))
           : ''
     }

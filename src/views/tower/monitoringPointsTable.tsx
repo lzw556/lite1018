@@ -1,6 +1,6 @@
 import { Empty, Table } from 'antd';
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import usePermission, { Permission } from '../../permission/permission';
 import { isMobile } from '../../utils/deviceDetection';
 import { getPathFromType } from '../asset';
@@ -13,6 +13,7 @@ import {
   getRealPoints,
   sortMonitoringPointByAttributes
 } from '../monitoring-point';
+import { SelfLink } from '../../components/selfLink';
 
 export const MonitoringPointsTable = ({
   asset,
@@ -44,13 +45,13 @@ export const MonitoringPointsTable = ({
   return (
     <>
       {showTitle && (
-        <Link
+        <SelfLink
           to={`${getPathFromType(asset.type)}${id}`}
           state={state}
           style={{ display: 'block', marginBottom: 8, fontSize: 16 }}
         >
           {name}
-        </Link>
+        </SelfLink>
       )}
       <Table
         {...{

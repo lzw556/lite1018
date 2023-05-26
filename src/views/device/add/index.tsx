@@ -12,10 +12,11 @@ import { processArrayValuesInSensorSetting } from '../../../components/formItems
 import { isMobile } from '../../../utils/deviceDetection';
 import { DeviceType } from '../../../types/device_type';
 import { DeviceSettingContent } from '../DeviceSettingContent';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { PageTitle } from '../../../components/pageTitle';
 import intl from 'react-intl-universal';
 import { FormInputItem } from '../../../components/formInputItem';
+import { SelfLink } from '../../../components/selfLink';
 
 const AddDevicePage = () => {
   const [deviceSettings, setDeviceSettings] = useState<DeviceSetting[]>();
@@ -80,7 +81,7 @@ const AddDevicePage = () => {
       <Content>
         <PageTitle
           items={[
-            { title: <Link to='/devices'>{intl.get('MENU_DEVICE_LSIT')}</Link> },
+            { title: <SelfLink to='/devices'>{intl.get('MENU_DEVICE_LSIT')}</SelfLink> },
             { title: intl.get('CREATE_DEVICE') }
           ]}
         />

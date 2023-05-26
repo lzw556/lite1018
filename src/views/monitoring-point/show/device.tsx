@@ -1,6 +1,5 @@
 import { Tag } from 'antd';
 import React from 'react';
-import { Link } from 'react-router-dom';
 import { NameValueGroups } from '../../../components/name-values';
 import ShadowCard from '../../../components/shadowCard';
 import { Device } from '../../../types/device';
@@ -11,6 +10,7 @@ import { convertAlarmLevelToState, getAlarmLevelColor, getAlarmStateText } from 
 import { MonitoringPointRow } from '../types';
 import intl from 'react-intl-universal';
 import { toMac } from '../../../utils/format';
+import { SelfLink } from '../../../components/selfLink';
 
 export const RelatedDevices = (point: MonitoringPointRow) => {
   const { bindingDevices: devices = [], alertLevel } = point;
@@ -43,7 +43,10 @@ function SingleDeviceInfo(props: Device & { alertLevel?: number }) {
         divider={40}
         col={{ ...colProps }}
         items={[
-          { name: intl.get('DEVICE_NAME'), value: <Link to={`/devices/${id}`}>{name}</Link> },
+          {
+            name: intl.get('DEVICE_NAME'),
+            value: <SelfLink to={`/devices/${id}`}>{name}</SelfLink>
+          },
           { name: intl.get('TYPE'), value: intl.get(DeviceType.toString(typeId)) },
           { name: intl.get('MODEL'), value: information?.model ?? '-' },
           { name: intl.get('MAC_ADDRESS'), value: toMac(macAddress.toUpperCase()) },
