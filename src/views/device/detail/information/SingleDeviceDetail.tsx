@@ -9,6 +9,7 @@ import intl from 'react-intl-universal';
 import { toMac } from '../../../../utils/format';
 import { NameValueGroups } from '../../../../components/name-values';
 import { SelfLink } from '../../../../components/selfLink';
+import { isMobile } from '../../../../utils/deviceDetection';
 
 const { Text } = Typography;
 
@@ -108,5 +109,11 @@ export const SingleDeviceDetail: React.FC<{ device: Device; upgradeStatus: any }
       )
     });
   }
-  return <NameValueGroups items={items} divider={40} col={{ xxl: 8, xl: 12, lg: 12, md: 12 }} />;
+  return (
+    <NameValueGroups
+      items={items}
+      divider={isMobile ? 10 : 40}
+      col={{ xxl: 8, xl: 12, lg: 12, md: 12, xs: 24 }}
+    />
+  );
 };

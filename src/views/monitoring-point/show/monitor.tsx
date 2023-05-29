@@ -39,7 +39,7 @@ export const MonitoringPointMonitor = (point: MonitoringPointRow) => {
     <Row gutter={[32, 32]}>
       {(type === MonitoringPointTypeValue.TOWER_INCLINATION ||
         type === MonitoringPointTypeValue.TOWER_BASE_SETTLEMENT) && (
-        <Col span={6}>
+        <Col span={isMobile ? 24 : 6}>
           <CircleChart
             data={[
               {
@@ -85,8 +85,8 @@ export function generateChartOptionsOfHistoryDatas(
           return relVal;
         }
       },
-      legend: { show: !!propertyKey },
-      grid: { bottom: 20, left: 5, containLabel: true },
+      legend: { show: !!propertyKey, top: isMobile ? 40 : 'auto' },
+      grid: { bottom: 20, left: 5, top: isMobile ? 100 : 60, containLabel: true },
       title: {
         text: `${intl.get(property.name)}${unit ? `(${unit})` : ''}`,
         subtext: propertyKey

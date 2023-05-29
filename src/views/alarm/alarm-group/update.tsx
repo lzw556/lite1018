@@ -318,7 +318,7 @@ export default function UpdateAlarmRuleGroup() {
               </>
             )}
           </Form.List>
-          <Form.Item wrapperCol={{ offset: 3 }}>
+          <Form.Item wrapperCol={{ offset: isMobile ? 0 : 3 }}>
             <Button
               type='primary'
               onClick={() => {

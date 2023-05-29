@@ -8,6 +8,7 @@ import { FormInputItem } from '../../../components/formInputItem';
 import { MonitoringPointTypeValue } from '../types';
 import { ThicknessFieldsOfCreation } from './thicknessFieldsOfCreation';
 import { AngleFieldsOfCreation } from './angleFieldsOfCreation';
+import { isMobile } from '../../../utils/deviceDetection';
 
 export const MonitoringPointFormItem = ({
   devices,
@@ -99,7 +100,7 @@ export const MonitoringPointFormItem = ({
               )}
             </div>
           ))}
-          <Form.Item wrapperCol={{ offset: 4 }}>
+          <Form.Item wrapperCol={{ offset: isMobile ? 0 : 4 }}>
             <Popover
               title={intl.get('SELECT_SENSOR')}
               content={
@@ -115,7 +116,7 @@ export const MonitoringPointFormItem = ({
                 )
               }
               trigger={['click']}
-              placement='rightTop'
+              placement={isMobile ? 'top' : 'rightTop'}
               open={open}
               onOpenChange={(open) => setVisible(open)}
               overlayStyle={{ width: 400 }}

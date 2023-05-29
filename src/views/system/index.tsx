@@ -53,7 +53,7 @@ const SystemPage = () => {
               strokeColor={ColorHealth}
               percent={Number(item.toFixed(0))}
               size={'small'}
-              style={{ margin: '2px', width: '164px' }}
+              style={{ margin: '2px', width: '50%' }}
             />
           </Form.Item>
         );
@@ -65,12 +65,9 @@ const SystemPage = () => {
   return (
     <Content>
       <PageTitle items={[{ title: intl.get('MENU_SYSTEM_STATUS') }]} />
-      <Row justify={'space-between'}>
-        <Col
-          span={isMobile ? 24 : 12}
-          style={{ paddingRight: isMobile ? 0 : '4px', marginBottom: isMobile ? 8 : 0 }}
-        >
-          <ShadowCard title={intl.get('SYSTEM_INFO')} size={'small'} style={{ height: '256px' }}>
+      <Row justify={'space-between'} gutter={isMobile ? [0, 10] : [10, 10]} align='stretch'>
+        <Col span={isMobile ? 24 : 12}>
+          <ShadowCard title={intl.get('SYSTEM_INFO')} size={'small'}>
             <Form.Item
               label={intl.get('OEPRATING_SYSTEM')}
               labelAlign={'left'}
@@ -117,11 +114,7 @@ const SystemPage = () => {
           span={isMobile ? 24 : 12}
           style={{ paddingLeft: isMobile ? 0 : '4px', marginBottom: isMobile ? 8 : 0 }}
         >
-          <ShadowCard
-            title={intl.get('HARD_DISK_STATUS')}
-            size={'small'}
-            style={{ height: '256px' }}
-          >
+          <ShadowCard title={intl.get('HARD_DISK_STATUS')} size={'small'}>
             <Row justify={'start'}>
               <Col span={6}>
                 <Statistic title={intl.get('TOTAL_AMOUNT_MB')} value={data?.server.disk.totalMB} />
@@ -135,18 +128,8 @@ const SystemPage = () => {
             </Row>
           </ShadowCard>
         </Col>
-      </Row>
-      <br />
-      <Row justify={'space-between'}>
-        <Col
-          span={isMobile ? 24 : 12}
-          style={{ paddingRight: isMobile ? 0 : '4px', marginBottom: isMobile ? 8 : 0 }}
-        >
-          <ShadowCard
-            title={intl.get('CPU_RUNNING_STATUS')}
-            size={'small'}
-            style={{ height: '256px' }}
-          >
+        <Col span={isMobile ? 24 : 12}>
+          <ShadowCard title={intl.get('CPU_RUNNING_STATUS')} size={'small'}>
             <Form.Item
               label={intl.get('NUMBER_OF_CPU_CORES')}
               labelAlign={'left'}
@@ -170,7 +153,7 @@ const SystemPage = () => {
           span={isMobile ? 24 : 12}
           style={{ paddingLeft: isMobile ? 0 : '4px', marginBottom: isMobile ? 8 : 0 }}
         >
-          <ShadowCard title={intl.get('MEMORY_STATUS')} size={'small'} style={{ height: '256px' }}>
+          <ShadowCard title={intl.get('MEMORY_STATUS')} size={'small'}>
             <Row justify={'start'}>
               <Col span={12}>
                 <Statistic title={intl.get('TOTAL_AMOUNT_MB')} value={data?.server.ram.totalMB} />

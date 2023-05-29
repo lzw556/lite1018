@@ -28,6 +28,7 @@ import { MONITORING_POINT } from '../../monitoring-point';
 import { AssertAssetCategory, AssertOfAssetCategory } from '../../asset';
 import { BindMonitoringPoints2 } from './bindMonitoringPoints2';
 import { SelfLink } from '../../../components/selfLink';
+import { isMobile } from '../../../utils/deviceDetection';
 
 export default function AlarmRuleList() {
   const config = useAppConfigContext();
@@ -147,7 +148,8 @@ export default function AlarmRuleList() {
       dataSource,
       pagination: false,
       size: 'small',
-      style: { marginLeft: 40, width: columns.length === 2 ? 'auto' : 770 }
+      style: { marginLeft: 40, width: columns.length === 2 ? 'auto' : 770 },
+      scroll: isMobile ? { x: 600 } : undefined
     };
   };
 
@@ -164,7 +166,8 @@ export default function AlarmRuleList() {
       emptyText: (
         <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={intl.get('NO_DATA_PROMPT')} />
       )
-    }
+    },
+    scroll: isMobile ? { x: 600 } : undefined
   });
 
   const fetchAlarmRules = () => {

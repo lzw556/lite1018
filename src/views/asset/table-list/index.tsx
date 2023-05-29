@@ -11,6 +11,7 @@ import { PageTitle } from '../../../components/pageTitle';
 import intl from 'react-intl-universal';
 import { useAssetCategoryChain } from '../../../config/assetCategory.config';
 import { CreateAssetActionBar } from '../components/createAssetActionBar';
+import { isMobile } from '../../../utils/deviceDetection';
 
 export default function AssetsTableList() {
   const { assets, refresh } = useAssetsContext();
@@ -44,7 +45,7 @@ export default function AssetsTableList() {
     return (
       <ShadowCard>
         <Row gutter={[16, 16]}>
-          <Col span={6}>
+          <Col span={isMobile ? 24 : 6}>
             <Label name={intl.get(root.label)}>
               <Select
                 bordered={false}

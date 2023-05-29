@@ -8,6 +8,7 @@ import { MonitoringPointRow } from '../types';
 import { getThicknessAnalysis } from '../services';
 import { transformThicknessAnalysis } from '../historyDataHelper';
 import dayjs from '../../../utils/dayjsUtils';
+import { isMobile } from '../../../utils/deviceDetection';
 
 const DURATIONS = [
   { label: intl.get('THICKNESS_ANALYSIS_ALL'), value: 'all' as 'all', color: '#73c0de' },
@@ -84,36 +85,38 @@ export const ThicknessAnalysis = (props: MonitoringPointRow) => {
       <Row gutter={[0, 16]}>
         <Col span={24}>
           <Checkbox.Group
-            options={DURATIONS.map(({ label, value, color }) => ({
-              value,
-              label: (
-                <Row align='middle'>
-                  <Col>{label}</Col>
-                  <Col>
-                    <span
-                      style={{
-                        display: 'block',
-                        marginLeft: 5,
-                        height: 16,
-                        width: 16,
-                        backgroundColor: color
-                      }}
-                    ></span>
-                  </Col>
-                </Row>
-              )
-            }))}
             onChange={(checked) => {
               setMarkLineDatas([
                 ...defaultMarkLines.current,
                 ...checked.map((c) => analysisData.analysis[c as Duration].data)
               ]);
             }}
-          />
+          >
+            <Row align='middle'>
+              {DURATIONS.map(({ label, value, color }) => (
+                <Col>
+                  <Checkbox value={value}>
+                    {label}
+                    <span
+                      style={{
+                        position: 'relative',
+                        top: 3,
+                        display: 'inline-block',
+                        marginLeft: 5,
+                        height: 16,
+                        width: 16,
+                        backgroundColor: color
+                      }}
+                    ></span>
+                  </Checkbox>
+                </Col>
+              ))}
+            </Row>
+          </Checkbox.Group>
         </Col>
         <Col span={24}>
           <Row>
-            <Col span={18}>
+            <Col span={isMobile ? 24 : 18}>
               {analysisData.options.map((o: any) => (
                 <ChartContainer
                   key={o.title}
@@ -183,7 +186,7 @@ export const ThicknessAnalysis = (props: MonitoringPointRow) => {
                 />
               ))}
             </Col>
-            <Col span={6} style={{ paddingTop: 60 }}>
+            <Col span={isMobile ? 24 : 6} style={{ paddingTop: 60 }}>
               {renderSummary()}
             </Col>
           </Row>

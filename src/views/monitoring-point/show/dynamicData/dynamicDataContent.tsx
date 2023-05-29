@@ -15,6 +15,7 @@ import { roundValue } from '../../../../utils/format';
 import { MonitoringPointRow } from '../../types';
 import { CircleChart } from '../../../tower/circleChart';
 import { getMonitoringPointType } from '../../utils';
+import { isMobile } from '../../../../utils/deviceDetection';
 
 export const DynamicDataContent = ({
   type,
@@ -70,7 +71,7 @@ export const DynamicDataContent = ({
   return (
     <>
       {isAngle && (
-        <Col span={8}>
+        <Col span={isMobile ? 24 : 8}>
           <CircleChart
             data={[]}
             dynamicData={[
@@ -87,7 +88,7 @@ export const DynamicDataContent = ({
           />
         </Col>
       )}
-      <Col span={isAngle ? 10 : 18} style={{ backgroundColor: '#f0f2f5' }}>
+      <Col span={isAngle ? (isMobile ? 24 : 10) : 18} style={{ backgroundColor: '#f0f2f5' }}>
         <Row gutter={[0, 12]}>
           <Col span={24}>
             <ShadowCard>{renderMeta()}</ShadowCard>

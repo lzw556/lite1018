@@ -19,6 +19,7 @@ import { Store, useStore } from '../../hooks/store';
 import { store as reduxStore } from '../../store';
 import { PageTitle } from '../../components/pageTitle';
 import intl from 'react-intl-universal';
+import { isMobile } from '../../utils/deviceDetection';
 
 const ProjectPage = () => {
   const [open, setVisible] = useState(false);
@@ -187,6 +188,7 @@ const ProjectPage = () => {
             setStore((prev) => ({ ...prev, pagedOptions: { index, size } }))
           }
           columns={columns}
+          scroll={isMobile ? { x: 600 } : undefined}
         />
       </ShadowCard>
       {open && (

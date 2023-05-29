@@ -11,6 +11,7 @@ import { MonitoringPointRow } from '../types';
 import intl from 'react-intl-universal';
 import { toMac } from '../../../utils/format';
 import { SelfLink } from '../../../components/selfLink';
+import { isMobile } from '../../../utils/deviceDetection';
 
 export const RelatedDevices = (point: MonitoringPointRow) => {
   const { bindingDevices: devices = [], alertLevel } = point;
@@ -34,13 +35,13 @@ export const RelatedDevices = (point: MonitoringPointRow) => {
 };
 
 function SingleDeviceInfo(props: Device & { alertLevel?: number }) {
-  const colProps = generateColProps({ xxl: 8, xl: 12, lg: 12, md: 12 });
+  const colProps = generateColProps({ xxl: 8, xl: 12, lg: 12, md: 12, xs: 24 });
   const { id, name, typeId, information, state, macAddress, data, alertLevel } = props;
 
   return (
     <ShadowCard>
       <NameValueGroups
-        divider={40}
+        divider={isMobile ? 10 : 40}
         col={{ ...colProps }}
         items={[
           {

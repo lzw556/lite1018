@@ -449,20 +449,20 @@ export default function CreateAlarmRuleGroup() {
                     {name !== 0 && (
                       <Button
                         icon={<MinusCircleOutlined />}
-                        style={{ position: 'absolute', top: 0 }}
+                        style={{ position: 'absolute', top: 0, left: '80%' }}
                         onClick={() => remove(name)}
                       />
                     )}
                     <Divider />
                   </div>
                 ))}
-                <Form.Item wrapperCol={{ offset: 2 }}>
+                <Form.Item wrapperCol={{ offset: isMobile ? 0 : 3 }}>
                   <Button onClick={() => add()}>{intl.get('CREATE_ALARM_RULE')}</Button>
                 </Form.Item>
               </>
             )}
           </Form.List>
-          <Form.Item wrapperCol={{ offset: 2 }}>
+          <Form.Item label='' wrapperCol={{ offset: isMobile ? 0 : 3 }}>
             <Button
               type='primary'
               onClick={() => {

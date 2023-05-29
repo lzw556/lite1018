@@ -20,6 +20,7 @@ import {
 import intl from 'react-intl-universal';
 import { useLocaleContext } from '../../../../localeProvider';
 import { VibrationDynamicDataContent } from './vibrationDynamicDataContent';
+import { isMobile } from '../../../../utils/deviceDetection';
 
 export const MonitoringPointDynamicData: React.FC<MonitoringPointRow & { dataType?: DataType }> = (
   props
@@ -62,7 +63,7 @@ export const MonitoringPointDynamicData: React.FC<MonitoringPointRow & { dataTyp
     return (
       <Table
         size={'middle'}
-        scroll={{ y: 600 }}
+        scroll={{ y: isMobile ? 200 : 600 }}
         showHeader={false}
         columns={[
           {
@@ -139,7 +140,7 @@ export const MonitoringPointDynamicData: React.FC<MonitoringPointRow & { dataTyp
                 />
               </Col>
             )}
-            {timestamps.length > 0 && <Col span={6}>{renderTimestampsList()}</Col>}
+            {timestamps.length > 0 && <Col span={isMobile ? 24 : 6}>{renderTimestampsList()}</Col>}
             {timestamp && dynamicDataType && dynamicData.values && !isVibration && (
               <DynamicDataContent
                 key={props.dataType}

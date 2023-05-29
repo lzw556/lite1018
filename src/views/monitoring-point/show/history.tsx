@@ -70,7 +70,7 @@ export const MonitoringPointHistory = (point: MonitoringPointRow) => {
   return (
     <Row gutter={[32, 32]}>
       {isAngle && historyData && (
-        <Col span={8}>
+        <Col span={isMobile ? 24 : 8}>
           <CircleChart
             data={[
               {
@@ -86,7 +86,7 @@ export const MonitoringPointHistory = (point: MonitoringPointRow) => {
           />
         </Col>
       )}
-      <Col span={isAngle && historyData ? 16 : 24}>
+      <Col span={isAngle && historyData ? (isMobile ? 24 : 16) : 24}>
         <Row justify='space-between'>
           <Col></Col>
           <Col>
