@@ -87,7 +87,7 @@ export function buildTrendChartOfFlange(
       left: isMobile ? 0 : 80,
       subtext: property ? `${intl.get(property.name)}(${property.unit})` : ''
     },
-    legend: { bottom: 0 },
+    legend: { bottom: 0, type: series.length > 8 ? 'scroll' : 'plain' },
     grid: { bottom: isMobile ? 120 : 60 },
     tooltip: {
       trigger: 'axis',
