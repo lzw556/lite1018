@@ -136,7 +136,8 @@ export namespace DeviceType {
       type === DeviceType.BoltLooseningWIRED ||
       type === DeviceType.VibrationTemperature3AxisWIRED ||
       type === DeviceType.TemperatureWIRED ||
-      type === DeviceType.PressureTemperatureWIRED
+      type === DeviceType.PressureTemperatureWIRED ||
+      (isMultiChannel(type) as boolean)
     );
   }
 }
