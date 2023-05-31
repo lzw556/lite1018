@@ -5,7 +5,7 @@ import { oneWeekNumberRange } from '../../../components/rangeDatePicker';
 import { LineChartStyles } from '../../../constants/chart';
 import dayjs from '../../../utils/dayjsUtils';
 import { isMobile } from '../../../utils/deviceDetection';
-import { computeScale, getDisplayValue } from '../../../utils/format';
+import { getDisplayValue } from '../../../utils/format';
 import { getHistoryDatas } from '../historyDataHelper';
 import { getDataOfMonitoringPoint } from '../services';
 import { HistoryData, MonitoringPointRow, MonitoringPointTypeValue } from '../types';
@@ -109,8 +109,7 @@ export function generateChartOptionsOfHistoryDatas(
         data: times.map((item) => dayjs.unix(item).local().format('YYYY-MM-DD HH:mm:ss'))
       },
       yAxis: {
-        type: 'value',
-        ...computeScale(seriesData[0].data, property.precision)
+        type: 'value'
       }
     };
   });
