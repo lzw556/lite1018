@@ -1505,13 +1505,6 @@
   dependencies:
     regenerator-runtime "^0.13.4"
 
-"@babel/runtime@^7.15.3":
-  version "7.16.3"
-  resolved "https://registry.npmmirror.com/@babel/runtime/download/@babel/runtime-7.16.3.tgz?cache=0&sync_timestamp=1636494920863&other_urls=https%3A%2F%2Fregistry.npmmirror.com%2F%40babel%2Fruntime%2Fdownload%2F%40babel%2Fruntime-7.16.3.tgz#b86f0db02a04187a3c17caa77de69840165d42d5"
-  integrity sha512-WBwekcqacdY2e9AF/Q7WLFUWmdJGJTkbjqTjoMDgXkVZ3ZRUvOPsLb5KdwISoQVsbP+DQzVZW4Zhci0DvpbNTQ==
-  dependencies:
-    regenerator-runtime "^0.13.4"
-
 "@babel/runtime@^7.16.7", "@babel/runtime@^7.20.0", "@babel/runtime@^7.20.7":
   version "7.21.0"
   resolved "https://registry.npmmirror.com/@babel/runtime/-/runtime-7.21.0.tgz#5b55c9d394e5fcf304909a8b00c07dc217b56673"
@@ -1627,18 +1620,6 @@
   version "2.3.0"
   resolved "https://registry.npmmirror.com/@formatjs/intl-utils/-/intl-utils-2.3.0.tgz#2dc8c57044de0340eb53a7ba602e59abf80dc799"
   integrity sha512-KWk80UPIzPmUg+P0rKh6TqspRw0G6eux1PuJr+zz47ftMaZ9QDwbGzHZbtzWkl5hgayM/qrKRutllRC7D/vVXQ==
-
-"@fortawesome/fontawesome-common-types@^0.2.36":
-  version "0.2.36"
-  resolved "https://registry.nlark.com/@fortawesome/fontawesome-common-types/download/@fortawesome/fontawesome-common-types-0.2.36.tgz#b44e52db3b6b20523e0c57ef8c42d315532cb903"
-  integrity sha1-tE5S2ztrIFI+DFfvjELTFVMsuQM=
-
-"@fortawesome/fontawesome-svg-core@^1.2.36":
-  version "1.2.36"
-  resolved "https://registry.nlark.com/@fortawesome/fontawesome-svg-core/download/@fortawesome/fontawesome-svg-core-1.2.36.tgz#4f2ea6f778298e0c47c6524ce2e7fd58eb6930e3"
-  integrity sha1-Ty6m93gpjgxHxlJM4uf9WOtpMOM=
-  dependencies:
-    "@fortawesome/fontawesome-common-types" "^0.2.36"
 
 "@hapi/address@2.x.x":
   version "2.1.4"
@@ -2993,14 +2974,6 @@ ansi-styles@^6.0.0:
   version "6.2.1"
   resolved "https://registry.npmmirror.com/ansi-styles/-/ansi-styles-6.2.1.tgz#0e62320cf99c21afff3b3012192546aacbfb05c5"
   integrity sha512-bN798gFfQX+viw3R7yrGWRqnrN2oRkEkUjjl4JNn4E8GxxbjtG3FbrEIIY3l8/hrwUwIeCZvi4QuOTP4MErVug==
-
-antd-img-crop@^3.16.0:
-  version "3.16.0"
-  resolved "https://registry.npmmirror.com/antd-img-crop/download/antd-img-crop-3.16.0.tgz#c1a4cf9b6a97a21b40039aa94fede95385555a6f"
-  integrity sha1-waTPm2qXohtAA5qpT+3pU4VVWm8=
-  dependencies:
-    "@babel/runtime" "^7.15.3"
-    react-easy-crop "^3.5.2"
 
 antd@^5.3.0:
   version "5.3.0"
@@ -8084,11 +8057,6 @@ klona@^2.0.4:
   resolved "https://registry.npm.taobao.org/klona/download/klona-2.0.4.tgz#7bb1e3affb0cb8624547ef7e8f6708ea2e39dfc0"
   integrity sha1-e7Hjr/sMuGJFR+9+j2cI6i4538A=
 
-konva@^8.3.0:
-  version "8.3.0"
-  resolved "https://registry.npmmirror.com/konva/download/konva-8.3.0.tgz#538452fedc0d0e135415f5f53787f779e8530027"
-  integrity sha512-V83lFjf1xPJp7SzWKktOgRFPYa8SOHKVfgru3jjdMjKTGNpCGrIh3CuJeKC/tJ5Fg0P3lOpPCR30gDbDsATmDA==
-
 language-subtag-registry@~0.3.2:
   version "0.3.21"
   resolved "https://registry.npm.taobao.org/language-subtag-registry/download/language-subtag-registry-0.3.21.tgz#04ac218bea46f04cb039084602c6da9e788dd45a"
@@ -8885,11 +8853,6 @@ normalize-url@^3.0.0:
   version "3.3.0"
   resolved "https://registry.nlark.com/normalize-url/download/normalize-url-3.3.0.tgz?cache=0&sync_timestamp=1628689122508&other_urls=https%3A%2F%2Fregistry.nlark.com%2Fnormalize-url%2Fdownload%2Fnormalize-url-3.3.0.tgz#b2e1c4dc4f7c6d57743df733a4f5978d18650559"
   integrity sha1-suHE3E98bVd0PfczpPWXjRhlBVk=
-
-normalize-wheel@^1.0.1:
-  version "1.0.1"
-  resolved "https://registry.nlark.com/normalize-wheel/download/normalize-wheel-1.0.1.tgz#aec886affdb045070d856447df62ecf86146ec45"
-  integrity sha1-rsiGr/2wRQcNhWRH32Ls+GFG7EU=
 
 npm-run-path@^2.0.0:
   version "2.0.2"
@@ -10961,25 +10924,10 @@ react-dom@^17.0.2:
     object-assign "^4.1.1"
     scheduler "^0.20.2"
 
-react-easy-crop@^3.5.2:
-  version "3.5.3"
-  resolved "https://registry.npmmirror.com/react-easy-crop/download/react-easy-crop-3.5.3.tgz#7481b6e484a8b6ac308373f0b173aad4f1d10239"
-  integrity sha1-dIG25ISotqwwg3PwsXOq1PHRAjk=
-  dependencies:
-    normalize-wheel "^1.0.1"
-    tslib "2.0.1"
-
 react-error-overlay@^6.0.9:
   version "6.0.9"
   resolved "https://registry.nlark.com/react-error-overlay/download/react-error-overlay-6.0.9.tgz#3c743010c9359608c375ecd6bc76f35d93995b0a"
   integrity sha1-PHQwEMk1lgjDdezWvHbzXZOZWwo=
-
-react-infinite-scroll-component@^6.1.0:
-  version "6.1.0"
-  resolved "https://registry.nlark.com/react-infinite-scroll-component/download/react-infinite-scroll-component-6.1.0.tgz#7e511e7aa0f728ac3e51f64a38a6079ac522407f"
-  integrity sha1-flEeeqD3KKw+UfZKOKYHmsUiQH8=
-  dependencies:
-    throttle-debounce "^2.1.0"
 
 react-intl-universal@^2.6.13:
   version "2.6.13"
@@ -11004,31 +10952,6 @@ react-is@^17.0.1:
   version "17.0.2"
   resolved "https://registry.nlark.com/react-is/download/react-is-17.0.2.tgz?cache=0&sync_timestamp=1629908196814&other_urls=https%3A%2F%2Fregistry.nlark.com%2Freact-is%2Fdownload%2Freact-is-17.0.2.tgz#e691d4a8e9c789365655539ab372762b0efb54f0"
   integrity sha1-5pHUqOnHiTZWVVOas3J2Kw77VPA=
-
-react-konva-utils@^0.2.0:
-  version "0.2.0"
-  resolved "https://registry.nlark.com/react-konva-utils/download/react-konva-utils-0.2.0.tgz#e79ed7776edd50f40c152d8d49d2693ff12e910b"
-  integrity sha1-557Xd27dUPQMFS2NSdJpP/EukQs=
-  dependencies:
-    react-konva "^17.0.2-4"
-    use-image "^1.0.7"
-
-react-konva@^17.0.2-4, react-konva@^17.0.2-5:
-  version "17.0.2-5"
-  resolved "https://registry.npmjs.org/react-konva/-/react-konva-17.0.2-5.tgz#e70b0acf323402de0a540f27b300fbe7ed151849"
-  integrity sha512-IyzdfqRDK8r1ulp/jbLPX18AuO+n5yNtL0+4T0QEUsgArRqIl/VRCG1imA5mYJBk0cBNC5+fWDHN+HWEW62ZEQ==
-  dependencies:
-    react-reconciler "~0.26.2"
-    scheduler "^0.20.2"
-
-react-reconciler@~0.26.2:
-  version "0.26.2"
-  resolved "https://registry.npmmirror.com/react-reconciler/download/react-reconciler-0.26.2.tgz#bbad0e2d1309423f76cf3c3309ac6c96e05e9d91"
-  integrity sha1-u60OLRMJQj92zzwzCaxsluBenZE=
-  dependencies:
-    loose-envify "^1.1.0"
-    object-assign "^4.1.1"
-    scheduler "^0.20.2"
 
 react-refresh@^0.8.3:
   version "0.8.3"
@@ -12632,11 +12555,6 @@ throat@^5.0.0:
   resolved "https://registry.npm.taobao.org/throat/download/throat-5.0.0.tgz#c5199235803aad18754a667d659b5e72ce16764b"
   integrity sha1-xRmSNYA6rRh1SmZ9ZZtecs4Wdks=
 
-throttle-debounce@^2.1.0:
-  version "2.3.0"
-  resolved "https://registry.npm.taobao.org/throttle-debounce/download/throttle-debounce-2.3.0.tgz#fd31865e66502071e411817e241465b3e9c372e2"
-  integrity sha1-/TGGXmZQIHHkEYF+JBRls+nDcuI=
-
 throttle-debounce@^5.0.0:
   version "5.0.0"
   resolved "https://registry.npmmirror.com/throttle-debounce/-/throttle-debounce-5.0.0.tgz#a17a4039e82a2ed38a5e7268e4132d6960d41933"
@@ -12774,11 +12692,6 @@ tsconfig-paths@^3.11.0:
     json5 "^1.0.1"
     minimist "^1.2.0"
     strip-bom "^3.0.0"
-
-tslib@2.0.1:
-  version "2.0.1"
-  resolved "https://registry.nlark.com/tslib/download/tslib-2.0.1.tgz#410eb0d113e5b6356490eec749603725b021b43e"
-  integrity sha1-QQ6w0RPltjVkkO7HSWA3JbAhtD4=
 
 tslib@2.3.0:
   version "2.3.0"
@@ -13035,12 +12948,7 @@ url@^0.11.0:
     punycode "1.3.2"
     querystring "0.2.0"
 
-use-force-update@^1.0.11:
-  version "1.0.11"
-  resolved "https://registry.npmmirror.com/use-force-update/-/use-force-update-1.0.11.tgz#9483e9cf3e3cfba0f486cce141b66426bcb27619"
-  integrity sha512-h4SICYgTJHon8w9dFIqdqR1Vrzdgl4YaRfRwhmAh01kBGljzTICanyfaFU8C4etuEfRdYpE+04XX2ZrEhOWKXQ==
-
-use-image@^1.0.7, use-image@^1.0.8:
+use-image@^1.0.8:
   version "1.0.8"
   resolved "https://registry.npmmirror.com/use-image/download/use-image-1.0.8.tgz#a8fa4ae359afbb0fc30c7cab0a7f4d537281a9d4"
   integrity sha1-qPpK41mvuw/DDHyrCn9NU3KBqdQ=
