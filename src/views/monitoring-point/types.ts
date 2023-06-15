@@ -271,8 +271,8 @@ export type MonitoringPointRow = {
     index: number;
     tower_install_height?: number;
     tower_base_radius?: number;
-    initial_thickness?: number;
-    critical_thickness?: number;
+    initial_thickness?: { enabled: boolean; value: number };
+    critical_thickness?: { enabled: boolean; value: number };
   };
   assetName: string;
   properties: Property[];

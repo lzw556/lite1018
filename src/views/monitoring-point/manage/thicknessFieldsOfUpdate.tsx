@@ -2,49 +2,15 @@ import { InputNumber } from 'antd';
 import React from 'react';
 import intl from 'react-intl-universal';
 import { FormInputItem } from '../../../components/formInputItem';
+import { ThicknessAttributeFormItem } from './thicknessAttributeFormItem';
 
 export const ThicknessFieldsOfUpdate = () => {
   return (
     <>
-      <FormInputItem
-        label={intl.get('INITIAL_THICKNESS')}
-        name={['attributes', 'initial_thickness']}
-        requiredMessage={intl.get('PLEASE_ENTER_SOMETHING', {
-          something: intl.get('INITIAL_THICKNESS')
-        })}
-        numericRule={{
-          message: intl.get('PLEASE_ENTER_NUMERIC')
-        }}
-        numericChildren={
-          <InputNumber
-            placeholder={intl.get('PLEASE_ENTER_SOMETHING', {
-              something: intl.get('INITIAL_THICKNESS')
-            })}
-            style={{ width: '100%' }}
-            controls={false}
-            addonAfter='mm'
-          />
-        }
-      />
-      <FormInputItem
+      <ThicknessAttributeFormItem label={intl.get('INITIAL_THICKNESS')} name='initial_thickness' />
+      <ThicknessAttributeFormItem
         label={intl.get('CRITICAL_THICKNESS')}
-        name={['attributes', 'critical_thickness']}
-        requiredMessage={intl.get('PLEASE_ENTER_SOMETHING', {
-          something: intl.get('CRITICAL_THICKNESS')
-        })}
-        numericRule={{
-          message: intl.get('PLEASE_ENTER_NUMERIC')
-        }}
-        numericChildren={
-          <InputNumber
-            placeholder={intl.get('PLEASE_ENTER_SOMETHING', {
-              something: intl.get('CRITICAL_THICKNESS')
-            })}
-            style={{ width: '100%' }}
-            controls={false}
-            addonAfter='mm'
-          />
-        }
+        name='critical_thickness'
       />
       <FormInputItem
         label={intl.get('CORROSION_RATE_SHORT_TERM')}

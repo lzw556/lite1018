@@ -2,6 +2,7 @@ import { Form, InputNumber } from 'antd';
 import React from 'react';
 import intl from 'react-intl-universal';
 import { FormInputItem } from '../../../components/formInputItem';
+import { ThicknessAttributeFormItem } from './thicknessAttributeFormItem';
 
 export const ThicknessFieldsOfCreation = ({
   name,
@@ -14,48 +15,16 @@ export const ThicknessFieldsOfCreation = ({
 }) => {
   return (
     <>
-      <Form.Item required label={`${intl.get('FIELD_THICKNESS')}(mm)`} style={{ marginBottom: 0 }}>
-        <FormInputItem
-          {...restFields}
-          name={[name, 'initial_thickness']}
-          requiredMessage={intl.get('PLEASE_ENTER_SOMETHING', {
-            something: intl.get('INITIAL_THICKNESS')
-          })}
-          numericRule={{
-            message: intl.get('PLEASE_ENTER_NUMERIC')
-          }}
-          style={{ display: 'inline-block', width: 200, marginRight: 20 }}
-          numericChildren={
-            <InputNumber
-              placeholder={intl.get('PLEASE_ENTER_SOMETHING', {
-                something: intl.get('INITIAL_THICKNESS')
-              })}
-              style={{ width: '100%' }}
-              controls={false}
-            />
-          }
-        />
-        <FormInputItem
-          {...restFields}
-          name={[name, 'critical_thickness']}
-          requiredMessage={intl.get('PLEASE_ENTER_SOMETHING', {
-            something: intl.get('CRITICAL_THICKNESS')
-          })}
-          numericRule={{
-            message: intl.get('PLEASE_ENTER_NUMERIC')
-          }}
-          style={{ display: 'inline-block', width: 200 }}
-          numericChildren={
-            <InputNumber
-              placeholder={intl.get('PLEASE_ENTER_SOMETHING', {
-                something: intl.get('CRITICAL_THICKNESS')
-              })}
-              style={{ width: '100%' }}
-              controls={false}
-            />
-          }
-        />
-      </Form.Item>
+      <ThicknessAttributeFormItem
+        label={intl.get('INITIAL_THICKNESS')}
+        itemName={name}
+        name='initial_thickness'
+      />
+      <ThicknessAttributeFormItem
+        label={intl.get('CRITICAL_THICKNESS')}
+        itemName={name}
+        name='critical_thickness'
+      />
       <Form.Item
         required
         label={`${intl.get('FIELD_CORROSION_RATE')}(${intl.get('UNIT_DAY')})`}
@@ -63,7 +32,7 @@ export const ThicknessFieldsOfCreation = ({
       >
         <FormInputItem
           {...restFields}
-          name={[name, 'corrosion_rate_short_term']}
+          name={[name, 'attributes', 'corrosion_rate_short_term']}
           requiredMessage={intl.get('PLEASE_ENTER_SOMETHING', {
             something: intl.get('CORROSION_RATE_SHORT_TERM')
           })}
@@ -86,7 +55,7 @@ export const ThicknessFieldsOfCreation = ({
         />
         <FormInputItem
           {...restFields}
-          name={[name, 'corrosion_rate_long_term']}
+          name={[name, 'attributes', 'corrosion_rate_long_term']}
           requiredMessage={intl.get('PLEASE_ENTER_SOMETHING', {
             something: intl.get('CORROSION_RATE_LONG_TERM')
           })}
