@@ -72,7 +72,7 @@ export const MonitoringPointFormItem = ({
                 <FormInputItem
                   label={intl.get('POSITION')}
                   {...restFields}
-                  name={[name, 'place']}
+                  name={[name, 'attributes', 'index']}
                   requiredMessage={intl.get('PLEASE_ENTER_SOMETHING', {
                     something: intl.get('POSITION')
                   })}

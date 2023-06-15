@@ -7,17 +7,12 @@ import { Device } from '../../../types/device';
 import intl from 'react-intl-universal';
 
 export type MonitoringPointInfo = {
-  place?: string;
   name: string;
   dev_id: number;
   dev_name: string;
   dev_type: number;
   channel?: number;
-  initial_thickness?: number;
-  critical_thickness?: number;
-  tower_install_angle?: number;
-  tower_install_height?: number;
-  tower_base_radius?: number;
+  attributes?: any;
 };
 
 export const DeviceSelection: React.FC<{

@@ -67,33 +67,7 @@ export const MonitoringPointCreate: React.FC<
             try {
               addMonitoringPoints({
                 monitoring_points: values.monitoring_points.map(
-                  ({
-                    dev_id,
-                    place,
-                    name,
-                    channel,
-                    initial_thickness,
-                    critical_thickness,
-                    tower_base_radius,
-                    tower_install_angle,
-                    tower_install_height
-                  }) => {
-                    let attributes: any = { index: Number(place) };
-                    if (initial_thickness != null) {
-                      attributes.initial_thickness = initial_thickness;
-                    }
-                    if (critical_thickness != null) {
-                      attributes.critical_thickness = critical_thickness;
-                    }
-                    if (tower_base_radius != null) {
-                      attributes.tower_base_radius = tower_base_radius;
-                    }
-                    if (tower_install_angle != null) {
-                      attributes.tower_install_angle = tower_install_angle;
-                    }
-                    if (tower_install_height != null) {
-                      attributes.tower_install_height = tower_install_height;
-                    }
+                  ({ dev_id, name, channel, attributes }) => {
                     const process_id = getProcessId({
                       monitoringPointType: values.type,
                       isChannel: !!channel

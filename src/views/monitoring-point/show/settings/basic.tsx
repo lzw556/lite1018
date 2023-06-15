@@ -24,7 +24,7 @@ export const BasicSetting = ({
       monitoringPoint={monitoringPoint}
       style={{ width: isMobile ? '100%' : '50%' }}
     >
-      <Form.Item wrapperCol={{ offset: 4 }}>
+      <Form.Item wrapperCol={{ offset: 6 }}>
         <Button
           type='primary'
           onClick={() => {

@@ -19,7 +19,7 @@ export const AngleFieldsOfCreation = ({
     <Form.Item required label={`${intl.get('TOWER_INSTALL_ANGLE')}(°)`} style={{ marginBottom: 0 }}>
       <FormInputItem
         {...restFields}
-        name={[name, 'tower_install_angle']}
+        name={[name, 'attributes', 'tower_install_angle']}
         requiredMessage={intl.get('PLEASE_ENTER_SOMETHING', {
           something: intl.get('TOWER_INSTALL_ANGLE')
         })}
@@ -47,7 +47,7 @@ export const AngleFieldsOfCreation = ({
         <FormInputItem
           {...restFields}
           required
-          name={[name, 'tower_install_height']}
+          name={[name, 'attributes', 'tower_install_height']}
           label={`${intl.get('TOWER_INSTALL_HEIGHT')}(m)`}
           numericRule={{
             others: [
@@ -93,7 +93,7 @@ export const AngleFieldsOfCreation = ({
         <FormInputItem
           {...restFields}
           required
-          name={[name, 'tower_base_radius']}
+          name={[name, 'attributes', 'tower_base_radius']}
           label={`${intl.get('TOWER_BASE_RADIUS')}(m)`}
           numericRule={{
             others: [
