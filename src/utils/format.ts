@@ -1,4 +1,4 @@
-import { round } from 'lodash';
+import { round, floor, ceil } from 'lodash';
 import dayjs from './dayjsUtils';
 
 export const getFilename = (res: any) => {
@@ -34,25 +34,42 @@ export function toMac(mac: string) {
   return mac;
 }
 
-export function computeScale(datas: number[], precision: number) {
-  const nums = datas
-    .filter((n) => n != null && !Number.isNaN(n))
-    .map((n) => roundValue(n, precision));
-  const min = Math.min(...nums);
-  const max = Math.max(...nums);
-  const getLeftData = (min: number, max: number) => {
-    const diff = max - min;
-    const increment = diff / 2;
-    const decrement = diff * 1.5;
-    const lessMin = min >= 0 && min - decrement < 0 ? 0 : min - decrement;
-    return {
-      max: max + increment,
-      min: lessMin,
-      interval: (max + increment - lessMin) / 5,
-      axisLabel: {
-        formatter: (val: number) => (Number.isInteger(val) ? val : val.toFixed(precision))
-      }
-    };
-  };
-  return min === max ? null : getLeftData(min, max);
+export function getRangeOfValuedYAxis(
+  actual: { min: number; max: number },
+  precision: number,
+  initial?: { min: number; max: number }
+): {
+  min?: number;
+  max?: number;
+} {
+  const max = initial ? Math.max(actual.max, initial?.max) : actual.max;
+  const min = initial ? Math.min(actual.min, initial?.min) : actual.min;
+  const RATELIKELINE = 1 / 100;
+  const total = max - min;
+  const percentage = total / Math.abs(min);
+  const isCloseToLine = percentage < RATELIKELINE;
+  const lessMin = min - Math.abs(min) * percentage;
+  const moreMax = max + Math.abs(max) * percentage;
+  const actualPrecision =
+    Number.isInteger(min) || Math.abs(min) + Math.abs(max) >= 5 ? 0 : precision;
+  let finalMin = undefined,
+    finalMax = undefined;
+  if (isCloseToLine && total !== 0) {
+    if (max > 0) {
+      finalMin = floor(lessMin, actualPrecision);
+    } else {
+      finalMax = ceil(moreMax, actualPrecision);
+    }
+  }
+  return { min: finalMin, max: finalMax };
+}
+
+export function getDurationByDays(days: number): {
+  duration: number;
+  unit: 'UNIT_DAY' | 'UNIT_YEAR';
+} {
+  if (days < 365) {
+    return { duration: days, unit: 'UNIT_DAY' };
+  }
+  return { duration: floor(days / 365, 1), unit: 'UNIT_YEAR' };
 }

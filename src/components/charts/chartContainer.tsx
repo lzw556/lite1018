@@ -10,12 +10,14 @@ export const ChartContainer = <T,>({
   title,
   style,
   options,
-  clickHandler
+  clickHandler,
+  instanceRef
 }: {
   title: string;
   style?: React.CSSProperties;
   options?: ChartOptions<T>;
   clickHandler?: (paras: any, instance: any) => void;
+  instanceRef?: React.Ref<any>;
 }) => {
   const genericOps = cloneDeep(COMMON_OPTIONS);
   const _ops = merge(genericOps, {
@@ -50,6 +52,7 @@ export const ChartContainer = <T,>({
         style={style}
         notMerge={true}
         onEvents={{ click: clickHandler ?? (() => {}) }}
+        ref={instanceRef}
       />
     </div>
   );

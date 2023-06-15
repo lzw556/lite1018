@@ -3,6 +3,11 @@ import * as React from 'react';
 import dayjs, { RangeValue } from '../utils/dayjsUtils';
 import intl from 'react-intl-universal';
 
+export const oneYearRange: RangeValue = [
+  dayjs().startOf('day').subtract(1, 'y'),
+  dayjs().endOf('day')
+];
+
 export const oneWeekRange: RangeValue = [
   dayjs().startOf('day').subtract(7, 'd'),
   dayjs().endOf('day')
