@@ -165,6 +165,7 @@ export function useDeviceTabs(deviceTypeId?: number) {
     case DeviceType.VibrationTemperature3AxisAdvanced:
     case DeviceType.VibrationTemperature3AxisAdvancedNB:
     case DeviceType.VibrationTemperature3AxisWIRED:
+    case DeviceType.VibrationTemperature3Axis16G:
       if (hasPermission(Permission.DeviceData)) {
         tabs.unshift(...tabTitleList, { key: 'waveData', tab: 'WAVEFORM_DATA' });
       }

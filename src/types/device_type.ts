@@ -12,6 +12,7 @@ export enum DeviceType {
   VibrationTemperature3AxisAdvanced = 327940,
   VibrationTemperature3AxisNB = 327941,
   VibrationTemperature3AxisAdvancedNB = 327942,
+  VibrationTemperature3Axis16G = 327943,
   VibrationTemperature3AxisWIRED = 328193,
   Temperature = 393217,
   TemperatureWIRED = 393473,
@@ -53,6 +54,8 @@ export namespace DeviceType {
         return 'DEVICE_TYPE_VIBRATION_PRO';
       case DeviceType.VibrationTemperature3AxisAdvancedNB:
         return 'DEVICE_TYPE_VIBRATION_PRO_NB';
+      case DeviceType.VibrationTemperature3Axis16G:
+        return 'DEVICE_TYPE_VIBRATION_16G';
       case DeviceType.VibrationTemperature3AxisWIRED:
         return 'DEVICE_TYPE_WIRED_VIBRATION';
       case DeviceType.Temperature:
@@ -91,6 +94,7 @@ export namespace DeviceType {
       DeviceType.VibrationTemperature3AxisAdvanced,
       DeviceType.VibrationTemperature3AxisNB,
       DeviceType.VibrationTemperature3AxisAdvancedNB,
+      DeviceType.VibrationTemperature3Axis16G,
       DeviceType.VibrationTemperature3AxisWIRED,
       DeviceType.Temperature,
       DeviceType.TemperatureWIRED,
