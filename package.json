@@ -34,7 +34,8 @@
     "deploy:basic": "cd build && scp -r ./ root@172.16.7.134:/home/workspace/cloud-lite-web3",
     "deploy:corrosion": "cd build && scp -r ./ root@172.16.7.134:/home/workspace/cloud-lite-web4",
     "deploy:wirelesshart": "cd build && scp -r ./ root@172.16.7.134:/home/workspace/cloud-lite-web5",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "analyze": "source-map-explorer 'build/static/js/*.js'"
   },
   "eslintConfig": {
     "extends": [
@@ -74,8 +75,9 @@
     "husky": "^8.0.3",
     "lint-staged": "^13.1.0",
     "prettier": "^2.7.1",
-    "typescript": "4.3.5",
-    "react-scripts": "4.0.3"
+    "react-scripts": "4.0.3",
+    "source-map-explorer": "^2.5.3",
+    "typescript": "4.3.5"
   },
   "lint-staged": {
     "*.{ts,tsx,js,jsx,css,json}": "npx prettier --write"
