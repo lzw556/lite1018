@@ -96,7 +96,8 @@ export const SingleDeviceDetail: React.FC<{ device: Device; upgradeStatus: any }
   }
   if (device.information.iccid_4g) {
     items.push({ name: intl.get('4G_CARD_NO'), value: device.information.iccid_4g });
-  } else if (device.information.ip_address) {
+  }
+  if (device.information.ip_address) {
     items.push({
       name: intl.get('IP_ADDRESS'),
       value: (
