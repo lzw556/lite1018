@@ -53,16 +53,16 @@ export function buildFlangePreloadChart(points: MonitoringPointRow[]) {
         for (let i = 0; i < params.length; i++) {
           const index = Number(params[i].value[0]) + 1;
           const value = Number(params[i].value[1]);
-          relVal += `<br/> ${params[i].marker} ${index}号${params[i].seriesName}: ${
-            property.name
-          }${getDisplayValue(value, property.unit)}`;
+          relVal += `<br/> ${params[i].marker} ${intl.get('INDEXED_NUMBER', { index })}${
+            params[i].seriesName
+          }: ${intl.get(property.name)}${getDisplayValue(value, property.unit)}`;
         }
         return relVal;
       }
     },
     grid: { bottom: 20, left: 50 },
     title: {
-      text: `${property.name}${property.unit ? `(${property.unit})` : ''}`
+      text: `${intl.get(property.name)}${property.unit ? `(${property.unit})` : ''}`
     },
     series,
     xAxis: {
