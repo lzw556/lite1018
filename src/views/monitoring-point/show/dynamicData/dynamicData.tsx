@@ -87,7 +87,8 @@ export const MonitoringPointDynamicData: React.FC<MonitoringPointRow & { dataTyp
                         props.id,
                         text.timestamp,
                         language === 'en-US' ? 'en' : 'zh',
-                        props.dataType
+                        props.dataType,
+                        isVibration ? vibrationFilters : undefined
                       ).then((res) => {
                         const url = window.URL.createObjectURL(new Blob([res.data]));
                         const link = document.createElement('a');

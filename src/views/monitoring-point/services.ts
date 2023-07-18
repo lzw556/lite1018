@@ -99,11 +99,22 @@ export function clearHistory(id: number, from: number, to: number, type: string 
   return request.delete(url);
 }
 
-export function downloadRawHistory(id: number, timestamp: number, lang: string, type?: DataType) {
-  return request.download<any>(`/monitoringPoints/${id}/download/data/${timestamp}`, {
-    lang,
-    type
-  });
+export function downloadRawHistory(
+  id: number,
+  timestamp: number,
+  lang: string,
+  type?: DataType,
+  filter?: { field: string; axis: number }
+) {
+  return request.download<any>(
+    `/monitoringPoints/${id}/download/data/${timestamp}`,
+    filter
+      ? { lang, type, calculate: filter.field }
+      : {
+          lang,
+          type
+        }
+  );
 }
 
 export type ThicknessAnalysis = {
