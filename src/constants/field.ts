@@ -52,5 +52,9 @@ export const FIRST_CLASS_PROPERTIES = [
   {
     typeId: DeviceType.VibrationTemperature3Axis16G,
     properties: ['vibration_severity_y', 'enveloping_pk2pk_y', 'temperature']
+  },
+  {
+    typeId: DeviceType.VibrationTemperature3Axis16GWIRED,
+    properties: ['vibration_severity_y', 'enveloping_pk2pk_y', 'temperature']
   }
 ];

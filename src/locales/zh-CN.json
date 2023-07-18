@@ -980,5 +980,6 @@
   "SETTING_DISP_MODE": "位移模式",
   "SETTING_DISP_MODE_HI": "HI模式",
   "SETTING_DISP_MODE_LO": "LO模式",
-  "INDEXED_NUMBER": "{index}号"
+  "INDEXED_NUMBER": "{index}号",
+  "DEVICE_TYPE_WIRED_VIBRATION_16G": "有线振动温度传感器 SVT210AS"
 }

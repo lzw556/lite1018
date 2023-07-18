@@ -980,5 +980,6 @@
   "SETTING_DISP_MODE": "Displacement Mode",
   "SETTING_DISP_MODE_HI": "Mode HI",
   "SETTING_DISP_MODE_LO": "Mode LO",
-  "INDEXED_NUMBER": "Number {index} "
+  "INDEXED_NUMBER": "Number {index} ",
+  "DEVICE_TYPE_WIRED_VIBRATION_16G": "Wired Vibration Temperature Sensor SVT210AS"
 }

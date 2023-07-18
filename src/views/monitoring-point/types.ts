@@ -164,7 +164,8 @@ export const MONITORING_POINT_TYPE_VALUE_DEVICE_TYPE_ID_MAPPING = new Map([
       DeviceType.VibrationTemperature3AxisAdvancedNB,
       DeviceType.VibrationTemperature3AxisNB,
       DeviceType.VibrationTemperature3AxisWIRED,
-      DeviceType.VibrationTemperature3Axis16G
+      DeviceType.VibrationTemperature3Axis16G,
+      DeviceType.VibrationTemperature3Axis16GWIRED
     ]
   ],
   [MonitoringPointTypeValue.TOWER_INCLINATION, [DeviceType.AngleDip]],
