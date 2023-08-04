@@ -47,18 +47,18 @@ export const ThicknessAnalysis = (props: MonitoringPointRow) => {
   const [range, setRange] = React.useState<[number, number]>();
   const defaultMarkLines = React.useMemo(() => {
     const lines = [];
-    if (attributes?.critical_thickness?.enabled && attributes?.critical_thickness.value) {
+    if (attributes?.critical_thickness && attributes?.critical_thickness_enabled) {
       lines.push({
         name: 'criticalThickness',
-        yAxis: attributes?.critical_thickness.value,
+        yAxis: attributes?.critical_thickness,
         lineStyle: { color: ColorDanger },
         label: { formatter: intl.get('CRITICAL_THICKNESS') }
       });
     }
-    if (attributes?.initial_thickness?.enabled && attributes?.initial_thickness.value) {
+    if (attributes?.initial_thickness && attributes?.initial_thickness_enabled) {
       lines.push({
         name: 'intialThickness',
-        yAxis: attributes?.initial_thickness.value,
+        yAxis: attributes?.initial_thickness,
         lineStyle: { color: 'rgb(0,130,252)' },
         label: { formatter: intl.get('INITIAL_THICKNESS') }
       });
@@ -253,13 +253,13 @@ function getRangeOfYAxis(
 ) {
   let min = values.min;
   let max = values.max;
-  if (attributes?.initial_thickness?.enabled && attributes?.initial_thickness?.value) {
-    min = Math.min(min, attributes?.initial_thickness?.value);
-    max = Math.max(max, attributes?.initial_thickness?.value);
+  if (attributes?.initial_thickness && attributes?.initial_thickness_enabled) {
+    min = Math.min(min, attributes?.initial_thickness);
+    max = Math.max(max, attributes?.initial_thickness);
   }
-  if (attributes?.critical_thickness?.enabled && attributes?.critical_thickness?.value) {
-    min = Math.min(min, attributes?.critical_thickness?.value);
-    max = Math.max(max, attributes?.critical_thickness?.value);
+  if (attributes?.critical_thickness && attributes?.critical_thickness_enabled) {
+    min = Math.min(min, attributes?.critical_thickness);
+    max = Math.max(max, attributes?.critical_thickness);
   }
   return { min: min - Math.abs(max - min) * 0.05, max: max + Math.abs(max - min) * 0.05 };
 }

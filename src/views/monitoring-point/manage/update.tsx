@@ -4,7 +4,7 @@ import { bindDevice, unbindDevice, updateMeasurement } from '../services';
 import { MonitoringPoint, MonitoringPointRow, MONITORING_POINT } from '../types';
 import { UpdateForm } from './updateForm';
 import intl from 'react-intl-universal';
-import { getProcessId } from '../utils';
+import { buildRequestAttrs, getProcessId } from '../utils';
 
 export const MonitoringPointUpdate: React.FC<
   ModalProps & { monitoringPoint: MonitoringPointRow; onSuccess: () => void }
@@ -36,7 +36,13 @@ export const MonitoringPointUpdate: React.FC<
               } else {
                 bindDevice(id, values.device_id, values.channel, processId);
               }
-              updateMeasurement(id, values).then(() => {
+              const valuesWithAttrs = values.attributes
+                ? {
+                    ...values,
+                    attributes: buildRequestAttrs(values.attributes, monitoringPoint.attributes)
+                  }
+                : null;
+              updateMeasurement(id, valuesWithAttrs ?? values).then(() => {
                 onSuccess();
               });
             } catch (error) {

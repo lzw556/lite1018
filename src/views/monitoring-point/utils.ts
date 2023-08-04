@@ -28,7 +28,7 @@ export function convertRow(values?: MonitoringPointRow): MonitoringPoint | null 
     type: values.type,
     asset_id: values.assetId,
     device_id: firstDevice?.id,
-    attributes: values.attributes,
+    attributes: parseAttrs(values.attributes),
     channel: firstDevice?.channel === 0 ? 1 : firstDevice?.channel
   };
 }
@@ -190,3 +190,68 @@ export function getMonitoringPointType(type: number) {
     }
   }
 }
+
+export const buildRequestAttrs = (attributes: any, oldAttrs?: any) => {
+  if (attributes) {
+    const { critical_thickness, initial_thickness, ...rest } = attributes;
+    let attr = { ...rest };
+    if (critical_thickness) {
+      attr = {
+        ...attr,
+        critical_thickness_enabled: critical_thickness.enabled
+      };
+      if (critical_thickness.value) {
+        attr = { ...attr, critical_thickness: critical_thickness.value };
+      } else if (oldAttrs && oldAttrs.critical_thickness) {
+        attr = { ...attr, critical_thickness: oldAttrs.critical_thickness };
+      }
+    }
+    if (initial_thickness) {
+      attr = {
+        ...attr,
+        initial_thickness_enabled: initial_thickness.enabled
+      };
+      if (initial_thickness.value) {
+        attr = { ...attr, initial_thickness: initial_thickness.value };
+      } else if (oldAttrs && oldAttrs.initial_thickness) {
+        attr = { ...attr, initial_thickness: oldAttrs.initial_thickness };
+      }
+    }
+    return attr;
+  }
+  return attributes;
+};
+
+export const parseAttrs = (attributes: MonitoringPointRow['attributes']) => {
+  let attr = null;
+  if (attributes) {
+    const {
+      critical_thickness,
+      critical_thickness_enabled,
+      initial_thickness,
+      initial_thickness_enabled,
+      ...rest
+    } = attributes;
+    attr = { ...rest };
+    if (critical_thickness) {
+      attr = {
+        ...attr,
+        critical_thickness: {
+          enabled: critical_thickness_enabled,
+          value: critical_thickness
+        }
+      };
+    }
+    if (initial_thickness) {
+      attr = {
+        ...attr,
+        initial_thickness: {
+          enabled: initial_thickness_enabled,
+          value: initial_thickness
+        }
+      };
+    }
+  }
+
+  return attr ?? attributes;
+};

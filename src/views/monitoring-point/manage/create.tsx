@@ -8,7 +8,7 @@ import { MonitoringPointFormItem } from './monitoringPointFormItem';
 import { SelectParentFormItem } from './selectParentFormItem';
 import intl from 'react-intl-universal';
 import { MONITORING_POINT } from '../types';
-import { getProcessId } from '../utils';
+import { buildRequestAttrs, getProcessId } from '../utils';
 
 export type MonitoringPointBatch = {
   asset_id: number;
@@ -76,7 +76,7 @@ export const MonitoringPointCreate: React.FC<
                       return {
                         name,
                         type: values.type,
-                        attributes,
+                        attributes: buildRequestAttrs(attributes),
                         device_binding: {
                           device_id: dev_id,
                           process_id,
@@ -88,7 +88,7 @@ export const MonitoringPointCreate: React.FC<
                       return {
                         name,
                         type: values.type,
-                        attributes,
+                        attributes: buildRequestAttrs(attributes),
                         device_binding: { device_id: dev_id, process_id },
                         asset_id: values.asset_id
                       };

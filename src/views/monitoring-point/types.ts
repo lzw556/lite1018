@@ -247,7 +247,7 @@ export type MonitoringPoint = {
   type: number;
   asset_id: number;
   device_id?: number;
-  attributes?: { index: number };
+  attributes?: { index?: number };
   channel?: number;
   device_type?: number;
 };
@@ -273,8 +273,10 @@ export type MonitoringPointRow = {
     index: number;
     tower_install_height?: number;
     tower_base_radius?: number;
-    initial_thickness?: { enabled: boolean; value: number };
-    critical_thickness?: { enabled: boolean; value: number };
+    initial_thickness?: number;
+    initial_thickness_enabled?: boolean;
+    critical_thickness?: number;
+    critical_thickness_enabled?: boolean;
   };
   assetName: string;
   properties: Property[];

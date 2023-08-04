@@ -6,7 +6,7 @@ import { bindDevice, unbindDevice, updateMeasurement } from '../../services';
 import { MonitoringPoint, MonitoringPointRow } from '../../types';
 import intl from 'react-intl-universal';
 import { UpdateForm } from '../../manage/updateForm';
-import { getProcessId } from '../../utils';
+import { buildRequestAttrs, getProcessId } from '../../utils';
 
 export const BasicSetting = ({
   monitoringPoint,
@@ -44,7 +44,13 @@ export const BasicSetting = ({
                 } else {
                   bindDevice(id, values.device_id, values.channel, processId);
                 }
-                updateMeasurement(id, values).then(onUpdateSuccess);
+                const valuesWithAttrs = values.attributes
+                  ? {
+                      ...values,
+                      attributes: buildRequestAttrs(values.attributes, monitoringPoint.attributes)
+                    }
+                  : null;
+                updateMeasurement(id, valuesWithAttrs ?? values).then(onUpdateSuccess);
               } catch (error) {
                 console.log(error);
               }

@@ -4,13 +4,18 @@ import intl from 'react-intl-universal';
 import { FormInputItem } from '../../../components/formInputItem';
 import { ThicknessAttributeFormItem } from './thicknessAttributeFormItem';
 
-export const ThicknessFieldsOfUpdate = () => {
+export const ThicknessFieldsOfUpdate = ({ form }: { form?: any }) => {
   return (
     <>
-      <ThicknessAttributeFormItem label={intl.get('INITIAL_THICKNESS')} name='initial_thickness' />
+      <ThicknessAttributeFormItem
+        label={intl.get('INITIAL_THICKNESS')}
+        name='initial_thickness'
+        form={form}
+      />
       <ThicknessAttributeFormItem
         label={intl.get('CRITICAL_THICKNESS')}
         name='critical_thickness'
+        form={form}
       />
       <FormInputItem
         label={intl.get('CORROSION_RATE_SHORT_TERM')}

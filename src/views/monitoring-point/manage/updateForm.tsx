@@ -160,7 +160,9 @@ export const UpdateForm = ({
           something: intl.get('POSITION')
         })}
       />
-      {monitoringPoint.type === MonitoringPointTypeValue.THICKNESS && <ThicknessFieldsOfUpdate />}
+      {monitoringPoint.type === MonitoringPointTypeValue.THICKNESS && (
+        <ThicknessFieldsOfUpdate form={form} />
+      )}
       {(monitoringPoint.type === MonitoringPointTypeValue.TOWER_INCLINATION ||
         monitoringPoint.type === MonitoringPointTypeValue.TOWER_BASE_SETTLEMENT) && (
         <AngleFieldsOfUpdate type={monitoringPoint.type} />
