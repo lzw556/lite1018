@@ -25,7 +25,7 @@ const LoginPage: FC = () => {
         dispatch(userLoginSuccess(res.data));
         navigate('/');
       } else {
-        message.error(res.msg).then();
+        message.error(intl.get(res.msg)).then();
       }
     });
   };
