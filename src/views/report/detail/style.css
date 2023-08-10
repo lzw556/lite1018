@@ -1,0 +1,44 @@
+.report {
+  --page-width: 210mm;
+  --page-height: 297mm;
+  --page-padding: 20mm;
+  --page-gap: 15px;
+}
+.report {
+  position: relative;
+  margin: auto;
+  width: var(--page-width);
+  min-height: var(--page-height);
+  overflow-x: auto;
+  font-family: nsimsun, FangSong, sans-serif;
+  font-size: 20px;
+  line-height: 2.5;
+}
+.report .page {
+  margin-bottom: var(--page-gap);
+  padding: var(--page-padding);
+  height: var(--page-height);
+  background-color: #fff;
+}
+.report .page .center-container {
+  display: flex;
+  justify-content: center;
+}
+.report .page h1.title,
+.report .page h2.title,
+.report .page h3.title {
+  text-align: center;
+}
+.report .page h1 {
+  font-size: 2em;
+}
+.report .page h2 {
+  font-size: 1.5em;
+}
+.report .page h3 {
+  font-size: 1.2em;
+}
+.report .page .value {
+  padding: 0 3px;
+  font-family: monospace;
+}

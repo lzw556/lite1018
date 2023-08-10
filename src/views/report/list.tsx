@@ -13,6 +13,7 @@ import TableLayout from '../layout/TableLayout';
 import intl from 'react-intl-universal';
 import { PageTitle } from '../../components/pageTitle';
 import dayjs from '../../utils/dayjsUtils';
+import { Link } from 'react-router-dom';
 
 export default function ReportList() {
   const [dataSource, setDataSource] = useState<PageResult<Report[]>>();
@@ -36,8 +37,8 @@ export default function ReportList() {
   const columns = [
     {
       title: intl.get('NAME'),
-      dataIndex: 'name',
-      key: 'name',
+      dataIndex: 'reportName',
+      key: 'reportName',
       width: 400
     },
     {
@@ -50,25 +51,30 @@ export default function ReportList() {
       title: intl.get('OPERATION'),
       key: 'action',
       render: (text: any, record: any) => {
+        // return (
+        //   <a
+        //     href='#!'
+        //     onClick={(e) => {
+        //       e.preventDefault();
+        //       downloadReport(record.filename).then((res) => {
+        //         if (res.status === 200) {
+        //           const url = window.URL.createObjectURL(new Blob([res.data as any]));
+        //           const link = document.createElement('a');
+        //           link.href = url;
+        //           link.setAttribute('download', `${record.name}.pdf`);
+        //           document.body.appendChild(link);
+        //           link.click();
+        //         }
+        //       });
+        //     }}
+        //   >
+        //     {intl.get('DOWNLOAD')}
+        //   </a>
+        // );
         return (
-          <a
-            href='#!'
-            onClick={(e) => {
-              e.preventDefault();
-              downloadReport(record.filename).then((res) => {
-                if (res.status === 200) {
-                  const url = window.URL.createObjectURL(new Blob([res.data as any]));
-                  const link = document.createElement('a');
-                  link.href = url;
-                  link.setAttribute('download', `${record.name}.pdf`);
-                  document.body.appendChild(link);
-                  link.click();
-                }
-              });
-            }}
-          >
-            {intl.get('DOWNLOAD')}
-          </a>
+          <Link to={`/reports/${record.id}`} state={record}>
+            查看报告
+          </Link>
         );
       }
     }
@@ -109,12 +115,3 @@ export function getReports(page: number, size: number, from: number, to: number)
 export function downloadReport(filename: string) {
   return request.download<any>(`/reports/${filename}`);
 }
-
-type Report = {
-  id: number;
-  start: number;
-  end: number;
-  filename: string;
-  name: string;
-  reportDate: number;
-};

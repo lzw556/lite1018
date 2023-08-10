@@ -53,6 +53,7 @@ export const ChartContainer = <T,>({
         notMerge={true}
         onEvents={{ click: clickHandler ?? (() => {}) }}
         ref={instanceRef}
+        opts={{ renderer: 'svg' }}
       />
     </div>
   );

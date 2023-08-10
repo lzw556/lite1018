@@ -18,6 +18,7 @@ import {
   ImportNetwork,
   AlarmRecord,
   AddDevice,
+  ReportList,
   Report,
   DeviceWirelessHart,
   DeviceDetailWirelessHart,
@@ -159,7 +160,8 @@ const AppRouter = () => {
         { path: 'me', element: <Me /> },
         { path: 'roles', element: <Role /> },
         { path: 'systeminfo', element: <System /> },
-        { path: 'Reports', element: <Report /> }
+        { path: 'reports', element: <ReportList /> },
+        { path: 'reports/:id', element: <Report /> }
       ]
     }
   ];
