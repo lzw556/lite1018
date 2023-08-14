@@ -145,6 +145,7 @@ export namespace DeviceType {
       type === DeviceType.VibrationTemperature3AxisWIRED ||
       type === DeviceType.TemperatureWIRED ||
       type === DeviceType.PressureTemperatureWIRED ||
+      type === DeviceType.VibrationTemperature3Axis16GWIRED ||
       (isMultiChannel(type) as boolean)
     );
   }
