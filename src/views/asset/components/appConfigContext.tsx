@@ -8,7 +8,8 @@ export type AppConfig =
   | 'hydroTurbine'
   | 'corrosion'
   | 'corrosionWirelessHART'
-  | 'windTurbinePro';
+  | 'windTurbinePro'
+  | 'vibration';
 
 const AppConfigContext = React.createContext<AppConfig>('windTurbine');
 

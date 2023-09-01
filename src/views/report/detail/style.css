@@ -9,7 +9,6 @@
   margin: auto;
   width: var(--page-width);
   min-height: var(--page-height);
-  overflow-x: auto;
   font-family: nsimsun, FangSong, sans-serif;
   font-size: 20px;
   line-height: 2.5;
@@ -20,7 +19,7 @@
   height: var(--page-height);
   background-color: #fff;
 }
-.report .page .center-container {
+.report .page .container {
   display: flex;
   justify-content: center;
 }
@@ -41,4 +40,35 @@
 .report .page .value {
   padding: 0 3px;
   font-family: monospace;
+}
+.report .page .text-list {
+  list-style: none;
+}
+.report .page .text-list > li.item {
+  display: flex;
+}
+.report .page .text-list > li.item > .index {
+  flex-shrink: 0;
+  width: 2em;
+}
+.report .page .text-list > li.item > .desc {
+  margin-bottom: 0;
+}
+.page.index .cover {
+  margin-bottom: 48px;
+  width: 100%;
+}
+.page.index .introduce {
+  margin-top: 96px;
+}
+.page.status .title {
+  margin-top: 30px;
+  text-align: center;
+}
+.page.alarm > .alarm-record-table + .alarm-record-table {
+  margin-top: 48px;
+}
+.page.iso .title {
+  text-align: center;
+  margin-bottom: 0;
 }

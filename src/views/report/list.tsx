@@ -45,7 +45,7 @@ export default function ReportList() {
       title: intl.get('REPORT_DATE'),
       dataIndex: 'reportDate',
       key: 'reportDate',
-      render: (text: number) => dayjs.unix(text).local().format('YYYY-MM-DD')
+      render: (text: number) => dayjs.unix(text).local().format('YYYY-MM-DD HH:mm:ss')
     },
     {
       title: intl.get('OPERATION'),

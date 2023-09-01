@@ -1,5 +1,5 @@
 import React from 'react';
-import { REPORT, Report } from './report';
+import { ALARM_LEVELS, Report } from './report';
 import { ChartContainer } from '../../../components/charts/chartContainer';
 import {
   ColorDanger,
@@ -11,84 +11,55 @@ import {
 
 export const Status = ({ report }: { report: Report }) => {
   const renderStatus = (title: string, states: string[], data: number[], color: string[]) => {
-    console.log('opsopsops', {
-      title: {
-        text: '',
-        left: 'center'
-      },
-      tooltip: {
-        trigger: 'item'
-      },
-      legend: {
-        orient: 'vertical',
-        left: 'left',
-        top: 'middle'
-      },
-      dataset: {
-        source: {
-          item: states,
-          data
-        }
-      },
-      series: [
-        {
-          type: 'pie',
-          radius: '50%',
-          label: {
-            show: true,
-            formatter: '{c}({d}%)'
-          }
-        }
-      ],
-      color
-    });
     return (
-      <div key={title} style={{ width: '80%', margin: 'auto' }}>
-        <p style={{ marginTop: 30, textAlign: 'center' }}>{`${title}${REPORT.status.text}`}</p>
-        <ChartContainer
-          title=''
-          options={
-            {
-              title: {
-                text: '',
-                left: 'center'
-              },
-              tooltip: {
-                trigger: 'item'
-              },
-              legend: {
-                orient: 'vertical',
-                left: 'left',
-                top: 'middle'
-              },
-              dataset: {
-                source: {
-                  item: states,
-                  data
-                }
-              },
-              series: [
-                {
-                  type: 'pie',
-                  radius: '50%',
-                  label: {
-                    show: true,
-                    formatter: '{c}({d}%)'
+      <div className='container'>
+        <div className='item' style={{ width: '80%' }}>
+          <p className='title'>{title}</p>
+          <ChartContainer
+            title=''
+            options={
+              {
+                title: {
+                  text: '',
+                  left: 'center'
+                },
+                tooltip: {
+                  trigger: 'item',
+                  formatter: '{c}'
+                },
+                legend: {
+                  orient: 'vertical',
+                  left: 'left',
+                  top: 'middle'
+                },
+                dataset: {
+                  source: {
+                    item: states,
+                    data
                   }
-                }
-              ],
-              color
-            } as any
-          }
-        />
+                },
+                series: [
+                  {
+                    type: 'pie',
+                    radius: '50%',
+                    label: {
+                      show: true,
+                      formatter: '{c}({d}%)'
+                    }
+                  }
+                ],
+                color
+              } as any
+            }
+          />
+        </div>
       </div>
     );
   };
 
   const renderAlarmText = (assetsStat: Report['assetsStat'], title: string) => {
     const { minorAlarmNum, majorAlarmNum, criticalAlarmNum } = assetsStat;
-    return REPORT.status.items[0].states
-      .filter((s, i) => i > 0)
+    return ALARM_LEVELS.filter((s, i) => i > 0)
       .reverse()
       .map((s, index) => (
         <span>
@@ -105,9 +76,8 @@ export const Status = ({ report }: { report: Report }) => {
     const total = minorAlarmNum + majorAlarmNum + criticalAlarmNum;
     return (
       <span>
-        本周共有<span className='value'>{total}</span>个{REPORT.status.items[0].title}
-        处于报警状态，其中
-        {renderAlarmText(assetsStat, REPORT.status.items[0].title)}；
+        本周共有<span className='value'>{total}</span>个资产处于报警状态，其中
+        {renderAlarmText(assetsStat, '资产')}；
       </span>
     );
   };
@@ -116,7 +86,7 @@ export const Status = ({ report }: { report: Report }) => {
     return (
       <span>
         其中，有
-        {renderAlarmText(monitoringPointsStat, REPORT.status.items[1].title)}；
+        {renderAlarmText(monitoringPointsStat, '监测点')}；
       </span>
     );
   };
@@ -138,44 +108,38 @@ export const Status = ({ report }: { report: Report }) => {
 
   return (
     <>
-      <section className='page'>
-        <h3>{REPORT.status.title}</h3>
-        {REPORT.status.items
-          .filter((item) => item.page === 1)
-          .map(({ title, states }, index) => {
-            const data =
-              index === 0
-                ? [
-                    report?.assetsStat.normalAlarmNum,
-                    report?.assetsStat.minorAlarmNum,
-                    report?.assetsStat.majorAlarmNum,
-                    report?.assetsStat.criticalAlarmNum
-                  ]
-                : [
-                    report?.monitoringPointsStat.normalAlarmNum,
-                    report?.monitoringPointsStat.minorAlarmNum,
-                    report?.monitoringPointsStat.majorAlarmNum,
-                    report?.monitoringPointsStat.criticalAlarmNum
-                  ];
-            return renderStatus(title, states, data, [
-              ColorHealth,
-              ColorInfo,
-              ColorWarn,
-              ColorDanger
-            ]);
-          })}
+      <section className='page status'>
+        <h3>一、 资产和设备健康状态概述</h3>
+        {renderStatus(
+          '资产状态',
+          ALARM_LEVELS,
+          [
+            report?.assetsStat.normalAlarmNum,
+            report?.assetsStat.minorAlarmNum,
+            report?.assetsStat.majorAlarmNum,
+            report?.assetsStat.criticalAlarmNum
+          ],
+          [ColorHealth, ColorInfo, ColorWarn, ColorDanger]
+        )}
+        {renderStatus(
+          '监测点状态',
+          ALARM_LEVELS,
+          [
+            report?.monitoringPointsStat.normalAlarmNum,
+            report?.monitoringPointsStat.minorAlarmNum,
+            report?.monitoringPointsStat.majorAlarmNum,
+            report?.monitoringPointsStat.criticalAlarmNum
+          ],
+          [ColorHealth, ColorInfo, ColorWarn, ColorDanger]
+        )}
       </section>
-      <section className='page'>
-        {REPORT.status.items
-          .filter((item) => item.page === 2)
-          .map(({ title, states }) =>
-            renderStatus(
-              title,
-              states,
-              [report?.devicesStat.onlineNum, report?.devicesStat.offlineNum],
-              [ColorHealth, ColorOffline]
-            )
-          )}
+      <section className='page status'>
+        {renderStatus(
+          '设备状态',
+          ['在线', '离线'],
+          [report?.devicesStat.onlineNum, report?.devicesStat.offlineNum],
+          [ColorHealth, ColorOffline]
+        )}
         <section>
           <p>
             {report?.assetsStat &&
@@ -184,7 +148,10 @@ export const Status = ({ report }: { report: Report }) => {
             {report?.monitoringPointsStat &&
               verifyAlarm(report.monitoringPointsStat) &&
               renderMonitoringPointsSummary(report?.monitoringPointsStat)}
-            {report?.devicesStat && renderDevicesSummary(report?.devicesStat)}
+            {(verifyAlarm(report.assetsStat) || verifyAlarm(report.monitoringPointsStat)) && <br />}
+            {report?.devicesStat &&
+              report?.devicesStat.offlineNum > 0 &&
+              renderDevicesSummary(report?.devicesStat)}
           </p>
         </section>
       </section>
