@@ -1,20 +1,22 @@
 import { cloneDeep } from 'lodash';
 import dayjs from '../../utils/dayjsUtils';
-import { getDisplayValue, roundValue } from '../../utils/format';
 import {
   MonitoringPoint,
   MonitoringPointRow,
   MonitoringPointTypeValue,
-  MONITORING_POINT_FIRST_CLASS_FIELDS_MAPPING,
   MONITORING_POINT_TYPE_VALUE_DYNAMIC_MAPPING,
   Property,
-  MonitoringPointTypeText
+  MonitoringPointTypeText,
+  MONITORING_POINT_DISPLAY_PROPERTIES,
+  HistoryData
 } from './types';
 import intl from 'react-intl-universal';
-
-export function getKeysOfFirstClassFields(measurementType: number) {
-  return MONITORING_POINT_FIRST_CLASS_FIELDS_MAPPING.get(measurementType) ?? [];
-}
+import { DisplayProperty } from '../../constants/properties';
+import { ThicknessAnalysis } from './services';
+import { Analysis } from './show/thicknessAnalysis';
+import { pickDataOfFirstProperties } from '../device/util';
+import { getDisplayName } from '../../utils/format';
+import { Language } from '../../localeProvider';
 
 export function convertRow(values?: MonitoringPointRow): MonitoringPoint | null {
   if (!values) return null;
@@ -33,49 +35,11 @@ export function convertRow(values?: MonitoringPointRow): MonitoringPoint | null 
   };
 }
 
-export function getFirstClassFields(measurement: MonitoringPointRow) {
-  if (!measurement.properties) return [];
-  const fields: (Property['fields'][0] & Pick<Property, 'precision' | 'unit'>)[] = [];
-  getKeysOfFirstClassFields(measurement.type).forEach((fieldKey) => {
-    for (const property of measurement.properties) {
-      const field = property.fields.find((field) => field.key === fieldKey);
-      if (field) {
-        const name = field.name;
-        fields.push({ ...field, unit: property.unit, precision: property.precision, name });
-        break;
-      }
-    }
-  });
-  return fields;
-}
-
-export function getSpecificProperties(
-  properties: Property[],
-  measurementType: number,
-  includeRemainProperties: boolean = true
-) {
-  const filterableProperties = properties.filter(({ isShow }) => isShow);
-  const fieldKeysOfType = getKeysOfFirstClassFields(measurementType);
-  const sorted: Property[] = [];
-  fieldKeysOfType.forEach((fieldKey) => {
-    const property = filterableProperties.find(({ fields }) =>
-      fields.map(({ key }) => key).includes(fieldKey)
-    );
-    if (property) sorted.push(property);
-  });
-  if (includeRemainProperties) {
-    filterableProperties.forEach((property) => {
-      if (!sorted.map(({ key }) => key).includes(property.key)) sorted.push(property);
-    });
-  }
-  return sorted;
-}
-
-export function removeDulpicateProperties(properties: Property[]) {
+export function removeDulpicateProperties(properties: DisplayProperty[]) {
   const final = cloneDeep(properties);
   return final.map((property) => {
     const fields = property.fields;
-    if (fields.every((field) => field.key === property.key)) {
+    if (fields?.every((field) => field.key === property.key)) {
       return { ...property, fields: [] };
     } else {
       return property;
@@ -84,34 +48,25 @@ export function removeDulpicateProperties(properties: Property[]) {
 }
 
 export function generateDatasOfMeasurement(measurement: MonitoringPointRow) {
-  const properties = getFirstClassFields(measurement);
+  const properties = getDisplayProperties(measurement.properties, measurement.type).filter(
+    (p) => p.first
+  );
   const { data } = measurement;
-  if (properties.length > 0) {
-    return properties.map(({ name, key, unit, precision }) => {
-      let value = NaN;
-      if (data && data.values) {
-        value = roundValue(data.values[key] as number, precision);
-      }
-      return { name, value: getDisplayValue(value, unit) };
-    });
-  }
-  return [];
+  return pickDataOfFirstProperties(properties, data);
 }
 
-export function generatePropertyColumns(measurement: MonitoringPointRow) {
-  const properties = getFirstClassFields(measurement);
+export function generatePropertyColumns(measurement: MonitoringPointRow, lang: Language) {
+  const properties = generateDatasOfMeasurement(measurement);
   if (properties.length > 0) {
     return properties
-      .map(({ name, key, unit, precision }) => ({
-        title: `${intl.get(name)}${unit ? `(${unit})` : ''}`,
+      .map(({ name, key, value, fieldName }) => ({
+        title: getDisplayName({
+          name: intl.get(name),
+          suffix: fieldName && intl.get(fieldName),
+          lang
+        }),
         key,
-        render: ({ data }: MonitoringPointRow) => {
-          let value = NaN;
-          if (data && data.values) {
-            value = roundValue(data.values[key] as number, precision);
-          }
-          return getDisplayValue(value, unit);
-        },
+        render: (measurement: MonitoringPointRow) => value,
         width: 120
       }))
       .concat({
@@ -255,3 +210,146 @@ export const parseAttrs = (attributes: MonitoringPointRow['attributes']) => {
 
   return attr ?? attributes;
 };
+
+export function getDisplayProperties(
+  properties: Property[],
+  monitoringPointType: MonitoringPointTypeValue
+) {
+  const dispalyPropertiesSettings =
+    MONITORING_POINT_DISPLAY_PROPERTIES[
+      monitoringPointType as keyof typeof MONITORING_POINT_DISPLAY_PROPERTIES
+    ];
+  if (!dispalyPropertiesSettings || dispalyPropertiesSettings.length === 0) {
+    return properties.sort((prev, crt) => prev.sort - crt.sort) as DisplayProperty[];
+  } else {
+    return dispalyPropertiesSettings
+      .filter((p) => !p.losingOnMonitoringPoint)
+      .map((p) => {
+        const remote = properties.find((r) =>
+          p.parentKey ? r.key === p.parentKey : r.key === p.key
+        );
+        return {
+          ...p,
+          fields:
+            p.fields ??
+            remote?.fields
+              ?.filter((f) => (p.parentKey ? f.key === p.key : true))
+              .map((f, i) => ({
+                ...f,
+                first: p.defaultFirstFieldKey
+                  ? f.key === p.defaultFirstFieldKey
+                  : i === remote?.fields.length - 1
+              }))
+        };
+      })
+      .filter((p) => !!p.fields) as DisplayProperty[];
+  }
+}
+
+export function transformThicknessAnalysis(origin: {
+  data: HistoryData;
+  analysisResult: ThicknessAnalysis;
+}): Analysis | null {
+  if (!origin || !origin.data || !origin.analysisResult) return null;
+  const { analysisResult } = origin;
+  const {
+    k_1_month,
+    b_1_month,
+    corrosion_rate_1_month,
+    residual_life_1_month,
+    k_3_months,
+    b_3_months,
+    corrosion_rate_3_months,
+    residual_life_3_months,
+    k_6_months,
+    b_6_months,
+    corrosion_rate_6_months,
+    residual_life_6_months,
+    k_1_year,
+    b_1_year,
+    corrosion_rate_1_year,
+    residual_life_1_year,
+    k_all,
+    b_all,
+    corrosion_rate_all,
+    residual_life_all
+  } = analysisResult;
+  const times = origin.data.map(({ timestamp }) => timestamp);
+  const end = times[times.length - 1];
+  // algorithm: y = kx+b
+  const data_1 = [compuleStartPoint(times, 1), end].map((x) => ({
+    name: 1 as 1,
+    x,
+    y: k_1_month * x + b_1_month
+  }));
+  const data_3 = [compuleStartPoint(times, 3), end].map((x) => ({
+    name: 3 as 3,
+    x,
+    y: k_3_months * x + b_3_months
+  }));
+  const data_6 = [compuleStartPoint(times, 6), end].map((x) => ({
+    name: 6 as 6,
+    x,
+    y: k_6_months * x + b_6_months
+  }));
+  const data_12 = [compuleStartPoint(times, 12), end].map((x) => ({
+    name: 12 as 12,
+    x,
+    y: k_1_year * x + b_1_year
+  }));
+  const data_all = [compuleStartPoint(times), end].map((x) => ({
+    name: 'all' as 'all',
+    x,
+    y: k_all * x + b_all
+  }));
+  return {
+    1: {
+      data: data_1,
+      rate: corrosion_rate_1_month,
+      life: residual_life_1_month
+    },
+    3: {
+      data: data_3,
+      rate: corrosion_rate_3_months,
+      life: residual_life_3_months
+    },
+    6: {
+      data: data_6,
+      rate: corrosion_rate_6_months,
+      life: residual_life_6_months
+    },
+    12: {
+      data: data_12,
+      rate: corrosion_rate_1_year,
+      life: residual_life_1_year
+    },
+    all: {
+      data: data_all,
+      rate: corrosion_rate_all,
+      life: residual_life_all
+    }
+  };
+}
+
+export function compuleStartPoint(times: number[], interval?: 1 | 3 | 6 | 12) {
+  const last = times[times.length - 1];
+  if (interval) {
+    const start = dayjs.unix(last).subtract(interval, 'month').unix();
+    const selectedTime = times.find((t) => t === start);
+    const nearest = closest(start, times);
+    return selectedTime ?? nearest;
+  }
+  return times[0];
+}
+
+function closest(needle: number, haystack: number[]) {
+  return haystack.reduce((a, b) => {
+    let aDiff = Math.abs(a - needle);
+    let bDiff = Math.abs(b - needle);
+    if (aDiff === bDiff) {
+      return a > b ? a : b;
+    } else {
+      return bDiff < aDiff ? b : a;
+    }
+  });
+}

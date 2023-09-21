@@ -5,6 +5,7 @@ import { isMobile } from '../../../../utils/deviceDetection';
 import TableLayout from '../../../layout/TableLayout';
 import intl from 'react-intl-universal';
 import { translateMetricName } from '../../../alarm/alarm-group';
+import { getValue } from '../../../../utils/format';
 
 export const FilterableAlarmRuleTable: React.FC<{
   dataSource: PageResult<any[]>;
@@ -29,7 +30,7 @@ export const FilterableAlarmRuleTable: React.FC<{
       dataIndex: 'condition',
       key: 'condition',
       render: (_: any, record: any) => {
-        return `${record.operation} ${record.threshold} ${record.metric.unit}`;
+        return `${record.operation} ${getValue(record.threshold, record.metric.unit)} `;
       }
     }
   ];

@@ -9,9 +9,10 @@ import { generateColProps } from '../../../utils/grid';
 import { convertAlarmLevelToState, getAlarmLevelColor, getAlarmStateText } from '../../asset';
 import { MonitoringPointRow } from '../types';
 import intl from 'react-intl-universal';
-import { toMac } from '../../../utils/format';
+import { getDisplayName, toMac } from '../../../utils/format';
 import { SelfLink } from '../../../components/selfLink';
 import { isMobile } from '../../../utils/deviceDetection';
+import { useLocaleContext } from '../../../localeProvider';
 
 export const RelatedDevices = (point: MonitoringPointRow) => {
   const { bindingDevices: devices = [], alertLevel } = point;
@@ -35,6 +36,7 @@ export const RelatedDevices = (point: MonitoringPointRow) => {
 };
 
 function SingleDeviceInfo(props: Device & { alertLevel?: number }) {
+  const { language } = useLocaleContext();
   const colProps = generateColProps({ xxl: 8, xl: 12, lg: 12, md: 12, xs: 24 });
   const { id, name, typeId, information, state, macAddress, data, alertLevel } = props;
 
@@ -51,8 +53,22 @@ function SingleDeviceInfo(props: Device & { alertLevel?: number }) {
           { name: intl.get('TYPE'), value: intl.get(DeviceType.toString(typeId)) },
           { name: intl.get('MODEL'), value: information?.model ?? '-' },
           { name: intl.get('MAC_ADDRESS'), value: toMac(macAddress.toUpperCase()) },
-          { name: `${intl.get('BATTERY_VOLTAGE')}(mV)`, value: state?.batteryVoltage ?? '-' },
-          { name: `${intl.get('SIGNAL_STRENGTH')}(dB)`, value: state?.signalLevel ?? '-' },
+          {
+            name: getDisplayName({
+              name: intl.get('BATTERY_VOLTAGE'),
+              lang: language,
+              suffix: 'mV'
+            }),
+            value: state?.batteryVoltage ?? '-'
+          },
+          {
+            name: getDisplayName({
+              name: intl.get('SIGNAL_STRENGTH'),
+              lang: language,
+              suffix: 'dBm'
+            }),
+            value: state?.signalLevel ?? '-'
+          },
           {
             name: intl.get('STATUS'),
             value: (

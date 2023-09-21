@@ -46,6 +46,7 @@ import { AlarmRuleSettings } from '../../device/detail/setting/alarmRuleSettings
 import EditSettingModal from '../../device/edit/editSettingModal';
 import EditBaseInfoModel from './update';
 import { SelfLink } from '../../../components/selfLink';
+import { DataBarOfFirstProperties } from '../../device/dataBarOfFirstProperties';
 
 const { Search } = Input;
 const { Option } = Select;
@@ -168,10 +169,7 @@ const DevicePage = () => {
         const data = getValueOfFirstClassProperty(device);
         if (data && data.length > 0) {
           const channel = device.data?.values?.channel;
-          const channelText = channel ? `(${intl.get('CHANNEL')}${channel})` : '';
-          return (
-            data.map(({ name, value }) => `${intl.get(name)}:${value}`).join(', ') + channelText
-          );
+          return <DataBarOfFirstProperties data={data} channel={channel} />;
         }
         return intl.get('NO_DATA');
       }

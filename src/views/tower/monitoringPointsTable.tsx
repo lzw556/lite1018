@@ -14,6 +14,7 @@ import {
   sortMonitoringPointByAttributes
 } from '../monitoring-point';
 import { SelfLink } from '../../components/selfLink';
+import { useLocaleContext } from '../../localeProvider';
 
 export const MonitoringPointsTable = ({
   asset,
@@ -28,10 +29,11 @@ export const MonitoringPointsTable = ({
 }) => {
   const { id, name, monitoringPoints = [] } = asset;
   const { state } = useLocation();
+  const { language } = useLocaleContext();
   const { hasPermission } = usePermission();
   const dataSource = sortMonitoringPointByAttributes(getRealPoints(monitoringPoints));
   const columnsOfProperties =
-    monitoringPoints.length > 0 ? generatePropertyColumns(monitoringPoints[0]) : [];
+    monitoringPoints.length > 0 ? generatePropertyColumns(monitoringPoints[0], language) : [];
   const monitoringPointTableColumns = useMonitoringPointTableColumns();
   const monitoringPointTableOperationColumn = useMonitoringPointTableOperationColumn(
     onUpdate,

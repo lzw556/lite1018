@@ -12,7 +12,16 @@ export const MONITORING_POINTS = [
   },
   { id: MonitoringPointTypeValue.THICKNESS, label: MonitoringPointTypeText.THICKNESS },
   { id: MonitoringPointTypeValue.PRELOAD, label: MonitoringPointTypeText.PRELOAD },
+  {
+    id: MonitoringPointTypeValue.PRELOAD_ATTITUDE,
+    label: MonitoringPointTypeText.PRELOAD_ATTITUDE
+  },
   { id: MonitoringPointTypeValue.VIBRATION, label: MonitoringPointTypeText.VIBRATION },
+  { id: MonitoringPointTypeValue.VIBRATION_RPM, label: MonitoringPointTypeText.VIBRATION_RPM },
+  {
+    id: MonitoringPointTypeValue.VIBRATION_THREE_AXIS_RPM,
+    label: MonitoringPointTypeText.VIBRATION_THREE_AXIS_RPM
+  },
   {
     id: MonitoringPointTypeValue.TOWER_INCLINATION,
     label: MonitoringPointTypeText.TOWER_INCLINATION

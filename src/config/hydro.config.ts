@@ -16,7 +16,8 @@ export const MONITORING_POINTS = [
     id: MonitoringPointTypeValue.LOOSENING_ANGLE,
     label: MonitoringPointTypeText.LOOSENING_ANGLE
   },
-  { id: MonitoringPointTypeValue.PRELOAD, label: MonitoringPointTypeText.PRELOAD }
+  { id: MonitoringPointTypeValue.PRELOAD, label: MonitoringPointTypeText.PRELOAD },
+  { id: MonitoringPointTypeValue.PRELOAD_ATTITUDE, label: MonitoringPointTypeText.PRELOAD_ATTITUDE }
 ];
 export const MENUS_HIDDEN = [];
 

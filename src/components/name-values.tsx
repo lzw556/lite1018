@@ -11,7 +11,7 @@ export const NameValueGroups = ({
   namePercentage?: number;
   divider?: number;
   col: ColProps;
-  items: { name: string; value: React.ReactNode; className?: string }[];
+  items: { name: React.ReactNode; value: React.ReactNode; className?: string }[];
 }) => {
   let nameStyle: React.CSSProperties | undefined,
     valueStyle: React.CSSProperties | undefined = undefined;
@@ -22,10 +22,10 @@ export const NameValueGroups = ({
   return (
     <dl className='name-value-groups'>
       <Row>
-        {items.map(({ name, value, className }) => (
+        {items.map(({ name, value, className }, i) => (
           <Col
             className={`${className ? `name-value ${className}` : 'name-value'}`}
-            key={name}
+            key={i}
             {...col}
           >
             <dt style={{ ...nameStyle }}>{name}</dt>

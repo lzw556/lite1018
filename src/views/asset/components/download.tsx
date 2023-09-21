@@ -1,8 +1,8 @@
 import { Form, Modal, ModalProps, Select } from 'antd';
 import * as React from 'react';
-import { RangeDatePicker } from '../../../components/rangeDatePicker';
+import { RangeDatePicker, oneWeekNumberRange } from '../../../components/rangeDatePicker';
 import { getFilename } from '../../../utils/format';
-import { MonitoringPointRow, getSpecificProperties } from '../../monitoring-point';
+import { MonitoringPointRow, getDisplayProperties } from '../../monitoring-point';
 import { downloadHistory } from '..';
 import { useLocaleContext } from '../../../localeProvider';
 import intl from 'react-intl-universal';
@@ -19,13 +19,13 @@ export interface DownloadModalProps extends ModalProps {
 
 export const DownloadHistory: React.FC<DownloadModalProps> = (props) => {
   const { open, measurement, property, onSuccess, assetId } = props;
-  const [range, setRange] = React.useState<[number, number]>();
+  const [range, setRange] = React.useState<[number, number]>(oneWeekNumberRange);
   const [form] = Form.useForm();
   const { language } = useLocaleContext();
 
   const properties = props.virtualPoint
     ? props.virtualPoint.properties.filter((pro) => pro.key === 'preload' || pro.key === 'pressure')
-    : getSpecificProperties(measurement.properties, measurement.type);
+    : getDisplayProperties(measurement.properties, measurement.type);
 
   React.useEffect(() => {
     if (open) {
@@ -87,9 +87,7 @@ export const DownloadHistory: React.FC<DownloadModalProps> = (props) => {
           </Select>
         </Form.Item>
         <Form.Item label={intl.get('DATE_RANGE')} required>
-          <RangeDatePicker
-            onChange={React.useCallback((range: [number, number]) => setRange(range), [])}
-          />
+          <RangeDatePicker onChange={setRange} />
         </Form.Item>
       </Form>
     </Modal>

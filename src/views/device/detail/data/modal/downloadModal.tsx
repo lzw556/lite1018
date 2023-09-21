@@ -2,10 +2,10 @@ import { Form, Modal, ModalProps, Select } from 'antd';
 import { FC, useEffect } from 'react';
 import { DownloadDeviceDataRequest } from '../../../../../apis/device';
 import { Device } from '../../../../../types/device';
-import { getSpecificProperties } from '../../../util';
+import { getDisplayProperties } from '../../../util';
 import intl from 'react-intl-universal';
 import { useLocaleContext } from '../../../../../localeProvider';
-import { RangeDatePicker } from '../../../../../components/rangeDatePicker';
+import { RangeDatePicker, oneWeekNumberRange } from '../../../../../components/rangeDatePicker';
 import React from 'react';
 
 const { Option } = Select;
@@ -19,7 +19,7 @@ export interface DownloadModalProps extends ModalProps {
 
 const DownloadModal: FC<DownloadModalProps> = (props) => {
   const { open, device, property, onSuccess } = props;
-  const [range, setRange] = React.useState<[number, number]>();
+  const [range, setRange] = React.useState<[number, number]>(oneWeekNumberRange);
   const [form] = Form.useForm();
   const { language } = useLocaleContext();
 
@@ -75,10 +75,7 @@ const DownloadModal: FC<DownloadModalProps> = (props) => {
             mode={'multiple'}
             maxTagCount={2}
           >
-            {getSpecificProperties(
-              device.properties.filter((pro) => pro.key !== 'channel'),
-              device.typeId
-            ).map((item) => (
+            {getDisplayProperties(device.properties, device.typeId).map((item) => (
               <Option key={item.key} value={item.key}>
                 {intl.get(item.name)}
               </Option>
@@ -86,9 +83,7 @@ const DownloadModal: FC<DownloadModalProps> = (props) => {
           </Select>
         </Form.Item>
         <Form.Item label={intl.get('DATE_RANGE')} required>
-          <RangeDatePicker
-            onChange={React.useCallback((range: [number, number]) => setRange(range), [])}
-          />
+          <RangeDatePicker onChange={setRange} />
         </Form.Item>
       </Form>
     </Modal>

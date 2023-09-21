@@ -1,10 +1,10 @@
 import { ColorDanger, ColorHealth, ColorInfo, ColorWarn } from '../../constants/color';
 import { isMobile } from '../../utils/deviceDetection';
-import { getDisplayValue, roundValue } from '../../utils/format';
+import { getValue, roundValue } from '../../utils/format';
 import {
   MonitoringPointRow,
   MonitoringPointTypeValue,
-  getFirstClassFields,
+  getDisplayProperties,
   sortMonitoringPointByAttributes
 } from '../monitoring-point';
 import { AssetRow } from '../asset/types';
@@ -46,16 +46,14 @@ export function buildCirclePointsChartOfFlange(
   series.push(actuals.series);
 
   const legends = [];
-  const firstClassFields = getFirstClassFields(measurements[0]);
-  let field: any = null;
-  if (firstClassFields.length > 0) {
-    field = firstClassFields[0];
-  }
+  const unit = getDisplayProperties(measurements[0].properties, measurements[0].type).filter(
+    (p) => p.first
+  )?.[0]?.unit;
   if (
     measurements[0].type === MonitoringPointTypeValue.PRELOAD &&
     checkValidAttr(attributes, 'normal', min)
   ) {
-    const seriesName = `${intl.get('RATING')} ${attributes?.normal?.value}${field?.unit}`;
+    const seriesName = `${intl.get('RATING')} ${attributes?.normal?.value}${unit}`;
     const normal = getSeries(ColorHealth, attributes?.normal?.value, seriesName);
     legends.push({ name: seriesName, itemStyle: { color: ColorHealth } });
     series.push(normal.series);
@@ -65,34 +63,30 @@ export function buildCirclePointsChartOfFlange(
     measurements[0].type === MonitoringPointTypeValue.LOOSENING_ANGLE &&
     checkValidAttr(attributes, 'initial', min)
   ) {
-    const seriesName = `${intl.get('INITIAL_VALUE')} ${attributes?.initial?.value}${field?.unit}`;
+    const seriesName = `${intl.get('INITIAL_VALUE')} ${attributes?.initial?.value}${unit}`;
     const initial = getSeries(ColorHealth, attributes?.initial?.value, seriesName);
     legends.push({ name: seriesName, itemStyle: { color: ColorHealth } });
     series.push(initial.series);
   }
 
   if (checkValidAttr(attributes, 'info', min)) {
-    const seriesName = `${intl.get('ALARM_LEVEL_MINOR_TITLE')} ${attributes?.info?.value}${
-      field?.unit
-    }`;
+    const seriesName = `${intl.get('ALARM_LEVEL_MINOR_TITLE')} ${attributes?.info?.value}${unit}`;
     const info = getSeries(ColorInfo, attributes?.info?.value, seriesName);
     legends.push({ name: seriesName, itemStyle: { color: ColorInfo } });
     series.push(info.series);
   }
 
   if (checkValidAttr(attributes, 'warn', min)) {
-    const seriesName = `${intl.get('ALARM_LEVEL_MAJOR_TITLE')} ${attributes?.warn?.value}${
-      field?.unit
-    }`;
+    const seriesName = `${intl.get('ALARM_LEVEL_MAJOR_TITLE')} ${attributes?.warn?.value}${unit}`;
     const warn = getSeries(ColorWarn, attributes?.warn?.value, seriesName);
     legends.push({ name: seriesName, itemStyle: { color: ColorWarn } });
     series.push(warn.series);
   }
 
   if (checkValidAttr(attributes, 'danger', min)) {
-    const seriesName = `${intl.get('ALARM_LEVEL_CRITICAL_TITLE')} ${attributes?.danger?.value}${
-      field?.unit
-    }`;
+    const seriesName = `${intl.get('ALARM_LEVEL_CRITICAL_TITLE')} ${
+      attributes?.danger?.value
+    }${unit}`;
     const danger = getSeries(ColorDanger, attributes?.danger?.value, seriesName);
     legends.push({ name: seriesName, itemStyle: { color: ColorDanger } });
     series.push(danger.series);
@@ -183,11 +177,9 @@ function generateOuter(measurements: MonitoringPointRow[], isBig: boolean = fals
     splitLine: { show: false }
   };
   const seriesData = measurements.map(({ name, attributes, data, alertLevel }, index) => {
-    const firstClassFields = getFirstClassFields(measurements[0]);
-    let field: any = null;
-    if (firstClassFields.length > 0) {
-      field = firstClassFields[0];
-    }
+    let field = getDisplayProperties(measurements[0].properties, measurements[0].type).filter(
+      (p) => p.first
+    )?.[0];
     let value = NaN;
     if (field && data) {
       value = roundValue(data.values[field.key] as number, field.precision);
@@ -205,7 +197,7 @@ function generateOuter(measurements: MonitoringPointRow[], isBig: boolean = fals
           alertLevel && alertLevel > 0
             ? `${getAlarmStateText(convertAlarmLevelToState(alertLevel))}报警<br/>`
             : ''
-        }${generateRowOfTooltip('', name, getDisplayValue(value, field?.unit))}`
+        }${generateRowOfTooltip('', name, getValue(value, field?.unit))}`
       },
       itemStyle: {
         opacity: 1,
@@ -233,11 +225,9 @@ function generateActuals(measurements: MonitoringPointRow[], isBig: boolean = fa
     radius = { radius: isBig ? '85%' : '80%' };
   }
   const seriesData: any = [];
-  const firstClassFields = getFirstClassFields(measurements[0]);
-  let field: any = null;
-  if (firstClassFields.length > 0) {
-    field = firstClassFields[0];
-  }
+  let field = getDisplayProperties(measurements[0].properties, measurements[0].type).filter(
+    (p) => p.first
+  )?.[0];
   let max = 0;
   let min = 0;
   measurements.forEach(({ data, name }, index) => {

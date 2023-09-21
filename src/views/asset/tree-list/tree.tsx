@@ -2,7 +2,6 @@ import { Space, Tree } from 'antd';
 import * as React from 'react';
 import { combineMonitoringPointToAsset } from '../common/utils';
 import './tree.css';
-import intl from 'react-intl-universal';
 import { AssertAssetCategory, AssertOfAssetCategory, AssetRow } from '../types';
 import { generateDatasOfMeasurement, MonitoringPointIcon, pickId } from '../../monitoring-point';
 import { mapTree } from '../../../utils/tree';
@@ -15,6 +14,7 @@ import { useActionBarStatus } from '../common/useActionBarStatus';
 import { ActionBar } from '../common/actionBar';
 import usePermission, { Permission } from '../../../permission/permission';
 import { TowerIcon } from '../../tower';
+import { DataBarOfFirstProperties } from '../../device/dataBarOfFirstProperties';
 
 export const AssetTree: React.FC<{
   assets: AssetRow[];
@@ -86,7 +86,7 @@ export const AssetTree: React.FC<{
             if (nameValues.length > 0) {
               alarmText = (
                 <Space style={{ fontSize: 14, color: '#8a8e99' }}>
-                  {nameValues.map(({ name, value }) => `${intl.get(name)}: ${value}`)}
+                  <DataBarOfFirstProperties data={nameValues} />
                 </Space>
               );
             }

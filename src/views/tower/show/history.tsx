@@ -6,8 +6,8 @@ import { oneWeekNumberRange, RangeDatePicker } from '../../../components/rangeDa
 import { isMobile } from '../../../utils/deviceDetection';
 import { AssetRow, DownloadHistory } from '../../asset';
 import {
+  getDisplayProperties,
   getRealPoints,
-  getSpecificProperties,
   HistoryData,
   MONITORING_POINT
 } from '../../monitoring-point';
@@ -23,22 +23,11 @@ export const TowerHistory = ({
   historyDatas: { name: string; data: HistoryData; height?: number; radius?: number }[] | undefined;
 }) => {
   const realPoints = getRealPoints(tower.monitoringPoints);
-  const [range, setRange] = React.useState<[number, number]>();
+  const [range, setRange] = React.useState<[number, number]>(oneWeekNumberRange);
   const [open, setVisible] = React.useState(false);
   const [property, setProperty] = React.useState<string | undefined>();
   const internalHistorys = useHistoryDatas(tower, range) ?? historyDatas;
   const firstPoint = realPoints[0];
-
-  const handleChange = React.useCallback((range: [number, number]) => {
-    if (checkIsRangeChanged(range)) {
-      setRange(range);
-    }
-  }, []);
-
-  function checkIsRangeChanged(range?: [number, number]) {
-    if (range === undefined) return false;
-    return range[0] !== oneWeekNumberRange[0] || range[1] !== oneWeekNumberRange[1];
-  }
 
   if (realPoints.length === 0)
     return (
@@ -48,35 +37,49 @@ export const TowerHistory = ({
       />
     );
 
-  const properties = getSpecificProperties(firstPoint.properties, firstPoint.type);
+  const isEmpty =
+    !internalHistorys ||
+    internalHistorys.length === 0 ||
+    internalHistorys.every(({ data }) => data.length === 0);
+  const properties = getDisplayProperties(firstPoint.properties, firstPoint.type);
 
   return (
-    <Row>
-      <Col span={8}>
-        <CircleChart
-          data={
-            internalHistorys?.map((h) => {
-              return {
-                name: h.name,
-                history: h.data,
-                typeLabel: '',
-                height: h.height,
-                radius: h.radius
-              };
-            }) ?? []
-          }
-          style={{ height: 550 }}
-          large={true}
-          hideSubTitle={true}
-        />
+    <Row gutter={[32, 32]}>
+      <Col span={24}>
+        <Space direction={isMobile ? 'vertical' : 'horizontal'}>
+          <RangeDatePicker onChange={setRange} showFooter={true} />
+        </Space>
       </Col>
-      <Col span={16}>
-        <Row gutter={[32, 32]}>
-          <Col span={24}>
-            <Row justify='space-between'>
-              <Col></Col>
+      {isEmpty && (
+        <Col span={24}>
+          <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+        </Col>
+      )}
+      {!isEmpty && (
+        <>
+          <Col span={8}>
+            <CircleChart
+              data={
+                internalHistorys?.map((h) => {
+                  return {
+                    name: h.name,
+                    history: h.data,
+                    typeLabel: '',
+                    height: h.height,
+                    radius: h.radius
+                  };
+                }) ?? []
+              }
+              style={{ height: 550 }}
+              large={true}
+              hideSubTitle={true}
+            />
+          </Col>
+          <Col span={16}>
+            <Row justify='end'>
               <Col>
-                <Space direction={isMobile ? 'vertical' : 'horizontal'}>
+                {' '}
+                <Col span={24}>
                   <Label name={intl.get('PROPERTY')}>
                     <Select
                       bordered={false}
@@ -94,30 +97,31 @@ export const TowerHistory = ({
                       ))}
                     </Select>
                   </Label>
-                  <RangeDatePicker onChange={handleChange} showFooter={true} />
-                </Space>
+                </Col>
               </Col>
             </Row>
+            <Row gutter={[32, 32]}>
+              <Col span={24}>
+                <TowerHistoryChart
+                  tower={tower}
+                  historyDatas={internalHistorys}
+                  propertyKey={property}
+                  showTitle={false}
+                />
+              </Col>
+              {open && realPoints.length > 0 && (
+                <DownloadHistory
+                  measurement={firstPoint}
+                  open={open}
+                  onSuccess={() => setVisible(false)}
+                  onCancel={() => setVisible(false)}
+                  assetId={tower.id}
+                />
+              )}
+            </Row>
           </Col>
-          <Col span={24}>
-            <TowerHistoryChart
-              tower={tower}
-              historyDatas={internalHistorys}
-              propertyKey={property}
-              showTitle={false}
-            />
-          </Col>
-          {open && realPoints.length > 0 && (
-            <DownloadHistory
-              measurement={firstPoint}
-              open={open}
-              onSuccess={() => setVisible(false)}
-              onCancel={() => setVisible(false)}
-              assetId={tower.id}
-            />
-          )}
-        </Row>
-      </Col>
+        </>
+      )}
     </Row>
   );
 };

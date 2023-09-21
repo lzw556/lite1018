@@ -138,10 +138,10 @@ export function getDataOfCircleChart(
     history.forEach(({ values }) => {
       values.forEach(({ data }) => {
         if (data['FIELD_DIRECTION'] != null) {
-          directions.push(roundValue(data['FIELD_DIRECTION']));
+          directions.push(roundValue(data['FIELD_DIRECTION'], 2));
         }
         if (data['FIELD_DISPLACEMENT_RADIAL'] != null) {
-          displacements.push(roundValue(data['FIELD_DISPLACEMENT_RADIAL']));
+          displacements.push(roundValue(data['FIELD_DISPLACEMENT_RADIAL'], 2));
         }
       });
     });

@@ -1,11 +1,12 @@
-import { Col, Row, Select } from 'antd';
+import { Col, Empty, Row, Select } from 'antd';
 import React from 'react';
-import { ChartContainer } from '../../../../components/charts/chartContainer';
 import Label from '../../../../components/label';
 import { isMobile } from '../../../../utils/deviceDetection';
-import { getDisplayValue, roundValue } from '../../../../utils/format';
-import { MONITORING_POINT, Property } from '../../../monitoring-point';
+import { roundValue } from '../../../../utils/format';
+import { MONITORING_POINT } from '../../../monitoring-point';
 import intl from 'react-intl-universal';
+import { PropertyChart } from '../../../../components/charts/propertyChart';
+import { DisplayProperty } from '../../../../constants/properties';
 
 export type FlangeStatusData = {
   timestamp: number;
@@ -25,60 +26,51 @@ export type FlangeStatusData = {
 
 export function SingleFlangeStatus({
   properties,
-  flangeData,
-  initialProperty
+  flangeData
 }: {
-  properties: Property[];
+  properties: DisplayProperty[];
   flangeData?: FlangeStatusData;
-  initialProperty?: string;
 }) {
-  const [property, setProperty] = React.useState(initialProperty ?? properties[0].key);
+  const [property, setProperty] = React.useState(properties.length > 0 ? properties[0] : undefined);
+
+  if (!property) return <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />;
 
   return (
     <Row>
-      {!initialProperty && (
-        <Col span={24}>
-          <Row justify='end'>
-            <Col>
-              <Label name={intl.get('PROPERTY')}>
-                <Select
-                  bordered={false}
-                  defaultValue={property}
-                  placeholder={intl.get('PLEASE_SELECT_PROPERTY')}
-                  style={{ width: isMobile ? '100%' : '120px' }}
-                  onChange={(value: string) => {
-                    setProperty(value);
-                  }}
-                >
-                  {properties
-                    .filter((pro) => pro.key === 'preload' || pro.key === 'pressure')
-                    .map(({ name, key }) => (
-                      <Select.Option key={key} value={key}>
-                        {intl.get(name)}
-                      </Select.Option>
-                    ))}
-                </Select>
-              </Label>
-            </Col>
-          </Row>
-        </Col>
-      )}
       <Col span={24}>
-        <ChartContainer
-          title=''
-          style={{ height: 500 }}
-          options={generateFlangeStatusChartOptions(property, flangeData) as any}
-        />
+        <Row justify='end'>
+          <Col>
+            <Label name={intl.get('PROPERTY')}>
+              <Select
+                bordered={false}
+                defaultValue={property.key}
+                placeholder={intl.get('PLEASE_SELECT_PROPERTY')}
+                style={{ width: isMobile ? '100%' : '120px' }}
+                onChange={(value: string) => {
+                  setProperty(properties.find((item: any) => item.key === value));
+                }}
+              >
+                {properties
+                  .filter((pro) => pro.key === 'preload' || pro.key === 'pressure')
+                  .map(({ name, key }) => (
+                    <Select.Option key={key} value={key}>
+                      {intl.get(name)}
+                    </Select.Option>
+                  ))}
+              </Select>
+            </Label>
+          </Col>
+        </Row>
       </Col>
+      <Col span={24}>{renderChart(property, flangeData)}</Col>
     </Row>
   );
 }
 
-function generateFlangeStatusChartOptions(propertyKey: string, origialData?: FlangeStatusData) {
+function renderChart(property: DisplayProperty, origialData?: FlangeStatusData) {
   if (!origialData || origialData.values.length === 0) return null;
-  const property = origialData.values.find(({ key }) => key === propertyKey);
   const series: any = [];
-  const propertyInput = origialData.values.find(({ key }) => key === `${propertyKey}_input`);
+  const propertyInput = origialData.values.find(({ key }) => key === `${property.key}_input`);
   if (propertyInput) {
     const propertyInputDatas = propertyInput.data[propertyInput.name] as {
       index: number;
@@ -87,58 +79,39 @@ function generateFlangeStatusChartOptions(propertyKey: string, origialData?: Fla
     }[];
     if (propertyInputDatas.length > 0) {
       series.push({
-        type: 'scatter',
-        name: intl.get(MONITORING_POINT),
-        data: propertyInputDatas.map(({ index, value }) => [index - 1, roundValue(value)])
+        data: {
+          [intl.get(MONITORING_POINT)]: propertyInputDatas.map(({ value }) => roundValue(value))
+        },
+        raw: { symbol: 'circle', type: 'scatter' },
+        xAxisValues: propertyInputDatas.map(({ index }) => `${index}`)
       });
     }
   }
-  let xAxisDatas: number[] = [];
   const fake = origialData.values.find(({ fields }) =>
-    fields.find((field) => field.key === propertyKey)
+    fields.find((field) => field.key === property.key)
   );
   if (fake) {
-    const field = fake.fields.find((field) => field.key === propertyKey);
+    const field = fake.fields.find((field) => field.key === property.key);
     if (field) {
       const fakeDatas = fake.data[field.name] as number[];
       if (fakeDatas.length > 0) {
-        xAxisDatas = fakeDatas.map((value, index) => index + 1);
         series.push({
-          type: 'line',
-          name: intl.get('BOLT'),
-          data: fakeDatas.map((value, index) => [index, roundValue(value)])
+          data: { [intl.get('BOLT')]: fakeDatas.map((value) => roundValue(value)) },
+          xAxisValues: fakeDatas.map((n, index) => `${index + 1}`),
+          main: true
         });
       }
     }
   }
 
-  return {
-    tooltip: {
-      trigger: 'axis',
-      formatter: function (params: any) {
-        let relVal = '';
-        for (let i = 0; i < params.length; i++) {
-          const index = Number(params[i].value[0]) + 1;
-          const value = Number(params[i].value[1]);
-          relVal += `<br/> ${params[i].marker} ${intl.get('INDEXED_NUMBER', { index })}${
-            params[i].seriesName
-          }: ${intl.get(property?.name ?? '')}${getDisplayValue(value, property?.unit)}`;
-        }
-        return relVal;
-      }
-    },
-    legend: { show: !!propertyKey },
-    grid: { bottom: 20, left: 50 },
-    title: {
-      text: `${intl.get(property?.name ?? '')}${property?.unit ? `(${property.unit})` : ''}`
-    },
-    series,
-    xAxis: {
-      type: 'category',
-      boundaryGap: false,
-      axisLabel: { align: 'left' },
-      data: xAxisDatas
-    },
-    yAxis: { type: 'value' }
-  };
+  if (series.length === 0) return <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />;
+
+  return (
+    <PropertyChart
+      series={series}
+      style={{ height: 500 }}
+      yAxisMinInterval={property.interval}
+      yAxisValueMeta={{ precision: property.precision, unit: property.unit }}
+    />
+  );
 }

@@ -1,51 +1,47 @@
-import { round } from 'lodash';
-import { FIRST_CLASS_PROPERTIES } from '../../constants/field';
 import { Device } from '../../types/device';
 import { Property } from '../../types/property';
+import { DeviceType, SENSOR_DISPLAY_PROPERTIES } from '../../types/device_type';
+import { DisplayProperty } from '../../constants/properties';
+import { getValue, roundValue } from '../../utils/format';
 
 export const getValueOfFirstClassProperty = (device: Device) => {
-  const properties = getFirstClassFields(device);
+  const properties = getDisplayProperties(device.properties, device.typeId).filter((p) => p.first);
   const { data } = device;
-  if (data.timestamp < 0) return [];
-  if (properties.length > 0) {
-    return properties.map(({ name, key, unit, precision }) => {
-      let value = NaN;
-      if (data && data.values) {
-        value = roundValue(data.values[key], precision);
-      }
-      return { name, value: getDisplayValue(value, unit) };
-    });
-  }
-  return [];
+  return pickDataOfFirstProperties(properties, data);
 };
 
-function getDisplayValue(value: number | null | undefined, unit?: string) {
-  if (Number.isNaN(value) || value === null || value === undefined) return '-';
-  return `${value}${unit ?? ''}`;
-}
-
-function roundValue(value: number, precision?: number) {
-  if (value === null || value === undefined) return Number.NaN;
-  if (Number.isNaN(value) || value === 0) return value;
-  return round(value, precision ?? 3);
-}
-
-function getFirstClassFields(device: Device) {
-  if (!device.properties) return [];
-  const fields: (Property['fields'][0] & Pick<Property, 'precision' | 'unit'>)[] = [];
-  const propertiesOfType = FIRST_CLASS_PROPERTIES.find((pro) => pro.typeId === device.typeId);
-  const fieldKeysOfType = propertiesOfType ? propertiesOfType.properties : [];
-  fieldKeysOfType.forEach((fieldKey) => {
-    for (const property of device.properties) {
-      const field = property.fields.find((field) => field.key === fieldKey);
-      if (field) {
-        const name = field.name === property.name ? field.name : property.name;
-        fields.push({ ...field, unit: property.unit, precision: property.precision, name });
-        break;
+export function pickDataOfFirstProperties(
+  properties: DisplayProperty[],
+  data?: {
+    timestamp: number;
+    values: {
+      [propName: string]: number | number[];
+    };
+  }
+) {
+  if (!data || data.timestamp < 0 || properties.length === 0) {
+    return [];
+  }
+  const { values } = data;
+  if (!values) {
+    return [];
+  }
+  return properties.map(({ name, key, unit, precision, fields }) => {
+    let value = NaN;
+    let fieldName = undefined;
+    if (Object.hasOwn(values, key)) {
+      value = roundValue(values[key] as number, precision);
+    } else if (fields && fields.length > 0) {
+      const values = fields
+        .map((f) => ({ name: f.name, value: data.values[f.key], first: f.first }))
+        .filter((f) => !!f.first);
+      if (values.length > 0) {
+        value = roundValue(values[0].value as number, precision);
+        fieldName = values[0].name;
       }
     }
+    return { name, key, value: getValue(value, unit), fieldName };
   });
-  return fields;
 }
 
 export const omitSpecificKeys = <T extends { [propName: string]: any }>(
@@ -79,24 +75,30 @@ export type Filters = {
   types?: string;
 };
 
-export function getSpecificProperties(
-  properties: Property[],
-  deviceType: number,
-  includeRemainProperties: boolean = true
-) {
-  const propertiesOfType = FIRST_CLASS_PROPERTIES.find((pro) => pro.typeId === deviceType);
-  const fieldKeysOfType = propertiesOfType ? propertiesOfType.properties : [];
-  const sorted: Property[] = [];
-  fieldKeysOfType.forEach((fieldKey) => {
-    const property = properties.find(({ fields }) =>
-      fields.map(({ key }) => key).includes(fieldKey)
-    );
-    if (property) sorted.push(property);
-  });
-  if (includeRemainProperties) {
-    properties.forEach((property) => {
-      if (!sorted.map(({ key }) => key).includes(property.key)) sorted.push(property);
-    });
+export function getDisplayProperties(properties: Property[], deviceType: DeviceType) {
+  const remotes = properties.filter((pro) => pro.key !== 'channel');
+  const dispalyPropertiesSettings =
+    SENSOR_DISPLAY_PROPERTIES[deviceType as keyof typeof SENSOR_DISPLAY_PROPERTIES];
+  if (!dispalyPropertiesSettings || dispalyPropertiesSettings.length === 0) {
+    return remotes.sort((prev, crt) => prev.sort - crt.sort) as DisplayProperty[];
+  } else {
+    return dispalyPropertiesSettings
+      .map((p) => {
+        const remote = remotes.find((r) => (p.parentKey ? r.key === p.parentKey : r.key === p.key));
+        return {
+          ...p,
+          fields:
+            p.fields ??
+            remote?.fields
+              ?.filter((f) => (p.parentKey ? f.key === p.key : true))
+              .map((f, i) => ({
+                ...f,
+                first: p.defaultFirstFieldKey
+                  ? f.key === p.defaultFirstFieldKey
+                  : i === remote?.fields.length - 1
+              }))
+        };
+      })
+      .filter((p) => !!p.fields) as DisplayProperty[];
   }
-  return sorted;
 }

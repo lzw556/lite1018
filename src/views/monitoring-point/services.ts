@@ -148,3 +148,9 @@ export function getThicknessAnalysis(id: number, from: number, to: number) {
     }>(`monitoringPoints/${id}/analysisResult?from=${from}&to=${to}`)
     .then(GetResponse);
 }
+
+export function batchDownload(id: number, type: string, timestamps: number[]) {
+  return request.download<any>(
+    `monitoringPoints/${id}/batchDownload/data?type=${type}&timestamps=${timestamps.join(',')}`
+  );
+}

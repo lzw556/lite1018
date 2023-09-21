@@ -1,7 +1,7 @@
 import { Col, Row } from 'antd';
 import { Content } from 'antd/lib/layout/layout';
-import React, { useCallback, useEffect, useState } from 'react';
-import { RangeDatePicker } from '../../components/rangeDatePicker';
+import React, { useEffect, useState } from 'react';
+import { RangeDatePicker, oneWeekNumberRange } from '../../components/rangeDatePicker';
 import ShadowCard from '../../components/shadowCard';
 import { Store, useStore } from '../../hooks/store';
 import { Permission } from '../../permission/permission';
@@ -17,7 +17,7 @@ import { Link } from 'react-router-dom';
 
 export default function ReportList() {
   const [dataSource, setDataSource] = useState<PageResult<Report[]>>();
-  const [range, setRange] = React.useState<[number, number]>();
+  const [range, setRange] = React.useState<[number, number]>(oneWeekNumberRange);
   const [store, setStore] = useStore('reportList');
 
   const fetchReports = (store: Store['reportList'], from: number, to: number) => {
@@ -86,9 +86,7 @@ export default function ReportList() {
       <ShadowCard>
         <Row gutter={[0, 20]}>
           <Col span={24}>
-            <RangeDatePicker
-              onChange={useCallback((range: [number, number]) => setRange(range), [])}
-            />
+            <RangeDatePicker onChange={setRange} />
           </Col>
           <Col span={24}>
             <TableLayout

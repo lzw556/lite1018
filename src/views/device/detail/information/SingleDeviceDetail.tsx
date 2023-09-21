@@ -6,10 +6,12 @@ import { DeviceType } from '../../../../types/device_type';
 import { SingleDeviceStatus } from '../../SingleDeviceStatus';
 import DeviceUpgradeSpin from '../../spin/deviceUpgradeSpin';
 import intl from 'react-intl-universal';
-import { toMac } from '../../../../utils/format';
+import { getDisplayName, toMac } from '../../../../utils/format';
 import { NameValueGroups } from '../../../../components/name-values';
 import { SelfLink } from '../../../../components/selfLink';
 import { isMobile } from '../../../../utils/deviceDetection';
+import { useLocaleContext } from '../../../../localeProvider';
+import { Term } from '../../../../components/term';
 
 const { Text } = Typography;
 
@@ -17,7 +19,8 @@ export const SingleDeviceDetail: React.FC<{ device: Device; upgradeStatus: any }
   device,
   upgradeStatus
 }) => {
-  const items = [
+  const { language } = useLocaleContext();
+  const items: { name: React.ReactNode; value: React.ReactNode }[] = [
     {
       name: intl.get('DEVICE_NAME'),
       value: (
@@ -53,21 +56,39 @@ export const SingleDeviceDetail: React.FC<{ device: Device; upgradeStatus: any }
       value: <SingleDeviceStatus alertStates={device.alertStates} state={device.state} />
     }
   ];
-  if (device.state && !DeviceType.isMultiChannel(device.typeId)) {
+  if (device.parentName && device.parentName.length > 0) {
     items.push({
-      name: intl.get('NETWORK_BELONG_TO'),
-      value: device.network ? device.network.name : intl.get('NONE')
+      name: intl.get('PARENT'),
+      value: device.parentName
     });
+  }
+  if (device.state && !DeviceType.isMultiChannel(device.typeId)) {
     if (device.typeId !== DeviceType.Gateway && !DeviceType.isWiredSensor(device.typeId)) {
       items.push({
-        name: `${intl.get('BATTERY_VOLTAGE')}(mV)`,
+        name: getDisplayName({ name: intl.get('BATTERY_VOLTAGE'), lang: language, suffix: 'mV' }),
         value: device.state ? device.state.batteryVoltage : '-'
       });
     }
   }
   if (!DeviceType.isWiredSensor(device.typeId)) {
     items.push({
-      name: `${intl.get('SIGNAL_STRENGTH')}(dB)`,
+      name: (
+        <Term
+          name={getDisplayName({
+            name:
+              device.typeId === DeviceType.Gateway
+                ? intl.get('MOBILE_SIGNAL_STRENGTH')
+                : intl.get('SIGNAL_STRENGTH'),
+            lang: language,
+            suffix: 'dBm'
+          })}
+          description={
+            device.typeId === DeviceType.Gateway
+              ? intl.get('MOBILE_SIGNAL_STRENGTH_DESC')
+              : intl.get('SIGNAL_STRENGTH_DESC')
+          }
+        />
+      ),
       value: device.state ? device.state.signalLevel : '-'
     });
   }

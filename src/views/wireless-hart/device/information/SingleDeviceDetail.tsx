@@ -4,11 +4,12 @@ import * as React from 'react';
 import { Device } from '../../../../types/device';
 import { DeviceType } from '../../../../types/device_type';
 import intl from 'react-intl-universal';
-import { toMac } from '../../../../utils/format';
+import { getDisplayName, toMac } from '../../../../utils/format';
 import { NameValueGroups } from '../../../../components/name-values';
 import DeviceUpgradeSpin from '../../../device/spin/deviceUpgradeSpin';
 import { SingleDeviceStatus } from '../../../device/SingleDeviceStatus';
 import { SelfLink } from '../../../../components/selfLink';
+import { useLocaleContext } from '../../../../localeProvider';
 
 const { Text } = Typography;
 
@@ -16,6 +17,7 @@ export const SingleDeviceDetail: React.FC<{ device: Device; upgradeStatus: any }
   device,
   upgradeStatus
 }) => {
+  const { language } = useLocaleContext();
   const items = [
     {
       name: intl.get('DEVICE_NAME'),
@@ -76,14 +78,14 @@ export const SingleDeviceDetail: React.FC<{ device: Device; upgradeStatus: any }
     });
     if (device.typeId !== DeviceType.Gateway) {
       items.push({
-        name: `${intl.get('BATTERY_VOLTAGE')}(mV)`,
+        name: getDisplayName({ name: intl.get('BATTERY_VOLTAGE'), lang: language, suffix: 'mV' }),
         value: device.state ? device.state.batteryVoltage : '-'
       });
     }
   }
   if (device.typeId !== DeviceType.Gateway) {
     items.push({
-      name: `${intl.get('SIGNAL_STRENGTH')}(dB)`,
+      name: getDisplayName({ name: intl.get('SIGNAL_STRENGTH'), lang: language, suffix: 'dBm' }),
       value: device.state ? device.state.signalLevel : '-'
     });
     items.push({

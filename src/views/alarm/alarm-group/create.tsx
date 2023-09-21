@@ -9,23 +9,23 @@ import { getPropertiesByMeasurementType } from './services';
 import { AlarmRule } from './types';
 import { addAlarmRule } from './services';
 import {
-  Property,
-  getSpecificProperties,
   removeDulpicateProperties,
-  MONITORING_POINT
+  MONITORING_POINT,
+  getDisplayProperties
 } from '../../monitoring-point';
 import { useAppConfigContext } from '../../asset/components/appConfigContext';
 import { MONITORING_POINTS } from '../../../config/assetCategory.config';
 import { FormInputItem } from '../../../components/formInputItem';
 import intl from 'react-intl-universal';
 import { SelfLink } from '../../../components/selfLink';
+import { DisplayProperty } from '../../../constants/properties';
 
 export default function CreateAlarmRuleGroup() {
   const navigate = useNavigate();
   const config = useAppConfigContext();
   const [form] = Form.useForm();
-  const [properties, setProperties] = React.useState<Property[]>([]);
-  const [metric, setMetric] = React.useState<{ key: string; name: string; unit: string }[]>([]);
+  const [properties, setProperties] = React.useState<DisplayProperty[]>([]);
+  const [metric, setMetric] = React.useState<{ key: string; name: string; unit?: string }[]>([]);
   const [disabled, setDisabled] = React.useState(true);
   const [smallSize, setSmallSize] = React.useState(window.innerWidth < 1500);
 
@@ -68,7 +68,7 @@ export default function CreateAlarmRuleGroup() {
                   if (measurementType) {
                     setDisabled(false);
                     setProperties(
-                      removeDulpicateProperties(getSpecificProperties(res, measurementType))
+                      removeDulpicateProperties(getDisplayProperties(res, measurementType))
                     );
                   }
                 });
@@ -111,351 +111,350 @@ export default function CreateAlarmRuleGroup() {
           <Form.List name='rules' initialValue={[0]}>
             {(fields, { add, remove }) => (
               <>
-                {fields.map(({ key, name, ...restFields }, index) => (
-                  <div key={key} style={{ position: 'relative' }}>
-                    {!smallSize && (
-                      <>
-                        <FormInputItem
-                          label={intl.get('NAME')}
-                          {...restFields}
-                          name={[name, 'name']}
-                          dependencies={index === 0 ? undefined : ['user', index - 1, 'name']}
-                          requiredMessage={intl.get('PLEASE_ENTER_NAME')}
-                          lengthLimit={{
-                            min: 4,
-                            max: 16,
-                            label: intl.get('NAME').toLowerCase()
-                          }}
-                        >
-                          <Input
-                            placeholder={intl.get('PLEASE_ENTER_NAME')}
-                            style={{ width: isMobile ? '75%' : 435 }}
-                          />
-                        </FormInputItem>
-                        <Row>
-                          {properties && properties.length > 0 && (
-                            <Col xl={6} offset={1}>
+                {fields.map(({ key, name, ...restFields }, index) => {
+                  let unitText = '';
+                  if (metric.length > 0 && metric[index] && metric[index].unit) {
+                    const unit = metric[index].unit as string;
+                    unitText = intl.get(unit).d(unit);
+                  }
+
+                  return (
+                    <div key={key} style={{ position: 'relative' }}>
+                      {!smallSize && (
+                        <>
+                          <FormInputItem
+                            label={intl.get('NAME')}
+                            {...restFields}
+                            name={[name, 'name']}
+                            dependencies={index === 0 ? undefined : ['user', index - 1, 'name']}
+                            requiredMessage={intl.get('PLEASE_ENTER_NAME')}
+                            lengthLimit={{
+                              min: 4,
+                              max: 16,
+                              label: intl.get('NAME').toLowerCase()
+                            }}
+                          >
+                            <Input
+                              placeholder={intl.get('PLEASE_ENTER_NAME')}
+                              style={{ width: isMobile ? '75%' : 435 }}
+                            />
+                          </FormInputItem>
+                          <Row>
+                            {properties && properties.length > 0 && (
+                              <Col xl={6} offset={1}>
+                                <Form.Item
+                                  labelCol={{ span: 8 }}
+                                  {...restFields}
+                                  name={[name, 'index']}
+                                  label={intl.get('INDEX')}
+                                  rules={[
+                                    {
+                                      required: true,
+                                      message: intl.get('PLEASE_SELECT_INDEX_NAME')
+                                    }
+                                  ]}
+                                  style={{ marginBottom: 0 }}
+                                >
+                                  <Cascader
+                                    disabled={disabled}
+                                    style={{ width: '100%' }}
+                                    popupClassName='alarm-rule-creation-cascader'
+                                    onChange={(e, selectOptions) => {
+                                      if (e !== undefined) {
+                                        const property = properties.find(({ key }) => key === e[0]);
+                                        if (property) {
+                                          const selected = e.length === 1 ? [...e, ...e] : e;
+                                          const metric = {
+                                            key: selected.join('.'),
+                                            name: selectOptions.map(({ name }) => name).join(':'),
+                                            unit: property.unit
+                                              ? intl.get(property.unit).d(property.unit)
+                                              : property.unit
+                                          };
+                                          setMetric((prev) => {
+                                            if (prev.length === 0) {
+                                              return [metric];
+                                            } else if (prev.length < index + 1) {
+                                              return [...prev, metric];
+                                            } else {
+                                              return prev.map((item, n) => {
+                                                if (n === index) {
+                                                  return metric;
+                                                } else {
+                                                  return item;
+                                                }
+                                              });
+                                            }
+                                          });
+                                        }
+                                      }
+                                    }}
+                                    options={properties.map((p) => ({
+                                      ...p,
+                                      label: intl.get(p.name),
+                                      fields: p.fields?.map((field) => ({
+                                        ...field,
+                                        label: intl.get(field.name)
+                                      }))
+                                    }))}
+                                    fieldNames={{ value: 'key', children: 'fields' }}
+                                  />
+                                </Form.Item>
+                              </Col>
+                            )}
+                            <Col xl={6} offset={properties.length === 0 ? 1 : 0}>
+                              <FormInputItem
+                                labelCol={{ span: 8 }}
+                                label={intl.get('DURATION')}
+                                {...restFields}
+                                name={[name, 'duration']}
+                                requiredMessage={intl.get('PLEASE_ENTER_SOMETHING', {
+                                  something: intl.get('DURATION')
+                                })}
+                                numericRule={{
+                                  isInteger: true,
+                                  min: 1,
+                                  message: intl.get('UNSIGNED_INTEGER_ENTER_PROMPT')
+                                }}
+                                initialValue={1}
+                                style={{ marginBottom: 0 }}
+                              />
+                            </Col>
+                            <Col xl={6}>
+                              <FormInputItem
+                                labelCol={{ span: 8 }}
+                                label={intl.get('CONDITION')}
+                                style={{ marginBottom: 0 }}
+                                {...restFields}
+                                name={[name, 'threshold']}
+                                requiredMessage={intl.get('PLEASE_ENTER_SOMETHING', {
+                                  something: intl.get('CONDITION')
+                                })}
+                                numericRule={{
+                                  isInteger: false
+                                }}
+                                numericChildren={
+                                  <InputNumber
+                                    addonBefore={
+                                      <Form.Item
+                                        {...restFields}
+                                        name={[name, 'operation']}
+                                        noStyle
+                                        initialValue={'>='}
+                                      >
+                                        <Select style={{ width: 65 }}>
+                                          <Select.Option key={'>'} value={'>'}>
+                                            &gt;
+                                          </Select.Option>
+                                          <Select.Option key={'>='} value={'>='}>
+                                            &gt;=
+                                          </Select.Option>
+                                          <Select.Option key={'<'} value={'<'}>
+                                            &lt;
+                                          </Select.Option>
+                                          <Select.Option key={'<='} value={'<='}>
+                                            &lt;=
+                                          </Select.Option>
+                                        </Select>
+                                      </Form.Item>
+                                    }
+                                    controls={false}
+                                    addonAfter={unitText}
+                                  />
+                                }
+                              />
+                            </Col>
+                            <Col xl={5}>
                               <Form.Item
                                 labelCol={{ span: 8 }}
+                                label={intl.get('SEVERITY')}
                                 {...restFields}
-                                name={[name, 'index']}
-                                label={intl.get('INDEX')}
-                                rules={[
-                                  { required: true, message: intl.get('PLEASE_SELECT_INDEX_NAME') }
-                                ]}
+                                name={[name, 'level']}
+                                initialValue={3}
                                 style={{ marginBottom: 0 }}
                               >
-                                <Cascader
-                                  disabled={disabled}
-                                  style={{ width: '100%' }}
-                                  popupClassName='alarm-rule-creation-cascader'
-                                  onChange={(e, selectOptions) => {
-                                    if (e !== undefined) {
-                                      const property = properties.find(({ key }) => key === e[0]);
-                                      if (property) {
-                                        const selected = e.length === 1 ? [...e, ...e] : e;
-                                        const metric = {
-                                          key: selected.join('.'),
-                                          name: selectOptions.map(({ name }) => name).join(':'),
-                                          unit: property.unit
-                                            ? intl.get(property.unit).d(property.unit)
-                                            : property.unit
-                                        };
-                                        setMetric((prev) => {
-                                          if (prev.length === 0) {
-                                            return [metric];
-                                          } else if (prev.length < index + 1) {
-                                            return [...prev, metric];
-                                          } else {
-                                            return prev.map((item, n) => {
-                                              if (n === index) {
-                                                return metric;
-                                              } else {
-                                                return item;
-                                              }
-                                            });
-                                          }
-                                        });
-                                      }
-                                    }
-                                  }}
-                                  options={properties.map((p) => ({
-                                    ...p,
-                                    label: intl.get(p.name),
-                                    fields: p.fields.map((field) => ({
-                                      ...field,
-                                      label: intl.get(field.name)
-                                    }))
-                                  }))}
-                                  fieldNames={{ value: 'key', children: 'fields' }}
-                                />
+                                <Select style={{ width: 120 }}>
+                                  <Select.Option key={1} value={1}>
+                                    {intl.get('ALARM_LEVEL_MINOR')}
+                                  </Select.Option>
+                                  <Select.Option key={2} value={2}>
+                                    {intl.get('ALARM_LEVEL_MAJOR')}
+                                  </Select.Option>
+                                  <Select.Option key={3} value={3}>
+                                    {intl.get('ALARM_LEVEL_CRITICAL')}
+                                  </Select.Option>
+                                </Select>
                               </Form.Item>
                             </Col>
-                          )}
-                          <Col xl={6} offset={properties.length === 0 ? 1 : 0}>
-                            <FormInputItem
-                              labelCol={{ span: 8 }}
-                              label={intl.get('DURATION')}
-                              {...restFields}
-                              name={[name, 'duration']}
-                              requiredMessage={intl.get('PLEASE_ENTER_SOMETHING', {
-                                something: intl.get('DURATION')
-                              })}
-                              numericRule={{
-                                isInteger: true,
-                                min: 1,
-                                message: intl.get('UNSIGNED_INTEGER_ENTER_PROMPT')
-                              }}
-                              initialValue={1}
-                              style={{ marginBottom: 0 }}
-                            />
-                          </Col>
-                          <Col xl={6}>
-                            <FormInputItem
-                              labelCol={{ span: 8 }}
-                              label={intl.get('CONDITION')}
-                              style={{ marginBottom: 0 }}
-                              {...restFields}
-                              name={[name, 'threshold']}
-                              requiredMessage={intl.get('PLEASE_ENTER_SOMETHING', {
-                                something: intl.get('CONDITION')
-                              })}
-                              numericRule={{
-                                isInteger: false
-                              }}
-                              numericChildren={
-                                <InputNumber
-                                  addonBefore={
-                                    <Form.Item
-                                      {...restFields}
-                                      name={[name, 'operation']}
-                                      noStyle
-                                      initialValue={'>='}
-                                    >
-                                      <Select style={{ width: 65 }}>
-                                        <Select.Option key={'>'} value={'>'}>
-                                          &gt;
-                                        </Select.Option>
-                                        <Select.Option key={'>='} value={'>='}>
-                                          &gt;=
-                                        </Select.Option>
-                                        <Select.Option key={'<'} value={'<'}>
-                                          &lt;
-                                        </Select.Option>
-                                        <Select.Option key={'<='} value={'<='}>
-                                          &lt;=
-                                        </Select.Option>
-                                      </Select>
-                                    </Form.Item>
-                                  }
-                                  controls={false}
-                                  addonAfter={
-                                    metric.length > 0 && metric[index]
-                                      ? metric[index].unit
-                                        ? intl.get(metric[index].unit).d(metric[index].unit)
-                                        : metric[index].unit
-                                      : ''
-                                  }
-                                />
-                              }
-                            />
-                          </Col>
-                          <Col xl={5}>
-                            <Form.Item
-                              labelCol={{ span: 8 }}
-                              label={intl.get('SEVERITY')}
-                              {...restFields}
-                              name={[name, 'level']}
-                              initialValue={3}
-                              style={{ marginBottom: 0 }}
-                            >
-                              <Select style={{ width: 120 }}>
-                                <Select.Option key={1} value={1}>
-                                  {intl.get('ALARM_LEVEL_MINOR')}
-                                </Select.Option>
-                                <Select.Option key={2} value={2}>
-                                  {intl.get('ALARM_LEVEL_MAJOR')}
-                                </Select.Option>
-                                <Select.Option key={3} value={3}>
-                                  {intl.get('ALARM_LEVEL_CRITICAL')}
-                                </Select.Option>
-                              </Select>
-                            </Form.Item>
-                          </Col>
-                        </Row>
-                      </>
-                    )}
-                    {smallSize && (
-                      <>
-                        <FormInputItem
-                          label={intl.get('NAME')}
-                          {...restFields}
-                          name={[name, 'name']}
-                          dependencies={index === 0 ? undefined : ['user', index - 1, 'name']}
-                          requiredMessage={intl.get('PLEASE_ENTER_NAME')}
-                          lengthLimit={{
-                            min: 4,
-                            max: 16,
-                            label: intl.get('NAME').toLowerCase()
-                          }}
-                        >
-                          <Input
-                            placeholder={intl.get('PLEASE_ENTER_NAME')}
-                            style={{ width: isMobile ? '75%' : 435 }}
-                          />
-                        </FormInputItem>
-                        {properties && properties.length > 0 && (
-                          <Form.Item
+                          </Row>
+                        </>
+                      )}
+                      {smallSize && (
+                        <>
+                          <FormInputItem
+                            label={intl.get('NAME')}
                             {...restFields}
-                            name={[name, 'index']}
-                            label={intl.get('INDEX')}
-                            rules={[
-                              { required: true, message: intl.get('PLEASE_SELECT_INDEX_NAME') }
-                            ]}
+                            name={[name, 'name']}
+                            dependencies={index === 0 ? undefined : ['user', index - 1, 'name']}
+                            requiredMessage={intl.get('PLEASE_ENTER_NAME')}
+                            lengthLimit={{
+                              min: 4,
+                              max: 16,
+                              label: intl.get('NAME').toLowerCase()
+                            }}
                           >
-                            <Cascader
-                              disabled={disabled}
-                              popupClassName='alarm-rule-creation-cascader'
+                            <Input
+                              placeholder={intl.get('PLEASE_ENTER_NAME')}
                               style={{ width: isMobile ? '75%' : 435 }}
-                              onChange={(e, selectOptions) => {
-                                if (e !== undefined) {
-                                  const property = properties.find(({ key }) => key === e[0]);
-                                  if (property) {
-                                    const selected = e.length === 1 ? [...e, ...e] : e;
-                                    const metric = {
-                                      key: selected.join('.'),
-                                      name: selectOptions.map(({ name }) => name).join(':'),
-                                      unit: property.unit
-                                        ? intl.get(property.unit).d(property.unit)
-                                        : property.unit
-                                    };
-                                    setMetric((prev) => {
-                                      if (prev.length === 0) {
-                                        return [metric];
-                                      } else if (prev.length < index + 1) {
-                                        return [...prev, metric];
-                                      } else {
-                                        return prev.map((item, n) => {
-                                          if (n === index) {
-                                            return metric;
-                                          } else {
-                                            return item;
-                                          }
-                                        });
-                                      }
-                                    });
+                            />
+                          </FormInputItem>
+                          {properties && properties.length > 0 && (
+                            <Form.Item
+                              {...restFields}
+                              name={[name, 'index']}
+                              label={intl.get('INDEX')}
+                              rules={[
+                                { required: true, message: intl.get('PLEASE_SELECT_INDEX_NAME') }
+                              ]}
+                            >
+                              <Cascader
+                                disabled={disabled}
+                                popupClassName='alarm-rule-creation-cascader'
+                                style={{ width: isMobile ? '75%' : 435 }}
+                                onChange={(e, selectOptions) => {
+                                  if (e !== undefined) {
+                                    const property = properties.find(({ key }) => key === e[0]);
+                                    if (property) {
+                                      const selected = e.length === 1 ? [...e, ...e] : e;
+                                      const metric = {
+                                        key: selected.join('.'),
+                                        name: selectOptions.map(({ name }) => name).join(':'),
+                                        unit: property.unit
+                                          ? intl.get(property.unit).d(property.unit)
+                                          : property.unit
+                                      };
+                                      setMetric((prev) => {
+                                        if (prev.length === 0) {
+                                          return [metric];
+                                        } else if (prev.length < index + 1) {
+                                          return [...prev, metric];
+                                        } else {
+                                          return prev.map((item, n) => {
+                                            if (n === index) {
+                                              return metric;
+                                            } else {
+                                              return item;
+                                            }
+                                          });
+                                        }
+                                      });
+                                    }
                                   }
+                                }}
+                                options={properties.map((p) => ({
+                                  ...p,
+                                  label: intl.get(p.name),
+                                  fields: p.fields?.map((field) => ({
+                                    ...field,
+                                    label: intl.get(field.name)
+                                  }))
+                                }))}
+                                fieldNames={{ value: 'key', children: 'fields' }}
+                              />
+                            </Form.Item>
+                          )}
+                          <FormInputItem
+                            label={intl.get('DURATION')}
+                            {...restFields}
+                            name={[name, 'duration']}
+                            requiredMessage={intl.get('PLEASE_ENTER_SOMETHING', {
+                              something: intl.get('DURATION')
+                            })}
+                            numericRule={{
+                              isInteger: true,
+                              min: 1,
+                              message: intl.get('UNSIGNED_INTEGER_ENTER_PROMPT')
+                            }}
+                            initialValue={1}
+                            numericChildren={
+                              <InputNumber
+                                controls={false}
+                                style={{ width: isMobile ? '75%' : 435 }}
+                              />
+                            }
+                          />
+                          <FormInputItem
+                            label={intl.get('CONDITION')}
+                            {...restFields}
+                            name={[name, 'threshold']}
+                            requiredMessage={intl.get('PLEASE_ENTER_SOMETHING', {
+                              something: intl.get('CONDITION')
+                            })}
+                            numericRule={{
+                              isInteger: false
+                            }}
+                            numericChildren={
+                              <InputNumber
+                                style={{ width: isMobile ? '75%' : 435 }}
+                                addonBefore={
+                                  <Form.Item
+                                    {...restFields}
+                                    name={[name, 'operation']}
+                                    noStyle
+                                    initialValue={'>='}
+                                  >
+                                    <Select style={{ width: 65 }}>
+                                      <Select.Option key={'>'} value={'>'}>
+                                        &gt;
+                                      </Select.Option>
+                                      <Select.Option key={'>='} value={'>='}>
+                                        &gt;=
+                                      </Select.Option>
+                                      <Select.Option key={'<'} value={'<'}>
+                                        &lt;
+                                      </Select.Option>
+                                      <Select.Option key={'<='} value={'<='}>
+                                        &lt;=
+                                      </Select.Option>
+                                    </Select>
+                                  </Form.Item>
                                 }
-                              }}
-                              options={properties.map((p) => ({
-                                ...p,
-                                label: intl.get(p.name),
-                                fields: p.fields.map((field) => ({
-                                  ...field,
-                                  label: intl.get(field.name)
-                                }))
-                              }))}
-                              fieldNames={{ value: 'key', children: 'fields' }}
-                            />
+                                controls={false}
+                                addonAfter={unitText}
+                              />
+                            }
+                          />
+                          <Form.Item
+                            label={intl.get('SEVERITY')}
+                            {...restFields}
+                            name={[name, 'level']}
+                            initialValue={3}
+                          >
+                            <Select style={{ width: isMobile ? '75%' : 435 }}>
+                              <Select.Option key={1} value={1}>
+                                {intl.get('ALARM_LEVEL_MINOR')}
+                              </Select.Option>
+                              <Select.Option key={2} value={2}>
+                                {intl.get('ALARM_LEVEL_MAJOR')}
+                              </Select.Option>
+                              <Select.Option key={3} value={3}>
+                                {intl.get('ALARM_LEVEL_CRITICAL')}
+                              </Select.Option>
+                            </Select>
                           </Form.Item>
-                        )}
-                        <FormInputItem
-                          label={intl.get('DURATION')}
-                          {...restFields}
-                          name={[name, 'duration']}
-                          requiredMessage={intl.get('PLEASE_ENTER_SOMETHING', {
-                            something: intl.get('DURATION')
-                          })}
-                          numericRule={{
-                            isInteger: true,
-                            min: 1,
-                            message: intl.get('UNSIGNED_INTEGER_ENTER_PROMPT')
-                          }}
-                          initialValue={1}
-                          numericChildren={
-                            <InputNumber
-                              controls={false}
-                              style={{ width: isMobile ? '75%' : 435 }}
-                            />
-                          }
+                        </>
+                      )}
+                      {name !== 0 && (
+                        <Button
+                          icon={<MinusCircleOutlined />}
+                          style={{ position: 'absolute', top: 0, left: '80%' }}
+                          onClick={() => remove(name)}
                         />
-                        <FormInputItem
-                          label={intl.get('CONDITION')}
-                          {...restFields}
-                          name={[name, 'threshold']}
-                          requiredMessage={intl.get('PLEASE_ENTER_SOMETHING', {
-                            something: intl.get('CONDITION')
-                          })}
-                          numericRule={{
-                            isInteger: false
-                          }}
-                          numericChildren={
-                            <InputNumber
-                              style={{ width: isMobile ? '75%' : 435 }}
-                              addonBefore={
-                                <Form.Item
-                                  {...restFields}
-                                  name={[name, 'operation']}
-                                  noStyle
-                                  initialValue={'>='}
-                                >
-                                  <Select style={{ width: 65 }}>
-                                    <Select.Option key={'>'} value={'>'}>
-                                      &gt;
-                                    </Select.Option>
-                                    <Select.Option key={'>='} value={'>='}>
-                                      &gt;=
-                                    </Select.Option>
-                                    <Select.Option key={'<'} value={'<'}>
-                                      &lt;
-                                    </Select.Option>
-                                    <Select.Option key={'<='} value={'<='}>
-                                      &lt;=
-                                    </Select.Option>
-                                  </Select>
-                                </Form.Item>
-                              }
-                              controls={false}
-                              addonAfter={
-                                metric.length > 0 && metric[index]
-                                  ? metric[index].unit
-                                    ? intl.get(metric[index].unit).d(metric[index].unit)
-                                    : metric[index].unit
-                                  : ''
-                              }
-                            />
-                          }
-                        />
-                        <Form.Item
-                          label={intl.get('SEVERITY')}
-                          {...restFields}
-                          name={[name, 'level']}
-                          initialValue={3}
-                        >
-                          <Select style={{ width: isMobile ? '75%' : 435 }}>
-                            <Select.Option key={1} value={1}>
-                              {intl.get('ALARM_LEVEL_MINOR')}
-                            </Select.Option>
-                            <Select.Option key={2} value={2}>
-                              {intl.get('ALARM_LEVEL_MAJOR')}
-                            </Select.Option>
-                            <Select.Option key={3} value={3}>
-                              {intl.get('ALARM_LEVEL_CRITICAL')}
-                            </Select.Option>
-                          </Select>
-                        </Form.Item>
-                      </>
-                    )}
-                    {name !== 0 && (
-                      <Button
-                        icon={<MinusCircleOutlined />}
-                        style={{ position: 'absolute', top: 0, left: '80%' }}
-                        onClick={() => remove(name)}
-                      />
-                    )}
-                    <Divider />
-                  </div>
-                ))}
+                      )}
+                      <Divider />
+                    </div>
+                  );
+                })}
                 <Form.Item wrapperCol={{ offset: isMobile ? 0 : 3 }}>
                   <Button onClick={() => add()}>{intl.get('CREATE_ALARM_RULE')}</Button>
                 </Form.Item>

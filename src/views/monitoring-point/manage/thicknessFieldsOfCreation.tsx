@@ -3,6 +3,8 @@ import React from 'react';
 import intl from 'react-intl-universal';
 import { FormInputItem } from '../../../components/formInputItem';
 import { ThicknessAttributeFormItem } from './thicknessAttributeFormItem';
+import { getDisplayName } from '../../../utils/format';
+import { useLocaleContext } from '../../../localeProvider';
 
 export const ThicknessFieldsOfCreation = ({
   name,
@@ -13,6 +15,7 @@ export const ThicknessFieldsOfCreation = ({
     fieldKey?: number | undefined;
   };
 }) => {
+  const { language } = useLocaleContext();
   return (
     <>
       <ThicknessAttributeFormItem
@@ -27,7 +30,11 @@ export const ThicknessFieldsOfCreation = ({
       />
       <Form.Item
         required
-        label={`${intl.get('FIELD_CORROSION_RATE')}(${intl.get('UNIT_DAY')})`}
+        label={getDisplayName({
+          name: intl.get('FIELD_CORROSION_RATE'),
+          suffix: intl.get('UNIT_DAY'),
+          lang: language
+        })}
         style={{ marginBottom: 0 }}
       >
         <FormInputItem

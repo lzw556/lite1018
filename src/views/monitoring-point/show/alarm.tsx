@@ -18,6 +18,7 @@ import { MonitoringPointRow } from '../types';
 import intl from 'react-intl-universal';
 import { translateMetricName } from '../../alarm/alarm-group';
 import { SelfLink } from '../../../components/selfLink';
+import { getValue } from '../../../utils/format';
 
 export const AlarmRuleSetting = (point: MonitoringPointRow) => {
   const [allRules, setAllRules] = React.useState<AlarmRule[]>();
@@ -40,7 +41,7 @@ export const AlarmRuleSetting = (point: MonitoringPointRow) => {
           dataIndex: 'condition',
           key: 'condition',
           render: (_: any, record: any) => {
-            return `${record.operation} ${record.threshold} ${record.metric.unit}`;
+            return `${record.operation} ${getValue(record.threshold, record.metric.unit)} `;
           },
           width: 150
         },

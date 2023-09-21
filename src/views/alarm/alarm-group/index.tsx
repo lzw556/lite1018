@@ -29,6 +29,7 @@ import { AssertAssetCategory, AssertOfAssetCategory } from '../../asset';
 import { BindMonitoringPoints2 } from './bindMonitoringPoints2';
 import { SelfLink } from '../../../components/selfLink';
 import { isMobile } from '../../../utils/deviceDetection';
+import { getValue } from '../../../utils/format';
 
 export default function AlarmRuleList() {
   const config = useAppConfigContext();
@@ -276,4 +277,22 @@ export function translateMetricName(name: string) {
   } else {
     return intl.get(name);
   }
+}
+
+export function getAlarmDetail(
+  record: { operation: string; threshold: number; value: number },
+  metric: {
+    name: string;
+
+    unit: string;
+    value: number;
+  }
+) {
+  const { operation, threshold, value } = record;
+  const { name, unit } = metric;
+  const thres = getValue(threshold, unit);
+  const alarmValue = getValue(value, unit);
+  return `${translateMetricName(name)} ${operation} ${thres} ${intl.get(
+    'ALARM_VALUE'
+  )}: ${alarmValue}`;
 }

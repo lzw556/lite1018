@@ -46,7 +46,7 @@ export const CircleChart = ({
     datas: transformedData,
     titles: [
       intl.get('SCATTERGRAM'),
-      intl.get('FIELD_DISPLACEMENT_RADIAL'),
+      `${intl.get('FIELD_DISPLACEMENT_RADIAL')}${intl.get('FIELD_DISPLACEMENT')}`,
       intl.get('FIELD_DIRECTION')
     ],
     lang: language,

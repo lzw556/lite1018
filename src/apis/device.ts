@@ -3,6 +3,7 @@ import { PageResult } from '../types/page';
 import { Device } from '../types/device';
 import { DeleteResponse, GetResponse, PostResponse, PutResponse } from '../utils/response';
 import { AlarmRule } from '../types/alarm_rule_template';
+import { HistoryData } from '../views/monitoring-point';
 
 export function CheckMacAddressRequest(mac: string) {
   return request.get(`/check/devices/${mac}`).then(GetResponse);
@@ -42,11 +43,27 @@ export function DeleteDeviceRequest(id: number) {
 }
 
 export function FindDeviceDataRequest(id: number, from: number, to: number, filters: any) {
-  return request.get<any>(`/devices/${id}/data`, { from, to, ...filters }).then(GetResponse);
+  return request
+    .get<HistoryData>(`/devices/${id}/data`, { from, to, ...filters })
+    .then(GetResponse);
+}
+
+export interface DeviceWaveData {
+  timestamp: number;
+  values: {
+    frequency: number;
+    highEnvelopes: number[];
+    lowEnvelopes: number[];
+    values: number[];
+    xAxis: number[];
+    xAxisUnit: string;
+  };
 }
 
 export function GetDeviceDataRequest(id: number, timestamp: number, filters: any) {
-  return request.get<any>(`/devices/${id}/data/${timestamp}`, { ...filters }).then(GetResponse);
+  return request
+    .get<DeviceWaveData>(`/devices/${id}/data/${timestamp}`, { ...filters })
+    .then(GetResponse);
 }
 
 export function DownloadDeviceDataRequest(
@@ -93,7 +110,12 @@ export function GetDefaultDeviceSettingsRequest(type: number) {
 }
 
 export function GetDeviceRuntimeRequest(id: number, from: number, to: number) {
-  return request.get<any>(`/devices/${id}/runtime`, { from, to }).then(GetResponse);
+  return request
+    .get<{ batteryVoltage: number; signalStrength: number; timestamp: number }[]>(
+      `/devices/${id}/runtime`,
+      { from, to }
+    )
+    .then(GetResponse);
 }
 
 export function GetDeviceEventsRequest(id: number, from: number, to: number) {

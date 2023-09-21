@@ -11,3 +11,9 @@ tbody.ant-table-tbody > tr.ant-table-row:hover > td {
   width: initial;
   border: initial;
 }
+.ant-statistic.multi-axis-property-statistic
+  > .ant-statistic-content
+  > .ant-statistic-content-value {
+  font-size: 14px;
+  vertical-align: top;
+}

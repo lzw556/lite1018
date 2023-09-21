@@ -62,7 +62,7 @@ const AddNetworkModal: FC<AddNetworkModalProps> = (props) => {
       cancelText={intl.get('CANCEL')}
       confirmLoading={isLoading}
     >
-      <Form form={form} labelCol={{ span: 7 }}>
+      <Form form={form} labelCol={{ span: 9 }}>
         <fieldset>
           <legend>{intl.get('BASIC_INFORMATION')}</legend>
 

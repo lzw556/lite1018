@@ -1,3 +1,5 @@
+import { PROPERTY_CATEGORIES } from '../constants/properties';
+
 export enum DeviceType {
   Gateway = 1,
   Router = 257,
@@ -8,13 +10,15 @@ export enum DeviceType {
   BoltElongation8Channels = 196612,
   NormalTemperatureCorrosion = 262145,
   HighTemperatureCorrosion = 262401,
-  VibrationTemperature3Axis = 327938,
-  VibrationTemperature3AxisAdvanced = 327940,
+  SVT210R = 327938,
+  SVT220520 = 327940,
   VibrationTemperature3AxisNB = 327941,
   VibrationTemperature3AxisAdvancedNB = 327942,
-  VibrationTemperature3Axis16G = 327943,
-  VibrationTemperature3AxisWIRED = 328193,
-  VibrationTemperature3Axis16GWIRED = 328194,
+  SVT210510 = 327943,
+  SVT210RS = 328193,
+  SVT210S = 328194,
+  SVT220S1 = 328195,
+  SVT220S3 = 328196,
   Temperature = 393217,
   TemperatureWIRED = 393473,
   Pressure = 524289,
@@ -47,20 +51,24 @@ export namespace DeviceType {
         return 'DEVICE_TYPE_HIGH_TEMPATURE_CORROSION';
       case DeviceType.NormalTemperatureCorrosion:
         return 'DEVICE_TYPE_CORROSION';
-      case DeviceType.VibrationTemperature3Axis:
-        return 'DEVICE_TYPE_VIBRATION';
+      case DeviceType.SVT210R:
+        return 'DEVICE_TYPE_SVT210R';
       case DeviceType.VibrationTemperature3AxisNB:
         return 'DEVICE_TYPE_VIBRATION_NB';
-      case DeviceType.VibrationTemperature3AxisAdvanced:
-        return 'DEVICE_TYPE_VIBRATION_PRO';
+      case DeviceType.SVT220520:
+        return 'DEVICE_TYPE_SVT220520';
       case DeviceType.VibrationTemperature3AxisAdvancedNB:
         return 'DEVICE_TYPE_VIBRATION_PRO_NB';
-      case DeviceType.VibrationTemperature3Axis16G:
-        return 'DEVICE_TYPE_VIBRATION_16G';
-      case DeviceType.VibrationTemperature3Axis16GWIRED:
-        return 'DEVICE_TYPE_WIRED_VIBRATION_16G';
-      case DeviceType.VibrationTemperature3AxisWIRED:
-        return 'DEVICE_TYPE_WIRED_VIBRATION';
+      case DeviceType.SVT210510:
+        return 'DEVICE_TYPE_SVT210510';
+      case DeviceType.SVT210S:
+        return 'DEVICE_TYPE_SVT210S';
+      case DeviceType.SVT210RS:
+        return 'DEVICE_TYPE_SVT210RS';
+      case DeviceType.SVT220S1:
+        return 'DEVICE_TYPE_SVT220S1';
+      case DeviceType.SVT220S3:
+        return 'DEVICE_TYPE_SVT220S3';
       case DeviceType.Temperature:
         return 'DEVICE_TYPE_TEMPERATURE';
       case DeviceType.TemperatureWIRED:
@@ -93,13 +101,15 @@ export namespace DeviceType {
       DeviceType.BoltElongation8Channels,
       DeviceType.NormalTemperatureCorrosion,
       DeviceType.HighTemperatureCorrosion,
-      DeviceType.VibrationTemperature3Axis,
-      DeviceType.VibrationTemperature3AxisAdvanced,
+      DeviceType.SVT210R,
+      DeviceType.SVT220520,
       DeviceType.VibrationTemperature3AxisNB,
       DeviceType.VibrationTemperature3AxisAdvancedNB,
-      DeviceType.VibrationTemperature3Axis16G,
-      DeviceType.VibrationTemperature3AxisWIRED,
-      DeviceType.VibrationTemperature3Axis16GWIRED,
+      DeviceType.SVT210510,
+      DeviceType.SVT210RS,
+      DeviceType.SVT210S,
+      DeviceType.SVT220S1,
+      DeviceType.SVT220S3,
       DeviceType.Temperature,
       DeviceType.TemperatureWIRED,
       DeviceType.Pressure,
@@ -142,11 +152,49 @@ export namespace DeviceType {
   export function isWiredSensor(type: number) {
     return (
       type === DeviceType.BoltLooseningWIRED ||
-      type === DeviceType.VibrationTemperature3AxisWIRED ||
+      type === DeviceType.SVT210RS ||
       type === DeviceType.TemperatureWIRED ||
       type === DeviceType.PressureTemperatureWIRED ||
-      type === DeviceType.VibrationTemperature3Axis16GWIRED ||
+      type === DeviceType.SVT210S ||
+      type === DeviceType.SVT220S1 ||
+      type === DeviceType.SVT220S3 ||
       (isMultiChannel(type) as boolean)
     );
   }
+
+  export function isVibration(type: DeviceType | undefined) {
+    switch (type) {
+      case DeviceType.SVT210R:
+      case DeviceType.SVT220520:
+      case DeviceType.VibrationTemperature3AxisNB:
+      case DeviceType.VibrationTemperature3AxisAdvancedNB:
+      case DeviceType.SVT210510:
+      case DeviceType.SVT210RS:
+      case DeviceType.SVT210S:
+      case DeviceType.SVT220S1:
+      case DeviceType.SVT220S3:
+        return true;
+    }
+    return false;
+  }
 }
+
+export const SENSOR_DISPLAY_PROPERTIES = {
+  [DeviceType.BoltLoosening]: PROPERTY_CATEGORIES.SA,
+  [DeviceType.BoltLooseningWIRED]: PROPERTY_CATEGORIES.SA,
+  [DeviceType.BoltElongation]: PROPERTY_CATEGORIES.SAS,
+  [DeviceType.BoltElongation4Channels]: PROPERTY_CATEGORIES.DS,
+  [DeviceType.BoltElongation8Channels]: PROPERTY_CATEGORIES.DS,
+  [DeviceType.NormalTemperatureCorrosion]: PROPERTY_CATEGORIES.DC_NORMAL,
+  [DeviceType.HighTemperatureCorrosion]: PROPERTY_CATEGORIES.DC_HIGH,
+  [DeviceType.SVT210R]: PROPERTY_CATEGORIES.SVT210R,
+  [DeviceType.SVT210510]: PROPERTY_CATEGORIES.SVT210510,
+  [DeviceType.SVT220520]: PROPERTY_CATEGORIES.SVT220520,
+  [DeviceType.SVT210RS]: PROPERTY_CATEGORIES.SVT210RS,
+  [DeviceType.SVT210S]: PROPERTY_CATEGORIES.SVT220S1S3,
+  [DeviceType.SVT220S1]: PROPERTY_CATEGORIES.SVT220S1S3,
+  [DeviceType.SVT220S3]: PROPERTY_CATEGORIES.SVT220S1S3,
+  [DeviceType.Temperature]: PROPERTY_CATEGORIES.ST,
+  [DeviceType.PressureTemperature]: PROPERTY_CATEGORIES.SPT,
+  [DeviceType.AngleDip]: PROPERTY_CATEGORIES.SQ
+};

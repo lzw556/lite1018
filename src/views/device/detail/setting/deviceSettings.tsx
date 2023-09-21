@@ -38,7 +38,7 @@ const DeviceSettings: FC<DeviceSettingsProps> = ({ device }) => {
     <Skeleton loading={isLoading}>
       <Row justify={'start'}>
         <Col xxl={10} xl={13} xs={24}>
-          <Form form={form} labelCol={{ xl: 7, xxl: 6 }}>
+          <Form form={form} labelCol={{ xl: 9, xxl: 9 }}>
             <DeviceSettingContent deviceType={device.typeId} settings={settings} />
           </Form>
         </Col>

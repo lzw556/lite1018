@@ -19,7 +19,7 @@ import Label from '../label';
 import { RangeDatePicker } from '../rangeDatePicker';
 import { Store, useStore } from '../../hooks/store';
 import intl from 'react-intl-universal';
-import { translateMetricName } from '../../views/alarm/alarm-group';
+import { getAlarmDetail } from '../../views/alarm/alarm-group';
 
 const { Option } = Select;
 
@@ -178,11 +178,7 @@ export const FilterableAlarmRecordTable: React.FC<{
       dataIndex: 'metric',
       key: 'metric',
       width: '15%',
-      render: (metric: any, record: any) => {
-        return `${translateMetricName(metric.name)} ${record.operation} ${record.threshold}${
-          metric.unit
-        } ${intl.get('ALARM_VALUE')}: ${record.value}${metric.unit}`;
-      }
+      render: (metric: any, record: any) => getAlarmDetail(record, metric)
     },
     {
       title: intl.get('ALARM_TIMESTAMP'),

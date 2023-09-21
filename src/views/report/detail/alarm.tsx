@@ -1,7 +1,7 @@
 import React from 'react';
 import { Table } from 'antd';
 import intl from 'react-intl-universal';
-import { translateMetricName } from '../../alarm/alarm-group';
+import { getAlarmDetail } from '../../alarm/alarm-group';
 import dayjs from '../../../utils/dayjsUtils';
 import { Report } from './report';
 
@@ -183,11 +183,7 @@ function AlarmRecordTable<T>({
         {
           dataIndex: 'metric',
           title: intl.get('ALARM_DETAIL'),
-          render: (metric: any, record: any) => {
-            return `${translateMetricName(metric.name)} ${record.operation} ${record.threshold}${
-              metric.unit
-            } ${intl.get('ALARM_VALUE')}: ${record.value}${metric.unit}`;
-          }
+          render: (metric: any, record: any) => getAlarmDetail(record, metric)
         },
         {
           dataIndex: 'createdAt',

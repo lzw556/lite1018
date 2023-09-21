@@ -1,14 +1,19 @@
 import { Col, Empty, Row, Select, Space, Spin, Statistic } from 'antd';
 import React from 'react';
 import intl from 'react-intl-universal';
-import { RangeDatePicker, oneYearRange } from '../../../components/rangeDatePicker';
-import { ChartContainer } from '../../../components/charts/chartContainer';
+import {
+  RangeDatePicker,
+  oneYearNumberRange,
+  oneYearRange
+} from '../../../components/rangeDatePicker';
 import { ColorDanger } from '../../../constants/color';
-import { MonitoringPointRow } from '../types';
+import { HistoryData, MonitoringPointRow } from '../types';
 import { getThicknessAnalysis } from '../services';
-import { transformThicknessAnalysis } from '../historyDataHelper';
 import dayjs from '../../../utils/dayjsUtils';
-import { getDurationByDays } from '../../../utils/format';
+import { getDurationByDays, getDisplayName, getValue } from '../../../utils/format';
+import { PropertyChart, transformHistoryData } from '../../../components/charts/propertyChart';
+import { getDisplayProperties, transformThicknessAnalysis } from '../utils';
+import { useLocaleContext } from '../../../localeProvider';
 
 const DURATIONS = [
   {
@@ -38,13 +43,11 @@ export type MarkLineData =
   | AnalysisPart['data'];
 
 export const ThicknessAnalysis = (props: MonitoringPointRow) => {
-  const { id, attributes } = props;
+  const { language } = useLocaleContext();
+  const { id, attributes, properties, type } = props;
   const [loading, setLoading] = React.useState(true);
-  const [analysisData, setAnalysisData] = React.useState<{
-    options: any;
-    analysis: Analysis;
-  } | null>(null);
-  const [range, setRange] = React.useState<[number, number]>();
+  const [analysisData, setAnalysisData] = React.useState<Analysis | null>(null);
+  const [range, setRange] = React.useState<[number, number]>(oneYearNumberRange);
   const defaultMarkLines = React.useMemo(() => {
     const lines = [];
     if (attributes?.critical_thickness && attributes?.critical_thickness_enabled) {
@@ -65,17 +68,17 @@ export const ThicknessAnalysis = (props: MonitoringPointRow) => {
     }
     return lines;
   }, [attributes]);
-  const [markLineDatas, setMarkLineDatas] = React.useState<MarkLineData[]>(defaultMarkLines);
   const [selectedDuration, setSelectedDuration] = React.useState<Duration | 'none'>('none');
-
-  const instance = React.useRef<any>(null);
+  const [historyData, setHistoryData] = React.useState<HistoryData>();
+  const chartInstanceRef = React.useRef<any>();
 
   function getData(id: number, range: [number, number]) {
     setLoading(true);
     getThicknessAnalysis(id, range[0], range[1])
       .then((data) => {
         console.log(data);
-        setAnalysisData(transformThicknessAnalysis(data, 'thickness'));
+        setHistoryData(data.data);
+        setAnalysisData(transformThicknessAnalysis(data));
       })
       .finally(() => setLoading(false));
   }
@@ -83,156 +86,39 @@ export const ThicknessAnalysis = (props: MonitoringPointRow) => {
   React.useEffect(() => {
     if (range) {
       getData(id, range);
-      setMarkLineDatas(defaultMarkLines);
     }
-  }, [id, range, defaultMarkLines]);
+  }, [id, range]);
 
   React.useEffect(() => {
-    if (selectedDuration !== 'none') {
-      if (analysisData) {
-        setMarkLineDatas([
-          ...defaultMarkLines,
-          analysisData.analysis[selectedDuration as Duration].data
-        ]);
-      }
-    } else {
-      setMarkLineDatas(defaultMarkLines);
-    }
-  }, [selectedDuration, analysisData, defaultMarkLines]);
-
-  React.useEffect(() => {
-    const datas = markLineDatas.filter((m) => Array.isArray(m));
-    if (datas.length > 0) {
-      const data = datas[0] as AnalysisPart['data'];
-      if (instance && instance.current) {
-        instance.current.getEchartsInstance().dispatchAction({
+    if (selectedDuration !== 'none' && analysisData) {
+      const sub = analysisData[selectedDuration];
+      if (sub && sub.data)
+        chartInstanceRef.current.getEchartsInstance().dispatchAction({
           type: 'brush',
           areas: [
             {
               brushType: 'lineX',
-              coordRange: data.map(({ x }) => dayjs.unix(x).local().format('YYYY-MM-DD HH:mm:ss')),
+              coordRange: sub.data.map(({ x }) =>
+                dayjs.unix(x).local().format('YYYY-MM-DD HH:mm:ss')
+              ),
               xAxisIndex: 0
             }
           ]
         });
-      }
     }
-  }, [markLineDatas]);
-
-  function renderContent() {
-    if (loading) return <Spin />;
-    if (!analysisData || !analysisData.options) {
-      return (
-        <Col span={24}>
-          <Empty description={intl.get('NO_DATA_PROMPT')} image={Empty.PRESENTED_IMAGE_SIMPLE} />
-        </Col>
-      );
-    }
-
-    return (
-      <Row gutter={[0, 16]}>
-        <Col span={24}>{renderSummary()}</Col>
-        <Col span={24}>
-          {analysisData.options.map((o: any) => (
-            <ChartContainer
-              key={o.title}
-              title=''
-              style={{ height: 500 }}
-              options={{
-                ...o,
-                toolbox: { show: false },
-                brush: {
-                  toolbox: ['lineX', 'clear'],
-                  xAxisIndex: 0,
-                  transformable: false
-                },
-                yAxis: {
-                  axisLabel: {
-                    formatter: (val: number) => (Number.isInteger(val) ? val : val.toFixed(3))
-                  },
-                  min: (values: { min: number; max: number }) => {
-                    return getRangeOfYAxis(values, attributes).min;
-                  },
-                  max: (values: { min: number; max: number }) => {
-                    return getRangeOfYAxis(values, attributes).max;
-                  }
-                },
-                series: o.series.map((s: any) => ({
-                  ...s,
-                  symbol: 'none',
-                  areaStyle: null,
-                  markLine: {
-                    symbol: 'none',
-                    data: markLineDatas.map((m, i) => {
-                      if (Array.isArray(m)) {
-                        return m.map((item) => ({
-                          name: DURATIONS.find((d) => d.value === item.name)?.label,
-                          coord: [dayjs.unix(item.x).local().format('YYYY-MM-DD HH:mm:ss'), item.y],
-                          lineStyle: {
-                            width: 3,
-                            color: 'rgb(34,237,124)'
-                          },
-                          label: {
-                            distance: [-50 * i, 0]
-                          }
-                        }));
-                      } else {
-                        return m;
-                      }
-                    })
-                  }
-                }))
-              }}
-              instanceRef={instance}
-            />
-          ))}
-        </Col>
-      </Row>
-    );
-  }
-
-  function renderSummary() {
-    const lines = markLineDatas.filter((m) => Array.isArray(m));
-    if (lines.length === 0) return null;
-    return lines.map((m, i) => {
-      const duration = (m as AnalysisPart['data'])[0].name;
-      const { rate, life } = analysisData!.analysis[duration];
-      const formattedLife = getDurationByDays(life);
-      return (
-        <Row align='bottom'>
-          <Col span={6}>
-            <Statistic
-              title={i === 0 ? `${intl.get('FIELD_CORROSION_RATE')}(mm/a)` : ' '}
-              value={rate}
-            />
-          </Col>
-          <Col span={6} offset={1}>
-            <Statistic
-              title={
-                i === 0
-                  ? `${intl.get('FIELD_RESIDUAL_LIFE')}(${intl.get(formattedLife.unit)})`
-                  : ' '
-              }
-              value={formattedLife.duration}
-            />
-          </Col>
-        </Row>
-      );
-    });
-  }
+  }, [selectedDuration, analysisData]);
 
   return (
     <Row gutter={[0, 16]}>
       <Col span={24}>
         <Space>
-          <RangeDatePicker
-            onChange={React.useCallback((range: [number, number]) => setRange(range), [])}
-            defaultRange={oneYearRange}
-          />
+          <RangeDatePicker onChange={setRange} defaultRange={oneYearRange} />
           <Select
             defaultValue='none'
             style={{ width: '9em' }}
-            onChange={(val: Duration | 'none') => setSelectedDuration(val)}
+            onChange={(val: Duration | 'none') => {
+              setSelectedDuration(val);
+            }}
           >
             {DURATIONS.map(({ label, value }) => (
               <Select.Option key={value} value={value}>
@@ -245,21 +131,117 @@ export const ThicknessAnalysis = (props: MonitoringPointRow) => {
       <Col span={24}>{renderContent()}</Col>
     </Row>
   );
-};
 
-function getRangeOfYAxis(
-  values: { min: number; max: number },
-  attributes: MonitoringPointRow['attributes']
-) {
-  let min = values.min;
-  let max = values.max;
-  if (attributes?.initial_thickness && attributes?.initial_thickness_enabled) {
-    min = Math.min(min, attributes?.initial_thickness);
-    max = Math.max(max, attributes?.initial_thickness);
+  function renderContent() {
+    if (loading) return <Spin />;
+    if (!historyData || historyData.length === 0) {
+      return (
+        <Col span={24}>
+          <Empty description={intl.get('NO_DATA_PROMPT')} image={Empty.PRESENTED_IMAGE_SIMPLE} />
+        </Col>
+      );
+    }
+
+    return (
+      <Row gutter={[0, 16]}>
+        <Col span={24}>{renderSummary()}</Col>
+        <Col span={24}>{renderChart()}</Col>
+      </Row>
+    );
   }
-  if (attributes?.critical_thickness && attributes?.critical_thickness_enabled) {
-    min = Math.min(min, attributes?.critical_thickness);
-    max = Math.max(max, attributes?.critical_thickness);
+
+  function renderSummary() {
+    if (selectedDuration === 'none' || !analysisData) return null;
+    const { rate, life } = analysisData[selectedDuration];
+    const formattedLife = getDurationByDays(life);
+    return (
+      <Row align='bottom'>
+        <Col span={6}>
+          <Statistic
+            title={getDisplayName({
+              name: intl.get('FIELD_CORROSION_RATE'),
+              lang: language,
+              suffix: 'mm/a'
+            })}
+            value={getValue(rate)}
+          />
+        </Col>
+        <Col span={6} offset={1}>
+          <Statistic
+            title={getDisplayName({
+              name: intl.get('FIELD_RESIDUAL_LIFE'),
+              lang: language,
+              suffix: intl.get(formattedLife.unit)
+            })}
+            value={getValue(formattedLife.duration)}
+          />
+        </Col>
+      </Row>
+    );
   }
-  return { min: min - Math.abs(max - min) * 0.05, max: max + Math.abs(max - min) * 0.05 };
-}
+
+  function renderChart() {
+    if (!historyData || historyData.length === 0) {
+      return null;
+    }
+    const _properties = getDisplayProperties(properties, type);
+    if (_properties.length === 0) return null;
+    const property = _properties[0];
+    const { precision, unit } = property;
+    const transform = transformHistoryData(historyData, property);
+    let markLineData: any = defaultMarkLines;
+    if (
+      analysisData &&
+      selectedDuration !== 'none' &&
+      analysisData[selectedDuration] &&
+      analysisData[selectedDuration].data
+    ) {
+      const newLines = analysisData[selectedDuration].data
+        .filter((m) => !!m && !Number.isNaN(m.y))
+        .map((m, i) => {
+          return {
+            name: DURATIONS.find((d) => d.value === m.name)?.label,
+            coord: [dayjs.unix(m.x).local().format('YYYY-MM-DD HH:mm:ss'), m.y],
+            lineStyle: {
+              width: 3,
+              color: 'rgb(34,237,124)'
+            }
+          };
+        });
+      if (newLines.length > 0) {
+        markLineData = [...defaultMarkLines, newLines];
+      }
+    }
+    return (
+      transform && (
+        <PropertyChart
+          rawOptions={{
+            animation: false,
+            toolbox: { show: false },
+            brush: {
+              toolbox: ['lineX', 'clear'],
+              xAxisIndex: 0,
+              transformable: false
+            }
+          }}
+          series={transform.series.map((s) => ({
+            ...s,
+            raw: {
+              markLine: {
+                symbol: 'none',
+                data: markLineData,
+                label: {
+                  distance: [-60, 0]
+                }
+              }
+            }
+          }))}
+          style={{ height: 500 }}
+          yAxisMinInterval={property.interval}
+          yAxisValueMeta={{ unit, precision }}
+          ref={chartInstanceRef}
+        />
+      )
+    );
+  }
+};

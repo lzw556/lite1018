@@ -1,6 +1,6 @@
-import { Col, Empty, Row, Space, Spin, Table } from 'antd';
+import { Button, Col, Empty, Row, Space, Spin, Table } from 'antd';
 import React from 'react';
-import { RangeDatePicker } from '../../../../components/rangeDatePicker';
+import { RangeDatePicker, oneWeekNumberRange } from '../../../../components/rangeDatePicker';
 import usePermission, { Permission } from '../../../../permission/permission';
 import dayjs from '../../../../utils/dayjsUtils';
 import { getFilename } from '../../../../utils/format';
@@ -13,7 +13,10 @@ import {
 } from '../../types';
 import { DynamicDataContent } from './dynamicDataContent';
 import {
-  DynamicDataProperty,
+  AngleDynamicData,
+  PreloadDynamicData,
+  PreloadWaveData,
+  ThicknessWaveData,
   VibrationWaveFormDataType,
   useDynamicDataRequest
 } from './dynamicDataHelper';
@@ -21,14 +24,18 @@ import intl from 'react-intl-universal';
 import { useLocaleContext } from '../../../../localeProvider';
 import { VibrationDynamicDataContent } from './vibrationDynamicDataContent';
 import { isMobile } from '../../../../utils/deviceDetection';
+import { BatchDownlaodWaveDataModal } from './batchDownlaodWaveDataModal';
 
 export const MonitoringPointDynamicData: React.FC<MonitoringPointRow & { dataType?: DataType }> = (
   props
 ) => {
   const { language } = useLocaleContext();
-  const [range, setRange] = React.useState<[number, number]>();
+  const [range, setRange] = React.useState<[number, number]>(oneWeekNumberRange);
   const { hasPermission } = usePermission();
-  const isVibration = props.type === MonitoringPointTypeValue.VIBRATION;
+  const isVibration =
+    props.type === MonitoringPointTypeValue.VIBRATION ||
+    props.type === MonitoringPointTypeValue.VIBRATION_RPM ||
+    props.type === MonitoringPointTypeValue.VIBRATION_THREE_AXIS_RPM;
   const getDynamicDataType = () => {
     const config = MONITORING_POINT_TYPE_VALUE_DYNAMIC_MAPPING.get(props.type);
     if (props.dataType === 'raw') {
@@ -52,18 +59,16 @@ export const MonitoringPointDynamicData: React.FC<MonitoringPointRow & { dataTyp
   const {
     all: { timestamps, loading },
     selected: { timestamp, dynamicData, setTimestamp }
-  } = useDynamicDataRequest<DynamicDataProperty | VibrationWaveFormDataType>(
-    props.id,
-    props.dataType,
-    range,
-    vibrationFilters
-  );
+  } = useDynamicDataRequest<
+    PreloadWaveData | ThicknessWaveData | AngleDynamicData | VibrationWaveFormDataType
+  >(props.id, props.dataType, range, vibrationFilters);
+  const [batchDownloadModalVisible, setBatchDownloadModalVisible] = React.useState(false);
 
   const renderTimestampsList = () => {
     return (
       <Table
         size={'middle'}
-        scroll={{ y: isMobile ? 200 : 600 }}
+        scroll={{ y: isMobile ? 200 : 650 }}
         showHeader={false}
         columns={[
           {
@@ -125,9 +130,7 @@ export const MonitoringPointDynamicData: React.FC<MonitoringPointRow & { dataTyp
   return (
     <Row gutter={[0, 16]}>
       <Col span={24}>
-        <RangeDatePicker
-          onChange={React.useCallback((range: [number, number]) => setRange(range), [])}
-        />
+        <RangeDatePicker onChange={setRange} />
       </Col>
       <Col span={24}>
         {loading && <Spin />}
@@ -141,13 +144,28 @@ export const MonitoringPointDynamicData: React.FC<MonitoringPointRow & { dataTyp
                 />
               </Col>
             )}
-            {timestamps.length > 0 && <Col span={isMobile ? 24 : 6}>{renderTimestampsList()}</Col>}
+            {timestamps.length > 0 && (
+              <Col span={isMobile ? 24 : 6}>
+                <Row gutter={[0, 16]}>
+                  <Col span={24}>
+                    <Button onClick={() => setBatchDownloadModalVisible(true)}>
+                      {intl.get('BATCH_DOWNLOAD')}
+                    </Button>
+                  </Col>
+                  <Col span={24}>{renderTimestampsList()}</Col>
+                </Row>
+              </Col>
+            )}
             {timestamp && dynamicDataType && dynamicData.values && !isVibration && (
               <DynamicDataContent
                 key={props.dataType}
                 type={dynamicDataType}
                 data={{
-                  values: dynamicData.values as DynamicDataProperty,
+                  values: dynamicData.values as
+                    | PreloadWaveData
+                    | ThicknessWaveData
+                    | AngleDynamicData
+                    | PreloadDynamicData,
                   loading: dynamicData.loading
                 }}
                 monitoringPoint={{ ...props }}
@@ -180,6 +198,13 @@ export const MonitoringPointDynamicData: React.FC<MonitoringPointRow & { dataTyp
           </Row>
         )}
       </Col>
+      <BatchDownlaodWaveDataModal
+        open={batchDownloadModalVisible}
+        onCancel={() => setBatchDownloadModalVisible(false)}
+        id={props.id}
+        type={props.dataType ?? 'waveform'}
+        timestamps={timestamps}
+      />
     </Row>
   );
 };

@@ -1,5 +1,6 @@
-import { round, floor, ceil } from 'lodash';
+import { round, floor } from 'lodash';
 import dayjs from './dayjsUtils';
+import { Language } from '../localeProvider';
 
 export const getFilename = (res: any) => {
   let filename = `${dayjs().format('YYYY-MM-DD HH:mm:ss')}.json`;
@@ -17,51 +18,11 @@ export const getFilename = (res: any) => {
   return filename;
 };
 
-export function getDisplayValue(value: number | null | undefined, unit?: string) {
-  if (Number.isNaN(value) || value === null || value === undefined) return '-';
-  return `${value}${unit ?? ''}`;
-}
-
-export function roundValue(value: number, precision?: number) {
-  if (Number.isNaN(value) || value === 0) return value;
-  return round(value, precision ?? 3);
-}
-
 export function toMac(mac: string) {
   if (mac.length === 12) {
     return mac.replace(/\w(?=(\w{2})+$)/g, '$&-');
   }
   return mac;
-}
-
-export function getRangeOfValuedYAxis(
-  actual: { min: number; max: number },
-  precision: number,
-  initial?: { min: number; max: number }
-): {
-  min?: number;
-  max?: number;
-} {
-  const max = initial ? Math.max(actual.max, initial?.max) : actual.max;
-  const min = initial ? Math.min(actual.min, initial?.min) : actual.min;
-  const RATELIKELINE = 1 / 100;
-  const total = max - min;
-  const percentage = total / Math.abs(min);
-  const isCloseToLine = percentage < RATELIKELINE;
-  const lessMin = min - Math.abs(min) * percentage;
-  const moreMax = max + Math.abs(max) * percentage;
-  const actualPrecision =
-    Number.isInteger(min) || Math.abs(min) + Math.abs(max) >= 5 ? 0 : precision;
-  let finalMin = undefined,
-    finalMax = undefined;
-  if (isCloseToLine && total !== 0) {
-    if (max > 0) {
-      finalMin = floor(lessMin, actualPrecision);
-    } else {
-      finalMax = ceil(moreMax, actualPrecision);
-    }
-  }
-  return { min: finalMin, max: finalMax };
 }
 
 export function getDurationByDays(days: number): {
@@ -72,4 +33,34 @@ export function getDurationByDays(days: number): {
     return { duration: days, unit: 'UNIT_DAY' };
   }
   return { duration: floor(days / 365, 1), unit: 'UNIT_YEAR' };
+}
+
+export function getValue(value: number | null | undefined, unit?: string) {
+  if (Number.isNaN(value) || value === null || value === undefined) return '-';
+  return `${value}${unit ?? ''}`;
+}
+
+export function roundValue(value: number, precision?: number) {
+  if (value === null || value === undefined) return Number.NaN;
+  if (Number.isNaN(value) || value === 0) return value;
+  return round(value, precision ?? 3);
+}
+
+export function getDisplayName({
+  name,
+  lang,
+  suffix
+}: {
+  name: string;
+  lang: Language;
+  suffix?: string;
+}) {
+  const zh = lang === 'zh-CN';
+  const braceLeft = zh ? '（' : '(';
+  const braceRight = zh ? '）' : ')';
+  if (suffix) {
+    return `${name}${braceLeft}${suffix}${braceRight}`;
+  } else {
+    return name;
+  }
 }

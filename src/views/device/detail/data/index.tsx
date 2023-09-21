@@ -9,14 +9,14 @@ import { FindDeviceDataRequest, RemoveDeviceDataRequest } from '../../../../apis
 import HasPermission from '../../../../permission';
 import { Permission } from '../../../../permission/permission';
 import Label from '../../../../components/label';
-import { DefaultHistoryDataOption, LineChartStyles } from '../../../../constants/chart';
-import ReactECharts from 'echarts-for-react';
 import DownloadModal from './modal/downloadModal';
-import { isMobile } from '../../../../utils/deviceDetection';
-import { RangeDatePicker } from '../../../../components/rangeDatePicker';
-import { getSpecificProperties } from '../../util';
+import { RangeDatePicker, oneWeekNumberRange } from '../../../../components/rangeDatePicker';
+import { getDisplayProperties } from '../../util';
 import { DeviceType } from '../../../../types/device_type';
 import intl from 'react-intl-universal';
+import { HistoryData } from '../../../monitoring-point';
+import { PropertyChart, transformHistoryData } from '../../../../components/charts/propertyChart';
+import { DisplayProperty } from '../../../../constants/properties';
 
 const { Option } = Select;
 
@@ -25,11 +25,12 @@ export interface DeviceDataProps {
 }
 
 const HistoryDataPage: FC<DeviceDataProps> = ({ device }) => {
-  const [property, setProperty] = useState<any>(
-    device.properties.filter((pro) => pro.key !== 'channel')[0]
+  const properties = getDisplayProperties(device.properties, device.typeId);
+  const [property, setProperty] = useState<DisplayProperty | undefined>(
+    properties.length > 0 ? properties[0] : undefined
   );
-  const [range, setRange] = useState<[number, number]>();
-  const [dataSource, setDataSource] = useState<any>();
+  const [range, setRange] = useState<[number, number]>(oneWeekNumberRange);
+  const [dataSource, setDataSource] = useState<HistoryData>();
   const [downloadVisible, setDownloadVisible] = useState<boolean>(false);
   const channels = DeviceType.isMultiChannel(device.typeId, true);
   const [channel, setChannel] = useState('1');
@@ -48,64 +49,23 @@ const HistoryDataPage: FC<DeviceDataProps> = ({ device }) => {
   }, [fetchDeviceData]);
 
   const renderHistoryDataChart = () => {
-    if (dataSource) {
-      const data = dataSource.map((item: any) => {
-        return {
-          time: dayjs.unix(item.timestamp).local(),
-          property: item.values.find((item: any) => item.key === property.key)
-        };
-      });
-      const fields = new Map<string, number[]>();
-      const times: any[] = [];
-      data.forEach((item: any) => {
-        times.push(item.time);
-        Object.keys(item.property.data).forEach((key) => {
-          if (!fields.has(key)) {
-            fields.set(key, [item.property.data[key]]);
-          } else {
-            fields.get(key)?.push(item.property.data[key]);
-          }
-        });
-      });
-      const legends: string[] = [];
-      const series: any[] = [];
-      Array.from(fields.keys()).forEach((key, index) => {
-        legends.push(intl.get(key));
-        series.push({
-          ...LineChartStyles[index],
-          name: intl.get(key),
-          type: 'line',
-          data: fields.get(key)
-        });
-      });
-      const option = {
-        ...DefaultHistoryDataOption,
-        tooltip: {
-          trigger: 'axis',
-          formatter: function (params: any) {
-            let relVal = params[0].name;
-            for (let i = 0; i < params.length; i++) {
-              let value: any = Number(params[i].value);
-              value = value ? value.toFixed(3) : value;
-              relVal += `<br/> ${params[i].marker} ${params[i].seriesName}: ${value}${property.unit}`;
-            }
-            return relVal;
-          }
-        },
-        title: { text: `${intl.get(property.name)}${property.unit ? `(${property.unit})` : ''}` },
-        legend: { data: legends, left: isMobile ? 'right' : 'center' },
-        series,
-        xAxis: {
-          type: 'category',
-          boundaryGap: false,
-          data: times.map((item: any) => item.format('YYYY-MM-DD HH:mm:ss'))
-        }
-      };
+    if (dataSource && dataSource.length > 0 && property) {
+      const { unit, precision } = property;
+      const transform = transformHistoryData(dataSource, property);
       return (
-        <ReactECharts option={option} notMerge={true} style={{ height: `380px`, border: 'none' }} />
+        transform && (
+          <PropertyChart
+            dataZoom={true}
+            series={transform.series}
+            style={{ height: 450 }}
+            withArea={true}
+            yAxisMinInterval={property.interval}
+            yAxisValueMeta={{ unit, precision, showName: true }}
+          />
+        )
       );
     }
-    return <EmptyLayout description={intl.get('NO_DATA')} style={{ height: `400px` }} />;
+    return <EmptyLayout description={intl.get('NO_DATA')} style={{ height: 300 }} />;
   };
 
   const onRemoveDeviceData = () => {
@@ -151,34 +111,28 @@ const HistoryDataPage: FC<DeviceDataProps> = ({ device }) => {
                     </Select>
                   </Label>
                 )}
-                <Label name={intl.get('PROPERTY')}>
-                  <Select
-                    bordered={false}
-                    defaultValue={property.key}
-                    placeholder={intl.get('PLEASE_SELECT_SOMETHING', {
-                      something: intl.get('PROPERTY')
-                    })}
-                    style={{ width: '120px' }}
-                    onChange={(value) => {
-                      setProperty(device.properties.find((item: any) => item.key === value));
-                    }}
-                  >
-                    {device
-                      ? getSpecificProperties(
-                          device.properties.filter((pro) => pro.key !== 'channel'),
-                          device.typeId
-                        ).map((item) => (
-                          <Option key={item.key} value={item.key}>
-                            {intl.get(item.name).d(item.name)}
-                          </Option>
-                        ))
-                      : null}
-                  </Select>
-                </Label>
-                <RangeDatePicker
-                  onChange={useCallback((range: [number, number]) => setRange(range), [])}
-                  showFooter={true}
-                />
+                {properties && property && (
+                  <Label name={intl.get('PROPERTY')}>
+                    <Select
+                      bordered={false}
+                      defaultValue={property.key}
+                      placeholder={intl.get('PLEASE_SELECT_SOMETHING', {
+                        something: intl.get('PROPERTY')
+                      })}
+                      style={{ width: '120px' }}
+                      onChange={(value) => {
+                        setProperty(properties.find((item: any) => item.key === value));
+                      }}
+                    >
+                      {properties.map((item) => (
+                        <Option key={item.key} value={item.key}>
+                          {intl.get(item.name).d(item.name)}
+                        </Option>
+                      ))}
+                    </Select>
+                  </Label>
+                )}
+                <RangeDatePicker onChange={setRange} showFooter={true} />
                 <HasPermission value={Permission.DeviceDataDownload}>
                   <Button
                     type='primary'
@@ -199,7 +153,12 @@ const HistoryDataPage: FC<DeviceDataProps> = ({ device }) => {
           </Row>
           <Row justify='center'>
             <Col span={24}>
-              <Card bordered={false} style={{ height: `400px` }}>
+              <Card
+                bordered={false}
+                title={device.name}
+                headStyle={{ minHeight: '3em', borderColor: 'transparent', textAlign: 'center' }}
+                bodyStyle={{ paddingTop: 0 }}
+              >
                 {renderHistoryDataChart()}
               </Card>
             </Col>

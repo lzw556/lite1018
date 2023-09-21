@@ -1,21 +1,24 @@
-import { Col, Row, Select, Spin } from 'antd';
+import { Col, Empty, Row, Select, Spin } from 'antd';
 import * as React from 'react';
-import { ChartContainer } from '../../../../components/charts/chartContainer';
 import Label from '../../../../components/label';
 import ShadowCard from '../../../../components/shadowCard';
 import {
-  DynamicDataProperty,
+  AngleDynamicData,
   DynamicDataType,
-  generateChartOptions,
-  transformDynamicData
+  Metadata,
+  PreloadDynamicData,
+  PreloadWaveData,
+  ThicknessWaveData
 } from './dynamicDataHelper';
 import intl from 'react-intl-universal';
 import { NameValueGroups } from '../../../../components/name-values';
-import { roundValue } from '../../../../utils/format';
+import { getValue, roundValue } from '../../../../utils/format';
 import { MonitoringPointRow } from '../../types';
 import { CircleChart } from '../../../tower/circleChart';
 import { getMonitoringPointType } from '../../utils';
 import { isMobile } from '../../../../utils/deviceDetection';
+import { PropertyChart, Series } from '../../../../components/charts/propertyChart';
+import { AXIS_THREE } from '../../../device/detail/dynamicData/constants';
 
 export const DynamicDataContent = ({
   type,
@@ -24,7 +27,7 @@ export const DynamicDataContent = ({
 }: {
   type: DynamicDataType;
   data: {
-    values: DynamicDataProperty;
+    values: PreloadWaveData | ThicknessWaveData | AngleDynamicData | PreloadDynamicData;
     loading: boolean;
   };
   monitoringPoint: MonitoringPointRow;
@@ -36,19 +39,22 @@ export const DynamicDataContent = ({
   const [field, setField] = React.useState(fields[0]);
   const isAngle = 'dynamic_direction' in values && 'dynamic_displacement' in values;
   const displacements = (isAngle ? values['dynamic_displacement_radial'] : []) as number[];
-  const angles = displacements.map((d, i) => [
-    roundValue(d),
-    roundValue(values['dynamic_direction'][i] as number)
-  ]);
+  const isDynamicPreload = 'dynamic_acceleration' in values;
+  const angles = isAngle
+    ? displacements.map((d, i) => [
+        roundValue(d, 2),
+        roundValue(values['dynamic_direction'][i] as number, 2)
+      ])
+    : [];
 
   const renderMeta = () => {
     return (
       <NameValueGroups
         col={{ span: 12 }}
         divider={50}
-        items={type.metaData.map(({ label, value, unit }) => ({
+        items={type.metaData.map(({ label, value, unit, precision }) => ({
           name: intl.get(label),
-          value: getMetaProperty(values.metadata, value, unit)
+          value: getMetaProperty(values.metadata, value, unit, precision)
         }))}
       />
     );
@@ -56,16 +62,102 @@ export const DynamicDataContent = ({
 
   const renderChart = () => {
     if (loading) return <Spin />;
-    const _field = {
-      ...field,
-      label: intl.get(field.label)
-    };
-    return (
-      <ChartContainer
-        options={generateChartOptions(transformDynamicData(values, _field), _field) as any}
-        title=''
-      />
-    );
+    if (!values) {
+      return <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />;
+    }
+    if (isAngle) {
+      const data = values[field.value as keyof Omit<AngleDynamicData, 'metadata'>];
+      return (
+        <PropertyChart
+          series={[
+            {
+              data: { [intl.get(field.label)]: data },
+              xAxisValues: data.map((n, i) => `${i}`)
+            }
+          ]}
+          style={{ height: 450 }}
+          yAxisValueMeta={{ unit: field.unit, precision: field.precision }}
+        />
+      );
+    } else if (isDynamicPreload) {
+      const data = values[field.value as keyof Omit<PreloadDynamicData, 'metadata'>];
+      let series: Series[] = [];
+      if (data.length > 0) {
+        if (typeof data[0] === 'number') {
+          series = [
+            {
+              data: { [intl.get(field.label)]: data as number[] },
+              xAxisValues: data.map((n, i) => `${i}`)
+            }
+          ];
+        } else {
+          type Dynamic_acceleration = Omit<PreloadDynamicData, 'metadata'>['dynamic_acceleration'];
+          series = AXIS_THREE.map(({ label, value }) => {
+            const axisData = (data as Dynamic_acceleration).map(
+              (item) => item[value as keyof Dynamic_acceleration[0]]
+            );
+            return {
+              data: {
+                [intl.get(label)]: axisData
+              },
+              xAxisValues: axisData.map((n, i) => `${i}`)
+            };
+          });
+        }
+      }
+      return (
+        <PropertyChart
+          series={series}
+          style={{ height: 450 }}
+          yAxisValueMeta={{ unit: field.unit, precision: field.precision }}
+        />
+      );
+    } else {
+      //Preload Wave, Thickness Wave
+      const tofs = values['tof'];
+      const tof = values.metadata['tof'];
+      const isContained =
+        tof && !Number.isNaN(tof) && tof <= Math.max(...tofs) && tof >= Math.min(...tofs);
+      const _tofs = Array.from(new Set([...tofs, tof].sort((prev, crt) => prev - crt)));
+      const index = _tofs.indexOf(tof);
+
+      let startValue = 0;
+      let endValue = 100;
+      if (isContained && index !== -1) {
+        const percentage = (index / _tofs.length) * 100;
+        const interval = { default: 10, medium: 15, large: 20, xLarge: 25 };
+        let offsetRight = interval.default;
+        let offsetLeft = interval.default;
+        if (percentage <= 20) {
+          offsetRight = interval.xLarge;
+        } else if (percentage <= 30) {
+          offsetRight = interval.large;
+        } else if (percentage <= 40) {
+          offsetRight = interval.medium;
+        } else if (percentage >= 60) {
+          offsetLeft = interval.medium;
+        } else if (percentage >= 80) {
+          offsetLeft = interval.large;
+        }
+        startValue = index - offsetLeft;
+        endValue = index + offsetRight;
+      }
+      return (
+        <PropertyChart
+          dataZoom={isContained ? { startValue, endValue } : { start: 70, end: 100 }}
+          series={[
+            {
+              data: { [field.label]: values['mv'] },
+              xAxisValues: tofs.map((n) => `${n}`),
+              raw: { smooth: true }
+            }
+          ]}
+          style={{ height: 450 }}
+          xAxisUnit='ns'
+          yAxisValueMeta={{ precision: field.precision }}
+        />
+      );
+    }
   };
 
   return (
@@ -83,7 +175,7 @@ export const DynamicDataContent = ({
                 radius: attributes?.tower_base_radius
               }
             ]}
-            style={{ height: 550 }}
+            style={{ height: 650 }}
             large={true}
           />
         </Col>
@@ -133,13 +225,12 @@ export const DynamicDataContent = ({
 };
 
 export const getMetaProperty = (
-  meta: DynamicDataProperty['metadata'],
+  meta: Metadata,
   metaValue: string,
-  unit: string
+  unit: string,
+  precision: number
 ) => {
   if (!meta) return '-';
   if (metaValue === 'defect_location') return '无缺陷';
-  if (meta[metaValue] === undefined || meta[metaValue] === null) return '-';
-  let value = meta[metaValue] ? meta[metaValue].toFixed(3) : meta[metaValue];
-  return `${value}${unit}`;
+  return getValue(roundValue(meta[metaValue], precision), unit);
 };

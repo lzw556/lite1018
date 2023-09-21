@@ -2,6 +2,7 @@ import { Form, Input, Radio, Typography } from 'antd';
 import { FC, useState } from 'react';
 import { IpnSetting } from '../../types/ipn_setting';
 import intl from 'react-intl-universal';
+import { Term } from '../term';
 
 export const IPNSettingKeys = [
   'ip_mode',
@@ -29,7 +30,12 @@ const IpnFormItem: FC<IpnFromItemProps> = ({ ipn }) => {
       return (
         <div>
           <Form.Item
-            label={intl.get('IP_ADDRESS')}
+            label={
+              <Term
+                name={intl.get('IP_ADDRESS')}
+                description={intl.get('SETTING_IP_ADDRESS_DESC')}
+              />
+            }
             name={['ipn', 'ip_addr']}
             initialValue={ipn?.ip_addr}
             rules={[{ required: true, message: intl.get('PLEASE_ENTER_IP_ADDRESS') }]}
@@ -37,7 +43,12 @@ const IpnFormItem: FC<IpnFromItemProps> = ({ ipn }) => {
             <Input placeholder={intl.get('PLEASE_ENTER_GATEWAY_IP_ADDRESS')} />
           </Form.Item>
           <Form.Item
-            label={intl.get('SUBNET_MASK')}
+            label={
+              <Term
+                name={intl.get('SUBNET_MASK')}
+                description={intl.get('SETTING_SUBNET_MASK_DESC')}
+              />
+            }
             name={['ipn', 'subnet_mask']}
             initialValue={ipn?.subnet_mask}
             rules={[{ required: true, message: intl.get('PLEASE_ENTER_GATEWAY_SUBNET_MASK') }]}
@@ -47,7 +58,10 @@ const IpnFormItem: FC<IpnFromItemProps> = ({ ipn }) => {
           <Form.Item
             label={
               <Typography.Text ellipsis={true} title={intl.get('GATEWAY_ADDRESS')}>
-                {intl.get('GATEWAY_ADDRESS')}
+                <Term
+                  name={intl.get('GATEWAY_ADDRESS')}
+                  description={intl.get('SETTING_GATEWAY_ADDRESS_DESC')}
+                />
               </Typography.Text>
             }
             name={['ipn', 'gateway_addr']}
@@ -65,7 +79,12 @@ const IpnFormItem: FC<IpnFromItemProps> = ({ ipn }) => {
     if (isNtpEnabled) {
       return (
         <Form.Item
-          label={intl.get('NTP_ADDRESS')}
+          label={
+            <Term
+              name={intl.get('NTP_ADDRESS')}
+              description={intl.get('SETTING_NTP_ADDRESS_DESC')}
+            />
+          }
           initialValue={ipn?.ntp_addr}
           name={['ipn', 'ntp_addr']}
           rules={[{ required: true, message: intl.get('PLEASE_ENTER_NTP_SERVER_ADDRESS') }]}
@@ -79,7 +98,7 @@ const IpnFormItem: FC<IpnFromItemProps> = ({ ipn }) => {
   return (
     <div>
       <Form.Item
-        label={intl.get('IP_MODE')}
+        label={<Term name={intl.get('IP_MODE')} description={intl.get('SETTING_IP_MODE_DESC')} />}
         required
         name={['ipn', 'ip_mode']}
         initialValue={ipn?.ip_mode}
@@ -101,9 +120,10 @@ const IpnFormItem: FC<IpnFromItemProps> = ({ ipn }) => {
       {renderIPFormItem()}
       <Form.Item
         label={
-          <Typography.Text ellipsis={true} title={intl.get('NTP_IS_ENABLED')}>
-            {intl.get('NTP_IS_ENABLED')}
-          </Typography.Text>
+          <Term
+            name={intl.get('SETTING_NTP_IS_ENABLED')}
+            description={intl.get('SETTING_NTP_IS_ENABLED_DESC')}
+          />
         }
         required
         name={['ipn', 'ntp_is_enabled']}

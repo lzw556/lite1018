@@ -1,4 +1,4 @@
-import { Form, InputNumber, Select, Typography } from 'antd';
+import { Form, InputNumber, Select } from 'antd';
 import { FC } from 'react';
 import CommunicationPeriodSelect from '../../components/communicationPeriodSelect';
 import GroupSizeSelect from '../../components/groupSizeSelect';
@@ -10,6 +10,7 @@ import {
   SECOND_COMMUNICATION_PERIOD
 } from '../../constants';
 import intl from 'react-intl-universal';
+import { Term } from '../term';
 
 export interface NetworkFormItemProps {
   mode: NetworkProvisioningMode;
@@ -23,9 +24,10 @@ const WsnFormItem: FC<NetworkFormItemProps> = ({ mode, onModeChange }) => {
         <>
           <Form.Item
             label={
-              <Typography.Text ellipsis={true} title={intl.get('MAJOR_COMMUNICATION_PERIOD')}>
-                {intl.get('MAJOR_COMMUNICATION_PERIOD')}
-              </Typography.Text>
+              <Term
+                name={intl.get('MAJOR_COMMUNICATION_PERIOD')}
+                description={intl.get('MAJOR_COMMUNICATION_PERIOD_DESC')}
+              />
             }
             name={['wsn', 'communication_period']}
             rules={[Rules.required]}
@@ -39,9 +41,10 @@ const WsnFormItem: FC<NetworkFormItemProps> = ({ mode, onModeChange }) => {
           </Form.Item>
           <Form.Item
             label={
-              <Typography.Text ellipsis={true} title={intl.get('SECONDARY_COMMUNICATION_PERIOD')}>
-                {intl.get('SECONDARY_COMMUNICATION_PERIOD')}
-              </Typography.Text>
+              <Term
+                name={intl.get('SECONDARY_COMMUNICATION_PERIOD')}
+                description={intl.get('SECONDARY_COMMUNICATION_PERIOD_DESC')}
+              />
             }
             name={['wsn', 'communication_period_2']}
             rules={[Rules.required]}
@@ -59,9 +62,10 @@ const WsnFormItem: FC<NetworkFormItemProps> = ({ mode, onModeChange }) => {
     return (
       <Form.Item
         label={
-          <Typography.Text ellipsis={true} title={intl.get('COMMUNICATION_PERIOD')}>
-            {intl.get('COMMUNICATION_PERIOD')}
-          </Typography.Text>
+          <Term
+            name={intl.get('COMMUNICATION_PERIOD')}
+            description={intl.get('COMMUNICATION_PERIOD_DESC')}
+          />
         }
         name={['wsn', 'communication_period']}
         rules={[Rules.required]}
@@ -79,11 +83,7 @@ const WsnFormItem: FC<NetworkFormItemProps> = ({ mode, onModeChange }) => {
   return (
     <div>
       <Form.Item
-        label={
-          <Typography.Text ellipsis={true} title={intl.get('WSN_MODE')}>
-            {intl.get('WSN_MODE')}
-          </Typography.Text>
-        }
+        label={<Term name={intl.get('WSN_MODE')} description={intl.get('WSN_MODE_DESC')} />}
         name={'mode'}
         rules={[Rules.required]}
       >
@@ -104,9 +104,10 @@ const WsnFormItem: FC<NetworkFormItemProps> = ({ mode, onModeChange }) => {
       {render()}
       <Form.Item
         label={
-          <Typography.Text ellipsis={true} title={intl.get('COMMUNICATION_OFFSET')}>
-            {intl.get('COMMUNICATION_OFFSET')}
-          </Typography.Text>
+          <Term
+            name={intl.get('COMMUNICATION_OFFSET')}
+            description={intl.get('COMMUNICATION_OFFSET_DESC')}
+          />
         }
         name={['wsn', 'communication_offset']}
         rules={[
@@ -140,7 +141,7 @@ const WsnFormItem: FC<NetworkFormItemProps> = ({ mode, onModeChange }) => {
       </Form.Item>
       {mode === NetworkProvisioningMode.Mode1 && (
         <Form.Item
-          label={intl.get('GROUP_SIZE')}
+          label={<Term name={intl.get('GROUP_SIZE')} description={intl.get('GROUP_SIZE_DESC')} />}
           name={['wsn', 'group_size']}
           rules={[Rules.required]}
         >

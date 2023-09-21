@@ -1,19 +1,11 @@
 import React from 'react';
-import { ChartContainer } from '../../components/charts/chartContainer';
 import dayjs from '../../utils/dayjsUtils';
-import { isMobile } from '../../utils/deviceDetection';
-import { getDisplayValue } from '../../utils/format';
 import { AssetRow } from '../asset/types';
-import {
-  getHistoryDatas,
-  getRealPoints,
-  HistoryData,
-  MonitoringPointTypeValue,
-  Property
-} from '../monitoring-point';
+import { getDisplayProperties, getRealPoints, HistoryData } from '../monitoring-point';
 import intl from 'react-intl-universal';
 import { MONITORING_POINTS } from '../../config/assetCategory.config';
 import { useAppConfigContext } from '../asset';
+import { PropertyChart, transformHistoryData } from '../../components/charts/propertyChart';
 
 export const FlangeHistoryChart = ({
   historyDatas,
@@ -29,8 +21,8 @@ export const FlangeHistoryChart = ({
   const config = useAppConfigContext();
   const points = getRealPoints(flange.monitoringPoints);
   const firstPoint = points[0];
-  const selectedProperty =
-    firstPoint.properties.find((p) => p.key === propertyKey) ?? firstPoint.properties[0];
+  const properties = getDisplayProperties(firstPoint.properties, firstPoint.type);
+  const selectedProperty = properties.find((p) => p.key === propertyKey) ?? properties[0];
 
   if (points.length === 0) return <p>{intl.get('PARAMETER_ERROR_PROMPT')}</p>;
 
@@ -42,77 +34,27 @@ export const FlangeHistoryChart = ({
       })}`
     : '';
 
+  if (historyDatas === undefined) return null;
+  const xAxisValues: number[] = [];
+  const series: any = [];
+  historyDatas.forEach(({ name, data }) => {
+    xAxisValues.push(...data.map(({ timestamp }) => timestamp));
+    const transformed = transformHistoryData(data, selectedProperty, { replace: name });
+    if (transformed?.series) {
+      series.push(...transformed.series);
+    }
+  });
+
   return (
-    <ChartContainer
-      options={buildTrendChartOfFlange(historyDatas, selectedProperty, firstPoint.type) as any}
-      title={title}
-      style={{ height: 550 }}
+    <PropertyChart
+      rawOptions={{ title: { text: title } }}
+      series={series}
+      style={{ height: 500 }}
+      xAxisValues={Array.from(new Set(xAxisValues))
+        .sort((prev, crt) => prev - crt)
+        .map((t) => dayjs.unix(t).local().format('YYYY-MM-DD HH:mm:ss'))}
+      yAxisMinInterval={selectedProperty.interval}
+      yAxisValueMeta={{ precision: selectedProperty.precision, unit: selectedProperty.unit }}
     />
   );
 };
-
-export function buildTrendChartOfFlange(
-  history: { name: string; data: HistoryData }[] | undefined,
-  property: Property,
-  type: number
-) {
-  if (history === undefined) return null;
-  const series = history.map(({ name, data }) => {
-    const datas = getHistoryDatas(data, type, property.key);
-    let _data: [string, number][] = [];
-    datas.forEach(({ times, seriesData, property: _property }) => {
-      if (property.key === _property.key) {
-        const _series = seriesData.find(({ name }) => name === property.name);
-        if (_series) {
-          times.map((time, index) =>
-            _data.push([
-              dayjs.unix(time).local().format('YYYY-MM-DD HH:mm:ss'),
-              _series.data[index]
-            ])
-          );
-        }
-      }
-    });
-    return {
-      type: 'line',
-      name,
-      data: _data,
-      showSymbol: _data.length === 1
-    };
-  });
-
-  return {
-    title: {
-      text: '',
-      left: isMobile ? 0 : 80,
-      subtext: property ? `${intl.get(property.name)}(${property.unit})` : ''
-    },
-    legend: { bottom: 0, type: series.length > 8 ? 'scroll' : 'plain' },
-    grid: { bottom: isMobile ? 120 : 60 },
-    tooltip: {
-      trigger: 'axis',
-      valueFormatter: (value: any) => `${getDisplayValue(value, property?.unit)}`
-    },
-    xAxis: { type: 'time' },
-    yAxis:
-      type === MonitoringPointTypeValue.PRELOAD
-        ? { type: 'value' }
-        : {
-            type: 'value',
-            ...calculateRangeOfAngle(series.map(({ data }) => data.map((item) => item[1])))
-          },
-    series
-  };
-}
-
-function calculateRangeOfAngle(seriesData: number[][]) {
-  let max = 15;
-  let min = -5;
-  seriesData.forEach((series) => {
-    const maxSeries = Math.max(...series);
-    const minSeries = Math.min(...series);
-    if (maxSeries > max) max = maxSeries;
-    if (minSeries < min) min = minSeries;
-  });
-  return { max, min };
-}

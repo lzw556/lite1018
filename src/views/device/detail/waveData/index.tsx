@@ -1,12 +1,11 @@
-import { Checkbox, Col, Row, Select, Space, Table } from 'antd';
-import EChartsReact from 'echarts-for-react';
+import { Checkbox, Col, Empty, Row, Select, Space, Table } from 'antd';
 import dayjs from '../../../../utils/dayjsUtils';
 import * as React from 'react';
 import { useState } from 'react';
-import { LineChartStyles } from '../../../../constants/chart';
 import { EmptyLayout } from '../../../layout';
 import { Device } from '../../../../types/device';
 import {
+  DeviceWaveData,
   DownloadDeviceDataByTimestampRequest,
   FindDeviceDataRequest,
   GetDeviceDataRequest
@@ -18,49 +17,22 @@ import { DeviceType } from '../../../../types/device_type';
 import intl from 'react-intl-universal';
 import { RangeDatePicker, oneWeekNumberRange } from '../../../../components/rangeDatePicker';
 import { useLocaleContext } from '../../../../localeProvider';
+import { PropertyChart } from '../../../../components/charts/propertyChart';
+import { getDisplayName } from '../../../../utils/format';
 
 const { Option } = Select;
-
-const defaultChartOption = {
-  title: { top: 0 },
-  tooltip: {},
-  xAxis: {},
-  grid: {
-    left: '2%',
-    right: '8%',
-    bottom: '12%',
-    containLabel: true,
-    borderWidth: '0'
-  },
-  yAxis: { type: 'value' },
-  series: [],
-  animation: false,
-  smooth: true,
-  dataZoom: [
-    {
-      type: 'slider',
-      show: true,
-      startValue: 0,
-      endValue: 3000,
-      height: '32',
-      zoomLock: false
-    }
-  ]
-};
 
 const WaveDataChart: React.FC<{ device: Device }> = ({ device }) => {
   const { language } = useLocaleContext();
   const [range, setRange] = React.useState<[number, number]>(oneWeekNumberRange);
   const [dataSource, setDataSource] = React.useState<any>();
   const [selectedTimestamp, setSelectedTimestamp] = React.useState<number>();
-  const [deviceData, setDeviceData] = React.useState<any>();
-  const [calculate, setCalculate] = React.useState<string>('accelerationTimeDomain');
+  const [deviceData, setDeviceData] = React.useState<DeviceWaveData>();
+  const [calculate, setCalculate] = React.useState<string>('accelerationFrequencyDomain');
   const [dimension, setDimension] = React.useState<number>(0);
   const [isLoading, setIsLoading] = React.useState(false);
   const [isShowEnvelope, setIsShowEnvelope] = React.useState(false);
-  const [dataType] = useState(
-    device.typeId === DeviceType.VibrationTemperature3AxisAdvanced ? 16842758 : 16842753
-  );
+  const [dataType] = useState(device.typeId === DeviceType.SVT220520 ? 16842758 : 16842753);
   const { hasPermission } = usePermission();
 
   const fetchDeviceWaveDataTimestamps = (id: number, range: [number, number], dataType: number) => {
@@ -92,17 +64,6 @@ const WaveDataChart: React.FC<{ device: Device }> = ({ device }) => {
       });
   };
 
-  const handleChange = React.useCallback((range: [number, number]) => {
-    if (checkIsRangeChanged(range)) {
-      setRange(range);
-    }
-  }, []);
-
-  function checkIsRangeChanged(range?: [number, number]) {
-    if (range === undefined) return false;
-    return range[0] !== oneWeekNumberRange[0] || range[1] !== oneWeekNumberRange[1];
-  }
-
   React.useEffect(() => {
     fetchDeviceWaveDataTimestamps(device.id, range, dataType);
   }, [device.id, range, dataType]);
@@ -122,17 +83,41 @@ const WaveDataChart: React.FC<{ device: Device }> = ({ device }) => {
   const getChartTitle = () => {
     switch (calculate) {
       case 'accelerationTimeDomain':
-        return `${intl.get('FIELD_ACCELERATION_TIME_DOMAIN')}(m/s²)`;
+        return getDisplayName({
+          name: intl.get('FIELD_ACCELERATION_TIME_DOMAIN'),
+          suffix: 'm/s²',
+          lang: language
+        });
       case 'accelerationFrequencyDomain':
-        return `${intl.get('FIELD_ACCELERATION_FREQUENCY_DOMAIN')}(m/s²)`;
+        return getDisplayName({
+          name: intl.get('FIELD_ACCELERATION_FREQUENCY_DOMAIN'),
+          suffix: 'm/s²',
+          lang: language
+        });
       case 'velocityTimeDomain':
-        return `${intl.get('FIELD_VELOCITY_TIME_DOMAIN')}(mm/s)`;
+        return getDisplayName({
+          name: intl.get('FIELD_VELOCITY_TIME_DOMAIN'),
+          suffix: 'mm/s',
+          lang: language
+        });
       case 'velocityFrequencyDomain':
-        return `${intl.get('FIELD_VELOCITY_FREQUENCY_DOMAIN')}(mm/s)`;
+        return getDisplayName({
+          name: intl.get('FIELD_VELOCITY_FREQUENCY_DOMAIN'),
+          suffix: 'mm/s',
+          lang: language
+        });
       case 'displacementTimeDomain':
-        return `${intl.get('FIELD_DISPLACEMENT_TIME_DOMAIN')}(μm)`;
+        return getDisplayName({
+          name: intl.get('FIELD_DISPLACEMENT_TIME_DOMAIN'),
+          suffix: 'μm',
+          lang: language
+        });
       case 'displacementFrequencyDomain':
-        return `${intl.get('FIELD_DISPLACEMENT_FREQUENCY_DOMAIN')}(μm)`;
+        return getDisplayName({
+          name: intl.get('FIELD_DISPLACEMENT_FREQUENCY_DOMAIN'),
+          suffix: 'μm',
+          lang: language
+        });
     }
     return '';
   };
@@ -184,28 +169,24 @@ const WaveDataChart: React.FC<{ device: Device }> = ({ device }) => {
   };
 
   const renderChart = () => {
+    const legends = [intl.get('AXIS_X'), intl.get('AXIS_Y'), intl.get('AXIS_Z')];
     if (deviceData === undefined && !isLoading) {
-      return <EmptyLayout description={intl.get('LOADING')} />;
+      return <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />;
     } else {
-      let option: any = { ...defaultChartOption };
-      if (deviceData) {
-        const data = deviceData.values;
-        const legends = [intl.get('AXIS_X'), intl.get('AXIS_Y'), intl.get('AXIS_Z')];
-        let series: any[] = [
-          {
-            name: legends[dimension],
-            type: 'line',
-            data: data.values,
-            itemStyle: LineChartStyles[dimension].itemStyle,
-            showSymbol: false
+      let series: any = [];
+      if (deviceData && deviceData.values) {
+        series.push({
+          data: { [legends[dimension]]: deviceData?.values.values },
+          xAxisValues: deviceData.values.xAxis.map((n) => `${n}`),
+          raw: {
+            smooth: true
           }
-        ];
+        });
         if (isShowEnvelope) {
-          series = [
-            {
-              name: legends[dimension],
-              type: 'line',
-              data: data.highEnvelopes,
+          series.push({
+            data: { [legends[dimension]]: deviceData?.values.highEnvelopes },
+            xAxisValues: deviceData.values.xAxis.map((n) => `${n}`),
+            raw: {
               lineStyle: {
                 opacity: 0
               },
@@ -213,58 +194,36 @@ const WaveDataChart: React.FC<{ device: Device }> = ({ device }) => {
                 color: '#ccc'
               },
               stack: 'confidence-band',
-              symbol: 'none'
-            },
-            {
-              name: legends[dimension],
-              type: 'line',
-              data: data.lowEnvelopes,
-              lineStyle: {
-                opacity: 0
-              },
-              areaStyle: {
-                color: '#ccc'
-              },
-              stack: 'confidence-band',
-              symbol: 'none'
-            },
-            ...series
-          ];
-        }
-        option = {
-          ...defaultChartOption,
-          legend: {
-            data: [legends[dimension]],
-            itemStyle: {
-              color: LineChartStyles[dimension].itemStyle.color
+              smooth: true
             }
-          },
-          title: { text: `${getChartTitle()} ${data.frequency / 1000}KHz`, top: 0 },
-          tooltip: {
-            trigger: 'axis',
-            axisPointer: {
-              type: 'cross',
-              crossStyle: {
-                color: '#999'
-              }
-            },
-            formatter: `{b} ${data.xAxisUnit}<br/>${legends[dimension]}: {c}`
-          },
-          xAxis: {
-            type: 'category',
-            data: data.xAxis,
-            name: data.xAxisUnit
-          },
-          series: series
-        };
+          });
+          series.push({
+            data: { [legends[dimension]]: deviceData?.values.lowEnvelopes },
+            xAxisValues: deviceData.values.xAxis.map((n) => `${n}`),
+            raw: {
+              lineStyle: {
+                opacity: 0
+              },
+              areaStyle: {
+                color: '#ccc'
+              },
+              stack: 'confidence-band',
+              smooth: true
+            }
+          });
+        }
       }
+
       return (
-        <EChartsReact
-          loadingOption={{ text: intl.get('LOADING') }}
-          showLoading={isLoading}
+        <PropertyChart
+          dataZoom={true}
+          loading={isLoading}
+          rawOptions={{ title: { text: `${(deviceData?.values.frequency ?? 0) / 1000}KHz` } }}
+          series={series}
           style={{ height: 500 }}
-          option={option}
-          notMerge={true}
+          xAxisUnit={deviceData?.values.xAxisUnit}
+          yAxisMinInterval={0}
+          yAxisValueMeta={{ precision: 3 }}
         />
       );
     }
@@ -276,23 +235,23 @@ const WaveDataChart: React.FC<{ device: Device }> = ({ device }) => {
       style={{ width: !isMobile ? '120px' : '100%' }}
       onChange={setCalculate}
     >
-      <Option key={'accelerationTimeDomain'} value={'accelerationTimeDomain'}>
-        {intl.get('FIELD_ACCELERATION_TIME_DOMAIN')}
-      </Option>
       <Option key={'accelerationFrequencyDomain'} value={'accelerationFrequencyDomain'}>
         {intl.get('FIELD_ACCELERATION_FREQUENCY_DOMAIN')}
       </Option>
-      <Option key={'velocityTimeDomain'} value={'velocityTimeDomain'}>
-        {intl.get('FIELD_VELOCITY_TIME_DOMAIN')}
+      <Option key={'accelerationTimeDomain'} value={'accelerationTimeDomain'}>
+        {intl.get('FIELD_ACCELERATION_TIME_DOMAIN')}
       </Option>
       <Option key={'velocityFrequencyDomain'} value={'velocityFrequencyDomain'}>
         {intl.get('FIELD_VELOCITY_FREQUENCY_DOMAIN')}
       </Option>
-      <Option key={'displacementTimeDomain'} value={'displacementTimeDomain'}>
-        {intl.get('FIELD_DISPLACEMENT_TIME_DOMAIN')}
+      <Option key={'velocityTimeDomain'} value={'velocityTimeDomain'}>
+        {intl.get('FIELD_VELOCITY_TIME_DOMAIN')}
       </Option>
       <Option key={'displacementFrequencyDomain'} value={'displacementFrequencyDomain'}>
         {intl.get('FIELD_DISPLACEMENT_FREQUENCY_DOMAIN')}
+      </Option>
+      <Option key={'displacementTimeDomain'} value={'displacementTimeDomain'}>
+        {intl.get('FIELD_DISPLACEMENT_TIME_DOMAIN')}
       </Option>
     </Select>
   );
@@ -324,7 +283,7 @@ const WaveDataChart: React.FC<{ device: Device }> = ({ device }) => {
       <>
         <Row style={{ marginBottom: 8 }}>
           <Col span={24}>
-            <RangeDatePicker onChange={handleChange} />
+            <RangeDatePicker onChange={setRange} />
           </Col>
         </Row>
         <Row style={{ marginBottom: 8 }} align='middle'>
@@ -376,7 +335,7 @@ const WaveDataChart: React.FC<{ device: Device }> = ({ device }) => {
         <Col xl={6} xxl={4} style={{ maxHeight: 500 }}>
           <Row justify={'center'} style={{ width: '100%' }}>
             <Col span={24}>
-              <RangeDatePicker onChange={handleChange} />
+              <RangeDatePicker onChange={setRange} />
             </Col>
           </Row>
           <Row justify={'space-between'} style={{ paddingTop: '0px' }}>

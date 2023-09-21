@@ -10,8 +10,8 @@ import { Permission } from '../../../permission/permission';
 import { isMobile } from '../../../utils/deviceDetection';
 import { AssetRow, DownloadHistory } from '../../asset';
 import {
+  getDisplayProperties,
   getRealPoints,
-  getSpecificProperties,
   HistoryData,
   MONITORING_POINT
 } from '../../monitoring-point';
@@ -26,22 +26,11 @@ export const FlangeHistory = ({
   historyDatas: { name: string; data: HistoryData }[] | undefined;
 }) => {
   const realPoints = getRealPoints(flange.monitoringPoints);
-  const [range, setRange] = React.useState<[number, number]>();
+  const [range, setRange] = React.useState<[number, number]>(oneWeekNumberRange);
   const [open, setVisible] = React.useState(false);
   const [property, setProperty] = React.useState<string | undefined>();
   const internalHistorys = useHistoryDatas(flange, range) ?? historyDatas;
   const firstPoint = realPoints[0];
-
-  const handleChange = React.useCallback((range: [number, number]) => {
-    if (checkIsRangeChanged(range)) {
-      setRange(range);
-    }
-  }, []);
-
-  function checkIsRangeChanged(range?: [number, number]) {
-    if (range === undefined) return false;
-    return range[0] !== oneWeekNumberRange[0] || range[1] !== oneWeekNumberRange[1];
-  }
 
   if (realPoints.length === 0)
     return (
@@ -51,7 +40,7 @@ export const FlangeHistory = ({
       />
     );
 
-  const properties = getSpecificProperties(firstPoint.properties, firstPoint.type);
+  const properties = getDisplayProperties(firstPoint.properties, firstPoint.type);
 
   return (
     <Row gutter={[32, 32]}>
@@ -77,7 +66,7 @@ export const FlangeHistory = ({
                   ))}
                 </Select>
               </Label>
-              <RangeDatePicker onChange={handleChange} showFooter={true} />
+              <RangeDatePicker onChange={setRange} showFooter={true} />
               {checkIsFlangePreload(flange) && (
                 <HasPermission value={Permission.AssetDataDownload}>
                   <Button

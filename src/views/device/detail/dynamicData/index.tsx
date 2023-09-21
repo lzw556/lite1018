@@ -1,5 +1,5 @@
 import { DownloadOutlined } from '@ant-design/icons';
-import { Col, Row, Select, Space, Table } from 'antd';
+import { Col, Empty, Row, Select, Space, Spin, Table } from 'antd';
 import dayjs from '../../../../utils/dayjsUtils';
 import * as React from 'react';
 import { Device } from '../../../../types/device';
@@ -7,7 +7,6 @@ import { isMobile } from '../../../../utils/deviceDetection';
 import { EmptyLayout } from '../../../layout';
 import { useFindingDeviceData } from '../../hooks/useFindingDeviceData';
 import usePermission, { Permission } from '../../../../permission/permission';
-import EChartsReact from 'echarts-for-react';
 import {
   Fields_ad,
   Fields_be,
@@ -18,7 +17,6 @@ import {
   Values_be
 } from '../../hooks/useGetingDeviceData';
 import Label from '../../../../components/label';
-import { LineChartStyles } from '../../../../constants/chart';
 import { DownloadDeviceDataByTimestampRequest } from '../../../../apis/device';
 import { DeviceType } from '../../../../types/device_type';
 import { AXIS_THREE, DYNAMIC_DATA_ANGLEDIP, DYNAMIC_DATA_BOLTELONGATION } from './constants';
@@ -28,44 +26,28 @@ import { oneWeekNumberRange, RangeDatePicker } from '../../../../components/rang
 import { useLocaleContext } from '../../../../localeProvider';
 import { NameValueGroups } from '../../../../components/name-values';
 import { getMetaProperty } from '../../../monitoring-point/show/dynamicData/dynamicDataContent';
+import { PropertyChart } from '../../../../components/charts/propertyChart';
 
 export const DynamicData: React.FC<Device> = ({ id, typeId }) => {
   const { language } = useLocaleContext();
   const { fields, data_type } =
     typeId === DeviceType.AngleDip ? DYNAMIC_DATA_ANGLEDIP : DYNAMIC_DATA_BOLTELONGATION;
   const [range, setRange] = React.useState<[number, number]>(oneWeekNumberRange);
-  const [isLoading, timestamps, fetchTimestamps] = useFindingDeviceData(range);
-  const [timestamp, setTimestamp] = React.useState(0);
+  const [isLoading, timestamps] = useFindingDeviceData(id, data_type, range[0], range[1]);
+  const [selectedTimestamp, setSelectedTimestamp] = React.useState(0);
+  const selectedTimestampObj =
+    timestamps.find((t) => t.timestamp === selectedTimestamp) ??
+    (timestamps.length > 0 ? timestamps[0] : null);
   const [field, setField] = React.useState(fields[0]);
   const { hasPermission } = usePermission();
-  React.useEffect(() => {
-    fetchTimestamps(id, {
-      data_type
-    });
-  }, [id, fetchTimestamps, data_type]);
-
-  React.useEffect(() => {
-    if (timestamps.length > 0) setTimestamp(timestamps[0].timestamp);
-  }, [timestamps]);
 
   const [isLoading2, data, fetchData] = useGetingDeviceData<Values_be | Values_ad>();
 
   React.useEffect(() => {
-    if (timestamp > 0) {
-      fetchData(id, timestamp, { data_type });
+    if (selectedTimestampObj) {
+      fetchData(id, selectedTimestampObj.timestamp, { data_type });
     }
-  }, [timestamp, id, fetchData, data_type]);
-
-  const handleChange = React.useCallback((range: [number, number]) => {
-    if (checkIsRangeChanged(range)) {
-      setRange(range);
-    }
-  }, []);
-
-  function checkIsRangeChanged(range?: [number, number]) {
-    if (range === undefined) return false;
-    return range[0] !== oneWeekNumberRange[0] || range[1] !== oneWeekNumberRange[1];
-  }
+  }, [selectedTimestampObj, id, fetchData, data_type]);
 
   const onDownload = (timestamp: number) => {
     DownloadDeviceDataByTimestampRequest(
@@ -92,30 +74,187 @@ export const DynamicData: React.FC<Device> = ({ id, typeId }) => {
     });
   };
 
-  const renderChart = () => {
-    const defaultChartOption = {
-      grid: {
-        left: '2%',
-        right: '8%',
-        bottom: '12%',
-        containLabel: true,
-        borderWidth: '0'
-      },
-      yAxis: { type: 'value' },
-      animation: false,
-      smooth: true,
-      dataZoom: [
-        {
-          type: 'slider',
-          show: true,
-          startValue: 0,
-          endValue: 3000,
-          height: '32',
-          zoomLock: false
-        }
-      ]
-    };
-    if (timestamp === 0 || !data || !data.values) {
+  return (
+    <Row gutter={[0, 16]}>
+      <Col span={24}>
+        <RangeDatePicker onChange={setRange} />
+      </Col>
+      <Col span={24}>
+        {isLoading && <Spin />}
+        {!isLoading && (
+          <>
+            {timestamps.length === 0 && (
+              <Empty
+                description={intl.get('NO_DATA_PROMPT')}
+                image={Empty.PRESENTED_IMAGE_SIMPLE}
+              />
+            )}
+            {timestamps.length > 0 && (
+              <Row>
+                {renderTimestampList()}
+                <Col span={isMobile ? 24 : 18} style={{ backgroundColor: '#f0f2f5' }}>
+                  {selectedTimestampObj && (
+                    <ShadowCard style={{ marginBottom: 10 }}>{renderMeta()}</ShadowCard>
+                  )}
+                  <ShadowCard>
+                    <Row justify='end'>
+                      <Col>
+                        <Label name={intl.get('PROPERTY')}>
+                          <Select
+                            bordered={false}
+                            defaultValue={fields[0].value}
+                            placeholder={intl.get('PLEASE_SELECT_PROPERTY')}
+                            style={{ width: '120px' }}
+                            onChange={(value) => {
+                              const field = fields.find((f) => f.value === value);
+                              if (field) {
+                                setField(field);
+                              }
+                            }}
+                          >
+                            {fields.map(({ label, value, unit }) => (
+                              <Select.Option key={value} value={value} data-unit={unit}>
+                                {intl.get(label)}
+                              </Select.Option>
+                            ))}
+                          </Select>
+                        </Label>
+                      </Col>
+                    </Row>
+                    <Row justify={'start'}>
+                      <Col span={24}>{renderChart()}</Col>
+                    </Row>
+                  </ShadowCard>
+                </Col>
+              </Row>
+            )}
+          </>
+        )}
+      </Col>
+    </Row>
+  );
+
+  function renderTimestampList() {
+    if (isMobile) {
+      return (
+        <>
+          <Col span={18}>
+            <Select
+              style={{ width: '100%' }}
+              defaultValue={timestamps[0].timestamp}
+              onChange={setSelectedTimestamp}
+            >
+              {timestamps.map((item: any) => (
+                <Select.Option key={item.timestamp} value={item.timestamp}>
+                  {dayjs.unix(item.timestamp).local().format('YYYY-MM-DD HH:mm:ss')}
+                </Select.Option>
+              ))}
+            </Select>
+          </Col>
+          <Col offset={2} span={2}>
+            <DownloadOutlined
+              onClick={() => {
+                if (selectedTimestampObj) {
+                  onDownload(selectedTimestampObj?.timestamp);
+                }
+              }}
+            />
+          </Col>
+        </>
+      );
+    } else {
+      return (
+        <>
+          <Col span={6}>
+            <Table
+              size={'middle'}
+              scroll={{ y: 500 }}
+              showHeader={false}
+              columns={[
+                {
+                  title: intl.get('TIMESTAMP'),
+                  dataIndex: 'timestamp',
+                  key: 'timestamp',
+                  width: '80%',
+                  render: (timestamp: number) =>
+                    dayjs.unix(timestamp).local().format('YYYY-MM-DD HH:mm:ss')
+                },
+                {
+                  title: intl.get('OPERATION'),
+                  key: 'action',
+                  render: (text: any, record: any) => {
+                    if (hasPermission(Permission.DeviceRawDataDownload)) {
+                      return (
+                        <Space size='middle'>
+                          <a
+                            onClick={() => {
+                              if (selectedTimestampObj) {
+                                onDownload(selectedTimestampObj?.timestamp);
+                              }
+                            }}
+                          >
+                            {intl.get('DOWNLOAD')}
+                          </a>
+                        </Space>
+                      );
+                    }
+                  }
+                }
+              ]}
+              pagination={false}
+              dataSource={timestamps}
+              rowClassName={(record) =>
+                record.timestamp === selectedTimestampObj?.timestamp ? 'ant-table-row-selected' : ''
+              }
+              onRow={(record) => ({
+                onClick: () => {
+                  setSelectedTimestamp(record.timestamp);
+                },
+                onMouseLeave: () => (window.document.body.style.cursor = 'default'),
+                onMouseEnter: () => (window.document.body.style.cursor = 'pointer')
+              })}
+            />
+          </Col>
+        </>
+      );
+    }
+  }
+
+  function renderMeta() {
+    if (!selectedTimestampObj || !data || !data.values || !data.values.metadata) {
+      return null;
+    } else {
+      const meta = data.values.metadata;
+      if ('min_preload' in meta) {
+        return (
+          <NameValueGroups
+            col={{ span: 12 }}
+            divider={50}
+            items={DYNAMIC_DATA_BOLTELONGATION.metaData.map(
+              ({ label, value, unit, precision }) => ({
+                name: intl.get(label),
+                value: getMetaProperty(meta, value, unit, precision)
+              })
+            )}
+          />
+        );
+      } else {
+        return (
+          <NameValueGroups
+            col={{ span: 12 }}
+            divider={50}
+            items={DYNAMIC_DATA_ANGLEDIP.metaData.map(({ label, value, unit, precision }) => ({
+              name: intl.get(label),
+              value: getMetaProperty(meta, value, unit, precision)
+            }))}
+          />
+        );
+      }
+    }
+  }
+
+  function renderChart() {
+    if (!selectedTimestampObj || !data || !data.values) {
       return <EmptyLayout description={intl.get('NO_DATA_PROMPT')} />;
     } else {
       let series: any = [];
@@ -132,245 +271,25 @@ export const DynamicData: React.FC<Device> = ({ id, typeId }) => {
       if (!isAcceleration) {
         series = [
           {
-            type: 'line',
-            name: intl.get(field.label),
-            data: (items as number[]).map((item) => item.toFixed(3)),
-            itemStyle: { color: LineChartStyles[0].itemStyle.color }
+            data: { [intl.get(field.label)]: items },
+            xAxisValues: items.map((n, i) => i)
           }
         ];
       } else {
-        series = AXIS_THREE.map((axis, index) => ({
-          type: 'line',
-          name: intl.get(axis.label),
-          data: (items as Fields_be_axis[])
-            .map((item) => item[axis.value])
-            .map((item) => item.toFixed(3)),
-          itemStyle: { color: LineChartStyles[index].itemStyle.color }
+        series = AXIS_THREE.map((axis) => ({
+          data: { [intl.get(axis.label)]: (items as Fields_be_axis[]).map((n) => n[axis.value]) },
+          xAxisValues: items.map((n, i) => i)
         }));
       }
       return (
-        <EChartsReact
-          loadingOption={{ text: intl.get('LOADING') }}
-          showLoading={isLoading2}
-          style={{ height: 500 }}
-          option={{
-            legend: {
-              data: !isAcceleration
-                ? [intl.get(field.label)]
-                : AXIS_THREE.map((item) => intl.get(item.label))
-            },
-            title: { text: intl.get(field.label), top: 0 },
-            tooltip: {
-              trigger: 'axis',
-              formatter: (paras: any) => {
-                return `<p>
-                ${paras[0].dataIndex}
-                <br />
-                ${paras
-                  .map(
-                    (para: any) =>
-                      `${para.marker}${para.seriesName} <strong>${para.data}</strong>${field.unit}`
-                  )
-                  .join('&nbsp;&nbsp;')}
-              </p>`;
-              }
-            },
-            xAxis: {
-              type: 'category',
-              data: series[0].data.map((item: any, index: number) => index)
-            },
-            series,
-            ...defaultChartOption
-          }}
-          notMerge={true}
+        <PropertyChart
+          dataZoom={true}
+          loading={isLoading2}
+          series={series}
+          style={{ height: 330 }}
+          yAxisValueMeta={{ precision: field.precision, unit: field.unit }}
         />
       );
     }
-  };
-
-  const renderMeta = () => {
-    if (timestamp === 0 || !data || !data.values || !data.values.metadata) {
-      return null;
-    } else {
-      const meta = data.values.metadata;
-      if ('min_preload' in meta) {
-        return (
-          <NameValueGroups
-            col={{ span: 12 }}
-            divider={50}
-            items={DYNAMIC_DATA_BOLTELONGATION.metaData.map(({ label, value, unit }) => ({
-              name: intl.get(label),
-              value: getMetaProperty(meta, value, unit)
-            }))}
-          />
-        );
-      } else {
-        return (
-          <NameValueGroups
-            col={{ span: 12 }}
-            divider={50}
-            items={DYNAMIC_DATA_ANGLEDIP.metaData.map(({ label, value, unit }) => ({
-              name: intl.get(label),
-              value: getMetaProperty(meta, value, unit)
-            }))}
-          />
-        );
-      }
-    }
-  };
-
-  if (isLoading) return <p>loading...</p>;
-  if (isMobile) {
-    if (timestamps.length === 0) {
-      return <EmptyLayout description={intl.get('NO_DYANAMIC_DATA_PROMPT')} />;
-    }
-    return (
-      <>
-        <Row style={{ marginBottom: 8 }}>
-          <Col span={24}>
-            <RangeDatePicker onChange={handleChange} />
-          </Col>
-        </Row>
-        <Row style={{ marginBottom: 8 }} align='middle'>
-          <Col span={18}>
-            <Select
-              style={{ width: '100%' }}
-              defaultValue={timestamps[0].timestamp}
-              onChange={(value) => {
-                if (value !== timestamp) {
-                  setTimestamp(value);
-                }
-              }}
-            >
-              {timestamps.map((item: any) => (
-                <Select.Option key={item.timestamp} value={item.timestamp}>
-                  {dayjs.unix(item.timestamp).local().format('YYYY-MM-DD HH:mm:ss')}
-                </Select.Option>
-              ))}
-            </Select>
-          </Col>
-          <Col offset={2} span={2}>
-            <DownloadOutlined onClick={() => onDownload(timestamp)} />
-          </Col>
-        </Row>
-        {timestamp !== 0 && <ShadowCard style={{ marginBottom: 10 }}>{renderMeta()}</ShadowCard>}
-        <Row>
-          <Col span={20}>
-            <Label name={intl.get('PROPERTY')}>
-              <Select
-                bordered={false}
-                defaultValue={fields[0].value}
-                placeholder={intl.get('PLEASE_SELECT_PROPERTY')}
-                onChange={(value) => {
-                  const field = fields.find((f) => f.value === value);
-                  if (field) {
-                    setField(field);
-                  }
-                }}
-              >
-                {fields.map(({ label, value, unit }) => (
-                  <Select.Option key={value} value={value} data-unit={unit}>
-                    {intl.get(label)}
-                  </Select.Option>
-                ))}
-              </Select>
-            </Label>
-          </Col>
-        </Row>
-        <Row style={{ marginTop: 8 }}>
-          <Col span={24}>{renderChart()}</Col>
-        </Row>
-      </>
-    );
-  } else {
-    return (
-      <Row>
-        <Col xl={6} xxl={4} style={{ maxHeight: 500 }}>
-          <Row justify={'center'} style={{ width: '100%' }}>
-            <Col span={24}>
-              <RangeDatePicker onChange={handleChange} />
-            </Col>
-          </Row>
-          <Row justify={'space-between'} style={{ paddingTop: '0px' }}>
-            <Col span={24}>
-              <Table
-                size={'middle'}
-                scroll={{ y: 600 }}
-                showHeader={false}
-                columns={[
-                  {
-                    title: intl.get('TIMESTAMP'),
-                    dataIndex: 'timestamp',
-                    key: 'timestamp',
-                    width: '80%',
-                    render: (timestamp: number) =>
-                      dayjs.unix(timestamp).local().format('YYYY-MM-DD HH:mm:ss')
-                  },
-                  {
-                    title: intl.get('OPERATION'),
-                    key: 'action',
-                    render: (text: any, record: any) => {
-                      if (hasPermission(Permission.DeviceRawDataDownload)) {
-                        return (
-                          <Space size='middle'>
-                            <a onClick={() => onDownload(timestamp)}>{intl.get('DOWNLOAD')}</a>
-                          </Space>
-                        );
-                      }
-                    }
-                  }
-                ]}
-                pagination={false}
-                dataSource={timestamps}
-                rowClassName={(record) =>
-                  record.timestamp === timestamp ? 'ant-table-row-selected' : ''
-                }
-                onRow={(record) => ({
-                  onClick: () => {
-                    if (record.timestamp !== timestamp) {
-                      setTimestamp(record.timestamp);
-                    }
-                  },
-                  onMouseLeave: () => (window.document.body.style.cursor = 'default'),
-                  onMouseEnter: () => (window.document.body.style.cursor = 'pointer')
-                })}
-              />
-            </Col>
-          </Row>
-        </Col>
-        <Col xl={18} xxl={20} style={{ backgroundColor: '#f0f2f5' }}>
-          {timestamp !== 0 && <ShadowCard style={{ marginBottom: 10 }}>{renderMeta()}</ShadowCard>}
-          <ShadowCard>
-            <Row justify='end'>
-              <Col>
-                <Label name={intl.get('PROPERTY')}>
-                  <Select
-                    bordered={false}
-                    defaultValue={fields[0].value}
-                    placeholder={intl.get('PLEASE_SELECT_PROPERTY')}
-                    style={{ width: '120px' }}
-                    onChange={(value) => {
-                      const field = fields.find((f) => f.value === value);
-                      if (field) {
-                        setField(field);
-                      }
-                    }}
-                  >
-                    {fields.map(({ label, value, unit }) => (
-                      <Select.Option key={value} value={value} data-unit={unit}>
-                        {intl.get(label)}
-                      </Select.Option>
-                    ))}
-                  </Select>
-                </Label>
-              </Col>
-            </Row>
-            <Row justify={'start'}>
-              <Col span={24}>{renderChart()}</Col>
-            </Row>
-          </ShadowCard>
-        </Col>
-      </Row>
-    );
   }
 };

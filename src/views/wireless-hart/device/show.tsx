@@ -159,18 +159,11 @@ export function useDeviceTabs(deviceTypeId?: number) {
       tabs.push({ key: 'ta', tab: 'STATUS_HISTORY' });
     }
   }
+  if (DeviceType.isVibration(deviceTypeId) && hasPermission(Permission.DeviceData)) {
+    tabs.unshift(...tabTitleList, { key: 'waveData', tab: 'WAVEFORM_DATA' });
+    return tabs;
+  }
   switch (deviceTypeId) {
-    case DeviceType.VibrationTemperature3Axis:
-    case DeviceType.VibrationTemperature3AxisNB:
-    case DeviceType.VibrationTemperature3AxisAdvanced:
-    case DeviceType.VibrationTemperature3AxisAdvancedNB:
-    case DeviceType.VibrationTemperature3AxisWIRED:
-    case DeviceType.VibrationTemperature3Axis16G:
-    case DeviceType.VibrationTemperature3Axis16GWIRED:
-      if (hasPermission(Permission.DeviceData)) {
-        tabs.unshift(...tabTitleList, { key: 'waveData', tab: 'WAVEFORM_DATA' });
-      }
-      break;
     case DeviceType.Gateway:
     case DeviceType.Router:
       return tabs;

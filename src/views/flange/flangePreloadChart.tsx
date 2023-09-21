@@ -1,79 +1,60 @@
 import React from 'react';
-import { ChartContainer } from '../../components/charts/chartContainer';
-import { getDisplayValue, roundValue } from '../../utils/format';
+import { getDisplayName, roundValue } from '../../utils/format';
 import {
   MonitoringPointRow,
   MonitoringPointTypeValue,
   getRealPoints,
-  MONITORING_POINT
+  MONITORING_POINT,
+  getDisplayProperties
 } from '../monitoring-point';
 import intl from 'react-intl-universal';
+import { PropertyChart } from '../../components/charts/propertyChart';
+import { useLocaleContext } from '../../localeProvider';
 
 export const FlangePreloadChart = ({ points }: { points: MonitoringPointRow[] }) => {
-  return (
-    <ChartContainer
-      options={buildFlangePreloadChart(points) as any}
-      title=''
-      style={{ height: 550 }}
-    />
-  );
-};
-
-export function buildFlangePreloadChart(points: MonitoringPointRow[]) {
+  const { language } = useLocaleContext();
   if (!points || points.length === 0) return null;
-  const series: any = [];
   const reals = getRealPoints(points).filter((point) => !!point.data);
   const fakes = points
     .filter((point) => point.type === MonitoringPointTypeValue.FLANGE_PRELOAD)
     .filter((point) => !!point.data);
   if (reals.length === 0 || fakes.length === 0) return null;
-  const property = reals[0].properties[0];
-  series.push({
-    type: 'scatter',
-    name: intl.get(MONITORING_POINT),
-    data: reals.map(({ attributes, data }, n) => [
-      attributes ? attributes?.index - 1 : 1,
-      roundValue((data?.values[property.key] as number) || NaN)
-    ])
-  });
+  const properties = getDisplayProperties(reals[0].properties, reals[0].type);
+  if (properties.length === 0) return null;
+  const property = properties[0];
+  const { precision, unit, name, key, interval } = property;
 
-  series.push({
-    type: 'line',
-    name: intl.get('BOLT'),
-    data: (fakes[0].data?.values[property.key] as number[]).map((val, index) => [
-      index,
-      roundValue(val)
-    ])
-  });
-  return {
-    tooltip: {
-      trigger: 'axis',
-      formatter: function (params: any) {
-        let relVal = '';
-        for (let i = 0; i < params.length; i++) {
-          const index = Number(params[i].value[0]) + 1;
-          const value = Number(params[i].value[1]);
-          relVal += `<br/> ${params[i].marker} ${intl.get('INDEXED_NUMBER', { index })}${
-            params[i].seriesName
-          }: ${intl.get(property.name)}${getDisplayValue(value, property.unit)}`;
+  return (
+    <PropertyChart
+      rawOptions={{
+        title: { text: getDisplayName({ name: intl.get(name), suffix: unit, lang: language }) }
+      }}
+      series={[
+        {
+          data: {
+            [intl.get(MONITORING_POINT)]: reals.map(({ data }) =>
+              roundValue((data?.values[key] as number) || NaN)
+            )
+          },
+          raw: { symbol: 'circle', type: 'scatter' },
+          xAxisValues: reals.map(({ attributes }) => (attributes ? `${attributes.index}` : '1'))
+        },
+        {
+          data: {
+            [intl.get('BOLT')]: (fakes[0].data?.values[key] as number[]).map((val) =>
+              roundValue(val)
+            )
+          },
+          xAxisValues: getXAxisData(fakes[0]).map((n) => `${n}`),
+          main: true
         }
-        return relVal;
-      }
-    },
-    grid: { bottom: 20, left: 50 },
-    title: {
-      text: `${intl.get(property.name)}${property.unit ? `(${property.unit})` : ''}`
-    },
-    series,
-    xAxis: {
-      type: 'category',
-      boundaryGap: false,
-      axisLabel: { align: 'left' },
-      data: getXAxisData(fakes[0])
-    },
-    yAxis: { type: 'value' }
-  };
-}
+      ]}
+      style={{ height: 550 }}
+      yAxisMinInterval={interval}
+      yAxisValueMeta={{ precision, unit }}
+    />
+  );
+};
 
 function getXAxisData(fakePoint: MonitoringPointRow) {
   if (!fakePoint || !fakePoint.data || fakePoint.properties.length === 0) return [];

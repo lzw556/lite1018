@@ -2,27 +2,27 @@ import * as React from 'react';
 import { FindDeviceDataRequest } from '../../../apis/device';
 
 export const useFindingDeviceData = (
-  range?: [number, number]
-): [boolean, { timestamp: number }[], (id: number, filters: any) => void] => {
+  id: number,
+  data_type: number,
+  from: number,
+  to: number
+): [boolean, { timestamp: number }[]] => {
   const [isLoading, setIsLoading] = React.useState(false);
-  const [data, setData] = React.useState([]);
-  const fetchDeviceWaveDataTimestamps = React.useCallback(
-    (id: number, filters: any) => {
-      setIsLoading(true);
-      if (range) {
-        const [from, to] = range;
-        FindDeviceDataRequest(id, from, to, filters)
-          .then((data: any) => {
-            setIsLoading(false);
-            setData(data);
-          })
-          .catch((_) => {
-            setIsLoading(false);
-          });
-      }
-    },
-    [range]
-  );
+  const [data, setData] = React.useState<{ timestamp: number }[]>([]);
 
-  return [isLoading, data, fetchDeviceWaveDataTimestamps];
+  React.useEffect(() => {
+    setIsLoading(true);
+    if (from && to) {
+      FindDeviceDataRequest(id, from, to, { data_type })
+        .then((data) => {
+          setIsLoading(false);
+          setData(data);
+        })
+        .catch((_) => {
+          setIsLoading(false);
+        });
+    }
+  }, [id, from, to, data_type]);
+
+  return [isLoading, data];
 };

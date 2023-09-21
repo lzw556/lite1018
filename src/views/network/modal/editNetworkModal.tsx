@@ -61,7 +61,7 @@ const EditNetworkModal: FC<EditNetworkModalProps> = (props) => {
       onOk={onSave}
       confirmLoading={isLoading}
     >
-      <Form form={form} labelCol={{ span: 7 }}>
+      <Form form={form} labelCol={{ span: 9 }}>
         <FormInputItem
           label={intl.get('NAME')}
           name='name'

@@ -22,4 +22,5 @@ export type Device = {
   dataTypes: number[];
   data?: any;
   tag?: string;
+  parentName?: string;
 };

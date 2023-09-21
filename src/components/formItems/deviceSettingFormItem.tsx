@@ -3,6 +3,7 @@ import { DeviceSetting, DeviceSettingValueType } from '../../types/device_settin
 import { FC, useState } from 'react';
 import { Rules } from '../../constants/validator';
 import intl from 'react-intl-universal';
+import { Term } from '../term';
 
 export interface DeviceSettingFormItemProps {
   value: DeviceSetting;
@@ -155,7 +156,9 @@ const DeviceSettingFormItem: FC<DeviceSettingFormItemProps> = ({ value, editable
   return (
     <>
       <Form.Item
-        label={intl.get(setting.name)}
+        label={
+          <Term name={intl.get(setting.name)} description={intl.get(`${setting.name}_DESC`)} />
+        }
         name={[setting.category, setting.key]}
         initialValue={setting.value}
         rules={renderRules(setting)}

@@ -18,6 +18,11 @@ export const oneWeekNumberRange: [number, number] = [
   oneWeekRange[1].utc().unix()
 ];
 
+export const oneYearNumberRange: [number, number] = [
+  oneYearRange[0].utc().unix(),
+  oneYearRange[1].utc().unix()
+];
+
 export const RangeDatePicker: React.FC<{
   defaultRange?: RangeValue;
   onChange?: (range: [number, number]) => void;
@@ -25,14 +30,13 @@ export const RangeDatePicker: React.FC<{
 }> = ({ defaultRange = oneWeekRange, onChange, showFooter }) => {
   const [range, setRange] = React.useState<RangeValue>(defaultRange);
 
-  React.useEffect(() => {
-    if (range && onChange) {
-      onChange([
-        dayjs(range[0]).startOf('day').utc().unix(),
-        dayjs(range[1]).endOf('day').utc().unix()
-      ]);
+  const handleChange = (range: RangeValue) => {
+    setRange(range);
+    const [start, end] = range;
+    if (start && end) {
+      onChange?.([start.utc().unix(), end.endOf('day').utc().unix()]);
     }
-  }, [range, onChange]);
+  };
 
   return (
     <DatePicker.RangePicker
@@ -46,16 +50,16 @@ export const RangeDatePicker: React.FC<{
         return (
           showFooter && (
             <Space>
-              <Button type='text' onClick={() => setRange(calculateRange(1))}>
+              <Button type='text' onClick={() => handleChange(calculateRange(1))}>
                 {intl.get('OPTION_LAST_MONTH')}
               </Button>
-              <Button type='text' onClick={() => setRange(calculateRange(3))}>
+              <Button type='text' onClick={() => handleChange(calculateRange(3))}>
                 {intl.get('OPTION_LAST_3_MONTHS')}
               </Button>
-              <Button type='text' onClick={() => setRange(calculateRange(6))}>
+              <Button type='text' onClick={() => handleChange(calculateRange(6))}>
                 {intl.get('OPTION_LAST_HALF_YEAR')}
               </Button>
-              <Button type='text' onClick={() => setRange(calculateRange(12))}>
+              <Button type='text' onClick={() => handleChange(calculateRange(12))}>
                 {intl.get('OPTION_LAST_YEAR')}
               </Button>
             </Space>
@@ -64,7 +68,7 @@ export const RangeDatePicker: React.FC<{
       }}
       onChange={(date) => {
         if (date) {
-          setRange(date as RangeValue);
+          handleChange(date as RangeValue);
         }
       }}
       disabledDate={(current) => current && current > dayjs().endOf('day')}

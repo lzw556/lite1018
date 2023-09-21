@@ -2,12 +2,13 @@ import { Col, Empty, Row, Spin, Table } from 'antd';
 import * as React from 'react';
 import { FlangeStatusData, SingleFlangeStatus } from './single';
 import dayjs from '../../../../utils/dayjsUtils';
-import { RangeDatePicker } from '../../../../components/rangeDatePicker';
+import { RangeDatePicker, oneWeekNumberRange } from '../../../../components/rangeDatePicker';
 import { AssetRow, getDataOfAsset, getFlangeData } from '../../../asset';
 import intl from 'react-intl-universal';
+import { getDisplayProperties } from '../../../monitoring-point';
 
 export const FakeFlangeStatus: React.FC<AssetRow> = (props) => {
-  const [range, setRange] = React.useState<[number, number]>();
+  const [range, setRange] = React.useState<[number, number]>(oneWeekNumberRange);
   const [timestamps, setTimestamps] = React.useState<{ timestamp: number }[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [timestamp, setTimestamp] = React.useState<number>();
@@ -66,7 +67,7 @@ export const FakeFlangeStatus: React.FC<AssetRow> = (props) => {
     return (
       <Table
         size={'middle'}
-        scroll={{ y: 600 }}
+        scroll={{ y: 500 }}
         showHeader={false}
         columns={[
           {
@@ -107,7 +108,10 @@ export const FakeFlangeStatus: React.FC<AssetRow> = (props) => {
       <SingleFlangeStatus
         properties={
           props.monitoringPoints && props.monitoringPoints.length > 0
-            ? props.monitoringPoints[0].properties
+            ? getDisplayProperties(
+                props.monitoringPoints[0].properties,
+                props.monitoringPoints[0].type
+              )
             : []
         }
         flangeData={flangeData}
@@ -118,9 +122,7 @@ export const FakeFlangeStatus: React.FC<AssetRow> = (props) => {
   return (
     <Row gutter={[0, 16]}>
       <Col span={24}>
-        <RangeDatePicker
-          onChange={React.useCallback((range: [number, number]) => setRange(range), [])}
-        />
+        <RangeDatePicker onChange={setRange} />
       </Col>
       <Col span={24}>{renderTimestampsSearchResult()}</Col>
     </Row>

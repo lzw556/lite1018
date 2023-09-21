@@ -20,6 +20,10 @@ export const MONITORING_POINTS = [
   },
   { id: MonitoringPointTypeValue.PRELOAD, label: MonitoringPointTypeText.PRELOAD },
   {
+    id: MonitoringPointTypeValue.PRELOAD_ATTITUDE,
+    label: MonitoringPointTypeText.PRELOAD_ATTITUDE
+  },
+  {
     id: MonitoringPointTypeValue.TOWER_INCLINATION,
     label: MonitoringPointTypeText.TOWER_INCLINATION
   },

@@ -1,92 +1,76 @@
 import * as React from 'react';
 import { Card, Empty } from 'antd';
 import dayjs from '../../utils/dayjsUtils';
-import ReactECharts from 'echarts-for-react';
 import { GetDeviceRuntimeRequest } from '../../apis/device';
-import { DefaultMonitorDataOption, LineChartStyles } from '../../constants/chart';
 import { isMobile } from '../../utils/deviceDetection';
 import { DeviceType } from '../../types/device_type';
 import intl from 'react-intl-universal';
+import { PropertyChart } from '../../components/charts/propertyChart';
 
 export const RuntimeChart: React.FC<{ deviceId: number; deviceType: number }> = ({
   deviceId,
   deviceType
 }) => {
-  const [runtimeOptions, setRuntimeOptions] = React.useState<any>();
+  const [runtimes, setRuntimes] = React.useState<
+    {
+      batteryVoltage: number;
+      signalStrength: number;
+      timestamp: number;
+    }[]
+  >([]);
 
   React.useEffect(() => {
     GetDeviceRuntimeRequest(
       deviceId,
       dayjs().startOf('day').subtract(13, 'd').utc().unix(),
       dayjs().endOf('day').utc().unix()
-    ).then((data) => {
-      const batteryOption = {
-        ...DefaultMonitorDataOption,
-        title: { text: intl.get('BATTERY_VOLTAGE') },
-        tooltip: {
-          trigger: 'axis',
-          formatter: '{b}<br/>{a}: {c}mV'
-        },
-        series: [
-          {
-            ...LineChartStyles[0],
-            name: intl.get('BATTERY_VOLTAGE'),
-            type: 'line',
-            data: data.map((item: any) => item.batteryVoltage)
-          }
-        ],
-        xAxis: {
-          type: 'category',
-          boundaryGap: false,
-          data: data.map((item: any) =>
-            dayjs.unix(item.timestamp).local().format('YYYY-MM-DD HH:mm:ss')
-          )
-        }
-      };
-      const signalOption = {
-        ...DefaultMonitorDataOption,
-        title: { text: intl.get('SIGNAL_STRENGTH') },
-        tooltip: {
-          trigger: 'axis',
-          formatter: '{b}<br/>{a}: {c}dB'
-        },
-        series: [
-          {
-            ...LineChartStyles[0],
-            name: intl.get('SIGNAL_STRENGTH'),
-            type: 'line',
-            data: data.map((item: any) => item.signalStrength)
-          }
-        ],
-        xAxis: {
-          type: 'category',
-          boundaryGap: false,
-          data: data.map((item: any) =>
-            dayjs.unix(item.timestamp).local().format('YYYY-MM-DD HH:mm:ss')
-          )
-        }
-      };
-      if (deviceType !== DeviceType.Gateway) {
-        setRuntimeOptions([batteryOption, signalOption]);
-      } else {
-        setRuntimeOptions([signalOption]);
-      }
-    });
+    ).then(setRuntimes);
   }, [deviceId, deviceType]);
 
-  if (runtimeOptions && runtimeOptions.length) {
+  if (runtimes.length) {
+    const xAxisValues = runtimes.map((item) =>
+      dayjs.unix(item.timestamp).local().format('YYYY-MM-DD HH:mm:ss')
+    );
     return (
       <Card bordered={false}>
-        {runtimeOptions.map((item: any, index: number) => {
-          return (
-            <Card.Grid
-              key={index}
-              style={{ boxShadow: 'none', border: 'none', width: isMobile ? '100%' : '50%' }}
-            >
-              <ReactECharts option={item} style={{ border: 'none', height: '256px' }} />
-            </Card.Grid>
-          );
-        })}
+        {deviceType !== DeviceType.Gateway && (
+          <Card.Grid
+            style={{ boxShadow: 'none', border: 'none', width: isMobile ? '100%' : '50%' }}
+          >
+            <PropertyChart
+              rawOptions={{ title: { text: intl.formatMessage({ id: 'BATTERY_VOLTAGE' }) } }}
+              series={[
+                {
+                  data: {
+                    [intl.formatMessage({ id: 'BATTERY_VOLTAGE' })]: runtimes.map(
+                      (item) => item.batteryVoltage
+                    )
+                  },
+                  xAxisValues
+                }
+              ]}
+              withArea={true}
+              yAxisValueMeta={{ unit: 'mV', precision: 0 }}
+            />
+          </Card.Grid>
+        )}
+        <Card.Grid style={{ boxShadow: 'none', border: 'none', width: isMobile ? '100%' : '50%' }}>
+          <PropertyChart
+            rawOptions={{ title: { text: intl.formatMessage({ id: 'SIGNAL_STRENGTH' }) } }}
+            series={[
+              {
+                data: {
+                  [intl.formatMessage({ id: 'SIGNAL_STRENGTH' })]: runtimes.map(
+                    (item) => item.signalStrength
+                  )
+                },
+                xAxisValues
+              }
+            ]}
+            withArea={true}
+            yAxisValueMeta={{ unit: 'dBm', precision: 0 }}
+          />
+        </Card.Grid>
       </Card>
     );
   }

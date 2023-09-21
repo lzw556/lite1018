@@ -47,6 +47,7 @@ import intl from 'react-intl-universal';
 import { CommandDropdown } from './commandDropdown';
 import { toMac } from '../../utils/format';
 import { SelfLink } from '../../components/selfLink';
+import { DataBarOfFirstProperties } from './dataBarOfFirstProperties';
 
 const { Search } = Input;
 const { Option } = Select;
@@ -162,10 +163,7 @@ const DevicePage = () => {
         const data = getValueOfFirstClassProperty(device);
         if (data && data.length > 0) {
           const channel = device.data?.values?.channel;
-          const channelText = channel ? `(${intl.get('CHANNEL')}${channel})` : '';
-          return (
-            data.map(({ name, value }) => `${intl.get(name)}:${value}`).join(', ') + channelText
-          );
+          return <DataBarOfFirstProperties data={data} channel={channel} />;
         }
         return intl.get('NO_DATA');
       }

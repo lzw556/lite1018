@@ -9,14 +9,14 @@ import HasPermission from '../../../../permission';
 import usePermission, { Permission } from '../../../../permission/permission';
 import { store } from '../../../../store';
 import intl from 'react-intl-universal';
-import { RangeDatePicker } from '../../../../components/rangeDatePicker';
+import { RangeDatePicker, oneWeekNumberRange } from '../../../../components/rangeDatePicker';
 
 export interface DeviceEventProps {
   device: Device;
 }
 
 const DeviceEvent: FC<DeviceEventProps> = ({ device }) => {
-  const [range, setRange] = useState<[number, number]>();
+  const [range, setRange] = useState<[number, number]>(oneWeekNumberRange);
   const [dataSource, setDataSource] = useState<any>();
   const [selectedRowKeys, setSelectedRowKeys] = useState<any[]>([]);
   const { hasPermission } = usePermission();
@@ -107,9 +107,7 @@ const DeviceEvent: FC<DeviceEventProps> = ({ device }) => {
           <Row justify='end'>
             <Col span={24} style={{ textAlign: 'right' }}>
               <Space style={{ textAlign: 'center' }}>
-                <RangeDatePicker
-                  onChange={useCallback((range: [number, number]) => setRange(range), [])}
-                />
+                <RangeDatePicker onChange={setRange} />
               </Space>
             </Col>
           </Row>

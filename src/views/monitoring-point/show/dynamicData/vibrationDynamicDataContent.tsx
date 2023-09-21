@@ -1,15 +1,11 @@
-import { Checkbox, Col, Row, Select, Space, Spin } from 'antd';
+import { Checkbox, Col, Row, Select, Space } from 'antd';
 import * as React from 'react';
-import { ChartContainer } from '../../../../components/charts/chartContainer';
 import Label from '../../../../components/label';
 import ShadowCard from '../../../../components/shadowCard';
-import {
-  DynamicDataType,
-  VibrationWaveFormDataType,
-  generateVibrationChartOptions
-} from './dynamicDataHelper';
+import { DynamicDataType, VibrationWaveFormDataType } from './dynamicDataHelper';
 import intl from 'react-intl-universal';
 import { AXIS_THREE } from '../../../device/detail/dynamicData/constants';
+import { PropertyChart } from '../../../../components/charts/propertyChart';
 
 const AXISES = AXIS_THREE.map(({ label, value }) => ({
   label,
@@ -31,33 +27,10 @@ export const VibrationDynamicDataContent = ({
   onAxisChange?: (axis: number) => void;
 }) => {
   const { fields } = type;
-  const { values, loading } = data;
+  const { loading } = data;
   const [field, setField] = React.useState(fields[0]);
   const [axis, setAxis] = React.useState(0);
   const [isShowEnvelope, setIsShowEnvelope] = React.useState(false);
-
-  const renderChart = () => {
-    if (loading) return <Spin />;
-    const _field = {
-      ...field,
-      label: intl.get(field.label)
-    };
-    return (
-      <ChartContainer
-        options={
-          generateVibrationChartOptions(
-            axis,
-            AXISES.map(({ label }) => label) as [string, string, string],
-            _field.label,
-            values,
-            isShowEnvelope
-          ) as any
-        }
-        title=''
-        style={{ height: 500 }}
-      />
-    );
-  };
 
   return (
     <>
@@ -126,4 +99,58 @@ export const VibrationDynamicDataContent = ({
       </Col>
     </>
   );
+
+  function renderChart() {
+    const { frequency, values, xAxis, xAxisUnit, highEnvelopes, lowEnvelopes } = data.values;
+    let series: any = [];
+    series.push({
+      data: { [AXISES.map(({ label }) => label)[axis]]: values },
+      xAxisValues: xAxis.map((n) => `${n}`),
+      raw: {
+        smooth: true
+      }
+    });
+    if (isShowEnvelope) {
+      series.push({
+        data: { [AXISES.map(({ label }) => label)[axis]]: highEnvelopes },
+        xAxisValues: xAxis.map((n) => `${n}`),
+        raw: {
+          lineStyle: {
+            opacity: 0
+          },
+          areaStyle: {
+            color: '#ccc'
+          },
+          stack: 'confidence-band',
+          smooth: true
+        }
+      });
+      series.push({
+        data: { [AXISES.map(({ label }) => label)[axis]]: lowEnvelopes },
+        xAxisValues: xAxis.map((n) => `${n}`),
+        raw: {
+          lineStyle: {
+            opacity: 0
+          },
+          areaStyle: {
+            color: '#ccc'
+          },
+          stack: 'confidence-band',
+          smooth: true
+        }
+      });
+    }
+    return (
+      <PropertyChart
+        dataZoom={true}
+        loading={loading}
+        rawOptions={{ title: { text: `${(frequency ?? 0) / 1000}KHz` } }}
+        series={series}
+        style={{ height: 500 }}
+        xAxisUnit={xAxisUnit}
+        yAxisMinInterval={0}
+        yAxisValueMeta={{ precision: field.precision, unit: field.unit }}
+      />
+    );
+  }
 };

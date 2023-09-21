@@ -1,215 +1,4 @@
 import { ColorHealth } from './color';
-import * as echarts from 'echarts';
-
-export const LineChartStyles = [
-  {
-    itemStyle: {
-      color: 'rgb(0,130,252)'
-    },
-    areaStyle: {
-      color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-        {
-          offset: 0,
-          color: 'rgb(0,130,252)'
-        },
-        {
-          offset: 1,
-          color: 'rgb(255,255,255)'
-        }
-      ])
-    }
-  },
-  {
-    itemStyle: {
-      color: 'rgb(253,216,69)'
-    },
-    areaStyle: {
-      color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-        {
-          offset: 0,
-          color: 'rgb(253,216,69)'
-        },
-        {
-          offset: 1,
-          color: 'rgb(255,255,255)'
-        }
-      ])
-    }
-  },
-  {
-    itemStyle: {
-      color: 'rgb(34,237,124)'
-    },
-    areaStyle: {
-      color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-        {
-          offset: 0,
-          color: 'rgb(34,237,124)'
-        },
-        {
-          offset: 1,
-          color: 'rgb(255,255,255)'
-        }
-      ])
-    }
-  }
-];
-
-export const DefaultHistoryDataOption = {
-  title: {
-    text: ''
-  },
-  tooltip: {
-    trigger: 'axis'
-  },
-  legend: {
-    data: []
-  },
-  toolbox: {},
-  grid: {
-    left: '3%',
-    right: '4%',
-    bottom: '12%',
-    containLabel: true,
-    borderWidth: '0'
-  },
-  xAxis: [
-    {
-      type: 'category',
-      boundaryGap: false,
-      data: []
-    }
-  ],
-  dataZoom: [
-    {
-      type: 'inside',
-      start: 80,
-      end: 100
-    },
-    {
-      start: 80,
-      end: 100
-    }
-  ],
-  yAxis: [
-    {
-      type: 'value'
-    }
-  ],
-  series: []
-};
-
-export const DefaultMonitorDataOption = {
-  title: {
-    text: '',
-    textStyle: {
-      fontSize: 12
-    }
-  },
-  tooltip: {
-    trigger: 'axis'
-  },
-  legend: {
-    type: 'plain',
-    show: false
-  },
-  toolbox: {},
-  grid: {
-    left: '3%',
-    right: '4%',
-    bottom: '3%',
-    containLabel: true,
-    borderWidth: '0'
-  },
-  xAxis: [
-    {
-      type: 'category',
-      boundaryGap: false,
-      data: []
-    }
-  ],
-  yAxis: [
-    {
-      type: 'value',
-      axisLine: {
-        show: false
-      },
-      splitLine: {
-        show: false
-      }
-    }
-  ],
-  series: []
-};
-
-export const DefaultMultiBarOption = {
-  tooltip: {
-    trigger: 'axis',
-    axisPointer: {
-      type: 'shadow'
-    }
-  },
-  legend: {
-    data: ['次要', '重要', '紧急']
-  },
-  grid: {
-    left: '8%',
-    top: '20%',
-    right: '3%',
-    bottom: '16%'
-  },
-  xAxis: [
-    {
-      type: 'category',
-      axisTick: { show: false },
-      data: []
-    }
-  ],
-  yAxis: [
-    {
-      type: 'value',
-      axisLine: {
-        show: false
-      },
-      axisTick: {
-        show: false
-      }
-    }
-  ],
-  series: []
-};
-
-export const DefaultPieOption = {
-  tooltip: {
-    trigger: 'item',
-    formatter: '{a} <br/>{b}: {c} ({d}%)'
-  },
-  legend: {
-    show: true,
-    bottom: 0,
-    right: 0
-  },
-  series: [
-    {
-      type: 'pie',
-      radius: ['70%'],
-      center: ['50%', '40%'],
-      avoidLabelOverlap: false,
-      label: {
-        show: false,
-        position: 'center'
-      },
-      emphasis: {
-        label: {
-          show: false,
-          fontSize: '10',
-          fontWeight: 'bold'
-        }
-      },
-      data: []
-    }
-  ]
-};
 
 export const DefaultGaugeOption = {
   series: [
@@ -246,4 +35,38 @@ export const DefaultGaugeOption = {
       }
     }
   ]
+};
+
+export const ChartStyle = {
+  Colors: [
+    '#0084FC',
+    '#FDD845',
+    '#22ED7C',
+    '#5470c6',
+    '#91cc75',
+    '#fac858',
+    '#ee6666',
+    '#73c0de',
+    '#3ba272'
+  ],
+  LineSeries: {
+    type: 'line',
+    symbol: 'none',
+    colorBy: 'series'
+  },
+  DashedSplitLine: {
+    splitLine: {
+      lineStyle: {
+        type: 'dashed'
+      }
+    },
+    show: true
+  },
+  Grid: {
+    top: '15%',
+    bottom: '10%',
+    right: '16',
+    left: '16',
+    containLabel: true
+  }
 };

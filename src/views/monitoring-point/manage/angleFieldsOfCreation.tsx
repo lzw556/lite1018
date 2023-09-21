@@ -3,6 +3,8 @@ import React from 'react';
 import intl from 'react-intl-universal';
 import { FormInputItem } from '../../../components/formInputItem';
 import { MonitoringPointTypeValue } from '../types';
+import { useLocaleContext } from '../../../localeProvider';
+import { getDisplayName } from '../../../utils/format';
 
 export const AngleFieldsOfCreation = ({
   type,
@@ -15,8 +17,17 @@ export const AngleFieldsOfCreation = ({
     fieldKey?: number | undefined;
   };
 }) => {
+  const { language } = useLocaleContext();
   return (
-    <Form.Item required label={`${intl.get('TOWER_INSTALL_ANGLE')}(°)`} style={{ marginBottom: 0 }}>
+    <Form.Item
+      required
+      label={getDisplayName({
+        name: intl.get('TOWER_INSTALL_ANGLE'),
+        suffix: '°',
+        lang: language
+      })}
+      style={{ marginBottom: 0 }}
+    >
       <FormInputItem
         {...restFields}
         name={[name, 'attributes', 'tower_install_angle']}
@@ -48,7 +59,11 @@ export const AngleFieldsOfCreation = ({
           {...restFields}
           required
           name={[name, 'attributes', 'tower_install_height']}
-          label={`${intl.get('TOWER_INSTALL_HEIGHT')}(m)`}
+          label={getDisplayName({
+            name: intl.get('TOWER_INSTALL_HEIGHT'),
+            suffix: 'm',
+            lang: language
+          })}
           numericRule={{
             others: [
               {
@@ -94,7 +109,11 @@ export const AngleFieldsOfCreation = ({
           {...restFields}
           required
           name={[name, 'attributes', 'tower_base_radius']}
-          label={`${intl.get('TOWER_BASE_RADIUS')}(m)`}
+          label={getDisplayName({
+            name: intl.get('TOWER_BASE_RADIUS'),
+            suffix: 'm',
+            lang: language
+          })}
           numericRule={{
             others: [
               {
