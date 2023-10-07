@@ -59,14 +59,17 @@ export function generatePropertyColumns(measurement: MonitoringPointRow, lang: L
   const properties = generateDatasOfMeasurement(measurement);
   if (properties.length > 0) {
     return properties
-      .map(({ name, key, value, fieldName }) => ({
+      .map(({ name, key, fieldName }) => ({
         title: getDisplayName({
           name: intl.get(name),
           suffix: fieldName && intl.get(fieldName),
           lang
         }),
         key,
-        render: (measurement: MonitoringPointRow) => value,
+        render: (measurement: MonitoringPointRow) => {
+          const datas = generateDatasOfMeasurement(measurement);
+          return datas.find((data) => key === data.key)?.value;
+        },
         width: 120
       }))
       .concat({
