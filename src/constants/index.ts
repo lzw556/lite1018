@@ -61,6 +61,14 @@ export const SECOND_COMMUNICATION_PERIOD = [
     text: 'NONE'
   },
   {
+    value: 10 * 60 * millisecond,
+    text: 'OPTION_10_MINUTES'
+  },
+  {
+    value: 20 * 60 * millisecond,
+    text: 'OPTION_20_MINUTES'
+  },
+  {
     value: 30 * 60 * millisecond,
     text: 'OPTION_30_MINUTES'
   },
