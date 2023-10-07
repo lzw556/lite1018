@@ -1,7 +1,6 @@
 import { Checkbox, Col, Empty, Row, Select, Space, Table } from 'antd';
 import dayjs from '../../../../utils/dayjsUtils';
 import * as React from 'react';
-import { useState } from 'react';
 import { EmptyLayout } from '../../../layout';
 import { Device } from '../../../../types/device';
 import {
@@ -13,7 +12,7 @@ import {
 import { isMobile } from '../../../../utils/deviceDetection';
 import { DownloadOutlined } from '@ant-design/icons';
 import usePermission, { Permission } from '../../../../permission/permission';
-import { DeviceType } from '../../../../types/device_type';
+import { SVT_DEVICE_TYPE_SENSOR_TYPE_MAPPING } from '../../../../types/device_type';
 import intl from 'react-intl-universal';
 import { RangeDatePicker, oneWeekNumberRange } from '../../../../components/rangeDatePicker';
 import { useLocaleContext } from '../../../../localeProvider';
@@ -32,7 +31,10 @@ const WaveDataChart: React.FC<{ device: Device }> = ({ device }) => {
   const [dimension, setDimension] = React.useState<number>(0);
   const [isLoading, setIsLoading] = React.useState(false);
   const [isShowEnvelope, setIsShowEnvelope] = React.useState(false);
-  const [dataType] = useState(device.typeId === DeviceType.SVT220520 ? 16842758 : 16842753);
+  const dataType =
+    SVT_DEVICE_TYPE_SENSOR_TYPE_MAPPING[
+      device.typeId as keyof typeof SVT_DEVICE_TYPE_SENSOR_TYPE_MAPPING
+    ];
   const { hasPermission } = usePermission();
 
   const fetchDeviceWaveDataTimestamps = (id: number, range: [number, number], dataType: number) => {

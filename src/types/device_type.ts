@@ -198,3 +198,17 @@ export const SENSOR_DISPLAY_PROPERTIES = {
   [DeviceType.PressureTemperature]: PROPERTY_CATEGORIES.SPT,
   [DeviceType.AngleDip]: PROPERTY_CATEGORIES.SQ
 };
+
+const SVT_SENSOR_TYPES = [16842753, 16842758, 16842759];
+
+export const SVT_DEVICE_TYPE_SENSOR_TYPE_MAPPING = {
+  [DeviceType.SVT210R]: SVT_SENSOR_TYPES[0],
+  [DeviceType.SVT220520]: SVT_SENSOR_TYPES[1],
+  [DeviceType.VibrationTemperature3AxisNB]: SVT_SENSOR_TYPES[0],
+  [DeviceType.VibrationTemperature3AxisAdvancedNB]: SVT_SENSOR_TYPES[1],
+  [DeviceType.SVT210510]: SVT_SENSOR_TYPES[0],
+  [DeviceType.SVT210RS]: SVT_SENSOR_TYPES[0],
+  [DeviceType.SVT210S]: SVT_SENSOR_TYPES[0],
+  [DeviceType.SVT220S1]: SVT_SENSOR_TYPES[2],
+  [DeviceType.SVT220S3]: SVT_SENSOR_TYPES[1]
+};
