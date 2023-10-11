@@ -1,10 +1,11 @@
-import { Form, Input, Modal, ModalProps, Radio, Select } from 'antd';
+import { Form, Input, ModalProps, Radio, Select } from 'antd';
 import * as React from 'react';
 import { addAsset, getAssets } from '../services';
 import { Asset, AssetRow } from '../types';
 import intl from 'react-intl-universal';
 import { useAssetCategoryChain } from '../../../config/assetCategory.config';
 import { FormInputItem } from '../../../components/formInputItem';
+import { ModalWrapper } from '../../../components/modalWrapper';
 
 export const CreateAreaAsset: React.FC<
   ModalProps & { parentId?: number; onSuccess: () => void }
@@ -24,10 +25,9 @@ export const CreateAreaAsset: React.FC<
   }, [parentId, key]);
 
   return (
-    <Modal
+    <ModalWrapper
       {...{
         title: intl.get('CREATE_SOMETHING', { something: intl.get('ASSET') }),
-        cancelText: intl.get('CANCEL'),
         okText: intl.get('CREATE'),
         ...props,
         onOk: () => {
@@ -97,6 +97,6 @@ export const CreateAreaAsset: React.FC<
           </Form.Item>
         )}
       </Form>
-    </Modal>
+    </ModalWrapper>
   );
 };

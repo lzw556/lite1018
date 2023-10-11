@@ -5,7 +5,6 @@ import { DeviceType } from '../../../../types/device_type';
 import intl from 'react-intl-universal';
 import { BasicSettings } from './basic';
 import DeviceSettings from '../../../device/detail/setting/deviceSettings';
-import { AlarmRuleSettings } from '../../../device/detail/setting/alarmRuleSettings';
 
 export interface SettingPageProps {
   device: Device;
@@ -37,7 +36,6 @@ const SettingPage: React.FC<SettingPageProps> = ({ device, onUpdate }) => {
         />
         {type === 'basic' && <BasicSettings device={device} onUpdate={onUpdate} />}
         {type === 'device' && <DeviceSettings device={device} />}
-        {type === 'alarm' && <AlarmRuleSettings device={device} />}
       </>
     );
   }

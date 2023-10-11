@@ -1,10 +1,11 @@
-import { Form, Modal, ModalProps } from 'antd';
+import { Form, ModalProps } from 'antd';
 import * as React from 'react';
 import { bindDevice, unbindDevice, updateMeasurement } from '../services';
 import { MonitoringPoint, MonitoringPointRow, MONITORING_POINT } from '../types';
 import { UpdateForm } from './updateForm';
 import intl from 'react-intl-universal';
 import { buildRequestAttrs, getProcessId } from '../utils';
+import { ModalWrapper } from '../../../components/modalWrapper';
 
 export const MonitoringPointUpdate: React.FC<
   ModalProps & { monitoringPoint: MonitoringPointRow; onSuccess: () => void }
@@ -13,10 +14,9 @@ export const MonitoringPointUpdate: React.FC<
   const [form] = Form.useForm<MonitoringPoint & { device_id: number }>();
 
   return (
-    <Modal
+    <ModalWrapper
       {...{
         title: intl.get('EDIT_SOMETHING', { something: intl.get(MONITORING_POINT) }),
-        cancelText: intl.get('CANCEL'),
         okText: intl.get('SAVE'),
         ...props,
         onOk: () => {
@@ -53,6 +53,6 @@ export const MonitoringPointUpdate: React.FC<
       }}
     >
       <UpdateForm form={form} monitoringPoint={monitoringPoint} />
-    </Modal>
+    </ModalWrapper>
   );
 };

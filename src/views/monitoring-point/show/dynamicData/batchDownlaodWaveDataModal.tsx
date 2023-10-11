@@ -1,10 +1,11 @@
-import { Button, Modal, ModalProps, Table } from 'antd';
+import { Button, ModalProps, Table } from 'antd';
 import React from 'react';
 import intl from 'react-intl-universal';
 import { isMobile } from '../../../../utils/deviceDetection';
 import dayjs from '../../../../utils/dayjsUtils';
 import { batchDownload } from '../../services';
 import { getFilename } from '../../../../utils/format';
+import { ModalWrapper } from '../../../../components/modalWrapper';
 
 export const BatchDownlaodWaveDataModal = ({
   id,
@@ -30,7 +31,7 @@ export const BatchDownlaodWaveDataModal = ({
   };
 
   return (
-    <Modal
+    <ModalWrapper
       title={intl.get('BATCH_DOWNLOAD')}
       {...rest}
       okButtonProps={{ disabled: selectedBatchDownloadTimestamps.length === 0 }}
@@ -81,6 +82,6 @@ export const BatchDownlaodWaveDataModal = ({
         }}
         rowKey='timestamp'
       />
-    </Modal>
+    </ModalWrapper>
   );
 };

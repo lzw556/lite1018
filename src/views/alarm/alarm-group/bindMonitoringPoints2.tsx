@@ -1,4 +1,4 @@
-import { Empty, Modal, ModalProps, Spin, Tree } from 'antd';
+import { Empty, ModalProps, Spin, Tree } from 'antd';
 import * as React from 'react';
 import { getAssets } from '../../asset/services';
 import { AssetRow, AssetTreeNode } from '../../asset/types';
@@ -9,6 +9,7 @@ import intl from 'react-intl-universal';
 import { useAssetCategoryChain } from '../../../config/assetCategory.config';
 import { combineMonitoringPointToAsset } from '../../asset/common/utils';
 import { list2Tree, mapTree, tree2List } from '../../../utils/tree';
+import { ModalWrapper } from '../../../components/modalWrapper';
 
 export const BindMonitoringPoints2: React.FC<
   ModalProps & { selectedRow: AlarmRule } & { onSuccess: () => void }
@@ -80,10 +81,9 @@ export const BindMonitoringPoints2: React.FC<
   }
 
   return (
-    <Modal
+    <ModalWrapper
       width={800}
       title={intl.get('EDIT_SOMETHING', { something: intl.get(MONITORING_POINT) })}
-      // bodyStyle={{ maxHeight: 700, overflow: 'auto' }}
       {...props}
       onOk={() => {
         if (checkedIds.length === 0) props.onSuccess();
@@ -97,6 +97,6 @@ export const BindMonitoringPoints2: React.FC<
       }}
     >
       {renderModalContent()}
-    </Modal>
+    </ModalWrapper>
   );
 };

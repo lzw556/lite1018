@@ -1,9 +1,10 @@
-import { Form, Input, message, Modal, ModalProps, Typography } from 'antd';
+import { Form, Input, message, ModalProps, Typography } from 'antd';
 import { Project } from '../../types/project';
 import { FC, useEffect, useState } from 'react';
 import { CreateProjectRequest, UpdateProjectRequest } from '../../apis/project';
 import intl from 'react-intl-universal';
 import { FormInputItem } from '../../components/formInputItem';
+import { ModalWrapper } from '../../components/modalWrapper';
 
 export interface EditProjectModalProps extends ModalProps {
   project?: Project;
@@ -65,7 +66,7 @@ const EditProjectModal: FC<EditProjectModalProps> = (props) => {
   };
 
   return (
-    <Modal
+    <ModalWrapper
       {...props}
       width={420}
       title={project ? intl.get('EDIT_PROJECT') : intl.get('CREATE_PROJECT')}
@@ -93,7 +94,7 @@ const EditProjectModal: FC<EditProjectModalProps> = (props) => {
           <Input.TextArea placeholder={intl.get('PLEASE_ENTER_PROJECT_DESCRIPTION')} />
         </Form.Item>
       </Form>
-    </Modal>
+    </ModalWrapper>
   );
 };
 

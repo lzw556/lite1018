@@ -1,8 +1,9 @@
-import { Button, Form, Input, Modal, Select } from 'antd';
+import { Button, Form, Input, Select } from 'antd';
 import { DeviceType } from '../../../types/device_type';
 import { Property } from '../../../types/property';
 import intl from 'react-intl-universal';
 import { FormInputItem } from '../../../components/formInputItem';
+import { ModalWrapper } from '../../../components/modalWrapper';
 
 const EditCalibrateParas = ({
   typeId,
@@ -46,7 +47,7 @@ const EditCalibrateParas = ({
 
   if (property) {
     return (
-      <Modal
+      <ModalWrapper
         width={420}
         open={open}
         title={intl.get('CALIBRATION_PARAMETERS')}
@@ -104,7 +105,7 @@ const EditCalibrateParas = ({
             </Form.Item>
           )}
         </Form>
-      </Modal>
+      </ModalWrapper>
     );
   } else {
     return <p>{intl.get('PARAMETER_ERROR_PROMPT')}</p>;

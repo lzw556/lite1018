@@ -1,15 +1,4 @@
-import {
-  Button,
-  Col,
-  Dropdown,
-  Input,
-  MenuProps,
-  Modal,
-  Popconfirm,
-  Row,
-  Select,
-  Space
-} from 'antd';
+import { Button, Col, Dropdown, Input, MenuProps, Popconfirm, Row, Select, Space } from 'antd';
 import {
   CaretDownOutlined,
   CodeOutlined,
@@ -42,7 +31,6 @@ import { getValueOfFirstClassProperty, omitSpecificKeys } from '../../device/uti
 import { SingleDeviceStatus } from '../../device/SingleDeviceStatus';
 import DeviceUpgradeSpin from '../../device/spin/deviceUpgradeSpin';
 import { CommandDropdown } from '../../device/commandDropdown';
-import { AlarmRuleSettings } from '../../device/detail/setting/alarmRuleSettings';
 import EditSettingModal from '../../device/edit/editSettingModal';
 import EditBaseInfoModel from './update';
 import { SelfLink } from '../../../components/selfLink';
@@ -57,7 +45,6 @@ const DevicePage = () => {
   const [editBaseInfoVisible, setEditBaseInfoVisible] = useState<boolean>(false);
   const [dataSource, setDataSource] = useState<PageResult<any>>();
   const { hasPermission } = usePermission();
-  const [openAlarmRules, setVisibleAlarmRules] = useState(false);
   const [store, setStore, gotoPage] = useStore('deviceList');
   const config = useAppConfigContext();
 
@@ -87,7 +74,6 @@ const DevicePage = () => {
       setDevice(data);
       setEditBaseInfoVisible(key === '1');
       setEditSettingVisible(key === '2');
-      setVisibleAlarmRules(key === '3');
     });
   };
 
@@ -362,19 +348,6 @@ const DevicePage = () => {
             setEditSettingVisible(false);
           }}
         />
-      )}
-      {openAlarmRules && device && (
-        <Modal
-          title={intl.get('ALARM_RULES')}
-          open={openAlarmRules}
-          onCancel={() => {
-            setVisibleAlarmRules(false);
-            setDevice(undefined);
-          }}
-          footer={null}
-        >
-          <AlarmRuleSettings device={device} />
-        </Modal>
       )}
     </Content>
   );

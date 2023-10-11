@@ -1,10 +1,11 @@
-import { Checkbox, Form, Modal, ModalProps, Row, Col, Button } from 'antd';
+import { Checkbox, Form, ModalProps, Row, Col, Button } from 'antd';
 import { CheckboxValueType } from 'antd/lib/checkbox/Group';
 import * as React from 'react';
 import { AssetRow, exportAssets } from '..';
 import { getFilename } from '../../../utils/format';
 import { getProject } from '../../../utils/session';
 import intl from 'react-intl-universal';
+import { ModalWrapper } from '../../../components/modalWrapper';
 
 export const SelectAssets: React.FC<{ winds: AssetRow[]; onSuccess: () => void } & ModalProps> = (
   props
@@ -32,7 +33,7 @@ export const SelectAssets: React.FC<{ winds: AssetRow[]; onSuccess: () => void }
   };
 
   return (
-    <Modal
+    <ModalWrapper
       {...props}
       title={intl.get('EXPORT')}
       footer={[
@@ -73,6 +74,6 @@ export const SelectAssets: React.FC<{ winds: AssetRow[]; onSuccess: () => void }
           </Checkbox.Group>
         </Form.Item>
       </Form>
-    </Modal>
+    </ModalWrapper>
   );
 };

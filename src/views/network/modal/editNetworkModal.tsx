@@ -1,5 +1,5 @@
 import { Network } from '../../../types/network';
-import { Form, Input, Modal, ModalProps } from 'antd';
+import { Form, Input, ModalProps } from 'antd';
 import { FC, useEffect, useState } from 'react';
 import WsnFormItem from '../../../components/formItems/wsnFormItem';
 import { UpdateNetworkRequest } from '../../../apis/network';
@@ -7,6 +7,7 @@ import { useProvisionMode } from '../useProvisionMode';
 import intl from 'react-intl-universal';
 import { FormInputItem } from '../../../components/formInputItem';
 import { useLocaleFormLayout } from '../../../hooks/useLocaleFormLayout';
+import { ModalWrapper } from '../../../components/modalWrapper';
 
 export interface EditNetworkModalProps extends ModalProps {
   network: Network;
@@ -55,13 +56,12 @@ const EditNetworkModal: FC<EditNetworkModalProps> = (props) => {
   };
 
   return (
-    <Modal
+    <ModalWrapper
       {...props}
       title={intl.get('EDIT_NETWORK')}
       width={420}
       onOk={onSave}
       confirmLoading={isLoading}
-      bodyStyle={{ maxHeight: 600, overflow: 'auto' }}
     >
       <Form form={form} {...useLocaleFormLayout(9)}>
         <FormInputItem
@@ -74,7 +74,7 @@ const EditNetworkModal: FC<EditNetworkModalProps> = (props) => {
         </FormInputItem>
         {provisionMode && <WsnFormItem mode={provisionMode} onModeChange={setProvisionMode} />}
       </Form>
-    </Modal>
+    </ModalWrapper>
   );
 };
 

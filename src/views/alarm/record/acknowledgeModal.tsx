@@ -1,8 +1,9 @@
-import { Form, Input, Modal, ModalProps } from 'antd';
+import { Form, Input, ModalProps } from 'antd';
 import { AcknowledgeAlarmRecordRequest } from '../../../apis/alarm';
 import { FC, useEffect } from 'react';
 import intl from 'react-intl-universal';
 import { getAlarmDetail } from '../alarm-group';
+import { ModalWrapper } from '../../../components/modalWrapper';
 
 export interface AcknowledgeModalProps extends ModalProps {
   record: any;
@@ -27,7 +28,7 @@ const AcknowledgeModal: FC<AcknowledgeModalProps> = (props) => {
   };
 
   return (
-    <Modal {...props} width={400} title={intl.get('ALARM_PROCESSING')} onOk={onSave}>
+    <ModalWrapper {...props} width={400} title={intl.get('ALARM_PROCESSING')} onOk={onSave}>
       <Form form={form} labelCol={{ span: 6 }}>
         <Form.Item label={intl.get('ALARM_SOURCE')} name={['source', 'name']}>
           <Input disabled />
@@ -39,7 +40,7 @@ const AcknowledgeModal: FC<AcknowledgeModalProps> = (props) => {
           <Input.TextArea placeholder={intl.get('PLEASE_ENTER_NOTE')} rows={4} />
         </Form.Item>
       </Form>
-    </Modal>
+    </ModalWrapper>
   );
 };
 

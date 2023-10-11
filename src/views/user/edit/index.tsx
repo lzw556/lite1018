@@ -1,10 +1,11 @@
-import { Form, Input, Modal } from 'antd';
+import { Form, Input } from 'antd';
 import { useEffect, useState } from 'react';
 import { UpdateUserRequest } from '../../../apis/user';
 import { User } from '../../../types/user';
 import { Rules } from '../../../constants/validator';
 import RoleSelect from '../../../components/roleSelect';
 import intl from 'react-intl-universal';
+import { ModalWrapper } from '../../../components/modalWrapper';
 
 export interface EditUserProps {
   open: boolean;
@@ -44,11 +45,10 @@ const EditUserModal = (props: EditUserProps) => {
   };
 
   return (
-    <Modal
+    <ModalWrapper
       width={420}
       title={intl.get('EDIT_USER')}
       open={open}
-      cancelText={intl.get('CANCEL')}
       onCancel={onCancel}
       okText={intl.get('SAVE')}
       onOk={onSave}
@@ -72,7 +72,7 @@ const EditUserModal = (props: EditUserProps) => {
           <Input placeholder={intl.get('EMAIL')} />
         </Form.Item>
       </Form>
-    </Modal>
+    </ModalWrapper>
   );
 };
 

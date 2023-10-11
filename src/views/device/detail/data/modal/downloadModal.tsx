@@ -1,4 +1,4 @@
-import { Form, Modal, ModalProps, Select } from 'antd';
+import { Form, ModalProps, Select } from 'antd';
 import { FC, useEffect } from 'react';
 import { DownloadDeviceDataRequest } from '../../../../../apis/device';
 import { Device } from '../../../../../types/device';
@@ -7,6 +7,7 @@ import intl from 'react-intl-universal';
 import { useLocaleContext } from '../../../../../localeProvider';
 import { RangeDatePicker, oneWeekNumberRange } from '../../../../../components/rangeDatePicker';
 import React from 'react';
+import { ModalWrapper } from '../../../../../components/modalWrapper';
 
 const { Option } = Select;
 
@@ -60,13 +61,12 @@ const DownloadModal: FC<DownloadModalProps> = (props) => {
   };
 
   return (
-    <Modal
+    <ModalWrapper
       {...props}
       width={430}
       title={intl.get('DWONLOAD_DATA')}
       okText={intl.get('DOWNLOAD')}
       onOk={onDownload}
-      cancelText={intl.get('CANCEL')}
     >
       <Form form={form} labelCol={{ span: 8 }}>
         <Form.Item label={intl.get('PROPERTY')} name={'properties'} required>
@@ -86,7 +86,7 @@ const DownloadModal: FC<DownloadModalProps> = (props) => {
           <RangeDatePicker onChange={setRange} />
         </Form.Item>
       </Form>
-    </Modal>
+    </ModalWrapper>
   );
 };
 

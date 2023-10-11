@@ -1,11 +1,11 @@
-import { Checkbox, Form, Modal, ModalProps, Row, Col, Button } from 'antd';
+import { Checkbox, Form, ModalProps, Row, Col, Button } from 'antd';
 import { CheckboxValueType } from 'antd/lib/checkbox/Group';
 import * as React from 'react';
-import { isMobile } from '../../../utils/deviceDetection';
 import { getFilename } from '../../../utils/format';
 import { exportAlarmRules } from './services';
 import { AlarmRule } from './types';
 import intl from 'react-intl-universal';
+import { ModalWrapper } from '../../../components/modalWrapper';
 
 export const SelectRules: React.FC<{ rules: AlarmRule[]; onSuccess: () => void } & ModalProps> = (
   props
@@ -33,10 +33,10 @@ export const SelectRules: React.FC<{ rules: AlarmRule[]; onSuccess: () => void }
   };
 
   return (
-    <Modal
+    <ModalWrapper
       {...props}
       title={intl.get('SELECT_ALARM_RULE')}
-      width={isMobile ? '80%' : '50%'}
+      // width={isMobile ? '80%' : '50%'}
       footer={[
         <Button key='back' onClick={(e) => props.onCancel && props.onCancel(e as any)}>
           {intl.get('CANCEL')}
@@ -75,6 +75,6 @@ export const SelectRules: React.FC<{ rules: AlarmRule[]; onSuccess: () => void }
           </Checkbox.Group>
         </Form.Item>
       </Form>
-    </Modal>
+    </ModalWrapper>
   );
 };

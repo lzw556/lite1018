@@ -1,4 +1,4 @@
-import { Form, Input, Modal, ModalProps, Radio, Select } from 'antd';
+import { Form, Input, ModalProps, Radio, Select } from 'antd';
 import * as React from 'react';
 import { getAssets, updateAsset } from '../services';
 import { Asset, AssetRow } from '../types';
@@ -6,6 +6,7 @@ import intl from 'react-intl-universal';
 import { convertRow } from '../common/utils';
 import { useAssetCategoryChain } from '../../../config/assetCategory.config';
 import { FormInputItem } from '../../../components/formInputItem';
+import { ModalWrapper } from '../../../components/modalWrapper';
 
 export const UpdateAreaAsset: React.FC<ModalProps & { asset: AssetRow; onSuccess: () => void }> = (
   props
@@ -31,10 +32,9 @@ export const UpdateAreaAsset: React.FC<ModalProps & { asset: AssetRow; onSuccess
   }, [asset, form]);
 
   return (
-    <Modal
+    <ModalWrapper
       {...{
         title: intl.get('EDIT_SOMETHING', { something: intl.get('ASSET') }),
-        cancelText: intl.get('CANCEL'),
         okText: intl.get('SAVE'),
         ...props,
         onOk: () => {
@@ -104,6 +104,6 @@ export const UpdateAreaAsset: React.FC<ModalProps & { asset: AssetRow; onSuccess
           </Form.Item>
         )}
       </Form>
-    </Modal>
+    </ModalWrapper>
   );
 };

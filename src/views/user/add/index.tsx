@@ -1,4 +1,4 @@
-import { Form, Input, Modal, Select, Typography } from 'antd';
+import { Form, Input, Select, Typography } from 'antd';
 import { AddUserRequest } from '../../../apis/user';
 import { useEffect, useState } from 'react';
 import RoleSelect from '../../../components/roleSelect';
@@ -6,6 +6,7 @@ import { GetProjectsRequest } from '../../../apis/project';
 import intl from 'react-intl-universal';
 import { FormInputItem } from '../../../components/formInputItem';
 import { useLocaleFormLayout } from '../../../hooks/useLocaleFormLayout';
+import { ModalWrapper } from '../../../components/modalWrapper';
 
 export interface AddUserProps {
   open: boolean;
@@ -53,13 +54,11 @@ const AddUserModal = (props: AddUserProps) => {
   };
 
   return (
-    <Modal
+    <ModalWrapper
       width={420}
       title={intl.get('CREATE_USER')}
       open={open}
-      cancelText={intl.get('CANCEL')}
       onCancel={onCancel}
-      okText={intl.get('OK')}
       onOk={onAdd}
       confirmLoading={isLoading}
     >
@@ -127,7 +126,7 @@ const AddUserModal = (props: AddUserProps) => {
           </Select>
         </Form.Item>
       </Form>
-    </Modal>
+    </ModalWrapper>
   );
 };
 

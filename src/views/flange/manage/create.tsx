@@ -1,8 +1,9 @@
-import { Form, Modal, ModalProps } from 'antd';
+import { Form, ModalProps } from 'antd';
 import React from 'react';
 import { addAsset, Asset } from '../../asset';
 import intl from 'react-intl-universal';
 import { CreateForm } from './createForm';
+import { ModalWrapper } from '../../../components/modalWrapper';
 
 export const FlangeCreate: React.FC<
   ModalProps & {
@@ -14,12 +15,10 @@ export const FlangeCreate: React.FC<
   const [form] = Form.useForm<Asset>();
 
   return (
-    <Modal
+    <ModalWrapper
       {...{
         title: intl.get('CREATE_SOMETHING', { something: intl.get('FLANGE') }),
-        cancelText: intl.get('CANCEL'),
         okText: intl.get('CREATE'),
-        bodyStyle: { overflow: 'auto', maxHeight: 610 },
         ...props,
         onOk: () => {
           form.validateFields().then((values) => {
@@ -45,6 +44,6 @@ export const FlangeCreate: React.FC<
       }}
     >
       <CreateForm form={form} parentId={parentId} />
-    </Modal>
+    </ModalWrapper>
   );
 };

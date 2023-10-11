@@ -1,4 +1,4 @@
-import { Form, Input, Modal, ModalProps, Typography } from 'antd';
+import { Form, Input, ModalProps, Typography } from 'antd';
 import { FC, useEffect, useState } from 'react';
 import IpnFormItem from '../../../components/formItems/ipnFormItem';
 import WsnFormItem from '../../../components/formItems/wsnFormItem';
@@ -10,6 +10,7 @@ import { useProvisionMode } from '../useProvisionMode';
 import intl from 'react-intl-universal';
 import { FormInputItem } from '../../../components/formInputItem';
 import { useLocaleFormLayout } from '../../../hooks/useLocaleFormLayout';
+import { ModalWrapper } from '../../../components/modalWrapper';
 
 export interface AddNetworkModalProps extends ModalProps {
   onSuccess: () => void;
@@ -54,15 +55,12 @@ const AddNetworkModal: FC<AddNetworkModalProps> = (props) => {
   };
 
   return (
-    <Modal
+    <ModalWrapper
       {...props}
       width={460}
       title={intl.get('CREATE_NETWORK')}
-      okText={intl.get('OK')}
       onOk={onAdd}
-      cancelText={intl.get('CANCEL')}
       confirmLoading={isLoading}
-      bodyStyle={{ maxHeight: 600, overflow: 'auto' }}
     >
       <Form form={form} {...useLocaleFormLayout(9)}>
         <fieldset>
@@ -104,7 +102,7 @@ const AddNetworkModal: FC<AddNetworkModalProps> = (props) => {
           <IpnFormItem ipn={DEFAULT_IPN_SETTING} />
         </fieldset>
       </Form>
-    </Modal>
+    </ModalWrapper>
   );
 };
 

@@ -1,4 +1,4 @@
-import { Form, Input, Modal, ModalProps, Select } from 'antd';
+import { Form, Input, ModalProps, Select } from 'antd';
 import * as React from 'react';
 import { addAsset, getAssets } from '../services';
 import { Asset, AssetRow } from '../types';
@@ -6,6 +6,7 @@ import intl from 'react-intl-universal';
 import { useAssetCategoryChain } from '../../../config/assetCategory.config';
 import { FormInputItem } from '../../../components/formInputItem';
 import { getParents } from '../common/utils';
+import { ModalWrapper } from '../../../components/modalWrapper';
 
 export const CreateAsset: React.FC<ModalProps & { parentId?: number; onSuccess: () => void }> = (
   props
@@ -23,10 +24,9 @@ export const CreateAsset: React.FC<ModalProps & { parentId?: number; onSuccess: 
   }, [parentId, isChild, key]);
 
   return (
-    <Modal
+    <ModalWrapper
       {...{
         title: intl.get('CREATE_SOMETHING', { something: intl.get(label) }),
-        cancelText: intl.get('CANCEL'),
         okText: intl.get('CREATE'),
         ...props,
         onOk: () => {
@@ -74,6 +74,6 @@ export const CreateAsset: React.FC<ModalProps & { parentId?: number; onSuccess: 
           </Form.Item>
         )}
       </Form>
-    </Modal>
+    </ModalWrapper>
   );
 };

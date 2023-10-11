@@ -1,10 +1,11 @@
-import { Form, Modal, ModalProps } from 'antd';
+import { Form, ModalProps } from 'antd';
 import { Device } from '../../../types/device';
 import { GetDeviceSettingRequest, UpdateDeviceSettingRequest } from '../../../apis/device';
 import { useEffect, useState } from 'react';
 import { DeviceSettingContent } from '../DeviceSettingContent';
 import { processArrayValuesInSensorSetting } from '../../../components/formItems/deviceSettingFormItem';
 import intl from 'react-intl-universal';
+import { ModalWrapper } from '../../../components/modalWrapper';
 
 export interface EditSettingProps extends ModalProps {
   device: Device;
@@ -38,21 +39,19 @@ const EditSettingModal = (props: EditSettingProps) => {
   };
 
   return (
-    <Modal
+    <ModalWrapper
       width={520}
       open={open}
       title={intl.get('DEVICE_SETTINGS')}
       okText={intl.get('UPDATE')}
       onOk={onSave}
-      cancelText={intl.get('CANCEL')}
       onCancel={onCancel}
       confirmLoading={isLoading}
-      bodyStyle={{ maxHeight: 600, overflow: 'auto' }}
     >
       <Form form={form} layout='vertical'>
         <DeviceSettingContent deviceType={device.typeId} settings={settings} />
       </Form>
-    </Modal>
+    </ModalWrapper>
   );
 };
 

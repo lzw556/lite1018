@@ -1,10 +1,11 @@
-import { Form, Input, Modal, ModalProps, Select } from 'antd';
+import { Form, Input, ModalProps, Select } from 'antd';
 import React, { useEffect, useState } from 'react';
 import intl from 'react-intl-universal';
 import { Network } from '../../../types/network';
 import { UpdateNetworkRequest } from '../../../apis/network';
 import { FormInputItem } from '../../../components/formInputItem';
 import { WIRELESS_HART_POLLING_PERIOD } from '../../../constants';
+import { ModalWrapper } from '../../../components/modalWrapper';
 
 export const UpdateNetwork = (
   props: ModalProps & {
@@ -52,7 +53,7 @@ export const UpdateNetwork = (
   };
 
   return (
-    <Modal
+    <ModalWrapper
       {...props}
       title={intl.get('EDIT_NETWORK')}
       width={420}
@@ -107,6 +108,6 @@ export const UpdateNetwork = (
           </Select>
         </Form.Item>
       </Form>
-    </Modal>
+    </ModalWrapper>
   );
 };

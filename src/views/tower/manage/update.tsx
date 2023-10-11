@@ -1,8 +1,9 @@
-import { Form, Modal, ModalProps } from 'antd';
+import { Form, ModalProps } from 'antd';
 import React from 'react';
 import { Asset, AssetRow, updateAsset } from '../../asset';
 import { UpdateForm } from './updateForm';
 import intl from 'react-intl-universal';
+import { ModalWrapper } from '../../../components/modalWrapper';
 
 export const UpdateTower: React.FC<
   ModalProps & {
@@ -14,12 +15,10 @@ export const UpdateTower: React.FC<
   const [form] = Form.useForm<Asset>();
 
   return (
-    <Modal
+    <ModalWrapper
       {...{
         title: intl.get('EDIT_SOMETHING', { something: intl.get('TOWER') }),
-        cancelText: intl.get('CANCEL'),
         okText: intl.get('SAVE'),
-        bodyStyle: { overflow: 'auto', maxHeight: 610 },
         ...props,
         onOk: () => {
           form.validateFields().then((values) => {
@@ -35,6 +34,6 @@ export const UpdateTower: React.FC<
       }}
     >
       <UpdateForm tower={tower} form={form} />
-    </Modal>
+    </ModalWrapper>
   );
 };

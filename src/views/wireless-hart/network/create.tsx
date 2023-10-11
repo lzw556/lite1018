@@ -1,9 +1,10 @@
-import { Form, Input, Modal, ModalProps, Select } from 'antd';
+import { Form, Input, ModalProps, Select } from 'antd';
 import React, { useState } from 'react';
 import intl from 'react-intl-universal';
 import { CreateNetworkRequest } from '../../../apis/network';
 import { FormInputItem } from '../../../components/formInputItem';
 import { WIRELESS_HART_POLLING_PERIOD } from '../../../constants';
+import { ModalWrapper } from '../../../components/modalWrapper';
 
 export const CreateNetwork = (
   props: ModalProps & {
@@ -35,13 +36,11 @@ export const CreateNetwork = (
       });
   };
   return (
-    <Modal
+    <ModalWrapper
       {...props}
       width={460}
       title={intl.get('CREATE_NETWORK')}
-      okText={intl.get('OK')}
       onOk={onAdd}
-      cancelText={intl.get('CANCEL')}
       confirmLoading={isLoading}
     >
       <Form form={form} labelCol={{ span: 7 }}>
@@ -96,6 +95,6 @@ export const CreateNetwork = (
           </Select>
         </Form.Item>
       </Form>
-    </Modal>
+    </ModalWrapper>
   );
 };

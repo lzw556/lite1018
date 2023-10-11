@@ -1,10 +1,11 @@
-import { Form, Modal, ModalProps } from 'antd';
+import { Form, ModalProps } from 'antd';
 import * as React from 'react';
 import { updateAsset } from '../services';
 import { Asset, AssetRow } from '../types';
 import { UpdateAssetForm } from './updateForm';
 import intl from 'react-intl-universal';
 import { useAssetCategoryChain } from '../../../config/assetCategory.config';
+import { ModalWrapper } from '../../../components/modalWrapper';
 
 export const UpdateAsset: React.FC<ModalProps & { asset: AssetRow; onSuccess: () => void }> = (
   props
@@ -16,10 +17,9 @@ export const UpdateAsset: React.FC<ModalProps & { asset: AssetRow; onSuccess: ()
   } = useAssetCategoryChain();
 
   return (
-    <Modal
+    <ModalWrapper
       {...{
         title: intl.get('EDIT_SOMETHING', { something: intl.get(label) }),
-        cancelText: intl.get('CANCEL'),
         okText: intl.get('SAVE'),
         ...props,
         onOk: () => {
@@ -36,6 +36,6 @@ export const UpdateAsset: React.FC<ModalProps & { asset: AssetRow; onSuccess: ()
       }}
     >
       <UpdateAssetForm form={form} asset={asset} />
-    </Modal>
+    </ModalWrapper>
   );
 };

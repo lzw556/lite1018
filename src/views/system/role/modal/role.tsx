@@ -1,6 +1,7 @@
-import { Form, Input, Modal, ModalProps } from 'antd';
+import { Form, Input, ModalProps } from 'antd';
 import { FC } from 'react';
 import intl from 'react-intl-universal';
+import { ModalWrapper } from '../../../../components/modalWrapper';
 
 export interface RoleModalProps extends ModalProps {
   form: any;
@@ -10,7 +11,7 @@ const RoleModal: FC<RoleModalProps> = (props) => {
   const { form } = props;
 
   return (
-    <Modal {...props}>
+    <ModalWrapper {...props}>
       <Form form={form} labelCol={{ span: 6 }}>
         <Form.Item
           name='name'
@@ -23,7 +24,7 @@ const RoleModal: FC<RoleModalProps> = (props) => {
           <Input placeholder={intl.get('ROLE_DESCRIPTION')} />
         </Form.Item>
       </Form>
-    </Modal>
+    </ModalWrapper>
   );
 };
 

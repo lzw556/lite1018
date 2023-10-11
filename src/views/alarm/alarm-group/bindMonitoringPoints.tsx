@@ -1,4 +1,4 @@
-import { Checkbox, Col, Empty, Form, Input, Modal, ModalProps, Row, Select, Spin } from 'antd';
+import { Checkbox, Col, Empty, Form, Input, ModalProps, Row, Select, Spin } from 'antd';
 import * as React from 'react';
 import { getAssets } from '../../asset/services';
 import { AssetRow } from '../../asset/types';
@@ -7,6 +7,7 @@ import { AlarmRule } from './types';
 import intl from 'react-intl-universal';
 import { useAssetCategoryChain } from '../../../config/assetCategory.config';
 import { MONITORING_POINT } from '../../monitoring-point';
+import { ModalWrapper } from '../../../components/modalWrapper';
 
 type MixinAssetRow = AssetRow & { pointIds: number[]; checked: boolean; indeterminate: boolean };
 
@@ -166,10 +167,9 @@ export const BindMonitoringPoints: React.FC<
   };
 
   return (
-    <Modal
+    <ModalWrapper
       width={800}
       title={intl.get('EDIT_SOMETHING', { something: intl.get(MONITORING_POINT) })}
-      bodyStyle={{ maxHeight: 700, overflow: 'auto' }}
       {...props}
       okButtonProps={{ disabled: assets.length === 0 }}
       onOk={() => {
@@ -184,11 +184,10 @@ export const BindMonitoringPoints: React.FC<
               props.onSuccess()
             );
           }
-          console.log(monitoring_point_ids);
         });
       }}
     >
       <Form form={form}>{renderModalContent()}</Form>
-    </Modal>
+    </ModalWrapper>
   );
 };

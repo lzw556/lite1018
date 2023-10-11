@@ -1,4 +1,4 @@
-import { Form, Modal, ModalProps } from 'antd';
+import { Form, ModalProps } from 'antd';
 import * as React from 'react';
 import { Device } from '../../../types/device';
 import { AssetRow } from '../../asset';
@@ -9,6 +9,7 @@ import { SelectParentFormItem } from './selectParentFormItem';
 import intl from 'react-intl-universal';
 import { MONITORING_POINT } from '../types';
 import { buildRequestAttrs, getProcessId } from '../utils';
+import { ModalWrapper } from '../../../components/modalWrapper';
 
 export type MonitoringPointBatch = {
   asset_id: number;
@@ -55,10 +56,9 @@ export const MonitoringPointCreate: React.FC<
   }, [form, selectedPoints]);
 
   return (
-    <Modal
+    <ModalWrapper
       {...{
         title: intl.get('CREATE_SOMETHING', { something: intl.get(MONITORING_POINT) }),
-        cancelText: intl.get('CANCEL'),
         okText: intl.get('CREATE'),
         ...props,
         width: 500,
@@ -128,7 +128,7 @@ export const MonitoringPointCreate: React.FC<
           initialSelected={selectedPoints}
         />
       </Form>
-    </Modal>
+    </ModalWrapper>
   );
 };
 

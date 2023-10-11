@@ -1,4 +1,4 @@
-import { Form, Input, Modal } from 'antd';
+import { Form, Input } from 'antd';
 import { useEffect, useState } from 'react';
 import { UpdateDeviceRequest } from '../../../apis/device';
 import NetworkSelect from '../../../components/select/networkSelect';
@@ -6,6 +6,7 @@ import { Normalizes, Rules } from '../../../constants/validator';
 import DeviceSelect from '../../../components/select/deviceSelect';
 import intl from 'react-intl-universal';
 import { FormInputItem } from '../../../components/formInputItem';
+import { ModalWrapper } from '../../../components/modalWrapper';
 
 const EditBaseInfoModel = (props: any) => {
   const { open, device, onCancel, onSuccess } = props;
@@ -36,13 +37,12 @@ const EditBaseInfoModel = (props: any) => {
   }, [device, form]);
 
   return (
-    <Modal
+    <ModalWrapper
       width={420}
       open={open}
       title={intl.get('DEVICE_INFO')}
       okText={intl.get('UPDATE')}
       onOk={onSave}
-      cancelText={intl.get('CANCEL')}
       onCancel={onCancel}
       confirmLoading={isLoading}
     >
@@ -99,7 +99,7 @@ const EditBaseInfoModel = (props: any) => {
           </Form.Item>
         )}
       </Form>
-    </Modal>
+    </ModalWrapper>
   );
 };
 

@@ -1,4 +1,4 @@
-import { Col, Divider, Form, message, Modal, Row, Select } from 'antd';
+import { Col, Divider, Form, message, Row, Select } from 'antd';
 import { FC, useEffect, useState } from 'react';
 import { Firmware } from '../../../types/firmware';
 import { Device } from '../../../types/device';
@@ -8,6 +8,7 @@ import { DeviceUpgradeRequest } from '../../../apis/device';
 import { DeviceCommand } from '../../../types/device_command';
 import intl from 'react-intl-universal';
 import { NameValueGroups } from '../../../components/name-values';
+import { ModalWrapper } from '../../../components/modalWrapper';
 
 export interface UpgradeModalProps {
   open: boolean;
@@ -40,8 +41,8 @@ const UpgradeModal: FC<UpgradeModalProps> = ({ open, device, onCancel, onSuccess
           <Row gutter={[0, 16]}>
             <Col span={24}>
               <NameValueGroups
-                col={{ span: 18 }}
-                namePercentage={30}
+                col={{ span: 24 }}
+                namePercentage={50}
                 items={[
                   { name: intl.get('FIRMWARE_VERSION'), value: firmware.version },
                   { name: intl.get('HARDWARE_VERSION'), value: firmware.productId },
@@ -81,17 +82,16 @@ const UpgradeModal: FC<UpgradeModalProps> = ({ open, device, onCancel, onSuccess
   };
 
   return (
-    <Modal
+    <ModalWrapper
       width={420}
       open={open}
-      title={intl.get('DEVICE_UPGRADING')}
+      title={intl.get('UPGRADE_FIRMWARE')}
       okText={intl.get('UPGRADE')}
       onOk={onUpgrade}
-      cancelText={intl.get('CANCEL')}
       onCancel={onCancel}
       confirmLoading={isLoading}
     >
-      <Form form={form}>
+      <Form form={form} layout='vertical'>
         <Form.Item label={intl.get('SELECT_FIRMWARE_VERSION')} name={'firmware'}>
           <Select
             placeholder={intl.get('PLEASE_SELECT_FIRMWARE_VERSION')}
@@ -108,7 +108,7 @@ const UpgradeModal: FC<UpgradeModalProps> = ({ open, device, onCancel, onSuccess
         </Form.Item>
       </Form>
       {renderFirmware()}
-    </Modal>
+    </ModalWrapper>
   );
 };
 

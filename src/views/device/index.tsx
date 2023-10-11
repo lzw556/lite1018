@@ -4,7 +4,6 @@ import {
   Dropdown,
   Input,
   MenuProps,
-  Modal,
   Popconfirm,
   Row,
   Select,
@@ -37,7 +36,6 @@ import DeviceUpgradeSpin from './spin/deviceUpgradeSpin';
 import { SingleDeviceStatus } from './SingleDeviceStatus';
 import { getValueOfFirstClassProperty, omitSpecificKeys } from './util';
 import { isMobile } from '../../utils/deviceDetection';
-import { AlarmRuleSettings } from './detail/setting/alarmRuleSettings';
 import { Store, useStore } from '../../hooks/store';
 import { Normalizes } from '../../constants/validator';
 import { PageTitle } from '../../components/pageTitle';
@@ -59,7 +57,6 @@ const DevicePage = () => {
   const [editBaseInfoVisible, setEditBaseInfoVisible] = useState<boolean>(false);
   const [dataSource, setDataSource] = useState<PageResult<any>>();
   const { hasPermission } = usePermission();
-  const [openAlarmRules, setVisibleAlarmRules] = useState(false);
   const [store, setStore, gotoPage] = useStore('deviceList');
   const config = useAppConfigContext();
 
@@ -89,7 +86,6 @@ const DevicePage = () => {
       setDevice(data);
       setEditBaseInfoVisible(key === '1');
       setEditSettingVisible(key === '2');
-      setVisibleAlarmRules(key === '3');
     });
   };
 
@@ -358,19 +354,6 @@ const DevicePage = () => {
             setEditSettingVisible(false);
           }}
         />
-      )}
-      {openAlarmRules && device && (
-        <Modal
-          title={intl.get('ALARM_RULES')}
-          open={openAlarmRules}
-          onCancel={() => {
-            setVisibleAlarmRules(false);
-            setDevice(undefined);
-          }}
-          footer={null}
-        >
-          <AlarmRuleSettings device={device} />
-        </Modal>
       )}
     </Content>
   );

@@ -1,8 +1,9 @@
-import { Form, Input, Modal } from 'antd';
+import { Form, Input } from 'antd';
 import { FC, useState } from 'react';
 import { UpdateMyPass } from '../../../apis/profile';
 import intl from 'react-intl-universal';
 import { useLocaleFormLayout } from '../../../hooks/useLocaleFormLayout';
+import { ModalWrapper } from '../../../components/modalWrapper';
 
 export interface EditPassProps {
   open: boolean;
@@ -31,13 +32,11 @@ const EditPassModal: FC<EditPassProps> = ({ open, onSuccess, onCancel }) => {
   };
 
   return (
-    <Modal
+    <ModalWrapper
       width={420}
       open={open}
       title={intl.get('MODIFY_PASSWORD')}
-      okText={intl.get('OK')}
       onOk={onSave}
-      cancelText={intl.get('CANCEL')}
       onCancel={onCancel}
       confirmLoading={isLoading}
     >
@@ -74,7 +73,7 @@ const EditPassModal: FC<EditPassProps> = ({ open, onSuccess, onCancel }) => {
           <Input type={'password'} placeholder={intl.get('PLEASE_CONFIRM_PASSWORD')} />
         </Form.Item>
       </Form>
-    </Modal>
+    </ModalWrapper>
   );
 };
 
