@@ -39,7 +39,7 @@ export const MonitoringPointFormItem = ({
       ]}
     >
       {(fields, { add, remove }, { errors }) => (
-        <div style={{ overflow: 'auto', maxHeight: 600 }}>
+        <>
           {fields.map(({ key, name, ...restFields }, index) => (
             <div
               style={{
@@ -130,7 +130,7 @@ export const MonitoringPointFormItem = ({
               <Form.ErrorList errors={errors} />
             </Popover>
           </Form.Item>
-        </div>
+        </>
       )}
     </Form.List>
   );
