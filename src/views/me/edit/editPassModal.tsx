@@ -1,7 +1,8 @@
-import { Form, Input, Modal, Typography } from 'antd';
+import { Form, Input, Modal } from 'antd';
 import { FC, useState } from 'react';
 import { UpdateMyPass } from '../../../apis/profile';
 import intl from 'react-intl-universal';
+import { useLocaleFormLayout } from '../../../hooks/useLocaleFormLayout';
 
 export interface EditPassProps {
   open: boolean;
@@ -40,35 +41,23 @@ const EditPassModal: FC<EditPassProps> = ({ open, onSuccess, onCancel }) => {
       onCancel={onCancel}
       confirmLoading={isLoading}
     >
-      <Form form={form} labelCol={{ span: 6 }}>
+      <Form form={form} {...useLocaleFormLayout()}>
         <Form.Item
-          label={
-            <Typography.Text ellipsis={true} title={intl.get('OLD_PASSWORD')}>
-              {intl.get('OLD_PASSWORD')}
-            </Typography.Text>
-          }
+          label={intl.get('OLD_PASSWORD')}
           name='pwd'
           rules={[{ required: true, message: intl.get('PLEASE_ENTER_OLD_PASSWORD') }]}
         >
           <Input type={'password'} placeholder={intl.get('PLEASE_ENTER_OLD_PASSWORD')} />
         </Form.Item>
         <Form.Item
-          label={
-            <Typography.Text ellipsis={true} title={intl.get('NEW_PASSWORD')}>
-              {intl.get('NEW_PASSWORD')}
-            </Typography.Text>
-          }
+          label={intl.get('NEW_PASSWORD')}
           name='newPwd'
           rules={[{ required: true, message: intl.get('PLEASE_ENTER_NEW_PASSWORD') }]}
         >
           <Input type={'password'} placeholder={intl.get('PLEASE_ENTER_NEW_PASSWORD')} />
         </Form.Item>
         <Form.Item
-          label={
-            <Typography.Text ellipsis={true} title={intl.get('CONFIRM_PASSWORD')}>
-              {intl.get('CONFIRM_PASSWORD')}
-            </Typography.Text>
-          }
+          label={intl.get('CONFIRM_PASSWORD')}
           name='confirmPwd'
           rules={[
             { required: true, message: intl.get('PLEASE_CONFIRM_PASSWORD') },

@@ -47,8 +47,9 @@ const EditSettingModal = (props: EditSettingProps) => {
       cancelText={intl.get('CANCEL')}
       onCancel={onCancel}
       confirmLoading={isLoading}
+      bodyStyle={{ maxHeight: 600, overflow: 'auto' }}
     >
-      <Form form={form} labelCol={{ span: 8 }}>
+      <Form form={form} layout='vertical'>
         <DeviceSettingContent deviceType={device.typeId} settings={settings} />
       </Form>
     </Modal>

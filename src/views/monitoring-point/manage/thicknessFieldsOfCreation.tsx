@@ -1,4 +1,4 @@
-import { Form, InputNumber } from 'antd';
+import { Col, InputNumber, Row } from 'antd';
 import React from 'react';
 import intl from 'react-intl-universal';
 import { FormInputItem } from '../../../components/formInputItem';
@@ -17,27 +17,28 @@ export const ThicknessFieldsOfCreation = ({
 }) => {
   const { language } = useLocaleContext();
   return (
-    <>
-      <ThicknessAttributeFormItem
-        label={intl.get('INITIAL_THICKNESS')}
-        itemName={name}
-        name='initial_thickness'
-      />
-      <ThicknessAttributeFormItem
-        label={intl.get('CRITICAL_THICKNESS')}
-        itemName={name}
-        name='critical_thickness'
-      />
-      <Form.Item
-        required
-        label={getDisplayName({
-          name: intl.get('FIELD_CORROSION_RATE'),
-          suffix: intl.get('UNIT_DAY'),
-          lang: language
-        })}
-        style={{ marginBottom: 0 }}
-      >
+    <Row>
+      <Col span={24}>
+        <ThicknessAttributeFormItem
+          label={intl.get('INITIAL_THICKNESS')}
+          itemName={name}
+          name='initial_thickness'
+        />
+      </Col>
+      <Col span={24}>
+        <ThicknessAttributeFormItem
+          label={intl.get('CRITICAL_THICKNESS')}
+          itemName={name}
+          name='critical_thickness'
+        />
+      </Col>
+      <Col span={12}>
         <FormInputItem
+          label={getDisplayName({
+            name: intl.get('CORROSION_RATE_SHORT_TERM'),
+            suffix: intl.get('UNIT_DAY'),
+            lang: language
+          })}
           {...restFields}
           name={[name, 'attributes', 'corrosion_rate_short_term']}
           requiredMessage={intl.get('PLEASE_ENTER_SOMETHING', {
@@ -60,8 +61,15 @@ export const ThicknessFieldsOfCreation = ({
             />
           }
         />
+      </Col>
+      <Col span={12}>
         <FormInputItem
           {...restFields}
+          label={getDisplayName({
+            name: intl.get('CORROSION_RATE_LONG_TERM'),
+            suffix: intl.get('UNIT_DAY'),
+            lang: language
+          })}
           name={[name, 'attributes', 'corrosion_rate_long_term']}
           requiredMessage={intl.get('PLEASE_ENTER_SOMETHING', {
             something: intl.get('CORROSION_RATE_LONG_TERM')
@@ -83,7 +91,7 @@ export const ThicknessFieldsOfCreation = ({
             />
           }
         />
-      </Form.Item>
-    </>
+      </Col>
+    </Row>
   );
 };

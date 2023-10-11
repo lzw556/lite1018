@@ -20,6 +20,7 @@ import { PageTitle } from '../../../components/pageTitle';
 import intl from 'react-intl-universal';
 import { FormInputItem } from '../../../components/formInputItem';
 import { SelfLink } from '../../../components/selfLink';
+import { useLocaleFormLayout } from '../../../hooks/useLocaleFormLayout';
 
 const NetworkDetail = () => {
   const { hasPermission } = usePermission();
@@ -28,6 +29,7 @@ const NetworkDetail = () => {
   const [network, setNetwork] = useState<Network>();
   const [form] = Form.useForm();
   const [provisionMode, setProvisionMode, settings] = useProvisionMode(network);
+  const formLayout = useLocaleFormLayout(9);
 
   useEffect(() => {
     if (id) {
@@ -107,7 +109,7 @@ const NetworkDetail = () => {
           </Col>
           <Col xl={8} xxl={6}>
             <ShadowCard style={{ marginLeft: 10, height: '100%' }}>
-              <Form form={form} labelCol={{ span: 9 }}>
+              <Form form={form} {...formLayout}>
                 <FormInputItem
                   label={intl.get('NAME')}
                   name='name'
@@ -133,10 +135,7 @@ const NetworkDetail = () => {
                             type='primary'
                             onClick={() => {
                               form.validateFields().then((values) => {
-                                UpdateNetworkRequest(network.id, values).then((res) => {
-                                  if (res.code === 200)
-                                    message.success(intl.get('SAVED_SUCCESSFUL'));
-                                });
+                                UpdateNetworkRequest(network.id, values);
                               });
                             }}
                           >

@@ -61,7 +61,7 @@ export const MonitoringPointCreate: React.FC<
         cancelText: intl.get('CANCEL'),
         okText: intl.get('CREATE'),
         ...props,
-        width: 600,
+        width: 500,
         onOk: () => {
           form.validateFields().then((values) => {
             try {
@@ -105,7 +105,7 @@ export const MonitoringPointCreate: React.FC<
         }
       }}
     >
-      <Form form={form} labelCol={{ span: 4 }}>
+      <Form form={form} layout='vertical'>
         <SelectParentFormItem
           parent={parent}
           onSelect={(type: number, devices: Device[]) => {

@@ -42,7 +42,7 @@ export default function CreateAlarmRuleGroup() {
         ]}
       />
       <ShadowCard>
-        <Form form={form} labelCol={{ span: 3 }} wrapperCol={{ span: 18 }}>
+        <Form form={form} labelCol={{ span: smallSize ? 5 : 3 }} wrapperCol={{ span: 18 }}>
           <Form.Item
             label={intl.get('OBJECT_TYPE', { object: intl.get(MONITORING_POINT) })}
             name='type'
@@ -455,13 +455,13 @@ export default function CreateAlarmRuleGroup() {
                     </div>
                   );
                 })}
-                <Form.Item wrapperCol={{ offset: isMobile ? 0 : 3 }}>
+                <Form.Item wrapperCol={{ offset: isMobile ? 0 : smallSize ? 5 : 3 }}>
                   <Button onClick={() => add()}>{intl.get('CREATE_ALARM_RULE')}</Button>
                 </Form.Item>
               </>
             )}
           </Form.List>
-          <Form.Item label='' wrapperCol={{ offset: isMobile ? 0 : 3 }}>
+          <Form.Item label='' wrapperCol={{ offset: isMobile ? 0 : smallSize ? 5 : 3 }}>
             <Button
               type='primary'
               onClick={() => {

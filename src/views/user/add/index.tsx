@@ -5,6 +5,7 @@ import RoleSelect from '../../../components/roleSelect';
 import { GetProjectsRequest } from '../../../apis/project';
 import intl from 'react-intl-universal';
 import { FormInputItem } from '../../../components/formInputItem';
+import { useLocaleFormLayout } from '../../../hooks/useLocaleFormLayout';
 
 export interface AddUserProps {
   open: boolean;
@@ -62,7 +63,7 @@ const AddUserModal = (props: AddUserProps) => {
       onOk={onAdd}
       confirmLoading={isLoading}
     >
-      <Form form={form} labelCol={{ span: 6 }}>
+      <Form form={form} {...useLocaleFormLayout()}>
         <FormInputItem
           name='username'
           label={intl.get('USERNAME')}

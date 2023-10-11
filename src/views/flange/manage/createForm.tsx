@@ -28,7 +28,7 @@ export const CreateForm: React.FC<
   }, [parentId, key]);
 
   return (
-    <Form form={form} labelCol={{ span: 6 }}>
+    <Form form={form} labelCol={{ span: 7 }}>
       <FormInputItem
         label={intl.get('NAME')}
         name='name'
@@ -103,7 +103,7 @@ export const CreateForm: React.FC<
       <Form.Item
         name={['attributes', 'sub_type']}
         valuePropName='checked'
-        wrapperCol={{ offset: 6 }}
+        wrapperCol={{ offset: 7 }}
         initialValue={false}
       >
         <Checkbox onChange={(e) => setIsFlangePreload(e.target.checked)}>

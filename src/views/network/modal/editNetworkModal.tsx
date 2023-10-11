@@ -6,6 +6,7 @@ import { UpdateNetworkRequest } from '../../../apis/network';
 import { useProvisionMode } from '../useProvisionMode';
 import intl from 'react-intl-universal';
 import { FormInputItem } from '../../../components/formInputItem';
+import { useLocaleFormLayout } from '../../../hooks/useLocaleFormLayout';
 
 export interface EditNetworkModalProps extends ModalProps {
   network: Network;
@@ -60,8 +61,9 @@ const EditNetworkModal: FC<EditNetworkModalProps> = (props) => {
       width={420}
       onOk={onSave}
       confirmLoading={isLoading}
+      bodyStyle={{ maxHeight: 600, overflow: 'auto' }}
     >
-      <Form form={form} labelCol={{ span: 9 }}>
+      <Form form={form} {...useLocaleFormLayout(9)}>
         <FormInputItem
           label={intl.get('NAME')}
           name='name'

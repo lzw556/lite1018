@@ -73,7 +73,7 @@ const EditProjectModal: FC<EditProjectModalProps> = (props) => {
       onOk={project ? onSave : onAdd}
       confirmLoading={isLoading}
     >
-      <Form form={form} labelCol={{ span: 4 }}>
+      <Form form={form} labelCol={{ span: 6 }}>
         <FormInputItem
           name='name'
           label={intl.get('NAME')}

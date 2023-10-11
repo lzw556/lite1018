@@ -13,6 +13,7 @@ import { useNavigate } from 'react-router';
 import { PageTitle } from '../../../components/pageTitle';
 import intl from 'react-intl-universal';
 import { toMac } from '../../../utils/format';
+import { useLocaleFormLayout } from '../../../hooks/useLocaleFormLayout';
 
 const { Dragger } = Upload;
 
@@ -224,7 +225,7 @@ const ImportNetworkPage = () => {
         }
       />
       <ShadowCard>
-        <Form form={form} labelCol={{ span: 9 }}>
+        <Form form={form} {...useLocaleFormLayout(9)}>
           {!success ? (
             <Row justify='space-between'>
               <Col xl={16} xxl={18}>

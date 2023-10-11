@@ -18,6 +18,7 @@ import { getParents } from '../../asset/common/utils';
 import { FormInputItem } from '../../../components/formInputItem';
 import { ThicknessFieldsOfUpdate } from './thicknessFieldsOfUpdate';
 import { AngleFieldsOfUpdate } from './angleFieldsOfUpdate';
+import { useLocaleFormLayout } from '../../../hooks/useLocaleFormLayout';
 
 export const UpdateForm = ({
   monitoringPoint,
@@ -57,7 +58,7 @@ export const UpdateForm = ({
   }, [monitoringPoint, form]);
 
   return (
-    <Form form={form} labelCol={{ span: 6 }} style={style}>
+    <Form form={form} {...useLocaleFormLayout()} style={style}>
       <FormInputItem
         label={intl.get('NAME')}
         name='name'

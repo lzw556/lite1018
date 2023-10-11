@@ -7,6 +7,7 @@ import { MonitoringPoint, MonitoringPointRow } from '../../types';
 import intl from 'react-intl-universal';
 import { UpdateForm } from '../../manage/updateForm';
 import { buildRequestAttrs, getProcessId } from '../../utils';
+import { useLocaleContext } from '../../../../localeProvider';
 
 export const BasicSetting = ({
   monitoringPoint,
@@ -17,6 +18,7 @@ export const BasicSetting = ({
   onUpdateSuccess: () => void;
 }) => {
   const [form] = Form.useForm<MonitoringPoint & { device_id: number }>();
+  const { language } = useLocaleContext();
 
   return (
     <UpdateForm
@@ -24,7 +26,7 @@ export const BasicSetting = ({
       monitoringPoint={monitoringPoint}
       style={{ width: isMobile ? '100%' : '50%' }}
     >
-      <Form.Item wrapperCol={{ offset: 6 }}>
+      <Form.Item wrapperCol={{ offset: language === 'en-US' ? 0 : 6 }}>
         <Button
           type='primary'
           onClick={() => {

@@ -54,7 +54,7 @@ export const PrimaryLayout = () => {
       <Layout hasSider>
         <Sider
           className='sider'
-          width={200}
+          width={230}
           style={{
             background: 'white',
             height: '100%',

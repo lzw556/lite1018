@@ -9,6 +9,7 @@ import { NetworkProvisioningMode } from '../../../types/network';
 import { useProvisionMode } from '../useProvisionMode';
 import intl from 'react-intl-universal';
 import { FormInputItem } from '../../../components/formInputItem';
+import { useLocaleFormLayout } from '../../../hooks/useLocaleFormLayout';
 
 export interface AddNetworkModalProps extends ModalProps {
   onSuccess: () => void;
@@ -61,8 +62,9 @@ const AddNetworkModal: FC<AddNetworkModalProps> = (props) => {
       onOk={onAdd}
       cancelText={intl.get('CANCEL')}
       confirmLoading={isLoading}
+      bodyStyle={{ maxHeight: 600, overflow: 'auto' }}
     >
-      <Form form={form} labelCol={{ span: 9 }}>
+      <Form form={form} {...useLocaleFormLayout(9)}>
         <fieldset>
           <legend>{intl.get('BASIC_INFORMATION')}</legend>
 

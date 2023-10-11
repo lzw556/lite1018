@@ -1,5 +1,5 @@
 import { MinusCircleOutlined } from '@ant-design/icons';
-import { Button, Form, Input, Popover } from 'antd';
+import { Button, Col, Form, Input, Popover, Row } from 'antd';
 import React from 'react';
 import { Device } from '../../../types/device';
 import { DeviceSelection, MonitoringPointInfo } from './DeviceSelection';
@@ -56,37 +56,42 @@ export const MonitoringPointFormItem = ({
                   onRemove(index);
                 }}
               />
-              <Form.Item required label={intl.get('NAME')} style={{ marginBottom: 0 }}>
-                <FormInputItem
-                  {...restFields}
-                  name={[name, 'name']}
-                  requiredMessage={intl.get('PLEASE_ENTER_NAME')}
-                  lengthLimit={{ min: 4, max: 50, label: intl.get('NAME').toLowerCase() }}
-                  style={{ display: 'inline-block', width: 200, marginRight: 20 }}
-                >
-                  <Input placeholder={intl.get('PLEASE_ENTER_NAME')} />
-                </FormInputItem>
-                <Form.Item name={[name, 'channel']} hidden={true}>
-                  <Input />
-                </Form.Item>
-                <FormInputItem
-                  label={intl.get('POSITION')}
-                  {...restFields}
-                  name={[name, 'attributes', 'index']}
-                  requiredMessage={intl.get('PLEASE_ENTER_SOMETHING', {
-                    something: intl.get('POSITION')
-                  })}
-                  style={{ display: 'inline-block', width: 200 }}
-                  numericRule={{
-                    isInteger: true,
-                    min: 1,
-                    message: intl.get('UNSIGNED_INTEGER_ENTER_PROMPT')
-                  }}
-                  placeholder={intl.get('PLEASE_ENTER_SOMETHING', {
-                    something: intl.get('POSITION')
-                  })}
-                />
-              </Form.Item>
+              <Row>
+                <Col span={12}>
+                  <FormInputItem
+                    {...restFields}
+                    label={intl.get('NAME')}
+                    name={[name, 'name']}
+                    requiredMessage={intl.get('PLEASE_ENTER_NAME')}
+                    lengthLimit={{ min: 4, max: 50, label: intl.get('NAME').toLowerCase() }}
+                    style={{ display: 'inline-block', width: 200, marginRight: 20 }}
+                  >
+                    <Input placeholder={intl.get('PLEASE_ENTER_NAME')} />
+                  </FormInputItem>
+                  <Form.Item name={[name, 'channel']} hidden={true}>
+                    <Input />
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
+                  <FormInputItem
+                    label={intl.get('POSITION')}
+                    {...restFields}
+                    name={[name, 'attributes', 'index']}
+                    requiredMessage={intl.get('PLEASE_ENTER_SOMETHING', {
+                      something: intl.get('POSITION')
+                    })}
+                    style={{ display: 'inline-block', width: 200 }}
+                    numericRule={{
+                      isInteger: true,
+                      min: 1,
+                      message: intl.get('UNSIGNED_INTEGER_ENTER_PROMPT')
+                    }}
+                    placeholder={intl.get('PLEASE_ENTER_SOMETHING', {
+                      something: intl.get('POSITION')
+                    })}
+                  />
+                </Col>
+              </Row>
               {selectedPointType === MonitoringPointTypeValue.THICKNESS && (
                 <ThicknessFieldsOfCreation name={name} restFields={restFields} />
               )}
@@ -100,7 +105,7 @@ export const MonitoringPointFormItem = ({
               )}
             </div>
           ))}
-          <Form.Item wrapperCol={{ offset: isMobile ? 0 : 4 }}>
+          <Form.Item>
             <Popover
               title={intl.get('SELECT_SENSOR')}
               content={
