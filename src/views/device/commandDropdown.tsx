@@ -114,7 +114,8 @@ export const CommandDropdown = ({
       typeId === DeviceType.PressureGuoDa ||
       typeId === DeviceType.PressureWoErKe ||
       typeId === DeviceType.PressureTemperature ||
-      typeId === DeviceType.PressureTemperatureWIRED
+      typeId === DeviceType.PressureTemperatureWIRED ||
+      DeviceType.isVibration(typeId)
     ) {
       items.push({ key: DeviceCommand.Calibrate, label: intl.get('CALIBRATE') });
     }

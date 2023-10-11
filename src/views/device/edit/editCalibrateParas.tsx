@@ -1,9 +1,11 @@
-import { Button, Form, Input, Select } from 'antd';
+import { Button, Form, InputNumber, Select } from 'antd';
 import { DeviceType } from '../../../types/device_type';
 import { Property } from '../../../types/property';
 import intl from 'react-intl-universal';
 import { FormInputItem } from '../../../components/formInputItem';
 import { ModalWrapper } from '../../../components/modalWrapper';
+
+type Paras = { param: number; channel?: number; sub_command?: number };
 
 const EditCalibrateParas = ({
   typeId,
@@ -16,7 +18,7 @@ const EditCalibrateParas = ({
   properties: Property[];
   open: boolean;
   setVisible: React.Dispatch<React.SetStateAction<boolean>>;
-  onUpdate: (val: { param: number; channel?: number }) => void;
+  onUpdate: (val: Paras) => void;
 }) => {
   const [form] = Form.useForm();
   const typeParaMapping = new Map();
@@ -30,17 +32,33 @@ const EditCalibrateParas = ({
   typeParaMapping.set(DeviceType.PressureWoErKe, 'pressure');
   typeParaMapping.set(DeviceType.PressureTemperature, 'pressure');
   typeParaMapping.set(DeviceType.PressureTemperatureWIRED, 'pressure');
-  const property = properties.find((pro) => pro.key === typeParaMapping.get(typeId));
+  const isVibration = DeviceType.isVibration(typeId);
+  const isSVT220S1 = DeviceType.SVT220S1 === typeId;
+  const property = properties.find(
+    (pro) => pro.key === (isVibration ? 'acceleration_peak' : typeParaMapping.get(typeId))
+  );
   const isSPT =
     typeId === DeviceType.PressureTemperature || typeId === DeviceType.PressureTemperatureWIRED;
   const channels = DeviceType.isMultiChannel(typeId, true);
+  const AXIS = [
+    { label: 'AXIS_X', value: 1 },
+    { label: 'AXIS_Y', value: 2 },
+    { label: 'AXIS_Z', value: 3 }
+  ];
 
   function handleSubmit(param?: number) {
     if (param !== undefined) {
       onUpdate({ param });
     } else {
       form.validateFields().then((values) => {
-        onUpdate({ param: Number(values.param), channel: Number(values.channel) });
+        let paras: Paras = { param: Number(values.param) };
+        if (values.channel) {
+          paras = { ...paras, channel: Number(values.channel) };
+        }
+        if (values.sub_command || isVibration) {
+          paras = { ...paras, sub_command: isSVT220S1 ? 3 : Number(values.sub_command) };
+        }
+        onUpdate(paras);
       });
     }
   }
@@ -80,14 +98,17 @@ const EditCalibrateParas = ({
               something: intl.get(property.name).d(property.name)
             })}
             numericRule={{ isInteger: false }}
-          >
-            <Input
-              placeholder={intl.get('PLEASE_ENTER_SOMETHING', {
-                something: intl.get(property.name).d(property.name)
-              })}
-              suffix={`${property.unit}`}
-            />
-          </FormInputItem>
+            numericChildren={
+              <InputNumber
+                controls={false}
+                style={{ width: '100%' }}
+                placeholder={intl.get('PLEASE_ENTER_SOMETHING', {
+                  something: intl.get(property.name).d(property.name)
+                })}
+                addonAfter={property.unit}
+              />
+            }
+          />
           {channels.length > 0 && (
             <Form.Item
               label={intl.get('CHANNEL')}
@@ -99,6 +120,22 @@ const EditCalibrateParas = ({
                 {channels.map(({ label, value }) => (
                   <Select.Option key={value} value={value}>
                     {label}
+                  </Select.Option>
+                ))}
+              </Select>
+            </Form.Item>
+          )}
+          {isVibration && !isSVT220S1 && (
+            <Form.Item
+              label={intl.get('AXIS')}
+              name='sub_command'
+              rules={[{ required: true, message: intl.get('PLEASE_SELECT_CHANNEL') }]}
+              initialValue={1}
+            >
+              <Select>
+                {AXIS.map(({ label, value }) => (
+                  <Select.Option key={value} value={value}>
+                    {intl.get(label)}
                   </Select.Option>
                 ))}
               </Select>
