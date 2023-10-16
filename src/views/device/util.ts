@@ -19,25 +19,24 @@ export function pickDataOfFirstProperties(
     };
   }
 ) {
-  if (!data || data.timestamp < 0 || properties.length === 0) {
-    return [];
-  }
-  const { values } = data;
-  if (!values) {
+  if (properties.length === 0) {
     return [];
   }
   return properties.map(({ name, key, unit, precision, fields }) => {
     let value = NaN;
     let fieldName = undefined;
-    if (Object.hasOwn(values, key)) {
-      value = roundValue(values[key] as number, precision);
-    } else if (fields && fields.length > 0) {
-      const values = fields
-        .map((f) => ({ name: f.name, value: data.values[f.key], first: f.first }))
-        .filter((f) => !!f.first);
-      if (values.length > 0) {
-        value = roundValue(values[0].value as number, precision);
-        fieldName = values[0].name;
+    if (data && data.values) {
+      const { values } = data;
+      if (Object.hasOwn(values, key)) {
+        value = roundValue(values[key] as number, precision);
+      } else if (fields && fields.length > 0) {
+        const values = fields
+          .map((f) => ({ name: f.name, value: data.values[f.key], first: f.first }))
+          .filter((f) => !!f.first);
+        if (values.length > 0) {
+          value = roundValue(values[0].value as number, precision);
+          fieldName = values[0].name;
+        }
       }
     }
     return { name, key, value: getValue(value, unit), fieldName };
