@@ -216,7 +216,8 @@ export const MONITORING_POINT_TYPE_VALUE_DEVICE_TYPE_ID_MAPPING = new Map([
       DeviceType.SVT220520,
       DeviceType.VibrationTemperature3AxisNB,
       DeviceType.VibrationTemperature3AxisAdvancedNB,
-      DeviceType.SVT210510
+      DeviceType.SVT210510,
+      DeviceType.SVT110
     ]
   ],
   [MonitoringPointTypeValue.VIBRATION_RPM, [DeviceType.SVT220S1]],

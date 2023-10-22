@@ -22,6 +22,7 @@ export type DisplayPropertyCategories = {
     | 'SVT210R'
     | 'SVT220520'
     | 'SVT210510'
+    | 'SVT110'
     | 'SVT210RS'
     | 'SVT220S1S3'
     | 'ST'
@@ -422,6 +423,7 @@ export const PROPERTY_CATEGORIES: DisplayPropertyCategories = {
   ],
   SVT210R,
   SVT210510: SVT210R,
+  SVT110: SVT210R,
   SVT220520: SVT210R,
   SVT210RS: [
     VELOCITY_RMS,

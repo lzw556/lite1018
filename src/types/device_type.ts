@@ -15,6 +15,7 @@ export enum DeviceType {
   VibrationTemperature3AxisNB = 327941,
   VibrationTemperature3AxisAdvancedNB = 327942,
   SVT210510 = 327943,
+  SVT110 = 327945,
   SVT210RS = 328193,
   SVT210S = 328194,
   SVT220S1 = 328195,
@@ -61,6 +62,8 @@ export namespace DeviceType {
         return 'DEVICE_TYPE_VIBRATION_PRO_NB';
       case DeviceType.SVT210510:
         return 'DEVICE_TYPE_SVT210510';
+      case DeviceType.SVT110:
+        return 'DEVICE_TYPE_SVT110';
       case DeviceType.SVT210S:
         return 'DEVICE_TYPE_SVT210S';
       case DeviceType.SVT210RS:
@@ -106,6 +109,7 @@ export namespace DeviceType {
       DeviceType.VibrationTemperature3AxisNB,
       DeviceType.VibrationTemperature3AxisAdvancedNB,
       DeviceType.SVT210510,
+      DeviceType.SVT110,
       DeviceType.SVT210RS,
       DeviceType.SVT210S,
       DeviceType.SVT220S1,
@@ -169,6 +173,7 @@ export namespace DeviceType {
       case DeviceType.VibrationTemperature3AxisNB:
       case DeviceType.VibrationTemperature3AxisAdvancedNB:
       case DeviceType.SVT210510:
+      case DeviceType.SVT110:
       case DeviceType.SVT210RS:
       case DeviceType.SVT210S:
       case DeviceType.SVT220S1:
@@ -189,6 +194,7 @@ export const SENSOR_DISPLAY_PROPERTIES = {
   [DeviceType.HighTemperatureCorrosion]: PROPERTY_CATEGORIES.DC_HIGH,
   [DeviceType.SVT210R]: PROPERTY_CATEGORIES.SVT210R,
   [DeviceType.SVT210510]: PROPERTY_CATEGORIES.SVT210510,
+  [DeviceType.SVT110]: PROPERTY_CATEGORIES.SVT110,
   [DeviceType.SVT220520]: PROPERTY_CATEGORIES.SVT220520,
   [DeviceType.SVT210RS]: PROPERTY_CATEGORIES.SVT210RS,
   [DeviceType.SVT210S]: PROPERTY_CATEGORIES.SVT220S1S3,
@@ -207,6 +213,7 @@ export const SVT_DEVICE_TYPE_SENSOR_TYPE_MAPPING = {
   [DeviceType.VibrationTemperature3AxisNB]: SVT_SENSOR_TYPES[0],
   [DeviceType.VibrationTemperature3AxisAdvancedNB]: SVT_SENSOR_TYPES[1],
   [DeviceType.SVT210510]: SVT_SENSOR_TYPES[0],
+  [DeviceType.SVT110]: SVT_SENSOR_TYPES[0],
   [DeviceType.SVT210RS]: SVT_SENSOR_TYPES[0],
   [DeviceType.SVT210S]: SVT_SENSOR_TYPES[0],
   [DeviceType.SVT220S1]: SVT_SENSOR_TYPES[2],
