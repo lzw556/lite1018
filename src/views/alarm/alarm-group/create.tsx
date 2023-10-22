@@ -68,7 +68,7 @@ export default function CreateAlarmRuleGroup() {
                   if (measurementType) {
                     setDisabled(false);
                     setProperties(
-                      removeDulpicateProperties(getDisplayProperties(res, measurementType))
+                      removeDulpicateProperties(getDisplayProperties(res, measurementType, res))
                     );
                   }
                 });

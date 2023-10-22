@@ -121,21 +121,23 @@ const DC_TEMPERATURE_ENV: DisplayProperty = {
   parentKey: 'temperature'
 };
 const SHORT_CORROSION_RATE: DisplayProperty = {
-  key: 'short_corrosion_rate',
+  key: 'short_term_corrosion_rate',
   name: 'FIELD_SHORT_CORROSION_RATE',
+  first: true,
   precision: 3,
-  losingOnMonitoringPoint: true,
+  // losingOnMonitoringPoint: true,
   unit: 'mm/a',
-  fields: [{ key: 'short_corrosion_rate', name: 'FIELD_SHORT_CORROSION_RATE', dataIndex: 0 }],
+  fields: [{ key: 'short_term_corrosion_rate', name: 'FIELD_SHORT_CORROSION_RATE', dataIndex: 0 }],
   parentKey: 'corrosion_rate'
 };
 const LONG_CORROSION_RATE: DisplayProperty = {
-  key: 'long_corrosion_rate',
+  key: 'long_term_corrosion_rate',
   name: 'FIELD_LONG_CORROSION_RATE',
+  first: true,
   precision: 3,
-  losingOnMonitoringPoint: true,
+  // losingOnMonitoringPoint: true,
   unit: 'mm/a',
-  fields: [{ key: 'long_corrosion_rate', name: 'FIELD_LONG_CORROSION_RATE', dataIndex: 0 }],
+  fields: [{ key: 'long_term_corrosion_rate', name: 'FIELD_LONG_CORROSION_RATE', dataIndex: 0 }],
   parentKey: 'corrosion_rate'
 };
 //DC specific end

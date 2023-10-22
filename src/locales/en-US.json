@@ -1089,8 +1089,8 @@
   "SETTING_DEN_IS_ENABLED_DESC": "Enable sensor acceleration noise reduction",
   "SETTING_DISP_MODE": "Displacement Mode",
   "SETTING_DISP_MODE_DESC": "Select low-frequency mode for vibration frequencies less than or equal to 200Hz; otherwise, select high-frequency mode",
-  "SETTING_DISP_MODE_HI": "Mode HI",
-  "SETTING_DISP_MODE_LO": "Mode LO",
+  "SETTING_DISP_MODE_HI": "High Frequency Mode",
+  "SETTING_DISP_MODE_LO": "Low Frequency Mode",
   "INDEXED_NUMBER": "Number {index} ",
   "DEVICE_TYPE_SVT210S": "Wired Vibration Temperature Sensor SVT210S",
   "DEVICE_TYPE_SVT220S1": "Wired Vibration Temperature Sensor SVT220S1",
@@ -1114,5 +1114,15 @@
   "DYNAMIC_FIELD_PRESSURE": "Dynamic Stress",
   "DYNAMIC_FIELD_ACCELERATION": "Dynamic Acceleration",
   "DOWNLOAD_ALL": "Download all",
-  "BATCH_DOWNLOAD": "Batch download"
+  "BATCH_DOWNLOAD": "Batch download",
+  "SETTING_ENVELOP_CALCULATION_IS_ENABLED": "Acceleration Envelope Enable",
+  "SETTING_ENVELOP_CALCULATION_IS_ENABLED_DESC": "When enabled,report accelerationenvelope",
+  "SETTING_DISPLACEMENT_CALCULATION_IS_ENABLED": "Displacement Enable",
+  "SETTING_DISPLACEMENT_CALCULATION_IS_ENABLED_DESC": "When enabled,report displacementpeak-to-peak",
+  "SETTING_VELOCITY_CALCULATION_IS_ENABLED": "Velocity Enable",
+  "SETTING_VELOCITY_CALCULATION_IS_ENABLED_DESC": "When enabled,report velocity RMS",
+  "AXIS": "Axis",
+  "DEVICE_TYPE_SVT110": "Wireless Vibration Temperature Sensor SVT110",
+  "FIELD_SHORT_TERM_CORROSION_RATE": "Corrosion Rate",
+  "FIELD_LONG_TERM_CORROSION_RATE": "Long-term Corrosion Rate"
 }

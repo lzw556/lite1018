@@ -216,7 +216,8 @@ export const parseAttrs = (attributes: MonitoringPointRow['attributes']) => {
 
 export function getDisplayProperties(
   properties: Property[],
-  monitoringPointType: MonitoringPointTypeValue
+  monitoringPointType: MonitoringPointTypeValue,
+  filters?: Property[]
 ) {
   const dispalyPropertiesSettings =
     MONITORING_POINT_DISPLAY_PROPERTIES[
@@ -224,6 +225,8 @@ export function getDisplayProperties(
     ];
   if (!dispalyPropertiesSettings || dispalyPropertiesSettings.length === 0) {
     return properties.sort((prev, crt) => prev.sort - crt.sort) as DisplayProperty[];
+  } else if (filters && filters.length > 0) {
+    return filters as DisplayProperty[];
   } else {
     return dispalyPropertiesSettings
       .filter((p) => !p.losingOnMonitoringPoint)
