@@ -450,8 +450,8 @@
   "FIELD_KURTOSIS_NORM_DESC": "描述振动信号的波形平缓程度，用于检测异常波形和非线性振动情况",
   "FIELD_LENGTH": "长度",
   "FIELD_LENGTH_DESC": "螺栓长度",
-  "FIELD_LONG_CORROSION_RATE": "长期腐蚀率",
-  "FIELD_LONG_CORROSION_RATE_DESC": "依照设置时间计算出腐蚀率",
+  "FIELD_LONG_TERM_CORROSION_RATE": "长期腐蚀率",
+  "FIELD_LONG_TERM_CORROSION_RATE_DESC": "依照设置时间计算出腐蚀率",
   "FIELD_LOOSENING_ANGLE": "松动角度",
   "FIELD_LOOSENING_ANGLE_DESC": "螺母松动角度",
   "FIELD_MARGIN_FACTOR": "裕度因子",
@@ -482,8 +482,8 @@
   "FIELD_ROLL_DESC": "绕Y轴的旋转角度",
   "FIELD_SECOND_HARMONIC": "二倍频振幅",
   "FIELD_SECOND_HARMONIC_DESC": "频域中具有频率为基频（主要振动频率）的两倍的振动分量的幅值",
-  "FIELD_SHORT_CORROSION_RATE": "短期腐蚀率",
-  "FIELD_SHORT_CORROSION_RATE_DESC": "依照设置时间计算出腐蚀率",
+  "FIELD_SHORT_TERM_CORROSION_RATE": "短期腐蚀率",
+  "FIELD_SHORT_TERM_CORROSION_RATE_DESC": "依照设置时间计算出腐蚀率",
   "FIELD_SIGNAL_QUALITY": "超声信号质量",
   "FIELD_SIGNAL_QUALITY_DESC": "超声信号质量，用于检测安装质量",
   "FIELD_SIGNAL_STRENGTH": "超声信号强度",
@@ -1122,7 +1122,5 @@
   "SETTING_VELOCITY_CALCULATION_IS_ENABLED": "速度计算",
   "SETTING_VELOCITY_CALCULATION_IS_ENABLED_DESC": "启用后传感器上报速度有效值",
   "AXIS": "坐标轴",
-  "DEVICE_TYPE_SVT110": "无线振动温度传感器 SVT110",
-  "FIELD_SHORT_TERM_CORROSION_RATE": "短期腐蚀率",
-  "FIELD_LONG_TERM_CORROSION_RATE": "长期腐蚀率"
+  "DEVICE_TYPE_SVT110": "无线振动温度传感器 SVT110"
 }

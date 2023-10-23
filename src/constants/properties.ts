@@ -120,24 +120,28 @@ const DC_TEMPERATURE_ENV: DisplayProperty = {
   fields: [{ key: 'env_temperature', name: 'FIELD_ENVIRONMENT_TEMPERATURE', dataIndex: 0 }],
   parentKey: 'temperature'
 };
-const SHORT_CORROSION_RATE: DisplayProperty = {
+const SHORT_TERM_CORROSION_RATE: DisplayProperty = {
   key: 'short_term_corrosion_rate',
-  name: 'FIELD_SHORT_CORROSION_RATE',
+  name: 'FIELD_SHORT_TERM_CORROSION_RATE',
   first: true,
   precision: 3,
   // losingOnMonitoringPoint: true,
   unit: 'mm/a',
-  fields: [{ key: 'short_term_corrosion_rate', name: 'FIELD_SHORT_CORROSION_RATE', dataIndex: 0 }],
+  fields: [
+    { key: 'short_term_corrosion_rate', name: 'FIELD_SHORT_TERM_CORROSION_RATE', dataIndex: 0 }
+  ],
   parentKey: 'corrosion_rate'
 };
-const LONG_CORROSION_RATE: DisplayProperty = {
+const LONG_TERM_CORROSION_RATE: DisplayProperty = {
   key: 'long_term_corrosion_rate',
-  name: 'FIELD_LONG_CORROSION_RATE',
+  name: 'FIELD_LONG_TERM_CORROSION_RATE',
   first: true,
   precision: 3,
   // losingOnMonitoringPoint: true,
   unit: 'mm/a',
-  fields: [{ key: 'long_term_corrosion_rate', name: 'FIELD_LONG_CORROSION_RATE', dataIndex: 0 }],
+  fields: [
+    { key: 'long_term_corrosion_rate', name: 'FIELD_LONG_TERM_CORROSION_RATE', dataIndex: 0 }
+  ],
   parentKey: 'corrosion_rate'
 };
 //DC specific end
@@ -408,8 +412,8 @@ export const PROPERTY_CATEGORIES: DisplayPropertyCategories = {
     THICKNESS,
     DC_TEMPERATURE,
     TOF,
-    SHORT_CORROSION_RATE,
-    LONG_CORROSION_RATE,
+    SHORT_TERM_CORROSION_RATE,
+    LONG_TERM_CORROSION_RATE,
     { ...SIGNAL_STRENGTH, losingOnMonitoringPoint: true },
     { ...SIGNAL_QUALITY, losingOnMonitoringPoint: true }
   ],
@@ -418,8 +422,8 @@ export const PROPERTY_CATEGORIES: DisplayPropertyCategories = {
     DC_TEMPERATURE,
     DC_TEMPERATURE_ENV,
     TOF,
-    SHORT_CORROSION_RATE,
-    LONG_CORROSION_RATE,
+    SHORT_TERM_CORROSION_RATE,
+    LONG_TERM_CORROSION_RATE,
     { ...SIGNAL_STRENGTH, losingOnMonitoringPoint: true },
     { ...SIGNAL_QUALITY, losingOnMonitoringPoint: true }
   ],

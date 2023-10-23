@@ -450,8 +450,8 @@
   "FIELD_KURTOSIS_NORM_DESC": "The flatness of a vibration signal's waveform, used to detect abnormal waveforms and nonlinear vibration",
   "FIELD_LENGTH": "Length",
   "FIELD_LENGTH_DESC": "Bolt length",
-  "FIELD_LONG_CORROSION_RATE": "Long-term Corrosion Rate",
-  "FIELD_LONG_CORROSION_RATE—_DESC": "Corrosion rate based on the set time",
+  "FIELD_LONG_TERM_CORROSION_RATE": "Long-term Corrosion Rate",
+  "FIELD_LONG_TERM_CORROSION_RATE_DESC": "Corrosion rate based on the set time",
   "FIELD_LOOSENING_ANGLE": "Loosening Angle",
   "FIELD_LOOSENING_ANGLE_DESC": "Angle of nut loosening",
   "FIELD_MARGIN_FACTOR": "Margin Facor",
@@ -482,8 +482,8 @@
   "FIELD_ROLL_DESC": "Rotation angle around the Y-axis",
   "FIELD_SECOND_HARMONIC": "2nd Harmonic",
   "FIELD_SECOND_HARMONIC_DESC": "Amplitude of the vibration component in the frequency domain with twice the frequency of the fundamental frequency",
-  "FIELD_SHORT_CORROSION_RATE": "Corrosion Rate",
-  "FIELD_SHORT_CORROSION_RATE_DESC": "Corrosion rate based on the set time",
+  "FIELD_SHORT_TERM_CORROSION_RATE": "Corrosion Rate",
+  "FIELD_SHORT_TERM_CORROSION_RATE_DESC": "Corrosion rate based on the set time",
   "FIELD_SIGNAL_QUALITY": "Ultrasonic Signal Quality",
   "FIELD_SIGNAL_QUALITY_DESC": "Ultrasonic signal quality, used for installation quality inspection",
   "FIELD_SIGNAL_STRENGTH": "Ultrasonic Signal Strength",
@@ -1122,7 +1122,5 @@
   "SETTING_VELOCITY_CALCULATION_IS_ENABLED": "Velocity Enable",
   "SETTING_VELOCITY_CALCULATION_IS_ENABLED_DESC": "When enabled,report velocity RMS",
   "AXIS": "Axis",
-  "DEVICE_TYPE_SVT110": "Wireless Vibration Temperature Sensor SVT110",
-  "FIELD_SHORT_TERM_CORROSION_RATE": "Corrosion Rate",
-  "FIELD_LONG_TERM_CORROSION_RATE": "Long-term Corrosion Rate"
+  "DEVICE_TYPE_SVT110": "Wireless Vibration Temperature Sensor SVT110"
 }
