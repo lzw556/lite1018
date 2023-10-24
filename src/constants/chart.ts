@@ -51,7 +51,7 @@ export const ChartStyle = {
   ],
   LineSeries: {
     type: 'line',
-    symbol: 'none',
+    // symbol: 'none',
     colorBy: 'series'
   },
   DashedSplitLine: {
