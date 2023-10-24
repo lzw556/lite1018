@@ -176,7 +176,8 @@ const dynamic_angle: { dynamicData?: DynamicData; waveData?: WaveData } = {
       { label: 'FIELD_INCLINATION', value: 'mean_inclination', unit: '°', precision: 2 },
       { label: 'FIELD_PITCH', value: 'mean_pitch', unit: '°', precision: 2 },
       { label: 'FIELD_ROLL', value: 'mean_roll', unit: '°', precision: 2 },
-      { label: 'FIELD_WAGGLE', value: 'mean_waggle', unit: 'g', precision: 2 }
+      { label: 'FIELD_WAGGLE', value: 'mean_waggle', unit: 'g', precision: 2 },
+      { label: 'FIELD_TEMPERATURE', value: 'temperature', unit: '℃', precision: 1 }
     ]
   }
 };

@@ -453,7 +453,8 @@ export const PROPERTY_CATEGORIES: DisplayPropertyCategories = {
     { ...INCLINATION, first: true },
     { ...PITCH, first: true },
     { ...ROLL, first: true },
-    WAGGLE
+    WAGGLE,
+    TEMPERATURE
   ],
-  TOWER: [DISPLACEMENT_COMBINED, INCLINATION_COMBINED, DIRECTION, WAGGLE]
+  TOWER: [DISPLACEMENT_COMBINED, INCLINATION_COMBINED, DIRECTION, WAGGLE, TEMPERATURE]
 } as const;
