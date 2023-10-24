@@ -15,11 +15,9 @@ import { PageTitle } from '../../../components/pageTitle';
 import intl from 'react-intl-universal';
 import { useLocaleContext } from '../../../localeProvider';
 import HistoryDataPage from '../../device/detail/data';
-import WaveDataChart from '../../device/detail/waveData';
 import { RecentHistory } from '../../device/RecentHistory';
 import { RuntimeChart } from '../../device/RuntimeChart';
 import DeviceEvent from '../../device/detail/event';
-import { DynamicData } from '../../device/detail/dynamicData';
 import { CommandDropdown } from '../../device/commandDropdown';
 import SettingPage from './settings';
 import InformationCard from './information';
@@ -49,12 +47,10 @@ const DeviceDetailPage = () => {
       )
     ],
     ['historyData', device && <HistoryDataPage device={device} />],
-    ['waveData', device && <WaveDataChart device={device} />],
     ['monitor', device && <RecentHistory device={device} key={language} />],
     ['ta', device && <RuntimeChart deviceId={device.id} deviceType={device.typeId} />],
     ['events', device && <DeviceEvent device={device} />],
-    ['alarm', device && <FilterableAlarmRecordTable sourceId={device.id} />],
-    ['dynamicData', device && <DynamicData {...device} />]
+    ['alarm', device && <FilterableAlarmRecordTable sourceId={device.id} />]
   ]);
 
   const fetchDevice = useCallback(() => {
@@ -159,21 +155,10 @@ export function useDeviceTabs(deviceTypeId?: number) {
       tabs.push({ key: 'ta', tab: 'STATUS_HISTORY' });
     }
   }
-  if (DeviceType.isVibration(deviceTypeId) && hasPermission(Permission.DeviceData)) {
-    tabs.unshift(...tabTitleList, { key: 'waveData', tab: 'WAVEFORM_DATA' });
-    return tabs;
-  }
   switch (deviceTypeId) {
     case DeviceType.Gateway:
     case DeviceType.Router:
       return tabs;
-    case DeviceType.BoltElongation:
-    case DeviceType.AngleDip:
-    case DeviceType.AngleDipNB:
-      if (hasPermission(Permission.DeviceData)) {
-        tabs.unshift(...tabTitleList, { key: 'dynamicData', tab: 'DYNAMIC_DATA' });
-      }
-      break;
     default:
       if (hasPermission(Permission.DeviceData)) {
         tabs.unshift(...tabTitleList);

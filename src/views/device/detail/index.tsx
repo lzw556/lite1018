@@ -11,13 +11,11 @@ import { DeviceType } from '../../../types/device_type';
 import HasPermission from '../../../permission';
 import userPermission, { Permission } from '../../../permission/permission';
 import HistoryDataPage from './data';
-import WaveDataChart from './waveData';
 import useSocket, { SocketTopic } from '../../../socket';
 import { RecentHistory } from '../RecentHistory';
 import { RuntimeChart } from '../RuntimeChart';
 import DeviceEvent from './event';
 import { FilterableAlarmRecordTable } from '../../../components/alarm/filterableAlarmRecordTable';
-import { DynamicData } from './dynamicData';
 import { CommandDropdown } from '../commandDropdown';
 import { isNumber } from 'lodash';
 import { PageTitle } from '../../../components/pageTitle';
@@ -49,12 +47,10 @@ const DeviceDetailPage = () => {
       )
     ],
     ['historyData', device && <HistoryDataPage device={device} />],
-    ['waveData', device && <WaveDataChart device={device} />],
     ['monitor', device && <RecentHistory device={device} key={language} />],
     ['ta', device && <RuntimeChart deviceId={device.id} deviceType={device.typeId} />],
     ['events', device && <DeviceEvent device={device} />],
-    ['alarm', device && <FilterableAlarmRecordTable sourceId={device.id} />],
-    ['dynamicData', device && <DynamicData {...device} />]
+    ['alarm', device && <FilterableAlarmRecordTable sourceId={device.id} />]
   ]);
 
   const fetchDevice = useCallback(() => {
@@ -156,21 +152,10 @@ export function useDeviceTabs(deviceTypeId?: number) {
   if (hasPermission(Permission.DeviceRuntimeDataGet) && !DeviceType.isWiredSensor(deviceTypeId)) {
     tabs.push({ key: 'ta', tab: 'STATUS_HISTORY' });
   }
-  if (DeviceType.isVibration(deviceTypeId) && hasPermission(Permission.DeviceData)) {
-    tabs.unshift(...tabTitleList, { key: 'waveData', tab: 'WAVEFORM_DATA' });
-    return tabs;
-  }
   switch (deviceTypeId) {
     case DeviceType.Gateway:
     case DeviceType.Router:
       return tabs;
-    case DeviceType.BoltElongation:
-    case DeviceType.AngleDip:
-    case DeviceType.AngleDipNB:
-      if (hasPermission(Permission.DeviceData)) {
-        tabs.unshift(...tabTitleList, { key: 'dynamicData', tab: 'DYNAMIC_DATA' });
-      }
-      break;
     default:
       if (hasPermission(Permission.DeviceData)) {
         tabs.unshift(...tabTitleList);
