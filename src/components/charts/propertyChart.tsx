@@ -296,7 +296,7 @@ export function transformHistoryData(
     if (property.parentKey) {
       lastValues = [last[property.name]];
     } else {
-      lastValues = Object.values(last);
+      lastValues = property.fields?.map((f) => last[f.name]) ?? [];
     }
   }
   return {
