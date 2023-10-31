@@ -21,6 +21,7 @@ export interface Series {
 export const PropertyChart = React.forwardRef(function PropertyChart(
   {
     dataZoom = false,
+    dispatchActionOption,
     loading,
     onlyShowLastAxisInLegendByDefault = false,
     rawOptions,
@@ -34,6 +35,7 @@ export const PropertyChart = React.forwardRef(function PropertyChart(
     yAxisValueMeta
   }: {
     dataZoom?: boolean | NonNullable<object>;
+    dispatchActionOption?: any;
     loading?: boolean;
     onlyShowLastAxisInLegendByDefault?: boolean;
     rawOptions?: any;
@@ -216,7 +218,12 @@ export const PropertyChart = React.forwardRef(function PropertyChart(
     }
   };
 
-  React.useEffect(() => adjustIntervalOfYAxis(), [series]);
+  React.useEffect(() => {
+    adjustIntervalOfYAxis();
+    if (dispatchActionOption) {
+      chartInstanceRef.current?.getEchartsInstance().dispatchAction(dispatchActionOption);
+    }
+  }, [series, dispatchActionOption]);
 
   return (
     options && (

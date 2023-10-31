@@ -70,7 +70,6 @@ export const ThicknessAnalysis = (props: MonitoringPointRow) => {
   }, [attributes]);
   const [selectedDuration, setSelectedDuration] = React.useState<Duration | 'none'>('none');
   const [historyData, setHistoryData] = React.useState<HistoryData>();
-  const chartInstanceRef = React.useRef<any>();
 
   function getData(id: number, range: [number, number]) {
     setLoading(true);
@@ -89,24 +88,24 @@ export const ThicknessAnalysis = (props: MonitoringPointRow) => {
     }
   }, [id, range]);
 
-  React.useEffect(() => {
-    if (selectedDuration !== 'none' && analysisData) {
-      const sub = analysisData[selectedDuration];
-      if (sub && sub.data)
-        chartInstanceRef.current.getEchartsInstance().dispatchAction({
-          type: 'brush',
-          areas: [
-            {
-              brushType: 'lineX',
-              coordRange: sub.data.map(({ x }) =>
-                dayjs.unix(x).local().format('YYYY-MM-DD HH:mm:ss')
-              ),
-              xAxisIndex: 0
-            }
-          ]
-        });
+  let dispatchActionOption: any;
+  if (selectedDuration !== 'none' && analysisData) {
+    const sub = analysisData[selectedDuration];
+    if (sub && sub.data) {
+      dispatchActionOption = {
+        type: 'brush',
+        areas: [
+          {
+            brushType: 'lineX',
+            coordRange: sub.data.map(({ x }) =>
+              dayjs.unix(x).local().format('YYYY-MM-DD HH:mm:ss')
+            ),
+            xAxisIndex: 0
+          }
+        ]
+      };
     }
-  }, [selectedDuration, analysisData]);
+  }
 
   return (
     <Row gutter={[0, 16]}>
@@ -239,7 +238,7 @@ export const ThicknessAnalysis = (props: MonitoringPointRow) => {
           style={{ height: 500 }}
           yAxisMinInterval={property.interval}
           yAxisValueMeta={{ unit, precision }}
-          ref={chartInstanceRef}
+          dispatchActionOption={dispatchActionOption}
         />
       )
     );
