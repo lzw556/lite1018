@@ -295,20 +295,18 @@ export function transformHistoryData(
         })
       };
     }) ?? [];
-  const last = origin[origin.length - 1].values.find((v) =>
-    property.parentKey ? v.key === property.parentKey : v.key === property.key
-  )?.data;
-  let lastValues: number[] = [];
-  if (last) {
-    if (property.parentKey) {
-      lastValues = [last[property.name]];
-    } else {
-      lastValues = property.fields?.map((f) => last[f.name]) ?? [];
-    }
-  }
+
   return {
     series: series.map((s) => ({ data: s, xAxisValues })),
-    lastValues
+    values: series.map((s) => {
+      const value = Object.values(s)[0];
+      return {
+        name: Object.keys(s)[0],
+        last: value[value.length - 1],
+        min: Math.min(...value),
+        max: Math.max(...value)
+      };
+    })
   };
 }
 

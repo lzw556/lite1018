@@ -11,22 +11,23 @@ export const ChartHeader = ({
   values
 }: {
   property: DisplayProperty;
-  values: number[];
+  values: {
+    name: string;
+    last: number;
+    min: number;
+    max: number;
+  }[];
 }) => {
   const { language } = useLocaleContext();
   const isMultiAxis = values.length > 1;
-  const { fields, name, unit, precision } = property;
+  const { name, unit, precision } = property;
   let title = `${intl.get(name).d(name)}`;
   let valueText = '-';
   if (values.length > 1) {
     title = getDisplayName({ name: title, suffix: unit, lang: language });
-    if (fields) {
-      valueText = fields
-        .map((f, i) => `${intl.get(f.name)}${getValue(roundValue(values[i], precision))}`)
-        .join(' ');
-    }
+    valueText = values.map((v) => `${v.name}${getValue(roundValue(v.last, precision))}`).join(' ');
   } else if (values.length === 1) {
-    valueText = getValue(roundValue(values[0], precision), unit);
+    valueText = getValue(roundValue(values[0].last, precision), unit);
   }
 
   return (

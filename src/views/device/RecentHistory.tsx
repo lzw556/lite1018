@@ -40,7 +40,7 @@ export const RecentHistory: React.FC<{ device: Device }> = ({ device }) => {
             >
               {transform && (
                 <>
-                  <ChartHeader property={p} values={transform.lastValues} />
+                  <ChartHeader property={p} values={transform.values} />
                   <PropertyChart
                     series={transform.series}
                     withArea={true}

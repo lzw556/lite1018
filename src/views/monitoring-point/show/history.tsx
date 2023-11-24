@@ -31,7 +31,7 @@ export const MonitoringPointHistory = (point: MonitoringPointRow) => {
     type === MonitoringPointTypeValue.TOWER_BASE_SETTLEMENT;
   const typeLabel = getMonitoringPointType(type);
 
-  const fetchData = (id: number, range: [number, number], property: string, type: number) => {
+  const fetchData = (id: number, range: [number, number]) => {
     if (range) {
       const [from, to] = range;
       setLoading(true);
@@ -47,8 +47,8 @@ export const MonitoringPointHistory = (point: MonitoringPointRow) => {
   };
 
   React.useEffect(() => {
-    if (range && property) fetchData(id, range, property.key, type);
-  }, [id, range, property, type]);
+    if (range) fetchData(id, range);
+  }, [id, range]);
 
   const renderChart = () => {
     if (loading) return <Spin />;
@@ -161,7 +161,7 @@ export const MonitoringPointHistory = (point: MonitoringPointRow) => {
                             onOk: (close) => {
                               clearHistory(id, from, to).then((_) => {
                                 close();
-                                if (range) fetchData(id, range, property.key, type);
+                                if (range) fetchData(id, range);
                               });
                             }
                           });

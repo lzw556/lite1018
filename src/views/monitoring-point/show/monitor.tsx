@@ -59,7 +59,7 @@ export const MonitoringPointMonitor = (point: MonitoringPointRow) => {
             <Col span={isMobile ? 24 : 6} key={index}>
               {transform && (
                 <>
-                  <ChartHeader property={p} values={transform.lastValues} />
+                  <ChartHeader property={p} values={transform.values} />
                   <PropertyChart
                     series={transform.series}
                     withArea={true}
