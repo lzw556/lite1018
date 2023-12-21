@@ -9,7 +9,7 @@ export const oneYearRange: RangeValue = [
 ];
 
 export const oneWeekRange: RangeValue = [
-  dayjs().startOf('day').subtract(7, 'd'),
+  dayjs().startOf('day').subtract(6, 'd'),
   dayjs().endOf('day')
 ];
 
