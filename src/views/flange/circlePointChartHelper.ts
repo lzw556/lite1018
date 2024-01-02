@@ -37,11 +37,14 @@ export function buildCirclePointsChartOfFlange(
   const actuals = generateActuals(sortedMeasurements, isBig);
   polar.push(actuals.radius);
   angleAxis.push(actuals.angleAxis);
-  const max = getMax(actuals.max, attributes, measurements[0].type);
-  const min =
-    measurements[0].type === MonitoringPointTypeValue.LOOSENING_ANGLE
-      ? -(max * 1.5)
-      : actuals.min || -1;
+  let max = getMax(actuals.max, attributes, measurements[0].type);
+  let min = actuals.min || -1;
+  if (measurements[0].type === MonitoringPointTypeValue.LOOSENING_ANGLE) {
+    if (max < 5) {
+      max = 10;
+    }
+    min = -(max * 2);
+  }
   radiusAxis.push({ ...actuals.radiusAxis, max, min });
   series.push(actuals.series);
 
