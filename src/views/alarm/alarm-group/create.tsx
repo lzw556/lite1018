@@ -74,12 +74,12 @@ export default function CreateAlarmRuleGroup() {
                 });
                 const formData: AlarmRule['rules'] = form.getFieldValue('rules');
                 if (formData && formData.length > 0) {
-                  form.setFieldsValue(
-                    formData.map((field) => {
+                  form.setFieldsValue({
+                    rules: formData.map((field) => {
                       delete field.index;
                       return field;
                     })
-                  );
+                  });
                 }
               }}
             >
