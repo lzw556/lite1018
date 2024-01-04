@@ -223,7 +223,9 @@ export function getDisplayProperties(
       monitoringPointType as keyof typeof MONITORING_POINT_DISPLAY_PROPERTIES
     ];
   if (!dispalyPropertiesSettings || dispalyPropertiesSettings.length === 0) {
-    return properties.sort((prev, crt) => prev.sort - crt.sort) as DisplayProperty[];
+    return properties
+      .filter((p) => !!p.isShow)
+      .sort((prev, crt) => prev.sort - crt.sort) as DisplayProperty[];
   } else {
     return dispalyPropertiesSettings
       .filter((p) => !p.losingOnMonitoringPoint)
