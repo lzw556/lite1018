@@ -17,6 +17,7 @@ import {
 } from '../types';
 import { AssetExport } from './assetExport';
 import { FileInput } from './fileInput';
+import { AllMonitoringPointsDownload } from './allMonitoringPointsDownload';
 
 export function CreateAssetActionBar({
   roots,
@@ -112,6 +113,7 @@ export function CreateAssetActionBar({
   }
   if (needExtra) {
     if (roots.length > 0) {
+      actions.push(<AllMonitoringPointsDownload winds={roots} key='downloadAll' />);
       actions.push(<AssetExport winds={roots} key='export' />);
     }
     actions.push(<FileInput onUpload={handleUpload} key='upload' />);

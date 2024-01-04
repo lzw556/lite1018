@@ -2,7 +2,7 @@ import { round, floor } from 'lodash';
 import dayjs from './dayjsUtils';
 import { Language } from '../localeProvider';
 
-export const getFilename = (res: any) => {
+export const getFilename = (res: any, identifier?: number) => {
   let filename = `${dayjs().format('YYYY-MM-DD HH:mm:ss')}.json`;
   const dispos = res.headers['content-disposition'];
   if (dispos) {
@@ -11,7 +11,7 @@ export const getFilename = (res: any) => {
       const path = disposParts[1];
       const pathParts = path.split('filename=');
       if (pathParts && pathParts.length > 1) {
-        filename = decodeURI(pathParts[1]);
+        filename = decodeURI(identifier ? `${identifier}_${pathParts[1]}` : pathParts[1]);
       }
     }
   }
