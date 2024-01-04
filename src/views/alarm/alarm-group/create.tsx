@@ -68,7 +68,7 @@ export default function CreateAlarmRuleGroup() {
                   if (measurementType) {
                     setDisabled(false);
                     setProperties(
-                      removeDulpicateProperties(getDisplayProperties(res, measurementType, res))
+                      removeDulpicateProperties(getDisplayProperties(res, measurementType))
                     );
                   }
                 });
@@ -169,7 +169,7 @@ export default function CreateAlarmRuleGroup() {
                                             name: selectOptions.map(({ name }) => name).join(':'),
                                             unit: property.unit
                                               ? intl.get(property.unit).d(property.unit)
-                                              : property.unit
+                                              : property.unit || ''
                                           };
                                           setMetric((prev) => {
                                             if (prev.length === 0) {
@@ -331,7 +331,7 @@ export default function CreateAlarmRuleGroup() {
                                         name: selectOptions.map(({ name }) => name).join(':'),
                                         unit: property.unit
                                           ? intl.get(property.unit).d(property.unit)
-                                          : property.unit
+                                          : property.unit || ''
                                       };
                                       setMetric((prev) => {
                                         if (prev.length === 0) {

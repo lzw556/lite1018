@@ -26,7 +26,7 @@ export const DownloadHistory: React.FC<DownloadModalProps> = (props) => {
 
   const properties = props.virtualPoint
     ? props.virtualPoint.properties.filter((pro) => pro.key === 'preload' || pro.key === 'pressure')
-    : getDisplayProperties(measurement.properties, measurement.type, measurement.properties);
+    : getDisplayProperties(measurement.properties, measurement.type);
 
   React.useEffect(() => {
     if (open) {

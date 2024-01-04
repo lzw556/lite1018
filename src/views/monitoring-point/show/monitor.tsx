@@ -51,28 +51,26 @@ export const MonitoringPointMonitor = (point: MonitoringPointRow) => {
           />
         </Col>
       )}
-      {getDisplayProperties(properties, type, properties).map(
-        (p: DisplayProperty, index: number) => {
-          const { unit, precision } = p;
-          const transform = transformHistoryData(historyData, p);
-          return (
-            <Col span={isMobile ? 24 : 6} key={index}>
-              {transform && (
-                <>
-                  <ChartHeader property={p} values={transform.values} />
-                  <PropertyChart
-                    series={transform.series}
-                    withArea={true}
-                    xAxisLabelLimit={true}
-                    yAxisMinInterval={p.interval}
-                    yAxisValueMeta={{ unit, precision }}
-                  />
-                </>
-              )}
-            </Col>
-          );
-        }
-      )}
+      {getDisplayProperties(properties, type).map((p: DisplayProperty, index: number) => {
+        const { unit, precision } = p;
+        const transform = transformHistoryData(historyData, p);
+        return (
+          <Col span={isMobile ? 24 : 6} key={index}>
+            {transform && (
+              <>
+                <ChartHeader property={p} values={transform.values} />
+                <PropertyChart
+                  series={transform.series}
+                  withArea={true}
+                  xAxisLabelLimit={true}
+                  yAxisMinInterval={p.interval}
+                  yAxisValueMeta={{ unit, precision }}
+                />
+              </>
+            )}
+          </Col>
+        );
+      })}
     </Row>
   );
 };

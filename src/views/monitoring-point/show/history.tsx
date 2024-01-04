@@ -21,7 +21,7 @@ export const MonitoringPointHistory = (point: MonitoringPointRow) => {
   const [loading, setLoading] = React.useState(true);
   const [historyData, setHistoryData] = React.useState<HistoryData>();
   const [range, setRange] = React.useState<[number, number]>(oneWeekNumberRange);
-  const displayProperties = getDisplayProperties(properties, type, properties);
+  const displayProperties = getDisplayProperties(properties, type);
   const [property, setProperty] = React.useState<DisplayProperty | undefined>(
     displayProperties ? displayProperties[0] : undefined
   );

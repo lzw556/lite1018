@@ -93,56 +93,26 @@ const THICKNESS: DisplayProperty = {
   precision: 3,
   unit: 'mm'
 };
-// const CORROSION_RATE: DisplayProperty = {
-//   key: 'corrosion_rate',
-//   name: 'FIELD_CORROSION_RATE',
-//   precision: 3,
-//   losingOnMonitoringPoint: true,
-//   unit: 'mm/a'
-// };
+const CORROSION_RATE: DisplayProperty = {
+  key: 'corrosion_rate',
+  name: 'FIELD_CORROSION_RATE',
+  first: true,
+  precision: 3,
+  unit: 'mm/a'
+};
+const CORROSION_LOSS: DisplayProperty = {
+  key: 'corrosion_loss',
+  name: 'FIELD_CORROSION_LOSS',
+  precision: 3,
+  unit: 'mm'
+};
 const DC_TEMPERATURE: DisplayProperty = {
   key: 'temperature',
   name: 'FIELD_TEMPERATURE',
   first: true,
   precision: 1,
   unit: '℃',
-  unit2: '°C',
-  fields: [{ key: 'temperature', name: 'FIELD_TEMPERATURE', dataIndex: 0 }],
-  parentKey: 'temperature'
-};
-const DC_TEMPERATURE_ENV: DisplayProperty = {
-  key: 'env_temperature',
-  name: 'FIELD_ENVIRONMENT_TEMPERATURE',
-  first: true,
-  precision: 1,
-  unit: '℃',
-  unit2: '°C',
-  fields: [{ key: 'env_temperature', name: 'FIELD_ENVIRONMENT_TEMPERATURE', dataIndex: 0 }],
-  parentKey: 'temperature'
-};
-const SHORT_TERM_CORROSION_RATE: DisplayProperty = {
-  key: 'short_term_corrosion_rate',
-  name: 'FIELD_SHORT_TERM_CORROSION_RATE',
-  first: true,
-  precision: 3,
-  // losingOnMonitoringPoint: true,
-  unit: 'mm/a',
-  fields: [
-    { key: 'short_term_corrosion_rate', name: 'FIELD_SHORT_TERM_CORROSION_RATE', dataIndex: 0 }
-  ],
-  parentKey: 'corrosion_rate'
-};
-const LONG_TERM_CORROSION_RATE: DisplayProperty = {
-  key: 'long_term_corrosion_rate',
-  name: 'FIELD_LONG_TERM_CORROSION_RATE',
-  first: true,
-  precision: 3,
-  // losingOnMonitoringPoint: true,
-  unit: 'mm/a',
-  fields: [
-    { key: 'long_term_corrosion_rate', name: 'FIELD_LONG_TERM_CORROSION_RATE', dataIndex: 0 }
-  ],
-  parentKey: 'corrosion_rate'
+  unit2: '°C'
 };
 //DC specific end
 
@@ -412,20 +382,19 @@ export const PROPERTY_CATEGORIES: DisplayPropertyCategories = {
     THICKNESS,
     DC_TEMPERATURE,
     TOF,
-    SHORT_TERM_CORROSION_RATE,
-    LONG_TERM_CORROSION_RATE,
-    { ...SIGNAL_STRENGTH, losingOnMonitoringPoint: true },
-    { ...SIGNAL_QUALITY, losingOnMonitoringPoint: true }
+    CORROSION_RATE,
+    CORROSION_LOSS,
+    SIGNAL_STRENGTH,
+    SIGNAL_QUALITY
   ],
   DC_HIGH: [
     THICKNESS,
     DC_TEMPERATURE,
-    DC_TEMPERATURE_ENV,
     TOF,
-    SHORT_TERM_CORROSION_RATE,
-    LONG_TERM_CORROSION_RATE,
-    { ...SIGNAL_STRENGTH, losingOnMonitoringPoint: true },
-    { ...SIGNAL_QUALITY, losingOnMonitoringPoint: true }
+    CORROSION_RATE,
+    CORROSION_LOSS,
+    SIGNAL_STRENGTH,
+    SIGNAL_QUALITY
   ],
   SVT210R,
   SVT210510: SVT210R,
