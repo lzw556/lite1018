@@ -11,8 +11,6 @@ export interface DeviceSelectProps extends SelectProps<any> {
   onTypeChange?: (type: number | undefined) => void;
 }
 
-const { Option } = Select;
-
 const DeviceSelect: FC<DeviceSelectProps> = (props) => {
   const config = useAppConfigContext();
   const { filters, dispalyField = 'id' } = props;
@@ -29,19 +27,23 @@ const DeviceSelect: FC<DeviceSelectProps> = (props) => {
         props.onChange?.(value, option);
         props.onTypeChange?.(devices.find((device) => device.id === value)?.typeId);
       }}
-    >
-      {devices.map((device) => (
-        <Option key={device.id} value={device[dispalyField]}>
-          <Typography.Text strong>{device.name}</Typography.Text>
+      options={devices.map((d) => ({
+        value: d[dispalyField],
+        label: d.name,
+        macAddress: d.macAddress
+      }))}
+      optionRender={(option) => (
+        <>
+          <Typography.Text strong>{option.data.label}</Typography.Text>
           <br />
           {config !== 'corrosionWirelessHART' && (
             <Typography.Text type={'secondary'}>
-              {toMac(device.macAddress.toUpperCase())}
+              {toMac(option.data.macAddress.toUpperCase())}
             </Typography.Text>
           )}
-        </Option>
-      ))}
-    </Select>
+        </>
+      )}
+    />
   );
 };
 
