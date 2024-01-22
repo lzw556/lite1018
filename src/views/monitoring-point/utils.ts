@@ -126,7 +126,10 @@ export function getProcessId({
   if (isChannel) {
     return 2;
   }
-  if (monitoringPointType === MonitoringPointTypeValue.THICKNESS) {
+  if (
+    monitoringPointType === MonitoringPointTypeValue.THICKNESS ||
+    monitoringPointType === MonitoringPointTypeValue.THICKNESS_HIGH
+  ) {
     return 11;
   }
   if (

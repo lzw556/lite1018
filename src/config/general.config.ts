@@ -11,6 +11,7 @@ export const MONITORING_POINTS = [
     label: MonitoringPointTypeText.LOOSENING_ANGLE
   },
   { id: MonitoringPointTypeValue.THICKNESS, label: MonitoringPointTypeText.THICKNESS },
+  { id: MonitoringPointTypeValue.THICKNESS_HIGH, label: MonitoringPointTypeText.THICKNESS_HIGH },
   { id: MonitoringPointTypeValue.PRELOAD, label: MonitoringPointTypeText.PRELOAD },
   {
     id: MonitoringPointTypeValue.PRELOAD_ATTITUDE,

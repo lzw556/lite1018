@@ -6,7 +6,8 @@ export const SITE_NAME = 'CORROSION_MONITORING_SYSTEM';
 
 export const SENSORS = [DeviceType.NormalTemperatureCorrosion, DeviceType.HighTemperatureCorrosion];
 export const MONITORING_POINTS = [
-  { id: MonitoringPointTypeValue.THICKNESS, label: MonitoringPointTypeText.THICKNESS }
+  { id: MonitoringPointTypeValue.THICKNESS, label: MonitoringPointTypeText.THICKNESS },
+  { id: MonitoringPointTypeValue.THICKNESS_HIGH, label: MonitoringPointTypeText.THICKNESS_HIGH }
 ];
 export const MENUS_HIDDEN = [];
 

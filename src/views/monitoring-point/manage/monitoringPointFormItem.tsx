@@ -92,7 +92,8 @@ export const MonitoringPointFormItem = ({
                   />
                 </Col>
               </Row>
-              {selectedPointType === MonitoringPointTypeValue.THICKNESS && (
+              {(selectedPointType === MonitoringPointTypeValue.THICKNESS ||
+                selectedPointType === MonitoringPointTypeValue.THICKNESS_HIGH) && (
                 <ThicknessFieldsOfCreation name={name} restFields={restFields} />
               )}
               {(selectedPointType === MonitoringPointTypeValue.TOWER_INCLINATION ||

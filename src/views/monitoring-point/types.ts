@@ -11,6 +11,7 @@ export const MONITORING_POINT_PATHNAME = 'monitoring-points';
 export enum MonitoringPointTypeValue {
   LOOSENING_ANGLE = 10101,
   THICKNESS = 10201,
+  THICKNESS_HIGH = 10202,
   PRELOAD = 10301,
   VIBRATION = 10401,
   PRESSURE = 10601,
@@ -27,6 +28,7 @@ export enum MonitoringPointTypeValue {
 export enum MonitoringPointTypeText {
   LOOSENING_ANGLE = 'FIELD_LOOSENING_ANGLE',
   THICKNESS = 'FIELD_THICKNESS',
+  THICKNESS_HIGH = 'FIELD_THICKNESS_HIGH',
   PRELOAD = 'SETTING_GROUP_PRELOAD',
   VIBRATION = 'VIBRATION',
   PRESSURE = 'FIELD_PRESSURE2',
@@ -183,6 +185,7 @@ const dynamic_angle: { dynamicData?: DynamicData; waveData?: WaveData } = {
 };
 export const MONITORING_POINT_TYPE_VALUE_DYNAMIC_MAPPING = new Map([
   [MonitoringPointTypeValue.THICKNESS, dynamic_thickness],
+  [MonitoringPointTypeValue.THICKNESS_HIGH, dynamic_thickness],
   [MonitoringPointTypeValue.PRELOAD, dynamic_preload],
   [MonitoringPointTypeValue.PRELOAD_ATTITUDE, dynamic_preload],
   [MonitoringPointTypeValue.VIBRATION, dynamic_vibration],
@@ -197,10 +200,8 @@ export const MONITORING_POINT_TYPE_VALUE_DEVICE_TYPE_ID_MAPPING = new Map([
     MonitoringPointTypeValue.LOOSENING_ANGLE,
     [DeviceType.BoltLoosening, DeviceType.BoltLooseningWIRED]
   ],
-  [
-    MonitoringPointTypeValue.THICKNESS,
-    [DeviceType.NormalTemperatureCorrosion, DeviceType.HighTemperatureCorrosion]
-  ],
+  [MonitoringPointTypeValue.THICKNESS, [DeviceType.NormalTemperatureCorrosion]],
+  [MonitoringPointTypeValue.THICKNESS_HIGH, [DeviceType.HighTemperatureCorrosion]],
   [
     MonitoringPointTypeValue.PRELOAD,
     [
@@ -341,6 +342,7 @@ export const MONITORING_POINT_DISPLAY_PROPERTIES = {
   [MonitoringPointTypeValue.FLANGE_PRELOAD]: PROPERTY_CATEGORIES.SAS,
   [MonitoringPointTypeValue.PRELOAD_ATTITUDE]: PROPERTY_CATEGORIES.SAS,
   [MonitoringPointTypeValue.THICKNESS]: PROPERTY_CATEGORIES.DC_NORMAL,
+  [MonitoringPointTypeValue.THICKNESS_HIGH]: PROPERTY_CATEGORIES.DC_NORMAL,
   [MonitoringPointTypeValue.VIBRATION]: PROPERTY_CATEGORIES.SVT210R,
   [MonitoringPointTypeValue.VIBRATION_RPM]: PROPERTY_CATEGORIES.SVT220S1S3,
   [MonitoringPointTypeValue.VIBRATION_THREE_AXIS_RPM]: PROPERTY_CATEGORIES.SVT220S1S3,

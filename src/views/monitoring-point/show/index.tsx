@@ -65,7 +65,10 @@ export default function MonitoringPointShow() {
       children: <MonitoringPointHistory {...monitoringPoint} />
     }
   ];
-  if (monitoringPoint.type === MonitoringPointTypeValue.THICKNESS) {
+  if (
+    monitoringPoint.type === MonitoringPointTypeValue.THICKNESS ||
+    monitoringPoint.type === MonitoringPointTypeValue.THICKNESS_HIGH
+  ) {
     items.push({
       key: 'analysis',
       label: intl.get('ANALYSIS'),
