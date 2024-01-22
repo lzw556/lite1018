@@ -26,9 +26,13 @@ import { VibrationDynamicDataContent } from './vibrationDynamicDataContent';
 import { isMobile } from '../../../../utils/deviceDetection';
 import { BatchDownlaodWaveDataModal } from './batchDownlaodWaveDataModal';
 
-export const MonitoringPointDynamicData: React.FC<MonitoringPointRow & { dataType?: DataType }> = (
-  props
-) => {
+export const MonitoringPointDynamicData: React.FC<
+  MonitoringPointRow & {
+    dataType?: DataType;
+    enableSavingAsImage?: boolean;
+    showSideComments?: boolean;
+  }
+> = (props) => {
   const { language } = useLocaleContext();
   const [range, setRange] = React.useState<[number, number]>(oneWeekNumberRange);
   const { hasPermission } = usePermission();
@@ -193,6 +197,8 @@ export const MonitoringPointDynamicData: React.FC<MonitoringPointRow & { dataTyp
                     }
                   })
                 }
+                showSideComments={props.showSideComments}
+                enableSavingAsImage={props.enableSavingAsImage}
               />
             )}
           </Row>

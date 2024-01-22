@@ -16,16 +16,20 @@ export interface Series {
   main?: boolean;
   raw?: any;
   xAxisValues: string[];
+  xAxisValuesOffset?: number;
 }
 
 export const PropertyChart = React.forwardRef(function PropertyChart(
   {
     dataZoom = false,
     dispatchActionOption,
+    enableSavingAsImage = false,
+    hideLegend = false,
     loading,
     onlyShowLastAxisInLegendByDefault = false,
     rawOptions,
     series,
+    showSideComments = false,
     style,
     withArea = false,
     xAxisLabelLimit = false,
@@ -36,10 +40,13 @@ export const PropertyChart = React.forwardRef(function PropertyChart(
   }: {
     dataZoom?: boolean | NonNullable<object>;
     dispatchActionOption?: any;
+    enableSavingAsImage?: boolean;
+    hideLegend?: boolean;
     loading?: boolean;
     onlyShowLastAxisInLegendByDefault?: boolean;
     rawOptions?: any;
     series: Series[];
+    showSideComments?: boolean;
     style?: CSSProperties;
     withArea?: boolean;
     xAxisLabelLimit?: boolean;
@@ -75,6 +82,9 @@ export const PropertyChart = React.forwardRef(function PropertyChart(
       legend: getSelectedLegends(),
       ...rawOptions,
       series: buildSeries(),
+      toolbox: {
+        feature: { saveAsImage: enableSavingAsImage && { title: intl.get('SAVE_AS_IMAGE') } }
+      },
       tooltip: buildTooltip(),
       xAxis: {
         data: mainXAxisValues,
@@ -104,7 +114,11 @@ export const PropertyChart = React.forwardRef(function PropertyChart(
             }
           }
         },
-        name: xAxisUnit
+        name: xAxisUnit,
+        show:
+          series && series.some(({ xAxisValuesOffset }) => xAxisValuesOffset !== undefined)
+            ? false
+            : true
       },
       yAxis: {
         type: 'value',
@@ -154,7 +168,9 @@ export const PropertyChart = React.forwardRef(function PropertyChart(
   };
 
   const getSelectedLegends = () => {
-    if (series.length > 1 && onlyShowLastAxisInLegendByDefault === true) {
+    if (hideLegend) {
+      return { show: false };
+    } else if (series.length > 1 && onlyShowLastAxisInLegendByDefault === true) {
       const selected = series.map((s, i) => {
         const seriesName = Object.keys(s.data)[0];
         return [seriesName, i === series.length - 1];
@@ -180,7 +196,38 @@ export const PropertyChart = React.forwardRef(function PropertyChart(
   };
 
   const buildTooltip = () => {
+    const xAxisValuesOffsets = series
+      .map(({ xAxisValuesOffset }) => xAxisValuesOffset)
+      .filter((o) => o !== undefined);
     const { precision, unit } = yAxisValueMeta;
+    if (xAxisValuesOffsets.length > 0) {
+      return {
+        trigger: 'axis',
+        formatter: (
+          paras: {
+            data: any;
+            marker: string;
+            seriesIndex: number;
+            seriesName: string;
+          }[]
+        ) => {
+          let res = '';
+          paras.forEach(({ data, marker, seriesIndex, seriesName }) => {
+            const offset = xAxisValuesOffsets[seriesIndex] ?? 0;
+            res += `${dayjs
+              .unix(dayjs(data[0]).utc().unix() - offset)
+              .format('YYYY-MM-DD HH:mm:ss')}<br/>
+              <span>${marker}</span>
+              ${seriesName} <strong>${getValue(
+              roundValue(data[1], precision),
+              unit
+            )}</strong><br/>`;
+          });
+          return res;
+        },
+        confine: true
+      };
+    }
     return {
       trigger: 'axis',
       valueFormatter: (v: number) => getValue(roundValue(v, precision), unit),
@@ -224,6 +271,61 @@ export const PropertyChart = React.forwardRef(function PropertyChart(
       chartInstanceRef.current?.getEchartsInstance().dispatchAction(dispatchActionOption);
     }
   }, [series, dispatchActionOption]);
+
+  React.useEffect(() => {
+    const handleResize = () => {
+      const ins = chartInstanceRef.current?.getEchartsInstance();
+      if (ins) {
+        ins.resize();
+      }
+    };
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
+
+  React.useEffect(() => {
+    const ins = chartInstanceRef.current?.getEchartsInstance();
+    const handleChartClick = (paras: any) => {
+      const pointInPixel = [paras.offsetX, paras.offsetY];
+      if (ins.containPixel('grid', pointInPixel)) {
+        const markLines = series.map((s: Series & { markLine?: any }, i: number) => {
+          const xIndex = ins.convertFromPixel({ seriesIndex: i }, pointInPixel)[0];
+          const yAxisValues = Object.values(s.data)[0];
+          const x = s.xAxisValues[xIndex];
+          const y = ins.convertToPixel({ yAxisIndex: 0 }, yAxisValues[xIndex]);
+          const prevMarkLine = ins.getOption().series[i].markLine;
+          const markLineDatas = prevMarkLine
+            ? [...prevMarkLine.data, { xAxis: x, y }]
+            : [{ xAxis: x, y }];
+          return {
+            symbol: 'none',
+            animation: false,
+            lineStyle: {
+              color: 'red',
+              width: 2,
+              type: 'solid'
+            },
+            data: markLineDatas
+          };
+        });
+        const newSeries = ins
+          .getOption()
+          .series.map((s: any, i: number) => ({ ...s, markLine: markLines[i] }));
+        ins.setOption({ series: newSeries });
+      }
+    };
+    if (showSideComments && ins) {
+      ins.getZr().on('click', handleChartClick);
+    }
+
+    return () => {
+      if (showSideComments && ins && ins.getZr()) {
+        ins.getZr().off('click', handleChartClick);
+      }
+    };
+  }, [showSideComments, series]);
 
   return (
     options && (
@@ -269,32 +371,35 @@ function setAreaStyle(color: string) {
 export function transformHistoryData(
   origin: HistoryData,
   property: DisplayProperty,
-  naming?: { replace?: string; prefix?: string }
+  naming?: { replace?: string; prefix?: string },
+  fieldName?: string
 ) {
   if (origin.length === 0) return null;
   const xAxisValues = origin.map(({ timestamp }) =>
     dayjs.unix(timestamp).local().format('YYYY-MM-DD HH:mm:ss')
   );
   const series =
-    property.fields?.map((f) => {
-      let seriesName = intl.get(f.name);
-      if (naming) {
-        const { replace, prefix } = naming;
-        if (replace) {
-          seriesName = replace;
-        } else if (prefix) {
-          seriesName = `${prefix}${seriesName}`;
+    property.fields
+      ?.filter((f) => (fieldName ? f.name === fieldName : true))
+      .map((f) => {
+        let seriesName = intl.get(f.name);
+        if (naming) {
+          const { replace, prefix } = naming;
+          if (replace) {
+            seriesName = replace;
+          } else if (prefix) {
+            seriesName = `${prefix}${seriesName}`;
+          }
         }
-      }
-      return {
-        [seriesName]: origin.map(({ values }) => {
-          const value = values.find((v) =>
-            property.parentKey ? v.key === property.parentKey : v.key === property.key
-          );
-          return value?.data?.[f.name] ?? NaN;
-        })
-      };
-    }) ?? [];
+        return {
+          [seriesName]: origin.map(({ values }) => {
+            const value = values.find((v) =>
+              property.parentKey ? v.key === property.parentKey : v.key === property.key
+            );
+            return value?.data?.[f.name] ?? NaN;
+          })
+        };
+      }) ?? [];
 
   return {
     series: series.map((s) => ({ data: s, xAxisValues })),
@@ -303,8 +408,8 @@ export function transformHistoryData(
       return {
         name: Object.keys(s)[0],
         last: value[value.length - 1],
-        min: Math.min(...value),
-        max: Math.max(...value)
+        min: roundValue(Math.min(...value), property.precision),
+        max: roundValue(Math.max(...value), property.precision)
       };
     })
   };

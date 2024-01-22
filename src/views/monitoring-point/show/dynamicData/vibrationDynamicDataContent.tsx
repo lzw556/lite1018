@@ -16,15 +16,19 @@ export const VibrationDynamicDataContent = ({
   type,
   data,
   onFieldChange,
-  onAxisChange
+  onAxisChange,
+  enableSavingAsImage = false,
+  showSideComments = false
 }: {
   type: DynamicDataType;
   data: {
     values: VibrationWaveFormDataType;
     loading: boolean;
   };
+  enableSavingAsImage?: boolean;
   onFieldChange?: (field: string) => void;
   onAxisChange?: (axis: number) => void;
+  showSideComments?: boolean;
 }) => {
   const { fields } = type;
   const { loading } = data;
@@ -143,6 +147,7 @@ export const VibrationDynamicDataContent = ({
     return (
       <PropertyChart
         dataZoom={true}
+        enableSavingAsImage={enableSavingAsImage}
         loading={loading}
         rawOptions={{ title: { text: `${(frequency ?? 0) / 1000}KHz` } }}
         series={series}
@@ -150,6 +155,7 @@ export const VibrationDynamicDataContent = ({
         xAxisUnit={xAxisUnit}
         yAxisMinInterval={0}
         yAxisValueMeta={{ precision: field.precision, unit: field.unit }}
+        showSideComments={showSideComments}
       />
     );
   }
