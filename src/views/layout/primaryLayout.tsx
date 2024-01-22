@@ -48,23 +48,20 @@ export const PrimaryLayout = () => {
     return <Navigate to='/login' />;
   }
 
+  const style = {
+    height: 'calc(100vh - 60px)',
+    maxHeight: 'calc(100vh - 60px)',
+    overflowY: 'auto' as 'auto'
+  };
+
   return (
-    <Layout className='ts-console'>
-      <HeaderLayout hideConsole={true} menus={menus} />
+    <Layout>
+      <HeaderLayout menus={menus} />
       <Layout hasSider>
-        <Sider
-          className='sider'
-          width={230}
-          style={{
-            background: 'white',
-            height: '100%',
-            overflowY: 'scroll',
-            boxShadow: '0 2px 10px 0 rgba(0,0,0, 0.08)'
-          }}
-        >
+        <Sider width={230} style={{ ...style, background: '#fff' }}>
           {menus && <NavMenu menus={menus} />}
         </Sider>
-        <Layout style={{ padding: 16, background: '#eef0f5', overflowY: 'scroll' }}>
+        <Layout style={{ padding: 10, ...style }}>
           <ValidateProject>
             <Outlet />
           </ValidateProject>

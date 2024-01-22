@@ -3,14 +3,8 @@
   background-repeat: repeat-x;
   height: 60px;
   padding-left: 30px;
+  padding-right: 16px;
   line-height: 60px;
-}
-
-.ts-console {
-  position: fixed;
-  height: 100%;
-  width: 100%;
-  overflow-y: scroll;
 }
 
 ::-webkit-scrollbar {
@@ -50,7 +44,7 @@
     flex-grow: 1;
     text-align: center;
   }
-  .ts-console aside.sider {
+  .ant-layout.ant-layout-has-sider aside.sider {
     display: none;
   }
 }
