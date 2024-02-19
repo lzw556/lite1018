@@ -193,7 +193,10 @@ const AppRouter = () => {
   return (
     <>
       {initDone && (
-        <ConfigProvider locale={language === 'zh-CN' ? zhCN : enUS}>
+        <ConfigProvider
+          locale={language === 'zh-CN' ? zhCN : enUS}
+          theme={{ components: { Menu: { itemHoverColor: '#1677ff' } } }}
+        >
           <HashRouter>
             <Suspense
               fallback={

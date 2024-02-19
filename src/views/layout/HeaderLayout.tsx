@@ -1,8 +1,7 @@
 import { Header } from 'antd/es/layout/layout';
-import { Button, Col, Divider, Drawer, Dropdown, Row, Space, Typography } from 'antd';
+import { Button, Divider, Drawer, Dropdown, Space, Typography } from 'antd';
 import './layout.css';
 import '../../assets/iconfont.css';
-import logo from '../../assets/images/logo-dark.png';
 import { CaretDownOutlined, MenuOutlined, UserOutlined } from '@ant-design/icons';
 import { persistor, store } from '../../store';
 import { useState } from 'react';
@@ -51,69 +50,71 @@ const HeaderLayout = (props: any) => {
 
   return (
     <Header className='ts-header'>
-      <Row justify='start' className='pc'>
-        <Col span={12}>
-          <Brand
-            height={36}
-            brandNameStyle={{
-              fontSize: 18,
-              letterSpacing: 2
-            }}
-          />
-        </Col>
-        <Col span={12} style={{ textAlign: 'right' }}>
-          <Space>
-            <Text style={{ color: 'white', fontFamily: 'monospace' }} strong>
-              {now}
-            </Text>
-            {currentUser && (
-              <ProjectSelect
-                bordered={false}
-                suffixIcon={<CaretDownOutlined style={{ color: 'white' }} />}
-                onChange={onProjectChange}
-              />
-            )}
-            <Dropdown
-              menu={{ items: [{ key: 'logout', label: intl.get('LOGOUT'), onClick: onLogout }] }}
-            >
-              <Space>
-                <Button type={'text'} style={{ color: '#fff', paddingLeft: 0, paddingRight: 0 }}>
-                  <UserOutlined />
-                  {currentUser?.username}
-                </Button>
-              </Space>
-            </Dropdown>
-            <Dropdown
-              menu={{
-                items: [
-                  { key: 'zh-CN', label: '中文' },
-                  { key: 'en-US', label: 'EN' }
-                ],
-                onClick: ({ key }) => {
-                  if (key !== language) {
-                    setLocale((prev) => ({
-                      ...prev,
-                      language: key as Language
-                    }));
-                  }
-                }
-              }}
-            >
-              <Button
-                type={'text'}
-                style={{ color: '#fff', width: 60, paddingLeft: 0, paddingRight: 0 }}
-              >
-                {language === 'en-US' ? 'EN' : '中文'}
+      <div className='pc'>
+        <Brand
+          height={36}
+          brandNameStyle={{
+            fontSize: 18,
+            letterSpacing: 2
+          }}
+        />
+        {menus && <NavMenu menus={menus} />}
+        <Space>
+          <Text style={{ color: 'white', fontFamily: 'monospace' }} strong>
+            {now}
+          </Text>
+          {currentUser && (
+            <ProjectSelect
+              bordered={false}
+              suffixIcon={<CaretDownOutlined style={{ color: 'white' }} />}
+              onChange={onProjectChange}
+            />
+          )}
+          <Dropdown
+            menu={{ items: [{ key: 'logout', label: intl.get('LOGOUT'), onClick: onLogout }] }}
+          >
+            <Space>
+              <Button type={'text'} style={{ color: '#fff', paddingLeft: 0, paddingRight: 0 }}>
+                <UserOutlined />
+                {currentUser?.username}
               </Button>
-            </Dropdown>
-          </Space>
-        </Col>
-      </Row>
+            </Space>
+          </Dropdown>
+          <Dropdown
+            menu={{
+              items: [
+                { key: 'zh-CN', label: '中文' },
+                { key: 'en-US', label: 'EN' }
+              ],
+              onClick: ({ key }) => {
+                if (key !== language) {
+                  setLocale((prev) => ({
+                    ...prev,
+                    language: key as Language
+                  }));
+                }
+              }
+            }}
+          >
+            <Button
+              type={'text'}
+              style={{ color: '#fff', width: 60, paddingLeft: 0, paddingRight: 0 }}
+            >
+              {language === 'en-US' ? 'EN' : '中文'}
+            </Button>
+          </Dropdown>
+        </Space>
+      </div>
       <div className='mobile'>
         <MenuOutlined onClick={() => setVisible(true)} />
-        <div className='logo'>
-          <img src={logo} width={100} alt='ThetaSensors' style={{ verticalAlign: 'middle' }} />
-        </div>
+        <Brand
+          className='logo'
+          height={36}
+          brandNameStyle={{
+            fontSize: 18,
+            letterSpacing: 2
+          }}
+        />
         <Dropdown
           menu={{ items: [{ key: 'logout', label: intl.get('LOGOUT'), onClick: onLogout }] }}
         >
@@ -127,7 +128,7 @@ const HeaderLayout = (props: any) => {
           onClose={() => setVisible(false)}
           bodyStyle={{ paddingLeft: 0, paddingRight: 0 }}
         >
-          <NavMenu menus={menus} />
+          <NavMenu menus={menus} mode='inline' />
           <Divider />
           {currentUser && (
             <div style={{ paddingLeft: 24, paddingBottom: 100 }}>
