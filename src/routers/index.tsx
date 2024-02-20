@@ -42,6 +42,7 @@ import dayjs from '../utils/dayjsUtils';
 import 'dayjs/locale/zh-cn';
 import { AssetsContextProvider, ASSET_PATHNAME, useAppConfigContext } from '../views/asset';
 import { TOWER_PATHNAME } from '../views/tower';
+import { DevicesContextProvider } from '../views/device/index';
 
 const AlarmRuleGroups = lazy(() => import('../views/alarm/alarm-group/index'));
 const CreateAlarmRuleGroups = lazy(() => import('../views/alarm/alarm-group/create'));
@@ -85,44 +86,30 @@ const AppRouter = () => {
           )
         },
         {
-          path: `${ASSET_PATHNAME}/:id`,
-          element: (
-            <AssetsContextProvider>
-              <AssetShow />
-            </AssetsContextProvider>
-          )
-        },
-        {
-          path: `${FLANGE_PATHNAME}/:id`,
-          element: (
-            <AssetsContextProvider>
-              <FlangeShow />
-            </AssetsContextProvider>
-          )
-        },
-        {
-          path: `${TOWER_PATHNAME}/:id`,
-          element: (
-            <AssetsContextProvider>
-              <TowerShow />
-            </AssetsContextProvider>
-          )
-        },
-        {
-          path: `${MONITORING_POINT_PATHNAME}/:id`,
-          element: (
-            <AssetsContextProvider>
-              <MonitoringPointShow />
-            </AssetsContextProvider>
-          )
-        },
-        {
           path: 'asset-management',
           element: (
             <AssetsContextProvider>
               <AssetsTreeList />
             </AssetsContextProvider>
-          )
+          ),
+          children: [
+            {
+              path: `${ASSET_PATHNAME}/:id`,
+              element: <AssetShow />
+            },
+            {
+              path: `${FLANGE_PATHNAME}/:id`,
+              element: <FlangeShow />
+            },
+            {
+              path: `${TOWER_PATHNAME}/:id`,
+              element: <TowerShow />
+            },
+            {
+              path: `${MONITORING_POINT_PATHNAME}/:id`,
+              element: <MonitoringPointShow />
+            }
+          ]
         },
         {
           path: 'measurement-management',
@@ -132,10 +119,21 @@ const AppRouter = () => {
             </AssetsContextProvider>
           )
         },
-        { path: 'devices', element: isWirelessHart ? <DeviceWirelessHart /> : <Device /> },
         {
-          path: 'devices/:id',
-          element: isWirelessHart ? <DeviceDetailWirelessHart /> : <DeviceDetail />
+          path: 'devices',
+          element: isWirelessHart ? (
+            <DeviceWirelessHart />
+          ) : (
+            <DevicesContextProvider>
+              <Device />
+            </DevicesContextProvider>
+          ),
+          children: [
+            {
+              path: ':id',
+              element: isWirelessHart ? <DeviceDetailWirelessHart /> : <DeviceDetail />
+            }
+          ]
         },
         {
           path: 'devices/create',

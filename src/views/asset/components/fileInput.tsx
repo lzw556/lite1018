@@ -5,7 +5,8 @@ import intl from 'react-intl-universal';
 
 export const FileInput: React.FC<{
   onUpload: (data: any) => Promise<void>;
-}> = ({ onUpload }) => {
+  onlyIcon?: boolean;
+}> = ({ onUpload, onlyIcon = false }) => {
   const [loading, setLoading] = React.useState(false);
   const fileInput = React.useRef<HTMLInputElement | null>(null);
   return (
@@ -50,8 +51,12 @@ export const FileInput: React.FC<{
         type='primary'
         className={`ant-btn ant-btn-primary ${loading ? 'ant-btn-loading' : ''}`}
       >
-        <span className='ant-btn-loading-icon'> {loading && <LoadingOutlined />}</span>
-        {loading ? intl.get('IMPORTING_PROMPT') : intl.get('IMPORT_SETTINGS')}
+        {loading && (
+          <span className='ant-btn-loading-icon'>
+            <LoadingOutlined />
+          </span>
+        )}
+        {!onlyIcon && <>{loading ? intl.get('IMPORTING_PROMPT') : intl.get('IMPORT_SETTINGS')}</>}
         <ImportOutlined />
       </Button>
     </div>

@@ -1,6 +1,5 @@
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import { Button, Popconfirm, Space, Tag } from 'antd';
-import { useLocation } from 'react-router-dom';
 import HasPermission from '../../permission';
 import { Permission } from '../../permission/permission';
 import { isMobile } from '../../utils/deviceDetection';
@@ -11,7 +10,6 @@ import intl from 'react-intl-universal';
 import { SelfLink } from '../../components/selfLink';
 
 export const useMonitoringPointTableColumns = () => {
-  const { state } = useLocation();
   return [
     {
       title: intl.get('NAME'),
@@ -20,8 +18,8 @@ export const useMonitoringPointTableColumns = () => {
       width: isMobile ? 300 : 400,
       render: (name: string, row: MonitoringPointRow) => (
         <SelfLink
-          to={`/${MONITORING_POINT_PATHNAME}/${row.id}`}
-          state={state}
+          to={`/asset-management/${MONITORING_POINT_PATHNAME}/${row.id}`}
+          state={[`${row.id}-${row.type}`]}
           key={`${name}-${row.id}`}
         >
           {name}

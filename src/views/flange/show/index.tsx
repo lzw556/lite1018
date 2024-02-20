@@ -6,13 +6,7 @@ import { checkIsFlangePreload } from '..';
 import { oneWeekNumberRange } from '../../../components/rangeDatePicker';
 import { TabsCard } from '../../../components/tabsCard';
 import usePermission, { Permission } from '../../../permission/permission';
-import {
-  AssetAlarmStatistic,
-  AssetNavigator,
-  AssetRow,
-  getAsset,
-  useAssetsContext
-} from '../../asset';
+import { AssetAlarmStatistic, AssetRow, getAsset, useAssetsContext } from '../../asset';
 import {
   getDataOfMonitoringPoint,
   getRealPoints,
@@ -105,9 +99,6 @@ export default function FlangeShow() {
 
   return (
     <Row gutter={[16, 16]}>
-      <Col span={24}>
-        <AssetNavigator id={flange.id} />
-      </Col>
       <Col span={24}>
         <AssetAlarmStatistic {...flange} />
       </Col>

@@ -1123,5 +1123,7 @@
   "SETTING_VELOCITY_CALCULATION_IS_ENABLED_DESC": "启用后传感器上报速度有效值",
   "AXIS": "坐标轴",
   "DEVICE_TYPE_SVT110": "无线振动温度传感器 SVT110",
-  "FIELD_THICKNESS_HIGH": "高温厚度"
+  "FIELD_THICKNESS_HIGH": "高温厚度",
+  "PLEASE_SELECT_AN_ASSET": "请选择资产",
+  "PLEASE_SELECT_AN_DEVICE": "请选择设备"
 }

@@ -1123,5 +1123,7 @@
   "SETTING_VELOCITY_CALCULATION_IS_ENABLED_DESC": "When enabled,report velocity RMS",
   "AXIS": "Axis",
   "DEVICE_TYPE_SVT110": "Wireless Vibration Temperature Sensor SVT110",
-  "FIELD_THICKNESS_HIGH": "Thickness"
+  "FIELD_THICKNESS_HIGH": "Thickness",
+  "PLEASE_SELECT_AN_ASSET": "Please select an asset",
+  "PLEASE_SELECT_AN_DEVICE": "Please select a device"
 }

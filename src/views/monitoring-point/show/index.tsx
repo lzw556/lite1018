@@ -4,7 +4,7 @@ import { useParams } from 'react-router-dom';
 import { FilterableAlarmRecordTable } from '../../../components/alarm/filterableAlarmRecordTable';
 import { TabsCard } from '../../../components/tabsCard';
 import usePermission, { Permission } from '../../../permission/permission';
-import { useAssetsContext, AssetNavigator } from '../../asset';
+import { useAssetsContext } from '../../asset';
 import { getMeasurement } from '../services';
 import {
   INVALID_MONITORING_POINT,
@@ -128,9 +128,6 @@ export default function MonitoringPointShow() {
 
   return (
     <Row gutter={[16, 16]}>
-      <Col span={24}>
-        <AssetNavigator id={`${monitoringPoint.id}-${monitoringPoint.type}`} />
-      </Col>
       <Col span={24}>
         <RelatedDevices {...monitoringPoint} />
       </Col>
