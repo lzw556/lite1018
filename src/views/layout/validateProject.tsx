@@ -18,6 +18,7 @@ export const ValidateProject = ({ children }: { children: JSX.Element }) => {
   });
   const { result, loading, error } = projects;
   const [selectError, setSelectError] = React.useState<string | null>(null);
+  const [projectId, setProjectId] = React.useState(getProject());
 
   React.useEffect(() => {
     setProjects((prev) => ({ ...prev, loading: true }));
@@ -39,13 +40,13 @@ export const ValidateProject = ({ children }: { children: JSX.Element }) => {
             type: 'SET_PROJECT',
             payload: res.id
           });
+          setProjectId(res.id);
         })
         .catch(setSelectError);
     }
   }, [result]);
-
   if (error) return <Result status='500' title={intl.get('ERROR_UNKNOWN')} subTitle={error} />;
-  if (loading || result === null) return <Spin />;
+  if (loading || result === null || projectId === 0) return <Spin />;
   if (result.length === 0)
     return <Result status='500' title={intl.get('PROJECT_DOES_NOT_EXIST')} />;
   if (selectError)
