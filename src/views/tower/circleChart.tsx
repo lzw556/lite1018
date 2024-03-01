@@ -1,7 +1,7 @@
 import React from 'react';
 import intl from 'react-intl-universal';
 import { ChartContainer } from '../../components/charts/chartContainer';
-import { HistoryData } from '../monitoring-point';
+import { HistoryData, MonitoringPointTypeValue } from '../monitoring-point';
 import { buildCirclePointsChartOfTower, getDataOfCircleChart } from './circlePointChartHelper';
 import { useLocaleContext } from '../../localeProvider';
 
@@ -16,6 +16,7 @@ type Data = {
 export const CircleChart = ({
   data,
   style,
+  type,
   large = false,
   dynamicData = [],
   hideTitle,
@@ -29,6 +30,7 @@ export const CircleChart = ({
     typeLabel: string;
   }[];
   style?: React.CSSProperties;
+  type: MonitoringPointTypeValue;
   large?: boolean;
   dynamicData?: Data[];
   hideTitle?: boolean;
@@ -38,7 +40,7 @@ export const CircleChart = ({
   let circleChartOptions: any;
   const transformedData: Data[] = [];
   if (data.length > 0) {
-    transformedData.push(...getDataOfCircleChart(data));
+    transformedData.push(...getDataOfCircleChart(data, type));
   } else if (dynamicData && dynamicData.length > 0) {
     transformedData.push(...dynamicData);
   }
@@ -46,7 +48,11 @@ export const CircleChart = ({
     datas: transformedData,
     titles: [
       intl.get('SCATTERGRAM'),
-      `${intl.get('FIELD_DISPLACEMENT_RADIAL')}${intl.get('FIELD_DISPLACEMENT')}`,
+      `${intl.get(
+        `FIELD_DISPLACEMENT_${
+          type === MonitoringPointTypeValue.TOWER_BASE_SETTLEMENT ? 'AXIAL' : 'RADIAL'
+        }`
+      )}${intl.get('FIELD_DISPLACEMENT')}`,
       intl.get('FIELD_DIRECTION')
     ],
     lang: language,

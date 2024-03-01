@@ -101,6 +101,7 @@ export const MonitoringPointHistory = (point: MonitoringPointRow) => {
             ]}
             style={{ height: 550 }}
             large={true}
+            type={type}
           />
         </Col>
       )}

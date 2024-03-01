@@ -183,6 +183,50 @@ const dynamic_angle: { dynamicData?: DynamicData; waveData?: WaveData } = {
     ]
   }
 };
+
+const dynamic_angle_base: { dynamicData?: DynamicData; waveData?: WaveData } = {
+  dynamicData: {
+    serverDatatype: 'raw',
+    title: 'DYNAMIC_DATA',
+    fields: [
+      {
+        label: 'FIELD_DISPLACEMENT_AXIAL2',
+        value: 'dynamic_displacement_axial',
+        unit: 'mm',
+        precision: 2
+      },
+      {
+        label: 'FIELD_DISPLACEMENT_EW2',
+        value: 'dynamic_displacement_ew',
+        unit: 'mm',
+        precision: 2
+      },
+      {
+        label: 'FIELD_DISPLACEMENT_NS2',
+        value: 'dynamic_displacement_ns',
+        unit: 'mm',
+        precision: 2
+      },
+      {
+        label: 'FIELD_INCLINATION_AXIAL2',
+        value: 'dynamic_inclination_axial',
+        unit: '°',
+        precision: 2
+      },
+      { label: 'FIELD_INCLINATION_EW2', value: 'dynamic_inclination_ew', unit: '°', precision: 2 },
+      { label: 'FIELD_INCLINATION_NS2', value: 'dynamic_inclination_ns', unit: '°', precision: 2 },
+      { label: 'FIELD_DIRECTION', value: 'dynamic_direction', unit: '°', precision: 2 },
+      { label: 'FIELD_WAGGLE', value: 'dynamic_waggle', unit: 'g', precision: 2 }
+    ],
+    metaData: [
+      { label: 'FIELD_INCLINATION', value: 'mean_inclination', unit: '°', precision: 2 },
+      { label: 'FIELD_PITCH', value: 'mean_pitch', unit: '°', precision: 2 },
+      { label: 'FIELD_ROLL', value: 'mean_roll', unit: '°', precision: 2 },
+      { label: 'FIELD_WAGGLE', value: 'mean_waggle', unit: 'g', precision: 2 },
+      { label: 'FIELD_TEMPERATURE', value: 'temperature', unit: '℃', precision: 1 }
+    ]
+  }
+};
 export const MONITORING_POINT_TYPE_VALUE_DYNAMIC_MAPPING = new Map([
   [MonitoringPointTypeValue.THICKNESS, dynamic_thickness],
   [MonitoringPointTypeValue.THICKNESS_HIGH, dynamic_thickness],
@@ -192,7 +236,7 @@ export const MONITORING_POINT_TYPE_VALUE_DYNAMIC_MAPPING = new Map([
   [MonitoringPointTypeValue.VIBRATION_RPM, dynamic_vibration],
   [MonitoringPointTypeValue.VIBRATION_THREE_AXIS_RPM, dynamic_vibration],
   [MonitoringPointTypeValue.TOWER_INCLINATION, dynamic_angle],
-  [MonitoringPointTypeValue.TOWER_BASE_SETTLEMENT, dynamic_angle]
+  [MonitoringPointTypeValue.TOWER_BASE_SETTLEMENT, dynamic_angle_base]
 ]);
 
 export const MONITORING_POINT_TYPE_VALUE_DEVICE_TYPE_ID_MAPPING = new Map([
@@ -346,8 +390,8 @@ export const MONITORING_POINT_DISPLAY_PROPERTIES = {
   [MonitoringPointTypeValue.VIBRATION]: PROPERTY_CATEGORIES.SVT210R,
   [MonitoringPointTypeValue.VIBRATION_RPM]: PROPERTY_CATEGORIES.SVT220S1S3,
   [MonitoringPointTypeValue.VIBRATION_THREE_AXIS_RPM]: PROPERTY_CATEGORIES.SVT220S1S3,
-  [MonitoringPointTypeValue.TOWER_INCLINATION]: PROPERTY_CATEGORIES.TOWER,
-  [MonitoringPointTypeValue.TOWER_BASE_SETTLEMENT]: PROPERTY_CATEGORIES.TOWER,
+  [MonitoringPointTypeValue.TOWER_INCLINATION]: PROPERTY_CATEGORIES.TOWER_INCLINATION,
+  [MonitoringPointTypeValue.TOWER_BASE_SETTLEMENT]: PROPERTY_CATEGORIES.TOWER_BASE_SETTLEMENT,
   [MonitoringPointTypeValue.TEMPERATURE]: PROPERTY_CATEGORIES.ST,
   [MonitoringPointTypeValue.PRESSURE_TEMPERATURE]: PROPERTY_CATEGORIES.SPT
 };

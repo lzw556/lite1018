@@ -1,7 +1,7 @@
 import React from 'react';
 import { useLocation } from 'react-router-dom';
 import { NameValueGroups } from '../../components/name-values';
-import { INVALID_MONITORING_POINT } from '../monitoring-point';
+import { INVALID_MONITORING_POINT, getRealPoints } from '../monitoring-point';
 import { getAssetStatistics } from '../asset/common/statisticsHelper';
 import { Introduction } from '../asset/components/introduction';
 import { AssetRow } from '../asset/types';
@@ -14,6 +14,7 @@ import { oneWeekNumberRange } from '../../components/rangeDatePicker';
 
 export const TowerCard = (tower: AssetRow) => {
   const { id, name, statistics: towerStatistics } = tower;
+  const realPoints = getRealPoints(tower.monitoringPoints);
   const historyData = useHistoryDatas(tower, oneWeekNumberRange);
   const { state } = useLocation();
 
@@ -50,6 +51,7 @@ export const TowerCard = (tower: AssetRow) => {
             }
             hideTitle={true}
             style={{ left: '-24px', top: '-20px', height: 450 }}
+            type={realPoints?.[0].type}
           />
         ),
         horizontal: true

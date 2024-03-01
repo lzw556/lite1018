@@ -1,6 +1,6 @@
 import { Language } from '../../localeProvider';
 import { roundValue } from '../../utils/format';
-import { HistoryData } from '../monitoring-point';
+import { HistoryData, MonitoringPointTypeValue } from '../monitoring-point';
 
 export function buildCirclePointsChartOfTower({
   datas,
@@ -23,16 +23,20 @@ export function buildCirclePointsChartOfTower({
   const series: any = [];
   datas.forEach(({ name, data, height, radius, typeLabel }) => {
     const displacements = data.map((item) => item[0]);
-    const displacementMaxinum = Math.max(...displacements);
+    const displacementMaxinum = Math.max(...displacements.filter((d) => !Number.isNaN(d)));
     const directionMaxinum = data.map((item) => item[1])[
       displacements.indexOf(displacementMaxinum)
     ];
     let subtext = '';
     if (displacementMaxinum && !hideSubTitle) {
-      subtext += `${displacement} ${displacementMaxinum}mm`;
+      subtext += `${displacement} ${
+        displacementMaxinum === Number.NEGATIVE_INFINITY ? '-' : `${displacementMaxinum}mm`
+      }`;
     }
-    if (directionMaxinum && !hideSubTitle) {
-      subtext += `${large ? ' ' : '\r\n'}${direction} ${directionMaxinum}°`;
+    if (!hideSubTitle) {
+      subtext += `${large ? ' ' : '\r\n'}${direction} ${
+        directionMaxinum ? `${directionMaxinum}°` : '-'
+      }`;
     }
     const titleBaseOptions = {
       show: !hideTitle,
@@ -122,7 +126,8 @@ export function getDataOfCircleChart(
     typeLabel: string;
     height?: number;
     radius?: number;
-  }[]
+  }[],
+  type: MonitoringPointTypeValue
 ) {
   const ret: {
     name: string;
@@ -140,22 +145,23 @@ export function getDataOfCircleChart(
         if (data['FIELD_DIRECTION'] != null) {
           directions.push(roundValue(data['FIELD_DIRECTION'], 2));
         }
-        if (data['FIELD_DISPLACEMENT_RADIAL'] != null) {
-          displacements.push(roundValue(data['FIELD_DISPLACEMENT_RADIAL'], 2));
+        const key = `FIELD_DISPLACEMENT_${
+          type === MonitoringPointTypeValue.TOWER_BASE_SETTLEMENT ? 'AXIAL' : 'RADIAL'
+        }`;
+        if (data[key] !== undefined) {
+          displacements.push(roundValue(data[key], 2));
         }
       });
     });
-    if (
-      datas.length === 0 ||
-      displacements.length === 0 ||
-      directions.length !== displacements.length
-    ) {
+    if (datas.length === 0 || displacements.length === 0 || directions.length === 0) {
       ret.push({ name, typeLabel, data: [], height, radius });
     } else {
       ret.push({
         name,
         typeLabel,
-        data: directions.map((data, index) => [displacements[index], data]),
+        data: displacements
+          .map((data, index) => [data, directions[index]])
+          .filter((d) => !Number.isNaN(d[0])),
         height,
         radius
       });

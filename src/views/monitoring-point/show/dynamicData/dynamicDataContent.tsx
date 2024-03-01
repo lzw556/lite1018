@@ -13,7 +13,7 @@ import {
 import intl from 'react-intl-universal';
 import { NameValueGroups } from '../../../../components/name-values';
 import { getValue, roundValue } from '../../../../utils/format';
-import { MonitoringPointRow } from '../../types';
+import { MonitoringPointRow, MonitoringPointTypeValue } from '../../types';
 import { CircleChart } from '../../../tower/circleChart';
 import { getMonitoringPointType } from '../../utils';
 import { isMobile } from '../../../../utils/deviceDetection';
@@ -38,7 +38,15 @@ export const DynamicDataContent = ({
   const { values, loading } = data;
   const [field, setField] = React.useState(fields[0]);
   const isAngle = 'dynamic_direction' in values && 'dynamic_displacement' in values;
-  const displacements = (isAngle ? values['dynamic_displacement_radial'] : []) as number[];
+  const displacements = (
+    isAngle
+      ? values[
+          monitoringPoint.type === MonitoringPointTypeValue.TOWER_BASE_SETTLEMENT
+            ? 'dynamic_displacement_axial'
+            : 'dynamic_displacement_radial'
+        ]
+      : []
+  ) as number[];
   const isDynamicPreload = 'dynamic_acceleration' in values;
   const angles = isAngle
     ? displacements.map((d, i) => [
@@ -177,6 +185,7 @@ export const DynamicDataContent = ({
             ]}
             style={{ height: 650 }}
             large={true}
+            type={MonitoringPointType}
           />
         </Col>
       )}

@@ -43,10 +43,12 @@ export interface AngleDynamicData {
   metadata: Metadata;
   dynamic_displacement: number[];
   dynamic_displacement_radial: number[];
+  dynamic_displacement_axial: number[];
   dynamic_displacement_ew: number[];
   dynamic_displacement_ns: number[];
   dynamic_direction: number[];
   dynamic_inclination_radial: number[];
+  dynamic_inclination_axial: number[];
   dynamic_inclination_ew: number[];
   dynamic_inclination_ns: number[];
   dynamic_inclination: number[];

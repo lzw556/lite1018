@@ -48,6 +48,7 @@ export const MonitoringPointMonitor = (point: MonitoringPointRow) => {
                 radius: attributes?.tower_base_radius
               }
             ]}
+            type={type}
           />
         </Col>
       )}

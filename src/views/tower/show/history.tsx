@@ -72,6 +72,7 @@ export const TowerHistory = ({
               }
               style={{ height: 550 }}
               large={true}
+              type={firstPoint.type}
               hideSubTitle={true}
             />
           </Col>

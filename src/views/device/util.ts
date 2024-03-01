@@ -24,7 +24,7 @@ export function pickDataOfFirstProperties(
   }
   return properties.map(({ name, key, unit, precision, fields }) => {
     let value = NaN;
-    let fieldName = undefined;
+    let fieldName = fields && fields.length > 1 ? fields[0].name : undefined;
     if (data && data.values) {
       const { values } = data;
       if (Object.hasOwn(values, key)) {

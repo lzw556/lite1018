@@ -28,7 +28,8 @@ export type DisplayPropertyCategories = {
     | 'ST'
     | 'SPT'
     | 'SQ'
-    | 'TOWER']: readonly DisplayProperty[];
+    | 'TOWER_INCLINATION'
+    | 'TOWER_BASE_SETTLEMENT']: readonly DisplayProperty[];
 };
 
 //generic properties start
@@ -248,7 +249,7 @@ const RPM: DisplayProperty = {
 //SVT specific end
 
 //tower start
-const DISPLACEMENT_COMBINED: DisplayProperty = {
+const TOWER_INCLINATION_DISPLACEMENT_COMBINED: DisplayProperty = {
   key: 'displacement_combined',
   first: true,
   name: 'FIELD_DISPLACEMENT_COMBINED',
@@ -256,13 +257,29 @@ const DISPLACEMENT_COMBINED: DisplayProperty = {
   unit: 'mm',
   defaultFirstFieldKey: 'displacement_radial'
 };
-const INCLINATION_COMBINED: DisplayProperty = {
+const TOWER_INCLINATION_INCLINATION_COMBINED: DisplayProperty = {
   key: 'inclination_combined',
   first: true,
   name: 'FIELD_INCLINATION_COMBINED',
   precision: 4,
   unit: '°',
   defaultFirstFieldKey: 'inclination_radial'
+};
+const TOWER_BASE_SETTLEMENT_DISPLACEMENT_COMBINED: DisplayProperty = {
+  key: 'displacement_combined',
+  first: true,
+  name: 'FIELD_DISPLACEMENT_COMBINED',
+  precision: 3,
+  unit: 'mm',
+  defaultFirstFieldKey: 'displacement_axial'
+};
+const TOWER_BASE_SETTLEMENT_INCLINATION_COMBINED: DisplayProperty = {
+  key: 'inclination_combined',
+  first: true,
+  name: 'FIELD_INCLINATION_COMBINED',
+  precision: 4,
+  unit: '°',
+  defaultFirstFieldKey: 'inclination_axial'
 };
 const DIRECTION: DisplayProperty = {
   key: 'direction',
@@ -425,5 +442,18 @@ export const PROPERTY_CATEGORIES: DisplayPropertyCategories = {
     WAGGLE,
     TEMPERATURE
   ],
-  TOWER: [DISPLACEMENT_COMBINED, INCLINATION_COMBINED, DIRECTION, WAGGLE, TEMPERATURE]
+  TOWER_INCLINATION: [
+    TOWER_INCLINATION_DISPLACEMENT_COMBINED,
+    TOWER_INCLINATION_INCLINATION_COMBINED,
+    DIRECTION,
+    WAGGLE,
+    TEMPERATURE
+  ],
+  TOWER_BASE_SETTLEMENT: [
+    TOWER_BASE_SETTLEMENT_DISPLACEMENT_COMBINED,
+    TOWER_BASE_SETTLEMENT_INCLINATION_COMBINED,
+    DIRECTION,
+    WAGGLE,
+    TEMPERATURE
+  ]
 } as const;
