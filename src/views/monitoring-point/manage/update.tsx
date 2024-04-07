@@ -28,7 +28,10 @@ export const MonitoringPointUpdate: React.FC<
                 isChannel: !!values.channel
               });
               if (bindingDevices && bindingDevices.length > 0) {
-                if (bindingDevices[0].id !== values.device_id) {
+                if (
+                  bindingDevices[0].id !== values.device_id ||
+                  (values.channel && values.channel !== bindingDevices[0].channel)
+                ) {
                   //replace
                   unbindDevice(id, bindingDevices[0].id);
                   bindDevice(id, values.device_id, values.channel, processId);
