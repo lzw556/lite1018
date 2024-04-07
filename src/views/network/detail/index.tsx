@@ -109,7 +109,7 @@ const NetworkDetail = () => {
           </Col>
           <Col xl={8} xxl={6}>
             <ShadowCard style={{ marginLeft: 10, height: '100%' }}>
-              <Form form={form} {...formLayout}>
+              <Form form={form} {...formLayout} labelWrap={true}>
                 <FormInputItem
                   label={intl.get('NAME')}
                   name='name'

@@ -63,7 +63,7 @@ const EditNetworkModal: FC<EditNetworkModalProps> = (props) => {
       onOk={onSave}
       confirmLoading={isLoading}
     >
-      <Form form={form} {...useLocaleFormLayout(9)}>
+      <Form form={form} {...useLocaleFormLayout(9)} labelWrap={true}>
         <FormInputItem
           label={intl.get('NAME')}
           name='name'

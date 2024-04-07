@@ -225,7 +225,7 @@ const ImportNetworkPage = () => {
         }
       />
       <ShadowCard>
-        <Form form={form} {...useLocaleFormLayout(9)}>
+        <Form form={form} {...useLocaleFormLayout(9)} labelWrap={true}>
           {!success ? (
             <Row justify='space-between'>
               <Col xl={16} xxl={18}>

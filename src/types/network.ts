@@ -14,6 +14,7 @@ export type Network = {
   communicationOffset: number;
   groupSize: number;
   mode: number;
+  groupSize2: number;
 };
 
 export enum NetworkProvisioningMode {

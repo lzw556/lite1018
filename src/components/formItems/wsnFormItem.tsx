@@ -150,6 +150,30 @@ const WsnFormItem: FC<NetworkFormItemProps> = ({ mode, onModeChange }) => {
           />
         </Form.Item>
       )}
+      {mode === NetworkProvisioningMode.Mode2 && (
+        <Form.Item
+          label={
+            <Term name={intl.get('GROUP_SIZE_2')} description={intl.get('GROUP_SIZE_2_DESC')} />
+          }
+          name={['wsn', 'group_size_2']}
+          rules={[
+            {
+              required: true,
+              message: intl.get('PLEASE_ENTER_SOMETHING', {
+                something: intl.get('GROUP_SIZE_2')
+              })
+            }
+          ]}
+        >
+          <InputNumber
+            placeholder={intl.get('PLEASE_ENTER_SOMETHING', {
+              something: intl.get('GROUP_SIZE_2')
+            })}
+            controls={false}
+            style={{ width: '100%' }}
+          />
+        </Form.Item>
+      )}
     </div>
   );
 };

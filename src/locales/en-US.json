@@ -1127,5 +1127,6 @@
   "SETTING_VELOCITY_CALCULATION_IS_ENABLED_DESC": "When enabled,report velocity RMS",
   "AXIS": "Axis",
   "DEVICE_TYPE_SVT110": "Wireless Vibration Temperature Sensor SVT110",
-  "FIELD_THICKNESS_HIGH": "Thickness"
+  "FIELD_THICKNESS_HIGH": "Thickness",
+  "GROUP_SIZE_2": "Group Size (Waveform)"
 }

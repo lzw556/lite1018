@@ -7,6 +7,7 @@ type Wsn = {
   communication_period_2: number;
   communication_offset: number;
   group_size: number;
+  group_size_2: number;
 };
 
 type Settings = {
@@ -31,7 +32,8 @@ export function useProvisionMode(
         communication_period: network.communicationPeriod,
         communication_period_2: network.communicationPeriod2,
         communication_offset: network.communicationOffset,
-        group_size: network.groupSize
+        group_size: network.groupSize,
+        group_size_2: network.groupSize2
       };
     }
     setSettings({ mode: provisionMode, wsn });
