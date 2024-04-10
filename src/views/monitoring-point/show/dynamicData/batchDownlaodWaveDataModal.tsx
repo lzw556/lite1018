@@ -9,16 +9,22 @@ import { ModalWrapper } from '../../../../components/modalWrapper';
 
 export const BatchDownlaodWaveDataModal = ({
   id,
+  isVibration = false,
   type,
   timestamps,
   ...rest
-}: { id: number; type: string; timestamps: { timestamp: number }[] } & ModalProps) => {
+}: {
+  id: number;
+  type: string;
+  timestamps: { timestamp: number }[];
+  isVibration?: boolean;
+} & ModalProps) => {
   const [selectedBatchDownloadTimestamps, setSelectedBatchDownloadTimestamps] = React.useState<
     number[]
   >([]);
 
   const handleDownlaod = (timestamps: number[]) => {
-    batchDownload(id, type, timestamps).then((res) => {
+    batchDownload(id, type, timestamps, isVibration).then((res) => {
       if (res.status === 200) {
         const url = window.URL.createObjectURL(new Blob([res.data as any]));
         const link = document.createElement('a');

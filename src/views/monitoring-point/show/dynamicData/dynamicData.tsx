@@ -208,6 +208,7 @@ export const MonitoringPointDynamicData: React.FC<
         open={batchDownloadModalVisible}
         onCancel={() => setBatchDownloadModalVisible(false)}
         id={props.id}
+        isVibration={isVibration}
         type={props.dataType ?? 'waveform'}
         timestamps={timestamps}
       />

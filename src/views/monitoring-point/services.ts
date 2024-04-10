@@ -149,8 +149,10 @@ export function getThicknessAnalysis(id: number, from: number, to: number) {
     .then(GetResponse);
 }
 
-export function batchDownload(id: number, type: string, timestamps: number[]) {
+export function batchDownload(id: number, type: string, timestamps: number[], isVibration = false) {
   return request.download<any>(
-    `monitoringPoints/${id}/batchDownload/data?type=${type}&timestamps=${timestamps.join(',')}`
+    `monitoringPoints/${id}/batchDownload/data?type=${type}&timestamps=${timestamps.join(',')}${
+      isVibration ? '&calculate=accelerationTimeDomain' : ''
+    }`
   );
 }
