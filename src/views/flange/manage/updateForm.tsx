@@ -211,7 +211,7 @@ export const UpdateForm = ({
             numericChildren={
               <InputNumber
                 placeholder={intl.get('PLEASE_ENTER_SOMETHING', {
-                  something: intl.get('INITIAL_PRELOAD')
+                  something: intl.get('INITIAL_PRESSURE')
                 })}
                 style={{ width: '100%' }}
                 controls={false}
