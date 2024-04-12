@@ -42,7 +42,7 @@ const AddDevicePage = () => {
   };
 
   const renderNetwork = () => {
-    if (!DeviceType.isNB(deviceType) && !DeviceType.isMultiChannel(deviceType ?? 0)) {
+    if (!DeviceType.isRootDevice(deviceType ?? 0)) {
       return (
         <>
           <Form.Item
@@ -160,11 +160,13 @@ const AddDevicePage = () => {
                         />
                       </Form.Item>
                       {deviceType && renderNetwork()}
-                      {deviceType && !DeviceType.isMultiChannel(deviceType) && (
-                        <DeviceSettingContent settings={deviceSettings} deviceType={deviceType} />
-                      )}
+                      {deviceType &&
+                        DeviceType.hasDeviceSettings(deviceType) &&
+                        !DeviceType.hasGroupedSettings(deviceType) && (
+                          <DeviceSettingContent settings={deviceSettings} deviceType={deviceType} />
+                        )}
                     </fieldset>
-                    {deviceType && DeviceType.isMultiChannel(deviceType) && (
+                    {deviceType && DeviceType.hasGroupedSettings(deviceType) && (
                       <DeviceSettingContent settings={deviceSettings} deviceType={deviceType} />
                     )}
                   </Form>

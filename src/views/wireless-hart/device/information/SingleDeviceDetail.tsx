@@ -33,7 +33,7 @@ export const SingleDeviceDetail: React.FC<{ device: Device; upgradeStatus: any }
       value: intl.get(DeviceType.toString(device.typeId))
     }
   ];
-  if (device.typeId !== DeviceType.Gateway) {
+  if (!DeviceType.isGateway(device.typeId)) {
     items.push({
       name: intl.get('MAC_ADDRESS'),
       value: (
@@ -61,7 +61,7 @@ export const SingleDeviceDetail: React.FC<{ device: Device; upgradeStatus: any }
       value: device.ipPort.toString() ?? '-'
     });
   }
-  if (device.typeId !== DeviceType.Gateway) {
+  if (!DeviceType.isGateway(device.typeId)) {
     items.push({
       name: intl.get('MODEL'),
       value: device.information.model ? device.information.model : '-'
@@ -71,19 +71,19 @@ export const SingleDeviceDetail: React.FC<{ device: Device; upgradeStatus: any }
     name: intl.get('STATUS'),
     value: <SingleDeviceStatus alertStates={device.alertStates} state={device.state} />
   });
-  if (device.state && !DeviceType.isMultiChannel(device.typeId)) {
+  if (device.state && !DeviceType.isRootDevice(device.typeId)) {
     items.push({
       name: intl.get('NETWORK_BELONG_TO'),
       value: device.network ? device.network.name : intl.get('NONE')
     });
-    if (device.typeId !== DeviceType.Gateway) {
-      items.push({
-        name: getDisplayName({ name: intl.get('BATTERY_VOLTAGE'), lang: language, suffix: 'mV' }),
-        value: device.state ? device.state.batteryVoltage : '-'
-      });
-    }
   }
-  if (device.typeId !== DeviceType.Gateway) {
+  if (!DeviceType.isWiredDevice(device.typeId)) {
+    items.push({
+      name: getDisplayName({ name: intl.get('BATTERY_VOLTAGE'), lang: language, suffix: 'mV' }),
+      value: device.state ? device.state.batteryVoltage : '-'
+    });
+  }
+  if (!DeviceType.isGateway(device.typeId)) {
     items.push({
       name: getDisplayName({ name: intl.get('SIGNAL_STRENGTH'), lang: language, suffix: 'dBm' }),
       value: device.state ? device.state.signalLevel : '-'
@@ -99,13 +99,13 @@ export const SingleDeviceDetail: React.FC<{ device: Device; upgradeStatus: any }
       ? dayjs(device.state.connectedAt * 1000).format('YYYY-MM-DD HH:mm:ss')
       : '-'
   });
-  if (device.typeId !== DeviceType.Gateway) {
+  if (!DeviceType.isGateway(device.typeId)) {
     items.push({
       name: intl.get('PRODUCT_ID'),
       value: device.information.product_id ? device.information.product_id : '-'
     });
   }
-  if (device.typeId !== DeviceType.Gateway && device.typeId !== DeviceType.Router) {
+  if (DeviceType.isSensor(device.typeId)) {
     items.push({
       name: intl.get('LAST_SAMPLING_TIME'),
       value:

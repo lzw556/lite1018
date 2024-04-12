@@ -29,7 +29,7 @@ export const BasicSettings: React.FC<BasicSettingsProps> = ({ device, onUpdate }
   }, [form, device]);
 
   const renderNetworkFormItem = () => {
-    if (DeviceType.isNB(device.typeId) || DeviceType.isMultiChannel(device.typeId)) {
+    if (DeviceType.isRootDevice(device.typeId)) {
       return <></>;
     }
     return (
@@ -86,7 +86,7 @@ export const BasicSettings: React.FC<BasicSettingsProps> = ({ device, onUpdate }
             >
               <Input placeholder={intl.get('PLEASE_ENTER_MAC_ADDRESS')} />
             </Form.Item>
-            {device && device.typeId !== DeviceType.Gateway && renderNetworkFormItem()}
+            {device && renderNetworkFormItem()}
           </Form>
         </Col>
       </Row>

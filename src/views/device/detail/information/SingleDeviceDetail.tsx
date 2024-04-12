@@ -62,28 +62,25 @@ export const SingleDeviceDetail: React.FC<{ device: Device; upgradeStatus: any }
       value: device.parentName
     });
   }
-  if (device.state && !DeviceType.isMultiChannel(device.typeId)) {
-    if (device.typeId !== DeviceType.Gateway && !DeviceType.isWiredSensor(device.typeId)) {
-      items.push({
-        name: getDisplayName({ name: intl.get('BATTERY_VOLTAGE'), lang: language, suffix: 'mV' }),
-        value: device.state ? device.state.batteryVoltage : '-'
-      });
-    }
+  if (device.state && !DeviceType.isWiredDevice(device.typeId)) {
+    items.push({
+      name: getDisplayName({ name: intl.get('BATTERY_VOLTAGE'), lang: language, suffix: 'mV' }),
+      value: device.state ? device.state.batteryVoltage : '-'
+    });
   }
   if (!DeviceType.isWiredSensor(device.typeId)) {
     items.push({
       name: (
         <Term
           name={getDisplayName({
-            name:
-              device.typeId === DeviceType.Gateway
-                ? intl.get('MOBILE_SIGNAL_STRENGTH')
-                : intl.get('SIGNAL_STRENGTH'),
+            name: DeviceType.isGateway(device.typeId)
+              ? intl.get('MOBILE_SIGNAL_STRENGTH')
+              : intl.get('SIGNAL_STRENGTH'),
             lang: language,
             suffix: 'dBm'
           })}
           description={
-            device.typeId === DeviceType.Gateway
+            DeviceType.isGateway(device.typeId)
               ? intl.get('MOBILE_SIGNAL_STRENGTH_DESC')
               : intl.get('SIGNAL_STRENGTH_DESC')
           }
@@ -106,7 +103,7 @@ export const SingleDeviceDetail: React.FC<{ device: Device; upgradeStatus: any }
     name: intl.get('PRODUCT_ID'),
     value: device.information.product_id ? device.information.product_id : '-'
   });
-  if (device.typeId !== DeviceType.Gateway && device.typeId !== DeviceType.Router) {
+  if (DeviceType.isSensor(device.typeId)) {
     items.push({
       name: intl.get('LAST_SAMPLING_TIME'),
       value:

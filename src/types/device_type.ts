@@ -95,6 +95,14 @@ export namespace DeviceType {
     }
   }
 
+  export function getGateways() {
+    return [DeviceType.Gateway];
+  }
+
+  export function getRouters() {
+    return [DeviceType.Router];
+  }
+
   export function sensors() {
     return [
       DeviceType.BoltLoosening,
@@ -164,6 +172,53 @@ export namespace DeviceType {
       type === DeviceType.SVT220S3 ||
       (isMultiChannel(type) as boolean)
     );
+  }
+
+  export function isWiredDevice(type: number) {
+    return type === DeviceType.Gateway || isWiredSensor(type);
+  }
+
+  export function isSPT(type: number) {
+    return type === DeviceType.PressureTemperature || type === DeviceType.PressureTemperatureWIRED;
+  }
+
+  export function hasDeviceSettings(type: number) {
+    return type !== DeviceType.Router;
+  }
+
+  export function isRootDevice(type: number) {
+    return type === DeviceType.Gateway || isMultiChannel(type) || isNB(type);
+  }
+
+  export function isGateway(type: number) {
+    return type === DeviceType.Gateway;
+  }
+
+  export function isSensor(type: number) {
+    return sensors().includes(type);
+  }
+
+  export function canSupportingCalibrate(type: number) {
+    return (
+      type === DeviceType.HighTemperatureCorrosion ||
+      type === DeviceType.NormalTemperatureCorrosion ||
+      type === DeviceType.BoltElongation ||
+      DeviceType.isMultiChannel(type) ||
+      type === DeviceType.Pressure ||
+      type === DeviceType.PressureGuoDa ||
+      type === DeviceType.PressureWoErKe ||
+      type === DeviceType.PressureTemperature ||
+      type === DeviceType.PressureTemperatureWIRED ||
+      DeviceType.isVibration(type)
+    );
+  }
+
+  export function hasGroupedSettings(type: number) {
+    return type === DeviceType.BoltElongation || isMultiChannel(type);
+  }
+
+  export function getNonSensorDeviceTypes() {
+    return [DeviceType.Gateway, DeviceType.Router];
   }
 
   export function isVibration(type: DeviceType | undefined) {

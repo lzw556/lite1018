@@ -95,7 +95,10 @@ const DevicePage = () => {
     if (hasPermission(Permission.DeviceEdit)) {
       items.push({ key: '1', label: intl.get('EDIT_DEVICE_INFO') });
     }
-    if (hasPermission(Permission.DeviceSettingsEdit) && record.typeId !== DeviceType.Router) {
+    if (
+      hasPermission(Permission.DeviceSettingsEdit) &&
+      DeviceType.hasDeviceSettings(record.typeId)
+    ) {
       items.push({ key: '2', label: intl.get('EDIT_DEVICE_SETTINGS') });
     }
     return { items, onClick: ({ key }) => onEdit(record.id, key), disabled: isUpgrading };
@@ -155,7 +158,7 @@ const DevicePage = () => {
       title: intl.get('DATA'),
       key: 'data',
       render: (text: any, device: Device) => {
-        if (device.typeId === DeviceType.Gateway || device.typeId === DeviceType.Router) return '-';
+        if (!DeviceType.isSensor(device.typeId)) return '-';
         const data = getValueOfFirstClassProperty(device);
         if (data && data.length > 0) {
           const channel = device.data?.values?.channel;
@@ -261,7 +264,7 @@ const DevicePage = () => {
                   }}
                   defaultValue={store.filters?.type}
                 >
-                  {[DeviceType.Gateway, DeviceType.Router]
+                  {DeviceType.getNonSensorDeviceTypes()
                     .concat(SENSORS.get(config) ?? [])
                     .map((d) => {
                       return (

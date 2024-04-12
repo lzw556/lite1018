@@ -89,7 +89,7 @@ export const CommandDropdown = ({
 
   if (!upgrading) {
     items.push({ key: DeviceCommand.Reboot, label: intl.get('RESTART') });
-    if (typeId !== DeviceType.Router && typeId !== DeviceType.Gateway) {
+    if (DeviceType.isSensor(typeId)) {
       items.push({ key: DeviceCommand.AcquireSensorData, label: intl.get('ACQUIRE_SENSOR_DATA') });
       const resetItem: MenuItem = { key: DeviceCommand.ResetData, label: intl.get('RESET_DATA') };
       if (chanels.length > 0) {
@@ -105,18 +105,7 @@ export const CommandDropdown = ({
       }
     }
     items.push({ key: DeviceCommand.Reset, label: intl.get('RESTORE_FACTORY_SETTINGS') });
-    if (
-      typeId === DeviceType.HighTemperatureCorrosion ||
-      typeId === DeviceType.NormalTemperatureCorrosion ||
-      typeId === DeviceType.BoltElongation ||
-      DeviceType.isMultiChannel(typeId) ||
-      typeId === DeviceType.Pressure ||
-      typeId === DeviceType.PressureGuoDa ||
-      typeId === DeviceType.PressureWoErKe ||
-      typeId === DeviceType.PressureTemperature ||
-      typeId === DeviceType.PressureTemperatureWIRED ||
-      DeviceType.isVibration(typeId)
-    ) {
+    if (DeviceType.canSupportingCalibrate(typeId)) {
       items.push({ key: DeviceCommand.Calibrate, label: intl.get('CALIBRATE') });
     }
   }

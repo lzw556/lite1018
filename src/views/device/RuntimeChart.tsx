@@ -33,7 +33,7 @@ export const RuntimeChart: React.FC<{ deviceId: number; deviceType: number }> = 
     );
     return (
       <Card bordered={false}>
-        {deviceType !== DeviceType.Gateway && (
+        {!DeviceType.isWiredDevice(deviceType) && (
           <Card.Grid
             style={{ boxShadow: 'none', border: 'none', width: isMobile ? '100%' : '50%' }}
           >

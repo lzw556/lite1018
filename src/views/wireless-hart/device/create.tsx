@@ -42,7 +42,7 @@ const AddDevicePage = () => {
   };
 
   const renderNetwork = () => {
-    if (!DeviceType.isNB(deviceType) && !DeviceType.isMultiChannel(deviceType ?? 0)) {
+    if (!DeviceType.isRootDevice(deviceType ?? 0)) {
       return (
         <>
           <Form.Item

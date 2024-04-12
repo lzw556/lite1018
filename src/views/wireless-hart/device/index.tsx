@@ -83,7 +83,10 @@ const DevicePage = () => {
     if (hasPermission(Permission.DeviceEdit)) {
       items.push({ key: '1', label: intl.get('EDIT_DEVICE_INFO') });
     }
-    if (hasPermission(Permission.DeviceSettingsEdit) && record.typeId !== DeviceType.Router) {
+    if (
+      hasPermission(Permission.DeviceSettingsEdit) &&
+      DeviceType.hasDeviceSettings(record.typeId)
+    ) {
       items.push({ key: '2', label: intl.get('EDIT_DEVICE_SETTINGS') });
     }
     return { items, onClick: ({ key }) => onEdit(record.id, key), disabled: isUpgrading };
@@ -120,7 +123,7 @@ const DevicePage = () => {
       dataIndex: 'macAddress',
       key: 'macAddress',
       render: (text: string, record: Device) => {
-        return record.typeId === DeviceType.Gateway ? '-' : toMac(text.toUpperCase());
+        return DeviceType.isGateway(record.typeId) ? '-' : toMac(text.toUpperCase());
       }
     },
     {
@@ -128,7 +131,7 @@ const DevicePage = () => {
       dataIndex: 'tag',
       key: 'tag',
       render: (text: string, record: Device) => {
-        return record.typeId === DeviceType.Gateway ? '-' : text;
+        return DeviceType.isGateway(record.typeId) ? '-' : text;
       }
     },
     {
@@ -151,7 +154,7 @@ const DevicePage = () => {
       title: intl.get('DATA'),
       key: 'data',
       render: (text: any, device: Device) => {
-        if (device.typeId === DeviceType.Gateway || device.typeId === DeviceType.Router) return '-';
+        if (!DeviceType.isSensor(device.typeId)) return '-';
         const data = getValueOfFirstClassProperty(device);
         if (data && data.length > 0) {
           const channel = device.data?.values?.channel;
@@ -257,13 +260,15 @@ const DevicePage = () => {
                   }}
                   defaultValue={store.filters?.type}
                 >
-                  {[DeviceType.Gateway].concat(SENSORS.get(config) ?? []).map((d) => {
-                    return (
-                      <Select.Option key={d} value={d}>
-                        {intl.get(DeviceType.toString(d))}
-                      </Select.Option>
-                    );
-                  })}
+                  {DeviceType.getGateways()
+                    .concat(SENSORS.get(config) ?? [])
+                    .map((d) => {
+                      return (
+                        <Select.Option key={d} value={d}>
+                          {intl.get(DeviceType.toString(d))}
+                        </Select.Option>
+                      );
+                    })}
                 </Select>
               </Label>
               <Input.Group compact>

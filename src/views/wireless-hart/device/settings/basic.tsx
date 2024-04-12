@@ -33,7 +33,7 @@ export const BasicSettings: React.FC<BasicSettingsProps> = ({ device, onUpdate }
   }, [form, device]);
 
   const renderNetworkFormItem = () => {
-    if (DeviceType.isNB(device.typeId) || DeviceType.isMultiChannel(device.typeId)) {
+    if (DeviceType.isRootDevice(device.typeId)) {
       return <></>;
     }
     return (
@@ -73,7 +73,7 @@ export const BasicSettings: React.FC<BasicSettingsProps> = ({ device, onUpdate }
             >
               <Input placeholder={intl.get('PLEASE_ENTER_DEVICE_NAME')} />
             </FormInputItem>
-            {device && device.typeId !== DeviceType.Gateway && (
+            {device && !DeviceType.isGateway(device.typeId) && (
               <Form.Item
                 label={intl.get('MAC_ADDRESS')}
                 name='mac_address'
@@ -93,7 +93,7 @@ export const BasicSettings: React.FC<BasicSettingsProps> = ({ device, onUpdate }
                 <Input placeholder={intl.get('PLEASE_ENTER_MAC_ADDRESS')} />
               </Form.Item>
             )}
-            {device && device.typeId !== DeviceType.Gateway && device.typeId !== DeviceType.Router && (
+            {device && DeviceType.isSensor(device.typeId) && (
               <FormInputItem
                 label={intl.get('DEVICE_TAG')}
                 name='tag'
@@ -109,7 +109,7 @@ export const BasicSettings: React.FC<BasicSettingsProps> = ({ device, onUpdate }
                 />
               </FormInputItem>
             )}
-            {device && device.typeId !== DeviceType.Gateway && renderNetworkFormItem()}
+            {device && renderNetworkFormItem()}
           </Form>
         </Col>
       </Row>

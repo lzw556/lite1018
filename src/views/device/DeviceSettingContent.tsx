@@ -9,8 +9,8 @@ export const DeviceSettingContent: React.FC<{
   deviceType: DeviceType;
   settings?: DeviceSetting[];
 }> = ({ deviceType, settings }) => {
-  if (deviceType !== DeviceType.Router && settings) {
-    if (deviceType === DeviceType.BoltElongation || DeviceType.isMultiChannel(deviceType)) {
+  if (settings) {
+    if (DeviceType.hasGroupedSettings(deviceType)) {
       let groups: DeviceSetting['group'][] = [];
       settings.forEach((setting) => {
         if (

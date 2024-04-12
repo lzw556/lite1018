@@ -130,37 +130,50 @@ const DeviceDetailPage = () => {
 export default DeviceDetailPage;
 
 export function useDeviceTabs(deviceTypeId?: number) {
-  const { hasPermission, hasPermissions } = userPermission();
+  const commonTabs = useCommonTabs();
+  const sensorTabs = useSensorTabs();
   if (deviceTypeId === undefined) return [];
-  const tabTitleList = [
-    {
-      key: 'monitor',
-      tab: 'MONITOR'
-    },
-    {
-      key: 'historyData',
-      tab: 'HISTORY_DATA'
+  if (DeviceType.isSensor(deviceTypeId)) {
+    if (DeviceType.isWiredSensor(deviceTypeId)) {
+      return [...sensorTabs, ...commonTabs.filter((t, i) => i + 1 < commonTabs.length)];
     }
-  ];
-  let tabs = [];
+    return [...sensorTabs, ...commonTabs];
+  } else {
+    return commonTabs;
+  }
+}
+
+function useCommonTabs() {
+  const tabs = [];
+  const { hasPermission, hasPermissions } = userPermission();
   if (hasPermission(Permission.DeviceEventList)) {
     tabs.push({ key: 'events', tab: 'EVENTS' });
   }
   if (hasPermissions(Permission.DeviceSettingsGet, Permission.DeviceSettingsEdit)) {
     tabs.push({ key: 'settings', tab: 'SETTINGS' });
   }
-  if (hasPermission(Permission.DeviceRuntimeDataGet) && !DeviceType.isWiredSensor(deviceTypeId)) {
+  if (hasPermission(Permission.DeviceRuntimeDataGet)) {
     tabs.push({ key: 'ta', tab: 'STATUS_HISTORY' });
   }
-  switch (deviceTypeId) {
-    case DeviceType.Gateway:
-    case DeviceType.Router:
-      return tabs;
-    default:
-      if (hasPermission(Permission.DeviceData)) {
-        tabs.unshift(...tabTitleList);
-      }
-      break;
+  return tabs;
+}
+
+function useSensorTabs() {
+  const tabs = [];
+  const { hasPermission } = userPermission();
+  if (hasPermission(Permission.DeviceData)) {
+    tabs.push(
+      ...[
+        {
+          key: 'monitor',
+          tab: 'MONITOR'
+        },
+        {
+          key: 'historyData',
+          tab: 'HISTORY_DATA'
+        }
+      ]
+    );
   }
   return tabs;
 }

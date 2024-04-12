@@ -45,14 +45,18 @@ const DeviceTypeSelect: FC<DeviceTypeSelectProps> = (props) => {
           {config !== 'corrosionWirelessHART' && (
             <>
               <OptGroup label={intl.get('GATEWAY')} key={'gateway'}>
-                <Option key={1} value={1}>
-                  {intl.get(DeviceType.toString(DeviceType.Gateway))}
-                </Option>
+                {DeviceType.getGateways().map((t) => (
+                  <Option key={t} value={t}>
+                    {intl.get(DeviceType.toString(t))}
+                  </Option>
+                ))}
               </OptGroup>
               <OptGroup label={intl.get('RELAY')} key={'router'}>
-                <Option key={257} value={257}>
-                  {intl.get(DeviceType.toString(DeviceType.Router))}
-                </Option>
+                {DeviceType.getRouters().map((t) => (
+                  <Option key={t} value={t}>
+                    {intl.get(DeviceType.toString(t))}
+                  </Option>
+                ))}
               </OptGroup>
             </>
           )}

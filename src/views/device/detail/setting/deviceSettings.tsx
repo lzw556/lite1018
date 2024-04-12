@@ -3,7 +3,6 @@ import { FC, useEffect, useState } from 'react';
 import { GetDeviceSettingRequest, UpdateDeviceSettingRequest } from '../../../../apis/device';
 import { Button, Col, Form, Row, Skeleton } from 'antd';
 import { DeviceSetting } from '../../../../types/device_setting';
-import { DeviceType } from '../../../../types/device_type';
 import { DeviceSettingContent } from '../../DeviceSettingContent';
 import { processArrayValuesInSensorSetting } from '../../../../components/formItems/deviceSettingFormItem';
 import intl from 'react-intl-universal';
@@ -47,11 +46,9 @@ const DeviceSettings: FC<DeviceSettingsProps> = ({ device }) => {
         <Col xl={13} xxl={10} xs={24}>
           <Row justify={'end'}>
             <Col>
-              {device.typeId !== DeviceType.Router && (
-                <Button type={'primary'} onClick={onSave}>
-                  {intl.get('SAVE')}
-                </Button>
-              )}
+              <Button type={'primary'} onClick={onSave}>
+                {intl.get('SAVE')}
+              </Button>
             </Col>
           </Row>
         </Col>

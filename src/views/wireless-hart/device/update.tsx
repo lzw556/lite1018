@@ -60,7 +60,7 @@ const EditBaseInfoModel = (props: any) => {
         >
           <Input placeholder={intl.get('PLEASE_ENTER_DEVICE_NAME')} />
         </FormInputItem>
-        {device && device.typeId !== DeviceType.Gateway && (
+        {device && !DeviceType.isGateway(device.typeId) && (
           <Form.Item
             label={intl.get('MAC_ADDRESS')}
             name='mac_address'
@@ -80,7 +80,7 @@ const EditBaseInfoModel = (props: any) => {
             <Input placeholder={intl.get('PLEASE_ENTER_MAC_ADDRESS')} />
           </Form.Item>
         )}
-        {device && device.typeId !== DeviceType.Gateway && device.typeId !== DeviceType.Router && (
+        {device && DeviceType.isSensor(device.typeId) && (
           <FormInputItem
             label={intl.get('DEVICE_TAG')}
             name='tag'

@@ -37,8 +37,7 @@ const EditCalibrateParas = ({
   const property = properties.find(
     (pro) => pro.key === (isVibration ? 'acceleration_peak' : typeParaMapping.get(typeId))
   );
-  const isSPT =
-    typeId === DeviceType.PressureTemperature || typeId === DeviceType.PressureTemperatureWIRED;
+  const isSPT = DeviceType.isSPT(typeId);
   const channels = DeviceType.isMultiChannel(typeId, true);
   const AXIS = [
     { label: 'AXIS_X', value: 1 },

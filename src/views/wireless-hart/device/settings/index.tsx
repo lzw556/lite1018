@@ -15,7 +15,7 @@ const SettingPage: React.FC<SettingPageProps> = ({ device, onUpdate }) => {
   const [type, setType] = React.useState('basic');
   const options = [];
   const { typeId } = device;
-  if (typeId !== DeviceType.Router && typeId !== DeviceType.Gateway) {
+  if (DeviceType.isSensor(typeId)) {
     options.push(
       { label: intl.get('BASIC_INFORMATION'), value: 'basic' },
       { label: intl.get('DEVICE_SETTINGS'), value: 'device' }
