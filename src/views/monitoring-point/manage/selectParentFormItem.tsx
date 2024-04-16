@@ -39,8 +39,10 @@ export const SelectParentFormItem = ({
       getAssets({ type: root.key, parent_id: 0 }).then((assets) => {
         setParents(getParents(assets, memoedLast.current));
       });
+    } else {
+      form.setFieldValue('asset_id', parent.id);
     }
-  }, [parent, root.key]);
+  }, [parent, root.key, form]);
 
   const handlePointTypeChange = React.useCallback(
     (type: number) => {
@@ -100,7 +102,7 @@ export const SelectParentFormItem = ({
           </Select>
         </Form.Item>
       ) : (
-        <Form.Item name='asset_id' hidden={true} initialValue={parent?.id}>
+        <Form.Item name='asset_id' hidden={true}>
           <Input />
         </Form.Item>
       )}
