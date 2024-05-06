@@ -15,12 +15,21 @@ import { isMobile } from '../../../utils/deviceDetection';
 import { useLocaleContext } from '../../../localeProvider';
 
 export const RelatedDevices = (point: MonitoringPointRow) => {
-  const { bindingDevices: devices = [], alertLevel } = point;
+  const { bindingDevices: devices = [], alertLevel, data } = point;
   const [key, setKey] = React.useState(devices[0].macAddress);
-  if (devices.length === 1) return <SingleDeviceInfo {...devices[0]} alertLevel={alertLevel} />;
+  if (devices.length === 1)
+    return (
+      <SingleDeviceInfo
+        {...devices[0]}
+        alertLevel={alertLevel}
+        lastSamplingTime={data?.timestamp}
+      />
+    );
   const contents: Record<string, JSX.Element> = {};
   devices.forEach((device) => {
-    contents[device.macAddress] = <SingleDeviceInfo {...device} alertLevel={alertLevel} />;
+    contents[device.macAddress] = (
+      <SingleDeviceInfo {...device} alertLevel={alertLevel} lastSamplingTime={data?.timestamp} />
+    );
   });
 
   return (
@@ -35,10 +44,10 @@ export const RelatedDevices = (point: MonitoringPointRow) => {
   );
 };
 
-function SingleDeviceInfo(props: Device & { alertLevel?: number }) {
+function SingleDeviceInfo(props: Device & { alertLevel?: number; lastSamplingTime?: number }) {
   const { language } = useLocaleContext();
   const colProps = generateColProps({ xxl: 8, xl: 12, lg: 12, md: 12, xs: 24 });
-  const { id, name, typeId, information, state, macAddress, data, alertLevel } = props;
+  const { id, name, typeId, information, state, macAddress, alertLevel, lastSamplingTime } = props;
 
   return (
     <ShadowCard>
@@ -85,9 +94,10 @@ function SingleDeviceInfo(props: Device & { alertLevel?: number }) {
           },
           {
             name: intl.get('LAST_SAMPLING_TIME'),
-            value: data?.timestamp
-              ? dayjs.unix(data.timestamp).local().format('YYYY-MM-DD HH:mm:ss')
-              : '-'
+            value:
+              lastSamplingTime && lastSamplingTime > 0
+                ? dayjs.unix(lastSamplingTime).local().format('YYYY-MM-DD HH:mm:ss')
+                : '-'
           }
         ]}
       />
