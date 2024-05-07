@@ -1128,5 +1128,19 @@
   "AXIS": "Axis",
   "DEVICE_TYPE_SVT110": "Wireless Vibration Temperature Sensor SVT110",
   "FIELD_THICKNESS_HIGH": "Thickness",
-  "GROUP_SIZE_2": "Group Size (Waveform)"
+  "GROUP_SIZE_2": "Group Size (Waveform)",
+  "SETTING_MOUTING_TYPE": "Mounting Type",
+  "SETTING_MOUTING_TYPE_GUM": "Gum",
+  "SETTING_MOUTING_TYPE_MAGNET": "Magnet",
+  "SETTING_ACQUISITION_MODE": "Acquisition Mode",
+  "SETTING_ACQUISITION_MODE_PERIOIDC_SAMPLING": " Periodic Sampling",
+  "SETTING_ACQUISITION_MODE_TRIGGER": "Trigger",
+  "SETTING_TRIGGER_MODE_ON_THRESHOLD": "On Threshold",
+  "SETTING_TRIGGER_MODE_OFF_THRESHOLD": "Off Threshold",
+  "SETTING_TRIGGER_MODE_PERIOD": "Trigger Period",
+  "SETTING_TRIGGER_MODE_DELAY": "Trigger Delay",
+  "SETTING_TRIGGER_MODE_ACTION": "Trigger Action",
+  "SETTING_TRIGGER_MODE_ACTION_PERIODIC_SAMPLING": "Periodic Sampling",
+  "SETTING_TRIGGER_MODE_ACTION_SAMPLING_ONCE": "Sampling Once",
+  "SETTING_TRIGGER_MODE_ACTION_WAVEFORM_ONCE": "Waveform Once"
 }
