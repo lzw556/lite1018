@@ -15,6 +15,7 @@ export type Network = {
   groupSize: number;
   mode: number;
   groupSize2: number;
+  intervalCnt: number;
 };
 
 export enum NetworkProvisioningMode {

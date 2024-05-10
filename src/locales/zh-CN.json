@@ -1129,6 +1129,7 @@
   "DEVICE_TYPE_SVT110": "无线振动温度传感器 SVT110",
   "FIELD_THICKNESS_HIGH": "高温厚度",
   "GROUP_SIZE_2": "每组设备数（波形）",
+  "INTERVAL_CNT": "次要通讯周期间隔倍数",
   "SETTING_MOUTING_TYPE": "安装方式",
   "SETTING_MOUTING_TYPE_GUM": "胶粘",
   "SETTING_MOUTING_TYPE_MAGNET": "磁吸",

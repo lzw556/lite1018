@@ -1129,6 +1129,7 @@
   "DEVICE_TYPE_SVT110": "Wireless Vibration Temperature Sensor SVT110",
   "FIELD_THICKNESS_HIGH": "Thickness",
   "GROUP_SIZE_2": "Group Size (Waveform)",
+  "INTERVAL_CNT": "Interval Count",
   "SETTING_MOUTING_TYPE": "Mounting Type",
   "SETTING_MOUTING_TYPE_GUM": "Gum",
   "SETTING_MOUTING_TYPE_MAGNET": "Magnet",
