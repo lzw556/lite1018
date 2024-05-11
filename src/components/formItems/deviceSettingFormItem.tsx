@@ -1,4 +1,4 @@
-import { Checkbox, Form, Input, Radio, Select } from 'antd';
+import { Checkbox, Form, Input, InputNumber, Radio, Select } from 'antd';
 import { DeviceSetting, DeviceSettingValueType } from '../../types/device_setting';
 import { FC, useState } from 'react';
 import { Rules } from '../../constants/validator';
@@ -59,12 +59,23 @@ const DeviceSettingFormItem: FC<DeviceSettingFormItemProps> = ({ value, editable
         </Select>
       );
     }
-    return (
-      <Input
-        suffix={setting.unit ? intl.get(setting.unit).d(setting.unit) : ''}
-        disabled={!editable}
-      />
-    );
+    if (setting.type === DeviceSettingValueType.string) {
+      return (
+        <Input
+          suffix={setting.unit ? intl.get(setting.unit).d(setting.unit) : ''}
+          disabled={!editable}
+        />
+      );
+    } else {
+      return (
+        <InputNumber
+          disabled={!editable}
+          controls={false}
+          style={{ width: '100%' }}
+          addonAfter={setting.unit ? intl.get(setting.unit).d(setting.unit) : ''}
+        />
+      );
+    }
   };
 
   const renderChildren = () => {
