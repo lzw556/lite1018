@@ -20,16 +20,14 @@ export type Network = {
 
 export enum NetworkProvisioningMode {
   Mode1 = 1,
-  Mode2
+  Mode2,
+  Mode3,
+  Mode4,
+  Mode5
 }
 
 export namespace NetworkProvisioningMode {
   export function toString(mode: NetworkProvisioningMode) {
-    switch (mode) {
-      case NetworkProvisioningMode.Mode2:
-        return intl.get('WSN_MODE') + '2';
-      default:
-        return intl.get('WSN_MODE') + '1';
-    }
+    return intl.get(`WSN_MODE_OPTION_${mode}`);
   }
 }

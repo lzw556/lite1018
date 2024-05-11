@@ -121,6 +121,15 @@ const WsnFormItem: FC<NetworkFormItemProps> = ({ mode, onModeChange }) => {
           <Select.Option key={2} value={NetworkProvisioningMode.Mode2}>
             {NetworkProvisioningMode.toString(NetworkProvisioningMode.Mode2)}
           </Select.Option>
+          <Select.Option key={3} value={NetworkProvisioningMode.Mode3}>
+            {NetworkProvisioningMode.toString(NetworkProvisioningMode.Mode3)}
+          </Select.Option>
+          <Select.Option key={4} value={NetworkProvisioningMode.Mode4}>
+            {NetworkProvisioningMode.toString(NetworkProvisioningMode.Mode4)}
+          </Select.Option>
+          <Select.Option key={5} value={NetworkProvisioningMode.Mode5}>
+            {NetworkProvisioningMode.toString(NetworkProvisioningMode.Mode5)}
+          </Select.Option>
         </Select>
       </Form.Item>
       {render()}
