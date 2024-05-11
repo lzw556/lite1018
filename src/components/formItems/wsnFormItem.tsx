@@ -56,6 +56,28 @@ const WsnFormItem: FC<NetworkFormItemProps> = ({ mode, onModeChange }) => {
               })}
             />
           </Form.Item>
+          <Form.Item
+            label={
+              <Term name={intl.get('INTERVAL_CNT')} description={intl.get('INTERVAL_CNT_DESC')} />
+            }
+            name={['wsn', 'interval_cnt']}
+            rules={[
+              {
+                required: true,
+                message: intl.get('PLEASE_ENTER_SOMETHING', {
+                  something: intl.get('INTERVAL_CNT')
+                })
+              }
+            ]}
+          >
+            <InputNumber
+              placeholder={intl.get('PLEASE_ENTER_SOMETHING', {
+                something: intl.get('INTERVAL_CNT')
+              })}
+              controls={false}
+              style={{ width: '100%' }}
+            />
+          </Form.Item>
         </>
       );
     }
@@ -151,52 +173,28 @@ const WsnFormItem: FC<NetworkFormItemProps> = ({ mode, onModeChange }) => {
         </Form.Item>
       )}
       {mode === NetworkProvisioningMode.Mode2 && (
-        <>
-          <Form.Item
-            label={
-              <Term name={intl.get('GROUP_SIZE_2')} description={intl.get('GROUP_SIZE_2_DESC')} />
-            }
-            name={['wsn', 'group_size_2']}
-            rules={[
-              {
-                required: true,
-                message: intl.get('PLEASE_ENTER_SOMETHING', {
-                  something: intl.get('GROUP_SIZE_2')
-                })
-              }
-            ]}
-          >
-            <InputNumber
-              placeholder={intl.get('PLEASE_ENTER_SOMETHING', {
+        <Form.Item
+          label={
+            <Term name={intl.get('GROUP_SIZE_2')} description={intl.get('GROUP_SIZE_2_DESC')} />
+          }
+          name={['wsn', 'group_size_2']}
+          rules={[
+            {
+              required: true,
+              message: intl.get('PLEASE_ENTER_SOMETHING', {
                 something: intl.get('GROUP_SIZE_2')
-              })}
-              controls={false}
-              style={{ width: '100%' }}
-            />
-          </Form.Item>
-          <Form.Item
-            label={
-              <Term name={intl.get('INTERVAL_CNT')} description={intl.get('INTERVAL_CNT_DESC')} />
+              })
             }
-            name={['wsn', 'interval_cnt']}
-            rules={[
-              {
-                required: true,
-                message: intl.get('PLEASE_ENTER_SOMETHING', {
-                  something: intl.get('INTERVAL_CNT')
-                })
-              }
-            ]}
-          >
-            <InputNumber
-              placeholder={intl.get('PLEASE_ENTER_SOMETHING', {
-                something: intl.get('INTERVAL_CNT')
-              })}
-              controls={false}
-              style={{ width: '100%' }}
-            />
-          </Form.Item>
-        </>
+          ]}
+        >
+          <InputNumber
+            placeholder={intl.get('PLEASE_ENTER_SOMETHING', {
+              something: intl.get('GROUP_SIZE_2')
+            })}
+            controls={false}
+            style={{ width: '100%' }}
+          />
+        </Form.Item>
       )}
     </div>
   );
