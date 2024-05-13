@@ -4,6 +4,7 @@ import { SETTING_GROUPS } from '../../constants/settingGroup';
 import { DeviceSetting } from '../../types/device_setting';
 import { DeviceType } from '../../types/device_type';
 import intl from 'react-intl-universal';
+import { SVTSettings } from './svtSettings';
 
 export const DeviceSettingContent: React.FC<{
   deviceType: DeviceType;
@@ -53,11 +54,16 @@ export const DeviceSettingContent: React.FC<{
     } else {
       return (
         <>
-          {settings
-            .sort((prev, next) => prev.sort - next.sort)
-            .map((setting) => (
-              <DeviceSettingFormItem editable={true} value={setting} key={setting.key} />
-            ))}
+          {DeviceType.isVibration(deviceType) && !DeviceType.isWiredDevice(deviceType)
+            ? settings &&
+              settings.length > 0 && (
+                <SVTSettings settings={settings} key={deviceType} type={deviceType} />
+              )
+            : settings
+                .sort((prev, next) => prev.sort - next.sort)
+                .map((setting) => (
+                  <DeviceSettingFormItem editable={true} value={setting} key={setting.key} />
+                ))}
         </>
       );
     }

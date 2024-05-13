@@ -29,7 +29,12 @@ const AddDevicePage = () => {
   const fetchDeviceDefaultSettings = (type: any) => {
     setDeviceType(type);
     setDeviceSettings([]);
-    GetDefaultDeviceSettingsRequest(type).then(setDeviceSettings);
+    GetDefaultDeviceSettingsRequest(type).then((deviceSettings: DeviceSetting[]) => {
+      deviceSettings.forEach((s) => {
+        form.setFieldValue([s.category, s.key], s.key === 'sensor_flags' ? [s.value] : s.value);
+      });
+      setDeviceSettings(deviceSettings);
+    });
   };
 
   const onSave = () => {
