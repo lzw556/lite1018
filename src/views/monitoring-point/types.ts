@@ -244,7 +244,10 @@ export const MONITORING_POINT_TYPE_VALUE_DEVICE_TYPE_ID_MAPPING = new Map([
     MonitoringPointTypeValue.LOOSENING_ANGLE,
     [DeviceType.BoltLoosening, DeviceType.BoltLooseningWIRED]
   ],
-  [MonitoringPointTypeValue.THICKNESS, [DeviceType.NormalTemperatureCorrosion]],
+  [
+    MonitoringPointTypeValue.THICKNESS,
+    [DeviceType.NormalTemperatureCorrosion, DeviceType.NormalTemperatureCorrosionLora]
+  ],
   [MonitoringPointTypeValue.THICKNESS_HIGH, [DeviceType.HighTemperatureCorrosion]],
   [
     MonitoringPointTypeValue.PRELOAD,
@@ -269,7 +272,13 @@ export const MONITORING_POINT_TYPE_VALUE_DEVICE_TYPE_ID_MAPPING = new Map([
   [MonitoringPointTypeValue.VIBRATION_RPM, [DeviceType.SVT220S1]],
   [
     MonitoringPointTypeValue.VIBRATION_THREE_AXIS_RPM,
-    [DeviceType.SVT210RS, DeviceType.SVT210S, DeviceType.SVT220S3]
+    [
+      DeviceType.SVT210RS,
+      DeviceType.SVT210S,
+      DeviceType.SVT220S3,
+      DeviceType.SVT210KL,
+      DeviceType.SVT510L
+    ]
   ],
   [MonitoringPointTypeValue.TOWER_INCLINATION, [DeviceType.AngleDip]],
   [MonitoringPointTypeValue.TOWER_BASE_SETTLEMENT, [DeviceType.AngleDip]],
@@ -287,7 +296,10 @@ export const MONITORING_POINT_TYPE_VALUE_DEVICE_TYPE_ID_MAPPING = new Map([
     MonitoringPointTypeValue.PRESSURE_TEMPERATURE,
     [DeviceType.PressureTemperature, DeviceType.PressureTemperatureWIRED, DeviceType.PressureWoErKe]
   ],
-  [MonitoringPointTypeValue.TEMPERATURE, [DeviceType.Temperature, DeviceType.TemperatureWIRED]],
+  [
+    MonitoringPointTypeValue.TEMPERATURE,
+    [DeviceType.Temperature, DeviceType.TemperatureWIRED, DeviceType.TemperatureLora]
+  ],
   [
     MonitoringPointTypeValue.FLANGE_PRELOAD,
     [

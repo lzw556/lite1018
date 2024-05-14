@@ -1,40 +1,33 @@
 import { Form, Input, ModalProps, Typography } from 'antd';
 import { FC, useEffect, useState } from 'react';
 import IpnFormItem from '../../../components/formItems/ipnFormItem';
-import WsnFormItem from '../../../components/formItems/wsnFormItem';
 import { DEFAULT_IPN_SETTING } from '../../../types/ipn_setting';
 import { Normalizes } from '../../../constants/validator';
 import { CreateNetworkRequest } from '../../../apis/network';
-import { NetworkProvisioningMode } from '../../../types/network';
-import { useProvisionMode } from '../useProvisionMode';
 import intl from 'react-intl-universal';
 import { FormInputItem } from '../../../components/formInputItem';
 import { useLocaleFormLayout } from '../../../hooks/useLocaleFormLayout';
 import { ModalWrapper } from '../../../components/modalWrapper';
+import LoRaWSNFormItem from '../../../components/formItems/loRaWSNFormItem';
+import { DEFAULT_WSN_SETTING } from '../../../types/wsn_setting';
 import { DeviceType } from '../../../types/device_type';
 
 export interface AddNetworkModalProps extends ModalProps {
   onSuccess: () => void;
 }
 
-const AddNetworkModal: FC<AddNetworkModalProps> = (props) => {
+const AddLoraNetworkModal: FC<AddNetworkModalProps> = (props) => {
   const { open, onSuccess } = props;
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [provisionMode, setProvisionMode, settings] = useProvisionMode();
+
   const [form] = Form.useForm();
 
   useEffect(() => {
     if (open) {
       form.resetFields();
+      form.setFieldsValue({ wsn: DEFAULT_WSN_SETTING });
     }
-    setProvisionMode(open ? NetworkProvisioningMode.Mode2 : undefined);
-  }, [open, form, setProvisionMode]);
-
-  useEffect(() => {
-    if (settings) {
-      form.setFieldsValue(settings);
-    }
-  }, [form, settings]);
+  }, [open, form]);
 
   const onAdd = () => {
     setIsLoading(true);
@@ -75,11 +68,11 @@ const AddNetworkModal: FC<AddNetworkModalProps> = (props) => {
           >
             <Input placeholder={intl.get('PLEASE_ENTER_NETWORK_NAME')} />
           </FormInputItem>
-          {provisionMode && <WsnFormItem mode={provisionMode} onModeChange={setProvisionMode} />}
+          <LoRaWSNFormItem />
         </fieldset>
         <fieldset>
           <legend>{intl.get('GATEWAY_INFORMATION')}</legend>
-          <Form.Item hidden={true} name={['gateway', 'type']} initialValue={DeviceType.Gateway}>
+          <Form.Item hidden={true} name={['gateway', 'type']} initialValue={DeviceType.GatewayLora}>
             <Input />
           </Form.Item>
           <Form.Item
@@ -110,4 +103,4 @@ const AddNetworkModal: FC<AddNetworkModalProps> = (props) => {
   );
 };
 
-export default AddNetworkModal;
+export default AddLoraNetworkModal;

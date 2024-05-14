@@ -2,6 +2,7 @@ import { PROPERTY_CATEGORIES } from '../constants/properties';
 
 export enum DeviceType {
   Gateway = 1,
+  GatewayLora = 5,
   Router = 257,
   BoltLoosening = 131073,
   BoltLooseningWIRED = 131329,
@@ -9,6 +10,7 @@ export enum DeviceType {
   BoltElongation4Channels = 196611,
   BoltElongation8Channels = 196612,
   NormalTemperatureCorrosion = 262145,
+  NormalTemperatureCorrosionLora = 262657,
   HighTemperatureCorrosion = 262401,
   SVT210R = 327938,
   SVT220520 = 327940,
@@ -20,7 +22,10 @@ export enum DeviceType {
   SVT210S = 328194,
   SVT220S1 = 328195,
   SVT220S3 = 328196,
+  SVT210KL = 327947,
+  SVT510L = 327950,
   Temperature = 393217,
+  TemperatureLora = 393729,
   TemperatureWIRED = 393473,
   Pressure = 524289,
   PressureGuoDa = 16777217,
@@ -36,6 +41,8 @@ export namespace DeviceType {
     switch (type) {
       case DeviceType.Gateway:
         return 'DEVICE_TYPE_GATEWAY';
+      case DeviceType.GatewayLora:
+        return 'DEVICE_TYPE_GATEWAY_LORA';
       case DeviceType.Router:
         return 'DEVICE_TYPE_RELAY';
       case DeviceType.BoltElongation:
@@ -52,6 +59,8 @@ export namespace DeviceType {
         return 'DEVICE_TYPE_HIGH_TEMPATURE_CORROSION';
       case DeviceType.NormalTemperatureCorrosion:
         return 'DEVICE_TYPE_CORROSION';
+      case DeviceType.NormalTemperatureCorrosionLora:
+        return 'DEVICE_TYPE_CORROSION_LORA';
       case DeviceType.SVT210R:
         return 'DEVICE_TYPE_SVT210R';
       case DeviceType.VibrationTemperature3AxisNB:
@@ -72,8 +81,14 @@ export namespace DeviceType {
         return 'DEVICE_TYPE_SVT220S1';
       case DeviceType.SVT220S3:
         return 'DEVICE_TYPE_SVT220S3';
+      case DeviceType.SVT210KL:
+        return 'DEVICE_TYPE_SVT210KL';
+      case DeviceType.SVT510L:
+        return 'DEVICE_TYPE_SVT510L';
       case DeviceType.Temperature:
         return 'DEVICE_TYPE_TEMPERATURE';
+      case DeviceType.TemperatureLora:
+        return 'DEVICE_TYPE_TEMPERATURE_LORA';
       case DeviceType.TemperatureWIRED:
         return 'DEVICE_TYPE_WIRED_TEMPERATURE';
       case DeviceType.Pressure:
@@ -96,7 +111,7 @@ export namespace DeviceType {
   }
 
   export function getGateways() {
-    return [DeviceType.Gateway];
+    return [DeviceType.Gateway, DeviceType.GatewayLora];
   }
 
   export function getRouters() {
@@ -111,6 +126,7 @@ export namespace DeviceType {
       DeviceType.BoltElongation4Channels,
       DeviceType.BoltElongation8Channels,
       DeviceType.NormalTemperatureCorrosion,
+      DeviceType.NormalTemperatureCorrosionLora,
       DeviceType.HighTemperatureCorrosion,
       DeviceType.SVT210R,
       DeviceType.SVT220520,
@@ -122,7 +138,10 @@ export namespace DeviceType {
       DeviceType.SVT210S,
       DeviceType.SVT220S1,
       DeviceType.SVT220S3,
+      DeviceType.SVT210KL,
+      DeviceType.SVT510L,
       DeviceType.Temperature,
+      DeviceType.TemperatureLora,
       DeviceType.TemperatureWIRED,
       DeviceType.Pressure,
       DeviceType.PressureGuoDa,
@@ -175,7 +194,7 @@ export namespace DeviceType {
   }
 
   export function isWiredDevice(type: number) {
-    return type === DeviceType.Gateway || isWiredSensor(type);
+    return type === DeviceType.Gateway || type === DeviceType.GatewayLora || isWiredSensor(type);
   }
 
   export function isSPT(type: number) {
@@ -187,11 +206,16 @@ export namespace DeviceType {
   }
 
   export function isRootDevice(type: number) {
-    return type === DeviceType.Gateway || isMultiChannel(type) || isNB(type);
+    return (
+      type === DeviceType.Gateway ||
+      type === DeviceType.GatewayLora ||
+      isMultiChannel(type) ||
+      isNB(type)
+    );
   }
 
   export function isGateway(type: number) {
-    return type === DeviceType.Gateway;
+    return type === DeviceType.Gateway || type === DeviceType.GatewayLora;
   }
 
   export function isSensor(type: number) {
@@ -202,6 +226,7 @@ export namespace DeviceType {
     return (
       type === DeviceType.HighTemperatureCorrosion ||
       type === DeviceType.NormalTemperatureCorrosion ||
+      type === DeviceType.NormalTemperatureCorrosionLora ||
       type === DeviceType.BoltElongation ||
       DeviceType.isMultiChannel(type) ||
       type === DeviceType.Pressure ||
@@ -218,7 +243,7 @@ export namespace DeviceType {
   }
 
   export function getNonSensorDeviceTypes() {
-    return [DeviceType.Gateway, DeviceType.Router];
+    return [DeviceType.Gateway, DeviceType.GatewayLora, DeviceType.Router];
   }
 
   export function isVibration(type: DeviceType | undefined) {
@@ -233,6 +258,8 @@ export namespace DeviceType {
       case DeviceType.SVT210S:
       case DeviceType.SVT220S1:
       case DeviceType.SVT220S3:
+      case DeviceType.SVT210KL:
+      case DeviceType.SVT510L:
         return true;
     }
     return false;
@@ -246,6 +273,7 @@ export const SENSOR_DISPLAY_PROPERTIES = {
   [DeviceType.BoltElongation4Channels]: PROPERTY_CATEGORIES.DS,
   [DeviceType.BoltElongation8Channels]: PROPERTY_CATEGORIES.DS,
   [DeviceType.NormalTemperatureCorrosion]: PROPERTY_CATEGORIES.DC_NORMAL,
+  [DeviceType.NormalTemperatureCorrosionLora]: PROPERTY_CATEGORIES.DC_NORMAL,
   [DeviceType.HighTemperatureCorrosion]: PROPERTY_CATEGORIES.DC_HIGH,
   [DeviceType.SVT210R]: PROPERTY_CATEGORIES.SVT210R,
   [DeviceType.SVT210510]: PROPERTY_CATEGORIES.SVT210510,
@@ -255,7 +283,10 @@ export const SENSOR_DISPLAY_PROPERTIES = {
   [DeviceType.SVT210S]: PROPERTY_CATEGORIES.SVT220S1S3,
   [DeviceType.SVT220S1]: PROPERTY_CATEGORIES.SVT220S1S3,
   [DeviceType.SVT220S3]: PROPERTY_CATEGORIES.SVT220S1S3,
+  [DeviceType.SVT210KL]: PROPERTY_CATEGORIES.SVT220S1S3,
+  [DeviceType.SVT510L]: PROPERTY_CATEGORIES.SVT220S1S3,
   [DeviceType.Temperature]: PROPERTY_CATEGORIES.ST,
+  [DeviceType.TemperatureLora]: PROPERTY_CATEGORIES.ST,
   [DeviceType.PressureTemperature]: PROPERTY_CATEGORIES.SPT,
   [DeviceType.AngleDip]: PROPERTY_CATEGORIES.SQ
 };
@@ -272,5 +303,7 @@ export const SVT_DEVICE_TYPE_SENSOR_TYPE_MAPPING = {
   [DeviceType.SVT210RS]: SVT_SENSOR_TYPES[0],
   [DeviceType.SVT210S]: SVT_SENSOR_TYPES[0],
   [DeviceType.SVT220S1]: SVT_SENSOR_TYPES[2],
-  [DeviceType.SVT220S3]: SVT_SENSOR_TYPES[1]
+  [DeviceType.SVT220S3]: SVT_SENSOR_TYPES[1],
+  [DeviceType.SVT210KL]: SVT_SENSOR_TYPES[1],
+  [DeviceType.SVT510L]: SVT_SENSOR_TYPES[1]
 };
