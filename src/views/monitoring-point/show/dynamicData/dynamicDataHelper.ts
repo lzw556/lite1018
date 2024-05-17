@@ -14,6 +14,7 @@ export type VibrationWaveFormDataType = {
   values: number[];
   xAxis: number[];
   xAxisUnit: string;
+  yAxisUnit: string;
 };
 
 export type Metadata = { [key: string]: number };

@@ -105,7 +105,8 @@ export const VibrationDynamicDataContent = ({
   );
 
   function renderChart() {
-    const { frequency, values, xAxis, xAxisUnit, highEnvelopes, lowEnvelopes } = data.values;
+    const { frequency, values, xAxis, xAxisUnit, yAxisUnit, highEnvelopes, lowEnvelopes } =
+      data.values;
     let series: any = [];
     series.push({
       data: { [AXISES.map(({ label }) => label)[axis]]: values },
@@ -154,7 +155,10 @@ export const VibrationDynamicDataContent = ({
         style={{ height: 500 }}
         xAxisUnit={xAxisUnit}
         yAxisMinInterval={0}
-        yAxisValueMeta={{ precision: field.precision, unit: field.unit }}
+        yAxisValueMeta={{
+          precision: field.precision,
+          unit: field.unit.length > 0 ? field.unit : yAxisUnit
+        }}
         showSideComments={showSideComments}
       />
     );

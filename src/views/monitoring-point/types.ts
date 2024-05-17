@@ -103,13 +103,13 @@ const dynamic_vibration: { dynamicData?: DynamicData; waveData?: WaveData } = {
       {
         label: 'FIELD_ACCELERATION_TIME_DOMAIN',
         value: 'accelerationTimeDomain',
-        unit: '',
+        unit: 'm/s²',
         precision: 1
       },
       {
         label: 'FIELD_ACCELERATION_FREQUENCY_DOMAIN',
         value: 'accelerationFrequencyDomain',
-        unit: '',
+        unit: 'm/s²',
         precision: 3
       },
       {
