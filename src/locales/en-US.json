@@ -382,6 +382,7 @@
   "FIELD_ACCELERATION_FREQUENCY_DOMAIN": "Acceleration (Frequency Domain)",
   "FIELD_ACCELERATION_RMS": "Acceleration RMS",
   "FIELD_ACCELERATION_RMS_DESC": "Vibration amplitude",
+  "FIELD_ORIGINAL_DOMAIN": "Original Data",
   "FIELD_ACCELERATION_TIME_DOMAIN": "Acceleration (Time Domain)",
   "FIELD_ACCELERATION_X": "Acceleration X",
   "FIELD_ACCELERATION_Y": "Acceleration Y",

@@ -101,6 +101,12 @@ const dynamic_vibration: { dynamicData?: DynamicData; waveData?: WaveData } = {
     title: 'WAVEFORM_DATA',
     fields: [
       {
+        label: 'FIELD_ORIGINAL_DOMAIN',
+        value: 'originalDomain',
+        unit: '',
+        precision: 1
+      },
+      {
         label: 'FIELD_ACCELERATION_TIME_DOMAIN',
         value: 'accelerationTimeDomain',
         unit: 'm/s²',

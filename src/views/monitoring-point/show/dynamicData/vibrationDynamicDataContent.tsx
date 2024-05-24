@@ -108,42 +108,44 @@ export const VibrationDynamicDataContent = ({
     const { frequency, values, xAxis, xAxisUnit, yAxisUnit, highEnvelopes, lowEnvelopes } =
       data.values;
     let series: any = [];
-    series.push({
-      data: { [AXISES.map(({ label }) => label)[axis]]: values },
-      xAxisValues: xAxis.map((n) => `${n}`),
-      raw: {
-        smooth: true
+    if (!!values && !!xAxis) {
+      series.push({
+        data: { [AXISES.map(({ label }) => label)[axis]]: values },
+        xAxisValues: xAxis.map((n) => `${n}`),
+        raw: {
+          smooth: true
+        }
+      });
+      if (isShowEnvelope) {
+        series.push({
+          data: { [AXISES.map(({ label }) => label)[axis]]: highEnvelopes },
+          xAxisValues: xAxis.map((n) => `${n}`),
+          raw: {
+            lineStyle: {
+              opacity: 0
+            },
+            areaStyle: {
+              color: '#ccc'
+            },
+            stack: 'confidence-band',
+            smooth: true
+          }
+        });
+        series.push({
+          data: { [AXISES.map(({ label }) => label)[axis]]: lowEnvelopes },
+          xAxisValues: xAxis.map((n) => `${n}`),
+          raw: {
+            lineStyle: {
+              opacity: 0
+            },
+            areaStyle: {
+              color: '#ccc'
+            },
+            stack: 'confidence-band',
+            smooth: true
+          }
+        });
       }
-    });
-    if (isShowEnvelope) {
-      series.push({
-        data: { [AXISES.map(({ label }) => label)[axis]]: highEnvelopes },
-        xAxisValues: xAxis.map((n) => `${n}`),
-        raw: {
-          lineStyle: {
-            opacity: 0
-          },
-          areaStyle: {
-            color: '#ccc'
-          },
-          stack: 'confidence-band',
-          smooth: true
-        }
-      });
-      series.push({
-        data: { [AXISES.map(({ label }) => label)[axis]]: lowEnvelopes },
-        xAxisValues: xAxis.map((n) => `${n}`),
-        raw: {
-          lineStyle: {
-            opacity: 0
-          },
-          areaStyle: {
-            color: '#ccc'
-          },
-          stack: 'confidence-band',
-          smooth: true
-        }
-      });
     }
     return (
       <PropertyChart
