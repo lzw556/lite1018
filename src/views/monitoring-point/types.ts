@@ -252,6 +252,7 @@ export const MONITORING_POINT_TYPE_VALUE_DEVICE_TYPE_ID_MAPPING = new Map([
   ],
   [MonitoringPointTypeValue.THICKNESS, [DeviceType.NormalTemperatureCorrosion]],
   [MonitoringPointTypeValue.THICKNESS_HIGH, [DeviceType.HighTemperatureCorrosion]],
+  [MonitoringPointTypeValue.THICKNESS_HIGH, [DeviceType.DC110H]],
   [
     MonitoringPointTypeValue.PRELOAD,
     [

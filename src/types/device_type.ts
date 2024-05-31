@@ -10,6 +10,7 @@ export enum DeviceType {
   BoltElongation8Channels = 196612,
   NormalTemperatureCorrosion = 262145,
   HighTemperatureCorrosion = 262401,
+  DC110H = 262404,
   SVT210R = 327938,
   SVT220520 = 327940,
   VibrationTemperature3AxisNB = 327941,
@@ -52,6 +53,8 @@ export namespace DeviceType {
         return 'DEVICE_TYPE_HIGH_TEMPATURE_CORROSION';
       case DeviceType.NormalTemperatureCorrosion:
         return 'DEVICE_TYPE_CORROSION';
+      case DeviceType.DC110H:
+        return 'DEVICE_TYPE_DC110H';
       case DeviceType.SVT210R:
         return 'DEVICE_TYPE_SVT210R';
       case DeviceType.VibrationTemperature3AxisNB:
@@ -112,6 +115,7 @@ export namespace DeviceType {
       DeviceType.BoltElongation8Channels,
       DeviceType.NormalTemperatureCorrosion,
       DeviceType.HighTemperatureCorrosion,
+      DeviceType.DC110H,
       DeviceType.SVT210R,
       DeviceType.SVT220520,
       DeviceType.VibrationTemperature3AxisNB,
@@ -202,6 +206,7 @@ export namespace DeviceType {
     return (
       type === DeviceType.HighTemperatureCorrosion ||
       type === DeviceType.NormalTemperatureCorrosion ||
+      type === DeviceType.DC110H ||
       type === DeviceType.BoltElongation ||
       DeviceType.isMultiChannel(type) ||
       type === DeviceType.Pressure ||
@@ -247,6 +252,7 @@ export const SENSOR_DISPLAY_PROPERTIES = {
   [DeviceType.BoltElongation8Channels]: PROPERTY_CATEGORIES.DS,
   [DeviceType.NormalTemperatureCorrosion]: PROPERTY_CATEGORIES.DC_NORMAL,
   [DeviceType.HighTemperatureCorrosion]: PROPERTY_CATEGORIES.DC_HIGH,
+  [DeviceType.DC110H]: PROPERTY_CATEGORIES.DC_HIGH,
   [DeviceType.SVT210R]: PROPERTY_CATEGORIES.SVT210R,
   [DeviceType.SVT210510]: PROPERTY_CATEGORIES.SVT210510,
   [DeviceType.SVT110]: PROPERTY_CATEGORIES.SVT110,
