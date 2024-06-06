@@ -42,6 +42,7 @@ import dayjs from '../utils/dayjsUtils';
 import 'dayjs/locale/zh-cn';
 import { AssetsContextProvider, ASSET_PATHNAME, useAppConfigContext } from '../views/asset';
 import { TOWER_PATHNAME } from '../views/tower';
+import { SITE_NAMES } from '../config/assetCategory.config';
 
 const AlarmRuleGroups = lazy(() => import('../views/alarm/alarm-group/index'));
 const CreateAlarmRuleGroups = lazy(() => import('../views/alarm/alarm-group/create'));
@@ -188,7 +189,8 @@ const AppRouter = () => {
     } else {
       dayjs.locale('en');
     }
-  }, [language]);
+    document.title = intl.get(SITE_NAMES.get(config) ?? '');
+  }, [language, config]);
 
   return (
     <>
