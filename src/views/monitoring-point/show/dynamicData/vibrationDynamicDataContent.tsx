@@ -159,7 +159,8 @@ export const VibrationDynamicDataContent = ({
         yAxisMinInterval={0}
         yAxisValueMeta={{
           precision: field.precision,
-          unit: field.unit.length > 0 ? field.unit : yAxisUnit
+          unit: field.unit.length > 0 ? field.unit : yAxisUnit,
+          showName: true
         }}
         showSideComments={showSideComments}
       />
