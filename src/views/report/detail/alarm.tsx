@@ -107,7 +107,7 @@ export const AlarmPage = ({ report }: { report: Report }) => {
           <span className='value'>{majorAlarmNum}</span>
           条为重要报警信息，
           <span className='value'>{minorAlarmNum}</span>
-          条为次要报警信息，已处理
+          条为普通报警信息，已处理
           <span className='value'>{handledNum}</span>
           条，还有<span className='value'>{unhandledNum}</span>
           条为未处理状态，请尽快处理并消除报警。

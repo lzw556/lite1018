@@ -32,7 +32,7 @@ export const A4_SIZE = { width: 210, height: 297, unit: 'mm', padding: 20 };
 export const A4_HEIGHT = 1122.519;
 export const PREFACE_PLATFORM = '博感云平台';
 export const COMPANY = '嘉兴博感科技有限公司';
-export const ALARM_LEVELS = ['正常', '次要', '重要', '紧急'];
+export const ALARM_LEVELS = ['正常', '普通', '重要', '紧急'];
 export const PREFACES = [
   `本评估报告由${PREFACE_PLATFORM}自动生成，版权归${COMPANY}所有；`,
   `委托方负有对监测报告保密的义务，未经受托方书面许可不得将本报告提供给第三方、印刷成其它宣传材料或发布于网络等公共信息平台；`,
