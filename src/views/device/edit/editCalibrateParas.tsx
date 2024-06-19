@@ -26,6 +26,7 @@ const EditCalibrateParas = ({
   typeParaMapping.set(DeviceType.BoltElongation4Channels, 'preload');
   typeParaMapping.set(DeviceType.BoltElongation8Channels, 'preload');
   typeParaMapping.set(DeviceType.NormalTemperatureCorrosion, 'thickness');
+  typeParaMapping.set(DeviceType.NormalTemperatureCorrosionLora, 'thickness');
   typeParaMapping.set(DeviceType.HighTemperatureCorrosion, 'thickness');
   typeParaMapping.set(DeviceType.DC110H, 'thickness');
   typeParaMapping.set(DeviceType.Pressure, 'pressure');

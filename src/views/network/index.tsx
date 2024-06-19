@@ -12,7 +12,7 @@ import ShadowCard from '../../components/shadowCard';
 import TableLayout from '../layout/TableLayout';
 import AddNetworkModal from './modal/addNetworkModal';
 import { Button, Col, Dropdown, MenuProps, message, Popconfirm, Row, Space } from 'antd';
-import { CodeOutlined, DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
+import { CodeOutlined, DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import { Network, NetworkProvisioningMode } from '../../types/network';
 import EditNetworkModal from './modal/editNetworkModal';
 import dayjs from '../../utils/dayjsUtils';
@@ -24,10 +24,14 @@ import { Store, useStore } from '../../hooks/store';
 import { PageTitle } from '../../components/pageTitle';
 import intl from 'react-intl-universal';
 import { SelfLink } from '../../components/selfLink';
+import AddLoraNetworkModal from './lora/addNetworkModal';
+import EditLoraNetworkModal from './lora/editNetworkModal';
+import { DeviceType } from '../../types/device_type';
 
 const NetworkPage = () => {
   const { hasPermission, hasPermissions } = usePermission();
   const [addVisible, setAddVisible] = useState<boolean>(false);
+  const [addLoraVisible, setAddLoraVisible] = useState<boolean>(false);
   const [editVisible, setEditVisible] = useState<boolean>(false);
   const [network, setNetwork] = useState<Network>();
   const [dataSource, setDataSource] = useState<PageResult<any>>();
@@ -139,8 +143,10 @@ const NetworkPage = () => {
       title: intl.get('MODE'),
       dataIndex: 'mode',
       key: 'mode',
-      render: (mode: number) => {
-        return NetworkProvisioningMode.toString(mode);
+      render: (mode: number, r: Network) => {
+        return r && r.gateway.typeId === DeviceType.Gateway
+          ? NetworkProvisioningMode.toString(mode)
+          : '-';
       }
     },
     {
@@ -222,10 +228,32 @@ const NetworkPage = () => {
         items={[{ title: intl.get('MENU_NETWORK_LIST') }]}
         actions={
           <HasPermission value={Permission.NetworkAdd}>
-            <Button type={'primary'} onClick={() => setAddVisible(true)}>
+            {/* <Button type={'primary'} onClick={() => setAddVisible(true)}>
               {intl.get('CREATE_SOMETHING', { something: intl.get('NETWORK') })}
               <PlusOutlined />
-            </Button>
+            </Button> */}
+            <Dropdown.Button
+              type='primary'
+              onClick={() => setAddVisible(true)}
+              menu={{
+                items: [
+                  {
+                    label: intl.get('CREATE_SOMETHING', {
+                      something: intl.get('DEVICE_TYPE_GATEWAY_LORA')
+                    }),
+                    key: 'lora'
+                  }
+                ],
+                onClick: (e) => {
+                  if (e.key === 'lora') {
+                    console.log('dddddddddddd', e);
+                    setAddLoraVisible(true);
+                  }
+                }
+              }}
+            >
+              {intl.get('CREATE_SOMETHING', { something: intl.get('NETWORK') })}
+            </Dropdown.Button>
           </HasPermission>
         }
       />
@@ -263,8 +291,33 @@ const NetworkPage = () => {
           }}
         />
       )}
-      {network && editVisible && (
+      {network && network.gateway.typeId === DeviceType.Gateway && editVisible && (
         <EditNetworkModal
+          open={editVisible}
+          network={network}
+          onCancel={() => setEditVisible(false)}
+          onSuccess={() => {
+            setEditVisible(false);
+            message.success(intl.get('SAVED_SUCCESSFUL'));
+            fetchNetworks(store);
+          }}
+        />
+      )}
+      {addLoraVisible && (
+        <AddLoraNetworkModal
+          open={addLoraVisible}
+          onCancel={() => setAddLoraVisible(false)}
+          onSuccess={() => {
+            setAddLoraVisible(false);
+            if (dataSource) {
+              const { size, page, total } = dataSource;
+              gotoPage({ size, total, index: page }, 'next');
+            }
+          }}
+        />
+      )}
+      {network && network.gateway.typeId === DeviceType.GatewayLora && editVisible && (
+        <EditLoraNetworkModal
           open={editVisible}
           network={network}
           onCancel={() => setEditVisible(false)}
