@@ -155,3 +155,7 @@ export function RemoveAlarmRuleFromDeviceRequest(id: number, ids: number[]) {
     .delete<PageResult<AlarmRule[]>>(`/devices/${id}/alarmRules`, { ids })
     .then(GetResponse);
 }
+
+export function ImportDeviceData(file: any) {
+  return request.upload('/devices/dataFile', file).then((res) => res.data);
+}

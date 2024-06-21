@@ -8,18 +8,26 @@ import {
   Row,
   Select,
   Space,
-  Typography
+  Typography,
+  Upload,
+  message
 } from 'antd';
 import {
   CaretDownOutlined,
   CodeOutlined,
   DeleteOutlined,
   EditOutlined,
-  PlusOutlined
+  PlusOutlined,
+  UploadOutlined
 } from '@ant-design/icons';
 import { Content } from 'antd/lib/layout/layout';
 import { useEffect, useState } from 'react';
-import { DeleteDeviceRequest, GetDeviceRequest, PagingDevicesRequest } from '../../apis/device';
+import {
+  DeleteDeviceRequest,
+  GetDeviceRequest,
+  ImportDeviceData,
+  PagingDevicesRequest
+} from '../../apis/device';
 import { DeviceType } from '../../types/device_type';
 import EditSettingModal from './edit/editSettingModal';
 import { Device } from '../../types/device';
@@ -56,6 +64,7 @@ const DevicePage = () => {
   const [editSettingVisible, setEditSettingVisible] = useState<boolean>(false);
   const [editBaseInfoVisible, setEditBaseInfoVisible] = useState<boolean>(false);
   const [dataSource, setDataSource] = useState<PageResult<any>>();
+  const [isUploading, setIsUploading] = useState<boolean>(false);
   const { hasPermission } = usePermission();
   const [store, setStore, gotoPage] = useStore('deviceList');
   const config = useAppConfigContext();
@@ -216,17 +225,50 @@ const DevicePage = () => {
     }
   ];
 
+  const onFileChange = (info: any) => {
+    if (info.file.status === 'uploading') {
+      setIsUploading(true);
+    }
+  };
+
+  const onUpload = (options: any) => {
+    const formData = new FormData();
+    formData.append('file', options.file);
+    ImportDeviceData(formData).then((res) => {
+      setIsUploading(false);
+      if (res.code === 200) {
+        message.success(intl.get('IMPORTED_SUCCESSFUL')).then(() => {});
+      } else {
+        message.error(`${intl.get('FAILED_TO_IMPORT')}${intl.get(res.msg).d(res.msg)}`).then();
+      }
+    });
+  };
+
   return (
     <Content>
       <PageTitle
         items={[{ title: intl.get('MENU_DEVICE_LSIT') }]}
         actions={
-          <SelfLink to='create'>
-            <Button type='primary'>
-              {intl.get('CREATE_DEVICE')}
-              <PlusOutlined />
-            </Button>
-          </SelfLink>
+          <Space>
+            <SelfLink to='create'>
+              <Button type='primary'>
+                {intl.get('CREATE_DEVICE')}
+                <PlusOutlined />
+              </Button>
+            </SelfLink>
+            <Upload
+              accept={'.csv'}
+              name='file'
+              customRequest={onUpload}
+              showUploadList={false}
+              onChange={onFileChange}
+            >
+              <Button type='primary' loading={isUploading}>
+                {intl.get('IMPORT_DEVICE_DATA')}
+                <UploadOutlined />
+              </Button>
+            </Upload>
+          </Space>
         }
       />
       <ShadowCard>
