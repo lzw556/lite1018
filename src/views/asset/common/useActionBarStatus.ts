@@ -36,11 +36,11 @@ export function useActionBarStatus() {
     setAction({ type: AssetAction.FLANGE_UPDATE, payload: { flange } });
   };
 
-  const handleMonitoringPointCreate = (paras?: AssetRow) => {
+  const handleMonitoringPointCreate = (paras?: AssetRow, windId?: number) => {
     setVisible(true);
     setAction({
       type: AssetAction.MONITORING_POINT_CREATE,
-      payload: { parent: paras }
+      payload: { parent: paras, windId }
     });
   };
 

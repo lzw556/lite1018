@@ -18,11 +18,13 @@ import { getParents } from '../../asset/common/utils';
 export const SelectParentFormItem = ({
   parent,
   onSelect,
-  form
+  form,
+  windId
 }: {
   parent?: AssetRow;
   onSelect: (pointType: number, devices: Device[]) => void;
   form: FormInstance<MonitoringPointBatch>;
+  windId?: number;
 }) => {
   const [parents, setParents] = React.useState<AssetRow[]>([]);
   const [isFlangePreload, setIsFlangePreload] = React.useState(checkIsFlangePreload(parent));
@@ -36,13 +38,13 @@ export const SelectParentFormItem = ({
 
   React.useEffect(() => {
     if (parent === undefined) {
-      getAssets({ type: root.key, parent_id: 0 }).then((assets) => {
+      getAssets(
+        windId ? { type: root.key, parent_id: 0, id: windId } : { type: root.key, parent_id: 0 }
+      ).then((assets) => {
         setParents(getParents(assets, memoedLast.current));
       });
-    } else {
-      form.setFieldValue('asset_id', parent.id);
     }
-  }, [parent, root.key, form]);
+  }, [parent, root.key, windId]);
 
   const handlePointTypeChange = React.useCallback(
     (type: number) => {
@@ -102,7 +104,7 @@ export const SelectParentFormItem = ({
           </Select>
         </Form.Item>
       ) : (
-        <Form.Item name='asset_id' hidden={true}>
+        <Form.Item name='asset_id' hidden={true} initialValue={parent?.id}>
           <Input />
         </Form.Item>
       )}

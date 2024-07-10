@@ -26,7 +26,8 @@ export function CreateAssetActionBar({
   hiddens = [],
   needExtra = true,
   lastParent,
-  pointParnet
+  pointParnet,
+  windId
 }: {
   roots: AssetRow[];
   refresh: () => void;
@@ -35,6 +36,7 @@ export function CreateAssetActionBar({
   needExtra?: boolean;
   lastParent?: AssetRow;
   pointParnet?: AssetRow;
+  windId?: number;
 }) {
   const { hasPermission } = usePermission();
   const { last, root, isChild } = useAssetCategoryChain();
@@ -104,7 +106,7 @@ export function CreateAssetActionBar({
       <Button
         key='create-monitoring-point'
         type='primary'
-        onClick={() => actionStatus.onMonitoringPointCreate(pointParnet)}
+        onClick={() => actionStatus.onMonitoringPointCreate(pointParnet, windId)}
       >
         {intl.get('CREATE_SOMETHING', { something: intl.get(MONITORING_POINT) })}
         <PlusOutlined />

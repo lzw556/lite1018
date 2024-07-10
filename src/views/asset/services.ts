@@ -4,7 +4,7 @@ import { HistoryData } from '../monitoring-point';
 import { ProjectStatistics } from './projectOverview';
 import { Asset, AssetRow } from './types';
 
-export function getAssets(filters?: Partial<Pick<Asset, 'type' | 'parent_id'>>) {
+export function getAssets(filters?: Partial<Pick<Asset, 'type' | 'parent_id' | 'id'>>) {
   return request.get<AssetRow[]>(`/assets`, { ...filters }).then(GetResponse);
 }
 

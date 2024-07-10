@@ -20,9 +20,9 @@ export type MonitoringPointBatch = {
 };
 
 export const MonitoringPointCreate: React.FC<
-  ModalProps & { parent?: AssetRow; onSuccess: () => void }
+  ModalProps & { parent?: AssetRow; windId?: number; onSuccess: () => void }
 > = (props) => {
-  const { parent, onSuccess } = props;
+  const { parent, onSuccess, windId } = props;
   const [form] = Form.useForm<MonitoringPointBatch>();
   const [selectedPointType, setSelectedPointType] = React.useState<number | undefined>();
   const [devices, setDevices] = React.useState<Device[]>([]);
@@ -119,6 +119,7 @@ export const MonitoringPointCreate: React.FC<
           }}
           form={form}
           key={parent?.id}
+          windId={windId}
         />
         <MonitoringPointFormItem
           selectedPointType={selectedPointType}

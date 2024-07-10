@@ -84,6 +84,7 @@ export const WindTurbineTabs = ({
             hiddens={[root.key]}
             needExtra={false}
             lastParent={asset}
+            windId={id}
           />
         )
       }
