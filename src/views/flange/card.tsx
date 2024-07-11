@@ -1,5 +1,4 @@
 import React from 'react';
-import { useLocation } from 'react-router-dom';
 import { NameValueGroups } from '../../components/name-values';
 import { INVALID_MONITORING_POINT } from '../monitoring-point';
 import { getAssetStatistics } from '../asset/common/statisticsHelper';
@@ -11,8 +10,7 @@ import { FLANGE_PATHNAME } from './types';
 import intl from 'react-intl-universal';
 
 export const FlangeCard = (flange: AssetRow) => {
-  const { id, name, statistics: flangeStatistics } = flange;
-  const { state } = useLocation();
+  const { id, name, statistics: flangeStatistics, type } = flange;
 
   const { alarmState, statistics } = getAssetStatistics(
     flangeStatistics,
@@ -26,8 +24,8 @@ export const FlangeCard = (flange: AssetRow) => {
       {...{
         title: {
           name: name,
-          path: `/${FLANGE_PATHNAME}/${id}`,
-          state
+          path: `/asset-management/${FLANGE_PATHNAME}/${id}`,
+          state: [`${id}-${type}`]
         },
         alarmState,
         icon: { svg: <FlangeIcon />, small: true, focus: true },

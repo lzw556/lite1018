@@ -6,17 +6,18 @@ import { useAppConfigContext } from '../asset/components/appConfigContext';
 import intl from 'react-intl-universal';
 
 export const Brand: React.FC<{
+  className?: string;
   height?: number;
   width?: number;
   logoImgAlt?: string;
   brandNameStyle: React.CSSProperties;
   gap?: number;
-}> = ({ height, width, logoImgAlt, brandNameStyle, gap = 30 }) => {
+}> = ({ className, height, width, logoImgAlt, brandNameStyle, gap = 30 }) => {
   const config = useAppConfigContext();
   const [image, status] = useImage('res/logo.png');
 
   return (
-    <Space size={gap}>
+    <Space size={gap} className={className}>
       {status === 'loaded' && (
         <img
           src={image?.src}

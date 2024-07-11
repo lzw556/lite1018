@@ -1,21 +1,14 @@
-import { ArrowRightOutlined, DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
+import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
 import { Button, Dropdown, Popconfirm } from 'antd';
 import React from 'react';
 import HasPermission from '../../../permission';
 import { Permission } from '../../../permission/permission';
 import intl from 'react-intl-universal';
-import {
-  deleteMeasurement,
-  getMeasurement,
-  MONITORING_POINT,
-  pickId
-} from '../../monitoring-point';
+import { deleteMeasurement, getMeasurement, MONITORING_POINT } from '../../monitoring-point';
 import { deleteAsset, getAsset } from '../services';
 import { AssertAssetCategory, AssertOfAssetCategory } from '../types';
 import { useAssetCategoryChain } from '../../../config/assetCategory.config';
-import { useLocation } from 'react-router-dom';
-import { getPathFromType, useAppConfigContext } from '../components';
-import { SelfLink } from '../../../components/selfLink';
+import { useAppConfigContext } from '../components';
 
 export const NodeActions = ({
   id,
@@ -32,7 +25,6 @@ export const NodeActions = ({
   rootId?: number;
   actionStatus: any;
 }) => {
-  const { state } = useLocation();
   const {
     onAssetCreate,
     onAssetUpdate,
@@ -55,37 +47,70 @@ export const NodeActions = ({
   return (
     <div style={{ height: 24, lineHeight: '24px' }}>
       <HasPermission value={Permission.AssetAdd}>
-        <Button type='text' size='small'>
-          <EditOutlined
-            onClick={() => {
-              if (isNodeAsset) {
-                getAsset(id)
-                  .then((asset) => {
-                    if (isNodeFlange) {
-                      onFlangeUpdate?.(asset);
-                    } else if (isNodeTower) {
-                      onTowerUpdate?.(asset);
-                    } else if (isNodePipe) {
-                      onAreaAssetUpdate?.(asset);
-                    } else {
-                      onAssetUpdate?.(asset);
-                    }
-                  })
-                  .catch(() => {
-                    onSuccess?.();
-                  });
-              } else {
-                getMeasurement(id)
-                  .then((point) => {
-                    onMonitoringPointUpdate?.(point);
-                  })
-                  .catch(() => {
-                    onSuccess?.();
-                  });
-              }
-            }}
-          />
-        </Button>
+        {isNodeRootAsset && (
+          <>
+            <Button type='text' size='small'>
+              <EditOutlined
+                onClick={() => {
+                  if (isNodeAsset) {
+                    getAsset(id)
+                      .then((asset) => {
+                        if (isNodeFlange) {
+                          onFlangeUpdate?.(asset);
+                        } else if (isNodeTower) {
+                          onTowerUpdate?.(asset);
+                        } else if (isNodePipe) {
+                          onAreaAssetUpdate?.(asset);
+                        } else {
+                          onAssetUpdate?.(asset);
+                        }
+                      })
+                      .catch(() => {
+                        onSuccess?.();
+                      });
+                  } else {
+                    getMeasurement(id)
+                      .then((point) => {
+                        onMonitoringPointUpdate?.(point);
+                      })
+                      .catch(() => {
+                        onSuccess?.();
+                      });
+                  }
+                }}
+              />
+            </Button>
+            {isNodeAsset && (
+              <AddAction
+                type={type}
+                onClick={(e) => {
+                  getAsset(id)
+                    .then((asset) => {
+                      if (isNodeWind) {
+                        if (e.key === 'tower-create') {
+                          onTowerCreate?.(asset.id);
+                        } else {
+                          onFlangeCreate?.(asset.id);
+                        }
+                      } else if (
+                        isNodeFlange ||
+                        e.key === 'monitoring-point-create' ||
+                        isNodePipe ||
+                        isNodeTower
+                      ) {
+                        onMonitoringPointCreate?.(asset);
+                      } else if (e.key === 'general-create') {
+                        onAssetCreate?.(asset.id);
+                      } else if (isNodeArea) {
+                        onAreaAssetCreate?.(asset.id);
+                      }
+                    })
+                    .catch(() => onSuccess?.());
+                }}
+              />
+            )}
+          </>
+        )}
         {!isNodeRootAsset && (
           <HasPermission value={Permission.AssetDelete}>
             <Popconfirm
@@ -108,43 +133,7 @@ export const NodeActions = ({
             </Popconfirm>
           </HasPermission>
         )}
-        {isNodeAsset && (
-          <AddAction
-            type={type}
-            onClick={(e) => {
-              getAsset(id)
-                .then((asset) => {
-                  if (isNodeWind) {
-                    if (e.key === 'tower-create') {
-                      onTowerCreate?.(asset.id);
-                    } else {
-                      onFlangeCreate?.(asset.id);
-                    }
-                  } else if (
-                    isNodeFlange ||
-                    e.key === 'monitoring-point-create' ||
-                    isNodePipe ||
-                    isNodeTower
-                  ) {
-                    onMonitoringPointCreate?.(asset);
-                  } else if (e.key === 'general-create') {
-                    onAssetCreate?.(asset.id);
-                  } else if (isNodeArea) {
-                    onAreaAssetCreate?.(asset.id);
-                  }
-                })
-                .catch(() => onSuccess?.());
-            }}
-          />
-        )}
       </HasPermission>
-      {!isNodeRootAsset && (
-        <SelfLink to={`${getPathFromType(type)}${pickId(id)}`} state={state}>
-          <Button type='text' size='small'>
-            <ArrowRightOutlined />
-          </Button>
-        </SelfLink>
-      )}
     </div>
   );
 };

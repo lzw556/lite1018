@@ -5,10 +5,11 @@ import { AssetRow } from '..';
 import { SelectAssets } from './selectAssets';
 import intl from 'react-intl-universal';
 
-export const AssetExport: React.FC<{ winds: AssetRow[]; disabled?: boolean }> = ({
-  winds,
-  disabled
-}) => {
+export const AssetExport: React.FC<{
+  winds: AssetRow[];
+  disabled?: boolean;
+  onlyIcon?: boolean;
+}> = ({ winds, disabled, onlyIcon = false }) => {
   const [open, setVisible] = React.useState(false);
   return (
     <>
@@ -19,7 +20,7 @@ export const AssetExport: React.FC<{ winds: AssetRow[]; disabled?: boolean }> = 
           setVisible(true);
         }}
       >
-        {intl.get('EXPORT_SETTINGS')}
+        {!onlyIcon && intl.get('EXPORT_SETTINGS')}
         <ExportOutlined />
       </Button>
       {open && (

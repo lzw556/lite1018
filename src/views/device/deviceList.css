@@ -1,0 +1,19 @@
+.device-sidebar {
+  position: fixed;
+  flex-direction: column;
+  width: 280px;
+  height: calc(100vh - 80px);
+  padding: 10px;
+  background-color: #fff;
+}
+.device-actions {
+  height: 40px;
+}
+.device-detail {
+  margin-left: 290px;
+}
+@media (max-width: 576px) {
+  .device-detail {
+    margin-left: 0;
+  }
+}

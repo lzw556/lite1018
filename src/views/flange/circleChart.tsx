@@ -1,5 +1,5 @@
 import React from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { ChartContainer } from '../../components/charts/chartContainer';
 import { getRealPoints, MONITORING_POINT_PATHNAME } from '../monitoring-point';
 import { AssetRow } from '../asset/types';
@@ -17,7 +17,6 @@ export const CircleChart = ({
   style?: React.CSSProperties;
 }) => {
   const { monitoringPoints, attributes } = asset;
-  const { state } = useLocation();
   const navigate = useNavigate();
   let chart: any = null;
   const points = getRealPoints(monitoringPoints);
@@ -29,7 +28,9 @@ export const CircleChart = ({
       clickHandler: (paras: any) => {
         const index = paras.value[1];
         if (points.length > index) {
-          navigate(`/${MONITORING_POINT_PATHNAME}/${points[index].id}`, { state });
+          navigate(`/asset-management/${MONITORING_POINT_PATHNAME}/${points[index].id}`, {
+            state: [`${points[index].id}-${points[index].type}`]
+          });
         }
       }
     };

@@ -1,7 +1,7 @@
 import { Col, Row, Spin } from 'antd';
 import React from 'react';
 import { useParams } from 'react-router-dom';
-import { AssetAlarmStatistic, AssetNavigator, useAssetsContext } from '../components';
+import { AssetAlarmStatistic, useAssetsContext } from '../components';
 import { AssertAssetCategory, AssertOfAssetCategory, AssetRow } from '../types';
 import { getAsset } from '../services';
 import ShadowCard from '../../../components/shadowCard';
@@ -35,9 +35,6 @@ export default function WindTurbineShow() {
 
   return (
     <Row gutter={[16, 16]}>
-      <Col span={24}>
-        <AssetNavigator id={asset.id} />
-      </Col>
       <Col span={24}>
         <AssetAlarmStatistic {...asset} />
         {isAssetWind && (

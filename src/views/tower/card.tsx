@@ -1,5 +1,4 @@
 import React from 'react';
-import { useLocation } from 'react-router-dom';
 import { NameValueGroups } from '../../components/name-values';
 import { INVALID_MONITORING_POINT, getRealPoints } from '../monitoring-point';
 import { getAssetStatistics } from '../asset/common/statisticsHelper';
@@ -13,10 +12,9 @@ import { useHistoryDatas } from './show';
 import { oneWeekNumberRange } from '../../components/rangeDatePicker';
 
 export const TowerCard = (tower: AssetRow) => {
-  const { id, name, statistics: towerStatistics } = tower;
+  const { id, name, statistics: towerStatistics, type } = tower;
   const realPoints = getRealPoints(tower.monitoringPoints);
   const historyData = useHistoryDatas(tower, oneWeekNumberRange);
-  const { state } = useLocation();
 
   const { alarmState, statistics } = getAssetStatistics(
     towerStatistics,
@@ -30,8 +28,8 @@ export const TowerCard = (tower: AssetRow) => {
       {...{
         title: {
           name: name,
-          path: `/${TOWER_PATHNAME}/${id}`,
-          state
+          path: `/asset-management/${TOWER_PATHNAME}/${id}`,
+          state: [`${id}-${type}`]
         },
         alarmState,
         icon: { svg: <TowerIcon />, small: true, focus: true },

@@ -1,5 +1,4 @@
 import { Layout } from 'antd';
-import Sider from 'antd/lib/layout/Sider';
 import React from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
 import { useDispatch } from 'redux-react-hook';
@@ -11,7 +10,6 @@ import { setMenusAction } from '../../store/actions/getMenusSuccess';
 import { SET_PERMISSION } from '../../store/actions/types';
 import { isLogin } from '../../utils/session';
 import HeaderLayout from './HeaderLayout';
-import { NavMenu } from './NavMenu';
 import { ValidateProject } from './validateProject';
 import './layout.css';
 import { Menu } from '../../types/menu';
@@ -57,15 +55,10 @@ export const PrimaryLayout = () => {
   return (
     <Layout>
       <HeaderLayout menus={menus} />
-      <Layout hasSider>
-        <Sider width={230} style={{ ...style, background: '#fff' }}>
-          {menus && <NavMenu menus={menus} />}
-        </Sider>
-        <Layout style={{ padding: 10, ...style }}>
-          <ValidateProject>
-            <Outlet />
-          </ValidateProject>
-        </Layout>
+      <Layout style={{ padding: 10, ...style }}>
+        <ValidateProject>
+          <Outlet />
+        </ValidateProject>
       </Layout>
       <AlertMessageNotification />
     </Layout>

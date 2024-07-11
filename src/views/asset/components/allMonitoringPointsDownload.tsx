@@ -5,10 +5,11 @@ import { AssetRow } from '..';
 import intl from 'react-intl-universal';
 import { BatchDownlaodHistoryDataModal } from './batchDownlaodHistoryDataModal';
 
-export const AllMonitoringPointsDownload: React.FC<{ winds: AssetRow[]; disabled?: boolean }> = ({
-  winds,
-  disabled
-}) => {
+export const AllMonitoringPointsDownload: React.FC<{
+  winds: AssetRow[];
+  disabled?: boolean;
+  onlyIcon?: boolean;
+}> = ({ winds, disabled, onlyIcon = false }) => {
   const [open, setVisible] = React.useState(false);
   return (
     <>
@@ -19,7 +20,7 @@ export const AllMonitoringPointsDownload: React.FC<{ winds: AssetRow[]; disabled
         }}
         type='primary'
       >
-        {intl.get('BATCH_DOWNLOAD')}
+        {!onlyIcon && intl.get('BATCH_DOWNLOAD')}
         <DownloadOutlined />
       </Button>
       {open && (

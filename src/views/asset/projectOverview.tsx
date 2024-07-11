@@ -1,9 +1,8 @@
 import { Empty } from 'antd';
 import * as React from 'react';
-import { useLocation } from 'react-router-dom';
 import { AssetIcon } from './icon/icon';
 import intl from 'react-intl-universal';
-import { Introduction, OverviewPage, rootPathState, useAssetsContext } from './components';
+import { Introduction, OverviewPage, useAssetsContext } from './components';
 import { generateColProps } from '../../utils/grid';
 import { ChartOptions } from '../../components/charts/common';
 import { Series_Pie } from '../../components/charts/pie';
@@ -28,7 +27,6 @@ export type ProjectStatistics = {
 };
 
 export default function ProjectOverview() {
-  const { state } = useLocation();
   const { assets } = useAssetsContext();
   const { root } = useAssetCategoryChain();
   const colProps = generateColProps({ xl: 8, xxl: 5 });
@@ -160,8 +158,8 @@ export default function ProjectOverview() {
                 count: <NameValueGroups items={statistics} col={{ span: 18 }} />,
                 title: {
                   name: item.name,
-                  path: `/${ASSET_PATHNAME}/${item.id}`,
-                  state: state ?? rootPathState
+                  path: `/asset-management/${ASSET_PATHNAME}/${item.id}`,
+                  state: [`${item.id}-${item.type}`]
                 },
                 alarmState,
                 icon: {

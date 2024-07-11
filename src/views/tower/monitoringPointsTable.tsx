@@ -1,6 +1,5 @@
 import { Empty, Table } from 'antd';
 import React from 'react';
-import { useLocation } from 'react-router-dom';
 import usePermission, { Permission } from '../../permission/permission';
 import { isMobile } from '../../utils/deviceDetection';
 import { getPathFromType } from '../asset';
@@ -28,7 +27,6 @@ export const MonitoringPointsTable = ({
   onDeleteSuccess: () => void;
 }) => {
   const { id, name, monitoringPoints = [] } = asset;
-  const { state } = useLocation();
   const { language } = useLocaleContext();
   const { hasPermission } = usePermission();
   const dataSource = sortMonitoringPointByAttributes(getRealPoints(monitoringPoints));
@@ -48,8 +46,8 @@ export const MonitoringPointsTable = ({
     <>
       {showTitle && (
         <SelfLink
-          to={`${getPathFromType(asset.type)}${id}`}
-          state={state}
+          to={`/asset-management${getPathFromType(asset.type)}${id}`}
+          state={[`${id}-${asset.type}`]}
           style={{ display: 'block', marginBottom: 8, fontSize: 16 }}
         >
           {name}

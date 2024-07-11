@@ -1,3 +1,18 @@
+.asset-sidebar {
+  /* display: flex; */
+  position: fixed;
+  flex-direction: column;
+  width: 280px;
+  height: calc(100vh - 80px);
+  padding: 10px;
+  background-color: #fff;
+}
+.asset-actions {
+  height: 40px;
+}
+.asset-detail {
+  margin-left: 290px;
+}
 .asset-list-tree .ant-space-item {
   font-size: 16px;
 }
@@ -6,4 +21,9 @@
   top: 2px;
   height: 18px;
   width: 18px;
+}
+@media (max-width: 576px) {
+  .asset-detail {
+    margin-left: 0;
+  }
 }

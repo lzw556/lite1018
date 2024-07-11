@@ -1156,5 +1156,7 @@
   "SETTING_TRIGGER_MODE_ACTION_PERIODIC_SAMPLING": "Periodic Sampling",
   "SETTING_TRIGGER_MODE_ACTION_SAMPLING_ONCE": "Sampling Once",
   "SETTING_TRIGGER_MODE_ACTION_WAVEFORM_ONCE": "Waveform Once",
-  "IMPORT_DEVICE_DATA": "Import Device Data"
+  "IMPORT_DEVICE_DATA": "Import Device Data",
+  "PLEASE_SELECT_AN_ASSET": "Please select an asset",
+  "PLEASE_SELECT_AN_DEVICE": "Please select a device"
 }

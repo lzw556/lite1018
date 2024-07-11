@@ -7,6 +7,14 @@
   line-height: 60px;
 }
 
+.pc .ts-menu {
+  flex: 1;
+  min-width: 0;
+  margin: 0 16px;
+  background-color: transparent;
+  color: #fff;
+}
+
 ::-webkit-scrollbar {
   width: 5px;
   height: 5px;
@@ -20,6 +28,9 @@
 ::-webkit-scrollbar-track {
   border-radius: 1em;
   background-color: rgba(50, 50, 50, 0.1);
+}
+.ts-header .pc {
+  display: flex;
 }
 .ts-header .mobile {
   display: none;
@@ -43,6 +54,7 @@
   .ts-header .mobile .logo {
     flex-grow: 1;
     text-align: center;
+    justify-content: center;
   }
   .ant-layout.ant-layout-has-sider aside.sider {
     display: none;

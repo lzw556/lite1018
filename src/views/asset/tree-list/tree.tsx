@@ -1,12 +1,10 @@
-import { Space, Tree } from 'antd';
+import { Space, Tree, Typography } from 'antd';
 import * as React from 'react';
 import { combineMonitoringPointToAsset } from '../common/utils';
-import './tree.css';
 import { AssertAssetCategory, AssertOfAssetCategory, AssetRow } from '../types';
-import { generateDatasOfMeasurement, MonitoringPointIcon, pickId } from '../../monitoring-point';
+import { MonitoringPointIcon, generateDatasOfMeasurement, pickId } from '../../monitoring-point';
 import { mapTree } from '../../../utils/tree';
 import { convertAlarmLevelToState } from '../common/statisticsHelper';
-import { isMobile } from '../../../utils/deviceDetection';
 import { AssetIcon } from '../icon/icon';
 import { NodeActions } from './nodeActions';
 import { FlangeIcon } from '../../flange';
@@ -14,13 +12,30 @@ import { useActionBarStatus } from '../common/useActionBarStatus';
 import { ActionBar } from '../common/actionBar';
 import usePermission, { Permission } from '../../../permission/permission';
 import { TowerIcon } from '../../tower';
+import { getPathFromType } from '../components';
+import { useNavigate } from 'react-router-dom';
 import { DataBarOfFirstProperties } from '../../device/dataBarOfFirstProperties';
+import { isMobile } from '../../../utils/deviceDetection';
 
 export const AssetTree: React.FC<{
   assets: AssetRow[];
+  height?: number;
+  isUsedInsideSidebar?: boolean;
+  onSelect?: (path: string[]) => void;
   onSuccess?: () => void;
   rootId?: number;
-}> = ({ assets, onSuccess, rootId }) => {
+  shouldNavigateWhenClick?: boolean;
+  selectedKeys?: string[];
+}> = ({
+  assets,
+  height,
+  isUsedInsideSidebar = false,
+  onSelect,
+  onSuccess,
+  rootId,
+  selectedKeys
+}) => {
+  const navigate = useNavigate();
   const [treedata, setTreedata] = React.useState<any>();
   const [selectedNode, setSelectedNode] = React.useState<any>();
   const actionStatus = useActionBarStatus();
@@ -91,11 +106,15 @@ export const AssetTree: React.FC<{
               );
             }
           }
-
           return (
             <Space>
-              {name}
-              {!isMobile && alarmText}
+              <Typography.Text
+                ellipsis={true}
+                style={{ maxWidth: isUsedInsideSidebar ? 110 : undefined }}
+              >
+                {name}
+              </Typography.Text>
+              {!isUsedInsideSidebar && !isMobile && alarmText}
               {selectedNode?.key === props.key && (
                 <NodeActions
                   id={pickId(selectedNode.id)}
@@ -111,9 +130,18 @@ export const AssetTree: React.FC<{
         }}
         onSelect={(selectedKeys: any, e: any) => {
           setSelectedNode(e.node);
+          const { id, type } = e.node;
+          const path = `${getPathFromType(type)}${pickId(id)}`;
+          onSelect?.(selectedKeys);
+          if (isUsedInsideSidebar) {
+            navigate(`/asset-management${path}`, {
+              state: selectedKeys
+            });
+          }
         }}
+        selectedKeys={selectedKeys}
         defaultExpandAll={true}
-        height={780}
+        height={height}
       />
       <ActionBar
         hasPermission={hasPermission(Permission.AssetAdd)}

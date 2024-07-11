@@ -21,7 +21,7 @@ import { isNumber } from 'lodash';
 import { PageTitle } from '../../../components/pageTitle';
 import intl from 'react-intl-universal';
 import { useLocaleContext } from '../../../localeProvider';
-import { SelfLink } from '../../../components/selfLink';
+import { useDevicesContext } from '..';
 
 const DeviceDetailPage = () => {
   const { id } = useParams();
@@ -31,8 +31,9 @@ const DeviceDetailPage = () => {
   const { PubSub } = useSocket();
   const [device, setDevice] = useState<Device>();
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [currentKey, setCurrentKey] = useState<string>('');
+  const [currentKey, setCurrentKey] = useState<string>();
   const tabs = useDeviceTabs(device?.typeId);
+  const { setToken } = useDevicesContext();
 
   const contents = new Map<string, any>([
     [
@@ -41,7 +42,7 @@ const DeviceDetailPage = () => {
         <SettingPage
           device={device}
           onUpdate={() => {
-            if (device) fetchDevice();
+            setToken((crt) => crt + 1);
           }}
         />
       )
@@ -86,20 +87,10 @@ const DeviceDetailPage = () => {
     };
   }, [device, PubSub]);
 
-  useEffect(() => {
-    if (tabs.length > 0 && currentKey === '') {
-      setCurrentKey(tabs[0].key);
-    }
-  }, [tabs, currentKey]);
-
   return (
     <Content>
       {device && (
         <PageTitle
-          items={[
-            { title: <SelfLink to='/devices'>{intl.get('MENU_DEVICE_LSIT')}</SelfLink> },
-            { title: intl.get('DEVICE_DETAIL') }
-          ]}
           actions={
             <HasPermission value={Permission.DeviceCommand}>
               <CommandDropdown device={device} initialUpgradeCode={location.state} />
@@ -114,11 +105,12 @@ const DeviceDetailPage = () => {
           {device && tabs.length > 0 && (
             <ShadowCard
               tabList={tabs.map((tab: any) => ({ ...tab, tab: intl.get(tab.tab) }))}
+              defaultActiveTabKey={tabs[0].key}
               onTabChange={(key) => {
                 setCurrentKey(key);
               }}
             >
-              {currentKey && contents.get(currentKey)}
+              {currentKey ? contents.get(currentKey) : contents.get(tabs[0].key)}
             </ShadowCard>
           )}
         </Col>

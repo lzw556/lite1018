@@ -1,4 +1,4 @@
-import { Menu } from 'antd';
+import { Menu, MenuProps } from 'antd';
 import * as React from 'react';
 import { useLocation } from 'react-router-dom';
 import { Menu as MenuItem } from '../../types/menu';
@@ -8,7 +8,8 @@ import { SelfLink } from '../../components/selfLink';
 
 export const NavMenu: React.FC<{
   menus: MenuItem[];
-}> = ({ menus }) => {
+  mode?: MenuProps['mode'];
+}> = ({ menus, mode = 'horizontal' }) => {
   const { pathname, state } = useLocation();
   const [openKeys, setOpenKeys] = React.useState<string[]>(getInitialOpenKeys());
   const items = mapTree(menus, (m) => {
@@ -56,7 +57,7 @@ export const NavMenu: React.FC<{
 
   return (
     <Menu
-      mode='inline'
+      mode={mode}
       className='ts-menu'
       items={items}
       defaultSelectedKeys={['project-overview']}
@@ -64,7 +65,6 @@ export const NavMenu: React.FC<{
       openKeys={openKeys}
       onOpenChange={(openKeys) => {
         setOpenKeys(openKeys);
-        console.log(openKeys);
       }}
     />
   );

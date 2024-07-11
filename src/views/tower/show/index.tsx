@@ -5,13 +5,7 @@ import { useParams } from 'react-router-dom';
 import { oneWeekNumberRange } from '../../../components/rangeDatePicker';
 import { TabsCard } from '../../../components/tabsCard';
 import usePermission, { Permission } from '../../../permission/permission';
-import {
-  AssetAlarmStatistic,
-  AssetNavigator,
-  AssetRow,
-  getAsset,
-  useAssetsContext
-} from '../../asset';
+import { AssetAlarmStatistic, AssetRow, getAsset, useAssetsContext } from '../../asset';
 import {
   getDataOfMonitoringPoint,
   getRealPoints,
@@ -91,9 +85,6 @@ export default function TowerShow() {
 
   return (
     <Row gutter={[16, 16]}>
-      <Col span={24}>
-        <AssetNavigator id={tower.id} />
-      </Col>
       <Col span={24}>
         <AssetAlarmStatistic {...tower} />
       </Col>
