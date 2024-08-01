@@ -27,9 +27,9 @@ export const RangeDatePicker: React.FC<{
   defaultRange?: RangeValue;
   onChange?: (range: [number, number]) => void;
   showFooter?: boolean;
-}> = ({ defaultRange = oneWeekRange, onChange, showFooter }) => {
+  value?: [number, number];
+}> = ({ defaultRange = oneWeekRange, onChange, showFooter, value }) => {
   const [range, setRange] = React.useState<RangeValue>(defaultRange);
-
   const handleChange = (range: RangeValue) => {
     setRange(range);
     const [start, end] = range;
@@ -42,7 +42,7 @@ export const RangeDatePicker: React.FC<{
     <DatePicker.RangePicker
       allowClear={false}
       defaultValue={defaultRange}
-      value={range}
+      value={value ? [dayjs.unix(value[0]), dayjs.unix(value[1])] : range}
       renderExtraFooter={() => {
         const calculateRange = (months: number): RangeValue => {
           return [dayjs().startOf('day').subtract(months, 'months'), dayjs().endOf('day')];

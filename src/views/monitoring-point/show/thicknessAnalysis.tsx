@@ -186,7 +186,6 @@ export const ThicknessAnalysis = (props: MonitoringPointRow) => {
     const _properties = getDisplayProperties(properties, type);
     if (_properties.length === 0) return null;
     const property = _properties[0];
-    const { precision, unit } = property;
     const transform = transformHistoryData(historyData, property);
     let markLineData: any = defaultMarkLines;
     if (
@@ -236,8 +235,7 @@ export const ThicknessAnalysis = (props: MonitoringPointRow) => {
             }
           }))}
           style={{ height: 500 }}
-          yAxisMinInterval={property.interval}
-          yAxisValueMeta={{ unit, precision }}
+          yAxis={property}
           dispatchActionOption={dispatchActionOption}
         />
       )

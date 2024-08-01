@@ -31,7 +31,6 @@ export const RecentHistory: React.FC<{ device: Device }> = ({ device }) => {
     if (historyData && historyData.length > 0) {
       return getDisplayProperties(device.properties, device.typeId).map(
         (p: DisplayProperty, index: number) => {
-          const { unit, precision } = p;
           const transform = transformHistoryData(historyData, p);
           return (
             <Card.Grid
@@ -44,9 +43,8 @@ export const RecentHistory: React.FC<{ device: Device }> = ({ device }) => {
                   <PropertyChart
                     series={transform.series}
                     withArea={true}
-                    xAxisLabelLimit={true}
-                    yAxisMinInterval={p.interval}
-                    yAxisValueMeta={{ unit, precision }}
+                    xAxis={{ labelLimit: true }}
+                    yAxis={p}
                   />
                 </>
               )}

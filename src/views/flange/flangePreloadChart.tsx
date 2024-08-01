@@ -50,8 +50,7 @@ export const FlangePreloadChart = ({ points }: { points: MonitoringPointRow[] })
         }
       ]}
       style={{ height: 550 }}
-      yAxisMinInterval={interval}
-      yAxisValueMeta={{ precision, unit }}
+      yAxis={{ interval, precision, unit }}
     />
   );
 };

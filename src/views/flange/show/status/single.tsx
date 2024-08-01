@@ -106,12 +106,5 @@ function renderChart(property: DisplayProperty, origialData?: FlangeStatusData) 
 
   if (series.length === 0) return <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />;
 
-  return (
-    <PropertyChart
-      series={series}
-      style={{ height: 500 }}
-      yAxisMinInterval={property.interval}
-      yAxisValueMeta={{ precision: property.precision, unit: property.unit }}
-    />
-  );
+  return <PropertyChart series={series} style={{ height: 500 }} yAxis={property} />;
 }

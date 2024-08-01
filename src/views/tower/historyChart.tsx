@@ -51,11 +51,12 @@ export const TowerHistoryChart = ({
       rawOptions={{ title: { text: title } }}
       series={series}
       style={{ height: 550 }}
-      xAxisValues={Array.from(new Set(xAxisValues))
-        .sort((prev, crt) => prev - crt)
-        .map((t) => dayjs.unix(t).local().format('YYYY-MM-DD HH:mm:ss'))}
-      yAxisMinInterval={selectedProperty.interval}
-      yAxisValueMeta={{ precision: selectedProperty.precision, unit: selectedProperty.unit }}
+      xAxis={{
+        data: Array.from(new Set(xAxisValues))
+          .sort((prev, crt) => prev - crt)
+          .map((t) => dayjs.unix(t).local().format('YYYY-MM-DD HH:mm:ss'))
+      }}
+      yAxis={selectedProperty}
     />
   );
 };

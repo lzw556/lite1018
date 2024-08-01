@@ -30,7 +30,6 @@ export const MonitoringPointDynamicData: React.FC<
   MonitoringPointRow & {
     dataType?: DataType;
     enableSavingAsImage?: boolean;
-    showSideComments?: boolean;
   }
 > = (props) => {
   const { language } = useLocaleContext();
@@ -197,7 +196,6 @@ export const MonitoringPointDynamicData: React.FC<
                     }
                   })
                 }
-                showSideComments={props.showSideComments}
                 enableSavingAsImage={props.enableSavingAsImage}
               />
             )}

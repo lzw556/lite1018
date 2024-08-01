@@ -50,7 +50,6 @@ const HistoryDataPage: FC<DeviceDataProps> = ({ device }) => {
 
   const renderHistoryDataChart = () => {
     if (dataSource && dataSource.length > 0 && property) {
-      const { unit, precision } = property;
       const transform = transformHistoryData(dataSource, property);
       return (
         transform && (
@@ -59,8 +58,7 @@ const HistoryDataPage: FC<DeviceDataProps> = ({ device }) => {
             series={transform.series}
             style={{ height: 450 }}
             withArea={true}
-            yAxisMinInterval={property.interval}
-            yAxisValueMeta={{ unit, precision, showName: true }}
+            yAxis={{ ...property, showName: true }}
           />
         )
       );

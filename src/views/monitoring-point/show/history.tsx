@@ -59,7 +59,6 @@ export const MonitoringPointHistory = (point: MonitoringPointRow) => {
         </Col>
       );
     } else if (property) {
-      const { unit, precision } = property;
       const transform = transformHistoryData(historyData, property);
       return (
         <Col span={24}>
@@ -75,8 +74,7 @@ export const MonitoringPointHistory = (point: MonitoringPointRow) => {
                 series={transform.series}
                 style={{ height: 450 }}
                 withArea={true}
-                yAxisMinInterval={property.interval}
-                yAxisValueMeta={{ unit, precision, showName: true }}
+                yAxis={{ ...property, showName: true }}
               />
             </Card>
           )}

@@ -14,10 +14,19 @@ import { getValue, roundValue } from '../../utils/format';
 export interface Series {
   data: { [name: string]: number[] };
   main?: boolean;
+  markLine?: any;
   raw?: any;
-  xAxisValues: string[];
-  xAxisValuesOffset?: number;
+  xAxisValues: string[] | number[];
 }
+
+type XAxis = {
+  data?: string[];
+  unit?: string;
+  labelLimit?: boolean;
+  type?: string;
+  precision?: number;
+};
+type YAxis = { interval?: number; unit?: string; precision?: number; showName?: boolean };
 
 export const PropertyChart = React.forwardRef(function PropertyChart(
   {
@@ -25,35 +34,36 @@ export const PropertyChart = React.forwardRef(function PropertyChart(
     dispatchActionOption,
     enableSavingAsImage = false,
     hideLegend = false,
+    linedComment,
     loading,
     onlyShowLastAxisInLegendByDefault = false,
+    onSeriesPointClick,
+    pointedComments = { data: [], mode: 'single' },
     rawOptions,
     series,
-    showSideComments = false,
     style,
     withArea = false,
-    xAxisLabelLimit = false,
-    xAxisUnit,
-    xAxisValues,
-    yAxisMinInterval,
-    yAxisValueMeta
+    xAxis,
+    yAxis
   }: {
     dataZoom?: boolean | NonNullable<object>;
     dispatchActionOption?: any;
     enableSavingAsImage?: boolean;
     hideLegend?: boolean;
+    linedComment?: string;
     loading?: boolean;
     onlyShowLastAxisInLegendByDefault?: boolean;
+    onSeriesPointClick?: (points: [string | number, number][]) => void;
+    pointedComments?: {
+      data: [string, number][];
+      mode?: 'single' | 'double' | 'multi';
+    };
     rawOptions?: any;
     series: Series[];
-    showSideComments?: boolean;
     style?: CSSProperties;
     withArea?: boolean;
-    xAxisLabelLimit?: boolean;
-    xAxisUnit?: string;
-    xAxisValues?: string[];
-    yAxisMinInterval?: number;
-    yAxisValueMeta: { unit?: string; precision: number; showName?: boolean };
+    xAxis?: XAxis;
+    yAxis: YAxis;
   },
   ref: React.ForwardedRef<EChartsInstance>
 ) {
@@ -63,7 +73,7 @@ export const PropertyChart = React.forwardRef(function PropertyChart(
     if (dz !== null) {
       grid = { ...grid, bottom: '13%' };
     }
-    if (xAxisUnit) {
+    if (xAxis?.unit) {
       grid = { ...grid, right: '40' };
     }
     if (series.length === 0) return null;
@@ -71,8 +81,8 @@ export const PropertyChart = React.forwardRef(function PropertyChart(
     if (series.filter((s) => s.main).length > 0) {
       mainXAxisValues = series.filter((s) => s.main)[0].xAxisValues;
     }
-    if (xAxisValues) {
-      mainXAxisValues = xAxisValues;
+    if (xAxis?.data) {
+      mainXAxisValues = xAxis.data;
     }
     return {
       color: ChartStyle.Colors,
@@ -88,14 +98,17 @@ export const PropertyChart = React.forwardRef(function PropertyChart(
       tooltip: buildTooltip(),
       xAxis: {
         data: mainXAxisValues,
-        type: 'category',
+        type: xAxis?.type ?? 'category',
+        encode: {
+          seriesName: [1]
+        },
         boundaryGap: false,
         axisLabel: {
           align: 'left',
           hideOverlap: true,
-          showMaxLabel: xAxisLabelLimit,
+          showMaxLabel: xAxis?.labelLimit,
           formatter: (val: string, index: number) => {
-            if (xAxisLabelLimit) {
+            if (xAxis?.labelLimit) {
               if (index === 0) {
                 return val;
               } else if (index === mainXAxisValues.length - 1) {
@@ -114,19 +127,15 @@ export const PropertyChart = React.forwardRef(function PropertyChart(
             }
           }
         },
-        name: xAxisUnit,
-        show:
-          series && series.some(({ xAxisValuesOffset }) => xAxisValuesOffset !== undefined)
-            ? false
-            : true
+        name: xAxis?.unit
       },
       yAxis: {
         type: 'value',
         ...ChartStyle.DashedSplitLine,
         min: (values: { min: number; max: number }) => {
           if (!Number.isNaN(values.min) && !Number.isNaN(values.max)) {
-            const max = _.round(values.max, yAxisValueMeta.precision);
-            const min = _.round(values.min, yAxisValueMeta.precision);
+            const max = _.round(values.max, yAxis.precision);
+            const min = _.round(values.min, yAxis.precision);
             const option = buildYAxisOption(max, min);
             intervalOfYAxisRef.current = option?.interval;
             return option?.min;
@@ -134,13 +143,14 @@ export const PropertyChart = React.forwardRef(function PropertyChart(
         },
         max: (values: { min: number; max: number }) => {
           if (!Number.isNaN(values.min) && !Number.isNaN(values.max)) {
-            const max = _.round(values.max, yAxisValueMeta.precision);
-            const min = _.round(values.min, yAxisValueMeta.precision);
+            const max = _.round(values.max, yAxis.precision);
+            const min = _.round(values.min, yAxis.precision);
             const option = buildYAxisOption(max, min);
             return option?.max;
           }
         },
-        name: yAxisValueMeta.showName && yAxisValueMeta.unit
+        name: yAxis.showName && yAxis.unit,
+        axisLabel: { hideOverlap: true }
       }
     };
   };
@@ -189,6 +199,10 @@ export const PropertyChart = React.forwardRef(function PropertyChart(
         ...ChartStyle.LineSeries,
         datasetIndex: i,
         emphasis: { focus: 'series' },
+        showSymbol: false,
+        encode: {
+          seriesName: [1]
+        },
         ...s.raw
       };
       return withArea ? { ...options, ...setAreaStyle(ChartStyle.Colors[i]) } : options;
@@ -196,53 +210,26 @@ export const PropertyChart = React.forwardRef(function PropertyChart(
   };
 
   const buildTooltip = () => {
-    const xAxisValuesOffsets = series
-      .map(({ xAxisValuesOffset }) => xAxisValuesOffset)
-      .filter((o) => o !== undefined);
-    const { precision, unit } = yAxisValueMeta;
-    if (xAxisValuesOffsets.length > 0) {
-      return {
-        trigger: 'axis',
-        formatter: (
-          paras: {
-            data: any;
-            marker: string;
-            seriesIndex: number;
-            seriesName: string;
-          }[]
-        ) => {
-          let res = '';
-          paras.forEach(({ data, marker, seriesIndex, seriesName }) => {
-            const offset = xAxisValuesOffsets[seriesIndex] ?? 0;
-            res += `${dayjs
-              .unix(dayjs(data[0]).utc().unix() - offset)
-              .format('YYYY-MM-DD HH:mm:ss')}<br/>
-              <span>${marker}</span>
-              ${seriesName} <strong>${getValue(
-              roundValue(data[1], precision),
-              unit
-            )}</strong><br/>`;
-          });
-          return res;
-        },
-        confine: true
-      };
-    }
     return {
       trigger: 'axis',
-      valueFormatter: (v: number) => getValue(roundValue(v, precision), unit),
+      formatter: (
+        paras: { value: [string | number, number]; marker: string; seriesName: string }[]
+      ) => {
+        return buildTooltipStr(paras, xAxis, yAxis);
+      },
       confine: true
     };
   };
 
   const buildYAxisOption = (max: number, min: number) => {
     const SPLIT_NUMBER = 6;
-    if (!yAxisMinInterval) return null;
-    const precision = pickPrecisionFromInterval(yAxisMinInterval);
-    const newMax = getFitedValue(max, yAxisMinInterval, precision, _.ceil);
-    const newMin = getFitedValue(min, yAxisMinInterval, precision, _.floor);
-    const fitAllInterval = add(newMin, multiply(SPLIT_NUMBER, yAxisMinInterval)) > newMax;
-    let interval = yAxisMinInterval;
+    const initialInterval = yAxis.interval;
+    if (!initialInterval) return null;
+    const precision = pickPrecisionFromInterval(initialInterval);
+    const newMax = getFitedValue(max, initialInterval, precision, _.ceil);
+    const newMin = getFitedValue(min, initialInterval, precision, _.floor);
+    const fitAllInterval = add(newMin, multiply(SPLIT_NUMBER, initialInterval)) > newMax;
+    let interval = initialInterval;
     if (!fitAllInterval) {
       interval = _.ceil((newMax - newMin) / SPLIT_NUMBER, precision);
     }
@@ -287,45 +274,155 @@ export const PropertyChart = React.forwardRef(function PropertyChart(
 
   React.useEffect(() => {
     const ins = chartInstanceRef.current?.getEchartsInstance();
+
+    const appendLinedComment = (series: any, linedComment: string | number) => {
+      const opts = {
+        lineStyle: { color: '#FF0000', width: 2 },
+        name: 'linedComment',
+        xAxis: linedComment
+      };
+      const prevMarkLine = series.markLine;
+      const markLineDatas = prevMarkLine
+        ? [...prevMarkLine.data.filter((d: any) => d.name !== 'linedComment'), opts]
+        : [opts];
+
+      return markLineDatas.length > 0
+        ? {
+            ...series,
+            markLine: {
+              ...series.markLine,
+              symbol: 'none',
+              animation: false,
+              label: { show: false },
+              data: markLineDatas
+            }
+          }
+        : series;
+    };
+
+    const renderPointedComments = (
+      series: any,
+      pointComments: [string | number, number],
+      mode: 'single' | 'double' | 'multi' = 'single'
+    ) => {
+      const opts = {
+        name: 'pointedComment',
+        label: {
+          show: true,
+          position: 'top',
+          color: '#FF0000',
+          formatter: ({ dataIndex, value }: { dataIndex: number; value: string }) =>
+            `${dataIndex + 1}\n${value}`
+        },
+        symbol:
+          'path://M392.448255 0h238.494873v635.98633h-238.494873zM495.00105 1016.783145L155.543347 677.325441A23.849487 23.849487 0 0 1 172.237988 635.98633h678.915407a23.849487 23.849487 0 0 1 16.694641 41.339111l-338.662721 339.457704a23.849487 23.849487 0 0 1-34.184265 0zM392.448255 0h238.494873v635.98633h-238.494873zM495.00105 1016.783145L155.543347 677.325441A23.849487 23.849487 0 0 1 172.237988 635.98633h678.915407a23.849487 23.849487 0 0 1 16.694641 41.339111l-338.662721 339.457704a23.849487 23.849487 0 0 1-34.184265 0z',
+        symbolSize: [8, 32],
+        symbolOffset: [0, -20],
+        itemStyle: { color: '#FF0000' }
+      };
+      const prevMarkPoints = series.markPoint;
+      let markPointDatas: any = [];
+      if (prevMarkPoints) {
+        const prevPointedCommentsValue = prevMarkPoints.data
+          .filter(
+            (d: any) =>
+              d.name === 'pointedComment' && d.value === `${pointComments[0]} ${pointComments[1]}`
+          )
+          .map((d: any) => d.value);
+        if (prevPointedCommentsValue.length > 0) {
+          markPointDatas = prevMarkPoints.data.filter(
+            (d: any) => !prevPointedCommentsValue.includes(d.value)
+          );
+        } else {
+          markPointDatas = [
+            ...prevMarkPoints.data.filter((d: any, i: number) => {
+              if (mode === 'double') {
+                return prevMarkPoints.data.length > 1 ? i !== 0 : true;
+              } else if (mode === 'multi') {
+                return true;
+              } else {
+                return d.name !== 'pointedComment';
+              }
+            }),
+            { ...opts, coord: pointComments, value: `${pointComments[0]} ${pointComments[1]}` }
+          ];
+        }
+      } else {
+        markPointDatas = [
+          {
+            ...opts,
+            coord: pointComments,
+            value: `${pointComments[0]} ${pointComments[1]}`
+          }
+        ];
+      }
+      return markPointDatas.length > 0
+        ? {
+            ...series,
+            markPoint: {
+              animation: false,
+              ...series.markPoint,
+              data: markPointDatas
+            }
+          }
+        : series;
+    };
+
     const handleChartClick = (paras: any) => {
       const pointInPixel = [paras.offsetX, paras.offsetY];
       if (ins.containPixel('grid', pointInPixel)) {
-        const markLines = series.map((s: Series & { markLine?: any }, i: number) => {
+        const points: [string | number, number][] = series.map((s, i) => {
           const xIndex = ins.convertFromPixel({ seriesIndex: i }, pointInPixel)[0];
           const yAxisValues = Object.values(s.data)[0];
           const x = s.xAxisValues[xIndex];
-          const y = ins.convertToPixel({ yAxisIndex: 0 }, yAxisValues[xIndex]);
-          const prevMarkLine = ins.getOption().series[i].markLine;
-          const markLineDatas = prevMarkLine
-            ? [...prevMarkLine.data, { xAxis: x, y }]
-            : [{ xAxis: x, y }];
-          return {
-            symbol: 'none',
-            animation: false,
-            lineStyle: {
-              color: 'red',
-              width: 2,
-              type: 'solid'
-            },
-            data: markLineDatas
-          };
+          const y = yAxisValues[xIndex];
+          return [x, y];
         });
-        const newSeries = ins
-          .getOption()
-          .series.map((s: any, i: number) => ({ ...s, markLine: markLines[i] }));
-        ins.setOption({ series: newSeries });
+        if (linedComment && points.length > 0) {
+          ins.setOption({
+            series: ins.getOption().series.map((s: any, i: number) => {
+              return appendLinedComment(s, points[i][0]);
+            })
+          });
+          if (onSeriesPointClick && points.length > 0) {
+            onSeriesPointClick(points);
+          }
+        } else if (pointedComments && pointedComments.data.length > 0 && points.length > 0) {
+          ins.setOption({
+            series: ins
+              .getOption()
+              .series.map((s: any, i: number) =>
+                renderPointedComments(s, points[i], pointedComments.mode)
+              )
+          });
+          if (onSeriesPointClick && points.length > 0) {
+            onSeriesPointClick(points);
+          }
+        }
       }
     };
-    if (showSideComments && ins) {
+    if (ins) {
+      if (linedComment) {
+        ins.setOption({
+          series: ins.getOption().series.map((s: any) => appendLinedComment(s, linedComment))
+        });
+      }
+      if (pointedComments && pointedComments.data.length > 0) {
+        ins.setOption({
+          series: ins
+            .getOption()
+            .series.map((s: any, i: number) => renderPointedComments(s, pointedComments.data[i]))
+        });
+      }
       ins.getZr().on('click', handleChartClick);
     }
 
     return () => {
-      if (showSideComments && ins && ins.getZr()) {
+      if (ins && ins.getZr()) {
         ins.getZr().off('click', handleChartClick);
       }
     };
-  }, [showSideComments, series]);
+  }, [series, linedComment, pointedComments, onSeriesPointClick]);
 
   return (
     options && (
@@ -441,4 +538,60 @@ function mod(x: number, y: number) {
 }
 function sub(x: number, y: number) {
   return Number(Mathjs.format(Mathjs.subtract(Mathjs.bignumber(x), Mathjs.bignumber(y))));
+}
+function buildTooltipStr(
+  paras: { value: [string | number, number]; marker: string; seriesName: string }[],
+  xAxis: XAxis | undefined,
+  yAxis: YAxis
+) {
+  if (paras.length === 0) {
+    return null;
+  }
+  const xAxisValue = paras[0].value[0];
+  const formattedXAxisValue =
+    typeof xAxisValue === 'number'
+      ? getValue(roundValue(xAxisValue, xAxis?.precision))
+      : xAxisValue;
+  let tooltipStr = `<div style='margin: 0px 0 0; line-height: 1'>
+      <div style='margin: 0px 0 0; line-height: 1'>
+        <div style='font-size: 14px; color: #666; font-weight: 400; line-height: 1'>
+          ${formattedXAxisValue} ${xAxis?.unit ?? ''}
+        </div>
+        <div style='margin: 10px 0 0; line-height: 1'>
+           `;
+  paras.forEach(({ marker, seriesName, value }, i) => {
+    const formattedValue = getValue(roundValue(value[1], yAxis.precision));
+    tooltipStr += buildTooltipItemStr(
+      marker,
+      seriesName,
+      formattedValue,
+      i === 0 ? 0 : 10,
+      formattedValue !== '-' ? yAxis.unit : ''
+    );
+  });
+  return (
+    tooltipStr +
+    `     </div>
+       </div>
+     </div>`
+  );
+}
+
+function buildTooltipItemStr(
+  marker: string,
+  seriesName: string,
+  value: string,
+  marginTop: number,
+  unit: string = ''
+) {
+  return `<div style='margin: ${marginTop}px 0 0; line-height: 1'>
+            <div style='margin: 0px 0 0; line-height: 1'>
+              ${marker}<span style='font-size: 14px; color: #666; font-weight: 400; margin-left: 2px'>${seriesName}
+              </span>
+              <span style='float: right; margin-left: 20px; font-size: 14px; color: #666;'>
+                <span style='font-weight: 900'>${value}</span> ${unit}
+              </span>
+              <div style='clear: both'></div>
+            </div>
+          </div>`;
 }

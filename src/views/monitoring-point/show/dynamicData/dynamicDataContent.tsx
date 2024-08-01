@@ -84,7 +84,7 @@ export const DynamicDataContent = ({
             }
           ]}
           style={{ height: 450 }}
-          yAxisValueMeta={{ unit: field.unit, precision: field.precision }}
+          yAxis={{ unit: field.unit, precision: field.precision }}
         />
       );
     } else if (isDynamicPreload) {
@@ -117,7 +117,7 @@ export const DynamicDataContent = ({
         <PropertyChart
           series={series}
           style={{ height: 450 }}
-          yAxisValueMeta={{ unit: field.unit, precision: field.precision }}
+          yAxis={{ unit: field.unit, precision: field.precision }}
         />
       );
     } else {
@@ -161,8 +161,8 @@ export const DynamicDataContent = ({
             }
           ]}
           style={{ height: 450 }}
-          xAxisUnit='ns'
-          yAxisValueMeta={{ precision: field.precision }}
+          xAxis={{ unit: 'ns' }}
+          yAxis={{ precision: field.precision }}
         />
       );
     }

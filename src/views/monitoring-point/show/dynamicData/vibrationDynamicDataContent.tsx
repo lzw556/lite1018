@@ -17,8 +17,7 @@ export const VibrationDynamicDataContent = ({
   data,
   onFieldChange,
   onAxisChange,
-  enableSavingAsImage = false,
-  showSideComments = false
+  enableSavingAsImage = false
 }: {
   type: DynamicDataType;
   data: {
@@ -28,7 +27,6 @@ export const VibrationDynamicDataContent = ({
   enableSavingAsImage?: boolean;
   onFieldChange?: (field: string) => void;
   onAxisChange?: (axis: number) => void;
-  showSideComments?: boolean;
 }) => {
   const { fields } = type;
   const { loading } = data;
@@ -155,14 +153,13 @@ export const VibrationDynamicDataContent = ({
         rawOptions={{ title: { text: `${(frequency ?? 0) / 1000}KHz` } }}
         series={series}
         style={{ height: 500 }}
-        xAxisUnit={xAxisUnit}
-        yAxisMinInterval={0}
-        yAxisValueMeta={{
+        xAxis={{ unit: xAxisUnit }}
+        yAxis={{
+          interval: 0,
           precision: field.precision,
           unit: field.unit.length > 0 ? field.unit : yAxisUnit,
           showName: true
         }}
-        showSideComments={showSideComments}
       />
     );
   }

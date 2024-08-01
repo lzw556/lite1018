@@ -126,7 +126,7 @@ const HeaderLayout = (props: any) => {
           width='60%'
           closable={false}
           onClose={() => setVisible(false)}
-          bodyStyle={{ paddingLeft: 0, paddingRight: 0 }}
+          styles={{ body: { paddingLeft: 0, paddingRight: 0 } }}
         >
           <NavMenu menus={menus} mode='inline' />
           <Divider />

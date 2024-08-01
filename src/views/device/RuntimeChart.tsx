@@ -50,7 +50,7 @@ export const RuntimeChart: React.FC<{ deviceId: number; deviceType: number }> = 
                 }
               ]}
               withArea={true}
-              yAxisValueMeta={{ unit: 'mV', precision: 0 }}
+              yAxis={{ unit: 'mV', precision: 0 }}
             />
           </Card.Grid>
         )}
@@ -68,7 +68,7 @@ export const RuntimeChart: React.FC<{ deviceId: number; deviceType: number }> = 
               }
             ]}
             withArea={true}
-            yAxisValueMeta={{ unit: 'dBm', precision: 0 }}
+            yAxis={{ unit: 'dBm', precision: 0 }}
           />
         </Card.Grid>
       </Card>

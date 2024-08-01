@@ -53,7 +53,6 @@ export const MonitoringPointMonitor = (point: MonitoringPointRow) => {
         </Col>
       )}
       {getDisplayProperties(properties, type).map((p: DisplayProperty, index: number) => {
-        const { unit, precision } = p;
         const transform = transformHistoryData(historyData, p);
         return (
           <Col span={isMobile ? 24 : 6} key={index}>
@@ -63,9 +62,8 @@ export const MonitoringPointMonitor = (point: MonitoringPointRow) => {
                 <PropertyChart
                   series={transform.series}
                   withArea={true}
-                  xAxisLabelLimit={true}
-                  yAxisMinInterval={p.interval}
-                  yAxisValueMeta={{ unit, precision }}
+                  xAxis={{ labelLimit: true }}
+                  yAxis={p}
                 />
               </>
             )}
