@@ -44,6 +44,16 @@ export function PutResponse(response: AxiosResponse<ResponseResult<any>>) {
   });
 }
 
+export function HandlePutResponse<T>(response: AxiosResponse<ResponseResult<T>>) {
+  return new Promise<T>((resolve, reject) => {
+    if (response.data.code === 200) {
+      resolve(response.data.data);
+    } else {
+      reject(response.data.msg);
+    }
+  });
+}
+
 export function DeleteResponse(response: AxiosResponse<ResponseResult<any>>) {
   return new Promise((resolve, reject) => {
     if (response.data.code === 200) {

@@ -1,6 +1,13 @@
 import request from '../../utils/request';
-import { DeleteResponse, GetResponse, PostResponse, PutResponse } from '../../utils/response';
+import {
+  DeleteResponse,
+  GetResponse,
+  HandlePutResponse,
+  PostResponse,
+  PutResponse
+} from '../../utils/response';
 import { DataType, HistoryData, MonitoringPoint, MonitoringPointRow } from './types';
+import { ChartSettings } from './vibration-analysis/useAnalysis';
 
 export function getMeasurements(filters?: Pick<MonitoringPoint, 'asset_id'>) {
   return request.get<MonitoringPoint[]>(`/monitoringPoints`, { ...filters }).then(GetResponse);
@@ -115,6 +122,83 @@ export function downloadRawHistory(
           type
         }
   );
+}
+
+export type TrendData = {
+  timestamp: number;
+  values: {
+    accelerationXRMS: number;
+    accelerationYRMS: number;
+    accelerationZRMS: number;
+    velocityXRMS: number;
+    velocityYRMS: number;
+    velocityZRMS: number;
+    displacementXRMS: number;
+    displacementYRMS: number;
+    displacementZRMS: number;
+  };
+  selected: boolean;
+};
+
+export function getTrend(id: number, from: number, to: number) {
+  return request
+    .get<TrendData[]>(`/monitoringPoints/${id}/data?from=${from}&to=${to}&type=trend`)
+    .then(GetResponse);
+}
+
+type VibrationAnalysisRequest = {
+  data: number[];
+  property: string;
+} & ChartSettings;
+
+export async function frequency(data: VibrationAnalysisRequest) {
+  return request
+    .put<{ rms: number; x: number[]; y: number[] }>('algo/frequencySpectrum', data)
+    .then(HandlePutResponse);
+}
+
+export async function timeEnvelope(data: VibrationAnalysisRequest) {
+  return request
+    .put<{ rms: number; x: number[]; y: number[] }>('algo/timeEnvelope', data)
+    .then(HandlePutResponse);
+}
+
+export async function envelope(data: VibrationAnalysisRequest) {
+  return request
+    .put<{ rms: number; x: number[]; y: number[] }>('algo/envelopeSpectrum', data)
+    .then(HandlePutResponse);
+}
+
+export async function power(data: VibrationAnalysisRequest) {
+  return request
+    .put<{ rms: number; x: number[]; y: number[] }>('algo/powerSpectrum', data)
+    .then(HandlePutResponse);
+}
+
+export async function cross(
+  data: Omit<VibrationAnalysisRequest, 'data' | 'property'> & { data_x: number[]; data_y: number[] }
+) {
+  return request
+    .put<{ density: number[]; phase: number[]; x: number[] }>('algo/crossSpectrum', data)
+    .then(HandlePutResponse);
+}
+
+export async function zoom(data: VibrationAnalysisRequest) {
+  return request
+    .put<{ rms: number; x: number[]; y: number[] }>('algo/zoomSpectrum', data)
+    .then(HandlePutResponse);
+}
+
+export async function cepstrum(data: VibrationAnalysisRequest) {
+  return request
+    .put<{ rms: number; x: number[]; y: number[] }>('algo/cepstrumSpectrum', data)
+    .then(HandlePutResponse);
+}
+
+export async function timeFrequency(data: VibrationAnalysisRequest) {
+  return request
+    .put<{ x: number[]; y: number[]; z: number[][] }>('algo/timeFrequency', data)
+    .then(HandlePutResponse);
 }
 
 export type ThicknessAnalysis = {

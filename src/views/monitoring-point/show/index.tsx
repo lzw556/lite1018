@@ -20,6 +20,7 @@ import { MonitoringPointHistory } from './history';
 import { MonitoringPointDynamicData } from './dynamicData/dynamicData';
 import { RelatedDevices } from './device';
 import { ThicknessAnalysis } from './thicknessAnalysis';
+import { VibrationAnalysis } from '../vibration-analysis';
 
 export default function MonitoringPointShow() {
   const { id } = useParams();
@@ -73,6 +74,17 @@ export default function MonitoringPointShow() {
       key: 'analysis',
       label: intl.get('ANALYSIS'),
       children: <ThicknessAnalysis {...monitoringPoint} />
+    });
+  }
+  if (
+    monitoringPoint.type === MonitoringPointTypeValue.VIBRATION ||
+    monitoringPoint.type === MonitoringPointTypeValue.VIBRATION_RPM ||
+    monitoringPoint.type === MonitoringPointTypeValue.VIBRATION_THREE_AXIS_RPM
+  ) {
+    items.push({
+      key: 'analysis',
+      label: intl.get('intelligent.analysis'),
+      children: <VibrationAnalysis />
     });
   }
   const config = MONITORING_POINT_TYPE_VALUE_DYNAMIC_MAPPING.get(monitoringPoint.type);
