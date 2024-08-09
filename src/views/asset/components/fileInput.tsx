@@ -49,6 +49,7 @@ export const FileInput: React.FC<{
       />
       <Button
         type='primary'
+        size='small'
         className={`ant-btn ant-btn-primary ${loading ? 'ant-btn-loading' : ''}`}
       >
         {loading && (

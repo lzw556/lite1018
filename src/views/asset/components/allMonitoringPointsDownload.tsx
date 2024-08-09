@@ -18,7 +18,9 @@ export const AllMonitoringPointsDownload: React.FC<{
         onClick={() => {
           setVisible(true);
         }}
+        size='small'
         type='primary'
+        title={intl.get('BATCH_DOWNLOAD')}
       >
         {!onlyIcon && intl.get('BATCH_DOWNLOAD')}
         <DownloadOutlined />

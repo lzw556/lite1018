@@ -638,7 +638,7 @@
   "NONE": "无",
   "NOT_BOUND_PROMPT": "尚未绑定",
   "NO_ALARM_RECORDS_PROMPT": "报警记录列表为空",
-  "NO_ASSET_PROMPT": "还没有{assetTypeLabel},",
+  "NO_ASSET_PROMPT": "还没有{assetTypeLabel}",
   "NO_DATA": "暂无数据",
   "NO_DATA_PROMPT": "暂无数据",
   "NO_DEVICES_PROMPT": "无设备",

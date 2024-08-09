@@ -27,7 +27,7 @@ export const AssetSidebar = ({
     const setHeight = () => {
       if (assetSidebarRef && assetSidebarRef.current) {
         const height = Number(getComputedStyle(assetSidebarRef.current).height.replace('px', ''));
-        setTreeHeight(height - 40);
+        setTreeHeight(height - 60);
       }
     };
     if (assets.length > 0) {
@@ -41,6 +41,9 @@ export const AssetSidebar = ({
 
   const side = (
     <div className='asset-sidebar' ref={assetSidebarRef}>
+      <div className='asset-actions'>
+        <AssetActionBar roots={assets} refresh={refresh} actionStatus={actionStatus} />
+      </div>
       <div className='asset-tree' style={{ height: treeHeight }}>
         <AssetTree
           assets={assets}
@@ -53,9 +56,6 @@ export const AssetSidebar = ({
             setPath(undefined);
           }}
         />
-      </div>
-      <div className='asset-actions'>
-        <AssetActionBar roots={assets} refresh={refresh} actionStatus={actionStatus} />
       </div>
     </div>
   );

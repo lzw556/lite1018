@@ -39,6 +39,8 @@ export function AssetActionBar({
     <Button
       key={root.key}
       type='primary'
+      size='small'
+      title={intl.get('CREATE_SOMETHING', { something: intl.get(root.label) })}
       onClick={() => {
         actionStatus.onAssetCreate();
       }}

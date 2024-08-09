@@ -16,9 +16,11 @@ export const AssetExport: React.FC<{
       <Button
         type='primary'
         disabled={disabled}
+        size='small'
         onClick={() => {
           setVisible(true);
         }}
+        title={intl.get('EXPORT_SETTINGS')}
       >
         {!onlyIcon && intl.get('EXPORT_SETTINGS')}
         <ExportOutlined />

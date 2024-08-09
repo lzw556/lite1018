@@ -78,6 +78,8 @@ export const AssetTree: React.FC<{
           };
         })
       );
+    } else {
+      setTreedata([]);
     }
   }, []);
 
