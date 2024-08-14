@@ -48,6 +48,8 @@ export const Cross = () => {
       })
         .then(setSubData)
         .finally(() => setLoading(false));
+    } else {
+      setSubData(undefined);
     }
   }, [originalDomain.values, originalDomain2.values, chartSettings]);
 
@@ -77,6 +79,7 @@ export const Cross = () => {
                   setAxies(axies.map((a) => ({ ...a, selected: a.value === value })))
                 }
                 value={axies.find((a) => a.selected)?.value}
+                style={{ width: 80 }}
               />
             </div>
             <div className='comparison'>
@@ -106,6 +109,7 @@ export const Cross = () => {
                   )
                 }
                 value={subProps.sub.axies.find((a) => a.selected)?.value}
+                style={{ width: 80 }}
               />
             </div>
           </div>
@@ -213,6 +217,7 @@ export const Cross = () => {
             setChartSettings((prev) => ({ ...prev, ...values }));
           }
         }}
+        showToolbar={!!subData}
       />
       {renderChartArea()}
     </div>

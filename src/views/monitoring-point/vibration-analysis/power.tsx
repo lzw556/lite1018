@@ -32,6 +32,8 @@ export const Power = () => {
       })
         .then(({ x, y }) => setSubData({ x, y }))
         .finally(() => setLoading(false));
+    } else {
+      setSubData(undefined);
     }
   }, [property?.value, originalDomain, chartSettings]);
 
@@ -68,6 +70,7 @@ export const Power = () => {
                 setAxies(axies.map((a) => ({ ...a, selected: a.value === value })))
               }
               value={axies.find((a) => a.selected)?.value}
+              style={{ width: 80 }}
             />
           </div>
           <div className='chart-card-content medium'>{renderChart()}</div>
@@ -114,6 +117,7 @@ export const Power = () => {
             setChartSettings((prev) => ({ ...prev, ...values }));
           }
         }}
+        showToolbar={!!subData}
       />
       {renderChartArea()}
     </div>

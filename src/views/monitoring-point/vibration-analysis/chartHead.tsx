@@ -10,6 +10,7 @@ import { ChartSettings } from './useAnalysis';
 export const ChartHead = ({
   activeKey,
   chartInstance,
+  showToolbar = false,
   title,
   toolbar,
   onSaveAsImage,
@@ -17,6 +18,7 @@ export const ChartHead = ({
 }: {
   activeKey?: string;
   chartInstance?: any;
+  showToolbar?: boolean;
   title?: string;
   toolbar?: React.ReactElement;
   onSaveAsImage?: (title: string) => void;
@@ -28,24 +30,26 @@ export const ChartHead = ({
     <div className='chart-card-head'>
       <span>{_title}</span>
       <div style={{ flex: 1 }}></div>
-      <Space className='toolbar' size={3}>
-        {activeKey && (
-          <ChartSettingsBtn activeKey={activeKey} onSetChartSettings={onSetChartSettings} />
-        )}
-        {toolbar}
-        <DownloadOutlined
-          onClick={() => {
-            if (chartInstance) {
-              saveAsImage(
-                chartInstance.getEchartsInstance().getDataURL({ backgroundColor: '#fff' }),
-                _title
-              );
-            } else if (onSaveAsImage) {
-              onSaveAsImage(_title);
-            }
-          }}
-        />
-      </Space>
+      {showToolbar && (
+        <Space className='toolbar' size={3}>
+          {activeKey && (
+            <ChartSettingsBtn activeKey={activeKey} onSetChartSettings={onSetChartSettings} />
+          )}
+          {toolbar}
+          <DownloadOutlined
+            onClick={() => {
+              if (chartInstance) {
+                saveAsImage(
+                  chartInstance.getEchartsInstance().getDataURL({ backgroundColor: '#fff' }),
+                  _title
+                );
+              } else if (onSaveAsImage) {
+                onSaveAsImage(_title);
+              }
+            }}
+          />
+        </Space>
+      )}
     </div>
   );
 };

@@ -36,6 +36,7 @@
 }
 .chart-card .chart-card-filters {
   display: flex;
+  justify-content: end;
   margin: 8px 0;
 }
 .chart-card .chart-card-filters .ant-select,

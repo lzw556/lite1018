@@ -38,6 +38,8 @@ export const TimeDomain = () => {
           }
         })
         .finally(() => setLoading(false));
+    } else {
+      setSubData(undefined);
     }
   }, [id, timestamp, property?.value, axis?.value]);
 
@@ -74,6 +76,7 @@ export const TimeDomain = () => {
                 setAxies(axies.map((a) => ({ ...a, selected: a.value === value })))
               }
               value={axies.find((a) => a.selected)?.value}
+              style={{ width: 80 }}
             />
           </div>
           <div className='chart-card-content medium'>{renderChart()}</div>
@@ -111,7 +114,7 @@ export const TimeDomain = () => {
   };
   return (
     <div className='chart-card'>
-      <ChartHead activeKey={activeKey} chartInstance={chart.current} />
+      <ChartHead activeKey={activeKey} chartInstance={chart.current} showToolbar={!!subData} />
       {renderChartArea()}
     </div>
   );

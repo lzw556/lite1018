@@ -35,6 +35,8 @@ export const TimeEnvelope = () => {
       })
         .then(({ x, y }) => setSubData({ x, y }))
         .finally(() => setLoading(false));
+    } else {
+      setSubData(undefined);
     }
   }, [originalDomain.values, property?.value, chartSettings]);
 
@@ -63,6 +65,7 @@ export const TimeEnvelope = () => {
                 setAxies(axies.map((a) => ({ ...a, selected: a.value === value })))
               }
               value={axies.find((a) => a.selected)?.value}
+              style={{ width: 80 }}
             />
           </div>
           <div className='chart-card-content medium'>{renderChart()}</div>
@@ -112,6 +115,7 @@ export const TimeEnvelope = () => {
             setChartSettings((prev) => ({ ...prev, ...values }));
           }
         }}
+        showToolbar={!!subData}
       />
       {renderChartArea()}
     </div>

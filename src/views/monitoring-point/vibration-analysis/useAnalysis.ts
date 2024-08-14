@@ -55,7 +55,7 @@ function useProperties() {
 
 function useFetchingTrendData(id: number, range: Range) {
   const [loading, setLoading] = React.useState(true);
-  const [data, setData] = React.useState<TrendProps['trendData']['data']>();
+  const [data, setData] = React.useState<TrendProps['trendData']['data']>([]);
   const [from, to] = range;
 
   React.useEffect(() => {
@@ -63,7 +63,7 @@ function useFetchingTrendData(id: number, range: Range) {
     getTrend(id, from, to)
       .then((data) => {
         if (data) {
-          setData(data.map((d, i) => ({ ...d, selected: i === 0 })));
+          setData(data.map((d, i) => ({ ...d, selected: i === data.length - 1 })));
         }
       })
       .finally(() => setLoading(false));
@@ -81,32 +81,36 @@ export function useTrendProps(id: number) {
   let seriesOpts = null;
   let timestamps: TrendProps['timestamps'] = [];
   const { data } = trendData;
-  if (data && data.length > 0 && property) {
-    const xAxisValues = data.map(({ timestamp }) =>
-      dayjs.unix(timestamp).local().format('YYYY-MM-DD HH:mm:ss')
-    );
-    const x = data.map(({ values }) => values[`${property.value}XRMS`]);
-    const y = data.map(({ values }) => values[`${property.value}YRMS`]);
-    const z = data.map(({ values }) => values[`${property.value}ZRMS`]);
-    seriesOpts = [
-      {
-        data: { [intl.get(AXIS_OPTIONS[0].label)]: x },
-        xAxisValues
-      },
-      {
-        data: { [intl.get(AXIS_OPTIONS[1].label)]: y },
-        xAxisValues
-      },
-      {
-        data: { [intl.get(AXIS_OPTIONS[2].label)]: z },
-        xAxisValues
-      }
-    ];
-    timestamps = data.map(({ timestamp, selected }) => ({
-      label: dayjs.unix(timestamp).local().format('YYYY-MM-DD HH:mm:ss'),
-      value: timestamp,
-      selected
-    }));
+  if (data) {
+    if (data.length > 0 && property) {
+      const xAxisValues = data.map(({ timestamp }) =>
+        dayjs.unix(timestamp).local().format('YYYY-MM-DD HH:mm:ss')
+      );
+      const x = data.map(({ values }) => values[`${property.value}XRMS`]);
+      const y = data.map(({ values }) => values[`${property.value}YRMS`]);
+      const z = data.map(({ values }) => values[`${property.value}ZRMS`]);
+      seriesOpts = [
+        {
+          data: { [intl.get(AXIS_OPTIONS[0].label)]: x },
+          xAxisValues
+        },
+        {
+          data: { [intl.get(AXIS_OPTIONS[1].label)]: y },
+          xAxisValues
+        },
+        {
+          data: { [intl.get(AXIS_OPTIONS[2].label)]: z },
+          xAxisValues
+        }
+      ];
+    }
+    timestamps = [...data]
+      .sort((d1, d2) => d2.timestamp - d1.timestamp)
+      .map(({ timestamp, selected }) => ({
+        label: dayjs.unix(timestamp).local().format('YYYY-MM-DD HH:mm:ss'),
+        value: timestamp,
+        selected
+      }));
   }
   return {
     properties,
@@ -182,14 +186,17 @@ export function useFetchingOriginalDomain(
       })
         .then((data) => {
           if (data && data.values.xAxis && data.values.values) {
-            setOriginalDomain?.({ ...data.values });
-            setOrigin({ ...data.values });
+            setOriginalDomain?.((prev) => ({ ...prev, ...data.values }));
+            setOrigin?.((prev) => ({ ...prev, ...data.values }));
           }
         })
         .finally(() => {
           setOriginalDomain?.((prev) => ({ ...prev, loading: false }));
           setOrigin((prev) => ({ ...prev, loading: false }));
         });
+    } else {
+      setOriginalDomain?.({ loading: false });
+      setOrigin({ loading: false });
     }
   }, [id, timestamp, axis, setOriginalDomain]);
   return origin;

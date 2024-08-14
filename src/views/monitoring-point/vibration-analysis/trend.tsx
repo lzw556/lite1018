@@ -15,12 +15,10 @@ export const Trend = () => {
   const chart = React.useRef<any>();
 
   const renderChartContent = () => {
-    if (!data) {
-      if (loading) {
-        return <Spin />;
-      } else {
-        return <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} style={{ margin: 0 }} />;
-      }
+    if (loading) {
+      return <Spin />;
+    } else if (data?.length === 0) {
+      return <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} style={{ margin: 0 }} />;
     } else if (seriesOpts) {
       const selected = data?.find(({ selected }) => !!selected)?.timestamp;
       return (
@@ -61,6 +59,7 @@ export const Trend = () => {
             );
           }
         }}
+        showToolbar={data?.length !== 0}
       />
       <div className='chart-card-filters'>
         <Select

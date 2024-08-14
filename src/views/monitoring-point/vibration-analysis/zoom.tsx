@@ -35,6 +35,8 @@ export const Zoom = () => {
       })
         .then(({ x, y }) => setSubData({ x, y }))
         .finally(() => setLoading(false));
+    } else {
+      setSubData(undefined);
     }
   }, [property?.value, originalDomain.values, chartSettings]);
 
@@ -71,6 +73,7 @@ export const Zoom = () => {
                 setAxies(axies.map((a) => ({ ...a, selected: a.value === value })))
               }
               value={axies.find((a) => a.selected)?.value}
+              style={{ width: 80 }}
             />
           </div>
           <div className='chart-card-content medium'>{renderChart()}</div>
@@ -117,6 +120,7 @@ export const Zoom = () => {
             setChartSettings((prev) => ({ ...prev, ...values }));
           }
         }}
+        showToolbar={!!subData}
       />
       {renderChartArea()}
     </div>
