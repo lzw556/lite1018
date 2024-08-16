@@ -66,7 +66,7 @@ export const DeviceTree = ({
 function buildDeviceTreeData(devices: Device[]): TreeDataNode[] {
   const nodes: TreeDataNode[] = [];
   devices.forEach((dev) => {
-    if (dev.typeId === DeviceType.Gateway) {
+    if (DeviceType.isGateway(dev.typeId)) {
       const { name, id, children } = getDeviceWithChildren(dev, devices);
       nodes.push({
         title: name,
