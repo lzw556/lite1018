@@ -22,7 +22,7 @@ export const AssetTree: React.FC<{
   height?: number;
   isUsedInsideSidebar?: boolean;
   onSelect?: (path: string[]) => void;
-  onSuccess?: () => void;
+  onSuccess?: (actionType?: string) => void;
   rootId?: number;
   shouldNavigateWhenClick?: boolean;
   selectedKeys?: string[];

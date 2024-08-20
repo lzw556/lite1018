@@ -21,7 +21,7 @@ export const NodeActions = ({
   id: number;
   type: number;
   name: string;
-  onSuccess?: () => void;
+  onSuccess?: (actionType?: string) => void;
   rootId?: number;
   actionStatus: any;
 }) => {
@@ -118,11 +118,11 @@ export const NodeActions = ({
               onConfirm={() => {
                 if (isNodeAsset) {
                   deleteAsset(id).then(() => {
-                    onSuccess?.();
+                    onSuccess?.('deleteAsset');
                   });
                 } else {
                   deleteMeasurement(id).then(() => {
-                    onSuccess?.();
+                    onSuccess?.('deleteMonitoringPoint');
                   });
                 }
               }}

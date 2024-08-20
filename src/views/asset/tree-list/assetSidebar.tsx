@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { AssetTree } from './tree';
 import { useActionBarStatus } from '../common/useActionBarStatus';
 import { AssetActionBar } from '../components/assetActionBar';
@@ -22,6 +23,7 @@ export const AssetSidebar = ({
   const [open, setOpen] = React.useState(false);
   const [treeHeight, setTreeHeight] = React.useState(780);
   const assetSidebarRef = React.useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
 
   React.useEffect(() => {
     const setHeight = () => {
@@ -51,9 +53,12 @@ export const AssetSidebar = ({
           height={treeHeight}
           isUsedInsideSidebar={true}
           onSelect={setPath}
-          onSuccess={() => {
+          onSuccess={(actionType) => {
             refresh();
             setPath(undefined);
+            if (actionType && actionType.indexOf('delete') > -1) {
+              navigate('/asset-management');
+            }
           }}
         />
       </div>
