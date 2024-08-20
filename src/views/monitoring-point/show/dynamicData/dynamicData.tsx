@@ -120,7 +120,7 @@ export const MonitoringPointDynamicData: React.FC<
         onRow={(record) => ({
           onClick: () => {
             if (record.timestamp !== timestamp) {
-              setTimestamp({ dataType: props.dataType, data: record.timestamp });
+              setTimestamp({ dataType: props.dataType, data: record.timestamp, id: props.id });
             }
           },
           onMouseLeave: () => (window.document.body.style.cursor = 'default'),

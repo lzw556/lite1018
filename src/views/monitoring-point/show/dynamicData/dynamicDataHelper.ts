@@ -67,9 +67,14 @@ export function useDynamicDataRequest<T>(
   const [timestamps, setTimestamps] = React.useState<{
     dataType?: DataType;
     data: { timestamp: number }[];
-  }>({ dataType, data: [] });
+    id: number;
+  }>({ dataType, data: [], id: 0 });
   const [loading, setLoading] = React.useState(true);
-  const [timestamp, setTimestamp] = React.useState<{ dataType?: DataType; data: number }>();
+  const [timestamp, setTimestamp] = React.useState<{
+    dataType?: DataType;
+    data: number;
+    id: number;
+  }>();
   const [dynamicData, setDynamicData] = React.useState<{
     timestamp: number;
     values: T;
@@ -79,22 +84,22 @@ export function useDynamicDataRequest<T>(
     if (range && dataType) {
       const [from, to] = range;
       getDataOfMonitoringPoint(id, from, to, dataType).then((data) => {
-        setTimestamps({ dataType, data });
+        setTimestamps({ dataType, data, id });
         setLoading(false);
       });
     }
   }, [range, id, dataType]);
 
   React.useEffect(() => {
-    if (timestamps.data.length > 0) {
-      setTimestamp({ dataType: timestamps.dataType, data: timestamps.data[0].timestamp });
+    if (timestamps.data.length > 0 && id === timestamps.id) {
+      setTimestamp({ dataType: timestamps.dataType, data: timestamps.data[0].timestamp, id });
     } else {
       setTimestamp(undefined);
     }
-  }, [timestamps]);
+  }, [timestamps, id]);
 
   React.useEffect(() => {
-    if (timestamp && timestamp.dataType === dataType) {
+    if (timestamp && timestamp.dataType === dataType && id === timestamp.id) {
       setLoading2(true);
       if (vibrationFilters) {
         getDynamicDataVibration<T>(id, timestamp.data, dataType, vibrationFilters).then((data) => {
