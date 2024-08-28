@@ -60,7 +60,7 @@ const MonitoringPointShow = lazy(() => import('../views/monitoring-point/show/in
 
 const AppRouter = () => {
   const config = useAppConfigContext();
-  const isWirelessHart = config === 'corrosionWirelessHART';
+  const isWirelessHart = config.type === 'corrosionWirelessHART';
   const [initDone, setInitDone] = React.useState(false);
   const routes: RouteObject[] = [
     { path: '/403', element: <Unauthorized /> },
@@ -187,7 +187,7 @@ const AppRouter = () => {
     } else {
       dayjs.locale('en');
     }
-    document.title = intl.get(SITE_NAMES.get(config) ?? '');
+    document.title = intl.get(SITE_NAMES.get(config.type) ?? '');
   }, [language, config]);
 
   return (

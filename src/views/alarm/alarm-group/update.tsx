@@ -60,7 +60,7 @@ export default function UpdateAlarmRuleGroup() {
             ]}
           >
             <Select disabled={true} style={{ width: isMobile ? '75%' : 435 }}>
-              {MONITORING_POINTS.get(config)?.map(({ label, id }) => (
+              {MONITORING_POINTS.get(config.type)?.map(({ label, id }) => (
                 <Select.Option key={id} value={id}>
                   {intl.get(label)}
                 </Select.Option>

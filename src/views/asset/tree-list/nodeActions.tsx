@@ -160,7 +160,7 @@ function AddAction({ type, onClick }: { type: number; onClick: (handler: any) =>
         </Button>
       </Dropdown>
     );
-  } else if (isNodeWind && config === 'windTurbinePro') {
+  } else if (isNodeWind && config.type === 'windTurbinePro') {
     return (
       <Dropdown
         menu={{

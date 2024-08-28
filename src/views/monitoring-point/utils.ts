@@ -361,3 +361,10 @@ function closest(needle: number, haystack: number[]) {
     }
   });
 }
+export function isMonitoringPointVibration(type: number) {
+  return (
+    type === MonitoringPointTypeValue.VIBRATION ||
+    type === MonitoringPointTypeValue.VIBRATION_RPM ||
+    type === MonitoringPointTypeValue.VIBRATION_THREE_AXIS_RPM
+  );
+}

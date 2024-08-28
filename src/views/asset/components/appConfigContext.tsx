@@ -2,7 +2,7 @@ import { Spin } from 'antd';
 import React from 'react';
 import request from '../../../utils/request';
 
-export type AppConfig =
+export type AppConfigType =
   | 'windTurbine'
   | 'general'
   | 'hydroTurbine'
@@ -11,18 +11,20 @@ export type AppConfig =
   | 'windTurbinePro'
   | 'vibration';
 
-const AppConfigContext = React.createContext<AppConfig>('windTurbine');
+export type AppConfig = { type: AppConfigType; analysisEnabled?: boolean };
+
+const AppConfigContext = React.createContext<AppConfig>({ type: 'windTurbine' });
 
 export const useAppConfigContext = () => React.useContext(AppConfigContext);
 
 export function AppConfigProvider({ children }: { children?: JSX.Element }) {
-  const [category, setCategory] = React.useState<AppConfig>();
+  const [config, setConfig] = React.useState<AppConfig>();
   React.useEffect(() => {
     request
-      .get<{ type: AppConfig }>('webConfig')
+      .get<AppConfig>('webConfig')
       .then((res) => {
         if (res.data.code === 200) {
-          setCategory(res.data.data.type);
+          setConfig(res.data.data);
         } else {
           throw Error(`API: webConfig occur errors`);
         }
@@ -31,6 +33,6 @@ export function AppConfigProvider({ children }: { children?: JSX.Element }) {
         console.log(err);
       });
   }, []);
-  if (category === undefined) return <Spin />;
-  return <AppConfigContext.Provider value={category}>{children}</AppConfigContext.Provider>;
+  if (config === undefined) return <Spin />;
+  return <AppConfigContext.Provider value={config}>{children}</AppConfigContext.Provider>;
 }

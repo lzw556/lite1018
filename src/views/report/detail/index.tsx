@@ -106,7 +106,7 @@ export default function Report() {
         {renderPreface()}
         <Status report={report} />
         <AlarmPage report={report} />
-        {config === 'vibration' && <ISO />}
+        {config.type === 'vibration' && <ISO />}
       </div>
     </div>
   );

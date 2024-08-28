@@ -85,7 +85,7 @@ export const UpdateForm = ({
           })}
           disabled={true}
         >
-          {MONITORING_POINTS.get(config)?.map(({ id, label }) => (
+          {MONITORING_POINTS.get(config.type)?.map(({ id, label }) => (
             <Select.Option key={id} value={id}>
               {intl.get(label)}
             </Select.Option>

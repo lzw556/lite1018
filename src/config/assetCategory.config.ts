@@ -1,6 +1,6 @@
 import { DeviceType } from '../types/device_type';
 import { AssetCategoryChain } from '../views/asset';
-import { AppConfig, useAppConfigContext } from '../views/asset/components/appConfigContext';
+import { AppConfigType, useAppConfigContext } from '../views/asset/components/appConfigContext';
 import { MonitoringPointType } from '../views/monitoring-point';
 import * as Corrosion from './corrosion.config';
 import * as General from './general.config';
@@ -9,7 +9,7 @@ import * as Wind from './wind.config';
 import * as CorrosionWirelessHart from './corrosionWirelessHart.config';
 import * as WindPro from './windpro.config';
 
-export const SITE_NAMES: Map<AppConfig, string> = new Map([
+export const SITE_NAMES: Map<AppConfigType, string> = new Map([
   ['corrosion', Corrosion.SITE_NAME],
   ['corrosionWirelessHART', CorrosionWirelessHart.SITE_NAME],
   ['general', General.SITE_NAME],
@@ -18,7 +18,7 @@ export const SITE_NAMES: Map<AppConfig, string> = new Map([
   ['windTurbinePro', WindPro.SITE_NAME]
 ]);
 
-export const SENSORS: Map<AppConfig, DeviceType[]> = new Map([
+export const SENSORS: Map<AppConfigType, DeviceType[]> = new Map([
   ['corrosion', Corrosion.SENSORS],
   ['corrosionWirelessHART', CorrosionWirelessHart.SENSORS],
   ['general', General.SENSORS],
@@ -27,7 +27,7 @@ export const SENSORS: Map<AppConfig, DeviceType[]> = new Map([
   ['windTurbinePro', WindPro.SENSORS]
 ]);
 
-export const MONITORING_POINTS: Map<AppConfig, MonitoringPointType[]> = new Map([
+export const MONITORING_POINTS: Map<AppConfigType, MonitoringPointType[]> = new Map([
   ['corrosion', Corrosion.MONITORING_POINTS],
   ['corrosionWirelessHART', CorrosionWirelessHart.MONITORING_POINTS],
   ['general', General.MONITORING_POINTS],
@@ -36,7 +36,7 @@ export const MONITORING_POINTS: Map<AppConfig, MonitoringPointType[]> = new Map(
   ['windTurbinePro', WindPro.MONITORING_POINTS]
 ]);
 
-export const MENUS_HIDDEN: Map<AppConfig, string[]> = new Map([
+export const MENUS_HIDDEN: Map<AppConfigType, string[]> = new Map([
   ['corrosion', Corrosion.MENUS_HIDDEN],
   ['corrosionWirelessHART', CorrosionWirelessHart.MENUS_HIDDEN],
   ['general', General.MENUS_HIDDEN],
@@ -45,7 +45,7 @@ export const MENUS_HIDDEN: Map<AppConfig, string[]> = new Map([
   ['windTurbinePro', WindPro.MENUS_HIDDEN]
 ]);
 
-export const ASSET_CATEGORY_CHAINS: Map<AppConfig, AssetCategoryChain[]> = new Map([
+export const ASSET_CATEGORY_CHAINS: Map<AppConfigType, AssetCategoryChain[]> = new Map([
   ['corrosion', Corrosion.ASSET_CATEGORY_CHAIN],
   ['corrosionWirelessHART', CorrosionWirelessHart.ASSET_CATEGORY_CHAIN],
   ['general', General.ASSET_CATEGORY_CHAIN],
@@ -56,7 +56,7 @@ export const ASSET_CATEGORY_CHAINS: Map<AppConfig, AssetCategoryChain[]> = new M
 
 export function useAssetCategoryChain() {
   const config = useAppConfigContext();
-  const chain = ASSET_CATEGORY_CHAINS.get(config) || [];
+  const chain = ASSET_CATEGORY_CHAINS.get(config.type) || [];
   const root = chain?.[0];
   const last = chain?.filter((c) => c.isLeaf === true);
   const isLeaf = (key: number) => chain.find((c) => c.key === key)?.isLeaf;

@@ -111,7 +111,7 @@ export const CommandDropdown = ({
   }
   if (hasPermissions(Permission.DeviceUpgrade, Permission.DeviceFirmwares)) {
     if (!upgrading) {
-      if (config !== 'corrosionWirelessHART') {
+      if (config.type !== 'corrosionWirelessHART') {
         items.push({ key: DeviceCommand.Upgrade, label: intl.get('UPGRADE_FIRMWARE') });
       }
     } else {

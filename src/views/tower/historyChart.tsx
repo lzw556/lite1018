@@ -30,7 +30,7 @@ export const TowerHistoryChart = ({
   const title = showTitle
     ? `${intl.get('OBJECT_TREND_CHART', {
         object: intl.get(
-          MONITORING_POINTS.get(config)?.find((m) => m.id === firstPoint.type)?.label ?? ''
+          MONITORING_POINTS.get(config.type)?.find((m) => m.id === firstPoint.type)?.label ?? ''
         )
       })}`
     : '';

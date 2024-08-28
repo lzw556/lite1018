@@ -89,7 +89,7 @@ export const AlarmRuleSetting = (point: MonitoringPointRow) => {
       key: 'type',
       width: 200,
       render: (typeId: number) => {
-        const label = MONITORING_POINTS.get(config)?.find((m) => m.id === typeId)?.label;
+        const label = MONITORING_POINTS.get(config.type)?.find((m) => m.id === typeId)?.label;
         return label ? intl.get(label) : '-';
       }
     },

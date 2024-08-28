@@ -127,7 +127,7 @@ export const SelectParentFormItem = ({
           })}
           onChange={(id) => handlePointTypeChange(id)}
         >
-          {MONITORING_POINTS.get(config)
+          {MONITORING_POINTS.get(config.type)
             ?.filter((t) =>
               monitoringPointTypes.length > 0 ? monitoringPointTypes?.includes(t.id) : true
             )

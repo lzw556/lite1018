@@ -62,7 +62,7 @@ export default function CreateAlarmRuleGroup() {
               })}
               onChange={(e) => {
                 getPropertiesByMeasurementType(e).then((res) => {
-                  const measurementType = MONITORING_POINTS.get(config)?.find(
+                  const measurementType = MONITORING_POINTS.get(config.type)?.find(
                     ({ id }) => e === id
                   )?.id;
                   if (measurementType) {
@@ -83,7 +83,7 @@ export default function CreateAlarmRuleGroup() {
                 }
               }}
             >
-              {MONITORING_POINTS.get(config)?.map(({ label, id }) => (
+              {MONITORING_POINTS.get(config.type)?.map(({ label, id }) => (
                 <Select.Option key={id} value={id}>
                   {intl.get(label)}
                 </Select.Option>

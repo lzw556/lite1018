@@ -8,11 +8,15 @@ import { useAppConfigContext } from '../components';
 
 export const AssetIcon = ({ className }: { className?: string }) => {
   const config = useAppConfigContext();
-  if (config === 'corrosion' || config === 'corrosionWirelessHART') {
+  if (config.type === 'corrosion' || config.type === 'corrosionWirelessHART') {
     return (
       <Icon component={() => <Corrosion fill='#fff' className={`icon-svg ${className} focus`} />} />
     );
-  } else if (config === 'windTurbine' || config === 'windTurbinePro' || config === 'hydroTurbine') {
+  } else if (
+    config.type === 'windTurbine' ||
+    config.type === 'windTurbinePro' ||
+    config.type === 'hydroTurbine'
+  ) {
     return <Icon component={() => <Wind fill='#fff' className={`icon-svg ${className} wind`} />} />;
   }
   return (

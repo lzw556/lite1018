@@ -261,7 +261,7 @@ const DevicePage = () => {
                   defaultValue={store.filters?.type}
                 >
                   {DeviceType.getGateways()
-                    .concat(SENSORS.get(config) ?? [])
+                    .concat(SENSORS.get(config.type) ?? [])
                     .map((d) => {
                       return (
                         <Select.Option key={d} value={d}>

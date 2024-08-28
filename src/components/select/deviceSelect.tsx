@@ -36,7 +36,7 @@ const DeviceSelect: FC<DeviceSelectProps> = (props) => {
         <>
           <Typography.Text strong>{option.data.label}</Typography.Text>
           <br />
-          {config !== 'corrosionWirelessHART' && (
+          {config.type !== 'corrosionWirelessHART' && (
             <Typography.Text type={'secondary'}>
               {toMac(option.data.macAddress.toUpperCase())}
             </Typography.Text>

@@ -26,7 +26,7 @@ export const Brand: React.FC<{
         />
       )}
       <strong style={{ ...brandNameStyle, color: '#fff' }} className='title'>
-        {intl.get(SITE_NAMES.get(config) ?? '')}
+        {intl.get(SITE_NAMES.get(config.type) ?? '')}
       </strong>
     </Space>
   );

@@ -4,7 +4,7 @@ import { useParams } from 'react-router-dom';
 import { FilterableAlarmRecordTable } from '../../../components/alarm/filterableAlarmRecordTable';
 import { TabsCard } from '../../../components/tabsCard';
 import usePermission, { Permission } from '../../../permission/permission';
-import { useAssetsContext } from '../../asset';
+import { useAppConfigContext, useAssetsContext } from '../../asset';
 import { getMeasurement } from '../services';
 import {
   INVALID_MONITORING_POINT,
@@ -12,7 +12,7 @@ import {
   MONITORING_POINT_TYPE_VALUE_DYNAMIC_MAPPING,
   MonitoringPointTypeValue
 } from '../types';
-import { checkHasDynamicData, checkHasWaveData } from '../utils';
+import { checkHasDynamicData, checkHasWaveData, isMonitoringPointVibration } from '../utils';
 import { MonitoringPointSet } from './settings/index';
 import intl from 'react-intl-universal';
 import { MonitoringPointMonitor } from './monitor';
@@ -29,6 +29,7 @@ export default function MonitoringPointShow() {
   const [loading, setLoading] = React.useState(true);
 
   const { hasPermission } = usePermission();
+  const appConfig = useAppConfigContext();
 
   const fetchPoint = (id: number) => {
     getMeasurement(id).then((point) => {
@@ -76,11 +77,7 @@ export default function MonitoringPointShow() {
       children: <ThicknessAnalysis {...monitoringPoint} />
     });
   }
-  if (
-    monitoringPoint.type === MonitoringPointTypeValue.VIBRATION ||
-    monitoringPoint.type === MonitoringPointTypeValue.VIBRATION_RPM ||
-    monitoringPoint.type === MonitoringPointTypeValue.VIBRATION_THREE_AXIS_RPM
-  ) {
+  if (isMonitoringPointVibration(monitoringPoint.type) && appConfig.analysisEnabled) {
     items.push({
       key: 'analysis',
       label: intl.get('intelligent.analysis'),
@@ -88,7 +85,10 @@ export default function MonitoringPointShow() {
     });
   }
   const config = MONITORING_POINT_TYPE_VALUE_DYNAMIC_MAPPING.get(monitoringPoint.type);
-  if (checkHasDynamicData(monitoringPoint.type)) {
+  if (
+    checkHasDynamicData(monitoringPoint.type) &&
+    (!isMonitoringPointVibration(monitoringPoint.type) || !appConfig.analysisEnabled)
+  ) {
     items.push({
       key: 'dynamicData',
       label: intl.get(config?.dynamicData?.title ?? ''),

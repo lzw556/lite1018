@@ -66,6 +66,6 @@ export const PrimaryLayout = () => {
 };
 
 function hideMenus(menus: Menu[], config: AppConfig) {
-  const filter = (m: Menu) => !MENUS_HIDDEN.get(config)?.includes(m.name);
+  const filter = (m: Menu) => !MENUS_HIDDEN.get(config.type)?.includes(m.name);
   return menus.filter(filter).map((m) => ({ ...m, children: m.children.filter(filter) }));
 }
