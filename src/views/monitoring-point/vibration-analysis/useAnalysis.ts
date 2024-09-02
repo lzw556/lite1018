@@ -14,7 +14,6 @@ type Range = [number, number];
 
 type TrendProps = {
   activeKey: string;
-  id: number;
   properties: Property[];
   setProperties: React.Dispatch<React.SetStateAction<Property[]>>;
   range: Range;
@@ -25,7 +24,7 @@ type TrendProps = {
     setData: React.Dispatch<React.SetStateAction<TrendData[] | undefined>>;
   };
   seriesOpts: any;
-  timestamps: { label: string; value: number; selected?: boolean }[];
+  timestamps: { id: number; label: string; value: number; selected?: boolean }[];
   title: string;
 };
 
@@ -57,6 +56,7 @@ function useFetchingTrendData(id: number, range: Range) {
   const [loading, setLoading] = React.useState(true);
   const [data, setData] = React.useState<TrendProps['trendData']['data']>([]);
   const [from, to] = range;
+  const [dataId, setDataId] = React.useState(id);
 
   React.useEffect(() => {
     setLoading(true);
@@ -64,12 +64,13 @@ function useFetchingTrendData(id: number, range: Range) {
       .then((data) => {
         if (data) {
           setData(data.map((d, i) => ({ ...d, selected: i === data.length - 1 })));
+          setDataId(id);
         }
       })
       .finally(() => setLoading(false));
   }, [id, from, to]);
 
-  return { loading, data, setData };
+  return { loading, data, setData, dataId };
 }
 
 export function useTrendProps(id: number) {
@@ -80,8 +81,8 @@ export function useTrendProps(id: number) {
   const trendData = useFetchingTrendData(id, range);
   let seriesOpts = null;
   let timestamps: TrendProps['timestamps'] = [];
-  const { data } = trendData;
-  if (data) {
+  const { data, dataId } = trendData;
+  if (data && dataId === id) {
     if (data.length > 0 && property) {
       const xAxisValues = data.map(({ timestamp }) =>
         dayjs.unix(timestamp).local().format('YYYY-MM-DD HH:mm:ss')
@@ -107,6 +108,7 @@ export function useTrendProps(id: number) {
     timestamps = [...data]
       .sort((d1, d2) => d2.timestamp - d1.timestamp)
       .map(({ timestamp, selected }) => ({
+        id,
         label: dayjs.unix(timestamp).local().format('YYYY-MM-DD HH:mm:ss'),
         value: timestamp,
         selected
@@ -210,20 +212,22 @@ export const AnalysisContext = React.createContext<
     }
 >(null!);
 
-function useFetchingPoints(id: number) {
+function useFetchingPoints(id?: number) {
   const [points, setPoints] =
     React.useState<{ label: string; value: number; selected?: boolean }[]>();
   React.useEffect(() => {
-    getMeasurement(id)
-      .then((point) => getMeasurements({ asset_id: point.assetId }))
-      .then((ps) =>
-        setPoints(ps.map((p) => ({ label: p.name, value: p.id, selected: p.id === id })))
-      );
+    if (id) {
+      getMeasurement(id)
+        .then((point) => getMeasurements({ asset_id: point.assetId }))
+        .then((ps) =>
+          setPoints(ps.map((p) => ({ label: p.name, value: p.id, selected: p.id === id })))
+        );
+    }
   }, [id]);
   return { points, setPoints };
 }
 
-export function useCrossComparison(id: number) {
+export function useCrossComparison(id?: number) {
   const { points, setPoints } = useFetchingPoints(id);
   const selectedPointId = points?.find((p) => !!p.selected)?.value;
   const trendProps = useTrendProps(selectedPointId!);

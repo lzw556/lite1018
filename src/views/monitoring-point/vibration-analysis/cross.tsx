@@ -11,10 +11,11 @@ import { ChartHead } from './chartHead';
 import { isEqual } from 'lodash';
 
 export const Cross = () => {
-  const { activeKey, id, trendData, timestamps, sub, originalDomain } = useAnalysisContext();
+  const { activeKey, trendData, timestamps, sub, originalDomain } = useAnalysisContext();
   const { axies, setAxies } = sub;
   const { setData } = trendData;
   const isExistedTimestamps = timestamps.length > 0;
+  const timestamp = timestamps.find((t) => !!t.selected);
   const [loading, setLoading] = React.useState(true);
   const [subData, setSubData] = React.useState<{
     density: number[];
@@ -22,7 +23,7 @@ export const Cross = () => {
     x: number[];
   }>();
 
-  const { points, setPoints, trendProps, subProps } = useCrossComparison(id);
+  const { points, setPoints, trendProps, subProps } = useCrossComparison(timestamp?.id);
   const originalDomain2 = useFetchingOriginalDomain(
     points?.find((p) => !!p.selected)?.value,
     trendProps.timestamps.find((t) => !!t.selected)?.value,

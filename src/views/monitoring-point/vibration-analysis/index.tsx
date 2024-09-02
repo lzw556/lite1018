@@ -78,11 +78,11 @@ function AnalysisProvider({
     <AnalysisContext.Provider
       value={{
         activeKey,
-        id,
         ...useTrendProps(id),
         ...useSubProps(),
         ...useOriginalDomainResult()
       }}
+      key={id}
     >
       {children}
     </AnalysisContext.Provider>

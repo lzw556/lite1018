@@ -8,24 +8,24 @@ import { OriginalDomainResponse } from './useAnalysis';
 import { ChartHead } from './chartHead';
 
 export const TimeDomain = () => {
-  const { activeKey, id, trendData, timestamps, sub } = useAnalysisContext();
+  const { activeKey, trendData, timestamps, sub } = useAnalysisContext();
   const { subProperties, setSubProperties, axies, setAxies } = sub;
   const { setData } = trendData;
   const isExistedTimestamps = timestamps.length > 0;
-  const timestamp = timestamps.find((t) => !!t.selected)?.value;
+  const timestamp = timestamps.find((t) => !!t.selected);
   const property = subProperties.find((p) => !!p.selected);
   const axis = axies.find((a) => !!a.selected);
   const [loading, setLoading] = React.useState(true);
   const [subData, setSubData] = React.useState<{ x: number[]; y: number[] }>();
   React.useEffect(() => {
     if (
-      id !== undefined &&
-      timestamp !== undefined &&
+      timestamp?.id !== undefined &&
+      timestamp?.value !== undefined &&
       property?.value !== undefined &&
       axis?.value !== undefined
     ) {
       setLoading(true);
-      getDynamicDataVibration<OriginalDomainResponse>(id, timestamp, 'raw', {
+      getDynamicDataVibration<OriginalDomainResponse>(timestamp.id, timestamp.value, 'raw', {
         field: `${property.value}TimeDomain`,
         axis: axis.value
       })
@@ -41,7 +41,7 @@ export const TimeDomain = () => {
     } else {
       setSubData(undefined);
     }
-  }, [id, timestamp, property?.value, axis?.value]);
+  }, [timestamp?.id, timestamp?.value, property?.value, axis?.value]);
 
   const renderChartArea = () => {
     if (!isExistedTimestamps) {

@@ -94,6 +94,7 @@ export default function MonitoringPointShow() {
       label: intl.get(config?.dynamicData?.title ?? ''),
       children: (
         <MonitoringPointDynamicData
+          key={monitoringPoint.id}
           {...monitoringPoint}
           dataType={config?.dynamicData?.serverDatatype}
         />
@@ -106,6 +107,7 @@ export default function MonitoringPointShow() {
       label: intl.get(config?.waveData?.title ?? ''),
       children: (
         <MonitoringPointDynamicData
+          key={monitoringPoint.id}
           {...monitoringPoint}
           dataType={config?.waveData?.serverDatatype}
         />

@@ -7,18 +7,18 @@ import { useFetchingOriginalDomain } from './useAnalysis';
 import { ChartHead } from './chartHead';
 
 export const OriginalDomain = () => {
-  const { activeKey, id, trendData, timestamps, sub, originalDomain, setOriginalDomain } =
+  const { activeKey, trendData, timestamps, sub, originalDomain, setOriginalDomain } =
     useAnalysisContext();
   const { subProperties, axies, setAxies } = sub;
   const { setData } = trendData;
   const isExistedTimestamps = timestamps.length > 0;
-  const timestamp = timestamps.find((t) => !!t.selected)?.value;
+  const timestamp = timestamps.find((t) => !!t.selected);
   const property = subProperties.find((p) => !!p.selected);
   const axis = axies.find((a) => !!a.selected);
 
   const { loading, values, xAxis } = originalDomain;
 
-  useFetchingOriginalDomain(id, timestamp, axis?.value, setOriginalDomain);
+  useFetchingOriginalDomain(timestamp?.id, timestamp?.value, axis?.value, setOriginalDomain);
 
   const renderChartArea = () => {
     if (!isExistedTimestamps) {
