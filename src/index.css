@@ -1,5 +1,6 @@
 @import 'antd/dist/reset.css';
 body {
+  color: rgba(0, 0, 0, 0.88);
   background-color: #f5f5f5;
 }
 tbody.ant-table-tbody > tr.ant-table-row:hover > td {
