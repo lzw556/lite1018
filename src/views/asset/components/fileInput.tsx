@@ -1,12 +1,13 @@
 import { ImportOutlined, LoadingOutlined } from '@ant-design/icons';
-import { Button, message } from 'antd';
+import { Button, ButtonProps, message } from 'antd';
 import * as React from 'react';
 import intl from 'react-intl-universal';
 
 export const FileInput: React.FC<{
   onUpload: (data: any) => Promise<void>;
   onlyIcon?: boolean;
-}> = ({ onUpload, onlyIcon = false }) => {
+  buttonProps?: ButtonProps;
+}> = ({ buttonProps, onUpload, onlyIcon = false }) => {
   const [loading, setLoading] = React.useState(false);
   const fileInput = React.useRef<HTMLInputElement | null>(null);
   return (
@@ -48,8 +49,8 @@ export const FileInput: React.FC<{
         }}
       />
       <Button
+        {...buttonProps}
         type='primary'
-        size='small'
         className={`ant-btn ant-btn-primary ${loading ? 'ant-btn-loading' : ''}`}
       >
         {loading && (

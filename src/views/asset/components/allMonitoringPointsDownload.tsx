@@ -1,5 +1,5 @@
 import { DownloadOutlined } from '@ant-design/icons';
-import { Button } from 'antd';
+import { Button, ButtonProps } from 'antd';
 import * as React from 'react';
 import { AssetRow } from '..';
 import intl from 'react-intl-universal';
@@ -9,16 +9,17 @@ export const AllMonitoringPointsDownload: React.FC<{
   winds: AssetRow[];
   disabled?: boolean;
   onlyIcon?: boolean;
-}> = ({ winds, disabled, onlyIcon = false }) => {
+  buttonProps?: ButtonProps;
+}> = ({ buttonProps, winds, disabled, onlyIcon = false }) => {
   const [open, setVisible] = React.useState(false);
   return (
     <>
       <Button
+        {...buttonProps}
         disabled={disabled}
         onClick={() => {
           setVisible(true);
         }}
-        size='small'
         type='primary'
         title={intl.get('BATCH_DOWNLOAD')}
       >

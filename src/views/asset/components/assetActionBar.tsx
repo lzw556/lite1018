@@ -56,10 +56,21 @@ export function AssetActionBar({
   );
 
   if (roots.length > 0) {
-    actions.push(<AllMonitoringPointsDownload winds={roots} key='downloadAll' onlyIcon />);
-    actions.push(<AssetExport winds={roots} key='export' onlyIcon />);
+    actions.push(
+      <AllMonitoringPointsDownload
+        winds={roots}
+        key='downloadAll'
+        onlyIcon
+        buttonProps={{ size: 'small' }}
+      />
+    );
+    actions.push(
+      <AssetExport winds={roots} key='export' onlyIcon buttonProps={{ size: 'small' }} />
+    );
   }
-  actions.push(<FileInput onUpload={handleUpload} key='upload' onlyIcon />);
+  actions.push(
+    <FileInput onUpload={handleUpload} key='upload' onlyIcon buttonProps={{ size: 'small' }} />
+  );
 
   return (
     <ActionBar
