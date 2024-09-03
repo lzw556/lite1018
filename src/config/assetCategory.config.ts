@@ -8,6 +8,7 @@ import * as Hydro from './hydro.config';
 import * as Wind from './wind.config';
 import * as CorrosionWirelessHart from './corrosionWirelessHart.config';
 import * as WindPro from './windpro.config';
+import * as Vibration from './vibration.config';
 
 export const SITE_NAMES: Map<AppConfigType, string> = new Map([
   ['corrosion', Corrosion.SITE_NAME],
@@ -15,7 +16,8 @@ export const SITE_NAMES: Map<AppConfigType, string> = new Map([
   ['general', General.SITE_NAME],
   ['hydroTurbine', Hydro.SITE_NAME],
   ['windTurbine', Wind.SITE_NAME],
-  ['windTurbinePro', WindPro.SITE_NAME]
+  ['windTurbinePro', WindPro.SITE_NAME],
+  ['vibration', Vibration.SITE_NAME]
 ]);
 
 export const SENSORS: Map<AppConfigType, DeviceType[]> = new Map([
@@ -24,7 +26,8 @@ export const SENSORS: Map<AppConfigType, DeviceType[]> = new Map([
   ['general', General.SENSORS],
   ['hydroTurbine', Hydro.SENSORS],
   ['windTurbine', Wind.SENSORS],
-  ['windTurbinePro', WindPro.SENSORS]
+  ['windTurbinePro', WindPro.SENSORS],
+  ['vibration', Vibration.SENSORS]
 ]);
 
 export const MONITORING_POINTS: Map<AppConfigType, MonitoringPointType[]> = new Map([
@@ -33,7 +36,8 @@ export const MONITORING_POINTS: Map<AppConfigType, MonitoringPointType[]> = new 
   ['general', General.MONITORING_POINTS],
   ['hydroTurbine', Hydro.MONITORING_POINTS],
   ['windTurbine', Wind.MONITORING_POINTS],
-  ['windTurbinePro', WindPro.MONITORING_POINTS]
+  ['windTurbinePro', WindPro.MONITORING_POINTS],
+  ['vibration', Vibration.MONITORING_POINTS]
 ]);
 
 export const MENUS_HIDDEN: Map<AppConfigType, string[]> = new Map([
@@ -42,7 +46,8 @@ export const MENUS_HIDDEN: Map<AppConfigType, string[]> = new Map([
   ['general', General.MENUS_HIDDEN],
   ['hydroTurbine', Hydro.MENUS_HIDDEN],
   ['windTurbine', Wind.MENUS_HIDDEN],
-  ['windTurbinePro', WindPro.MENUS_HIDDEN]
+  ['windTurbinePro', WindPro.MENUS_HIDDEN],
+  ['vibration', Vibration.MENUS_HIDDEN]
 ]);
 
 export const ASSET_CATEGORY_CHAINS: Map<AppConfigType, AssetCategoryChain[]> = new Map([
@@ -51,7 +56,8 @@ export const ASSET_CATEGORY_CHAINS: Map<AppConfigType, AssetCategoryChain[]> = n
   ['general', General.ASSET_CATEGORY_CHAIN],
   ['hydroTurbine', Hydro.ASSET_CATEGORY_CHAIN],
   ['windTurbine', Wind.ASSET_CATEGORY_CHAIN],
-  ['windTurbinePro', WindPro.ASSET_CATEGORY_CHAIN]
+  ['windTurbinePro', WindPro.ASSET_CATEGORY_CHAIN],
+  ['vibration', Vibration.ASSET_CATEGORY_CHAIN]
 ]);
 
 export function useAssetCategoryChain() {
@@ -60,6 +66,6 @@ export function useAssetCategoryChain() {
   const root = chain?.[0];
   const last = chain?.filter((c) => c.isLeaf === true);
   const isLeaf = (key: number) => chain.find((c) => c.key === key)?.isLeaf;
-  const isChild = (key: number) => chain.find((c) => c.key === key)?.isChild;
+  const isChild = (key: number | undefined) => chain.find((c) => c.key === key)?.isChild;
   return { chain, root, last, isLeaf, isChild };
 }

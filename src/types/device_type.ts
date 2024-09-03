@@ -269,6 +269,23 @@ export namespace DeviceType {
     }
     return false;
   }
+
+  export function vibrationSensors() {
+    return [
+      DeviceType.SVT210R,
+      DeviceType.SVT220520,
+      DeviceType.VibrationTemperature3AxisNB,
+      DeviceType.VibrationTemperature3AxisAdvancedNB,
+      DeviceType.SVT210510,
+      DeviceType.SVT110,
+      DeviceType.SVT210RS,
+      DeviceType.SVT210S,
+      DeviceType.SVT220S1,
+      DeviceType.SVT220S3,
+      DeviceType.SVT210KL,
+      DeviceType.SVT510L
+    ];
+  }
 }
 
 export const SENSOR_DISPLAY_PROPERTIES = {
