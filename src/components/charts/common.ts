@@ -1,8 +1,9 @@
 export type Title = {
   text: string;
   left?: 'left' | 'center';
-  top?: 'top' | 'center' | number;
-  textStyle?: { color: string };
+  top?: 'top' | 'middle' | number;
+  textStyle?: any;
+  subtext?: string;
 };
 
 export type Legend = {
