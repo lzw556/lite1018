@@ -566,7 +566,7 @@
   "INPUT_EMPTY_PROMPT": "Input cannot be empty.",
   "INVALID_FILE_FORMAT": "Invalid file format.",
   "INVALID_PAGE_PROMPT": "The page does not exist.",
-  "IOT_CLOUD_MONITORING_SYSTEM": "IoT Cloud Monitoring System",
+  "IOT_CLOUD_MONITORING_SYSTEM": "Machine Condition Monitoring System",
   "IP_ADDRESS": "IP Address",
   "IP_MODE": "IP Mode",
   "IP_MODE_DHCP": "DHCP",

@@ -566,7 +566,7 @@
   "INPUT_EMPTY_PROMPT": "输入不能为空。",
   "INVALID_FILE_FORMAT": "文件格式错误。",
   "INVALID_PAGE_PROMPT": "对不起，您访问的页面不存在。",
-  "IOT_CLOUD_MONITORING_SYSTEM": "IoT云监控平台",
+  "IOT_CLOUD_MONITORING_SYSTEM": "设备状态监测系统",
   "IP_ADDRESS": "IP地址",
   "IP_MODE": "IP模式",
   "IP_MODE_DHCP": "DHCP",
