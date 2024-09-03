@@ -7,6 +7,8 @@ import { UpdateAreaAsset } from '../area-asset/update';
 import { CreateAsset } from '../manage/create';
 import { UpdateAsset } from '../manage/update';
 import { CreateTower, UpdateTower } from '../../tower';
+import { CreateVibrationAsset } from '../vibration-asset/create';
+import { UpdateVibrationAsset } from '../vibration-asset/update';
 
 export enum AssetAction {
   ASSET_CREATE,
@@ -18,7 +20,9 @@ export enum AssetAction {
   AREA_ASSET_CREATE,
   AREA_ASSET_UPDATE,
   TOWER_CREATE,
-  TOWER_UPDATE
+  TOWER_UPDATE,
+  VIBRATION_ASSET_CREATE,
+  VIBRATION_ASSET_UPDATE
 }
 
 export const ActionBar: React.FC<{
@@ -161,6 +165,32 @@ export const ActionBar: React.FC<{
       )}
       {open && type === AssetAction.TOWER_UPDATE && (
         <UpdateTower
+          {...{
+            open,
+            onCancel: () => setVisible && setVisible(false),
+            ...payload,
+            onSuccess: () => {
+              if (onSuccess) onSuccess();
+              setVisible && setVisible(false);
+            }
+          }}
+        />
+      )}
+      {open && type === AssetAction.VIBRATION_ASSET_CREATE && (
+        <CreateVibrationAsset
+          {...{
+            open,
+            onCancel: () => setVisible && setVisible(false),
+            ...payload,
+            onSuccess: () => {
+              if (onSuccess) onSuccess();
+              setVisible && setVisible(false);
+            }
+          }}
+        />
+      )}
+      {open && type === AssetAction.VIBRATION_ASSET_UPDATE && (
+        <UpdateVibrationAsset
           {...{
             open,
             onCancel: () => setVisible && setVisible(false),

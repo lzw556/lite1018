@@ -43,7 +43,7 @@ export function CreateAssetActionBar({
   const parents = getParents(roots, last);
   const actions: React.ReactNode[] = [];
 
-  const shouldHide = (key: AssetCategoryKey) => hiddens.includes(key);
+  const shouldHide = (key: AssetCategoryKey | undefined) => key && hiddens.includes(key);
 
   const handleUpload = (data: any) => {
     return importAssets(getProject(), data).then((res) => {

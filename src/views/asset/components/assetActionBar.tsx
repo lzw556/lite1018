@@ -10,6 +10,7 @@ import { AssetRow } from '../types';
 import { AssetExport } from './assetExport';
 import { FileInput } from './fileInput';
 import { AllMonitoringPointsDownload } from './allMonitoringPointsDownload';
+import { useAppConfigContext } from './appConfigContext';
 
 export function AssetActionBar({
   roots,
@@ -20,6 +21,7 @@ export function AssetActionBar({
   refresh: () => void;
   actionStatus: any;
 }) {
+  const config = useAppConfigContext();
   const { hasPermission } = usePermission();
   const { root } = useAssetCategoryChain();
   const actions: React.ReactNode[] = [];
@@ -42,7 +44,11 @@ export function AssetActionBar({
       size='small'
       title={intl.get('CREATE_SOMETHING', { something: intl.get(root.label) })}
       onClick={() => {
-        actionStatus.onAssetCreate();
+        if (config.type === 'vibration') {
+          actionStatus.onVibrationAssetCreate();
+        } else {
+          actionStatus.onAssetCreate();
+        }
       }}
     >
       <PlusOutlined />

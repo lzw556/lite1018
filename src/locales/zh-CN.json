@@ -1207,5 +1207,13 @@
   "chart.window.length.2048": "2048",
   "chart.window.length.4096": "4096",
   "chart.window.length.8192": "8192",
-  "intelligent.analysis": "智能分析"
+  "intelligent.analysis": "智能分析",
+  "VIBRATION_MOTOR": "电机",
+  "motor.motor_type": "电机类型",
+  "motor.rotation_speed": "转速",
+  "motor.variable_frequency_drive": "变频驱动",
+  "motor.nominal_power": "额定功率",
+  "motor.mounting": "安装",
+  "motor.bearing_type": "轴承类型",
+  "motor.bearing_model": "轴承型号"
 }

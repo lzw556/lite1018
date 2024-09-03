@@ -72,6 +72,19 @@ export function useActionBarStatus() {
     setAction({ type: AssetAction.TOWER_UPDATE, payload: { tower } });
   };
 
+  const handleVibrationAssetCreate = (paras?: number) => {
+    setVisible(true);
+    setAction({
+      type: AssetAction.VIBRATION_ASSET_CREATE,
+      payload: { parentId: paras }
+    });
+  };
+
+  const handleVibrationAssetUpdate = (asset: AssetRow) => {
+    setVisible(true);
+    setAction({ type: AssetAction.VIBRATION_ASSET_UPDATE, payload: { asset } });
+  };
+
   return {
     open,
     setVisible,
@@ -85,6 +98,8 @@ export function useActionBarStatus() {
     onAreaAssetCreate: handleAreaAssetCreate,
     onAreaAssetUpdate: handleAreaAssetUpdate,
     onTowerCreate: handleCreateTower,
-    onTowerUpdate: handleUpdateTower
+    onTowerUpdate: handleUpdateTower,
+    onVibrationAssetCreate: handleVibrationAssetCreate,
+    onVibrationAssetUpdate: handleVibrationAssetUpdate
   };
 }

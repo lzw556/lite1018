@@ -33,6 +33,7 @@ export type AssetRow = {
   label: React.ReactNode;
   value: string | number;
   statistics: AssetChildrenStatistics;
+  alertLevel: number;
   attributes?: {
     index: number;
     type: number;
@@ -72,7 +73,8 @@ export enum AssetCategoryKey {
   SUB_AREA = 202,
   PIPE = 221,
   TANK = 222,
-  AREA_ASSET = 9990
+  AREA_ASSET = 9990,
+  VIBRATION_MOTOR = 351
 }
 
 export function isAssetCategoryKey(key?: number) {
@@ -90,10 +92,11 @@ export enum AssertOfAssetCategory {
   IS_PIPE,
   IS_AREA_ASSET,
   IS_GENERAL,
-  IS_TOWER
+  IS_TOWER,
+  IS_VIBRATION
 }
 
-export function AssertAssetCategory(key: number, assert: AssertOfAssetCategory) {
+export function AssertAssetCategory(key: number | undefined, assert: AssertOfAssetCategory) {
   switch (assert) {
     case AssertOfAssetCategory.IS_ASSET:
       return isAssetCategoryKey(key);
@@ -111,6 +114,8 @@ export function AssertAssetCategory(key: number, assert: AssertOfAssetCategory) 
       return key === AssetCategoryKey.GENERAL;
     case AssertOfAssetCategory.IS_TOWER:
       return key === AssetCategoryKey.TOWER;
+    case AssertOfAssetCategory.IS_VIBRATION:
+      return key === AssetCategoryKey.VIBRATION_MOTOR;
     default:
       return false;
   }
@@ -125,11 +130,12 @@ export enum AssetCategoryLabel {
   AREA = 'AREA',
   SUB_AREA = 'SUB_AREA',
   PIPE = 'PIPE',
-  TANK = 'TANK'
+  TANK = 'TANK',
+  VIBRATION_MOTOR = 'VIBRATION_MOTOR'
 }
 
 export type AssetCategoryDic = {
-  key: AssetCategoryKey;
+  key: AssetCategoryKey | undefined;
   label: AssetCategoryLabel;
 };
 export type AssetCategoryChain = AssetCategoryDic & {

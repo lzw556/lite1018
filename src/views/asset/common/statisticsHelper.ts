@@ -1,4 +1,10 @@
-import { ColorDanger, ColorHealth, ColorInfo, ColorWarn } from '../../../constants/color';
+import {
+  ColorDanger,
+  ColorHealth,
+  ColorInfo,
+  ColorOffline,
+  ColorWarn
+} from '../../../constants/color';
 import { AssetChildrenStatistics } from '..';
 import intl from 'react-intl-universal';
 
@@ -24,7 +30,7 @@ function tranformVM_AssetStatistics(
   alarmStatisWithName: Map<AlarmState, NameValue>,
   ...visibles: Visible[]
 ) {
-  const groups: NameValue[] = [];
+  const groups: (NameValue & { color: string })[] = [];
   visibles.forEach((visible) => {
     let name = '';
     let value: string | number = '';
@@ -36,6 +42,7 @@ function tranformVM_AssetStatistics(
     const assetStatis = childrenStatis.get(key as keyof AssetChildrenStatistics);
     const alarmStatis = alarmStatisWithName.get(key as AlarmState);
     let className = key === 'offlineDeviceNum' ? 'offline' : undefined; // hardcode
+    let color = ColorOffline;
     if (assetStatis) {
       value = assetStatis.value;
       if (!name) name = assetStatis.name;
@@ -43,8 +50,9 @@ function tranformVM_AssetStatistics(
       value = alarmStatis.value;
       if (!name) name = alarmStatis.name;
       className = key as AlarmState;
+      color = getAlarmLevelColor(key as AlarmState);
     }
-    groups.push({ name, value, className });
+    groups.push({ name, value, className, color });
   });
   return { statistics: groups, alarmState };
 }

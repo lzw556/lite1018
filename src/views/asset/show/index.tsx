@@ -9,6 +9,7 @@ import { AssetTree } from '../tree-list/tree';
 import { useActionBarStatus } from '../common/useActionBarStatus';
 import { WindTurbineTabs } from './windTurbineShow';
 import intl from 'react-intl-universal';
+import { VibrationAsset } from '../vibration-asset/vibrationAsset';
 
 export default function WindTurbineShow() {
   const { id } = useParams();
@@ -32,35 +33,52 @@ export default function WindTurbineShow() {
   if (asset === undefined) return <p>{intl.get('PARAMETER_ERROR_PROMPT')}</p>;
 
   const isAssetWind = AssertAssetCategory(asset.type, AssertOfAssetCategory.IS_WIND_LIKE);
+  const isVibration = AssertAssetCategory(asset.type, AssertOfAssetCategory.IS_VIBRATION);
 
-  return (
-    <Row gutter={[16, 16]}>
-      <Col span={24}>
-        <AssetAlarmStatistic {...asset} />
-        {isAssetWind && (
-          <WindTurbineTabs
-            id={Number(id)}
+  if (isVibration) {
+    return (
+      <Row gutter={[16, 16]}>
+        <Col span={24}>
+          <VibrationAsset
             asset={asset}
-            actionStatus={actionStatus}
-            fetchAsset={fetchAsset}
+            refresh={() => {
+              refresh();
+              fetchAsset(Number(id));
+            }}
           />
-        )}
-      </Col>
-      <Col span={24}>
-        {!isAssetWind && (
-          <ShadowCard>
-            <AssetTree
-              assets={asset ? [asset] : []}
-              {...actionStatus}
-              rootId={asset.id}
-              onSuccess={() => {
-                refresh();
-                fetchAsset(Number(id));
-              }}
+        </Col>
+      </Row>
+    );
+  } else {
+    return (
+      <Row gutter={[16, 16]}>
+        <Col span={24}>
+          <AssetAlarmStatistic {...asset} />
+          {isAssetWind && (
+            <WindTurbineTabs
+              id={Number(id)}
+              asset={asset}
+              actionStatus={actionStatus}
+              fetchAsset={fetchAsset}
             />
-          </ShadowCard>
+          )}
+        </Col>
+        {!isAssetWind && (
+          <Col span={24}>
+            <ShadowCard>
+              <AssetTree
+                assets={asset ? [asset] : []}
+                {...actionStatus}
+                rootId={asset.id}
+                onSuccess={() => {
+                  refresh();
+                  fetchAsset(Number(id));
+                }}
+              />
+            </ShadowCard>
+          </Col>
         )}
-      </Col>
-    </Row>
-  );
+      </Row>
+    );
+  }
 }

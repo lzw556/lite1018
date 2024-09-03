@@ -15,7 +15,7 @@ import { DisplayProperty } from '../../constants/properties';
 import { ThicknessAnalysis } from './services';
 import { Analysis } from './show/thicknessAnalysis';
 import { pickDataOfFirstProperties } from '../device/util';
-import { getDisplayName } from '../../utils/format';
+import { getDisplayName, getValue, roundValue } from '../../utils/format';
 import { Language } from '../../localeProvider';
 
 export function convertRow(values?: MonitoringPointRow): MonitoringPoint | null {
@@ -367,4 +367,27 @@ export function isMonitoringPointVibration(type: number) {
     type === MonitoringPointTypeValue.VIBRATION_RPM ||
     type === MonitoringPointTypeValue.VIBRATION_THREE_AXIS_RPM
   );
+}
+export function getPropertyColumns(measurement: MonitoringPointRow, lang: Language) {
+  if (!measurement) return [];
+  const properties = getDisplayProperties(measurement.properties, measurement.type).filter(
+    (p) => p.first
+  );
+  return properties.map(({ fields = [], key, name, precision, unit }) => {
+    const children = fields.map(({ key, name }) => ({
+      key,
+      render: (d: MonitoringPointRow) =>
+        getValue(roundValue(d?.data?.values[key] as number, precision)),
+      title: intl.get(name)
+    }));
+    const title = getDisplayName({ name: intl.get(name), lang, suffix: unit });
+    return children.length > 1
+      ? { key, title, children }
+      : {
+          key,
+          render: (d: MonitoringPointRow) =>
+            getValue(roundValue(d?.data?.values[key] as number, precision)),
+          title
+        };
+  });
 }

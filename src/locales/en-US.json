@@ -1207,5 +1207,13 @@
   "chart.window.length.2048": "2048",
   "chart.window.length.4096": "4096",
   "chart.window.length.8192": "8192",
-  "intelligent.analysis": "Intelligent Analysis"
+  "intelligent.analysis": "Intelligent Analysis",
+  "VIBRATION_MOTOR": "Motor",
+  "motor.motor_type": "Motor Type",
+  "motor.rotation_speed": "Rotation Speed",
+  "motor.variable_frequency_drive": "Variable Frequency Drive",
+  "motor.nominal_power": "Nominal Power",
+  "motor.mounting": "Mounting",
+  "motor.bearing_type": "Bearing Type",
+  "motor.bearing_model": "Bearing Model"
 }
