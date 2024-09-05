@@ -32,19 +32,15 @@ export const Cross = () => {
   const [chartSettings, setChartSettings] = React.useState(defaultChartSettings);
 
   React.useEffect(() => {
-    if (
-      originalDomain.values &&
-      originalDomain.values.length > 0 &&
-      originalDomain2.values &&
-      originalDomain2.values.length > 0
-    ) {
+    if (originalDomain && originalDomain2?.values) {
+      const { frequency, fullScale, range, values } = originalDomain;
       setLoading(true);
       cross({
-        data_x: originalDomain.values,
+        data_x: values,
         data_y: originalDomain2.values,
-        fs: chartSettings.fs,
-        full_scale: chartSettings.full_scale,
-        range: chartSettings.range,
+        fs: frequency,
+        full_scale: fullScale,
+        range,
         window: chartSettings.window
       })
         .then(setSubData)
@@ -52,7 +48,7 @@ export const Cross = () => {
     } else {
       setSubData(undefined);
     }
-  }, [originalDomain.values, originalDomain2.values, chartSettings]);
+  }, [originalDomain, originalDomain2?.values, chartSettings]);
 
   const renderChartArea = () => {
     if (!isExistedTimestamps) {

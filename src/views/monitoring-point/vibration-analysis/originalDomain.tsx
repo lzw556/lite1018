@@ -7,8 +7,16 @@ import { useFetchingOriginalDomain } from './useAnalysis';
 import { ChartHead } from './chartHead';
 
 export const OriginalDomain = () => {
-  const { activeKey, trendData, timestamps, sub, originalDomain, setOriginalDomain } =
-    useAnalysisContext();
+  const {
+    activeKey,
+    trendData,
+    timestamps,
+    sub,
+    originalDomain,
+    originalDomainLoading,
+    setOriginalDomain,
+    setOriginalDomainLoading
+  } = useAnalysisContext();
   const { subProperties, axies, setAxies } = sub;
   const { setData } = trendData;
   const isExistedTimestamps = timestamps.length > 0;
@@ -16,9 +24,13 @@ export const OriginalDomain = () => {
   const property = subProperties.find((p) => !!p.selected);
   const axis = axies.find((a) => !!a.selected);
 
-  const { loading, values, xAxis } = originalDomain;
-
-  useFetchingOriginalDomain(timestamp?.id, timestamp?.value, axis?.value, setOriginalDomain);
+  useFetchingOriginalDomain(
+    timestamp?.id,
+    timestamp?.value,
+    axis?.value,
+    setOriginalDomain,
+    setOriginalDomainLoading
+  );
 
   const renderChartArea = () => {
     if (!isExistedTimestamps) {
@@ -55,18 +67,19 @@ export const OriginalDomain = () => {
   };
   const chart = React.useRef<any>();
   const renderChart = () => {
-    if (!xAxis || !values) {
-      if (loading) {
+    if (!originalDomain) {
+      if (originalDomainLoading) {
         return <Spin />;
       } else {
         return <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} style={{ margin: 0 }} />;
       }
     } else {
+      const { xAxis, values } = originalDomain;
       return (
         <PropertyChart
           dataZoom={true}
           hideLegend={true}
-          loading={loading}
+          loading={originalDomainLoading}
           rawOptions={{ animation: false }}
           series={[
             {
@@ -84,7 +97,11 @@ export const OriginalDomain = () => {
 
   return (
     <div className='chart-card'>
-      <ChartHead activeKey={activeKey} chartInstance={chart.current} showToolbar={!!values} />
+      <ChartHead
+        activeKey={activeKey}
+        chartInstance={chart.current}
+        showToolbar={!!originalDomain?.values}
+      />
       {renderChartArea()}
     </div>
   );

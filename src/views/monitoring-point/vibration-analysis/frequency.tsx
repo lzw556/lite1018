@@ -5,7 +5,6 @@ import { useAnalysisContext } from '.';
 import { frequency } from '../services';
 import { ChartHead } from './chartHead';
 import { PropertyChart } from '../../../components/charts/propertyChart';
-import { defaultChartSettings } from './useAnalysis';
 
 export const Frequency = () => {
   const { activeKey, trendData, timestamps, sub, originalDomain } = useAnalysisContext();
@@ -18,14 +17,15 @@ export const Frequency = () => {
   const axis = axies.find((a) => !!a.selected);
 
   React.useEffect(() => {
-    if (property?.value && originalDomain.values && originalDomain.values.length > 0) {
+    if (property?.value && originalDomain) {
+      const { frequency: fs, fullScale, range, values } = originalDomain;
       setLoading(true);
       frequency({
         property: property.value,
-        data: originalDomain.values,
-        fs: defaultChartSettings.fs,
-        full_scale: defaultChartSettings.full_scale,
-        range: defaultChartSettings.range,
+        data: values,
+        fs,
+        full_scale: fullScale,
+        range,
         window: 'hann'
       })
         .then(({ x, y }) => setSubData({ x, y }))
@@ -33,7 +33,7 @@ export const Frequency = () => {
     } else {
       setSubData(undefined);
     }
-  }, [property?.value, originalDomain.values]);
+  }, [property?.value, originalDomain]);
 
   const renderChartArea = () => {
     if (!isExistedTimestamps) {

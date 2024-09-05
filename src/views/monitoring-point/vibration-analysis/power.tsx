@@ -20,14 +20,15 @@ export const Power = () => {
   const [chartSettings, setChartSettings] = React.useState(defaultChartSettings);
 
   React.useEffect(() => {
-    if (property?.value && originalDomain.values && originalDomain.values.length > 0) {
+    if (property?.value && originalDomain) {
+      const { frequency, fullScale, range, values } = originalDomain;
       setLoading(true);
       power({
         property: property.value,
-        data: originalDomain.values,
-        fs: chartSettings.fs,
-        full_scale: chartSettings.full_scale,
-        range: chartSettings.range,
+        data: values,
+        fs: frequency,
+        full_scale: fullScale,
+        range,
         window: chartSettings.window
       })
         .then(({ x, y }) => setSubData({ x, y }))

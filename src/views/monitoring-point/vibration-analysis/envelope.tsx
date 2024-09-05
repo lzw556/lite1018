@@ -20,14 +20,15 @@ export const Envelope = () => {
   const [chartSettings, setChartSettings] = React.useState(defaultChartSettings);
 
   React.useEffect(() => {
-    if (property?.value && originalDomain.values && originalDomain.values.length > 0) {
+    if (property?.value && originalDomain) {
+      const { frequency, fullScale, range, values } = originalDomain;
       setLoading(true);
       envelope({
         property: property?.value,
-        data: originalDomain.values,
-        fs: chartSettings.fs,
-        full_scale: chartSettings.full_scale,
-        range: chartSettings.range,
+        data: values,
+        fs: frequency,
+        full_scale: fullScale,
+        range,
         window: chartSettings.window,
         cutoff_range_high: chartSettings.cutoff_range_high,
         cutoff_range_low: chartSettings.cutoff_range_low,
@@ -39,7 +40,7 @@ export const Envelope = () => {
     } else {
       setSubData(undefined);
     }
-  }, [originalDomain.values, property?.value, chartSettings]);
+  }, [originalDomain, property?.value, chartSettings]);
 
   const renderChartArea = () => {
     if (!isExistedTimestamps) {

@@ -20,14 +20,15 @@ export const Zoom = () => {
   const [chartSettings, setChartSettings] = React.useState(defaultChartSettings);
 
   React.useEffect(() => {
-    if (property?.value && originalDomain.values && originalDomain.values.length > 0) {
+    if (property?.value && originalDomain) {
+      const { frequency, fullScale, range, values } = originalDomain;
       setLoading(true);
       zoom({
         property: property.value,
-        data: originalDomain.values,
-        fs: chartSettings.fs,
-        full_scale: chartSettings.full_scale,
-        range: chartSettings.range,
+        data: values,
+        fs: frequency,
+        full_scale: fullScale,
+        range,
         window: chartSettings.window,
         f_h: chartSettings.f_h,
         f_l: chartSettings.f_l,
@@ -38,7 +39,7 @@ export const Zoom = () => {
     } else {
       setSubData(undefined);
     }
-  }, [property?.value, originalDomain.values, chartSettings]);
+  }, [property?.value, originalDomain, chartSettings]);
 
   const renderChartArea = () => {
     if (!isExistedTimestamps) {

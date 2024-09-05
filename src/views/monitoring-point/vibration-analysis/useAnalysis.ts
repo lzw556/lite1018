@@ -159,15 +159,16 @@ export function useSubProps(): SubProps {
 }
 
 export type OriginalDomainResponse = {
-  loading: boolean;
-  values?: number[];
-  xAxis?: number[];
+  frequency: number;
+  fullScale: number;
+  number: number;
+  range: number;
+  values: number[];
+  xAxis: number[];
 };
 
 export function useOriginalDomainResult() {
-  const [originalDomain, setOriginalDomain] = React.useState<OriginalDomainResponse>({
-    loading: true
-  });
+  const [originalDomain, setOriginalDomain] = React.useState<OriginalDomainResponse | undefined>();
   return { originalDomain, setOriginalDomain };
 }
 
@@ -175,13 +176,13 @@ export function useFetchingOriginalDomain(
   id: number | undefined,
   timestamp: number | undefined,
   axis: number | undefined,
-  setOriginalDomain?: React.Dispatch<React.SetStateAction<OriginalDomainResponse>>
+  setOriginalDomain?: React.Dispatch<React.SetStateAction<OriginalDomainResponse | undefined>>,
+  setOriginalDomainLoading?: React.Dispatch<React.SetStateAction<boolean>>
 ) {
-  const [origin, setOrigin] = React.useState<OriginalDomainResponse>({ loading: true });
+  const [origin, setOrigin] = React.useState<OriginalDomainResponse | undefined>();
   React.useEffect(() => {
     if (id !== undefined && timestamp !== undefined && axis !== undefined) {
-      setOriginalDomain?.((prev) => ({ ...prev, loading: true }));
-      setOrigin((prev) => ({ ...prev, loading: true }));
+      setOriginalDomainLoading?.(true);
       getDynamicDataVibration<OriginalDomainResponse>(id, timestamp, 'raw', {
         field: 'originalDomain',
         axis: axis
@@ -193,22 +194,24 @@ export function useFetchingOriginalDomain(
           }
         })
         .finally(() => {
-          setOriginalDomain?.((prev) => ({ ...prev, loading: false }));
-          setOrigin((prev) => ({ ...prev, loading: false }));
+          setOriginalDomainLoading?.(false);
         });
     } else {
-      setOriginalDomain?.({ loading: false });
-      setOrigin({ loading: false });
+      setOriginalDomain?.(undefined);
+      setOrigin(undefined);
+      setOriginalDomainLoading?.(false);
     }
-  }, [id, timestamp, axis, setOriginalDomain]);
+  }, [id, timestamp, axis, setOriginalDomain, setOriginalDomainLoading]);
   return origin;
 }
 
 export const AnalysisContext = React.createContext<
   TrendProps &
     SubProps & {
-      originalDomain: OriginalDomainResponse;
-      setOriginalDomain: React.Dispatch<React.SetStateAction<OriginalDomainResponse>>;
+      originalDomain: OriginalDomainResponse | undefined;
+      setOriginalDomain: React.Dispatch<React.SetStateAction<OriginalDomainResponse | undefined>>;
+      originalDomainLoading: boolean;
+      setOriginalDomainLoading: React.Dispatch<React.SetStateAction<boolean>>;
     }
 >(null!);
 
@@ -236,9 +239,9 @@ export function useCrossComparison(id?: number) {
 }
 
 export type ChartSettings = {
-  fs: number;
-  full_scale: number;
-  range: number;
+  fs?: number;
+  full_scale?: number;
+  range?: number;
   window?: string;
   cutoff_range_low?: number;
   cutoff_range_high?: number;
@@ -250,10 +253,7 @@ export type ChartSettings = {
   window_length?: number;
 };
 
-export const defaultChartSettings: ChartSettings = {
-  fs: 25641,
-  full_scale: 16777215,
-  range: 50,
+export const defaultChartSettings: Partial<ChartSettings> = {
   window: 'none',
   cutoff_range_low: 5,
   cutoff_range_high: 100,

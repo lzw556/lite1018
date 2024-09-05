@@ -21,14 +21,15 @@ export const TimeFrequency = () => {
   const [chartSettings, setChartSettings] = React.useState(defaultChartSettings);
 
   React.useEffect(() => {
-    if (property?.value && originalDomain.values && originalDomain.values.length > 0) {
+    if (property?.value && originalDomain) {
+      const { frequency, fullScale, range, values } = originalDomain;
       setLoading(true);
       timeFrequency({
         property: property.value,
-        data: originalDomain.values,
-        fs: chartSettings.fs,
-        full_scale: chartSettings.full_scale,
-        range: chartSettings.range,
+        data: values,
+        fs: frequency,
+        full_scale: fullScale,
+        range,
         window_length: chartSettings.window_length
       })
         .then(setSubData)
@@ -36,7 +37,7 @@ export const TimeFrequency = () => {
     } else {
       setSubData(undefined);
     }
-  }, [property?.value, originalDomain.values, chartSettings]);
+  }, [property?.value, originalDomain, chartSettings]);
 
   const renderChartArea = () => {
     if (!isExistedTimestamps) {
