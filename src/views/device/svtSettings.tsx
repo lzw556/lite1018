@@ -14,10 +14,16 @@ export const SVTSettings = ({
   const mounting_type = settings?.find((s) => s.key === 'mounting_type');
   const disp_mode = settings?.find((s) => s.key === 'disp_mode');
   const base_frequency = settings?.find((s) => s.key === 'base_frequency');
+  const communication_period = DeviceType.isSVTLora(type)
+    ? settings?.find((s) => s.key === 'communication_period')
+    : null;
   const sample_period = settings?.find((s) => s.key === 'sample_period');
   const sample_offset = settings?.find((s) => s.key === 'sample_offset');
   const { mode, action, fields } = useAcquisitionModeRelatedFields(settings);
   const settingsFields = [...fields, mounting_type, disp_mode, base_frequency];
+  if (communication_period) {
+    settingsFields.push(communication_period);
+  }
   const commonSampleRelatedFields = [sample_period, sample_offset];
   const sampleRelatedFields: any = useSampleRelatedFields(type, settings);
   const waveRelatedFields = useWaveRealtedFields(mode, action, settings);

@@ -286,6 +286,10 @@ export namespace DeviceType {
       DeviceType.SVT510L
     ];
   }
+
+  export function isSVTLora(type: number) {
+    return type === DeviceType.SVT210KL || type === DeviceType.SVT510L;
+  }
 }
 
 export const SENSOR_DISPLAY_PROPERTIES = {
