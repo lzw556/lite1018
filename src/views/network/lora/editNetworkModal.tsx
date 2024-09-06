@@ -6,7 +6,6 @@ import intl from 'react-intl-universal';
 import { FormInputItem } from '../../../components/formInputItem';
 import { useLocaleFormLayout } from '../../../hooks/useLocaleFormLayout';
 import { ModalWrapper } from '../../../components/modalWrapper';
-import LoRaWSNFormItem from '../../../components/formItems/loRaWSNFormItem';
 
 export interface EditNetworkModalProps extends ModalProps {
   network: Network;
@@ -68,7 +67,6 @@ const EditLoraNetworkModal: FC<EditNetworkModalProps> = (props) => {
         >
           <Input placeholder={intl.get('PLEASE_ENTER_NAME')} />
         </FormInputItem>
-        <LoRaWSNFormItem />
       </Form>
     </ModalWrapper>
   );
