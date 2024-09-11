@@ -40,7 +40,7 @@ export const DynamicDataContent = ({
   const isAngle = 'dynamic_direction' in values && 'dynamic_displacement' in values;
   const displacements = (
     isAngle
-      ? values[
+      ? (values as AngleDynamicData)[
           monitoringPoint.type === MonitoringPointTypeValue.TOWER_BASE_SETTLEMENT
             ? 'dynamic_displacement_axial'
             : 'dynamic_displacement_radial'
@@ -51,7 +51,7 @@ export const DynamicDataContent = ({
   const angles = isAngle
     ? displacements.map((d, i) => [
         roundValue(d, 2),
-        roundValue(values['dynamic_direction'][i] as number, 2)
+        roundValue((values as AngleDynamicData)['dynamic_direction'][i] as number, 2)
       ])
     : [];
 
@@ -74,7 +74,9 @@ export const DynamicDataContent = ({
       return <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />;
     }
     if (isAngle) {
-      const data = values[field.value as keyof Omit<AngleDynamicData, 'metadata'>];
+      const data = (values as AngleDynamicData)[
+        field.value as keyof Omit<AngleDynamicData, 'metadata'>
+      ];
       return (
         <PropertyChart
           series={[
@@ -88,7 +90,9 @@ export const DynamicDataContent = ({
         />
       );
     } else if (isDynamicPreload) {
-      const data = values[field.value as keyof Omit<PreloadDynamicData, 'metadata'>];
+      const data = (values as PreloadDynamicData)[
+        field.value as keyof Omit<PreloadDynamicData, 'metadata'>
+      ];
       let series: Series[] = [];
       if (data.length > 0) {
         if (typeof data[0] === 'number') {
@@ -122,8 +126,9 @@ export const DynamicDataContent = ({
       );
     } else {
       //Preload Wave, Thickness Wave
-      const tofs = values['tof'];
-      const tof = values.metadata['tof'];
+      const vs = values as PreloadWaveData | ThicknessWaveData;
+      const tofs = vs['tof'];
+      const tof = vs.metadata['tof'];
       const isContained =
         tof && !Number.isNaN(tof) && tof <= Math.max(...tofs) && tof >= Math.min(...tofs);
       const _tofs = Array.from(new Set([...tofs, tof].sort((prev, crt) => prev - crt)));
@@ -155,7 +160,7 @@ export const DynamicDataContent = ({
           dataZoom={isContained ? { startValue, endValue } : { start: 70, end: 100 }}
           series={[
             {
-              data: { [field.label]: values['mv'] },
+              data: { [field.label]: vs['mv'] },
               xAxisValues: tofs.map((n) => `${n}`),
               raw: { smooth: true }
             }

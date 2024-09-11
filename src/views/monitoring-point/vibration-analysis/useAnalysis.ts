@@ -7,7 +7,8 @@ import {
   getMeasurement,
   getMeasurements,
   getTrend,
-  TrendData
+  TrendData,
+  ValuesPropertyName
 } from '../services';
 
 type Range = [number, number];
@@ -87,9 +88,9 @@ export function useTrendProps(id: number) {
       const xAxisValues = data.map(({ timestamp }) =>
         dayjs.unix(timestamp).local().format('YYYY-MM-DD HH:mm:ss')
       );
-      const x = data.map(({ values }) => values[`${property.value}XRMS`]);
-      const y = data.map(({ values }) => values[`${property.value}YRMS`]);
-      const z = data.map(({ values }) => values[`${property.value}ZRMS`]);
+      const x = data.map(({ values }) => values[`${property.value}XRMS` as ValuesPropertyName]);
+      const y = data.map(({ values }) => values[`${property.value}YRMS` as ValuesPropertyName]);
+      const z = data.map(({ values }) => values[`${property.value}ZRMS` as ValuesPropertyName]);
       seriesOpts = [
         {
           data: { [intl.get(AXIS_OPTIONS[0].label)]: x },
@@ -169,7 +170,8 @@ export type OriginalDomainResponse = {
 
 export function useOriginalDomainResult() {
   const [originalDomain, setOriginalDomain] = React.useState<OriginalDomainResponse | undefined>();
-  return { originalDomain, setOriginalDomain };
+  const [originalDomainLoading, setOriginalDomainLoading] = React.useState<boolean>(true);
+  return { originalDomain, setOriginalDomain, originalDomainLoading, setOriginalDomainLoading };
 }
 
 export function useFetchingOriginalDomain(

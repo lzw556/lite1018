@@ -1,4 +1,4 @@
-import { Empty, Table } from 'antd';
+import { Table } from 'antd';
 import React from 'react';
 import usePermission, { Permission } from '../../permission/permission';
 import { isMobile } from '../../utils/deviceDetection';
@@ -60,18 +60,13 @@ export const MonitoringPointsTable = ({
         </SelfLink>
       )}
       <Table
-        {...{
-          rowKey: (record) => record.id,
-          columns,
-          size: 'small',
-          dataSource,
-          pagination: false,
-          locale: {
-            emptyText: <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description='暂无数据' />
-          },
-          bordered: true,
-          scroll: isMobile ? { x: 1000 } : { x: 1300 }
-        }}
+        rowKey={(record) => record.id}
+        columns={columns}
+        size='small'
+        dataSource={dataSource}
+        pagination={false}
+        bordered={true}
+        scroll={isMobile ? { x: 1000 } : { x: 1300 }}
       />
     </>
   );

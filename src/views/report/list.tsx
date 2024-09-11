@@ -14,6 +14,7 @@ import intl from 'react-intl-universal';
 import { PageTitle } from '../../components/pageTitle';
 import dayjs from '../../utils/dayjsUtils';
 import { Link } from 'react-router-dom';
+import { Report } from './detail/report';
 
 export default function ReportList() {
   const [dataSource, setDataSource] = useState<PageResult<Report[]>>();

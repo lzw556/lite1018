@@ -1,6 +1,6 @@
 import { Content } from 'antd/es/layout/layout';
 import ShadowCard from '../../../components/shadowCard';
-import { Button, Col, Form, Input, message, Row, Select } from 'antd';
+import { Button, Col, Form, Input, Row, Select } from 'antd';
 import { useEffect, useState } from 'react';
 import { Network } from '../../../types/network';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -142,9 +142,6 @@ export default function ShowNetwork() {
                                     ...values.gateway,
                                     ip_port: Number(values.gateway.ip_port)
                                   }
-                                }).then((res) => {
-                                  if (res.code === 200)
-                                    message.success(intl.get('SAVED_SUCCESSFUL'));
                                 });
                               });
                             }}

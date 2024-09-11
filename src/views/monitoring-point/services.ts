@@ -124,19 +124,14 @@ export function downloadRawHistory(
   );
 }
 
+export type ValuesPropertyName = `${'acceleration' | 'velocity' | 'displacement'}${
+  | 'XRMS'
+  | 'YRMS'
+  | 'ZRMS'}`;
+
 export type TrendData = {
   timestamp: number;
-  values: {
-    accelerationXRMS: number;
-    accelerationYRMS: number;
-    accelerationZRMS: number;
-    velocityXRMS: number;
-    velocityYRMS: number;
-    velocityZRMS: number;
-    displacementXRMS: number;
-    displacementYRMS: number;
-    displacementZRMS: number;
-  };
+  values: { [key in ValuesPropertyName]: number };
   selected: boolean;
 };
 

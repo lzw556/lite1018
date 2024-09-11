@@ -14,7 +14,7 @@ const TITLE = '二、	本周报警';
 
 export const AlarmPage = ({ report }: { report: Report }) => {
   const dataSource = report.alarmRecords ?? [];
-  const dataSource2 = [];
+  const dataSource2: any = [];
 
   const getPageMetaOfAlarmRecords = () => {
     const initialUsedNums = TITLE_ROWS + TABLE_HEADER_ROWS;

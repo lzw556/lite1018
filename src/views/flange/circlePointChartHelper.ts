@@ -123,7 +123,7 @@ function checkValidAttr(
       if (abs) {
         return item.enabled && item.value !== '' && Math.abs(item.value as number) > reference;
       }
-      return item.enabled && item.value !== '' && item.value > reference;
+      return item.enabled && item.value !== '' && (item.value as number) > reference;
     }
     return false;
   }
