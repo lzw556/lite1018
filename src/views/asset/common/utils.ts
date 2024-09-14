@@ -22,7 +22,7 @@ export function getParents(
   excludeTreeNode(
     assets,
     (asset) => {
-      if (lastAssets === undefined) {
+      if (lastAssets === undefined || lastAssets.length === 0) {
         parents.push(asset);
       } else {
         if (lastAssets.map(({ key }) => key).includes(asset.type)) {

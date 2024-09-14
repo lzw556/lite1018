@@ -27,7 +27,7 @@ export const BindMonitoringPoints2: React.FC<
   }
 
   React.useEffect(() => {
-    getAssets({ type: root.key, parent_id: 0 })
+    getAssets(root?.key ? { type: root.key, parent_id: 0 } : { parent_id: 0 })
       .then((assets) => {
         getTreedata(assets, props.selectedRow.type);
       })

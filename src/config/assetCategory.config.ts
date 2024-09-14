@@ -64,7 +64,7 @@ export function useAssetCategoryChain() {
   const config = useAppConfigContext();
   const chain = ASSET_CATEGORY_CHAINS.get(config.type) || [];
   const root = chain?.[0];
-  const last = chain?.filter((c) => c.isLeaf === true);
+  const last = chain?.filter((c) => c.isLeaf === true && c.key !== undefined);
   const isLeaf = (key: number) => chain.find((c) => c.key === key)?.isLeaf;
   const isChild = (key: number | undefined) => chain.find((c) => c.key === key)?.isChild;
   return { chain, root, last, isLeaf, isChild };

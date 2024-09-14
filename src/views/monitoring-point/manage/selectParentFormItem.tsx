@@ -38,9 +38,14 @@ export const SelectParentFormItem = ({
 
   React.useEffect(() => {
     if (parent === undefined) {
-      getAssets(
-        windId ? { type: root.key, parent_id: 0, id: windId } : { type: root.key, parent_id: 0 }
-      ).then((assets) => {
+      let paras: any = { parent_id: 0 };
+      if (windId) {
+        paras = { ...paras, id: windId };
+      }
+      if (root.key) {
+        paras = { ...paras, type: root.key };
+      }
+      getAssets(paras).then((assets) => {
         setParents(getParents(assets, memoedLast.current));
       });
     }
