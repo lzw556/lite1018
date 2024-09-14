@@ -14,11 +14,7 @@ export const NavMenu: React.FC<{
   const [openKeys, setOpenKeys] = React.useState<string[]>(getInitialOpenKeys());
   const items = mapTree(menus, (m) => {
     let state = undefined;
-    if (
-      m.name === 'project-overview' ||
-      m.name === 'asset-management' ||
-      m.name === 'measurement-management'
-    ) {
+    if (m.name === 'project-overview' || m.name === 'asset-management') {
       state = { from: { path: m.path, label: intl.get(m.title) } };
     }
     const label = m.path ? (

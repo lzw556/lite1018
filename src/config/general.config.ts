@@ -34,7 +34,6 @@ export const MONITORING_POINTS = [
   { id: MonitoringPointTypeValue.PRESSURE, label: MonitoringPointTypeText.PRESSURE },
   { id: MonitoringPointTypeValue.TEMPERATURE, label: MonitoringPointTypeText.TEMPERATURE }
 ];
-export const MENUS_HIDDEN = ['measurement-management'];
 
 export const ASSET_CATEGORY_CHAIN: AssetCategoryChain[] = [
   { key: AssetCategoryKey.GENERAL, label: AssetCategoryLabel.GENERAL, isLeaf: true, isChild: true }

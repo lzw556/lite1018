@@ -13,7 +13,6 @@ export const MONITORING_POINTS = [
     label: MonitoringPointTypeText.VIBRATION_THREE_AXIS_RPM
   }
 ];
-export const MENUS_HIDDEN = ['measurement-management'];
 
 export const ASSET_CATEGORY_CHAIN: AssetCategoryChain[] = [
   { key: undefined, label: AssetCategoryLabel.GENERAL, isLeaf: true, isChild: true }

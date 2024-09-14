@@ -14,7 +14,6 @@ export const MONITORING_POINTS = [
   { id: MonitoringPointTypeValue.THICKNESS, label: MonitoringPointTypeText.THICKNESS },
   { id: MonitoringPointTypeValue.THICKNESS_HIGH, label: MonitoringPointTypeText.THICKNESS_HIGH }
 ];
-export const MENUS_HIDDEN = [];
 
 export const ASSET_CATEGORY_CHAIN: AssetCategoryChain[] = [
   { key: AssetCategoryKey.AREA, label: AssetCategoryLabel.AREA },

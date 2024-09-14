@@ -52,7 +52,6 @@ const UpdateAlarmRuleGroups = lazy(() => import('../views/alarm/alarm-group/upda
 //wind-turbine
 const Assets = lazy(() => import('../views/asset/projectOverview'));
 const AssetsTreeList = lazy(() => import('../views/asset/tree-list/index'));
-const AssetsTableList = lazy(() => import('../views/asset/table-list/index'));
 const AssetShow = lazy(() => import('../views/asset/show/index'));
 const FlangeShow = lazy(() => import('../views/flange/show/index'));
 const TowerShow = lazy(() => import('../views/tower/show/index'));
@@ -111,14 +110,6 @@ const AppRouter = () => {
               element: <MonitoringPointShow />
             }
           ]
-        },
-        {
-          path: 'measurement-management',
-          element: (
-            <AssetsContextProvider>
-              <AssetsTableList />
-            </AssetsContextProvider>
-          )
         },
         {
           path: 'devices',

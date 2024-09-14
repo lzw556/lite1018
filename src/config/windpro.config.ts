@@ -32,7 +32,6 @@ export const MONITORING_POINTS = [
     label: MonitoringPointTypeText.TOWER_BASE_SETTLEMENT
   }
 ];
-export const MENUS_HIDDEN = [];
 
 export const ASSET_CATEGORY_CHAIN: AssetCategoryChain[] = [
   { key: AssetCategoryKey.WIND_TURBINE, label: AssetCategoryLabel.WIND_TURBINE },

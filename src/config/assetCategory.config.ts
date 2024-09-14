@@ -40,16 +40,6 @@ export const MONITORING_POINTS: Map<AppConfigType, MonitoringPointType[]> = new 
   ['vibration', Vibration.MONITORING_POINTS]
 ]);
 
-export const MENUS_HIDDEN: Map<AppConfigType, string[]> = new Map([
-  ['corrosion', Corrosion.MENUS_HIDDEN],
-  ['corrosionWirelessHART', CorrosionWirelessHart.MENUS_HIDDEN],
-  ['general', General.MENUS_HIDDEN],
-  ['hydroTurbine', Hydro.MENUS_HIDDEN],
-  ['windTurbine', Wind.MENUS_HIDDEN],
-  ['windTurbinePro', WindPro.MENUS_HIDDEN],
-  ['vibration', Vibration.MENUS_HIDDEN]
-]);
-
 export const ASSET_CATEGORY_CHAINS: Map<AppConfigType, AssetCategoryChain[]> = new Map([
   ['corrosion', Corrosion.ASSET_CATEGORY_CHAIN],
   ['corrosionWirelessHART', CorrosionWirelessHart.ASSET_CATEGORY_CHAIN],

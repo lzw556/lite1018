@@ -19,7 +19,6 @@ export const MONITORING_POINTS = [
   { id: MonitoringPointTypeValue.PRELOAD, label: MonitoringPointTypeText.PRELOAD },
   { id: MonitoringPointTypeValue.PRELOAD_ATTITUDE, label: MonitoringPointTypeText.PRELOAD_ATTITUDE }
 ];
-export const MENUS_HIDDEN = [];
 
 export const ASSET_CATEGORY_CHAIN: AssetCategoryChain[] = [
   { key: AssetCategoryKey.WIND_TURBINE, label: AssetCategoryLabel.WIND_TURBINE },
