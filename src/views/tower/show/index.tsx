@@ -1,11 +1,10 @@
 import { PlusOutlined } from '@ant-design/icons';
-import { Button, Col, Row, Spin, TabsProps } from 'antd';
+import { Button, Col, Row, TabsProps } from 'antd';
 import React from 'react';
-import { useParams } from 'react-router-dom';
 import { oneWeekNumberRange } from '../../../components/rangeDatePicker';
 import { TabsCard } from '../../../components/tabsCard';
 import usePermission, { Permission } from '../../../permission/permission';
-import { AssetAlarmStatistic, AssetRow, getAsset, useAssetsContext } from '../../asset';
+import { AssetAlarmStatistic, AssetRow, useAssetsContext } from '../../asset';
 import {
   getDataOfMonitoringPoint,
   getRealPoints,
@@ -20,31 +19,20 @@ import intl from 'react-intl-universal';
 import { useActionBarStatus } from '../../asset/common/useActionBarStatus';
 import { ActionBar } from '../../asset/common/actionBar';
 
-export default function TowerShow() {
-  const { id } = useParams();
+export default function TowerShow({
+  tower,
+  fetchTower
+}: {
+  tower: AssetRow;
+  fetchTower: (id: number) => void;
+}) {
+  const { id } = tower;
   const { refresh } = useAssetsContext();
-  const [tower, setTower] = React.useState<AssetRow>();
-  const [loading, setLoading] = React.useState(true);
   const [tabKey, setTabKey] = React.useState('monitoringPointList');
   const actionStatus = useActionBarStatus();
   const range = React.useRef<[number, number]>(oneWeekNumberRange);
   const historyDatas = useHistoryDatas(tower, range.current);
-
   const { hasPermission } = usePermission();
-
-  const fetchTower = (id: number) => {
-    getAsset(id).then((tower) => {
-      setLoading(false);
-      setTower(tower);
-    });
-  };
-
-  React.useEffect(() => {
-    fetchTower(Number(id));
-  }, [id]);
-
-  if (loading) return <Spin />;
-  if (tower === undefined) return <p>{intl.get('PARAMETER_ERROR_PROMPT')}</p>;
 
   const items: TabsProps['items'] = [
     {
@@ -56,7 +44,7 @@ export default function TowerShow() {
           onUpdate={(point) => {
             actionStatus.onMonitoringPointUpdate?.(point);
           }}
-          onDeleteSuccess={() => fetchTower(Number(id))}
+          onDeleteSuccess={() => fetchTower(id)}
         />
       )
     },
@@ -75,7 +63,7 @@ export default function TowerShow() {
         <TowerSet
           tower={tower}
           onUpdateSuccess={() => {
-            fetchTower(Number(id));
+            fetchTower(id);
             refresh();
           }}
         />
@@ -108,7 +96,7 @@ export default function TowerShow() {
                 ]}
                 {...actionStatus}
                 onSuccess={() => {
-                  fetchTower(Number(id));
+                  fetchTower(id);
                   refresh();
                 }}
               />

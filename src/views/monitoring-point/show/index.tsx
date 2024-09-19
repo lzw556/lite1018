@@ -1,11 +1,9 @@
-import { Col, Empty, Row, Spin, TabsProps } from 'antd';
+import { Col, Empty, Row, TabsProps } from 'antd';
 import React from 'react';
-import { useParams } from 'react-router-dom';
 import { FilterableAlarmRecordTable } from '../../../components/alarm/filterableAlarmRecordTable';
 import { TabsCard } from '../../../components/tabsCard';
 import usePermission, { Permission } from '../../../permission/permission';
 import { useAppConfigContext, useAssetsContext } from '../../asset';
-import { getMeasurement } from '../services';
 import {
   INVALID_MONITORING_POINT,
   MonitoringPointRow,
@@ -22,27 +20,17 @@ import { RelatedDevices } from './device';
 import { ThicknessAnalysis } from './thicknessAnalysis';
 import { VibrationAnalysis } from '../vibration-analysis';
 
-export default function MonitoringPointShow() {
-  const { id } = useParams();
+export default function MonitoringPointShow({
+  monitoringPoint,
+  fetchPoint
+}: {
+  monitoringPoint: MonitoringPointRow;
+  fetchPoint: (id: number) => void;
+}) {
+  const { id } = monitoringPoint;
   const { refresh } = useAssetsContext();
-  const [monitoringPoint, setMonitoringPoint] = React.useState<MonitoringPointRow>();
-  const [loading, setLoading] = React.useState(true);
-
   const { hasPermission } = usePermission();
   const appConfig = useAppConfigContext();
-
-  const fetchPoint = (id: number) => {
-    getMeasurement(id).then((point) => {
-      setLoading(false);
-      setMonitoringPoint(point);
-    });
-  };
-
-  React.useEffect(() => {
-    fetchPoint(Number(id));
-  }, [id]);
-
-  if (loading) return <Spin />;
   if (
     monitoringPoint === undefined ||
     monitoringPoint.bindingDevices === undefined ||
@@ -122,7 +110,7 @@ export default function MonitoringPointShow() {
         <MonitoringPointSet
           point={monitoringPoint}
           onUpdateSuccess={() => {
-            fetchPoint(Number(id));
+            fetchPoint(id);
             refresh();
           }}
         />

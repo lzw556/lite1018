@@ -124,7 +124,7 @@ export default function ProjectOverview() {
       <Empty
         description={
           <p>
-            <SelfLink to='/asset-management'>{intl.get('CREATE_ONE')}</SelfLink>
+            <SelfLink to={`/${ASSET_PATHNAME}`}>{intl.get('CREATE_ONE')}</SelfLink>
           </p>
         }
         image={Empty.PRESENTED_IMAGE_SIMPLE}
@@ -158,7 +158,7 @@ export default function ProjectOverview() {
                 count: <NameValueGroups items={statistics} col={{ span: 18 }} />,
                 title: {
                   name: item.name,
-                  path: `/asset-management/${ASSET_PATHNAME}/${item.id}`,
+                  path: `/${ASSET_PATHNAME}/${item.id}-${item.type}`,
                   state: [`${item.id}-${item.type}`]
                 },
                 alarmState,

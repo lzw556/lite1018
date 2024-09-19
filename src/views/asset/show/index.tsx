@@ -1,37 +1,23 @@
-import { Col, Row, Spin } from 'antd';
+import { Col, Row } from 'antd';
 import React from 'react';
-import { useParams } from 'react-router-dom';
 import { AssetAlarmStatistic, useAssetsContext } from '../components';
 import { AssertAssetCategory, AssertOfAssetCategory, AssetRow } from '../types';
-import { getAsset } from '../services';
 import ShadowCard from '../../../components/shadowCard';
 import { AssetTree } from '../tree-list/tree';
 import { useActionBarStatus } from '../common/useActionBarStatus';
 import { WindTurbineTabs } from './windTurbineShow';
-import intl from 'react-intl-universal';
 import { VibrationAsset } from '../vibration-asset/vibrationAsset';
 
-export default function WindTurbineShow() {
-  const { id } = useParams();
+export default function WindTurbineShow({
+  asset,
+  fetchAsset
+}: {
+  asset: AssetRow;
+  fetchAsset: (id: number) => void;
+}) {
+  const { id } = asset;
   const { refresh } = useAssetsContext();
   const actionStatus = useActionBarStatus();
-  const [asset, setAsset] = React.useState<AssetRow>();
-  const [loading, setLoading] = React.useState(true);
-
-  const fetchAsset = (id: number) => {
-    getAsset(id).then((asset) => {
-      setLoading(false);
-      setAsset(asset);
-    });
-  };
-
-  React.useEffect(() => {
-    fetchAsset(Number(id));
-  }, [id]);
-
-  if (loading) return <Spin />;
-  if (asset === undefined) return <p>{intl.get('PARAMETER_ERROR_PROMPT')}</p>;
-
   const isAssetWind = AssertAssetCategory(asset.type, AssertOfAssetCategory.IS_WIND_LIKE);
   const isVibration = AssertAssetCategory(asset.type, AssertOfAssetCategory.IS_VIBRATION);
 
@@ -43,7 +29,7 @@ export default function WindTurbineShow() {
             asset={asset}
             refresh={() => {
               refresh();
-              fetchAsset(Number(id));
+              fetchAsset(id);
             }}
           />
         </Col>
@@ -56,7 +42,7 @@ export default function WindTurbineShow() {
           <AssetAlarmStatistic {...asset} />
           {isAssetWind && (
             <WindTurbineTabs
-              id={Number(id)}
+              id={id}
               asset={asset}
               actionStatus={actionStatus}
               fetchAsset={fetchAsset}
@@ -72,7 +58,7 @@ export default function WindTurbineShow() {
                 rootId={asset.id}
                 onSuccess={() => {
                   refresh();
-                  fetchAsset(Number(id));
+                  fetchAsset(id);
                 }}
               />
             </ShadowCard>

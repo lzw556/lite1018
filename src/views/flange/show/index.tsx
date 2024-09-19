@@ -1,12 +1,11 @@
 import { PlusOutlined } from '@ant-design/icons';
-import { Button, Col, Row, Spin, TabsProps } from 'antd';
+import { Button, Col, Row, TabsProps } from 'antd';
 import React from 'react';
-import { useParams } from 'react-router-dom';
 import { checkIsFlangePreload } from '..';
 import { oneWeekNumberRange } from '../../../components/rangeDatePicker';
 import { TabsCard } from '../../../components/tabsCard';
 import usePermission, { Permission } from '../../../permission/permission';
-import { AssetAlarmStatistic, AssetRow, getAsset, useAssetsContext } from '../../asset';
+import { AssetAlarmStatistic, AssetRow, useAssetsContext } from '../../asset';
 import {
   getDataOfMonitoringPoint,
   getRealPoints,
@@ -23,31 +22,21 @@ import intl from 'react-intl-universal';
 import { useActionBarStatus } from '../../asset/common/useActionBarStatus';
 import { ActionBar } from '../../asset/common/actionBar';
 
-export default function FlangeShow() {
-  const { id } = useParams();
+export default function FlangeShow({
+  flange,
+  fetchFlange
+}: {
+  flange: AssetRow;
+  fetchFlange: (id: number) => void;
+}) {
+  const { id } = flange;
   const { refresh } = useAssetsContext();
-  const [flange, setFlange] = React.useState<AssetRow>();
-  const [loading, setLoading] = React.useState(true);
   const [tabKey, setTabKey] = React.useState('');
   const actionStatus = useActionBarStatus();
   const range = React.useRef<[number, number]>(oneWeekNumberRange);
   const historyDatas = useHistoryDatas(flange, range.current);
 
   const { hasPermission } = usePermission();
-
-  const fetchFlange = (id: number) => {
-    getAsset(id).then((flange) => {
-      setLoading(false);
-      setFlange(flange);
-    });
-  };
-
-  React.useEffect(() => {
-    fetchFlange(Number(id));
-  }, [id]);
-
-  if (loading) return <Spin />;
-  if (flange === undefined) return <p>{intl.get('PARAMETER_ERROR_PROMPT')}</p>;
 
   const items: TabsProps['items'] = [
     {
@@ -64,7 +53,7 @@ export default function FlangeShow() {
           onUpdate={(point) => {
             actionStatus.onMonitoringPointUpdate?.(point);
           }}
-          onDeleteSuccess={() => fetchFlange(Number(id))}
+          onDeleteSuccess={() => fetchFlange(id)}
         />
       )
     },
@@ -89,7 +78,7 @@ export default function FlangeShow() {
         <FlangeSet
           flange={flange}
           onUpdateSuccess={() => {
-            fetchFlange(Number(id));
+            fetchFlange(id);
             refresh();
           }}
         />
@@ -122,7 +111,7 @@ export default function FlangeShow() {
                 ]}
                 {...actionStatus}
                 onSuccess={() => {
-                  fetchFlange(Number(id));
+                  fetchFlange(id);
                   refresh();
                 }}
               />

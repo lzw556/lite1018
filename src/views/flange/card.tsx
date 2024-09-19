@@ -3,10 +3,9 @@ import { NameValueGroups } from '../../components/name-values';
 import { INVALID_MONITORING_POINT } from '../monitoring-point';
 import { getAssetStatistics } from '../asset/common/statisticsHelper';
 import { Introduction } from '../asset/components/introduction';
-import { AssetRow } from '../asset/types';
+import { ASSET_PATHNAME, AssetRow } from '../asset/types';
 import { CircleChart } from './circleChart';
 import { FlangeIcon } from './icon';
-import { FLANGE_PATHNAME } from './types';
 import intl from 'react-intl-universal';
 
 export const FlangeCard = (flange: AssetRow) => {
@@ -24,7 +23,7 @@ export const FlangeCard = (flange: AssetRow) => {
       {...{
         title: {
           name: name,
-          path: `/asset-management/${FLANGE_PATHNAME}/${id}`,
+          path: `/${ASSET_PATHNAME}/${id}-${type}`,
           state: [`${id}-${type}`]
         },
         alarmState,

@@ -3,10 +3,9 @@ import { NameValueGroups } from '../../components/name-values';
 import { INVALID_MONITORING_POINT, getRealPoints } from '../monitoring-point';
 import { getAssetStatistics } from '../asset/common/statisticsHelper';
 import { Introduction } from '../asset/components/introduction';
-import { AssetRow } from '../asset/types';
+import { ASSET_PATHNAME, AssetRow } from '../asset/types';
 import { TowerIcon } from './icon';
 import intl from 'react-intl-universal';
-import { TOWER_PATHNAME } from '.';
 import { CircleChart } from './circleChart';
 import { useHistoryDatas } from './show';
 import { oneWeekNumberRange } from '../../components/rangeDatePicker';
@@ -28,7 +27,7 @@ export const TowerCard = (tower: AssetRow) => {
       {...{
         title: {
           name: name,
-          path: `/asset-management/${TOWER_PATHNAME}/${id}`,
+          path: `/${ASSET_PATHNAME}/${id}-${type}`,
           state: [`${id}-${type}`]
         },
         alarmState,

@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import { Header } from 'antd/es/layout/layout';
 import { Button, Divider, Drawer, Dropdown, Space, Typography } from 'antd';
 import './layout.css';
@@ -16,6 +17,7 @@ import { Language, useLocaleContext } from '../../localeProvider';
 const { Text } = Typography;
 
 const HeaderLayout = (props: any) => {
+  const navigate = useNavigate();
   const { setLocale, language } = useLocaleContext();
   const { menus } = props;
   const [currentUser] = useState<any>(store.getState().auth.data.user);
@@ -71,7 +73,12 @@ const HeaderLayout = (props: any) => {
             />
           )}
           <Dropdown
-            menu={{ items: [{ key: 'logout', label: intl.get('LOGOUT'), onClick: onLogout }] }}
+            menu={{
+              items: [
+                { key: 'me', label: intl.get('MENU_USER_CENTER'), onClick: () => navigate('/me') },
+                { key: 'logout', label: intl.get('LOGOUT'), onClick: onLogout }
+              ]
+            }}
           >
             <Space>
               <Button type={'text'} style={{ color: '#fff', paddingLeft: 0, paddingRight: 0 }}>

@@ -18,7 +18,7 @@ export const useMonitoringPointTableColumns = () => {
       width: isMobile ? 300 : 400,
       render: (name: string, row: MonitoringPointRow) => (
         <SelfLink
-          to={`/asset-management/${MONITORING_POINT_PATHNAME}/${row.id}`}
+          to={`/${MONITORING_POINT_PATHNAME}/${row.id}-${row.type}`}
           state={[`${row.id}-${row.type}`]}
           key={`${name}-${row.id}`}
         >

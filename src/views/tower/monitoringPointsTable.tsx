@@ -2,8 +2,7 @@ import { Table } from 'antd';
 import React from 'react';
 import usePermission, { Permission } from '../../permission/permission';
 import { isMobile } from '../../utils/deviceDetection';
-import { getPathFromType } from '../asset';
-import { AssetRow } from '../asset/types';
+import { ASSET_PATHNAME, AssetRow } from '../asset/types';
 import {
   MonitoringPointRow,
   useMonitoringPointTableColumns,
@@ -46,7 +45,7 @@ export const MonitoringPointsTable = ({
     <>
       {showTitle && (
         <SelfLink
-          to={`/asset-management${getPathFromType(asset.type)}${id}`}
+          to={`/${ASSET_PATHNAME}/${id}-${asset.type}`}
           state={[`${id}-${asset.type}`]}
           style={{ display: 'block', marginBottom: 8, fontSize: 16 }}
         >

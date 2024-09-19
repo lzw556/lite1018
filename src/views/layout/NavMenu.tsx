@@ -5,6 +5,7 @@ import { Menu as MenuItem } from '../../types/menu';
 import { mapTree } from '../../utils/tree';
 import intl from 'react-intl-universal';
 import { SelfLink } from '../../components/selfLink';
+import { ASSET_PATHNAME } from '../asset';
 
 export const NavMenu: React.FC<{
   menus: MenuItem[];
@@ -14,7 +15,7 @@ export const NavMenu: React.FC<{
   const [openKeys, setOpenKeys] = React.useState<string[]>(getInitialOpenKeys());
   const items = mapTree(menus, (m) => {
     let state = undefined;
-    if (m.name === 'project-overview' || m.name === 'asset-management') {
+    if (m.name === 'project-overview' || m.name === ASSET_PATHNAME) {
       state = { from: { path: m.path, label: intl.get(m.title) } };
     }
     const label = m.path ? (

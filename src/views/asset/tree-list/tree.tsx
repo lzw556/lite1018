@@ -1,7 +1,7 @@
 import { Space, Tree, Typography } from 'antd';
 import * as React from 'react';
 import { combineMonitoringPointToAsset } from '../common/utils';
-import { AssertAssetCategory, AssertOfAssetCategory, AssetRow } from '../types';
+import { AssertAssetCategory, AssertOfAssetCategory, ASSET_PATHNAME, AssetRow } from '../types';
 import { MonitoringPointIcon, generateDatasOfMeasurement, pickId } from '../../monitoring-point';
 import { mapTree } from '../../../utils/tree';
 import { convertAlarmLevelToState } from '../common/statisticsHelper';
@@ -12,7 +12,6 @@ import { useActionBarStatus } from '../common/useActionBarStatus';
 import { ActionBar } from '../common/actionBar';
 import usePermission, { Permission } from '../../../permission/permission';
 import { TowerIcon } from '../../tower';
-import { getPathFromType } from '../components';
 import { useNavigate } from 'react-router-dom';
 import { DataBarOfFirstProperties } from '../../device/dataBarOfFirstProperties';
 import { isMobile } from '../../../utils/deviceDetection';
@@ -21,20 +20,11 @@ export const AssetTree: React.FC<{
   assets: AssetRow[];
   height?: number;
   isUsedInsideSidebar?: boolean;
-  onSelect?: (path: string[]) => void;
   onSuccess?: (actionType?: string) => void;
   rootId?: number;
   shouldNavigateWhenClick?: boolean;
   selectedKeys?: string[];
-}> = ({
-  assets,
-  height,
-  isUsedInsideSidebar = false,
-  onSelect,
-  onSuccess,
-  rootId,
-  selectedKeys
-}) => {
+}> = ({ assets, height, isUsedInsideSidebar = false, onSuccess, rootId, selectedKeys }) => {
   const navigate = useNavigate();
   const [treedata, setTreedata] = React.useState<any>();
   const [selectedNode, setSelectedNode] = React.useState<any>();
@@ -133,12 +123,8 @@ export const AssetTree: React.FC<{
         onSelect={(selectedKeys: any, e: any) => {
           setSelectedNode(e.node);
           const { id, type } = e.node;
-          const path = `${getPathFromType(type)}${pickId(id)}`;
-          onSelect?.(selectedKeys);
           if (isUsedInsideSidebar) {
-            navigate(`/asset-management${path}`, {
-              state: selectedKeys
-            });
+            navigate(`/${ASSET_PATHNAME}/${pickId(id)}-${type}`);
           }
         }}
         selectedKeys={selectedKeys}

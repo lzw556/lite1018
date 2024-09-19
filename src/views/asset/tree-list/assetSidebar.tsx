@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { AssetTree } from './tree';
 import { useActionBarStatus } from '../common/useActionBarStatus';
 import { AssetActionBar } from '../components/assetActionBar';
-import { AssetRow } from '../types';
+import { ASSET_PATHNAME, AssetRow } from '../types';
 import { isMobile } from '../../../utils/deviceDetection';
 import { EllipsisOutlined } from '@ant-design/icons';
 import { Drawer } from 'antd';
@@ -11,13 +11,11 @@ import { Drawer } from 'antd';
 export const AssetSidebar = ({
   assets,
   refresh,
-  selectedKeys,
-  setPath
+  selectedKeys
 }: {
   assets: AssetRow[];
   refresh: () => void;
   selectedKeys?: string[];
-  setPath: React.Dispatch<React.SetStateAction<string[] | undefined>>;
 }) => {
   const actionStatus = useActionBarStatus();
   const [open, setOpen] = React.useState(false);
@@ -52,12 +50,10 @@ export const AssetSidebar = ({
           selectedKeys={selectedKeys}
           height={treeHeight}
           isUsedInsideSidebar={true}
-          onSelect={setPath}
           onSuccess={(actionType) => {
             refresh();
-            setPath(undefined);
             if (actionType && actionType.indexOf('delete') > -1) {
-              navigate('/asset-management');
+              navigate(`/${ASSET_PATHNAME}`);
             }
           }}
         />

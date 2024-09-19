@@ -4,28 +4,21 @@ import React from 'react';
 import { useAssetsContext } from '../components/assetsContext';
 import './tree.css';
 import intl from 'react-intl-universal';
-import { Outlet, useLocation } from 'react-router-dom';
+import { Outlet, useParams } from 'react-router-dom';
 import { AssetSidebar } from './assetSidebar';
 
 export default function AssetsTreeList() {
-  const location = useLocation();
+  const { id: pathId } = useParams();
   const { assets, refresh } = useAssetsContext();
-  const [path, setPath] = React.useState<string[] | undefined>();
-  const selectedKeys =
-    (location.pathname !== '/asset-management' ? location.state : undefined) ?? path;
+  const selectedKeys = pathId ? [pathId] : undefined;
 
   const renderResult = () => {
     return (
       <>
-        <AssetSidebar
-          assets={assets}
-          selectedKeys={selectedKeys}
-          refresh={refresh}
-          setPath={setPath}
-        />
+        <AssetSidebar assets={assets} selectedKeys={selectedKeys} refresh={refresh} />
         <div className='asset-detail'>
-          {selectedKeys && location.pathname !== '/asset-management' ? (
-            <Outlet />
+          {pathId ? (
+            <Outlet key={pathId} />
           ) : (
             <Empty
               description={intl.get('PLEASE_SELECT_AN_ASSET')}

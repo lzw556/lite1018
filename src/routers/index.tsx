@@ -30,8 +30,6 @@ import {
 import { PrimaryLayout } from '../views/layout/primaryLayout';
 import { isLogin } from '../utils/session';
 import { ConfigProvider, Spin } from 'antd';
-import { FLANGE_PATHNAME } from '../views/flange';
-import { MONITORING_POINT_PATHNAME } from '../views/monitoring-point';
 import { useLocaleContext } from '../localeProvider';
 import intl from 'react-intl-universal';
 import en_US from '../locales/en-US.json';
@@ -41,7 +39,6 @@ import enUS from 'antd/es/locale/en_US';
 import dayjs from '../utils/dayjsUtils';
 import 'dayjs/locale/zh-cn';
 import { AssetsContextProvider, ASSET_PATHNAME, useAppConfigContext } from '../views/asset';
-import { TOWER_PATHNAME } from '../views/tower';
 import { SITE_NAMES } from '../config/assetCategory.config';
 import { DevicesContextProvider } from '../views/device/index';
 
@@ -52,10 +49,7 @@ const UpdateAlarmRuleGroups = lazy(() => import('../views/alarm/alarm-group/upda
 //wind-turbine
 const Assets = lazy(() => import('../views/asset/projectOverview'));
 const AssetsTreeList = lazy(() => import('../views/asset/tree-list/index'));
-const AssetShow = lazy(() => import('../views/asset/show/index'));
-const FlangeShow = lazy(() => import('../views/flange/show/index'));
-const TowerShow = lazy(() => import('../views/tower/show/index'));
-const MonitoringPointShow = lazy(() => import('../views/monitoring-point/show/index'));
+const AssetDetail = lazy(() => import('../views/asset/tree-list/detail'));
 
 const AppRouter = () => {
   const config = useAppConfigContext();
@@ -86,7 +80,7 @@ const AppRouter = () => {
           )
         },
         {
-          path: 'asset-management',
+          path: ASSET_PATHNAME,
           element: (
             <AssetsContextProvider>
               <AssetsTreeList />
@@ -94,20 +88,8 @@ const AppRouter = () => {
           ),
           children: [
             {
-              path: `${ASSET_PATHNAME}/:id`,
-              element: <AssetShow />
-            },
-            {
-              path: `${FLANGE_PATHNAME}/:id`,
-              element: <FlangeShow />
-            },
-            {
-              path: `${TOWER_PATHNAME}/:id`,
-              element: <TowerShow />
-            },
-            {
-              path: `${MONITORING_POINT_PATHNAME}/:id`,
-              element: <MonitoringPointShow />
+              path: ':id',
+              element: <AssetDetail />
             }
           ]
         },

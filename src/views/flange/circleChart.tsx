@@ -28,7 +28,7 @@ export const CircleChart = ({
       clickHandler: (paras: any) => {
         const index = paras.value[1];
         if (points.length > index) {
-          navigate(`/asset-management/${MONITORING_POINT_PATHNAME}/${points[index].id}`, {
+          navigate(`/${MONITORING_POINT_PATHNAME}/${points[index].id}-${points[index].type}`, {
             state: [`${points[index].id}-${points[index].type}`]
           });
         }
