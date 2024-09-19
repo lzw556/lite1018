@@ -1,4 +1,4 @@
-import { Col, Empty, Row, TabsProps } from 'antd';
+import { Empty, TabsProps } from 'antd';
 import React from 'react';
 import { FilterableAlarmRecordTable } from '../../../components/alarm/filterableAlarmRecordTable';
 import { TabsCard } from '../../../components/tabsCard';
@@ -16,7 +16,6 @@ import intl from 'react-intl-universal';
 import { MonitoringPointMonitor } from './monitor';
 import { MonitoringPointHistory } from './history';
 import { MonitoringPointDynamicData } from './dynamicData/dynamicData';
-import { RelatedDevices } from './device';
 import { ThicknessAnalysis } from './thicknessAnalysis';
 import { VibrationAnalysis } from '../vibration-analysis';
 
@@ -45,8 +44,8 @@ export default function MonitoringPointShow({
 
   const items: TabsProps['items'] = [
     {
-      key: 'monitor',
-      label: intl.get('MONITOR'),
+      key: 'overview',
+      label: intl.get('OVERVIEW'),
       children: <MonitoringPointMonitor {...monitoringPoint} />
     },
     {
@@ -102,6 +101,16 @@ export default function MonitoringPointShow({
       )
     });
   }
+  items.push({
+    key: 'alerts',
+    label: intl.get('ALARM_RECORDS'),
+    children: (
+      <FilterableAlarmRecordTable
+        sourceId={monitoringPoint.id}
+        storeKey='monitoringPointAlarmRecordList'
+      />
+    )
+  });
   if (hasPermission(Permission.MeasurementEdit)) {
     items.push({
       key: 'settings',
@@ -117,25 +126,6 @@ export default function MonitoringPointShow({
       )
     });
   }
-  items.push({
-    key: 'alerts',
-    label: intl.get('ALARM_RECORDS'),
-    children: (
-      <FilterableAlarmRecordTable
-        sourceId={monitoringPoint.id}
-        storeKey='monitoringPointAlarmRecordList'
-      />
-    )
-  });
 
-  return (
-    <Row gutter={[16, 16]}>
-      <Col span={24}>
-        <RelatedDevices {...monitoringPoint} />
-      </Col>
-      <Col span={24}>
-        <TabsCard items={items} />
-      </Col>
-    </Row>
-  );
+  return <TabsCard items={items} />;
 }
