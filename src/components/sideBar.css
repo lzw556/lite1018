@@ -11,13 +11,13 @@
   border: solid 1px transparent;
   border-radius: 8px;
   width: 300px;
-  background-color: #fff;
 }
 .sidebar-container .sidebar {
   position: fixed;
   top: 0;
   height: 100%;
   max-height: 100vh;
+  background-color: #fff;
 }
 .sidebar-container .sidebar-inner {
   display: flex;
