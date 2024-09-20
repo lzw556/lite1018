@@ -5,7 +5,11 @@ import { Content } from 'antd/lib/layout/layout';
 import { Device } from '../../../../types/device';
 import dayjs from '../../../../utils/dayjsUtils';
 import { EmptyLayout } from '../../../layout';
-import { FindDeviceDataRequest, RemoveDeviceDataRequest } from '../../../../apis/device';
+import {
+  FindDeviceDataRequest,
+  GetDeviceRuntimeRequest,
+  RemoveDeviceDataRequest
+} from '../../../../apis/device';
 import HasPermission from '../../../../permission';
 import { Permission } from '../../../../permission/permission';
 import Label from '../../../../components/label';
@@ -24,8 +28,25 @@ export interface DeviceDataProps {
   device: Device;
 }
 
+const batteryVoltage: DisplayProperty = {
+  key: 'batteryVoltage',
+  name: 'BATTERY_VOLTAGE',
+  precision: 0,
+  unit: 'mV'
+};
+const signalStrength: DisplayProperty = {
+  key: 'signalStrength',
+  name: 'SIGNAL_STRENGTH',
+  precision: 0,
+  unit: 'dBm'
+};
+
 const HistoryDataPage: FC<DeviceDataProps> = ({ device }) => {
   const properties = getDisplayProperties(device.properties, device.typeId);
+  if (!DeviceType.isWiredDevice(device.typeId)) {
+    properties.push(batteryVoltage);
+  }
+  properties.push(signalStrength);
   const [property, setProperty] = useState<DisplayProperty | undefined>(
     properties.length > 0 ? properties[0] : undefined
   );
@@ -34,6 +55,13 @@ const HistoryDataPage: FC<DeviceDataProps> = ({ device }) => {
   const [downloadVisible, setDownloadVisible] = useState<boolean>(false);
   const channels = DeviceType.isMultiChannel(device.typeId, true);
   const [channel, setChannel] = useState('1');
+  const [runtimes, setRuntimes] = useState<
+    {
+      batteryVoltage: number;
+      signalStrength: number;
+      timestamp: number;
+    }[]
+  >([]);
 
   const fetchDeviceData = useCallback(() => {
     if (range) {
@@ -41,6 +69,7 @@ const HistoryDataPage: FC<DeviceDataProps> = ({ device }) => {
       FindDeviceDataRequest(device.id, from, to, channels.length > 0 ? { channel } : {}).then(
         setDataSource
       );
+      GetDeviceRuntimeRequest(device.id, from, to).then(setRuntimes);
     }
   }, [device.id, range, channel, channels.length]);
 
@@ -50,18 +79,45 @@ const HistoryDataPage: FC<DeviceDataProps> = ({ device }) => {
 
   const renderHistoryDataChart = () => {
     if (dataSource && dataSource.length > 0 && property) {
-      const transform = transformHistoryData(dataSource, property);
-      return (
-        transform && (
-          <PropertyChart
-            dataZoom={true}
-            series={transform.series}
-            style={{ height: 450 }}
-            withArea={true}
-            yAxis={{ ...property, showName: true }}
-          />
-        )
-      );
+      if ([batteryVoltage, signalStrength].map(({ key }) => key).includes(property.key)) {
+        if (runtimes.length > 0) {
+          const xAxisValues = runtimes.map((item) =>
+            dayjs.unix(item.timestamp).local().format('YYYY-MM-DD HH:mm:ss')
+          );
+          const { key, name } = property;
+          return (
+            <PropertyChart
+              dataZoom={true}
+              series={[
+                {
+                  data: {
+                    [intl.formatMessage({ id: name })]: runtimes.map(
+                      (item) => item[key as 'batteryVoltage' | 'signalStrength']
+                    )
+                  },
+                  xAxisValues
+                }
+              ]}
+              style={{ height: 650 }}
+              withArea={true}
+              yAxis={{ ...property, showName: true }}
+            />
+          );
+        }
+      } else {
+        const transform = transformHistoryData(dataSource, property);
+        return (
+          transform && (
+            <PropertyChart
+              dataZoom={true}
+              series={transform.series}
+              style={{ height: 650 }}
+              withArea={true}
+              yAxis={{ ...property, showName: true }}
+            />
+          )
+        );
+      }
     }
     return <EmptyLayout description={intl.get('NO_DATA')} style={{ height: 300 }} />;
   };
@@ -168,6 +224,7 @@ const HistoryDataPage: FC<DeviceDataProps> = ({ device }) => {
           open={downloadVisible}
           device={device}
           property={property}
+          properties={properties}
           onCancel={() => {
             setDownloadVisible(false);
           }}

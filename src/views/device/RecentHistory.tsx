@@ -12,8 +12,12 @@ import { ChartHeader } from '../../components/charts/chartHeader';
 import { HistoryData } from '../monitoring-point';
 import { PropertyChart, transformHistoryData } from '../../components/charts/propertyChart';
 import { DisplayProperty } from '../../constants/properties';
+import InformationCard from './detail/information';
 
-export const RecentHistory: React.FC<{ device: Device }> = ({ device }) => {
+export const RecentHistory: React.FC<{ device: Device; isLoading: boolean }> = ({
+  device,
+  isLoading
+}) => {
   const channels = DeviceType.isMultiChannel(device.typeId, true);
   const [historyData, setHistoryData] = React.useState<HistoryData>();
   const [channel, setChannel] = React.useState('1');
@@ -63,10 +67,12 @@ export const RecentHistory: React.FC<{ device: Device }> = ({ device }) => {
   };
 
   return (
-    <Row justify={'start'}>
+    <Row gutter={[0, 16]}>
+      <Col span={24}>
+        <InformationCard device={device} isLoading={isLoading} />
+      </Col>
       <Col span={24}>
         <Card
-          bordered={false}
           title={
             channels.length > 0 && (
               <Space>

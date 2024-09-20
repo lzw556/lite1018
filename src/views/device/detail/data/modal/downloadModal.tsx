@@ -2,24 +2,25 @@ import { Form, ModalProps, Select } from 'antd';
 import { FC, useEffect } from 'react';
 import { DownloadDeviceDataRequest } from '../../../../../apis/device';
 import { Device } from '../../../../../types/device';
-import { getDisplayProperties } from '../../../util';
 import intl from 'react-intl-universal';
 import { useLocaleContext } from '../../../../../localeProvider';
 import { RangeDatePicker, oneWeekNumberRange } from '../../../../../components/rangeDatePicker';
 import React from 'react';
 import { ModalWrapper } from '../../../../../components/modalWrapper';
+import { DisplayProperty } from '../../../../../constants/properties';
 
 const { Option } = Select;
 
 export interface DownloadModalProps extends ModalProps {
   device: Device;
   property?: any;
+  properties: DisplayProperty[];
   onSuccess: () => void;
   channel?: string;
 }
 
 const DownloadModal: FC<DownloadModalProps> = (props) => {
-  const { open, device, property, onSuccess } = props;
+  const { open, device, property, properties, onSuccess } = props;
   const [range, setRange] = React.useState<[number, number]>(oneWeekNumberRange);
   const [form] = Form.useForm();
   const { language } = useLocaleContext();
@@ -75,7 +76,7 @@ const DownloadModal: FC<DownloadModalProps> = (props) => {
             mode={'multiple'}
             maxTagCount={2}
           >
-            {getDisplayProperties(device.properties, device.typeId).map((item) => (
+            {properties.map((item) => (
               <Option key={item.key} value={item.key}>
                 {intl.get(item.name)}
               </Option>
