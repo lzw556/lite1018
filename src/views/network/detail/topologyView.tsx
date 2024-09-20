@@ -94,7 +94,7 @@ const TopologyView: FC<TopologyViewProps> = ({ network }) => {
     }
   }, [graph, network]);
 
-  return <div id={'container'} style={{ width: '100%', height: '100%' }} />;
+  return <div id={'container'} style={{ width: '100%', height: '100%', minHeight: 560 }} />;
 };
 
 export default TopologyView;

@@ -29,7 +29,7 @@ const DevicePage = () => {
             <Outlet key={pathId} />
           ) : (
             <Empty
-              description={intl.get('PLEASE_SELECT_AN_ASSET')}
+              description={intl.get('PLEASE_SELECT_AN_DEVICE')}
               image={Empty.PRESENTED_IMAGE_SIMPLE}
             />
           )
@@ -95,7 +95,20 @@ function useDevices() {
       Promise.all(fetchs)
         .then((nets) => {
           const devs: Device[] = [];
-          nets.forEach((net) => devs.push(...net.nodes));
+          const rootDev = { id: 0, name: 'jjj', macAddress: '000000000000' } as Device;
+          devs.push(rootDev);
+          nets.forEach((net) =>
+            devs.push(
+              ...net.nodes.map((n) => {
+                if (!n.parent || n.parent.length === 0) {
+                  return { ...n, parent: rootDev.macAddress };
+                } else {
+                  return n;
+                }
+              })
+            )
+          );
+          console.log(devs);
           setDevices(devs);
         })
         .finally(() => setLoading(false));
