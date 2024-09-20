@@ -1,18 +1,21 @@
-import { Empty, Spin } from 'antd';
+import { Button, Empty, Spin } from 'antd';
 import intl from 'react-intl-universal';
 import React from 'react';
-import { Outlet, useLocation, useParams } from 'react-router-dom';
+import { Outlet, useParams } from 'react-router-dom';
 import './deviceList.css';
 import { Device } from '../../types/device';
 import { GetNetworkRequest, GetNetworksRequest } from '../../apis/network';
-import { DeviceSidebar } from './deviceSidebar';
+import { PageWithSideBar } from '../../components/pageWithSideBar';
+import { DeviceTree } from './deviceTree';
+import { SelfLink } from '../../components/selfLink';
+import { PlusOutlined } from '@ant-design/icons';
+import { DeleteDeviceRequest } from '../../apis/device';
 
 const DevicePage = () => {
-  const { id } = useParams();
-  const [path, setPath] = React.useState<string[] | undefined>(id ? [id] : undefined);
-  const location = useLocation();
+  const { id: pathId } = useParams();
+  const selectedKeys = pathId ? [pathId] : undefined;
   const devicesContext = useDevicesContext();
-  const { devices, loading } = devicesContext;
+  const { devices, loading, setToken } = devicesContext;
 
   if (loading) return <Spin />;
   if (!loading && devices?.length === 0)
@@ -20,17 +23,38 @@ const DevicePage = () => {
   if (!devices) return null;
   return (
     <>
-      <DeviceSidebar {...devicesContext} path={path} setPath={setPath} />
-      <div className='device-detail'>
-        {path && path.length > 0 && location.pathname !== '/devices' ? (
-          <Outlet key={path[0]} />
-        ) : (
-          <Empty
-            description={intl.get('PLEASE_SELECT_AN_DEVICE')}
-            image={Empty.PRESENTED_IMAGE_SIMPLE}
-          />
-        )}
-      </div>
+      <PageWithSideBar
+        content={
+          pathId ? (
+            <Outlet key={pathId} />
+          ) : (
+            <Empty
+              description={intl.get('PLEASE_SELECT_AN_ASSET')}
+              image={Empty.PRESENTED_IMAGE_SIMPLE}
+            />
+          )
+        }
+        sideBar={{
+          body: (height) => (
+            <DeviceTree
+              selectedKeys={selectedKeys}
+              devices={devices}
+              height={height}
+              onConfirm={(key) => {
+                DeleteDeviceRequest(Number(key));
+                setToken((crt) => crt + 1);
+              }}
+            />
+          ),
+          head: (
+            <SelfLink to='create'>
+              <Button type='primary' size='small'>
+                <PlusOutlined />
+              </Button>
+            </SelfLink>
+          )
+        }}
+      />
     </>
   );
 };

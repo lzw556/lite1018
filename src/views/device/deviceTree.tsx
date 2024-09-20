@@ -12,13 +12,11 @@ export const DeviceTree = ({
   selectedKeys,
   devices,
   height,
-  onSelect,
   onConfirm
 }: {
   selectedKeys?: string[];
   devices: Device[];
   height: number;
-  onSelect: (keys: string[]) => void;
   onConfirm?: (key: string) => void;
 }) => {
   const navigate = useNavigate();
@@ -55,7 +53,6 @@ export const DeviceTree = ({
       height={height}
       onSelect={(keys, e: any) => {
         const id = `${e.node.key}`;
-        onSelect([id]);
         setSelectedKey(id);
         navigate(`/devices/${id}`);
       }}

@@ -1,15 +1,3 @@
-.asset-sidebar {
-  /* display: flex; */
-  position: fixed;
-  flex-direction: column;
-  width: 280px;
-  height: calc(100vh - 80px);
-  padding: 10px;
-  background-color: #fff;
-}
-.asset-actions {
-  height: 40px;
-}
 .asset-detail {
   margin-left: 290px;
 }
