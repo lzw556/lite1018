@@ -63,7 +63,7 @@ const AddNetworkModal: FC<AddNetworkModalProps> = (props) => {
       onOk={onAdd}
       confirmLoading={isLoading}
     >
-      <Form form={form} {...useLocaleFormLayout(9)} labelWrap={true}>
+      <Form form={form} {...useLocaleFormLayout(18, 'vertical')} labelWrap={true}>
         <fieldset>
           <legend>{intl.get('BASIC_INFORMATION')}</legend>
 

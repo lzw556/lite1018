@@ -1,4 +1,3 @@
-import { Content } from 'antd/lib/layout/layout';
 import { useEffect, useState } from 'react';
 import {
   DeleteNetworkRequest,
@@ -12,7 +11,13 @@ import ShadowCard from '../../components/shadowCard';
 import TableLayout from '../layout/TableLayout';
 import AddNetworkModal from './modal/addNetworkModal';
 import { Button, Col, Dropdown, MenuProps, message, Popconfirm, Row, Space } from 'antd';
-import { CodeOutlined, DeleteOutlined, EditOutlined } from '@ant-design/icons';
+import {
+  CodeOutlined,
+  DeleteOutlined,
+  EditOutlined,
+  ImportOutlined,
+  PlusOutlined
+} from '@ant-design/icons';
 import { Network, NetworkProvisioningMode } from '../../types/network';
 import EditNetworkModal from './modal/editNetworkModal';
 import dayjs from '../../utils/dayjsUtils';
@@ -21,12 +26,12 @@ import usePermission, { Permission } from '../../permission/permission';
 import HasPermission from '../../permission';
 import { isMobile } from '../../utils/deviceDetection';
 import { Store, useStore } from '../../hooks/store';
-import { PageTitle } from '../../components/pageTitle';
 import intl from 'react-intl-universal';
 import { SelfLink } from '../../components/selfLink';
 import AddLoraNetworkModal from './lora/addNetworkModal';
 import EditLoraNetworkModal from './lora/editNetworkModal';
 import { DeviceType } from '../../types/device_type';
+import { useDevicesContext } from '../device';
 
 const NetworkPage = () => {
   const { hasPermission, hasPermissions } = usePermission();
@@ -37,6 +42,7 @@ const NetworkPage = () => {
   const [dataSource, setDataSource] = useState<PageResult<any>>();
   const [store, setStore, gotoPage] = useStore('networkList');
   const [deviceListStore, setDeviceListStore] = useStore('deviceList');
+  const devicesContext = useDevicesContext();
 
   const fetchNetworks = (store: Store['networkList']) => {
     const {
@@ -66,6 +72,7 @@ const NetworkPage = () => {
           return { ...prev, filters: prevFilter };
         });
       }
+      devicesContext.setToken((prev) => prev + 1);
     });
   };
 
@@ -134,7 +141,7 @@ const NetworkPage = () => {
       key: 'name',
       render: (text: string, record: Network) => {
         if (hasPermission(Permission.NetworkDetail)) {
-          return <SelfLink to={`${record.id}`}>{text}</SelfLink>;
+          return <SelfLink to={`/devices/${record.gateway.id}`}>{text}</SelfLink>;
         }
         return text;
       }
@@ -223,41 +230,51 @@ const NetworkPage = () => {
   ];
 
   return (
-    <Content>
-      <PageTitle
-        items={[{ title: intl.get('MENU_NETWORK_LIST') }]}
-        actions={
-          <HasPermission value={Permission.NetworkAdd}>
-            {/* <Button type={'primary'} onClick={() => setAddVisible(true)}>
-              {intl.get('CREATE_SOMETHING', { something: intl.get('NETWORK') })}
-              <PlusOutlined />
-            </Button> */}
-            <Dropdown.Button
-              type='primary'
-              onClick={() => setAddVisible(true)}
-              menu={{
-                items: [
-                  {
-                    label: intl.get('CREATE_SOMETHING', {
-                      something: intl.get('DEVICE_TYPE_GATEWAY_LORA')
-                    }),
-                    key: 'lora'
+    <div style={{ marginTop: 10 }}>
+      <ShadowCard
+        title={intl.get('MENU_NETWORK_LIST')}
+        extra={
+          <Space>
+            <HasPermission value={Permission.NetworkAdd}>
+              <Dropdown.Button
+                type='primary'
+                onClick={() => setAddVisible(true)}
+                menu={{
+                  items: [
+                    {
+                      label: intl.get('CREATE_SOMETHING', {
+                        something: intl.get('DEVICE_TYPE_GATEWAY_LORA')
+                      }),
+                      key: 'lora'
+                    }
+                  ],
+                  onClick: (e) => {
+                    if (e.key === 'lora') {
+                      setAddLoraVisible(true);
+                    }
                   }
-                ],
-                onClick: (e) => {
-                  if (e.key === 'lora') {
-                    console.log('dddddddddddd', e);
-                    setAddLoraVisible(true);
-                  }
-                }
-              }}
-            >
-              {intl.get('CREATE_SOMETHING', { something: intl.get('NETWORK') })}
-            </Dropdown.Button>
-          </HasPermission>
+                }}
+              >
+                {intl.get('CREATE_SOMETHING', { something: intl.get('NETWORK') })}
+              </Dropdown.Button>
+            </HasPermission>
+            <HasPermission value={Permission.NetworkAdd}>
+              <SelfLink to='/devices/import'>
+                <Button type='primary'>
+                  {intl.get('MENU_IMPORT_NETWORK')}
+                  <ImportOutlined />
+                </Button>
+              </SelfLink>
+            </HasPermission>
+            <SelfLink to='/devices/create'>
+              <Button type='primary'>
+                {intl.get('CREATE_SOMETHING', { something: intl.get('DEVICE') })}
+                <PlusOutlined />
+              </Button>
+            </SelfLink>
+          </Space>
         }
-      />
-      <ShadowCard>
+      >
         <Row justify={'start'}>
           <Col span={24}>
             <TableLayout
@@ -288,6 +305,7 @@ const NetworkPage = () => {
               const { size, page, total } = dataSource;
               gotoPage({ size, total, index: page }, 'next');
             }
+            devicesContext.setToken((prev) => prev + 1);
           }}
         />
       )}
@@ -300,6 +318,7 @@ const NetworkPage = () => {
             setEditVisible(false);
             message.success(intl.get('SAVED_SUCCESSFUL'));
             fetchNetworks(store);
+            devicesContext.setToken((prev) => prev + 1);
           }}
         />
       )}
@@ -313,6 +332,7 @@ const NetworkPage = () => {
               const { size, page, total } = dataSource;
               gotoPage({ size, total, index: page }, 'next');
             }
+            devicesContext.setToken((prev) => prev + 1);
           }}
         />
       )}
@@ -328,7 +348,12 @@ const NetworkPage = () => {
           }}
         />
       )}
-    </Content>
+      {/* {importingOpen && (
+        <ModalWrapper open={importingOpen} onCancel={() => setImportingOpen(false)}>
+          <ImportNetworkPage />
+        </ModalWrapper>
+      )} */}
+    </div>
   );
 };
 

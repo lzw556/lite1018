@@ -1,5 +1,4 @@
 import { Button, Card, Col, Form, message, Result, Row, Upload } from 'antd';
-import { Content } from 'antd/lib/layout/layout';
 import { useEffect, useState } from 'react';
 import { ImportOutlined, InboxOutlined } from '@ant-design/icons';
 import { ImportNetworkRequest } from '../../../apis/network';
@@ -15,6 +14,8 @@ import intl from 'react-intl-universal';
 import { toMac } from '../../../utils/format';
 import { useLocaleFormLayout } from '../../../hooks/useLocaleFormLayout';
 import { DeviceType } from '../../../types/device_type';
+import { SelfLink } from '../../../components/selfLink';
+import { useDevicesContext } from '../../device';
 
 const { Dragger } = Upload;
 
@@ -33,11 +34,11 @@ const ImportNetworkPage = () => {
   const [networkSettings, setNetworkSettings] = useState<any>();
   const [provisionMode, setProvisionMode, settings] = useProvisionMode(networkSettings);
   const navigate = useNavigate();
-
+  const devicesContext = useDevicesContext();
   const checkJSONFormat = (source: any) => {
     return source.hasOwnProperty('deviceList') && source.hasOwnProperty('wsn');
   };
-  const formLayout = useLocaleFormLayout(9);
+  const formLayout = useLocaleFormLayout(18, 'vertical');
   const isGatewayBle = network?.devices?.[0]?.type === DeviceType.Gateway;
 
   const onBeforeUpload = (file: any) => {
@@ -93,7 +94,10 @@ const ImportNetworkPage = () => {
             };
           })
         };
-        ImportNetworkRequest(req).then((_) => setSuccess(true));
+        ImportNetworkRequest(req).then((_) => {
+          setSuccess(true);
+          devicesContext.setToken((prev) => prev + 1);
+        });
       });
     } else {
       message.error(intl.get('DO_NOT_IMPORT_EMPTY_NETWORK')).then();
@@ -215,9 +219,12 @@ const ImportNetworkPage = () => {
   };
 
   return (
-    <Content>
+    <div style={{ marginTop: 10 }}>
       <PageTitle
-        items={[{ title: intl.get('MENU_IMPORT_NETWORK') }]}
+        items={[
+          { title: <SelfLink to='/devices/0'>{intl.get('MENU_NETWORK_LIST')}</SelfLink> },
+          { title: intl.get('MENU_IMPORT_NETWORK') }
+        ]}
         actions={
           !success && (
             <Button type='primary' onClick={onSave}>
@@ -294,7 +301,7 @@ const ImportNetworkPage = () => {
           />
         )}
       </ShadowCard>
-    </Content>
+    </div>
   );
 };
 

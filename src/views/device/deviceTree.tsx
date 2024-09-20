@@ -2,9 +2,9 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Device } from '../../types/device';
 import { Badge, Button, Popconfirm, Tree, TreeDataNode } from 'antd';
-import { DeviceType } from '../../types/device_type';
 import { DeleteOutlined } from '@ant-design/icons';
 import intl from 'react-intl-universal';
+import { VIRTUAL_ROOT_DEVICE } from '../../constants';
 
 type DeviceWithChildren = Device & { title: string; key: string; children: DeviceWithChildren[] };
 
@@ -31,7 +31,7 @@ export const DeviceTree = ({
       treeData={buildDeviceTreeData(devices)}
       titleRender={(node) => {
         const device = devices.find((d) => `${d.id}` === node.key);
-        return (
+        return node.key !== VIRTUAL_ROOT_DEVICE.id.toString() ? (
           <>
             <Badge
               status={device && device.state && device.state.isOnline ? 'success' : 'default'}
@@ -48,6 +48,8 @@ export const DeviceTree = ({
               </Popconfirm>
             )}
           </>
+        ) : (
+          node.title
         );
       }}
       height={height}
@@ -63,10 +65,10 @@ export const DeviceTree = ({
 function buildDeviceTreeData(devices: Device[]): TreeDataNode[] {
   const nodes: TreeDataNode[] = [];
   devices.forEach((dev) => {
-    if (DeviceType.isGateway(dev.typeId)) {
+    if (dev.macAddress === VIRTUAL_ROOT_DEVICE.macAddress) {
       const { name, id, children } = getDeviceWithChildren(dev, devices);
       nodes.push({
-        title: name,
+        title: intl.get(name),
         key: `${id}`,
         children
       });

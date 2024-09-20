@@ -1,61 +1,52 @@
-import { Button, Empty, Spin } from 'antd';
+import { Empty, Spin } from 'antd';
 import intl from 'react-intl-universal';
 import React from 'react';
-import { Outlet, useParams } from 'react-router-dom';
+import { Outlet, useLocation, useParams } from 'react-router-dom';
 import './deviceList.css';
 import { Device } from '../../types/device';
 import { GetNetworkRequest, GetNetworksRequest } from '../../apis/network';
 import { PageWithSideBar } from '../../components/pageWithSideBar';
 import { DeviceTree } from './deviceTree';
-import { SelfLink } from '../../components/selfLink';
-import { PlusOutlined } from '@ant-design/icons';
 import { DeleteDeviceRequest } from '../../apis/device';
+import { VIRTUAL_ROOT_DEVICE } from '../../constants';
 
 const DevicePage = () => {
+  const { pathname } = useLocation();
   const { id: pathId } = useParams();
   const selectedKeys = pathId ? [pathId] : undefined;
   const devicesContext = useDevicesContext();
   const { devices, loading, setToken } = devicesContext;
-
-  if (loading) return <Spin />;
   if (!loading && devices?.length === 0)
     return <Empty description={intl.get('NO_DATA')} image={Empty.PRESENTED_IMAGE_SIMPLE} />;
   if (!devices) return null;
+
   return (
-    <>
-      <PageWithSideBar
-        content={
-          pathId ? (
-            <Outlet key={pathId} />
-          ) : (
-            <Empty
-              description={intl.get('PLEASE_SELECT_AN_DEVICE')}
-              image={Empty.PRESENTED_IMAGE_SIMPLE}
-            />
-          )
-        }
-        sideBar={{
-          body: (height) => (
+    <PageWithSideBar
+      content={
+        pathId || pathname !== '/devices' ? (
+          <Outlet key={pathId} />
+        ) : (
+          <Empty
+            description={intl.get('PLEASE_SELECT_AN_DEVICE')}
+            image={Empty.PRESENTED_IMAGE_SIMPLE}
+          />
+        )
+      }
+      sideBar={{
+        body: (height) => (
+          <Spin spinning={loading}>
             <DeviceTree
               selectedKeys={selectedKeys}
               devices={devices}
               height={height}
               onConfirm={(key) => {
-                DeleteDeviceRequest(Number(key));
-                setToken((crt) => crt + 1);
+                DeleteDeviceRequest(Number(key)).then(() => setToken((crt) => crt + 1));
               }}
             />
-          ),
-          head: (
-            <SelfLink to='create'>
-              <Button type='primary' size='small'>
-                <PlusOutlined />
-              </Button>
-            </SelfLink>
-          )
-        }}
-      />
-    </>
+          </Spin>
+        )
+      }}
+    />
   );
 };
 
@@ -95,20 +86,18 @@ function useDevices() {
       Promise.all(fetchs)
         .then((nets) => {
           const devs: Device[] = [];
-          const rootDev = { id: 0, name: 'jjj', macAddress: '000000000000' } as Device;
-          devs.push(rootDev);
+          devs.push(VIRTUAL_ROOT_DEVICE as Device);
           nets.forEach((net) =>
             devs.push(
               ...net.nodes.map((n) => {
                 if (!n.parent || n.parent.length === 0) {
-                  return { ...n, parent: rootDev.macAddress };
+                  return { ...n, parent: VIRTUAL_ROOT_DEVICE.macAddress };
                 } else {
                   return n;
                 }
               })
             )
           );
-          console.log(devs);
           setDevices(devs);
         })
         .finally(() => setLoading(false));

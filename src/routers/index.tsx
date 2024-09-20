@@ -104,23 +104,23 @@ const AppRouter = () => {
           ),
           children: [
             {
+              path: 'create',
+              element: isWirelessHart ? <AddDeviceWirelessHart /> : <AddDevice />
+            },
+            {
+              path: 'import',
+              element: isWirelessHart ? <ImportNetworkWirelessHart /> : <ImportNetwork />
+            },
+            {
               path: ':id',
               element: isWirelessHart ? <DeviceDetailWirelessHart /> : <DeviceDetail />
             }
           ]
         },
-        {
-          path: 'devices/create',
-          element: isWirelessHart ? <AddDeviceWirelessHart /> : <AddDevice />
-        },
         { path: 'networks', element: isWirelessHart ? <NetworkWirelessHart /> : <Network /> },
         {
           path: 'networks/:id',
           element: isWirelessHart ? <NetworkDetailWirelessHart /> : <NetworkDetail />
-        },
-        {
-          path: 'importNetwork',
-          element: isWirelessHart ? <ImportNetworkWirelessHart /> : <ImportNetwork />
         },
         { path: 'firmwares', element: <Firmware /> },
         { path: 'alerts', element: <AlarmRecord /> },

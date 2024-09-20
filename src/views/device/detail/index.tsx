@@ -23,6 +23,8 @@ import TopologyView from '../../network/detail/topologyView';
 import { Network } from '../../../types/network';
 import { GetNetworkRequest } from '../../../apis/network';
 import { RuntimeChart } from '../RuntimeChart';
+import { VIRTUAL_ROOT_DEVICE } from '../../../constants';
+import NetworkPage from '../../network';
 
 const DeviceDetailPage = () => {
   const { id } = useParams();
@@ -37,24 +39,26 @@ const DeviceDetailPage = () => {
 
   const fetchDevice = useCallback(() => {
     if (id && isNumber(Number(id))) {
-      setIsLoading(true);
-      GetDeviceRequest(Number(id))
-        .then((data) => {
-          setDevice(data);
-          if (DeviceType.isGateway(data.typeId)) {
-            if (data.network?.id) {
-              GetNetworkRequest(data.network?.id)
-                .then((data) => {
-                  setNetwork(data);
-                })
-                .catch((_) => {
-                  navigate('/devices');
-                });
+      if (Number(id) !== VIRTUAL_ROOT_DEVICE.id) {
+        setIsLoading(true);
+        GetDeviceRequest(Number(id))
+          .then((data) => {
+            setDevice(data);
+            if (DeviceType.isGateway(data.typeId)) {
+              if (data.network?.id) {
+                GetNetworkRequest(data.network?.id)
+                  .then((data) => {
+                    setNetwork(data);
+                  })
+                  .catch((_) => {
+                    navigate('/devices');
+                  });
+              }
             }
-          }
-          setIsLoading(false);
-        })
-        .catch((_) => navigate('/devices'));
+            setIsLoading(false);
+          })
+          .catch((_) => navigate('/devices'));
+      }
     } else {
       message.error(intl.get('DEVICE_DOES_NOT_EXIST')).then();
       navigate('/devices');
@@ -152,6 +156,9 @@ const DeviceDetailPage = () => {
     return tabs;
   }
 
+  if (Number(id) === VIRTUAL_ROOT_DEVICE.id) {
+    return <NetworkPage />;
+  }
   if (isLoading) {
     return <Spin />;
   }
