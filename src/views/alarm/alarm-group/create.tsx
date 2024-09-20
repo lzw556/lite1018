@@ -1,4 +1,5 @@
 import { MinusCircleOutlined } from '@ant-design/icons';
+import { Content } from 'antd/es/layout/layout';
 import { Button, Cascader, Col, Divider, Form, Input, InputNumber, Row, Select } from 'antd';
 import * as React from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -34,7 +35,7 @@ export default function CreateAlarmRuleGroup() {
   }, []);
 
   return (
-    <>
+    <Content>
       <PageTitle
         items={[
           { title: <SelfLink to='/alarmRules'>{intl.get('ALARM_RULES')}</SelfLink> },
@@ -492,6 +493,6 @@ export default function CreateAlarmRuleGroup() {
           </Form.Item>
         </Form>
       </ShadowCard>
-    </>
+    </Content>
   );
 }

@@ -4,6 +4,7 @@ import { ChartContainer } from '../../../components/charts/chartContainer';
 import { ChartOptions } from '../../../components/charts/common';
 import ShadowCard from '../../../components/shadowCard';
 import { generateColProps } from '../../../utils/grid';
+import { Content } from 'antd/es/layout/layout';
 
 export type TableListItem<T> = TableProps<T> & {
   colProps?: {
@@ -52,7 +53,7 @@ export const OverviewPage: React.FC<Overview> = (props) => {
   };
 
   return (
-    <>
+    <Content>
       {statistics}
       <Row gutter={[0, 16]}>
         {charts && (
@@ -84,6 +85,6 @@ export const OverviewPage: React.FC<Overview> = (props) => {
         {tabs && <Col span={24}>{tabs}</Col>}
         <Col span={24}>{props.children}</Col>
       </Row>
-    </>
+    </Content>
   );
 };

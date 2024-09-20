@@ -42,16 +42,10 @@ export const PrimaryLayout = () => {
     return <Navigate to='/login' />;
   }
 
-  const style = {
-    height: 'calc(100vh - 60px)',
-    maxHeight: 'calc(100vh - 60px)',
-    overflowY: 'auto' as 'auto'
-  };
-
   return (
     <Layout>
       <HeaderLayout menus={menus} />
-      <Layout style={{ padding: 10, ...style }}>
+      <Layout>
         <ValidateProject>
           <Outlet />
         </ValidateProject>
