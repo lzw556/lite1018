@@ -68,7 +68,7 @@ export default function MonitoringPointShow({
     items.push({
       key: 'analysis',
       label: intl.get('intelligent.analysis'),
-      children: <VibrationAnalysis />
+      children: <VibrationAnalysis id={monitoringPoint.id} />
     });
   }
   const config = MONITORING_POINT_TYPE_VALUE_DYNAMIC_MAPPING.get(monitoringPoint.type);

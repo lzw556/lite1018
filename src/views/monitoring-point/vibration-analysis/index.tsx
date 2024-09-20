@@ -1,5 +1,4 @@
 import React from 'react';
-import { useParams } from 'react-router-dom';
 import { Button, Tabs } from 'antd';
 import intl from 'react-intl-universal';
 import './style.css';
@@ -34,9 +33,8 @@ export const subs = [
   { key: 'timeFrequency', label: 'stft', children: <TimeFrequency /> }
 ];
 
-export const VibrationAnalysis = () => {
+export const VibrationAnalysis = ({ id }: { id: number }) => {
   const [activeKey, setActiveKey] = React.useState('originalDomain');
-  const { id } = useParams();
 
   return (
     <AnalysisProvider id={Number(id)} activeKey={activeKey}>
