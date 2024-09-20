@@ -19,6 +19,8 @@
   flex-direction: column;
   flex: 1;
   background-color: #fff;
+  border-left: solid 1px #f0f0f0;
+  border-right: solid 1px #f0f0f0;
 }
 #vibration-asset .main .content {
   display: flex;
@@ -30,16 +32,6 @@
   align-items: center;
   flex: 1;
   width: 50%;
-  /* height: 100%; */
-}
-#vibration-asset .cover > img {
-  width: 100%;
-}
-#vibration-asset .detail {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  width: 50%;
 }
 #vibration-asset .info {
   flex-shrink: 0;
@@ -49,17 +41,4 @@
 }
 #vibration-asset .monitoring-points {
   margin-top: 10px;
-}
-@media (max-width: 1300px) {
-  #vibration-asset .main .content {
-    flex-direction: column;
-  }
-  #vibration-asset .cover,
-  #vibration-asset .detail {
-    width: 100%;
-    height: 50%;
-  }
-  #vibration-asset .detail {
-    align-items: center;
-  }
 }
