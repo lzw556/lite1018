@@ -52,7 +52,7 @@ const SideBar = ({ body, head }: SideBarProps) => {
       <div className='sidebar' ref={sidebarRef}>
         {expanded ? (
           <div className='sidebar-inner'>
-            <div className='sidebar-head'>{head}</div>
+            {head && <div className='sidebar-head'>{head}</div>}
             <div className='sidebar-body' style={{ height: sidebarBodyHeight }}>
               {body(sidebarBodyHeight - 10)}
             </div>
