@@ -5,16 +5,13 @@ import './tree.css';
 import intl from 'react-intl-universal';
 import { Outlet, useNavigate, useParams } from 'react-router-dom';
 import { PageWithSideBar } from '../../../components/pageWithSideBar';
-import { useActionBarStatus } from '../common/useActionBarStatus';
 import { AssetTree } from './tree';
 import { ASSET_PATHNAME } from '../types';
-import { AssetActionBar } from '../components/assetActionBar';
 
 export default function AssetsTreeList() {
   const { id: pathId } = useParams();
   const { assets, refresh } = useAssetsContext();
   const selectedKeys = pathId ? [pathId] : undefined;
-  const actionStatus = useActionBarStatus();
   const navigate = useNavigate();
 
   return (
@@ -43,8 +40,7 @@ export default function AssetsTreeList() {
               }
             }}
           />
-        ),
-        head: <AssetActionBar roots={assets} refresh={refresh} actionStatus={actionStatus} />
+        )
       }}
     />
   );

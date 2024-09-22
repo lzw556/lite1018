@@ -25,13 +25,7 @@ export default function WindTurbineShow({
     return (
       <Row gutter={[16, 16]}>
         <Col span={24}>
-          <VibrationAsset
-            asset={asset}
-            refresh={() => {
-              refresh();
-              fetchAsset(id);
-            }}
-          />
+          <VibrationAsset asset={asset} refresh={refresh} />
         </Col>
       </Row>
     );

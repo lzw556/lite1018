@@ -19,7 +19,9 @@ export const CreateAsset: React.FC<ModalProps & { parentId?: number; onSuccess: 
   const [parents, setParents] = React.useState<AssetRow[]>([]);
   React.useEffect(() => {
     if (parentId === undefined && isChild) {
-      getAssets({ type: key, parent_id: 0 }).then((assets) => setParents(getParents(assets)));
+      getAssets(key ? { type: key, parent_id: 0 } : { parent_id: 0 }).then((assets) =>
+        setParents(getParents(assets))
+      );
     }
   }, [parentId, isChild, key]);
 

@@ -1,7 +1,14 @@
 import { Space, Tree, Typography } from 'antd';
 import * as React from 'react';
+import intl from 'react-intl-universal';
 import { combineMonitoringPointToAsset } from '../common/utils';
-import { AssertAssetCategory, AssertOfAssetCategory, ASSET_PATHNAME, AssetRow } from '../types';
+import {
+  AssertAssetCategory,
+  AssertOfAssetCategory,
+  ASSET_PATHNAME,
+  AssetRow,
+  VIRTUAL_ROOT_ASSET
+} from '../types';
 import { MonitoringPointIcon, generateDatasOfMeasurement, pickId } from '../../monitoring-point';
 import { mapTree } from '../../../utils/tree';
 import { convertAlarmLevelToState } from '../common/statisticsHelper';
@@ -33,7 +40,16 @@ export const AssetTree: React.FC<{
 
   const getTreedata = React.useCallback((assets: AssetRow[]) => {
     if (assets.length > 0) {
-      const mixedTree = mapTree(assets, (asset) => combineMonitoringPointToAsset(asset));
+      const mixedTree = mapTree(
+        [
+          {
+            ...VIRTUAL_ROOT_ASSET,
+            children: assets,
+            name: intl.get(VIRTUAL_ROOT_ASSET.name)
+          } as AssetRow
+        ],
+        (asset) => combineMonitoringPointToAsset(asset)
+      );
       setTreedata(
         mapTree(mixedTree, (mix) => {
           return {
@@ -61,8 +77,10 @@ export const AssetTree: React.FC<{
                 } else {
                   return <AssetIcon className={`${alarmState}`} />;
                 }
-              } else {
+              } else if (mix.type > 10000) {
                 return <MonitoringPointIcon className={`${alarmState} focus`} />;
+              } else {
+                return null;
               }
             }
           };
@@ -107,16 +125,17 @@ export const AssetTree: React.FC<{
                 {name}
               </Typography.Text>
               {!isUsedInsideSidebar && !isMobile && alarmText}
-              {selectedNode?.key === props.key && (
-                <NodeActions
-                  id={pickId(selectedNode.id)}
-                  type={selectedNode.type}
-                  name={selectedNode.name}
-                  onSuccess={onSuccess}
-                  rootId={rootId}
-                  actionStatus={actionStatus}
-                />
-              )}
+              {selectedNode?.key === props.key &&
+                props.key !== `${VIRTUAL_ROOT_ASSET.id}-${VIRTUAL_ROOT_ASSET.type}` && (
+                  <NodeActions
+                    id={pickId(selectedNode.id)}
+                    type={selectedNode.type}
+                    name={selectedNode.name}
+                    onSuccess={onSuccess}
+                    rootId={rootId}
+                    actionStatus={actionStatus}
+                  />
+                )}
             </Space>
           );
         }}

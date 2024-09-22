@@ -4,6 +4,7 @@ import './introduction.css';
 import { SelfLink } from '../../../components/selfLink';
 
 export type IntroductionProps = {
+  className?: string;
   count: JSX.Element;
   title: { name: string; path: string; state: any };
   icon: { svg: JSX.Element; small: boolean; focus?: boolean };
@@ -13,6 +14,7 @@ export type IntroductionProps = {
 };
 export const Introduction: React.FC<IntroductionProps> = (props) => {
   const {
+    className = '',
     title: { name, path, state },
     count,
     icon: { svg, small, focus },
@@ -20,7 +22,7 @@ export const Introduction: React.FC<IntroductionProps> = (props) => {
     chart
   } = props;
   return (
-    <div className={`introduction ${alarmState} ${focus ? 'focus' : ''}`}>
+    <div className={`${className} introduction ${alarmState} ${focus ? 'focus' : ''}`}>
       <div className='introduction-title'>
         <h3>
           <SelfLink to={path} state={state}>

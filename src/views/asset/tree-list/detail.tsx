@@ -3,13 +3,14 @@ import { useParams } from 'react-router-dom';
 import { Empty, Spin } from 'antd';
 import intl from 'react-intl-universal';
 import './tree.css';
-import { AssertAssetCategory, AssertOfAssetCategory, AssetRow } from '../types';
+import { AssertAssetCategory, AssertOfAssetCategory, AssetRow, VIRTUAL_ROOT_ASSET } from '../types';
 import { getAsset } from '../services';
 import { getMeasurement, MonitoringPointRow } from '../../monitoring-point';
 import WindTurbineShow from '../show';
 import FlangeShow from '../../flange/show';
 import TowerShow from '../../tower/show';
 import MonitoringPointShow from '../../monitoring-point/show';
+import { VirtualAssetDetail } from '../virtualAssetDetail';
 
 export default function AssetDetail() {
   const { id: pathId } = useParams();
@@ -17,6 +18,7 @@ export default function AssetDetail() {
   const [loading, setLoading] = React.useState(false);
   const [monitoringPoint, setMonitoringPoint] = React.useState<MonitoringPointRow>();
   const [loading2, setLoading2] = React.useState(false);
+  const [isAssetVirtual, setIsAssetVirtual] = React.useState(false);
 
   const fetchAsset = (id: number) => {
     setLoading(true);
@@ -39,14 +41,21 @@ export default function AssetDetail() {
       const [idStr, typeStr] = pathId.split('-');
       const id = Number(idStr);
       const type = Number(typeStr);
-      if (type < 10000) {
-        fetchAsset(Number(id));
+      if (id === VIRTUAL_ROOT_ASSET.id) {
+        setIsAssetVirtual(true);
       } else {
-        fetchPoint(Number(id));
+        if (type < 10000) {
+          fetchAsset(Number(id));
+        } else {
+          fetchPoint(Number(id));
+        }
       }
     }
   }, [pathId]);
 
+  if (isAssetVirtual) {
+    return <VirtualAssetDetail />;
+  }
   if (loading || loading2) {
     return <Spin />;
   }

@@ -11,22 +11,17 @@ import {
 import { ColorDanger, ColorHealth, ColorInfo, ColorWarn } from '../../../constants/color';
 import DianJi from './dianji.png';
 import { AssetRow } from '../types';
-import { Button, Col, Row, Table, Tag } from 'antd';
-import { getPropertyColumns, MONITORING_POINT, MonitoringPointRow } from '../../monitoring-point';
+import { Table, Tag } from 'antd';
+import { getPropertyColumns, MonitoringPointRow } from '../../monitoring-point';
 import dayjs from '../../../utils/dayjsUtils';
 import { useLocaleContext } from '../../../localeProvider';
 import { SettingsDetail } from './settingsDetail';
-import { PlusOutlined } from '@ant-design/icons';
-import { useActionBarStatus } from '../common/useActionBarStatus';
-import { ActionBar } from '../common/actionBar';
-import usePermission, { Permission } from '../../../permission/permission';
 import { TabsCard } from '../../../components/tabsCard';
 import { UpdateVibrationAsset2 } from './update2';
-
+import { Points } from './points';
 export const VibrationAsset = ({ asset, refresh }: { asset: AssetRow; refresh: () => void }) => {
   const { language } = useLocaleContext();
   const { alertLevel, monitoringPoints = [], name, statistics } = asset;
-  const { hasPermission } = usePermission();
   const data = getAssetStatistics(
     statistics,
     ['normal', intl.get('ALARM_LEVEL_NORMAL')],
@@ -38,7 +33,6 @@ export const VibrationAsset = ({ asset, refresh }: { asset: AssetRow; refresh: (
     value,
     itemStyle: { color }
   }));
-  const actionStatus = useActionBarStatus();
   const [activeKey, setActiveKey] = React.useState('overview');
 
   return (
@@ -202,9 +196,7 @@ export const VibrationAsset = ({ asset, refresh }: { asset: AssetRow; refresh: (
                 )}
                 <div className='main'>
                   <div className='content'>
-                    <div className='cover'>
-                      <img src={DianJi} alt='' />
-                    </div>
+                    <img src={DianJi} alt='' />
                   </div>
                 </div>
                 <div className='info'>
@@ -222,25 +214,6 @@ export const VibrationAsset = ({ asset, refresh }: { asset: AssetRow; refresh: (
                 </div>
               </div>
               <div className='monitoring-points'>
-                <Row justify='end' style={{ marginBottom: 10 }}>
-                  <Col>
-                    <ActionBar
-                      {...actionStatus}
-                      hasPermission={hasPermission(Permission.AssetAdd)}
-                      actions={[
-                        <Button
-                          key='create-monitoring-point'
-                          type='primary'
-                          onClick={() => actionStatus.onMonitoringPointCreate(asset)}
-                        >
-                          {intl.get('CREATE_SOMETHING', { something: intl.get(MONITORING_POINT) })}
-                          <PlusOutlined />
-                        </Button>
-                      ]}
-                      onSuccess={() => refresh()}
-                    />
-                  </Col>
-                </Row>
                 <Table
                   bordered
                   columns={[
@@ -266,7 +239,12 @@ export const VibrationAsset = ({ asset, refresh }: { asset: AssetRow; refresh: (
         {
           key: 'settings',
           label: intl.get('SETTINGS'),
-          children: <UpdateVibrationAsset2 asset={asset} onSuccess={() => refresh()} />
+          children: <UpdateVibrationAsset2 asset={asset} onSuccess={refresh} />
+        },
+        {
+          key: 'monitoringPointList',
+          label: intl.get('MONITORING_POINT_LIST'),
+          children: <Points asset={asset} onSuccess={refresh} />
         }
       ]}
       tabBarExtraContent={{

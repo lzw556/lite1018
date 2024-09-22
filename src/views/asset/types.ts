@@ -145,3 +145,9 @@ export type AssetCategoryChain = AssetCategoryDic & {
 };
 
 export const ASSET_PATHNAME = 'assets';
+
+export const VIRTUAL_ROOT_ASSET = {
+  id: 0,
+  type: 0,
+  name: 'ASSET_LIST'
+};

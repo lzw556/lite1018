@@ -26,12 +26,9 @@
   display: flex;
   flex: 1;
 }
-#vibration-asset .cover {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex: 1;
-  width: 50%;
+#vibration-asset .content > img {
+  /* max-height: 100%; */
+  max-width: 100%;
 }
 #vibration-asset .info {
   flex-shrink: 0;
@@ -40,5 +37,5 @@
   background-color: #fff;
 }
 #vibration-asset .monitoring-points {
-  margin-top: 10px;
+  margin-top: 20px;
 }
