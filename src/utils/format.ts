@@ -56,7 +56,7 @@ export function getDisplayName({
   suffix?: string;
 }) {
   const zh = lang === 'zh-CN';
-  const braceLeft = zh ? '（' : '(';
+  const braceLeft = zh ? '（' : ' (';
   const braceRight = zh ? '）' : ')';
   if (suffix) {
     return `${name}${braceLeft}${suffix}${braceRight}`;
