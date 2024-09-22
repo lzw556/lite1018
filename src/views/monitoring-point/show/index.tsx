@@ -1,9 +1,15 @@
-import { Empty, TabsProps } from 'antd';
+import { Empty, TabsProps, Tag } from 'antd';
 import React from 'react';
 import { FilterableAlarmRecordTable } from '../../../components/alarm/filterableAlarmRecordTable';
 import { TabsCard } from '../../../components/tabsCard';
 import usePermission, { Permission } from '../../../permission/permission';
-import { useAppConfigContext, useAssetsContext } from '../../asset';
+import {
+  convertAlarmLevelToState,
+  getAlarmLevelColor,
+  getAlarmStateText,
+  useAppConfigContext,
+  useAssetsContext
+} from '../../asset';
 import {
   INVALID_MONITORING_POINT,
   MonitoringPointRow,
@@ -26,7 +32,7 @@ export default function MonitoringPointShow({
   monitoringPoint: MonitoringPointRow;
   fetchPoint: (id: number) => void;
 }) {
-  const { id } = monitoringPoint;
+  const { id, name, alertLevel } = monitoringPoint;
   const { refresh } = useAssetsContext();
   const { hasPermission } = usePermission();
   const appConfig = useAppConfigContext();
@@ -127,5 +133,19 @@ export default function MonitoringPointShow({
     });
   }
 
-  return <TabsCard items={items} />;
+  return (
+    <TabsCard
+      items={items}
+      tabBarExtraContent={{
+        left: (
+          <div style={{ marginRight: 30 }}>
+            <Tag color={getAlarmLevelColor(convertAlarmLevelToState(alertLevel || 0))}>
+              {getAlarmStateText(convertAlarmLevelToState(alertLevel || 0))}
+            </Tag>
+            {name}
+          </div>
+        )
+      }}
+    />
+  );
 }
