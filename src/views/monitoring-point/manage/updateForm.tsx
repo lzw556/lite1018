@@ -44,7 +44,7 @@ export const UpdateForm = ({
   const memoedLast = React.useRef(last);
 
   React.useEffect(() => {
-    getAssets(root?.key ? { type: root.key, parent_id: 0 } : { parent_id: 0 }).then((assets) => {
+    getAssets({ type: root.key, parent_id: 0 }).then((assets) => {
       setParents(getParents(assets, memoedLast.current));
     });
   }, [root.key]);

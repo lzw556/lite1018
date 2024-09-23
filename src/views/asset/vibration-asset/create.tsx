@@ -15,20 +15,21 @@ export const CreateVibrationAsset: React.FC<
   const { parentId, onSuccess } = props;
   const [form] = Form.useForm<Asset>();
   const {
-    root: { label, isChild }
+    root: { key },
+    last
   } = useAssetCategoryChain();
   const [parents, setParents] = React.useState<AssetRow[]>([]);
   const [type, setType] = React.useState<number | undefined>();
   React.useEffect(() => {
-    if (parentId === undefined && isChild) {
-      getAssets({ parent_id: 0 }).then((assets) => setParents(getParents(assets)));
+    if (parentId === undefined) {
+      getAssets({ parent_id: 0, type: key }).then((assets) => setParents(getParents(assets)));
     }
-  }, [parentId, isChild]);
+  }, [parentId, key]);
 
   return (
     <ModalWrapper
       {...{
-        title: intl.get('CREATE_SOMETHING', { something: intl.get(label) }),
+        title: intl.get('CREATE_SOMETHING', { something: intl.get(last?.[0]?.label) }),
         okText: intl.get('CREATE'),
         ...props,
         onOk: () => {

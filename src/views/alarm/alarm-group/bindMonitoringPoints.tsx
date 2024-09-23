@@ -21,7 +21,7 @@ export const BindMonitoringPoints: React.FC<
   const { root } = useAssetCategoryChain();
 
   React.useEffect(() => {
-    getAssets(root?.key ? { type: root.key, parent_id: 0 } : { parent_id: 0 }).then((data) => {
+    getAssets({ type: root.key, parent_id: 0 }).then((data) => {
       setLoading(false);
       const assets = data.map((asset) => {
         const pointIds: number[] = [];

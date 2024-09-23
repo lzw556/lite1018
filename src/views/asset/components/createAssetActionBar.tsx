@@ -92,6 +92,8 @@ export function CreateAssetActionBar({
               actionStatus.onTowerCreate(lastParent?.id);
             } else if (AssertAssetCategory(key, AssertOfAssetCategory.IS_AREA_ASSET)) {
               actionStatus.onAreaAssetCreate();
+            } else if (AssertAssetCategory(key, AssertOfAssetCategory.IS_VIBRATION)) {
+              actionStatus.onVibrationAssetCreate();
             }
           }}
         >

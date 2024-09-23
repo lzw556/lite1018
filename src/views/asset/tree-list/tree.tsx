@@ -39,56 +39,42 @@ export const AssetTree: React.FC<{
   const { hasPermission } = usePermission();
 
   const getTreedata = React.useCallback((assets: AssetRow[]) => {
-    if (assets.length > 0) {
-      const mixedTree = mapTree(
-        [
-          {
-            ...VIRTUAL_ROOT_ASSET,
-            children: assets,
-            name: intl.get(VIRTUAL_ROOT_ASSET.name)
-          } as AssetRow
-        ],
-        (asset) => combineMonitoringPointToAsset(asset)
-      );
-      setTreedata(
-        mapTree(mixedTree, (mix) => {
-          return {
-            ...mix,
-            key: mix.type < 10000 ? `${mix.id}-${mix.type}` : `${mix.id}`,
-            icon: (props: any) => {
-              const alarmState = convertAlarmLevelToState(props.alertLevel);
-              const isNodeAsset = AssertAssetCategory(
-                mix.type ?? 0,
-                AssertOfAssetCategory.IS_ASSET
-              );
-              const isNodeFlange = AssertAssetCategory(
-                mix.type ?? 0,
-                AssertOfAssetCategory.IS_FLANGE
-              );
-              const isNodeTower = AssertAssetCategory(
-                mix.type ?? 0,
-                AssertOfAssetCategory.IS_TOWER
-              );
-              if (isNodeAsset) {
-                if (isNodeFlange) {
-                  return <FlangeIcon className={`${alarmState} focus`} />;
-                } else if (isNodeTower) {
-                  return <TowerIcon className={`${alarmState} focus`} />;
-                } else {
-                  return <AssetIcon className={`${alarmState}`} />;
-                }
-              } else if (mix.type > 10000) {
-                return <MonitoringPointIcon className={`${alarmState} focus`} />;
-              } else {
-                return null;
-              }
+    const mixedTree = mapTree(
+      [
+        {
+          ...VIRTUAL_ROOT_ASSET,
+          children: assets,
+          name: intl.get(VIRTUAL_ROOT_ASSET.name)
+        } as AssetRow
+      ],
+      (asset) => combineMonitoringPointToAsset(asset)
+    );
+    const data = mapTree(mixedTree, (mix) => {
+      return {
+        ...mix,
+        key: mix.type < 10000 ? `${mix.id}-${mix.type}` : `${mix.id}`,
+        icon: (props: any) => {
+          const alarmState = convertAlarmLevelToState(props.alertLevel);
+          const isNodeAsset = AssertAssetCategory(mix.type ?? 0, AssertOfAssetCategory.IS_ASSET);
+          const isNodeFlange = AssertAssetCategory(mix.type ?? 0, AssertOfAssetCategory.IS_FLANGE);
+          const isNodeTower = AssertAssetCategory(mix.type ?? 0, AssertOfAssetCategory.IS_TOWER);
+          if (isNodeAsset) {
+            if (isNodeFlange) {
+              return <FlangeIcon className={`${alarmState} focus`} />;
+            } else if (isNodeTower) {
+              return <TowerIcon className={`${alarmState} focus`} />;
+            } else {
+              return <AssetIcon className={`${alarmState}`} />;
             }
-          };
-        })
-      );
-    } else {
-      setTreedata([]);
-    }
+          } else if (mix.type > 10000) {
+            return <MonitoringPointIcon className={`${alarmState} focus`} />;
+          } else {
+            return null;
+          }
+        }
+      };
+    });
+    setTreedata(data);
   }, []);
 
   React.useEffect(() => {

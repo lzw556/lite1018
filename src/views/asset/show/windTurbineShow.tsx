@@ -81,7 +81,7 @@ export const WindTurbineTabs = ({
               refresh();
             }}
             actionStatus={actionStatus}
-            hiddens={[root.key!]}
+            hiddens={[root.key]}
             needExtra={false}
             lastParent={asset}
             windId={id}

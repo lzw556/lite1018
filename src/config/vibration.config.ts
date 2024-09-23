@@ -1,5 +1,5 @@
 import { DeviceType } from '../types/device_type';
-import { AssetCategoryChain, AssetCategoryLabel } from '../views/asset';
+import { AssetCategoryChain, AssetCategoryKey, AssetCategoryLabel } from '../views/asset';
 import { MonitoringPointTypeText, MonitoringPointTypeValue } from '../views/monitoring-point';
 
 export const SITE_NAME = 'IOT_CLOUD_MONITORING_SYSTEM';
@@ -15,5 +15,6 @@ export const MONITORING_POINTS = [
 ];
 
 export const ASSET_CATEGORY_CHAIN: AssetCategoryChain[] = [
-  { key: undefined, label: AssetCategoryLabel.GENERAL, isLeaf: true, isChild: true }
+  { key: AssetCategoryKey.AREA, label: AssetCategoryLabel.AREA },
+  { key: AssetCategoryKey.VIBRATION_MOTOR, label: AssetCategoryLabel.GENERAL, isLeaf: true }
 ];

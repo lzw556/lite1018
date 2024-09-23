@@ -135,7 +135,7 @@ export enum AssetCategoryLabel {
 }
 
 export type AssetCategoryDic = {
-  key: AssetCategoryKey | undefined;
+  key: AssetCategoryKey;
   label: AssetCategoryLabel;
 };
 export type AssetCategoryChain = AssetCategoryDic & {
