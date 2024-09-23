@@ -27,8 +27,8 @@
   flex: 1;
 }
 #vibration-asset .content > img {
-  /* max-height: 100%; */
   max-width: 100%;
+  object-fit: contain;
 }
 #vibration-asset .info {
   flex-shrink: 0;
