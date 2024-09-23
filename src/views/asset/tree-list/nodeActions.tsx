@@ -35,7 +35,8 @@ export const NodeActions = ({
     onAreaAssetCreate,
     onAreaAssetUpdate,
     onTowerCreate,
-    onTowerUpdate
+    onTowerUpdate,
+    onVibrationAssetCreate
   } = actionStatus;
   const isNodeAsset = AssertAssetCategory(type, AssertOfAssetCategory.IS_ASSET);
   const isNodeWind = AssertAssetCategory(type, AssertOfAssetCategory.IS_WIND_LIKE);
@@ -102,7 +103,11 @@ export const NodeActions = ({
                       } else if (e.key === 'general-create') {
                         onAssetCreate?.(asset.id);
                       } else if (isNodeArea) {
-                        onAreaAssetCreate?.(asset.id);
+                        if (e.key === 'vibration-asset-create') {
+                          onVibrationAssetCreate?.(asset.id);
+                        } else {
+                          onAreaAssetCreate?.(asset.id);
+                        }
                       }
                     })
                     .catch(() => onSuccess?.());
@@ -168,6 +173,19 @@ function AddAction({ type, onClick }: { type: number; onClick: (handler: any) =>
             { key: 'flange-create', label: intl.get('FLANGE') },
             { key: 'tower-create', label: intl.get('TOWER') }
           ],
+          onClick
+        }}
+      >
+        <Button type='text' size='small'>
+          <PlusOutlined />
+        </Button>
+      </Dropdown>
+    );
+  } else if (config.type === 'vibration') {
+    return (
+      <Dropdown
+        menu={{
+          items: [{ key: 'vibration-asset-create', label: intl.get('ASSET') }],
           onClick
         }}
       >
