@@ -1,8 +1,8 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChartContainer } from '../../components/charts/chartContainer';
-import { getRealPoints, MONITORING_POINT_PATHNAME } from '../monitoring-point';
-import { AssetRow } from '../asset/types';
+import { getRealPoints } from '../monitoring-point';
+import { ASSET_PATHNAME, AssetRow } from '../asset/types';
 import { buildCirclePointsChartOfFlange } from './circlePointChartHelper';
 
 export const CircleChart = ({
@@ -28,7 +28,7 @@ export const CircleChart = ({
       clickHandler: (paras: any) => {
         const index = paras.value[1];
         if (points.length > index) {
-          navigate(`/${MONITORING_POINT_PATHNAME}/${points[index].id}-${points[index].type}`, {
+          navigate(`/${ASSET_PATHNAME}/${points[index].id}-${points[index].type}`, {
             state: [`${points[index].id}-${points[index].type}`]
           });
         }

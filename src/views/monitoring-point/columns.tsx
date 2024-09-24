@@ -3,9 +3,14 @@ import { Button, Popconfirm, Space, Tag } from 'antd';
 import HasPermission from '../../permission';
 import { Permission } from '../../permission/permission';
 import { isMobile } from '../../utils/deviceDetection';
-import { convertAlarmLevelToState, getAlarmLevelColor, getAlarmStateText } from '../asset';
+import {
+  ASSET_PATHNAME,
+  convertAlarmLevelToState,
+  getAlarmLevelColor,
+  getAlarmStateText
+} from '../asset';
 import { deleteMeasurement } from './services';
-import { MonitoringPointRow, MONITORING_POINT, MONITORING_POINT_PATHNAME } from './types';
+import { MonitoringPointRow, MONITORING_POINT } from './types';
 import intl from 'react-intl-universal';
 import { SelfLink } from '../../components/selfLink';
 
@@ -18,7 +23,7 @@ export const useMonitoringPointTableColumns = () => {
       width: isMobile ? 300 : 400,
       render: (name: string, row: MonitoringPointRow) => (
         <SelfLink
-          to={`/${MONITORING_POINT_PATHNAME}/${row.id}-${row.type}`}
+          to={`/${ASSET_PATHNAME}/${row.id}-${row.type}`}
           state={[`${row.id}-${row.type}`]}
           key={`${name}-${row.id}`}
         >
