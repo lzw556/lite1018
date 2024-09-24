@@ -1,9 +1,9 @@
 import React from 'react';
-import { Card, Tabs, TabsProps } from 'antd';
+import { Card, CardProps, Tabs, TabsProps } from 'antd';
 
-export const TabsCard = ({ items, ...props }: TabsProps) => {
+export const TabsCard = ({ cardProps, items, ...props }: TabsProps & { cardProps?: CardProps }) => {
   return (
-    <Card bodyStyle={{ paddingTop: 0 }}>
+    <Card {...cardProps} bodyStyle={{ paddingTop: 0 }}>
       <Tabs items={items} {...props} />
     </Card>
   );
