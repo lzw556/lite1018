@@ -21,3 +21,7 @@ tbody.ant-table-tbody > tr.ant-table-row:hover > td {
   font-size: 14px;
   vertical-align: top;
 }
+
+.ant-tabs.ant-tabs-righted .ant-tabs-nav .ant-tabs-nav-wrap {
+  justify-content: flex-end;
+}
