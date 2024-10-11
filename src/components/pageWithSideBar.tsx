@@ -33,10 +33,9 @@ const SideBar = ({ body, head }: SideBarProps) => {
       if (sidebarRef && sidebarRef.current) {
         const height = Number(getComputedStyle(document.body).height.replace('px', ''));
         const headHeight = head ? 44 : 0;
-        const footerButtonHeight = 32;
         const topPadding = 60;
         if (height) {
-          setSidebarBodyHeight(height - headHeight - footerButtonHeight - topPadding);
+          setSidebarBodyHeight(height - headHeight - topPadding);
         }
       }
     };
@@ -57,10 +56,10 @@ const SideBar = ({ body, head }: SideBarProps) => {
               {body(sidebarBodyHeight - 10)}
             </div>
             <Button
-              className='sidebar-footer'
-              onClick={() => setExpanded(!expanded)}
+              className='sidebar-switch'
               icon={<DoubleLeftOutlined />}
-              block={true}
+              onClick={() => setExpanded(!expanded)}
+              type='text'
             />
           </div>
         ) : (

@@ -20,11 +20,17 @@
   background-color: #fff;
 }
 .sidebar-container .sidebar-inner {
+  position: relative;
   display: flex;
   flex-direction: column;
   width: 300px;
   height: 100%;
   padding-top: 60px;
+}
+.sidebar-container .sidebar-switch {
+  position: absolute;
+  top: 68px;
+  right: 20px;
 }
 .sidebar-container .sidebar-inner .sidebar-head,
 .sidebar-container .sidebar-inner .sidebar-body {
