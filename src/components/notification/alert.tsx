@@ -17,7 +17,7 @@ const AlertMessageNotification = () => {
         data &&
         data.monitoringPoint &&
         data.monitoringPoint.project &&
-        data.monitoringPoint.project === getProject()
+        data.monitoringPoint.project === getProject().id
       ) {
         setData(data);
       }

@@ -20,7 +20,7 @@ const ProjectSelect: FC<ProjectSelectProps> = (props) => {
     });
   }, []);
 
-  const projectId = getProject();
+  const projectId = getProject().id;
   if (!projectId) return null;
 
   return (

@@ -10,7 +10,7 @@ axios.defaults.baseURL = '/api';
 axios.interceptors.request.use((config: AxiosRequestConfig) => {
   if (isLogin()) {
     config.headers.Authorization = `Bearer ${getToken()}`;
-    config.headers.Project = getProject();
+    config.headers.Project = getProject().id;
     config.headers.Timezone = dayjs.tz.guess();
   }
   return config;

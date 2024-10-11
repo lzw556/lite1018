@@ -41,7 +41,7 @@ const HeaderLayout = (props: any) => {
         localStorage.removeItem('store');
         store.dispatch({
           type: 'SET_PROJECT',
-          payload: data.id
+          payload: { id: data.id, name: data.name }
         });
         window.location.href = '/';
       })

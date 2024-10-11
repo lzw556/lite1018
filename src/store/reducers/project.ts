@@ -1,7 +1,12 @@
 import { State } from './index';
 import { Action } from '../actions';
 
-export default function setProject(state: State<number> = { data: 0 }, action: Action<number>) {
+type Project = { id: number; name: string };
+
+export default function setProject(
+  state: State<Project> = { data: { id: 0, name: '' } },
+  action: Action<Project>
+) {
   switch (action.type) {
     case 'SET_PROJECT':
       return {

@@ -55,7 +55,7 @@ const ProjectPage = () => {
     DeleteProjectRequest(id).then(() => {
       reduxStore.dispatch({
         type: 'SET_PROJECT',
-        payload: 0
+        payload: { id: 0 }
       });
       if (dataSource) {
         const { size, page, total } = dataSource;

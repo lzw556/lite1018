@@ -18,7 +18,7 @@ export const ValidateProject = ({ children }: { children: JSX.Element }) => {
   });
   const { result, loading, error } = projects;
   const [selectError, setSelectError] = React.useState<string | null>(null);
-  const [projectId, setProjectId] = React.useState(getProject());
+  const [projectId, setProjectId] = React.useState(getProject().id);
 
   React.useEffect(() => {
     setProjects((prev) => ({ ...prev, loading: true }));
@@ -33,12 +33,12 @@ export const ValidateProject = ({ children }: { children: JSX.Element }) => {
   }, []);
 
   React.useEffect(() => {
-    if (result && result.length > 0 && !getProject()) {
+    if (result && result.length > 0 && !getProject().id) {
       GetMyProjectRequest(result[0].id)
         .then((res) => {
           store.dispatch({
             type: 'SET_PROJECT',
-            payload: res.id
+            payload: { id: res.id, name: res.name }
           });
           setProjectId(res.id);
         })
