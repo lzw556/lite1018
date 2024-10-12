@@ -19,8 +19,6 @@ import { useAssetsContext } from './assetsContext';
 import { TOWER_PATHNAME } from '../../tower';
 import { SelfLink } from '../../../components/selfLink';
 
-export const rootPathState = { from: { label: intl.get('OVERVIEW'), path: '/project-overview' } };
-
 export type TreeFlatListItem = AssetTreeNode & { path: number[] };
 
 export const AssetNavigator = ({ id }: { id: string | number }) => {
