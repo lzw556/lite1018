@@ -1,7 +1,6 @@
 import { Button, Space } from 'antd';
 import { Content } from 'antd/es/layout/layout';
 import TableLayout from '../../layout/TableLayout';
-import ShadowCard from '../../../components/shadowCard';
 import { useCallback, useEffect, useState } from 'react';
 import { GetRoleRequest, PagingRolesRequest } from '../../../apis/role';
 import AddRoleModal from './modal/add';
@@ -14,6 +13,7 @@ import { PageResult } from '../../../types/page';
 import { isMobile } from '../../../utils/deviceDetection';
 import { PageTitle } from '../../../components/pageTitle';
 import intl from 'react-intl-universal';
+import { Card } from '../../../components';
 
 const RolePage = () => {
   const [addVisible, setAddVisible] = useState(false);
@@ -88,7 +88,7 @@ const RolePage = () => {
   return (
     <Content>
       <PageTitle items={[{ title: intl.get('MENU_ROLE_MANAGEMENT') }]} />
-      <ShadowCard>
+      <Card>
         <TableLayout
           emptyText={intl.get('NO_ROLES')}
           permissions={[
@@ -102,7 +102,7 @@ const RolePage = () => {
           simple={isMobile}
           scroll={isMobile ? { x: 600 } : undefined}
         />
-      </ShadowCard>
+      </Card>
       <AddRoleModal
         open={addVisible}
         onCancel={() => setAddVisible(false)}

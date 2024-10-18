@@ -1,0 +1,57 @@
+#vibration-analysis .ant-tabs-tab {
+  justify-content: center;
+  padding: 8px 16px 8px 0;
+}
+#vibration-analysis .ant-tabs-tabpane {
+  padding-left: 16px;
+}
+
+.chart-card .chart-card-head {
+  display: flex;
+  align-items: center;
+  border-bottom: solid 1px #f0f0f0;
+  padding: 0 8px;
+  height: 30px;
+  color: rgba(0, 0, 0, 0.6);
+  background-color: #f5f5f5;
+}
+.chart-card .chart-card-head > span:first-child {
+  font-weight: 600;
+}
+.chart-card .chart-card-head .toolbar .anticon {
+  justify-content: center;
+  border: solid 1px;
+  border-radius: 3px;
+  width: 20px;
+  height: 20px;
+  vertical-align: -2px;
+  cursor: pointer;
+}
+.chart-card .chart-card-head .toolbar .anticon:hover {
+  color: #1677ff;
+}
+.chart-card .chart-card-head .toolbar .ant-divider {
+  margin-right: 5px;
+  border-color: rgba(0, 0, 0, 0.4);
+}
+.chart-card .chart-card-filters {
+  display: flex;
+  justify-content: end;
+  margin: 8px 0;
+}
+.chart-card .chart-card-filters .ant-select,
+.chart-card .chart-card-filters .ant-picker {
+  height: 30px;
+}
+.chart-card-content > * {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100% !important;
+}
+.chart-card-content.small {
+  height: 160px;
+}
+.chart-card-content.medium {
+  height: 500px;
+}

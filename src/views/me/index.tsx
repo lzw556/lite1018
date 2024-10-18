@@ -5,10 +5,10 @@ import EditPassModal from './edit/editPassModal';
 import './index.css';
 import { GetMyProfile, UpdateMyProfile } from '../../apis/profile';
 import { User } from '../../types/user';
-import ShadowCard from '../../components/shadowCard';
 import { isMobile } from '../../utils/deviceDetection';
 import { PageTitle } from '../../components/pageTitle';
 import intl from 'react-intl-universal';
+import { Card } from '../../components';
 
 const MePage = () => {
   const [isPhoneEdit, setIsPhoneEdit] = useState<boolean>(false);
@@ -78,7 +78,7 @@ const MePage = () => {
       <PageTitle items={[{ title: intl.get('MENU_USER_CENTER') }]} />
       <Row justify='center'>
         <Col span={24}>
-          <ShadowCard title={intl.get('BASIC_INFORMATION')} bordered={false}>
+          <Card title={intl.get('BASIC_INFORMATION')} bordered={false}>
             <Form form={form}>
               <Row gutter={[0, 16]}>
                 <Col span={24}>
@@ -122,9 +122,9 @@ const MePage = () => {
                 </Col>
               </Row>
             </Form>
-          </ShadowCard>
+          </Card>
           <br />
-          <ShadowCard title={intl.get('ACCOUNT_SECURITY')} bordered={false}>
+          <Card title={intl.get('ACCOUNT_SECURITY')} bordered={false}>
             <Row justify={'start'}>
               <Col span={isMobile ? 5 : 2} className='ts-label'>
                 {intl.get('PASSWORD')}
@@ -134,7 +134,7 @@ const MePage = () => {
                 <a onClick={() => setIsPassEdit(true)}>{intl.get('MODIFY')}</a>
               </Col>
             </Row>
-          </ShadowCard>
+          </Card>
         </Col>
       </Row>
       <EditPassModal

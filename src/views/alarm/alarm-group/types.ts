@@ -1,4 +1,4 @@
-import { MonitoringPointRow } from '../../monitoring-point';
+import { MonitoringPointRow } from '../../asset-common';
 
 export type AlarmRule = {
   id: number;

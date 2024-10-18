@@ -3,7 +3,7 @@ import { FC, useEffect, useState } from 'react';
 import { Device } from '../../types/device';
 import { GetDevicesRequest } from '../../apis/device';
 import { toMac } from '../../utils/format';
-import { useAppConfigContext } from '../../views/asset';
+import { useAppType } from '../../config';
 
 export interface DeviceSelectProps extends SelectProps<any> {
   filters?: any;
@@ -12,7 +12,7 @@ export interface DeviceSelectProps extends SelectProps<any> {
 }
 
 const DeviceSelect: FC<DeviceSelectProps> = (props) => {
-  const config = useAppConfigContext();
+  const appType = useAppType();
   const { filters, dispalyField = 'id' } = props;
   const [devices, setDevices] = useState<Device[]>([]);
 
@@ -36,7 +36,7 @@ const DeviceSelect: FC<DeviceSelectProps> = (props) => {
         <>
           <Typography.Text strong>{option.data.label}</Typography.Text>
           <br />
-          {config.type !== 'corrosionWirelessHART' && (
+          {appType !== 'corrosionWirelessHART' && (
             <Typography.Text type={'secondary'}>
               {toMac(option.data.macAddress.toUpperCase())}
             </Typography.Text>

@@ -1,13 +1,10 @@
-import { Checkbox, Col, Empty, Form, Input, ModalProps, Row, Select, Spin } from 'antd';
 import * as React from 'react';
-import { getAssets } from '../../asset/services';
-import { AssetRow } from '../../asset/types';
+import { Checkbox, Col, Empty, Form, Input, ModalProps, Row, Select, Spin } from 'antd';
+import intl from 'react-intl-universal';
 import { bindMeasurementsToAlarmRule2 } from './services';
 import { AlarmRule } from './types';
-import intl from 'react-intl-universal';
-import { useAssetCategoryChain } from '../../../config/assetCategory.config';
-import { MONITORING_POINT } from '../../monitoring-point';
 import { ModalWrapper } from '../../../components/modalWrapper';
+import { AssetRow, getAssets, MONITORING_POINT } from '../../asset-common';
 
 type MixinAssetRow = AssetRow & { pointIds: number[]; checked: boolean; indeterminate: boolean };
 
@@ -18,10 +15,9 @@ export const BindMonitoringPoints: React.FC<
   const [assets, setAssets] = React.useState<MixinAssetRow[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [asset, setAsset] = React.useState<MixinAssetRow>();
-  const { root } = useAssetCategoryChain();
 
   React.useEffect(() => {
-    getAssets({ type: root.key, parent_id: 0 }).then((data) => {
+    getAssets({ parent_id: 0 }).then((data) => {
       setLoading(false);
       const assets = data.map((asset) => {
         const pointIds: number[] = [];
@@ -51,7 +47,7 @@ export const BindMonitoringPoints: React.FC<
       });
       setAssets(assets);
     });
-  }, [props.selectedRow, form, root.key]);
+  }, [props.selectedRow, form]);
 
   React.useEffect(() => {
     if (assets.length > 0) {

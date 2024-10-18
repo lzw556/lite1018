@@ -1,9 +1,10 @@
-import { Card, Row, Col } from 'antd';
-import { Content } from 'antd/lib/layout/layout';
 import React from 'react';
+import { Row, Col } from 'antd';
+import { Content } from 'antd/lib/layout/layout';
+import intl from 'react-intl-universal';
 import { FilterableAlarmRecordTable } from '../../../components/alarm/filterableAlarmRecordTable';
 import { PageTitle } from '../../../components/pageTitle';
-import intl from 'react-intl-universal';
+import { Card } from '../../../components';
 
 const AlarmRecordPage = () => {
   return (

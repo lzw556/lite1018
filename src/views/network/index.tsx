@@ -7,7 +7,6 @@ import {
   NetworkSyncRequest,
   NetworkProvisionRequest
 } from '../../apis/network';
-import ShadowCard from '../../components/shadowCard';
 import TableLayout from '../layout/TableLayout';
 import AddNetworkModal from './modal/addNetworkModal';
 import { Button, Col, Dropdown, MenuProps, message, Popconfirm, Row, Space } from 'antd';
@@ -31,7 +30,8 @@ import { SelfLink } from '../../components/selfLink';
 import AddLoraNetworkModal from './lora/addNetworkModal';
 import EditLoraNetworkModal from './lora/editNetworkModal';
 import { DeviceType } from '../../types/device_type';
-import { useDevicesContext } from '../device';
+import { useContext, VIRTUAL_ROOT_DEVICE } from '../device';
+import { Card } from '../../components';
 
 const NetworkPage = () => {
   const { hasPermission, hasPermissions } = usePermission();
@@ -42,7 +42,7 @@ const NetworkPage = () => {
   const [dataSource, setDataSource] = useState<PageResult<any>>();
   const [store, setStore, gotoPage] = useStore('networkList');
   const [deviceListStore, setDeviceListStore] = useStore('deviceList');
-  const devicesContext = useDevicesContext();
+  const devicesContext = useContext();
 
   const fetchNetworks = (store: Store['networkList']) => {
     const {
@@ -72,7 +72,7 @@ const NetworkPage = () => {
           return { ...prev, filters: prevFilter };
         });
       }
-      devicesContext.setToken((prev) => prev + 1);
+      devicesContext.refresh(true);
     });
   };
 
@@ -230,9 +230,9 @@ const NetworkPage = () => {
   ];
 
   return (
-    <div style={{ marginTop: 10 }}>
-      <ShadowCard
-        title={intl.get('MENU_NETWORK_LIST')}
+    <>
+      <Card
+        title={VIRTUAL_ROOT_DEVICE.name}
         extra={
           <Space>
             <HasPermission value={Permission.NetworkAdd}>
@@ -294,7 +294,7 @@ const NetworkPage = () => {
             />
           </Col>
         </Row>
-      </ShadowCard>
+      </Card>
       {addVisible && (
         <AddNetworkModal
           open={addVisible}
@@ -305,7 +305,7 @@ const NetworkPage = () => {
               const { size, page, total } = dataSource;
               gotoPage({ size, total, index: page }, 'next');
             }
-            devicesContext.setToken((prev) => prev + 1);
+            devicesContext.refresh(true);
           }}
         />
       )}
@@ -318,7 +318,7 @@ const NetworkPage = () => {
             setEditVisible(false);
             message.success(intl.get('SAVED_SUCCESSFUL'));
             fetchNetworks(store);
-            devicesContext.setToken((prev) => prev + 1);
+            devicesContext.refresh(true);
           }}
         />
       )}
@@ -332,7 +332,7 @@ const NetworkPage = () => {
               const { size, page, total } = dataSource;
               gotoPage({ size, total, index: page }, 'next');
             }
-            devicesContext.setToken((prev) => prev + 1);
+            devicesContext.refresh(true);
           }}
         />
       )}
@@ -353,7 +353,7 @@ const NetworkPage = () => {
           <ImportNetworkPage />
         </ModalWrapper>
       )} */}
-    </div>
+    </>
   );
 };
 

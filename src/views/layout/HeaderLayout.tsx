@@ -41,7 +41,7 @@ const HeaderLayout = (props: any) => {
         localStorage.removeItem('store');
         store.dispatch({
           type: 'SET_PROJECT',
-          payload: { id: data.id, name: data.name }
+          payload: { id: data.id, name: data.name, type: data.type }
         });
         window.location.href = '/';
       })
@@ -67,7 +67,7 @@ const HeaderLayout = (props: any) => {
           </Text>
           {currentUser && (
             <ProjectSelect
-              bordered={false}
+              variant='borderless'
               suffixIcon={<CaretDownOutlined style={{ color: 'white' }} />}
               onChange={onProjectChange}
             />

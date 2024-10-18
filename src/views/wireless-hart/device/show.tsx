@@ -4,7 +4,6 @@ import { Col, message, Row } from 'antd';
 import { Device } from '../../../types/device';
 import { GetDeviceRequest } from '../../../apis/device';
 import { Content } from 'antd/lib/layout/layout';
-import ShadowCard from '../../../components/shadowCard';
 import { DeviceType } from '../../../types/device_type';
 import HasPermission from '../../../permission';
 import userPermission, { Permission } from '../../../permission/permission';
@@ -22,6 +21,7 @@ import { CommandDropdown } from '../../device/commandDropdown';
 import SettingPage from './settings';
 import InformationCard from './information';
 import { SelfLink } from '../../../components/selfLink';
+import { Card } from '../../../components';
 
 const DeviceDetailPage = () => {
   const { id } = useParams();
@@ -112,7 +112,7 @@ const DeviceDetailPage = () => {
           {device && <InformationCard device={device} isLoading={isLoading} />}
           <br />
           {device && tabs.length > 0 && (
-            <ShadowCard
+            <Card
               size={'small'}
               tabList={tabs.map((tab: any) => ({ ...tab, tab: intl.get(tab.tab) }))}
               onTabChange={(key) => {
@@ -120,7 +120,7 @@ const DeviceDetailPage = () => {
               }}
             >
               {currentKey && contents.get(currentKey)}
-            </ShadowCard>
+            </Card>
           )}
         </Col>
       </Row>

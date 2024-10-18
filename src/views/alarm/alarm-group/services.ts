@@ -1,6 +1,6 @@
 import request from '../../../utils/request';
 import { DeleteResponse, GetResponse, PostResponse, PutResponse } from '../../../utils/response';
-import { Property } from '../../monitoring-point';
+import { Property } from '../../asset-common';
 import { AlarmRule } from './types';
 
 export function addAlarmRule(rule: AlarmRule) {

@@ -7,7 +7,6 @@ import { InitializeUserState, User } from '../../types/user';
 import { DeleteOutlined, EditOutlined, UserAddOutlined } from '@ant-design/icons';
 import AddUserModal from './add';
 import EditUserModal from './edit';
-import ShadowCard from '../../components/shadowCard';
 import HasPermission from '../../permission';
 import { Permission } from '../../permission/permission';
 import { PageResult } from '../../types/page';
@@ -17,6 +16,7 @@ import { Role } from '../../types/role';
 import { PagingRolesRequest } from '../../apis/role';
 import { PageTitle } from '../../components/pageTitle';
 import intl from 'react-intl-universal';
+import { Card } from '../../components';
 
 const UserPage = () => {
   const [addUserVisible, setAddUserVisible] = useState<boolean>(false);
@@ -145,7 +145,7 @@ const UserPage = () => {
       />
       <Row justify='center'>
         <Col span={24}>
-          <ShadowCard>
+          <Card>
             <TableLayout
               columns={columns}
               permissions={[Permission.UserDelete, Permission.UserEdit]}
@@ -156,7 +156,7 @@ const UserPage = () => {
               simple={isMobile}
               scroll={isMobile ? { x: 600 } : undefined}
             />
-          </ShadowCard>
+          </Card>
         </Col>
       </Row>
       <AddUserModal

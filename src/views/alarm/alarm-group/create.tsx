@@ -1,29 +1,25 @@
-import { MinusCircleOutlined } from '@ant-design/icons';
-import { Content } from 'antd/es/layout/layout';
-import { Button, Cascader, Col, Divider, Form, Input, InputNumber, Row, Select } from 'antd';
 import * as React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Button, Cascader, Col, Divider, Form, Input, InputNumber, Row, Select } from 'antd';
+import { MinusCircleOutlined } from '@ant-design/icons';
+import { Content } from 'antd/es/layout/layout';
+import intl from 'react-intl-universal';
 import { PageTitle } from '../../../components/pageTitle';
-import ShadowCard from '../../../components/shadowCard';
 import { isMobile } from '../../../utils/deviceDetection';
 import { getPropertiesByMeasurementType } from './services';
 import { AlarmRule } from './types';
 import { addAlarmRule } from './services';
-import {
-  removeDulpicateProperties,
-  MONITORING_POINT,
-  getDisplayProperties
-} from '../../monitoring-point';
-import { useAppConfigContext } from '../../asset/components/appConfigContext';
-import { MONITORING_POINTS } from '../../../config/assetCategory.config';
 import { FormInputItem } from '../../../components/formInputItem';
-import intl from 'react-intl-universal';
 import { SelfLink } from '../../../components/selfLink';
 import { DisplayProperty } from '../../../constants/properties';
+import { MONITORING_POINT, Point } from '../../asset-common';
+import { App, useAppType } from '../../../config';
+import { cloneDeep } from 'lodash';
+import { Card } from '../../../components';
 
 export default function CreateAlarmRuleGroup() {
   const navigate = useNavigate();
-  const config = useAppConfigContext();
+  const appType = useAppType();
   const [form] = Form.useForm();
   const [properties, setProperties] = React.useState<DisplayProperty[]>([]);
   const [metric, setMetric] = React.useState<{ key: string; name: string; unit?: string }[]>([]);
@@ -42,7 +38,7 @@ export default function CreateAlarmRuleGroup() {
           { title: intl.get('CREATE_ALARM_RULE') }
         ]}
       />
-      <ShadowCard>
+      <Card>
         <Form form={form} labelCol={{ span: smallSize ? 5 : 3 }} wrapperCol={{ span: 18 }}>
           <Form.Item
             label={intl.get('OBJECT_TYPE', { object: intl.get(MONITORING_POINT) })}
@@ -63,13 +59,13 @@ export default function CreateAlarmRuleGroup() {
               })}
               onChange={(e) => {
                 getPropertiesByMeasurementType(e).then((res) => {
-                  const measurementType = MONITORING_POINTS.get(config.type)?.find(
+                  const measurementType = App.getMonitoringPointTypes(appType).find(
                     ({ id }) => e === id
                   )?.id;
                   if (measurementType) {
                     setDisabled(false);
                     setProperties(
-                      removeDulpicateProperties(getDisplayProperties(res, measurementType))
+                      removeDulpicateProperties(Point.getPropertiesByType(res, measurementType))
                     );
                   }
                 });
@@ -84,7 +80,7 @@ export default function CreateAlarmRuleGroup() {
                 }
               }}
             >
-              {MONITORING_POINTS.get(config.type)?.map(({ label, id }) => (
+              {App.getMonitoringPointTypes(appType).map(({ label, id }) => (
                 <Select.Option key={id} value={id}>
                   {intl.get(label)}
                 </Select.Option>
@@ -492,7 +488,19 @@ export default function CreateAlarmRuleGroup() {
             </Button>
           </Form.Item>
         </Form>
-      </ShadowCard>
+      </Card>
     </Content>
   );
+}
+
+function removeDulpicateProperties(properties: DisplayProperty[]) {
+  const final = cloneDeep(properties);
+  return final.map((property) => {
+    const fields = property.fields;
+    if (fields?.every((field) => field.key === property.key)) {
+      return { ...property, fields: [] };
+    } else {
+      return property;
+    }
+  });
 }

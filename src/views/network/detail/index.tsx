@@ -1,5 +1,4 @@
 import { Content } from 'antd/es/layout/layout';
-import ShadowCard from '../../../components/shadowCard';
 import { Button, Col, Form, Input, message, Row } from 'antd';
 import { useEffect, useState } from 'react';
 import { Network } from '../../../types/network';
@@ -21,6 +20,7 @@ import intl from 'react-intl-universal';
 import { FormInputItem } from '../../../components/formInputItem';
 import { SelfLink } from '../../../components/selfLink';
 import { useLocaleFormLayout } from '../../../hooks/useLocaleFormLayout';
+import { Card } from '../../../components';
 
 const NetworkDetail = () => {
   const { hasPermission } = usePermission();
@@ -100,15 +100,12 @@ const NetworkDetail = () => {
       return (
         <Row style={{ flexGrow: 1 }}>
           <Col xl={16} xxl={18} id={'topologyView'}>
-            <ShadowCard
-              style={{ height: '100%' }}
-              bodyStyle={{ height: '100%', minWidth: '500px' }}
-            >
+            <Card styles={{ body: { height: '100%', minWidth: '500px' } }}>
               <TopologyView network={network} />
-            </ShadowCard>
+            </Card>
           </Col>
           <Col xl={8} xxl={6}>
-            <ShadowCard style={{ marginLeft: 10, height: '100%' }}>
+            <Card style={{ marginLeft: 10, height: '100%' }}>
               <Form form={form} {...formLayout} labelWrap={true}>
                 <FormInputItem
                   label={intl.get('NAME')}
@@ -163,7 +160,7 @@ const NetworkDetail = () => {
                   </ButtonGroup>
                 </Col>
               </Row>
-            </ShadowCard>
+            </Card>
           </Col>
         </Row>
       );

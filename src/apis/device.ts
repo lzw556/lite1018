@@ -3,7 +3,7 @@ import { PageResult } from '../types/page';
 import { Device } from '../types/device';
 import { DeleteResponse, GetResponse, PostResponse, PutResponse } from '../utils/response';
 import { AlarmRule } from '../types/alarm_rule_template';
-import { HistoryData } from '../views/monitoring-point';
+import { HistoryData } from '../views/asset-common';
 
 export function CheckMacAddressRequest(mac: string) {
   return request.get(`/check/devices/${mac}`).then(GetResponse);

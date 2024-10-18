@@ -101,3 +101,26 @@ export function getDisplayProperties(properties: Property[], deviceType: DeviceT
       .filter((p) => !!p.fields) as DisplayProperty[];
   }
 }
+
+export const DeviceNS = {
+  Children: {
+    getOnlineStatusCount: (d: Device, devs: Device[]) => {
+      const children = getChildren(d, devs);
+      const online = children.filter((d) => !!d?.state?.isOnline).length;
+      return { online, offline: children.length - online };
+    }
+  },
+  Assert: {
+    isRoot: (d: Device) => DeviceType.isRootDevice(d.typeId) && (!d.parent || d.parent.length === 0)
+  }
+};
+
+function getChildren(dev: Device, devices: Device[]) {
+  const all: Device[] = [];
+  const children = devices.filter((d) => d.parent === dev.macAddress);
+  all.push(...children);
+  children.forEach((c) => {
+    all.push(...getChildren(c, devices));
+  });
+  return all;
+}

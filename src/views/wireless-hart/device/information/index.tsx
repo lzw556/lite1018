@@ -1,9 +1,9 @@
 import { Skeleton } from 'antd';
 import { FC, useEffect, useState } from 'react';
 import { Device } from '../../../../types/device';
-import ShadowCard from '../../../../components/shadowCard';
 import useSocket, { SocketTopic } from '../../../../socket';
 import { SingleDeviceDetail } from './SingleDeviceDetail';
+import { Card } from '../../../../components';
 
 export interface GatewayInformationProps {
   device: Device;
@@ -27,11 +27,11 @@ const InformationCard: FC<GatewayInformationProps> = ({ device, isLoading }) => 
   }, [PubSub, device.macAddress]);
 
   return (
-    <ShadowCard>
+    <Card>
       <Skeleton loading={isLoading}>
         <SingleDeviceDetail device={device} upgradeStatus={upgradeStatus} />
       </Skeleton>
-    </ShadowCard>
+    </Card>
   );
 };
 

@@ -2,7 +2,6 @@ import { Button, Col, Form, Input, Result, Row, Space } from 'antd';
 import { Content } from 'antd/es/layout/layout';
 import { useState } from 'react';
 import { AddDeviceRequest, GetDefaultDeviceSettingsRequest } from '../../../apis/device';
-import ShadowCard from '../../../components/shadowCard';
 import { Normalizes } from '../../../constants/validator';
 import NetworkSelect from '../../../components/select/networkSelect';
 import DeviceSelect from '../../../components/select/deviceSelect';
@@ -17,6 +16,7 @@ import intl from 'react-intl-universal';
 import { FormInputItem } from '../../../components/formInputItem';
 import { DeviceSettingContent } from '../../device/DeviceSettingContent';
 import { SelfLink } from '../../../components/selfLink';
+import { Card } from '../../../components';
 
 const AddDevicePage = () => {
   const [deviceSettings, setDeviceSettings] = useState<DeviceSetting[]>();
@@ -85,7 +85,7 @@ const AddDevicePage = () => {
             { title: intl.get('CREATE_DEVICE') }
           ]}
         />
-        <ShadowCard>
+        <Card>
           {success && (
             <Result
               status='success'
@@ -193,7 +193,7 @@ const AddDevicePage = () => {
               </Row>
             </Col>
           </Row>
-        </ShadowCard>
+        </Card>
       </Content>
     </>
   );

@@ -6,15 +6,15 @@ import reportWebVitals from './reportWebVitals';
 import { StoreContext } from 'redux-react-hook';
 import AppRouter from './routers';
 import { LocaleProvider } from './localeProvider';
-import { AppConfigProvider } from './views/asset/components/appConfigContext';
+import { AppProvider } from './config';
 
 ReactDOM.render(
   <StoreContext.Provider value={store}>
     <PersistGate loading={null} persistor={persistor}>
       <LocaleProvider>
-        <AppConfigProvider>
+        <AppProvider>
           <AppRouter />
-        </AppConfigProvider>
+        </AppProvider>
       </LocaleProvider>
     </PersistGate>
   </StoreContext.Provider>,

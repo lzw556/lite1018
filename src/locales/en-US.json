@@ -1215,5 +1215,16 @@
   "motor.nominal_power": "Nominal Power",
   "motor.mounting": "Mounting",
   "motor.bearing_type": "Bearing Type",
-  "motor.bearing_model": "Bearing Model"
+  "motor.bearing_model": "Bearing Model",
+  "real.time.data": "Real-time Data",
+  "property.group.core": "Core",
+  "property.group.timeDomain": "TimeDomain",
+  "property.group.frequency": "Frequency",
+  "property.group.statistics": "Statistics",
+  "wireless.network.settings": "WSN Settings",
+  "monitoring.point.attr": "Attributes",
+  "set.columns": "Setup Columns",
+  "axis.axial": "Axial",
+  "axis.vertical": "Vertical",
+  "axis.horizontal": "Horizontal"
 }

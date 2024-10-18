@@ -5,11 +5,11 @@ import EChartsReact, { EChartsInstance } from 'echarts-for-react';
 import _ from 'lodash';
 import * as Mathjs from 'mathjs';
 import intl from 'react-intl-universal';
-import { HistoryData } from '../../views/monitoring-point';
 import { DisplayProperty } from '../../constants/properties';
 import dayjs from '../../utils/dayjsUtils';
 import { ChartStyle } from '../../constants/chart';
 import { getValue, roundValue } from '../../utils/format';
+import { HistoryData } from '../../views/asset-common';
 
 export interface Series {
   data: { [name: string]: number[] };

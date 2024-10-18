@@ -9,7 +9,11 @@ export interface LabelProps {
 
 const Label: FC<LabelProps> = ({ name, width, children }) => {
   return (
-    <Form.Item label={name} className='ts-border' style={{ margin: 'auto', height: '32px', width }}>
+    <Form.Item
+      label={name}
+      className='ts-border'
+      style={{ height: '32px', width, marginBottom: 0 }}
+    >
       {children}
     </Form.Item>
   );

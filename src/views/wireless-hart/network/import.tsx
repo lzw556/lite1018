@@ -1,9 +1,8 @@
-import { Button, Card, Col, Form, Input, message, Result, Row, Select, Upload } from 'antd';
+import { Button, Col, Form, Input, message, Result, Row, Select, Upload } from 'antd';
 import { Content } from 'antd/lib/layout/layout';
 import { useEffect, useState } from 'react';
 import { ImportOutlined, InboxOutlined } from '@ant-design/icons';
 import { ImportNetworkRequest } from '../../../apis/network';
-import ShadowCard from '../../../components/shadowCard';
 import G6, { TreeGraph } from '@antv/g6';
 import '../../../components/shape/shape';
 import { useNavigate } from 'react-router';
@@ -12,6 +11,7 @@ import intl from 'react-intl-universal';
 import { FormInputItem } from '../../../components/formInputItem';
 import { WIRELESS_HART_POLLING_PERIOD } from '../../../constants';
 import { toMac } from '../../../utils/format';
+import { Card } from '../../../components';
 
 const { Dragger } = Upload;
 
@@ -220,7 +220,7 @@ const ImportNetworkPage = () => {
           )
         }
       />
-      <ShadowCard>
+      <Card>
         <Form form={form} labelCol={{ span: 9 }}>
           {!success ? (
             <Row justify='space-between'>
@@ -337,7 +337,7 @@ const ImportNetworkPage = () => {
             />
           )}
         </Form>
-      </ShadowCard>
+      </Card>
     </Content>
   );
 };

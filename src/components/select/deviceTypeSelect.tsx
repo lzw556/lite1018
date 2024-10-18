@@ -1,10 +1,9 @@
-import { DeviceType } from '../../types/device_type';
-import { Select, SelectProps } from 'antd';
 import { FC, useEffect } from 'react';
+import { Select, SelectProps } from 'antd';
 import { CaretDownOutlined } from '@ant-design/icons';
-import { SENSORS } from '../../config/assetCategory.config';
-import { useAppConfigContext } from '../../views/asset/components/appConfigContext';
 import intl from 'react-intl-universal';
+import { DeviceType } from '../../types/device_type';
+import { App, useAppType } from '../../config';
 
 const { Option, OptGroup } = Select;
 
@@ -15,7 +14,7 @@ export interface DeviceTypeSelectProps extends SelectProps<any> {
 
 const DeviceTypeSelect: FC<DeviceTypeSelectProps> = (props) => {
   const { sensors, children, onChange } = props;
-  const config = useAppConfigContext();
+  const appType = useAppType();
 
   useEffect(() => {
     if (onChange && sensors) {
@@ -24,9 +23,9 @@ const DeviceTypeSelect: FC<DeviceTypeSelectProps> = (props) => {
   }, [onChange, sensors]);
 
   const renderSensors = () => {
-    return SENSORS.get(config.type)?.map((item) => (
+    return App.getDeviceTypes(appType).map((item) => (
       <Option key={item} value={item}>
-        {DeviceType.toString(item)}
+        {intl.get(DeviceType.toString(item))}
       </Option>
     ));
   };
@@ -42,7 +41,7 @@ const DeviceTypeSelect: FC<DeviceTypeSelectProps> = (props) => {
     } else {
       return (
         <Select {...props}>
-          {config.type !== 'corrosionWirelessHART' && (
+          {appType !== 'corrosionWirelessHART' && (
             <>
               <OptGroup label={intl.get('GATEWAY')} key={'gateway'}>
                 {DeviceType.getGateways().map((t) => (
@@ -61,11 +60,7 @@ const DeviceTypeSelect: FC<DeviceTypeSelectProps> = (props) => {
             </>
           )}
           <OptGroup label={intl.get('SENSOR')} key={'sensor'}>
-            {SENSORS.get(config.type)?.map((item) => (
-              <Option key={item} value={item}>
-                {intl.get(DeviceType.toString(item))}
-              </Option>
-            ))}
+            {renderSensors()}
           </OptGroup>
         </Select>
       );

@@ -419,9 +419,3 @@ export const WIRELESS_HART_POLLING_PERIOD = [
     text: 'OPTION_2_HOURS'
   }
 ];
-
-export const VIRTUAL_ROOT_DEVICE = {
-  macAddress: '000000000000',
-  id: 0,
-  name: 'MENU_NETWORK_LIST'
-};

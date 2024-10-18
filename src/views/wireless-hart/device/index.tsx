@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { Button, Col, Dropdown, Input, MenuProps, Popconfirm, Row, Select, Space } from 'antd';
 import {
   CaretDownOutlined,
@@ -7,12 +8,11 @@ import {
   PlusOutlined
 } from '@ant-design/icons';
 import { Content } from 'antd/lib/layout/layout';
-import { useEffect, useState } from 'react';
+import intl from 'react-intl-universal';
 import { DeleteDeviceRequest, GetDeviceRequest, PagingDevicesRequest } from '../../../apis/device';
 import { DeviceType } from '../../../types/device_type';
 import { Device } from '../../../types/device';
 import Label from '../../../components/label';
-import ShadowCard from '../../../components/shadowCard';
 import { IsUpgrading } from '../../../types/device_upgrade_status';
 import HasPermission from '../../../permission';
 import usePermission, { Permission } from '../../../permission/permission';
@@ -23,9 +23,6 @@ import { isMobile } from '../../../utils/deviceDetection';
 import { Store, useStore } from '../../../hooks/store';
 import { Normalizes } from '../../../constants/validator';
 import { PageTitle } from '../../../components/pageTitle';
-import { SENSORS } from '../../../config/assetCategory.config';
-import { useAppConfigContext } from '../../asset/components/appConfigContext';
-import intl from 'react-intl-universal';
 import { toMac } from '../../../utils/format';
 import { getValueOfFirstClassProperty, omitSpecificKeys } from '../../device/util';
 import { SingleDeviceStatus } from '../../device/SingleDeviceStatus';
@@ -35,6 +32,8 @@ import EditSettingModal from '../../device/edit/editSettingModal';
 import EditBaseInfoModel from './update';
 import { SelfLink } from '../../../components/selfLink';
 import { DataBarOfFirstProperties } from '../../device/dataBarOfFirstProperties';
+import { App, useAppType } from '../../../config';
+import { Card } from '../../../components';
 
 const { Search } = Input;
 const { Option } = Select;
@@ -46,7 +45,6 @@ const DevicePage = () => {
   const [dataSource, setDataSource] = useState<PageResult<any>>();
   const { hasPermission } = usePermission();
   const [store, setStore, gotoPage] = useStore('deviceList');
-  const config = useAppConfigContext();
 
   const fetchDevices = (store: Store['deviceList']) => {
     const {
@@ -225,7 +223,7 @@ const DevicePage = () => {
           </SelfLink>
         }
       />
-      <ShadowCard>
+      <Card>
         <Row justify='center'>
           <Col span={24}>
             <Space direction={isMobile ? 'vertical' : 'horizontal'}>
@@ -261,7 +259,7 @@ const DevicePage = () => {
                   defaultValue={store.filters?.type}
                 >
                   {DeviceType.getGateways()
-                    .concat(SENSORS.get(config.type) ?? [])
+                    .concat(App.getDeviceTypes(useAppType()))
                     .map((d) => {
                       return (
                         <Select.Option key={d} value={d}>
@@ -325,7 +323,7 @@ const DevicePage = () => {
             />
           </Col>
         </Row>
-      </ShadowCard>
+      </Card>
       <EditBaseInfoModel
         device={device}
         open={editBaseInfoVisible}

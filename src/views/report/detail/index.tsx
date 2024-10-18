@@ -10,12 +10,12 @@ import dayjs from '../../../utils/dayjsUtils';
 import Cover from './cover.jpg';
 import './style.css';
 import { useLocation } from 'react-router-dom';
-import { useAppConfigContext } from '../../asset';
 import { ISO } from './iso';
 import intl from 'react-intl-universal';
+import { useAppType } from '../../../config';
 
 export default function Report() {
-  const config = useAppConfigContext();
+  const appType = useAppType();
   const { state } = useLocation();
   const report = state;
   const reportRef = React.useRef<HTMLDivElement>(null);
@@ -106,7 +106,7 @@ export default function Report() {
         {renderPreface()}
         <Status report={report} />
         <AlarmPage report={report} />
-        {config.type === 'vibration' && <ISO />}
+        {appType === 'vibration' && <ISO />}
       </div>
     </div>
   );

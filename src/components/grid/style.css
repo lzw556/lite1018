@@ -1,0 +1,7 @@
+.ant-row > .ant-col:first-child {
+  padding-left: 0 !important;
+}
+
+.ant-row > .ant-col:last-child {
+  padding-right: 0 !important;
+}

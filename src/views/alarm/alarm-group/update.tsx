@@ -1,23 +1,22 @@
-import { Button, Col, Divider, Form, Input, InputNumber, Row, Select } from 'antd';
 import * as React from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { Button, Col, Divider, Form, Input, InputNumber, Row, Select } from 'antd';
+import intl from 'react-intl-universal';
 import { PageTitle } from '../../../components/pageTitle';
-import ShadowCard from '../../../components/shadowCard';
-import { MONITORING_POINTS } from '../../../config/assetCategory.config';
 import { isMobile } from '../../../utils/deviceDetection';
 import { getAlarmRule, updateAlarmRule } from './services';
 import { AlarmRule } from './types';
-import intl from 'react-intl-universal';
 import { FormInputItem } from '../../../components/formInputItem';
-import { useAppConfigContext } from '../../asset';
-import { MONITORING_POINT } from '../../monitoring-point';
 import { translateMetricName } from '.';
 import { SelfLink } from '../../../components/selfLink';
+import { App, useAppType } from '../../../config';
+import { MONITORING_POINT } from '../../asset-common';
+import { Card } from '../../../components';
 
 export default function UpdateAlarmRuleGroup() {
   const navigate = useNavigate();
   const { id } = useParams();
-  const config = useAppConfigContext();
+  const appType = useAppType();
 
   const [form] = Form.useForm();
   const [rule, setRule] = React.useState<AlarmRule>();
@@ -45,7 +44,7 @@ export default function UpdateAlarmRuleGroup() {
           { title: intl.get('EDIT_ALARM_RULE') }
         ]}
       />
-      <ShadowCard>
+      <Card>
         <Form form={form} labelCol={{ span: 3 }} wrapperCol={{ span: 18 }}>
           <Form.Item
             label={intl.get('OBJECT_TYPE', { object: intl.get(MONITORING_POINT) })}
@@ -60,7 +59,7 @@ export default function UpdateAlarmRuleGroup() {
             ]}
           >
             <Select disabled={true} style={{ width: isMobile ? '75%' : 435 }}>
-              {MONITORING_POINTS.get(config.type)?.map(({ label, id }) => (
+              {App.getMonitoringPointTypes(appType).map(({ label, id }) => (
                 <Select.Option key={id} value={id}>
                   {intl.get(label)}
                 </Select.Option>
@@ -344,7 +343,7 @@ export default function UpdateAlarmRuleGroup() {
             </Button>
           </Form.Item>
         </Form>
-      </ShadowCard>
+      </Card>
     </>
   );
 }

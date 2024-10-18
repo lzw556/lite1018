@@ -1,11 +1,11 @@
-import { Menu, MenuProps } from 'antd';
 import * as React from 'react';
 import { useLocation } from 'react-router-dom';
+import { Menu, MenuProps } from 'antd';
+import intl from 'react-intl-universal';
 import { Menu as MenuItem } from '../../types/menu';
 import { mapTree } from '../../utils/tree';
-import intl from 'react-intl-universal';
 import { SelfLink } from '../../components/selfLink';
-import { ASSET_PATHNAME } from '../asset';
+import { ASSET_PATHNAME } from '../asset-common';
 
 export const NavMenu: React.FC<{
   menus: MenuItem[];

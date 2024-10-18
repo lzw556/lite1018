@@ -1,6 +1,6 @@
 import { FC, useCallback, useEffect, useState } from 'react';
-import { Button, Card, Col, Modal, Row, Select, Space } from 'antd';
-import { DeleteOutlined, DownloadOutlined } from '@ant-design/icons';
+import { Button, Col, Modal, Row, Select, Space } from 'antd';
+import { DeleteOutlined } from '@ant-design/icons';
 import { Content } from 'antd/lib/layout/layout';
 import { Device } from '../../../../types/device';
 import dayjs from '../../../../utils/dayjsUtils';
@@ -13,14 +13,14 @@ import {
 import HasPermission from '../../../../permission';
 import { Permission } from '../../../../permission/permission';
 import Label from '../../../../components/label';
-import DownloadModal from './modal/downloadModal';
 import { RangeDatePicker, oneWeekNumberRange } from '../../../../components/rangeDatePicker';
 import { getDisplayProperties } from '../../util';
 import { DeviceType } from '../../../../types/device_type';
 import intl from 'react-intl-universal';
-import { HistoryData } from '../../../monitoring-point';
 import { PropertyChart, transformHistoryData } from '../../../../components/charts/propertyChart';
 import { DisplayProperty } from '../../../../constants/properties';
+import { HistoryData } from '../../../asset-common';
+import { Card } from '../../../../components';
 
 const { Option } = Select;
 
@@ -52,7 +52,6 @@ const HistoryDataPage: FC<DeviceDataProps> = ({ device }) => {
   );
   const [range, setRange] = useState<[number, number]>(oneWeekNumberRange);
   const [dataSource, setDataSource] = useState<HistoryData>();
-  const [downloadVisible, setDownloadVisible] = useState<boolean>(false);
   const channels = DeviceType.isMultiChannel(device.typeId, true);
   const [channel, setChannel] = useState('1');
   const [runtimes, setRuntimes] = useState<
@@ -187,16 +186,6 @@ const HistoryDataPage: FC<DeviceDataProps> = ({ device }) => {
                   </Label>
                 )}
                 <RangeDatePicker onChange={setRange} showFooter={true} />
-                <HasPermission value={Permission.DeviceDataDownload}>
-                  <Button
-                    type='primary'
-                    onClick={() => {
-                      setDownloadVisible(true);
-                    }}
-                  >
-                    <DownloadOutlined />
-                  </Button>
-                </HasPermission>
                 <HasPermission value={Permission.DeviceDataDelete}>
                   <Button type='default' danger onClick={onRemoveDeviceData}>
                     <DeleteOutlined />
@@ -210,8 +199,9 @@ const HistoryDataPage: FC<DeviceDataProps> = ({ device }) => {
               <Card
                 bordered={false}
                 title={device.name}
-                headStyle={{ minHeight: '3em', borderColor: 'transparent', textAlign: 'center' }}
-                bodyStyle={{ paddingTop: 0 }}
+                styles={{
+                  body: { minHeight: '3em', borderColor: 'transparent', textAlign: 'center' }
+                }}
               >
                 {renderHistoryDataChart()}
               </Card>
@@ -219,21 +209,6 @@ const HistoryDataPage: FC<DeviceDataProps> = ({ device }) => {
           </Row>
         </Col>
       </Row>
-      {device && (
-        <DownloadModal
-          open={downloadVisible}
-          device={device}
-          property={property}
-          properties={properties}
-          onCancel={() => {
-            setDownloadVisible(false);
-          }}
-          onSuccess={() => {
-            setDownloadVisible(false);
-          }}
-          channel={channels.length > 0 ? channel : undefined}
-        />
-      )}
     </Content>
   );
 };

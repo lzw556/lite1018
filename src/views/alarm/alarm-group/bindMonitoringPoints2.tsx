@@ -1,20 +1,22 @@
-import { Empty, ModalProps, Spin, Tree } from 'antd';
 import * as React from 'react';
-import { getAssets } from '../../asset/services';
-import { AssetRow, AssetTreeNode } from '../../asset/types';
-import { MonitoringPointRow, MONITORING_POINT } from '../../monitoring-point';
+import { Empty, ModalProps, Spin, Tree } from 'antd';
+import intl from 'react-intl-universal';
 import { bindMeasurementsToAlarmRule2 } from './services';
 import { AlarmRule } from './types';
-import intl from 'react-intl-universal';
-import { useAssetCategoryChain } from '../../../config/assetCategory.config';
-import { combineMonitoringPointToAsset } from '../../asset/common/utils';
 import { list2Tree, mapTree, tree2List } from '../../../utils/tree';
 import { ModalWrapper } from '../../../components/modalWrapper';
+import {
+  AssetRow,
+  AssetTreeNode,
+  combine,
+  getAssets,
+  MONITORING_POINT,
+  MonitoringPointRow
+} from '../../asset-common';
 
 export const BindMonitoringPoints2: React.FC<
   ModalProps & { selectedRow: AlarmRule } & { onSuccess: () => void }
 > = (props) => {
-  const { root } = useAssetCategoryChain();
   const [loading, setLoading] = React.useState(true);
   const [treeData, setTreeData] = React.useState<any>();
   const [checkedIds, setCheckedIds] = React.useState<string[]>(
@@ -27,12 +29,12 @@ export const BindMonitoringPoints2: React.FC<
   }
 
   React.useEffect(() => {
-    getAssets({ type: root.key, parent_id: 0 })
+    getAssets({ parent_id: 0 })
       .then((assets) => {
         getTreedata(assets, props.selectedRow.type);
       })
       .finally(() => setLoading(false));
-  }, [props.selectedRow.type, root.key]);
+  }, [props.selectedRow.type]);
 
   const renderModalContent = () => {
     if (loading) return <Spin />;
@@ -55,7 +57,7 @@ export const BindMonitoringPoints2: React.FC<
 
   function getTreedata(assets: AssetRow[], ruleTypeId: number) {
     if (assets.length > 0) {
-      const mixedTree = mapTree(assets, (asset) => combineMonitoringPointToAsset(asset));
+      const mixedTree = mapTree(assets, (asset) => combine(asset));
       const list = tree2List(mixedTree);
       const matchedList = list.filter((item) => item.type > 10000 && item.type === ruleTypeId);
       const mathcedAssetIds: (string | number)[] = [];

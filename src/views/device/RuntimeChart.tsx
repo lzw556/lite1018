@@ -1,11 +1,12 @@
 import * as React from 'react';
-import { Card, Empty } from 'antd';
+import { Col, Empty, Row } from 'antd';
+import intl from 'react-intl-universal';
 import dayjs from '../../utils/dayjsUtils';
 import { GetDeviceRuntimeRequest } from '../../apis/device';
-import { isMobile } from '../../utils/deviceDetection';
 import { DeviceType } from '../../types/device_type';
-import intl from 'react-intl-universal';
 import { PropertyChart } from '../../components/charts/propertyChart';
+import { Card } from '../../components';
+import { generateColProps } from '../../utils/grid';
 
 export const RuntimeChart: React.FC<{ deviceId: number; deviceType: number }> = ({
   deviceId,
@@ -33,44 +34,44 @@ export const RuntimeChart: React.FC<{ deviceId: number; deviceType: number }> = 
     );
     return (
       <Card bordered={false}>
-        {!DeviceType.isWiredDevice(deviceType) && (
-          <Card.Grid
-            style={{ boxShadow: 'none', border: 'none', width: isMobile ? '100%' : '50%' }}
-          >
+        <Row>
+          {!DeviceType.isWiredDevice(deviceType) && (
+            <Col {...generateColProps({ lg: 12, xl: 12, xxl: 12 })}>
+              <PropertyChart
+                rawOptions={{ title: { text: intl.formatMessage({ id: 'BATTERY_VOLTAGE' }) } }}
+                series={[
+                  {
+                    data: {
+                      [intl.formatMessage({ id: 'BATTERY_VOLTAGE' })]: runtimes.map(
+                        (item) => item.batteryVoltage
+                      )
+                    },
+                    xAxisValues
+                  }
+                ]}
+                withArea={true}
+                yAxis={{ unit: 'mV', precision: 0 }}
+              />
+            </Col>
+          )}
+          <Col {...generateColProps({ lg: 12, xl: 12, xxl: 12 })}>
             <PropertyChart
-              rawOptions={{ title: { text: intl.formatMessage({ id: 'BATTERY_VOLTAGE' }) } }}
+              rawOptions={{ title: { text: intl.formatMessage({ id: 'SIGNAL_STRENGTH' }) } }}
               series={[
                 {
                   data: {
-                    [intl.formatMessage({ id: 'BATTERY_VOLTAGE' })]: runtimes.map(
-                      (item) => item.batteryVoltage
+                    [intl.formatMessage({ id: 'SIGNAL_STRENGTH' })]: runtimes.map(
+                      (item) => item.signalStrength
                     )
                   },
                   xAxisValues
                 }
               ]}
               withArea={true}
-              yAxis={{ unit: 'mV', precision: 0 }}
+              yAxis={{ unit: 'dBm', precision: 0 }}
             />
-          </Card.Grid>
-        )}
-        <Card.Grid style={{ boxShadow: 'none', border: 'none', width: isMobile ? '100%' : '50%' }}>
-          <PropertyChart
-            rawOptions={{ title: { text: intl.formatMessage({ id: 'SIGNAL_STRENGTH' }) } }}
-            series={[
-              {
-                data: {
-                  [intl.formatMessage({ id: 'SIGNAL_STRENGTH' })]: runtimes.map(
-                    (item) => item.signalStrength
-                  )
-                },
-                xAxisValues
-              }
-            ]}
-            withArea={true}
-            yAxis={{ unit: 'dBm', precision: 0 }}
-          />
-        </Card.Grid>
+          </Col>
+        </Row>
       </Card>
     );
   }

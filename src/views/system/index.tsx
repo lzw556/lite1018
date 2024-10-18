@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { GetSystemRequest } from '../../apis/system';
-import ShadowCard from '../../components/shadowCard';
 import { Col, Form, Progress, Row, Statistic, Tag } from 'antd';
 import { System } from '../../types/system';
 import EChartsReact from 'echarts-for-react';
@@ -10,6 +9,7 @@ import { Content } from 'antd/es/layout/layout';
 import { isMobile } from '../../utils/deviceDetection';
 import { PageTitle } from '../../components/pageTitle';
 import intl from 'react-intl-universal';
+import { Card } from '../../components';
 
 const SystemPage = () => {
   const [data, setData] = useState<System>();
@@ -67,7 +67,7 @@ const SystemPage = () => {
       <PageTitle items={[{ title: intl.get('MENU_SYSTEM_STATUS') }]} />
       <Row justify={'space-between'} gutter={isMobile ? [0, 10] : [10, 10]} align='stretch'>
         <Col span={isMobile ? 24 : 12}>
-          <ShadowCard title={intl.get('SYSTEM_INFO')} size={'small'}>
+          <Card title={intl.get('SYSTEM_INFO')} size={'small'}>
             <Form.Item
               label={intl.get('OEPRATING_SYSTEM')}
               labelAlign={'left'}
@@ -108,13 +108,13 @@ const SystemPage = () => {
             >
               {data ? data.mqtt.password : ''}
             </Form.Item>
-          </ShadowCard>
+          </Card>
         </Col>
         <Col
           span={isMobile ? 24 : 12}
           style={{ paddingLeft: isMobile ? 0 : '4px', marginBottom: isMobile ? 8 : 0 }}
         >
-          <ShadowCard title={intl.get('HARD_DISK_STATUS')} size={'small'}>
+          <Card title={intl.get('HARD_DISK_STATUS')} size={'small'}>
             <Row justify={'start'}>
               <Col span={6}>
                 <Statistic title={intl.get('TOTAL_AMOUNT_MB')} value={data?.server.disk.totalMB} />
@@ -126,10 +126,10 @@ const SystemPage = () => {
               </Col>
               <Col span={12}>{renderUsedChart(data ? data.server.disk.usedPercent : 0)}</Col>
             </Row>
-          </ShadowCard>
+          </Card>
         </Col>
         <Col span={isMobile ? 24 : 12}>
-          <ShadowCard title={intl.get('CPU_RUNNING_STATUS')} size={'small'}>
+          <Card title={intl.get('CPU_RUNNING_STATUS')} size={'small'}>
             <Form.Item
               label={intl.get('NUMBER_OF_CPU_CORES')}
               labelAlign={'left'}
@@ -147,13 +147,13 @@ const SystemPage = () => {
               {data ? data.server.cpu.cpus.length : ''}
             </Form.Item>
             {renderCores()}
-          </ShadowCard>
+          </Card>
         </Col>
         <Col
           span={isMobile ? 24 : 12}
           style={{ paddingLeft: isMobile ? 0 : '4px', marginBottom: isMobile ? 8 : 0 }}
         >
-          <ShadowCard title={intl.get('MEMORY_STATUS')} size={'small'}>
+          <Card title={intl.get('MEMORY_STATUS')} size={'small'}>
             <Row justify={'start'}>
               <Col span={12}>
                 <Statistic title={intl.get('TOTAL_AMOUNT_MB')} value={data?.server.ram.totalMB} />
@@ -161,7 +161,7 @@ const SystemPage = () => {
               </Col>
               <Col span={12}>{renderUsedChart(data ? data.server.ram.usedPercent : 0)}</Col>
             </Row>
-          </ShadowCard>
+          </Card>
         </Col>
       </Row>
     </Content>

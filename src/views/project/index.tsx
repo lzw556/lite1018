@@ -1,7 +1,6 @@
 import { Content } from 'antd/es/layout/layout';
-import ShadowCard from '../../components/shadowCard';
 import TableLayout from '../layout/TableLayout';
-import { Button, Card, Modal, Popconfirm, Space, Typography } from 'antd';
+import { Button, Modal, Popconfirm, Space, Typography } from 'antd';
 import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
 import { useEffect, useState } from 'react';
 import { PageResult } from '../../types/page';
@@ -20,6 +19,7 @@ import { store as reduxStore } from '../../store';
 import { PageTitle } from '../../components/pageTitle';
 import intl from 'react-intl-universal';
 import { isMobile } from '../../utils/deviceDetection';
+import { Card } from '../../components';
 
 const ProjectPage = () => {
   const [open, setVisible] = useState(false);
@@ -174,7 +174,7 @@ const ProjectPage = () => {
           </HasPermission>
         }
       />
-      <ShadowCard>
+      <Card>
         <TableLayout
           emptyText={intl.get('NO_PROJECTS_PROMPT')}
           permissions={[
@@ -190,7 +190,7 @@ const ProjectPage = () => {
           columns={columns}
           scroll={isMobile ? { x: 600 } : undefined}
         />
-      </ShadowCard>
+      </Card>
       {open && (
         <EditProjectModal
           open={open}

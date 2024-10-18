@@ -38,22 +38,19 @@ import zhCN from 'antd/es/locale/zh_CN';
 import enUS from 'antd/es/locale/en_US';
 import dayjs from '../utils/dayjsUtils';
 import 'dayjs/locale/zh-cn';
-import { AssetsContextProvider, ASSET_PATHNAME, useAppConfigContext } from '../views/asset';
-import { SITE_NAMES } from '../config/assetCategory.config';
-import { DevicesContextProvider } from '../views/device/index';
+import { App, useAppType } from '../config';
+import { ASSET_PATHNAME } from '../views/asset-common';
 
 const AlarmRuleGroups = lazy(() => import('../views/alarm/alarm-group/index'));
 const CreateAlarmRuleGroups = lazy(() => import('../views/alarm/alarm-group/create'));
 const UpdateAlarmRuleGroups = lazy(() => import('../views/alarm/alarm-group/update'));
 
-//wind-turbine
-const Assets = lazy(() => import('../views/asset/projectOverview'));
-const AssetsTreeList = lazy(() => import('../views/asset/tree-list/index'));
-const AssetDetail = lazy(() => import('../views/asset/tree-list/detail'));
+const Assets = lazy(() => import('../views/home'));
+const Asset = lazy(() => import('../views/home/main'));
 
 const AppRouter = () => {
-  const config = useAppConfigContext();
-  const isWirelessHart = config.type === 'corrosionWirelessHART';
+  const config = useAppType();
+  const isWirelessHart = config === 'corrosionWirelessHART';
   const [initDone, setInitDone] = React.useState(false);
   const routes: RouteObject[] = [
     { path: '/403', element: <Unauthorized /> },
@@ -63,45 +60,20 @@ const AppRouter = () => {
       path: '/',
       element: <PrimaryLayout />,
       children: [
-        {
-          index: true,
-          element: (
-            <AssetsContextProvider>
-              <Assets />
-            </AssetsContextProvider>
-          )
-        },
-        {
-          path: 'project-overview',
-          element: (
-            <AssetsContextProvider>
-              <Assets />
-            </AssetsContextProvider>
-          )
-        },
+        { index: true, element: <Assets /> },
         {
           path: ASSET_PATHNAME,
-          element: (
-            <AssetsContextProvider>
-              <AssetsTreeList />
-            </AssetsContextProvider>
-          ),
+          element: <Assets />,
           children: [
             {
               path: ':id',
-              element: <AssetDetail />
+              element: <Asset />
             }
           ]
         },
         {
           path: 'devices',
-          element: isWirelessHart ? (
-            <DeviceWirelessHart />
-          ) : (
-            <DevicesContextProvider>
-              <Device />
-            </DevicesContextProvider>
-          ),
+          element: isWirelessHart ? <DeviceWirelessHart /> : <Device />,
           children: [
             {
               path: 'create',
@@ -160,7 +132,7 @@ const AppRouter = () => {
     } else {
       dayjs.locale('en');
     }
-    document.title = intl.get(SITE_NAMES.get(config.type) ?? '');
+    document.title = intl.get(App.getSiteName(config));
   }, [language, config]);
 
   return (

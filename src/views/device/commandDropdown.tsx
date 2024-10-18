@@ -12,18 +12,22 @@ import { IsUpgrading } from '../../types/device_upgrade_status';
 import intl from 'react-intl-universal';
 import { DownOutlined } from '@ant-design/icons';
 import { isMobile } from '../../utils/deviceDetection';
-import { useAppConfigContext } from '../asset';
+import { NetworkProvisionRequest, NetworkSyncRequest } from '../../apis/network';
+import { Network } from '../../types/network';
+import { useAppType } from '../../config';
 
 export const CommandDropdown = ({
   device,
   target,
-  initialUpgradeCode
+  initialUpgradeCode,
+  network
 }: {
   device: Device;
   target?: JSX.Element;
   initialUpgradeCode?: number;
+  network?: Network;
 }) => {
-  const config = useAppConfigContext();
+  const appType = useAppType();
   const { id, typeId, macAddress } = device;
   const { PubSub } = useSocket();
   const [upgradedCode, setUpgradeCode] = useState(initialUpgradeCode ?? device.upgradeStatus?.code);
@@ -45,40 +49,62 @@ export const CommandDropdown = ({
   }, [PubSub, macAddress]);
 
   const handelMenuClick = ({ key }: any) => {
-    let commandKey = Number(key);
-    let channel = undefined;
-    if (Number.isNaN(commandKey)) {
-      try {
-        const commands: [number, number] = JSON.parse(key);
-        commandKey = commands[0];
-        channel = commands[1];
-      } catch (error) {}
-    }
-    switch (commandKey) {
-      case DeviceCommand.Upgrade:
-        setUpgradeVisible(true);
-        break;
-      case DeviceCommand.CancelUpgrade:
-        DeviceUpgradeRequest(id, { type: DeviceCommand.CancelUpgrade }).then((res) => {
+    if (key === 'sync') {
+      if (network) {
+        NetworkSyncRequest(network.id).then((res) => {
           if (res.code === 200) {
-            message.success(intl.get('CANCEL_UPGRADING_SUCCESSFUL')).then();
+            message.success(intl.get('SENT_SUCCESSFUL'));
           } else {
-            message.error(`${intl.get('FAILED_TO_CANCEL_UPGRADING')},${res.msg}`).then();
+            message.error(`${intl.get('FAILED_TO_SEND')}${intl.get(res.msg).d(res.msg)}`);
           }
         });
-        break;
-      case DeviceCommand.Calibrate:
-        setVisibleCalibrate(true);
-        break;
-      default:
-        SendDeviceCommandRequest(id, commandKey, channel ? { channel } : {}).then((res) => {
+      }
+    } else if (key === 'provision') {
+      if (network) {
+        NetworkProvisionRequest(network.id).then((res) => {
           if (res.code === 200) {
-            message.success(intl.get('SENT_SUCCESSFUL')).then();
+            message.success(intl.get('SENT_SUCCESSFUL'));
           } else {
-            message.error(intl.get('FAILED_TO_SEND')).then();
+            message.error(`${intl.get('FAILED_TO_SEND')}${intl.get(res.msg).d(res.msg)}`);
           }
         });
-        break;
+      }
+    } else {
+      let commandKey = Number(key);
+      let channel = undefined;
+      if (Number.isNaN(commandKey)) {
+        try {
+          const commands: [number, number] = JSON.parse(key);
+          commandKey = commands[0];
+          channel = commands[1];
+        } catch (error) {}
+      }
+      switch (commandKey) {
+        case DeviceCommand.Upgrade:
+          setUpgradeVisible(true);
+          break;
+        case DeviceCommand.CancelUpgrade:
+          DeviceUpgradeRequest(id, { type: DeviceCommand.CancelUpgrade }).then((res) => {
+            if (res.code === 200) {
+              message.success(intl.get('CANCEL_UPGRADING_SUCCESSFUL')).then();
+            } else {
+              message.error(`${intl.get('FAILED_TO_CANCEL_UPGRADING')},${res.msg}`).then();
+            }
+          });
+          break;
+        case DeviceCommand.Calibrate:
+          setVisibleCalibrate(true);
+          break;
+        default:
+          SendDeviceCommandRequest(id, commandKey, channel ? { channel } : {}).then((res) => {
+            if (res.code === 200) {
+              message.success(intl.get('SENT_SUCCESSFUL')).then();
+            } else {
+              message.error(intl.get('FAILED_TO_SEND')).then();
+            }
+          });
+          break;
+      }
     }
   };
 
@@ -88,6 +114,10 @@ export const CommandDropdown = ({
   const items: MenuProps['items'] = [];
 
   if (!upgrading) {
+    if (DeviceType.isGateway(typeId)) {
+      items.push({ key: 'sync', label: intl.get('SYNC_NETWORK') });
+      items.push({ key: 'provision', label: intl.get('PROVISION') });
+    }
     items.push({ key: DeviceCommand.Reboot, label: intl.get('RESTART') });
     if (DeviceType.isSensor(typeId)) {
       items.push({ key: DeviceCommand.AcquireSensorData, label: intl.get('ACQUIRE_SENSOR_DATA') });
@@ -111,7 +141,7 @@ export const CommandDropdown = ({
   }
   if (hasPermissions(Permission.DeviceUpgrade, Permission.DeviceFirmwares)) {
     if (!upgrading) {
-      if (config.type !== 'corrosionWirelessHART') {
+      if (appType !== 'corrosionWirelessHART') {
         items.push({ key: DeviceCommand.Upgrade, label: intl.get('UPGRADE_FIRMWARE') });
       }
     } else {

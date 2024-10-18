@@ -15,12 +15,12 @@ import { Button, Col, Popconfirm, Row, Space } from 'antd';
 import { DeleteOutlined, EditOutlined, ExportOutlined, PlusOutlined } from '@ant-design/icons';
 import { PageTitle } from '../../../components/pageTitle';
 import HasPermission from '../../../permission';
-import ShadowCard from '../../../components/shadowCard';
 import TableLayout from '../../layout/TableLayout';
 import { isMobile } from '../../../utils/deviceDetection';
 import { CreateNetwork } from './create';
 import { UpdateNetwork } from './update';
 import { SelfLink } from '../../../components/selfLink';
+import { Card } from '../../../components';
 
 export default function NetworkManage() {
   const { hasPermission } = usePermission();
@@ -154,7 +154,7 @@ export default function NetworkManage() {
           </HasPermission>
         }
       />
-      <ShadowCard>
+      <Card>
         <Row justify={'start'}>
           <Col span={24}>
             <TableLayout
@@ -174,7 +174,7 @@ export default function NetworkManage() {
             />
           </Col>
         </Row>
-      </ShadowCard>
+      </Card>
       {addVisible && (
         <CreateNetwork
           open={addVisible}

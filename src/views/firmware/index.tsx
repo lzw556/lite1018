@@ -9,7 +9,6 @@ import {
   UploadFirmwareRequest
 } from '../../apis/firmware';
 import dayjs from '../../utils/dayjsUtils';
-import ShadowCard from '../../components/shadowCard';
 import HasPermission from '../../permission';
 import { Permission } from '../../permission/permission';
 import { PageResult } from '../../types/page';
@@ -18,6 +17,7 @@ import { isMobile } from '../../utils/deviceDetection';
 import { Store, useStore } from '../../hooks/store';
 import { PageTitle } from '../../components/pageTitle';
 import intl from 'react-intl-universal';
+import { Card } from '../../components';
 
 const FirmwarePage = () => {
   const [isUploading, setIsUploading] = useState<boolean>(false);
@@ -142,7 +142,7 @@ const FirmwarePage = () => {
 
       <Row justify='center'>
         <Col span={24}>
-          <ShadowCard>
+          <Card>
             <TableLayout
               emptyText={intl.get('NO_FIRMWARES_PROMPT')}
               columns={columns}
@@ -154,7 +154,7 @@ const FirmwarePage = () => {
               simple={isMobile}
               scroll={isMobile ? { x: 900 } : undefined}
             />
-          </ShadowCard>
+          </Card>
         </Col>
       </Row>
     </Content>

@@ -1,3 +1,6 @@
+import * as React from 'react';
+import { Button, Empty, message, Popconfirm, Space, Table, TableProps, Tag } from 'antd';
+import { Content } from 'antd/es/layout/layout';
 import {
   DeleteOutlined,
   EditOutlined,
@@ -5,35 +8,29 @@ import {
   MoreOutlined,
   PlusOutlined
 } from '@ant-design/icons';
-import { Button, Empty, message, Popconfirm, Space, Table, TableProps, Tag } from 'antd';
-import { Content } from 'antd/es/layout/layout';
-import * as React from 'react';
+import intl from 'react-intl-universal';
 import { PageTitle } from '../../../components/pageTitle';
-import { MONITORING_POINTS, useAssetCategoryChain } from '../../../config/assetCategory.config';
 import HasPermission from '../../../permission';
 import { Permission } from '../../../permission/permission';
-import {
-  convertAlarmLevelToState,
-  getAlarmLevelColor,
-  getAlarmStateText
-} from '../../asset/common/statisticsHelper';
-import { useAppConfigContext } from '../../asset/components/appConfigContext';
-import { FileInput } from '../../asset/components/fileInput';
 import { BindMonitoringPoints } from './bindMonitoringPoints';
 import { SelectRules } from './selectRules';
 import { deleteAlarmRule, getAlarmRules, importAlarmRules } from './services';
 import { AlarmRule } from './types';
-import intl from 'react-intl-universal';
-import { MONITORING_POINT } from '../../monitoring-point';
-import { AssertAssetCategory, AssertOfAssetCategory } from '../../asset';
 import { BindMonitoringPoints2 } from './bindMonitoringPoints2';
 import { SelfLink } from '../../../components/selfLink';
 import { isMobile } from '../../../utils/deviceDetection';
 import { getValue } from '../../../utils/format';
+import { App, useAppType } from '../../../config';
+import { MONITORING_POINT } from '../../asset-common';
+import {
+  convertAlarmLevelToState,
+  getAlarmLevelColor,
+  getAlarmStateText
+} from '../../../types/alarm';
+import { FileInput } from '../../../components/fileInput';
 
 export default function AlarmRuleList() {
-  const config = useAppConfigContext();
-  const { root } = useAssetCategoryChain();
+  const appType = useAppType();
   const [open, setVisible] = React.useState(false);
   const [openExport, setVisibleExport] = React.useState(false);
   const [selectedRow, setSelectedRow] = React.useState<AlarmRule>();
@@ -51,7 +48,7 @@ export default function AlarmRuleList() {
       key: 'type',
       width: 200,
       render: (typeId: number) => {
-        const label = MONITORING_POINTS.get(config.type)?.find((m) => m.id === typeId)?.label;
+        const label = App.getMonitoringPointTypes(appType).find((m) => m.id === typeId)?.label;
         return label ? intl.get(label) : '-';
       }
     },
@@ -141,7 +138,9 @@ export default function AlarmRuleList() {
           render: (level: number) => {
             const alarmState = convertAlarmLevelToState(level);
             return (
-              <Tag color={getAlarmLevelColor(alarmState)}>{getAlarmStateText(alarmState)}</Tag>
+              <Tag color={getAlarmLevelColor(alarmState)}>
+                {intl.get(getAlarmStateText(alarmState))}
+              </Tag>
             );
           }
         }
@@ -237,7 +236,7 @@ export default function AlarmRuleList() {
         }
       />
       <Table {...result} />
-      {open && selectedRow && AssertAssetCategory(root.key, AssertOfAssetCategory.IS_WIND_LIKE) && (
+      {open && selectedRow && (
         <BindMonitoringPoints
           {...{
             open: open,
@@ -250,7 +249,7 @@ export default function AlarmRuleList() {
           }}
         />
       )}
-      {open && selectedRow && !AssertAssetCategory(root.key, AssertOfAssetCategory.IS_WIND_LIKE) && (
+      {/* {open && selectedRow && (
         <BindMonitoringPoints2
           {...{
             open: open,
@@ -262,7 +261,7 @@ export default function AlarmRuleList() {
             }
           }}
         />
-      )}
+      )} */}
     </Content>
   );
 }

@@ -53,7 +53,7 @@ const SideBar = ({ body, head }: SideBarProps) => {
           <div className='sidebar-inner'>
             {head && <div className='sidebar-head'>{head}</div>}
             <div className='sidebar-body' style={{ height: sidebarBodyHeight }}>
-              {body(sidebarBodyHeight - 10)}
+              {body(sidebarBodyHeight - 24)}
             </div>
             <Button
               className='sidebar-switch'

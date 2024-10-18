@@ -72,20 +72,17 @@ const TableLayout: FC<TableLayoutProps> = (props) => {
           />
         </Col>
       </Row>
-      <br />
-      <Row justify={'end'} style={{ textAlign: 'right' }}>
-        <Col span={24}>
-          {dataSource && !Array.isArray(dataSource) && (
-            <Pagination
-              {...pagination}
-              current={dataSource.page}
-              total={dataSource.total}
-              pageSize={dataSource.size}
-              simple={simple}
-            />
-          )}
-        </Col>
-      </Row>
+      {dataSource && !Array.isArray(dataSource) && (
+        <Pagination
+          {...pagination}
+          align='end'
+          current={dataSource.page}
+          total={dataSource.total}
+          pageSize={dataSource.size}
+          simple={simple}
+          style={{ marginTop: 12 }}
+        />
+      )}
     </>
   );
 };

@@ -1,21 +1,20 @@
-import { Button, Card, Col, Form, message, Result, Row, Upload } from 'antd';
+import { Breadcrumb, Button, Col, Form, message, Result, Row, Upload } from 'antd';
 import { useEffect, useState } from 'react';
 import { ImportOutlined, InboxOutlined } from '@ant-design/icons';
 import { ImportNetworkRequest } from '../../../apis/network';
-import ShadowCard from '../../../components/shadowCard';
 import G6, { TreeGraph } from '@antv/g6';
 import '../../../components/shape/shape';
 import WsnFormItem from '../../../components/formItems/wsnFormItem';
 import { useProvisionMode } from '../useProvisionMode';
 import { Network } from '../../../types/network';
 import { useNavigate } from 'react-router';
-import { PageTitle } from '../../../components/pageTitle';
 import intl from 'react-intl-universal';
 import { toMac } from '../../../utils/format';
 import { useLocaleFormLayout } from '../../../hooks/useLocaleFormLayout';
 import { DeviceType } from '../../../types/device_type';
 import { SelfLink } from '../../../components/selfLink';
-import { useDevicesContext } from '../../device';
+import { useContext, VIRTUAL_ROOT_DEVICE } from '../../device';
+import { Card } from '../../../components';
 
 const { Dragger } = Upload;
 
@@ -34,7 +33,7 @@ const ImportNetworkPage = () => {
   const [networkSettings, setNetworkSettings] = useState<any>();
   const [provisionMode, setProvisionMode, settings] = useProvisionMode(networkSettings);
   const navigate = useNavigate();
-  const devicesContext = useDevicesContext();
+  const devicesContext = useContext();
   const checkJSONFormat = (source: any) => {
     return source.hasOwnProperty('deviceList') && source.hasOwnProperty('wsn');
   };
@@ -96,7 +95,7 @@ const ImportNetworkPage = () => {
         };
         ImportNetworkRequest(req).then((_) => {
           setSuccess(true);
-          devicesContext.setToken((prev) => prev + 1);
+          devicesContext.refresh(true);
         });
       });
     } else {
@@ -219,89 +218,90 @@ const ImportNetworkPage = () => {
   };
 
   return (
-    <div style={{ marginTop: 10 }}>
-      <PageTitle
-        items={[
-          { title: <SelfLink to='/devices/0'>{intl.get('MENU_NETWORK_LIST')}</SelfLink> },
-          { title: intl.get('MENU_IMPORT_NETWORK') }
-        ]}
-        actions={
-          !success && (
-            <Button type='primary' onClick={onSave}>
-              {intl.get('SAVE_NETWORK')}
-              <ImportOutlined />
-            </Button>
-          )
-        }
-      />
-      <ShadowCard>
-        {!success && (
-          <Row justify='space-between'>
-            <Col xl={isGatewayBle ? 16 : 24} xxl={isGatewayBle ? 18 : 24}>
+    <Card
+      extra={
+        !success && (
+          <Button type='primary' onClick={onSave}>
+            {intl.get('SAVE_NETWORK')}
+            <ImportOutlined />
+          </Button>
+        )
+      }
+      title={
+        <Breadcrumb
+          items={[
+            { title: <SelfLink to='/devices/0'>{VIRTUAL_ROOT_DEVICE.name}</SelfLink> },
+            { title: intl.get('MENU_IMPORT_NETWORK') }
+          ]}
+        />
+      }
+    >
+      {!success && (
+        <Row justify='space-between'>
+          <Col xl={isGatewayBle ? 16 : 24} xxl={isGatewayBle ? 18 : 24}>
+            <Card
+              type='inner'
+              size={'small'}
+              title={intl.get('PREVIEW')}
+              style={{ height: `${height}px` }}
+              extra={renderAction()}
+            >
+              <div className='graph' style={{ height: `${height - 56}px`, width: '100%' }}>
+                {network?.devices.length ? (
+                  <div id={'container'} style={{ width: '100%', height: '100%' }} />
+                ) : (
+                  <Dragger accept={'.json'} beforeUpload={onBeforeUpload} showUploadList={false}>
+                    <p className='ant-upload-drag-icon'>
+                      <InboxOutlined />
+                    </p>
+                    <p className='ant-upload-text'>{intl.get('UPLOAD_NETWORK_PROMPT')}</p>
+                    <p className='ant-upload-hint'>{intl.get('UPLOAD_NETWORK_HINT')}</p>
+                  </Dragger>
+                )}
+              </div>
+            </Card>
+          </Col>
+          {isGatewayBle && (
+            <Col xl={8} xxl={6} style={{ paddingLeft: '4px' }}>
               <Card
                 type='inner'
                 size={'small'}
-                title={intl.get('PREVIEW')}
+                title={intl.get('EDIT')}
                 style={{ height: `${height}px` }}
-                extra={renderAction()}
               >
-                <div className='graph' style={{ height: `${height - 56}px`, width: '100%' }}>
-                  {network?.devices.length ? (
-                    <div id={'container'} style={{ width: '100%', height: '100%' }} />
-                  ) : (
-                    <Dragger accept={'.json'} beforeUpload={onBeforeUpload} showUploadList={false}>
-                      <p className='ant-upload-drag-icon'>
-                        <InboxOutlined />
-                      </p>
-                      <p className='ant-upload-text'>{intl.get('UPLOAD_NETWORK_PROMPT')}</p>
-                      <p className='ant-upload-hint'>{intl.get('UPLOAD_NETWORK_HINT')}</p>
-                    </Dragger>
+                <Form form={form} {...formLayout} labelWrap={true}>
+                  {network && provisionMode && (
+                    <WsnFormItem mode={provisionMode} onModeChange={setProvisionMode} />
                   )}
-                </div>
+                </Form>
               </Card>
             </Col>
-            {isGatewayBle && (
-              <Col xl={8} xxl={6} style={{ paddingLeft: '4px' }}>
-                <Card
-                  type='inner'
-                  size={'small'}
-                  title={intl.get('EDIT')}
-                  style={{ height: `${height}px` }}
-                >
-                  <Form form={form} {...formLayout} labelWrap={true}>
-                    {network && provisionMode && (
-                      <WsnFormItem mode={provisionMode} onModeChange={setProvisionMode} />
-                    )}
-                  </Form>
-                </Card>
-              </Col>
-            )}
-          </Row>
-        )}
-        {success && (
-          <Result
-            status='success'
-            title={intl.get('NETWORK_IMPORTED_SUCCESSFUL')}
-            subTitle={intl.get('NETWORK_IMPORTED_NEXT_PROMPT')}
-            extra={[
-              <Button type='primary' key='devices' onClick={() => navigate('/networks')}>
-                {intl.get('BACK_TO_NETWORKS')}
-              </Button>,
-              <Button
-                key='add'
-                onClick={() => {
-                  form.resetFields();
-                  setNetwork({ devices: [], wsn: {} });
-                  setSuccess(false);
-                }}
-              >
-                {intl.get('CONTINUE_TO_IMPORT_NETWORK')}
-              </Button>
-            ]}
-          />
-        )}
-      </ShadowCard>
-    </div>
+          )}
+        </Row>
+      )}
+      {success && (
+        <Result
+          status='success'
+          title={intl.get('NETWORK_IMPORTED_SUCCESSFUL')}
+          subTitle={intl.get('NETWORK_IMPORTED_NEXT_PROMPT')}
+          extra={[
+            <Button type='primary' key='devices' onClick={() => navigate('/networks')}>
+              {intl.get('BACK_TO_NETWORKS')}
+            </Button>,
+            <Button
+              key='add'
+              onClick={() => {
+                form.resetFields();
+                setNetwork({ devices: [], wsn: {} });
+                setSuccess(false);
+              }}
+            >
+              {intl.get('CONTINUE_TO_IMPORT_NETWORK')}
+            </Button>
+          ]}
+        />
+      )}
+    </Card>
   );
 };
 

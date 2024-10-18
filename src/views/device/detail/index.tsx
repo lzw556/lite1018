@@ -1,8 +1,10 @@
-import { useCallback, useEffect, useState } from 'react';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import { Card, message, Spin, Tabs } from 'antd';
+import React from 'react';
+import { useLocation } from 'react-router-dom';
+import { Button, Col, Descriptions, DescriptionsProps, Row, Space, Spin, Statistic } from 'antd';
+import Icon, { DownloadOutlined, ExportOutlined, WifiOutlined } from '@ant-design/icons';
+import { TabsProps } from 'antd/lib';
+import intl from 'react-intl-universal';
 import { Device } from '../../../types/device';
-import { GetDeviceRequest } from '../../../apis/device';
 import SettingPage from './setting';
 import { DeviceType } from '../../../types/device_type';
 import HasPermission from '../../../permission';
@@ -12,68 +14,32 @@ import useSocket, { SocketTopic } from '../../../socket';
 import { RecentHistory } from '../RecentHistory';
 import DeviceEvent from './event';
 import { CommandDropdown } from '../commandDropdown';
-import { isNumber } from 'lodash';
-import { PageTitle } from '../../../components/pageTitle';
-import intl from 'react-intl-universal';
-import { useDevicesContext } from '..';
-import { TabsProps } from 'antd/lib';
 import { SingleDeviceStatus } from '../SingleDeviceStatus';
 import InformationCard from './information';
 import TopologyView from '../../network/detail/topologyView';
-import { Network } from '../../../types/network';
-import { GetNetworkRequest } from '../../../apis/network';
 import { RuntimeChart } from '../RuntimeChart';
-import { VIRTUAL_ROOT_DEVICE } from '../../../constants';
-import NetworkPage from '../../network';
+import { useContext } from '..';
+import { Tabs } from '../../../components';
+import { toMac } from '../../../utils/format';
+import dayjs from '../../../utils/dayjsUtils';
+import { SelfLink } from '../../../components/selfLink';
+import { ExportNetworkRequest } from '../../../apis/network';
+import DownloadModal from './downloadModal';
+import { AssetNavigator } from '../navigator';
+import { Card } from '../../../components';
 
 const DeviceDetailPage = () => {
-  const { id } = useParams();
-  const navigate = useNavigate();
   const location = useLocation();
   const { PubSub } = useSocket();
-  const [device, setDevice] = useState<Device>();
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [network, setNetwork] = useState<Network>();
+  const { device, network, loading, refresh } = useContext();
   const tabs = useDeviceTabs(device?.typeId);
-  const { setToken } = useDevicesContext();
+  const [open, setOpen] = React.useState(false);
 
-  const fetchDevice = useCallback(() => {
-    if (id && isNumber(Number(id))) {
-      if (Number(id) !== VIRTUAL_ROOT_DEVICE.id) {
-        setIsLoading(true);
-        GetDeviceRequest(Number(id))
-          .then((data) => {
-            setDevice(data);
-            if (DeviceType.isGateway(data.typeId)) {
-              if (data.network?.id) {
-                GetNetworkRequest(data.network?.id)
-                  .then((data) => {
-                    setNetwork(data);
-                  })
-                  .catch((_) => {
-                    navigate('/devices');
-                  });
-              }
-            }
-            setIsLoading(false);
-          })
-          .catch((_) => navigate('/devices'));
-      }
-    } else {
-      message.error(intl.get('DEVICE_DOES_NOT_EXIST')).then();
-      navigate('/devices');
-    }
-  }, [id, navigate]);
-
-  useEffect(() => {
-    fetchDevice();
-  }, [fetchDevice]);
-
-  useEffect(() => {
+  React.useEffect(() => {
     if (device) {
       PubSub.subscribe(SocketTopic.connectionState, (msg: any, state: any) => {
         if (device.macAddress === state.macAddress) {
-          setDevice({ ...device, state: { ...device.state, isOnline: state.isOnline } });
+          // setDevice({ ...device, state: { ...device.state, isOnline: state.isOnline } });
         }
       });
     }
@@ -82,25 +48,104 @@ const DeviceDetailPage = () => {
       PubSub.unsubscribe(SocketTopic.connectionState);
     };
   }, [device, PubSub]);
-
   function renderOverview(device: Device) {
-    const info = <InformationCard device={device} isLoading={isLoading} />;
+    let info = null;
     let bottom = null;
-    const { typeId } = device;
+    const { information, macAddress, state, typeId } = device;
     if (DeviceType.isGateway(typeId) && network) {
+      const items: DescriptionsProps['items'] = [
+        {
+          key: 'mac',
+          label: intl.get('MAC_ADDRESS'),
+          children: toMac(macAddress.toUpperCase())
+        },
+        {
+          key: 'type',
+          label: intl.get('TYPE'),
+          children: intl.get(DeviceType.toString(device.typeId))
+        },
+        {
+          key: 'version',
+          label: intl.get('FIRMWARE_VERSION'),
+          children: information.firmware_version ? information.firmware_version : '-'
+        },
+        {
+          key: 'time',
+          label: intl.get('LAST_CONNECTION_TIME'),
+          children: state.connectedAt
+            ? dayjs(state.connectedAt * 1000).format('YYYY-MM-DD HH:mm:ss')
+            : '-'
+        }
+      ];
+      if (information.ip_address) {
+        items.push({
+          key: 'ip',
+          label: intl.get('IP_ADDRESS'),
+          children: (
+            <Space>
+              <SelfLink to={`http://${information.ip_address}`} target={'_blank'}>
+                {information.ip_address}
+              </SelfLink>
+            </Space>
+          )
+        });
+      }
+      items.push({
+        key: 'signal',
+        label: intl.get('MOBILE_SIGNAL_STRENGTH'),
+        children: state.signalLevel ? `${state.signalLevel} dBm` : '-'
+      });
+      if (information.iccid_4g) {
+        items.push({ key: 'nuber', label: intl.get('4G_CARD_NO'), children: information.iccid_4g });
+      }
       bottom = (
-        <Card>
-          <TopologyView network={network} />
-        </Card>
+        <Row>
+          <Col span={16}>
+            <Card style={{ marginRight: 12 }}>
+              <TopologyView network={network} />
+            </Card>
+          </Col>
+          <Col span={8}>
+            <Row gutter={[10, 10]}>
+              <Col span={24}>
+                <Card title={intl.get('DEVICE_STATUS')}>
+                  <Row align='middle'>
+                    <Col span={4}>
+                      <Icon
+                        component={() => <WifiOutlined style={{ fontSize: 30 }} />}
+                        width={30}
+                        height={30}
+                      />
+                    </Col>
+                    <Col>
+                      <Statistic
+                        title={intl.get('MOBILE_SIGNAL_STRENGTH')}
+                        value={state.signalLevel ?? '-'}
+                      />
+                    </Col>
+                  </Row>
+                </Card>
+              </Col>
+              <Col span={24}>
+                <Card title={intl.get('BASIC_INFORMATION')}>
+                  <Descriptions column={1} items={items} />
+                </Card>
+              </Col>
+            </Row>
+          </Col>
+        </Row>
       );
-    } else if (DeviceType.isSensor(typeId)) {
-      bottom = <RecentHistory device={device} />;
+    } else {
+      info = <InformationCard device={device} isLoading={loading} />;
+      if (DeviceType.isSensor(typeId)) {
+        bottom = <RecentHistory device={device} />;
+      }
     }
 
     return (
       <>
         {info}
-        {bottom !== null && <div style={{ marginTop: 16 }}>{bottom}</div>}
+        {bottom !== null && <div style={{ marginTop: info !== null ? 16 : 0 }}>{bottom}</div>}
       </>
     );
   }
@@ -143,52 +188,74 @@ const DeviceDetailPage = () => {
       tabs.push({
         key: 'settings',
         label: intl.get('SETTINGS'),
-        children: device && (
-          <SettingPage
-            device={device}
-            onUpdate={() => {
-              setToken((crt) => crt + 1);
-            }}
-          />
-        )
+        children: device && <SettingPage device={device} onUpdate={refresh} network={network} />
       });
     }
     return tabs;
   }
 
-  if (Number(id) === VIRTUAL_ROOT_DEVICE.id) {
-    return <NetworkPage />;
-  }
-  if (isLoading) {
-    return <Spin />;
-  }
   return (
-    <>
+    <Spin spinning={loading}>
       {device && (
-        <Card bodyStyle={{ padding: '10px 20px' }}>
-          <Tabs
-            tabBarExtraContent={{
-              left: (
-                <div style={{ marginRight: 30 }}>
-                  <SingleDeviceStatus alertStates={device.alertStates} state={device.state} />
-                  {device.name}
-                </div>
-              ),
-              right: (
-                <PageTitle
-                  actions={
-                    <HasPermission value={Permission.DeviceCommand}>
-                      <CommandDropdown device={device} initialUpgradeCode={location.state} />
-                    </HasPermission>
-                  }
-                />
-              )
-            }}
-            items={tabs}
-          />
-        </Card>
+        <Tabs
+          items={tabs}
+          tabBarExtraContent={{
+            left: (
+              <Space style={{ marginRight: 30 }}>
+                <AssetNavigator id={device.id} />
+                <SingleDeviceStatus alertStates={device.alertStates} state={device.state} />
+              </Space>
+            ),
+            right: (
+              <Space style={{ marginLeft: 30 }}>
+                {DeviceType.isGateway(device.typeId) && network && (
+                  <HasPermission value={Permission.NetworkExport}>
+                    <Button
+                      type='primary'
+                      onClick={() => {
+                        ExportNetworkRequest(network.id).then((res) => {
+                          const url = window.URL.createObjectURL(new Blob([res.data]));
+                          const link = document.createElement('a');
+                          link.href = url;
+                          link.setAttribute('download', `${network.name}.json`);
+                          document.body.appendChild(link);
+                          link.click();
+                        });
+                      }}
+                    >
+                      {intl.get('EXPORT_NETWORK')}
+                      <ExportOutlined />
+                    </Button>
+                  </HasPermission>
+                )}
+                {DeviceType.isSensor(device.typeId) && (
+                  <HasPermission value={Permission.DeviceData}>
+                    <Button type='primary' onClick={() => setOpen(true)}>
+                      {intl.get('DOWNLOAD_DATA')}
+                      <DownloadOutlined />
+                    </Button>
+                    <DownloadModal
+                      open={open}
+                      onCancel={() => setOpen(false)}
+                      device={device}
+                      onSuccess={() => setOpen(false)}
+                    />
+                  </HasPermission>
+                )}
+                <HasPermission value={Permission.DeviceCommand}>
+                  <CommandDropdown
+                    device={device}
+                    initialUpgradeCode={location.state}
+                    network={network}
+                  />
+                </HasPermission>
+              </Space>
+            )
+          }}
+          tabsRighted={true}
+        />
       )}
-    </>
+    </Spin>
   );
 };
 

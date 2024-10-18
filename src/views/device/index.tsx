@@ -1,107 +1,124 @@
-import { Empty, Spin } from 'antd';
-import intl from 'react-intl-universal';
 import React from 'react';
 import { Outlet, useLocation, useParams } from 'react-router-dom';
 import './deviceList.css';
 import { Device } from '../../types/device';
-import { GetNetworkRequest, GetNetworksRequest } from '../../apis/network';
+import { GetNetworkRequest } from '../../apis/network';
 import { PageWithSideBar } from '../../components/pageWithSideBar';
 import { DeviceTree } from './deviceTree';
-import { DeleteDeviceRequest } from '../../apis/device';
-import { VIRTUAL_ROOT_DEVICE } from '../../constants';
+import { getProject } from '../../utils/session';
+import { GetDeviceRequest, GetDevicesRequest } from '../../apis/device';
+import { DeviceType } from '../../types/device_type';
+import { Network } from '../../types/network';
+import { Virtual } from './virtual';
+
+export const VIRTUAL_ROOT_DEVICE = {
+  macAddress: '000000000000',
+  id: 0,
+  name: getProject().name
+};
+
+const virtualPathId = `${VIRTUAL_ROOT_DEVICE.id}`;
 
 const DevicePage = () => {
   const { pathname } = useLocation();
-  const { id: pathId } = useParams();
-  const selectedKeys = pathId ? [pathId] : undefined;
-  const devicesContext = useDevicesContext();
-  const { devices, loading, setToken } = devicesContext;
-  if (!loading && devices?.length === 0)
-    return <Empty description={intl.get('NO_DATA')} image={Empty.PRESENTED_IMAGE_SIMPLE} />;
-  if (!devices) return null;
+  const isRouteCreateOrImport = pathname === '/devices/create' || pathname === '/devices/import';
+  const { id: pathId = virtualPathId } = useParams();
 
   return (
-    <PageWithSideBar
-      content={
-        pathId || pathname !== '/devices' ? (
-          <Outlet key={pathId} />
-        ) : (
-          <Empty
-            description={intl.get('PLEASE_SELECT_AN_DEVICE')}
-            image={Empty.PRESENTED_IMAGE_SIMPLE}
-          />
-        )
-      }
-      sideBar={{
-        body: (height) => (
-          <Spin spinning={loading}>
-            <DeviceTree
-              selectedKeys={selectedKeys}
-              devices={devices}
-              height={height}
-              onConfirm={(key) => {
-                DeleteDeviceRequest(Number(key)).then(() => setToken((crt) => crt + 1));
-              }}
-            />
-          </Spin>
-        )
-      }}
-    />
+    <ContextProvider>
+      <PageWithSideBar
+        content={
+          pathId === virtualPathId && !isRouteCreateOrImport ? <Virtual /> : <Outlet key={pathId} />
+        }
+        sideBar={{
+          body: (height) => <DeviceTree selectedKeys={[pathId]} height={height} />
+        }}
+      />
+    </ContextProvider>
   );
 };
 
 export default DevicePage;
 
-export type DevicesContextProps = {
-  devices: Device[] | undefined;
+type ContextProps = {
+  devices: Device[];
+  devicesLoading: boolean;
   loading: boolean;
-  setToken: React.Dispatch<React.SetStateAction<number>>;
-  token: number;
+  refresh: (flag?: boolean) => void;
+  device: Device | undefined;
+  network: Network | undefined;
 };
 
-export const DevicesContext = React.createContext<DevicesContextProps>({
+const Context = React.createContext<ContextProps>({
   devices: [],
+  devicesLoading: false,
   loading: false,
-  token: 0,
-  setToken: () => {}
+  refresh: () => {},
+  device: undefined,
+  network: undefined
 });
 
-export const DevicesContextProvider = ({ children }: { children: React.ReactNode }) => {
-  const value = useDevices();
-  return <DevicesContext.Provider value={value}>{children}</DevicesContext.Provider>;
-};
-
-export const useDevicesContext = () => {
-  return React.useContext(DevicesContext);
-};
-
-function useDevices() {
-  const [token, setToken] = React.useState(0);
+const ContextProvider = ({ children }: { children: React.ReactNode }) => {
+  const { id: pathId = virtualPathId } = useParams();
+  const id = Number(pathId);
+  const [devicesLoading, setDeviceLoading] = React.useState(false);
+  const [devices, setDevices] = React.useState<Device[]>([]);
   const [loading, setLoading] = React.useState(false);
-  const [devices, setDevices] = React.useState<Device[] | undefined>();
+  const [device, setDevice] = React.useState<Device | undefined>();
+  const [network, setNetwork] = React.useState<Network | undefined>();
+
+  const fetchDevices = () => {
+    setDeviceLoading(true);
+
+    GetDevicesRequest({})
+      .then(setDevices)
+      .finally(() => setDeviceLoading(false));
+  };
+
   React.useEffect(() => {
+    fetchDevices();
+  }, []);
+
+  const fetchDevice = React.useCallback((id: number) => {
     setLoading(true);
-    GetNetworksRequest().then((nets) => {
-      const fetchs = nets.map((net) => GetNetworkRequest(net.id));
-      Promise.all(fetchs)
-        .then((nets) => {
-          const devs: Device[] = [];
-          devs.push(VIRTUAL_ROOT_DEVICE as Device);
-          nets.forEach((net) =>
-            devs.push(
-              ...net.nodes.map((n) => {
-                if (!n.parent || n.parent.length === 0) {
-                  return { ...n, parent: VIRTUAL_ROOT_DEVICE.macAddress };
-                } else {
-                  return n;
-                }
-              })
-            )
-          );
-          setDevices(devs);
-        })
-        .finally(() => setLoading(false));
-    });
-  }, [token]);
-  return { devices, loading, setDevices, token, setToken };
-}
+    GetDeviceRequest(Number(id))
+      .then((data) => {
+        setDevice(data);
+        if (DeviceType.isGateway(data.typeId)) {
+          if (data.network?.id) {
+            GetNetworkRequest(data.network?.id).then((data) => {
+              setNetwork(data);
+            });
+          }
+        }
+      })
+      .finally(() => setLoading(false));
+  }, []);
+
+  React.useEffect(() => {
+    if (!Number.isNaN(id) && id > 0) {
+      fetchDevice(id);
+    }
+  }, [id, fetchDevice]);
+
+  const refresh = React.useCallback(
+    (flag?: boolean) => {
+      if (flag) {
+        fetchDevices();
+      } else {
+        fetchDevice(id);
+      }
+    },
+    [id, fetchDevice]
+  );
+
+  return (
+    <Context.Provider value={{ devices, devicesLoading, device, loading, refresh, network }}>
+      {children}
+    </Context.Provider>
+  );
+};
+
+export const useContext = () => {
+  return React.useContext(Context);
+};

@@ -2,7 +2,6 @@ import { Col, Row } from 'antd';
 import { Content } from 'antd/lib/layout/layout';
 import React, { useEffect, useState } from 'react';
 import { RangeDatePicker, oneWeekNumberRange } from '../../components/rangeDatePicker';
-import ShadowCard from '../../components/shadowCard';
 import { Store, useStore } from '../../hooks/store';
 import { Permission } from '../../permission/permission';
 import { PageResult } from '../../types/page';
@@ -15,6 +14,7 @@ import { PageTitle } from '../../components/pageTitle';
 import dayjs from '../../utils/dayjsUtils';
 import { Link } from 'react-router-dom';
 import { Report } from './detail/report';
+import { Card } from '../../components';
 
 export default function ReportList() {
   const [dataSource, setDataSource] = useState<PageResult<Report[]>>();
@@ -84,7 +84,7 @@ export default function ReportList() {
   return (
     <Content>
       <PageTitle items={[{ title: intl.get('MENU_REPORTS') }]} />
-      <ShadowCard>
+      <Card>
         <Row gutter={[0, 20]}>
           <Col span={24}>
             <RangeDatePicker onChange={setRange} />
@@ -102,7 +102,7 @@ export default function ReportList() {
             />
           </Col>
         </Row>
-      </ShadowCard>
+      </Card>
     </Content>
   );
 }

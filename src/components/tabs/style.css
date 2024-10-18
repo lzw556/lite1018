@@ -1,0 +1,24 @@
+.ant-tabs {
+  border-radius: 8px;
+  background-color: #fff;
+}
+.ant-tabs .ant-tabs-nav {
+  margin-bottom: 0;
+  padding: 0 12px;
+}
+.ant-tabs.ant-tabs-righted .ant-tabs-nav .ant-tabs-nav-wrap {
+  justify-content: flex-end;
+}
+.ant-tabs .ant-tabs-content-holder {
+  padding: 12px;
+}
+.ant-tabs.ant-tabs-content-no-style .ant-tabs-content-holder {
+  padding: 0;
+  background-color: #f5f5f5;
+}
+.ant-tabs.ant-tabs-content-no-style .ant-tabs-nav {
+  margin-bottom: -1px;
+}
+.ant-tabs.ant-tabs-content-no-style .ant-card {
+  border-radius: 0;
+}

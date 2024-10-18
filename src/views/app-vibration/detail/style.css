@@ -1,0 +1,41 @@
+#vibration-asset .summary {
+  display: flex;
+}
+#vibration-asset .analysis {
+  flex-shrink: 0;
+  margin-right: 12px;
+  width: 240px;
+}
+#vibration-asset .analysis .chart-container {
+  padding-top: 12px;
+  height: 240px;
+  background-color: #fff;
+}
+#vibration-asset .analysis > .chart-container:first-child {
+  margin-bottom: 12px;
+}
+#vibration-asset .main {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  background-color: #fff;
+  border-left: solid 1px #f0f0f0;
+  border-right: solid 1px #f0f0f0;
+}
+#vibration-asset .main .content {
+  display: flex;
+  flex: 1;
+}
+#vibration-asset .content > img {
+  max-width: 100%;
+  object-fit: contain;
+}
+#vibration-asset .info {
+  flex-shrink: 0;
+  margin-left: 12px;
+  width: 260px;
+  background-color: #fff;
+}
+#vibration-asset .monitoring-points {
+  margin-top: 20px;
+}
