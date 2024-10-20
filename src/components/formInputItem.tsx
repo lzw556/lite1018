@@ -1,23 +1,23 @@
+import React from 'react';
 import { Form, FormItemProps, InputNumber } from 'antd';
 import { Rule } from 'antd/lib/form';
-import React from 'react';
 import intl from 'react-intl-universal';
 
-export const FormInputItem: React.FC<
-  FormItemProps & {
-    requiredMessage?: string;
-    lengthLimit?: { min: number; max: number; label: string };
-    numericRule?: {
-      isInteger?: boolean;
-      min?: number;
-      max?: number;
-      message?: string;
-      others?: Rule[];
-    };
-    numericChildren?: JSX.Element;
-    placeholder?: string;
-  }
-> = ({
+export type FormInputItemProps = FormItemProps & {
+  requiredMessage?: string;
+  lengthLimit?: { min: number; max: number; label: string };
+  numericRule?: {
+    isInteger?: boolean;
+    min?: number;
+    max?: number;
+    message?: string;
+    others?: Rule[];
+  };
+  numericChildren?: JSX.Element;
+  placeholder?: string;
+};
+
+export const FormInputItem: React.FC<FormInputItemProps> = ({
   name,
   label,
   children,
