@@ -1,10 +1,12 @@
-import { Form, Input, message, ModalProps, Typography } from 'antd';
+import { Form, Input, message, ModalProps, Select, Typography } from 'antd';
 import { Project } from '../../types/project';
 import { FC, useEffect, useState } from 'react';
 import { CreateProjectRequest, UpdateProjectRequest } from '../../apis/project';
 import intl from 'react-intl-universal';
 import { FormInputItem } from '../../components/formInputItem';
 import { ModalWrapper } from '../../components/modalWrapper';
+import { useAppConfig } from '../../config';
+import { ProjectType, useProjectTypeOptions } from '../../project';
 
 export interface EditProjectModalProps extends ModalProps {
   project?: Project;
@@ -15,6 +17,8 @@ const EditProjectModal: FC<EditProjectModalProps> = (props) => {
   const { project, open, onSuccess } = props;
   const [isLoading, setIsLoading] = useState(false);
   const [form] = Form.useForm();
+  const appConfig = useAppConfig();
+  const projectTypeOptions = useProjectTypeOptions();
 
   useEffect(() => {
     if (open) {
@@ -26,7 +30,8 @@ const EditProjectModal: FC<EditProjectModalProps> = (props) => {
       } else {
         form.resetFields();
         form.setFieldsValue({
-          description: ''
+          description: '',
+          type: ProjectType.General
         });
       }
     }
@@ -93,6 +98,14 @@ const EditProjectModal: FC<EditProjectModalProps> = (props) => {
         >
           <Input.TextArea placeholder={intl.get('PLEASE_ENTER_PROJECT_DESCRIPTION')} />
         </Form.Item>
+        {appConfig === 'windTurbinePro' && (
+          <Form.Item label={intl.get('TYPE')} name='type'>
+            <Select
+              disabled={!!project}
+              options={projectTypeOptions.map((o) => ({ ...o, label: intl.get(o.label) }))}
+            />
+          </Form.Item>
+        )}
       </Form>
     </ModalWrapper>
   );

@@ -9,9 +9,9 @@ import * as WindPro from './windpro';
 import * as Vibration from './vibration';
 import * as General from './general';
 import { getProject } from '../utils/session';
-import { ProjectType } from '../views/project/projectTypes';
+import { ProjectType } from '../project';
 
-export type AppType =
+type AppType =
   | 'windTurbine'
   | 'general'
   | 'hydroTurbine'
@@ -54,6 +54,10 @@ export function AppProvider({ children }: { children?: JSX.Element }) {
 }
 
 //util methods
+
+export function useAppConfig() {
+  return useAppContext().type;
+}
 
 export function useAppType() {
   let appType = useAppContext().type;

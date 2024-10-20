@@ -1,4 +1,4 @@
-import { ProjectType } from '../views/project/projectTypes';
+import { ProjectType } from '../project';
 
 export type Project = {
   id: number;

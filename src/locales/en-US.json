@@ -1226,5 +1226,12 @@
   "set.columns": "Setup Columns",
   "axis.axial": "Axial",
   "axis.vertical": "Vertical",
-  "axis.horizontal": "Horizontal"
+  "axis.horizontal": "Horizontal",
+  "project.type.general": "General",
+  "project.type.windturbinepro": "Wind Turbine Pro",
+  "project.type.windturbine": "Wind Turbine",
+  "project.type.hydro": "Hydro",
+  "project.type.corrosion": "Corrosion",
+  "project.type.corrosionwirelesshart": "Corrosion WirelessHart",
+  "project.type.vibration": "Vibration"
 }

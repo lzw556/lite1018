@@ -1226,5 +1226,12 @@
   "set.columns": "设置列",
   "axis.axial": "轴向",
   "axis.vertical": "径向",
-  "axis.horizontal": "水平向"
+  "axis.horizontal": "水平向",
+  "project.type.general": "通用",
+  "project.type.windturbinepro": "风机Pro",
+  "project.type.windturbine": "风机",
+  "project.type.hydro": "水轮机",
+  "project.type.corrosion": "腐蚀",
+  "project.type.corrosionwirelesshart": "腐蚀WirelessHart",
+  "project.type.vibration": "振动"
 }
